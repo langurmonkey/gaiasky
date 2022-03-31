@@ -19,7 +19,7 @@ class HipNamesTest {
     public static void main(String[] args) throws UnsupportedEncodingException {
         final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         HipNames hn = new HipNames();
-        Path folder = Paths.get(System.getenv("PROJECTS"), "/gaiasky/assets/assets-bak/data/hipnames/");
+        Path folder = Paths.get(System.getenv("PROJECTS"), "/gaiasky/util/gdx/shader/loader/assets-bak/data/hipnames/");
 
         hn.load(folder);
 

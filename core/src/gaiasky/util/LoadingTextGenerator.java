@@ -14,6 +14,7 @@ public class LoadingTextGenerator {
         adjectives = read(Gdx.files.internal("text/adjectives"));
         objects = read(Gdx.files.internal("text/objects"));
     }
+
     private static String[] read(FileHandle fh){
        return fh.readString().split("\\r\\n|\\n|\\r");
     }

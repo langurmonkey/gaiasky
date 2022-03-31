@@ -3,17 +3,21 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util.gdx.shader;
+package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.gdx.shader.DefaultIntShader;
+import gaiasky.util.gdx.shader.DefaultIntShader.Config;
+import gaiasky.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.shader.TessellationShader;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 
 public class TessellationShaderProvider extends DefaultIntShaderProvider {
     public static class Config extends DefaultIntShader.Config {
-        String controlShader = null;
-        String evaluationShader = null;
+        public String controlShader = null;
+        public String evaluationShader = null;
         public Config () {
         }
 

@@ -7,6 +7,14 @@ plugins {
 }
 
 allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
+
+allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 

@@ -10,6 +10,7 @@ import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
 import gaiasky.util.gdx.shader.attribute.Attributes;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
+import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 
 public class GroundShader extends RelativisticShader {
 

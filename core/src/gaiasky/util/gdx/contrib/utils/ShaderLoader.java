@@ -8,7 +8,7 @@ package gaiasky.util.gdx.contrib.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;

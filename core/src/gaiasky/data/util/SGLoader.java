@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.assets;
+package gaiasky.data.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;

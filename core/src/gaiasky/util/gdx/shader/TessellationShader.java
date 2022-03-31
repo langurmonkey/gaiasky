@@ -9,6 +9,8 @@ import gaiasky.util.Bits;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.model.IntMeshPart;
 import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
+import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
+import gaiasky.util.gdx.shader.provider.TessellationShaderProvider;
 import org.lwjgl.opengl.GL41;
 
 public class TessellationShader extends GroundShader {

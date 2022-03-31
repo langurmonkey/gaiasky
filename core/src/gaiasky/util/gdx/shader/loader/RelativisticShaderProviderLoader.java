@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.assets;
+package gaiasky.util.gdx.shader.loader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.util.gdx.shader.RelativisticShaderProvider;
+import gaiasky.util.gdx.shader.provider.RelativisticShaderProvider;
 
 public class RelativisticShaderProviderLoader<T extends RelativisticShaderProviderLoader.RelativisticShaderProviderParameter> extends AsynchronousAssetLoader<RelativisticShaderProvider, T> {
 

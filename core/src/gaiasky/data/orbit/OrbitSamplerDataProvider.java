@@ -8,7 +8,7 @@ package gaiasky.data.orbit;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;

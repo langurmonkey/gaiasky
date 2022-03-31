@@ -3,25 +3,28 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util.gdx.shader;
+package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.gdx.shader.AtmosphereShader;
+import gaiasky.util.gdx.shader.AtmosphereShader.Config;
+import gaiasky.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 
 public class AtmosphereShaderProvider extends DefaultIntShaderProvider {
-    public final AtmosphereShader.Config config;
+    public final Config config;
 
-    public AtmosphereShaderProvider(final AtmosphereShader.Config config) {
-        this.config = (config == null) ? new AtmosphereShader.Config() : config;
+    public AtmosphereShaderProvider(final Config config) {
+        this.config = (config == null) ? new Config() : config;
         EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
     public AtmosphereShaderProvider(final String vertexShader, final String fragmentShader) {
-        this(new AtmosphereShader.Config(vertexShader, fragmentShader));
+        this(new Config(vertexShader, fragmentShader));
     }
 
     public AtmosphereShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {

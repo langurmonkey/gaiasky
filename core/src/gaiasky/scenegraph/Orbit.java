@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.GaiaSky;
-import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;

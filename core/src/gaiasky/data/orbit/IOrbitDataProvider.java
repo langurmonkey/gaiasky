@@ -5,7 +5,7 @@
 
 package gaiasky.data.orbit;
 
-import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 
 public interface IOrbitDataProvider {

@@ -20,7 +20,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaiasky.util.gdx.shader;
+package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -30,7 +30,8 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
 /** {@link AssetLoader} for {@link ExtShaderProgram} instances loaded from text files. If the file suffix is ".vert", it is assumed
  * to be a vertex shader, and a fragment shader is found using the same file name with a ".frag" suffix. And vice versa if the

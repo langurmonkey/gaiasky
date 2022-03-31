@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.assets;
+package gaiasky.util.gdx.shader.loader;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;

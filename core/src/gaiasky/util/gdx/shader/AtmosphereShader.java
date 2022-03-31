@@ -32,6 +32,7 @@ import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.attribute.*;
+import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 
 public class AtmosphereShader extends BaseIntShader {
     public static class Config {

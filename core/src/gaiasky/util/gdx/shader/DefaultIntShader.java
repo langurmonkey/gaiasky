@@ -36,12 +36,13 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.attribute.*;
+import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 
 public class DefaultIntShader extends BaseIntShader {
     public static class Config {

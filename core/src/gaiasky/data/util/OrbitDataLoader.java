@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.assets;
+package gaiasky.data.util;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -14,7 +14,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import gaiasky.data.orbit.IOrbitDataProvider;
-import gaiasky.data.util.PointCloudData;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Logger;
