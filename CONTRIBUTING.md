@@ -74,7 +74,51 @@ A stack trace can be obtained by simply copy-pasting the contents of the termina
 
 ### Translations
 
-Right now we have translation files for Bulgarian, English (UK and US), German, French, Catalan, Spanish and Slovenian. Some are incomplete (especially French, Solvenian and German) so they might benefit from a check up. Adding new translations is as easy as submitting a pull request. Translation files should go in the [i18n](assets/i18n) folder.
+Right now we have translation files for Bulgarian, English (UK and US), German, French, Catalan, Spanish and Slovenian. The level of completion varies from language to language. You can compute it by running
+
+```commandline
+gradlew core:runTranslationStatus
+```
+
+The status of the different translations as of 2022-03-31 is as follows.
+
+```commandline
+Total keys: 1195
+
+Spanish (Spain) (es_ES)
+Translated: 629/1195
+52.64%
+
+Slovenian (Slovenia) (sl_SI)
+Translated: 392/1195
+32.8%
+
+French (France) (fr_FR)
+Translated: 489/1195
+40.92%
+
+Russian (Russia) (ru_RU)
+Translated: 809/1195
+67.7%
+
+Catalan (ca)
+Translated: 901/1195
+75.4%
+
+Bulgarian (Bulgaria) (bg_BG)
+Translated: 1193/1195
+99.83%
+
+German (Germany) (de_DE)
+Translated: 600/1195
+50.21%
+
+English (United States) (en_US)
+Translated: 11/1195
+0.92%
+```
+
+You can contribute to those, or you can create a new translation for another language. Adding new translations is as easy as submitting a pull request. Translation files should go in the [i18n](assets/i18n) folder.
 First, copy the default [gsbundle.properties](assets/i18n/gsbundle.properties) file and use it as a template. The translation files must have the format:
 
 `gsbundle_<language_code>[<_country_code>].properties`

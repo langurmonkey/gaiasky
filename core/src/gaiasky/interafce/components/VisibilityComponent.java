@@ -18,7 +18,7 @@ import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;

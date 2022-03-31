@@ -13,7 +13,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 

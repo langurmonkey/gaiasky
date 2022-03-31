@@ -28,6 +28,7 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;

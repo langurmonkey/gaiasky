@@ -12,7 +12,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Event;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.util.Constants;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;

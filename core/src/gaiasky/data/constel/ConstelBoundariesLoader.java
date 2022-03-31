@@ -13,7 +13,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ConstellationBoundaries;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Constants;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;

@@ -26,7 +26,7 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Invisible;
 import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;

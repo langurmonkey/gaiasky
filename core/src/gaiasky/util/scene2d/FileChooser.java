@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.interafce.GenericDialog;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 import gaiasky.util.validator.DirectoryNameValidator;

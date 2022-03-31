@@ -13,7 +13,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.parse.Parser;

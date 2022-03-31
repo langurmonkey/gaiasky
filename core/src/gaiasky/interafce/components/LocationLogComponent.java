@@ -11,7 +11,7 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.script.EventScriptingInterface;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.LocationLogManager;
 import gaiasky.util.LocationLogManager.LocationRecord;
 import gaiasky.util.TextUtils;

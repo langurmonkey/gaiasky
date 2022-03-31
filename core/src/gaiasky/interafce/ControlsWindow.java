@@ -23,7 +23,7 @@ import gaiasky.interafce.components.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.CatalogManager;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.MusicManager;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;

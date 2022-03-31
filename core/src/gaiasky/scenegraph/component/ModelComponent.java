@@ -28,6 +28,7 @@ import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
+import gaiasky.util.i18n.I18n;
 
 import java.util.HashMap;
 import java.util.Map;

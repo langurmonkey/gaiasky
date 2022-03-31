@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.DateFormatFactory.DateType;
@@ -49,8 +49,8 @@ public class LogWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        w = Math.min(800f, Gdx.graphics.getWidth() - 200);
-        h = Math.min(640f, Gdx.graphics.getHeight() - 150);
+        w = Math.min(1200f, Gdx.graphics.getWidth() - 200);
+        h = Math.min(860f, Gdx.graphics.getHeight() - 150);
         pad = 16f;
 
         logs = new Table(skin);

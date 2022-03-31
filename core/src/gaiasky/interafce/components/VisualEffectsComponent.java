@@ -15,6 +15,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.util.*;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.OwnSliderPlus;
 import gaiasky.util.scene2d.OwnTextIconButton;

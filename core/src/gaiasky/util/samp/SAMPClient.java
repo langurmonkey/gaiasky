@@ -23,6 +23,7 @@ import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import org.astrogrid.samp.Message;
 import org.astrogrid.samp.Metadata;

@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 
 import java.io.File;
 import java.nio.file.Files;

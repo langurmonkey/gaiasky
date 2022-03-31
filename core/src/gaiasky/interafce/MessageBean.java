@@ -5,7 +5,7 @@
 
 package gaiasky.interafce;
 
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.DateFormatFactory.DateType;
 import gaiasky.util.format.IDateFormat;

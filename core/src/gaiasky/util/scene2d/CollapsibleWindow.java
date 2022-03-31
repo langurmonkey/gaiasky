@@ -33,7 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 
 /**
  * A {@code CollapsableWindow} can be expanded/collapsed with a single click on

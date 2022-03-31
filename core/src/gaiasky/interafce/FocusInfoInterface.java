@@ -21,6 +21,7 @@ import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;

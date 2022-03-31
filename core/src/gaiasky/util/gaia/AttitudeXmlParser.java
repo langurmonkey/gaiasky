@@ -15,6 +15,7 @@ import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.gaia.time.Hours;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.units.Quantity;
 
 import java.nio.file.Files;

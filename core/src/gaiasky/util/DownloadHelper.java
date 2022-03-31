@@ -12,6 +12,7 @@ import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 
 import java.io.IOException;
 import java.io.InputStream;

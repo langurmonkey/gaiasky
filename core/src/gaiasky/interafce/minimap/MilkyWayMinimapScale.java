@@ -20,7 +20,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Scaling;
 import gaiasky.util.Constants;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;

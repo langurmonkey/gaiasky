@@ -45,6 +45,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;

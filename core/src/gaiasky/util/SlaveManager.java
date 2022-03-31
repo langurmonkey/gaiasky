@@ -14,6 +14,7 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMDataLoader.PFMDataParameter;
+import gaiasky.util.i18n.I18n;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

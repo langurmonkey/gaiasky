@@ -123,6 +123,16 @@ task rune(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky with an 
     args = ['-e']
 }
 
+task runTranslationStatus(dependsOn: jar, type: JavaExec, description: "Runs the translation status utility") {
+    systemProperties['assets.location'] = './assets/'
+    classpath = project.ext.sourceSets.main.runtimeClasspath
+    classpath += project.files(project.ext.assetsDir)
+    standardInput = System.in
+    workingDir = project.ext.workDir
+    mainClass = "gaiasky.util.i18n.TranslationStatus"
+
+}
+
 task createDistDir(description: "Creates the releases/dist folder") {
     doLast {
         File distDir = new File(project.distDir)

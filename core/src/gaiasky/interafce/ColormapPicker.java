@@ -26,7 +26,7 @@ import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;

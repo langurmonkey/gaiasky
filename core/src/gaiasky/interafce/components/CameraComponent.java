@@ -5,7 +5,6 @@
 
 package gaiasky.interafce.components;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -20,6 +19,7 @@ import gaiasky.interafce.beans.CameraComboBoxBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.util.Objects;

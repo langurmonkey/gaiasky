@@ -1,0 +1,146 @@
+package gaiasky.util.i18n;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import gaiasky.desktop.format.DesktopDateFormatFactory;
+import gaiasky.desktop.format.DesktopNumberFormatFactory;
+import gaiasky.interafce.ConsoleLogger;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
+import gaiasky.util.format.DateFormatFactory;
+import gaiasky.util.format.NumberFormatFactory;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * This class computes the translation status for each language.
+ */
+public class TranslationStatus {
+    private static final Log logger = Logger.getLogger(TranslationStatus.class);
+
+    public static void main(String[] args) {
+        // Assets location
+        String ASSETS_LOC = Settings.ASSETS_LOC;
+
+        Gdx.files = new Lwjgl3Files();
+
+        // Initialize number format
+        NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
+
+        // Initialize date format
+        DateFormatFactory.initialize(new DesktopDateFormatFactory());
+
+        // Add notification watch
+        new ConsoleLogger();
+
+        DecimalFormat df = new DecimalFormat("0.0#");
+
+        try {
+            PathMatcher globalMatcher = FileSystems.getDefault().getPathMatcher("glob:*.properties");
+            PathMatcher languageMatcher = FileSystems.getDefault().getPathMatcher("glob:*_*.properties");
+
+            Path i18nDir = Path.of(ASSETS_LOC, "i18n");
+            List<Path> candidatePaths = Files.list(i18nDir).collect(Collectors.toList());
+            List<Path> languagePaths = new ArrayList<>();
+            Path main = null;
+            for (Path p : candidatePaths) {
+                Path fileName = p.getFileName();
+                if (globalMatcher.matches(fileName)) {
+                    if (languageMatcher.matches(fileName)) {
+                        languagePaths.add(p);
+                        logger.debug("Language file: " + fileName);
+                    } else {
+                        main = p;
+                        logger.debug("Main file: " + fileName);
+                    }
+                }
+            }
+
+            if (main == null) {
+                logger.error("Main file not found");
+                return;
+            }
+
+            if (languagePaths.isEmpty()) {
+                logger.error("No language files found");
+                return;
+            }
+
+            // Load main file
+            InputStream is = new FileInputStream(main.toString());
+            Properties mainProps = new Properties();
+            mainProps.load(is);
+            is.close();
+
+            int totalKeys = mainProps.size();
+            logger.info("Total keys: " + totalKeys);
+            logger.info("");
+
+
+            for(Path p : languagePaths) {
+                String name = p.getFileName().toString();
+                name = name.substring(0, name.lastIndexOf(".properties"));
+
+                String languageCode = name.substring(name.indexOf("_") + 1);
+                String country = null;
+                if(languageCode.contains("_")) {
+                    country = languageCode.substring(languageCode.indexOf("_") + 1);
+                    languageCode = languageCode.substring(0, languageCode.indexOf("_"));
+                }
+                Locale locale = country == null ? new Locale(languageCode) : new Locale(languageCode, country);
+
+                // Load path
+                is = new FileInputStream(p.toString());
+                Properties lang = new Properties();
+                lang.load(is);
+                is.close();
+
+                int translatedKeys = 0;
+                Enumeration<Object> mainKeys = mainProps.keys();
+                Iterator<Object> it = mainKeys.asIterator();
+                while(it.hasNext()) {
+                    Object key = it.next();
+                    if(lang.containsKey(key)){
+                        translatedKeys++;
+                    }
+                }
+                Set<Object> unknownKeys = new HashSet<>();
+                it = lang.keys().asIterator();
+                while(it.hasNext()) {
+                    Object key = it.next();
+                    if(!mainProps.containsKey(key)) {
+                        unknownKeys.add(key);
+                    }
+                }
+
+                double percentage = 100.0 * ((double) translatedKeys / (double) totalKeys);
+                int unknownCount = unknownKeys.size();
+
+
+                logger.info(locale.getDisplayName() + " (" + locale + ")");
+                logger.info("Translated: " + translatedKeys + "/" + totalKeys);
+                logger.info(df.format(percentage) + "%");
+                if(translatedKeys < lang.size()) {
+                    logger.info(unknownCount + " unknown keys:");
+                    for(Object key : unknownKeys) {
+                        logger.info("\t" + key);
+                    }
+                }
+
+                logger.info("");
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+}

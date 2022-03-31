@@ -24,6 +24,7 @@ import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.FilterRule;
 import gaiasky.util.filter.FilterRule.IComparator;
 import gaiasky.util.filter.attrib.*;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;

@@ -18,7 +18,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings.StereoProfile;

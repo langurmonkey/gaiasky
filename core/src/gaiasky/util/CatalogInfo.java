@@ -15,6 +15,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.attrib.IAttribute;
+import gaiasky.util.i18n.I18n;
 
 import java.time.Instant;
 

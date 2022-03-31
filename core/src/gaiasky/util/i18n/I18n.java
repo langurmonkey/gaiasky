@@ -3,12 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.util;
+package gaiasky.util.i18n;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.I18NBundle;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
 import java.nio.file.Path;
 import java.util.Locale;

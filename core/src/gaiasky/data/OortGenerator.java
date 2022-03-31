@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.format.DateFormatFactory;

@@ -68,6 +68,7 @@ import gaiasky.util.gdx.shader.*;
 import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;

@@ -25,6 +25,7 @@ import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.update.VersionChecker;
 

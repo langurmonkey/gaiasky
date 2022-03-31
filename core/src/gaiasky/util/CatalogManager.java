@@ -10,6 +10,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.*;

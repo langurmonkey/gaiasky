@@ -19,6 +19,7 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.IBodyCoordinates;
+import gaiasky.util.i18n.I18n;
 import uk.ac.starlink.util.DataSource;
 
 import java.util.Arrays;

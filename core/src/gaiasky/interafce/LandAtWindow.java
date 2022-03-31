@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import gaiasky.event.EventManager;
 import gaiasky.event.Event;
 import gaiasky.scenegraph.CelestialBody;
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;

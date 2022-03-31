@@ -7,7 +7,6 @@ package gaiasky.interafce.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -24,6 +23,7 @@ import gaiasky.interafce.*;
 import gaiasky.scenegraph.IVisibilitySwitch;
 import gaiasky.scenegraph.MeshObject;
 import gaiasky.util.*;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.util.Collection;

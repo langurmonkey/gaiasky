@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.*;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;

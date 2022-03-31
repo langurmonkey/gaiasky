@@ -15,6 +15,7 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.i18n.I18n;
 
 import java.io.BufferedReader;
 import java.io.IOException;

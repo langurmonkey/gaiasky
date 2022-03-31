@@ -29,7 +29,7 @@
 
 package gaiasky.render;
 
-import gaiasky.util.I18n;
+import gaiasky.util.i18n.I18n;
 
 import java.util.BitSet;
 import java.util.HashMap;

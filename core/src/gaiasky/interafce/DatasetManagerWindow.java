@@ -36,6 +36,7 @@ import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
 import gaiasky.util.scene2d.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;

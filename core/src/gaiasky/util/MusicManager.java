@@ -12,6 +12,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;

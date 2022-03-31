@@ -26,6 +26,7 @@ import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
