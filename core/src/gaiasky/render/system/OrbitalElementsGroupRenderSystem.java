@@ -50,14 +50,12 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
     private int elems01Offset;
     private int elems02Offset;
     private int sizeOffset;
-    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.025)), Math.tan(Math.toRadians(1.1)) };
-    private final Colormap cmap;
+    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.025)), Math.tan(Math.toRadians(0.9)) };
 
     public OrbitalElementsGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
-        cmap = new Colormap();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
@@ -104,47 +102,49 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                 CatalogInfo ci = oeg.getCatalogInfo();
                 Array<SceneGraphNode> children = oeg.children;
                 children.forEach(child -> {
-                    Orbit orbit = (Orbit) child;
-                    OrbitComponent oc = orbit.oc;
+                    if (child instanceof Orbit) {
+                        Orbit orbit = (Orbit) child;
+                        OrbitComponent oc = orbit.oc;
 
-                    // 4 vertices per particle
-                    for (int vert = 0; vert < 4; vert++) {
-                        // Vertex POSITION
-                        tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
-                        tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
+                        // 4 vertices per particle
+                        for (int vert = 0; vert < 4; vert++) {
+                            // Vertex POSITION
+                            tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                            tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
-                        // UV coordinates
-                        tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                        tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+                            // UV coordinates
+                            tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                            tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
-                        // COLOR
-                        float[] c = oeg.isHighlighted() && ci != null ? ci.getHlColor() : orbit.pointColor;
-                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
+                            // COLOR
+                            float[] c = oeg.isHighlighted() && ci != null ? ci.getHlColor() : orbit.pointColor;
+                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
 
-                        // ORBIT ELEMENTS 01
-                        tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
-                        tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                        tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
-                        tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
+                            // ORBIT ELEMENTS 01
+                            tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
+                            tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
+                            tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
+                            tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
-                        // ORBIT ELEMENTS 02
-                        tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
-                        tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
-                        tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
-                        tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
+                            // ORBIT ELEMENTS 02
+                            tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
 
-                        // SIZE
-                        tempVerts[curr.vertexIdx + sizeOffset] = orbit.pointSize * (oeg.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
+                            // SIZE
+                            tempVerts[curr.vertexIdx + sizeOffset] = orbit.pointSize * (oeg.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
 
-                        curr.vertexIdx += curr.vertexSize;
-                        curr.numVertices++;
-                        numVerticesAdded.incrementAndGet();
+                            curr.vertexIdx += curr.vertexSize;
+                            curr.numVertices++;
+                            numVerticesAdded.incrementAndGet();
+                        }
+                        // Indices
+                        quadIndices(curr);
+                        numParticlesAdded.incrementAndGet();
+
+                        setInGpu(orbit, true);
                     }
-                    // Indices
-                    quadIndices(curr);
-                    numParticlesAdded.incrementAndGet();
-
-                    setInGpu(orbit, true);
                 });
                 int count = numVerticesAdded.get() * curr.vertexSize;
                 setCount(oeg, count);

@@ -21,7 +21,7 @@ import gaiasky.util.time.ITimeFrameProvider;
  * updates them accordingly to reduce CPU calls.
  */
 public class OrbitalElementsGroup extends GenericCatalog implements IRenderable, IObserver {
-    private Array<Orbit> orbitsWithOrbit;
+    private Array<SceneGraphNode> alwaysUpdate;
 
     @Override
     public void doneLoading(AssetManager manager) {
@@ -41,18 +41,21 @@ public class OrbitalElementsGroup extends GenericCatalog implements IRenderable,
      * for they need to be updated every single frame.
      */
     private void initializeOrbitsWithOrbit() {
-        if (orbitsWithOrbit == null) {
-            orbitsWithOrbit = new Array<>();
+        if (alwaysUpdate == null) {
+            alwaysUpdate = new Array<>();
         } else {
-            orbitsWithOrbit.clear();
+            alwaysUpdate.clear();
         }
         if (children != null && children.size > 0) {
             for (SceneGraphNode sgn : children) {
                 if (sgn instanceof Orbit) {
                     Orbit orbit = (Orbit) sgn;
                     if (!orbit.onlyBody) {
-                        orbitsWithOrbit.add(orbit);
+                        alwaysUpdate.add(orbit);
                     }
+                } else {
+                    // Not an orbit, always add
+                    alwaysUpdate.add(sgn);
                 }
             }
         }
@@ -100,8 +103,8 @@ public class OrbitalElementsGroup extends GenericCatalog implements IRenderable,
                 initialUpdate = false;
             } else {
                 // Update needed
-                for (int i = 0; i < orbitsWithOrbit.size; i++) {
-                    SceneGraphNode child = orbitsWithOrbit.get(i);
+                for (int i = 0; i < alwaysUpdate.size; i++) {
+                    SceneGraphNode child = alwaysUpdate.get(i);
                     child.update(time, translation, camera, this.opacity);
                 }
             }
