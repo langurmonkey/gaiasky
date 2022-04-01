@@ -2,12 +2,15 @@ package gaiasky.util.i18n;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 
@@ -28,7 +31,29 @@ import java.util.stream.Collectors;
 public class TranslationStatus {
     private static final Log logger = Logger.getLogger(TranslationStatus.class);
 
+    private static CLIArgs cliArgs;
+    private static class CLIArgs {
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+        @Parameter(names = { "-s", "--show-untranslated" }, description = "Show untranslated keys for each language.", order = 1) private boolean showUntranslated = false;
+        @Parameter(names = { "-u", "--show-unknown" }, description = "Show unknown keys for each language.", order = 2) private boolean showUnknown = false;
+    }
+
     public static void main(String[] args) {
+        cliArgs = new CLIArgs();
+        JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
+        jc.setProgramName("translationstatus");
+        try {
+            jc.parse(args);
+
+            if (cliArgs.help) {
+                jc.usage();
+                return;
+            }
+        } catch (Exception e) {
+            System.out.print("bad program arguments\n\n");
+            jc.usage();
+            return;
+        }
         // Assets location
         String ASSETS_LOC = Settings.ASSETS_LOC;
 
@@ -106,12 +131,15 @@ public class TranslationStatus {
                 is.close();
 
                 int translatedKeys = 0;
+                Set<Object> missingKeys = new HashSet<>();
                 Enumeration<Object> mainKeys = mainProps.keys();
                 Iterator<Object> it = mainKeys.asIterator();
                 while(it.hasNext()) {
                     Object key = it.next();
                     if(lang.containsKey(key)){
                         translatedKeys++;
+                    } else {
+                        missingKeys.add(key);
                     }
                 }
                 Set<Object> unknownKeys = new HashSet<>();
@@ -130,11 +158,23 @@ public class TranslationStatus {
                 logger.info(locale.getDisplayName() + " (" + locale + ")");
                 logger.info("Translated: " + translatedKeys + "/" + totalKeys);
                 logger.info(df.format(percentage) + "%");
-                if(translatedKeys < lang.size()) {
+                if(cliArgs.showUnknown && translatedKeys < lang.size()) {
                     logger.info(unknownCount + " unknown keys:");
+                    StringBuilder sb = new StringBuilder();
                     for(Object key : unknownKeys) {
-                        logger.info("\t" + key);
+                        sb.append(key).append(" ");
                     }
+                    String keyString = TextUtils.breakCharacters(sb.toString(), 100);
+                    logger.info(keyString);
+                }
+                if(cliArgs.showUntranslated && missingKeys.size() > 0) {
+                    logger.info(missingKeys.size() + " untranslated keys:");
+                    StringBuilder sb = new StringBuilder();
+                    for(Object key : missingKeys) {
+                        sb.append(key).append(" ");
+                    }
+                    String keyString = TextUtils.breakCharacters(sb.toString(), 100);
+                    logger.info(keyString);
                 }
 
                 logger.info("");

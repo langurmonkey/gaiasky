@@ -80,6 +80,27 @@ Right now we have translation files for Bulgarian, English (UK and US), German, 
 gradlew core:runTranslationStatus
 ```
 
+There are some CLI arguments you can use:
+
+```
+Usage: translationstatus [options]
+  Options:
+    -h, --help
+      Show program options and usage information.
+    -s, --show-untranslated
+      Show untranslated keys for each language.
+      Default: false
+    -u, --show-unknown
+      Show unknown keys for each language.
+      Default: false
+```
+
+You can pass CLI arguments to the application via Java like this:
+
+```commandline
+gradlew core:runTranslationStatus --args='-s -u'
+```
+
 The status of the different translations as of 2022-03-31 is as follows.
 
 ```commandline
@@ -102,8 +123,8 @@ Translated: 809/1195
 67.7%
 
 Catalan (ca)
-Translated: 901/1195
-75.4%
+Translated: 1195/1195
+100.0%
 
 Bulgarian (Bulgaria) (bg_BG)
 Translated: 1193/1195

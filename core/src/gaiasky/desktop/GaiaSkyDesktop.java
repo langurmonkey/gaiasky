@@ -74,7 +74,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     private static final String REQUIRED_JAVA_VERSION = "15";
 
-    private static GaiaSkyArgs gsArgs;
+    private static CLIArgs cliArgs;
 
     private static final int DEFAULT_OPENGL_MAJOR = 4;
     private static final int DEFAULT_OPENGL_MINOR = 1;
@@ -90,7 +90,7 @@ public class GaiaSkyDesktop implements IObserver {
     /**
      * Program arguments
      */
-    private static class GaiaSkyArgs {
+    private static class CLIArgs {
         @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
 
         @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
@@ -141,13 +141,13 @@ public class GaiaSkyDesktop implements IObserver {
     public static void main(final String[] args) {
         Thread.currentThread().setName("gaiasky-main-thread");
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        gsArgs = new GaiaSkyArgs();
-        JCommander jc = JCommander.newBuilder().addObject(gsArgs).build();
+        cliArgs = new CLIArgs();
+        JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
         jc.setProgramName("gaiasky");
         try {
             jc.parse(args);
 
-            if (gsArgs.help) {
+            if (cliArgs.help) {
                 printUsage(jc);
                 return;
             }
@@ -165,16 +165,16 @@ public class GaiaSkyDesktop implements IObserver {
             experimentalCheck();
 
             // Set properties file from arguments to VM params if needed
-            if (gsArgs.propertiesFile != null && !gsArgs.propertiesFile.isEmpty()) {
-                System.setProperty("properties.file", gsArgs.propertiesFile);
+            if (cliArgs.propertiesFile != null && !cliArgs.propertiesFile.isEmpty()) {
+                System.setProperty("properties.file", cliArgs.propertiesFile);
             }
 
             // Set assets location to VM params if needed
-            if (gsArgs.assetsLocation != null && !gsArgs.assetsLocation.isEmpty()) {
-                System.setProperty("assets.location", gsArgs.assetsLocation);
+            if (cliArgs.assetsLocation != null && !cliArgs.assetsLocation.isEmpty()) {
+                System.setProperty("assets.location", cliArgs.assetsLocation);
             }
 
-            if (gsArgs.vr) {
+            if (cliArgs.vr) {
                 Settings.APPLICATION_NAME += " VR";
             }
 
@@ -194,17 +194,17 @@ public class GaiaSkyDesktop implements IObserver {
             // Init properties file
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                initConfigFile(gsArgs.vr);
+                initConfigFile(cliArgs.vr);
             }
 
             // Init global configuration
-            SettingsManager.initialize(gsArgs.vr);
+            SettingsManager.initialize(cliArgs.vr);
 
             // Initialize i18n (only for global config logging)
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
 
             // Safe mode
-            if (gsArgs.safeMode && !Settings.settings.program.safeMode) {
+            if (cliArgs.safeMode && !Settings.settings.program.safeMode) {
                 Settings.settings.program.safeMode = true;
                 Settings.settings.program.safeModeFlag = true;
             }
@@ -213,9 +213,9 @@ public class GaiaSkyDesktop implements IObserver {
             I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
             // -v or --version
-            if (gsArgs.version) {
+            if (cliArgs.version) {
                 out.println(Settings.getShortApplicationName());
-                if (gsArgs.asciiart) {
+                if (cliArgs.asciiart) {
                     BufferedReader ascii = new BufferedReader(new InputStreamReader(Gdx.files.internal("icon/gsascii.txt").read()));
                     out.println();
                     String line;
@@ -299,7 +299,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         Settings s = Settings.settings;
         cfg.setTitle(Settings.APPLICATION_NAME);
-        if (!gsArgs.vr) {
+        if (!cliArgs.vr) {
             if (s.graphics.fullScreen.active) {
                 int[] fullScreenResolution = s.graphics.fullScreen.resolution;
                 // Full screen mode
@@ -332,7 +332,7 @@ public class GaiaSkyDesktop implements IObserver {
             configureWindowSize(cfg);
             cfg.setResizable(true);
         }
-        if (gsArgs.vr) {
+        if (cliArgs.vr) {
             cfg.setWindowIcon(FileType.Internal, "icon/gsvr_icon.png");
         } else {
             cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
@@ -341,9 +341,9 @@ public class GaiaSkyDesktop implements IObserver {
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
         // Headless mode
-        cfg.setInitialVisible(!gsArgs.headless);
+        cfg.setInitialVisible(!cliArgs.headless);
         // OpenGL debug
-        if (gsArgs.debugGpu) {
+        if (cliArgs.debugGpu) {
             cfg.enableGLDebugOutput(true, System.out);
         }
         // Color, Depth, stencil buffers, MSAA
@@ -443,7 +443,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
-        gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.headless, gsArgs.noScriptingServer, gsArgs.debug);
+        gs = new GaiaSky(cliArgs.skipWelcome, cliArgs.vr, cliArgs.externalView, cliArgs.headless, cliArgs.noScriptingServer, cliArgs.debug);
         new Lwjgl3Application(gs, cfg);
     }
 
@@ -614,7 +614,7 @@ public class GaiaSkyDesktop implements IObserver {
      * Checks for experimental features and issues warnings
      */
     private static void experimentalCheck() {
-        if (gsArgs.externalView) {
+        if (cliArgs.externalView) {
             out.println("============================ WARNING ================================");
             out.println("The -e/--externalview feature is experimental and may cause problems!");
             out.println("=====================================================================");
