@@ -81,6 +81,12 @@ Et voilà ! The bleeding edge Gaia Sky is running in your machine.
 
 Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and what arguments are accepted.
 
+If running with gradle, you can add arguments using the gradle `--args` flag, like this: 
+
+```
+gradlew core:run --args='-h'
+```
+
 ### 3.2 Getting the data
 
 As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
