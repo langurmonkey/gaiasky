@@ -224,14 +224,13 @@ public class GaiaSkyDesktop implements IObserver {
                     }
                 }
                 out.println();
-                out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
-                out.println("Written by " + Settings.AUTHOR_NAME + " <" + Settings.AUTHOR_EMAIL + ">");
+                out.println(I18n.txt("gui.help.license"));
+                out.println(I18n.txt("gui.help.writtenby", Settings.AUTHOR_NAME, Settings.AUTHOR_EMAIL));
                 out.println();
-                out.println(I18n.txt("gui.help.javaversion").toLowerCase() + ": " + System.getProperty("java.vm.version"));
-                out.println(I18n.txt("gui.help.javavmname").toLowerCase() + ": " + System.getProperty("java.vm.name"));
+                out.println(I18n.txt("gui.help.homepage") + "\t<" + Settings.WEBPAGE + ">");
+                out.println(I18n.txt("gui.help.docs") + "\t\t<" + Settings.DOCUMENTATION + ">");
                 out.println();
-                out.println("gaiasky homepage  <" + Settings.WEBPAGE + ">");
-                out.println("docs              <" + Settings.DOCUMENTATION + ">");
+                out.println(I18n.txt("gui.help.javaversion") + " " + System.getProperty("java.vm.version"));
                 out.println();
                 out.println("ZAH/DLR/BWT/DPAC");
                 return;
