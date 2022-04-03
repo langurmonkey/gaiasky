@@ -81,7 +81,7 @@ Et voilà ! The bleeding edge Gaia Sky is running in your machine.
 
 Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and what arguments are accepted.
 
-If running with gradle, you can add arguments using the gradle `--args` flag, like this: 
+If running directly with gradle, you can add arguments using the gradle `--args` flag, like this: 
 
 ```
 gradlew core:run --args='-h'
