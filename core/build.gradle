@@ -6,6 +6,7 @@ apply plugin: "de.undercouch.download"
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 sourceCompatibility = 15
+JavaVersion minJavaVersion = JavaVersion.VERSION_15
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets {
@@ -98,31 +99,6 @@ task run(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky") {
     setup()
 }
 
-task runvr(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky VR") {
-    setup()
-    args = ['-vr']
-}
-
-task runh(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky in headless mode") {
-    setup()
-    args = ['--headless']
-}
-
-task rund(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky showing the download manager at startup") {
-    setup()
-    args = ['-d']
-}
-
-task runc(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky showing the catalog chooser at startup") {
-    setup()
-    args = ['-c']
-}
-
-task rune(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky with an external view") {
-    setup()
-    args = ['-e']
-}
-
 task runTranslationStatus(dependsOn: jar, type: JavaExec, description: "Runs the translation status utility") {
     systemProperties['assets.location'] = './assets/'
     classpath = project.ext.sourceSets.main.runtimeClasspath
@@ -209,15 +185,15 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
     doLast {
         // Version check
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
-        boolean javaVersionOk = JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_15)
+        boolean javaVersionOk = JavaVersion.current().isCompatibleWith(minJavaVersion)
         if (vsc.equalsIgnoreCase("false")) {
             if (!javaVersionOk) {
-                println("WARNING: Gaia Sky must be built with Java " + JavaVersion.VERSION_15 + " or compatible, you are using " + JavaVersion.current())
+                println("WARNING: Gaia Sky must be built with Java " + minJavaVersion + " or compatible, you are using " + JavaVersion.current())
             }
         } else {
             if (!javaVersionOk) {
                 print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
-                throw new GradleException("Gaia Sky must be built with java " + JavaVersion.VERSION_15 + " or compatible, you are using " + JavaVersion.current())
+                throw new GradleException("Gaia Sky must be built with java " + minJavaVersion + " or compatible, you are using " + JavaVersion.current())
             }
         }
 
