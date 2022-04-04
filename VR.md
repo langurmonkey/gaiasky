@@ -6,6 +6,6 @@ The most up-to-date information on Gaia Sky VR, as well as how to install and ru
 
 ##  More info
 
-- [Gaia Sky documentation](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master)
+- [Gaia Sky documentation](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)
 - [The project's main README file](README.md)
 - [Gaia Sky website](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/)
