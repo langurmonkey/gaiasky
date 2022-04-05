@@ -323,7 +323,7 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
 }
 
 task downloadJDK(type: Download, description: "Downloads the JDK package into project.tmpDir") {
-    src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1%2B12/OpenJDK17U-jdk_x64_linux_hotspot_17.0.1_12.tar.gz"
+    src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.2_8.tar.gz"
     dest new File("$tmpDir", "$jdkArchive")
     onlyIfModified true
     overwrite false
