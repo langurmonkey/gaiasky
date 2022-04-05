@@ -32,7 +32,6 @@ import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -578,6 +577,11 @@ public class WelcomeGui extends AbstractGui {
         }
         if (ddw != null) {
             ddw.remove();
+            ddw = null;
+        }
+        if (preferencesWindow != null) {
+            preferencesWindow.remove();
+            preferencesWindow = null;
         }
     }
 

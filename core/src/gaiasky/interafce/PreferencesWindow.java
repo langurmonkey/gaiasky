@@ -2020,7 +2020,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     @Override
     public void dispose() {
-
     }
 
     private void reloadDefaultPreferences() {
