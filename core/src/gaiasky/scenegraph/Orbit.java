@@ -14,11 +14,11 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.GaiaSky;
-import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -31,8 +31,11 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -128,7 +131,6 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     public Orbit() {
         super();
-        pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
         localTransform = new Matrix4();
         localTransformD = new Matrix4d();
         auxMat = new Matrix4d();
@@ -154,6 +156,14 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             } catch (ReflectionException e) {
                 logger.error(e);
             }
+
+        // Initialize default colors if needed
+        if (cc == null) {
+            cc = new float[] { 0.8f, 0.8f, 0.8f, 1f };
+        }
+        if (pointColor == null) {
+            pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
+        }
 
         initRefresher();
     }
@@ -565,11 +575,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     }
 
     public void setPointcolor(double[] color) {
-        float[] f = GlobalResources.toFloatArray(color);
-        pointColor[0] = f[0];
-        pointColor[1] = f[1];
-        pointColor[2] = f[2];
-        pointColor[3] = f[3];
+        pointColor = GlobalResources.toFloatArray(color);
     }
 
     public String getProvider() {
