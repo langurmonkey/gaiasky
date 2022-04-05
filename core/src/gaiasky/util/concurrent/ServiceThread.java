@@ -39,6 +39,9 @@ public class ServiceThread extends Thread {
      */
     public void stopDaemon() {
         this.running = false;
+        synchronized (this.threadLock) {
+            this.threadLock.notifyAll();
+        }
     }
 
     /**

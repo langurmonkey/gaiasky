@@ -150,7 +150,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             daemon.start();
 
             // Initialize timer to flush the queue at regular intervals.
-            Timer timer = new Timer();
+            Timer timer = new Timer(true);
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {

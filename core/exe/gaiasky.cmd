@@ -13,7 +13,7 @@ cd %GSDIR%
 
 :: Memory
 SET OPTS=-Xms2g -Xmx6g
-:: Garbage Collector G1
+:: Shenandoah GC (only in LTS)
 SET OPTS=%OPTS% -XX:+UseShenandoahGC
 :: Assets location
 SET OPTS=%OPTS% -Dassets.location=.

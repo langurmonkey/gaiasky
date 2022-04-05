@@ -58,9 +58,9 @@ OPTS="$OPTS -Xms2g -Xmx6g"
 #OPTS="$OPTS -XX:+UseParallelGC"
 # G1 GC
 #OPTS="$OPTS -XX:+UseG1GC"
-# Shenandoah GC
+# Shenandoah GC (only in LTS)
 OPTS="$OPTS -XX:+UseShenandoahGC"
-# ZGC - experimental
+# ZGC - experimental (only Oracle)
 #OPTS="$OPTS -XX:+UseZGC"
 
 # GC debug only

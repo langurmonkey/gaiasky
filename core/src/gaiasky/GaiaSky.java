@@ -21,14 +21,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
+import gaiasky.data.AssetBean;
+import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.util.GaiaAttitudeLoader;
 import gaiasky.data.util.GaiaAttitudeLoader.GaiaAttitudeLoaderParameter;
 import gaiasky.data.util.OrbitDataLoader;
+import gaiasky.data.util.PointCloudData;
 import gaiasky.data.util.SGLoader;
 import gaiasky.data.util.SGLoader.SGLoaderParameter;
-import gaiasky.data.AssetBean;
-import gaiasky.data.StreamingOctreeLoader;
-import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.util.CrashReporter;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.Event;
@@ -39,10 +39,6 @@ import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.IPostProcessor.RenderType;
-import gaiasky.util.gdx.shader.loader.AtmosphereShaderProviderLoader;
-import gaiasky.util.gdx.shader.loader.GroundShaderProviderLoader;
-import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader;
-import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -64,8 +60,12 @@ import gaiasky.util.gdx.loader.*;
 import gaiasky.util.gdx.loader.is.GzipInputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
 import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.gdx.shader.*;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.attribute.Attribute;
+import gaiasky.util.gdx.shader.loader.AtmosphereShaderProviderLoader;
+import gaiasky.util.gdx.shader.loader.GroundShaderProviderLoader;
+import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader;
+import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
@@ -907,6 +907,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
         ModelCache.cache.dispose();
 
+        // Shutdown asset manager
+        if (assetManager != null) {
+            assetManager.dispose();
+        }
+
         // Shutdown dataset updater thread pool
         if (executorService != null) {
             executorService.shutDownThreadPool();
@@ -1480,7 +1485,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case CUBEMAP_CMD:
             boolean cubemapMode = (Boolean) data[0];
-            if(cubemapMode) {
+            if (cubemapMode) {
                 resetDynamicResolution();
             }
 
@@ -1575,7 +1580,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case REINITIALIZE_POSTPROCESSOR:
-            if(postProcessor != null) {
+            if (postProcessor != null) {
                 postProcessor.dispose();
             } else {
                 postProcessor = PostProcessorFactory.instance.getPostProcessor();
@@ -1588,7 +1593,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         case REINITIALIZE_RENDERER:
             sgr.setRendering(false);
             logger.info("Re-initializing main renderer");
-            if(sgr != null) {
+            if (sgr != null) {
                 sgr.dispose();
             }
             // Initialize and load
