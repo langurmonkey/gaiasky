@@ -26,6 +26,7 @@ import gaiasky.event.Event;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
 import gaiasky.util.TipGenerator;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -40,6 +41,7 @@ public class LoadingGui extends AbstractGui {
 
     public NotificationsInterface notificationsInterface;
     private TipGenerator tipGenerator;
+    private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
     private HorizontalGroup tip;
     private BigInteger m1, m2;
@@ -98,6 +100,7 @@ public class LoadingGui extends AbstractGui {
         titleGroup.addActor(version);
 
         // Funny text
+        loadingTextGenerator = new LoadingTextGenerator();
         lastFunnyTime = 0;
         i = -1;
         m1 = BigInteger.ZERO;
@@ -187,12 +190,12 @@ public class LoadingGui extends AbstractGui {
 
     private void randomFunnyText() {
         if (Settings.settings.runtime.openVr) {
-            spin.setText("Loading...");
+            spin.setText(I18n.txt("gui.loading"));
         } else {
             try {
-                spin.setText(LoadingTextGenerator.next());
+                spin.setText(loadingTextGenerator.next());
             } catch (Exception e) {
-                spin.setText("Loading...");
+                spin.setText(I18n.txt("gui.loading"));
             }
         }
     }

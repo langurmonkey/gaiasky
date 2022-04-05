@@ -43,6 +43,5 @@ Start Gaia Sky with the|%%mono-big -vr|flag to enable the Virtual Reality mode
 Create an external view by starting Gaia Sky with the|%%mono-big -e|flag
 Launch Gaia Sky in debug mode with|%%mono-big --debug
 Download and manage your datasets with the|%%hud-header Dataset manager
-Select the catalogs to load at startup by clicking on|%%hud-header Catalog selection
 Some planets and moons have elevation data and gravity in Game mode
 Gaia Sky can use|%%hud-header SAMP|to interoperate with other astronomical software packages like Topcat or Aladin

@@ -1,0 +1,6 @@
+# This file contains the order in which verbs, adjectives and objects are to be composed
+# into sentences for the given locale. This contains the Catalan version
+# V - verbs
+# A - adjectives
+# O - objects
+V O A

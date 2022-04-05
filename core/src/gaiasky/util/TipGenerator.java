@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import gaiasky.interafce.KeyBindings;
+import gaiasky.util.i18n.I18n;
+import gaiasky.util.i18n.I18nUtils;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
@@ -27,7 +29,7 @@ public class TipGenerator {
 
         this.tips = new ArrayList<>();
         try {
-            FileHandle fh = Gdx.files.internal("text/tips");
+            FileHandle fh = I18nUtils.getI18nFile("text/tips", I18n.getLocaleFromLanguageTag(Settings.settings.program.locale));
             String tipStr = fh.readString();
             String[] lines = tipStr.split("\\r\\n|\\n|\\r");
             KeyBindings kb = KeyBindings.instance;

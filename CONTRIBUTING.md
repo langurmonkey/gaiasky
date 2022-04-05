@@ -74,7 +74,22 @@ A stack trace can be obtained by simply copy-pasting the contents of the termina
 
 ### Translations
 
-Right now we have translation files for Bulgarian, English (UK and US), German, French, Catalan, Spanish and Slovenian. The level of completion varies from language to language. You can compute it by running
+The translation files are in `assets/i18n/gsbundle[lang-code].properties` for the main UI text strings, and in `assets/text` for the tips and the funny strings shown in the loading screen. These are `tips[lang-code]`, `verbs[lang-code]`, `objects[lang-code]` and `adjectives[lang-code]`. Additionally, there is an order file called `order[lang-code]` which specifies the order in which the verbs, adjectives and objects must be combined for the language in question to create well-constructed sentences. In English, for instance, the order is verb + adjective + object.
+
+In order to add a new translation, just copy the default file and use the code of your language and optionally your country (check [here](https://saimana.com/list-of-country-locale-code/) to find out your code). Files without language code correspond to English (GB). 
+
+For example, if you want to create a translation for Vietnamese (Vietnam), with language code `vi_VN`, the files you need to copy and rename are:
+
+```commandline
+assets/i18n/gsbundle.properties   -> assets/i18n/gsbundle_vi_VN.properties
+assets/text/tips                  -> assets/text/tips_vi_VN
+assets/text/verbs                 -> assets/text/verbs_vi_VN
+assets/text/adjectives            -> assets/text/adjectives_vi_VN
+assets/text/objects               -> assets/text/objects_vi_VN
+assets/text/order                 -> assets/text/order_vi_VN
+```
+
+Right now we have translation files for Bulgarian, English (UK and US), German, French, Catalan, Spanish and Slovenian. The level of completion varies from language to language. You can compute it by running:
 
 ```commandline
 gradlew core:runTranslationStatus

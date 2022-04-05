@@ -47,7 +47,7 @@ public class I18n {
             // Use system default
             locale = Locale.getDefault();
         } else {
-            locale = forLanguageTag(Settings.settings.program.locale);
+            locale = getLocaleFromLanguageTag(Settings.settings.program.locale);
             // Set as default locale
             Locale.setDefault(locale);
         }
@@ -68,7 +68,7 @@ public class I18n {
 
     }
 
-    private static Locale forLanguageTag(String languageTag) {
+    public static Locale getLocaleFromLanguageTag(String languageTag) {
         String[] tags = languageTag.split("-");
         if (tags.length > 1) {
             return new Locale(tags[0], tags[1]);
