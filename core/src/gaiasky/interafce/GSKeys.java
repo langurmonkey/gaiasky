@@ -8,6 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Input.Keys;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 
 import java.lang.reflect.Field;
 
@@ -171,5 +172,21 @@ public class GSKeys {
         }
 
         return code;
+    }
+
+    /**
+     * Intercepts the toString() method in {@link Keys} and injects our
+     * own I18n.
+     * @param keycode The key code.
+     * @return The string representation, internationalized.
+     */
+    public static String toString(int keycode) {
+        String eng = Keys.toString(keycode);
+        String key = "key." + eng.replaceAll(" ", "_");
+        if (I18n.hasKey(key)) {
+            return I18n.txt(key);
+        } else {
+            return eng;
+        }
     }
 }

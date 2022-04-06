@@ -7,6 +7,7 @@ package gaiasky.interafce.beans;
 
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,7 +17,7 @@ public class MappingFileComboBoxBean extends FileComboBoxBean {
         super(file);
         Path assets = Settings.assetsPath(".");
         try {
-            String suffix = file.toRealPath().startsWith(assets.toRealPath()) ? " [internal]" : " [user]";
+            String suffix = file.toRealPath().startsWith(assets.toRealPath()) ? " [" + I18n.txtOr("gui.internal", "internal") + "]" : " [" + I18n.txtOr("gui.user", "user") + "]";
             this.name += suffix;
         } catch (IOException e) {
             Logger.getLogger(MappingFileComboBoxBean.class.getSimpleName()).error(e);

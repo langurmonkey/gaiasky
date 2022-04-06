@@ -1166,13 +1166,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controls.add(new OwnLabel(I18n.txt("gui.keymappings.keys"), skin, "header")).left().row();
 
         controls.add(new OwnLabel(I18n.txt("action.forward"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.UP).toUpperCase(), skin, "mono-pink")).left().row();
+        controls.add(new OwnLabel(GSKeys.toString(Keys.UP).toUpperCase(), skin, "mono-pink")).left().row();
         controls.add(new OwnLabel(I18n.txt("action.backward"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink")).left().row();
+        controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink")).left().row();
         controls.add(new OwnLabel(I18n.txt("action.left"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink")).left().row();
+        controls.add(new OwnLabel(GSKeys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink")).left().row();
         controls.add(new OwnLabel(I18n.txt("action.right"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink")).left().row();
+        controls.add(new OwnLabel(GSKeys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink")).left().row();
 
         // Controls
         for (String[] action : data) {
@@ -1978,7 +1978,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             String controllerName = cn.getName();
             table.add(cn).left().padBottom(i == controllerNames.size - 1 ? 0f : pad10).padRight(pad20);
             if (controllerName != null && !settings.controls.gamepad.isControllerBlacklisted(controllerName)) {
-                OwnTextButton config = new OwnTextButton("Configure", skin);
+                OwnTextButton config = new OwnTextButton(I18n.txt("gui.controller.configure"), skin);
                 config.pad(pad5, pad10, pad5, pad10);
                 config.addListener(event -> {
                     if (event instanceof ChangeEvent) {
@@ -2402,7 +2402,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (key == Keys.PLUS) {
             return "+";
         }
-        return Keys.toString(key);
+        return GSKeys.toString(key);
     }
 
     @Override

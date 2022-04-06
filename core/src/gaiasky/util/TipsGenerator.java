@@ -1,63 +1,66 @@
 package gaiasky.util;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import gaiasky.interafce.KeyBindings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.i18n.I18nUtils;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.MissingResourceException;
 
-public class TipGenerator {
+public class TipsGenerator {
+    private static final int MAX_KEYS = 100;
 
     private final Skin skin;
     private final List<String[]> tips;
     private final int[] sequence;
     private int currentIndex = 0;
 
-    public TipGenerator(Skin skin) {
+    public TipsGenerator(Skin skin) {
         super();
         this.skin = skin;
 
         this.tips = new ArrayList<>();
-        try {
-            FileHandle fh = I18nUtils.getI18nFile("text/tips", I18n.getLocaleFromLanguageTag(Settings.settings.program.locale));
-            String tipStr = fh.readString();
-            String[] lines = tipStr.split("\\r\\n|\\n|\\r");
-            KeyBindings kb = KeyBindings.instance;
-            for (String line : lines) {
-                String[] tokens = line.split("\\|");
-                int n = tokens.length;
-                String[] tip = new String[n];
-                for (int i = 0; i < n; i++) {
-                    String style = "";
-                    String text = tokens[i];
-                    if (tokens[i].startsWith("%%")) {
-                        int idx = text.indexOf(" ");
-                        text = tokens[i].substring(idx + 1);
-                        style = tokens[i].substring(0, idx) + " ";
+        for (int j = 0; j < MAX_KEYS; j++) {
+            try {
+                String tipStr = I18n.txt("tip." + j);
+                String[] lines = tipStr.split("\\r\\n|\\n|\\r");
+                KeyBindings kb = KeyBindings.instance;
+                for (String line : lines) {
+                    String[] tokens = line.split("\\|");
+                    int n = tokens.length;
+                    String[] tip = new String[n];
+                    for (int i = 0; i < n; i++) {
+                        String style = "";
+                        String text = tokens[i];
+                        if (tokens[i].startsWith("%%")) {
+                            int idx = text.indexOf(" ");
+                            text = tokens[i].substring(idx + 1);
+                            style = tokens[i].substring(0, idx) + " ";
+                        }
+                        if (text.isBlank()) {
+                            tip[i] = null;
+                        } else {
+                            String keys = kb.getStringKeys(text);
+                            if (keys == null)
+                                tip[i] = style + text;
+                            else
+                                tip[i] = style + keys;
+                        }
                     }
-                    if (text.isBlank()) {
-                        tip[i] = null;
-                    } else {
-                        String keys = kb.getStringKeys(text);
-                        if (keys == null)
-                            tip[i] = style + text;
-                        else
-                            tip[i] = style + keys;
-                    }
+                    tips.add(tip);
                 }
-                tips.add(tip);
+            } catch (MissingResourceException e) {
+                // Skip
             }
-        } catch (Exception e) {
+        }
+        if (this.tips.isEmpty()) {
             fallback();
         }
 
@@ -116,18 +119,21 @@ public class TipGenerator {
             } else if (skin.has(style, TextButton.TextButtonStyle.class)) {
                 String[] keys = text.split("\\+");
                 int n = keys.length;
-                for(int i = 0; i < n; i++){
-                    OwnTextButton button = new OwnTextButton(keys[i], skin, style);
+                for (int i = 0; i < n; i++) {
+                    String t = keys[i];
+                    if(I18n.hasKey("key." + keys[i])){
+                       t = I18n.txt("key." + keys[i]);
+                    }
+                    OwnTextButton button = new OwnTextButton(t, skin, style);
                     button.pad(pad2, pad5, pad2, pad5);
                     g.addActor(button);
-                    if(i < n - 1){
+                    if (i < n - 1) {
                         OwnLabel plus = new OwnLabel("+", skin, "main-title-s");
                         plus.setColor(0.5f, 0.5f, 0.5f, 1f);
                         g.addActor(plus);
                     }
                 }
             }
-
         }
     }
 }

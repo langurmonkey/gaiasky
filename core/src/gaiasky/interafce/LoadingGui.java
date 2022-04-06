@@ -25,7 +25,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Event;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
-import gaiasky.util.TipGenerator;
+import gaiasky.util.TipsGenerator;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
@@ -40,7 +40,7 @@ public class LoadingGui extends AbstractGui {
     protected Table center, topLeft, bottomMiddle, screenMode;
 
     public NotificationsInterface notificationsInterface;
-    private TipGenerator tipGenerator;
+    private TipsGenerator tipGenerator;
     private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
     private HorizontalGroup tip;
@@ -112,7 +112,7 @@ public class LoadingGui extends AbstractGui {
         center.add(spin).padBottom(pad30).row();
 
         // Tips
-        tipGenerator = new TipGenerator(skin);
+        tipGenerator = new TipsGenerator(skin);
         tip = new HorizontalGroup();
         tip.space(pad10);
         bottomMiddle = new Table(skin);

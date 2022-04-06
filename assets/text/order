@@ -1,6 +1,0 @@
-# This file contains the order in which verbs, adjectives and objects are to be composed
-# into sentences for the given locale. This contains the default locale (en_GB)
-# V - verbs
-# A - adjectives
-# O - objects
-V A O

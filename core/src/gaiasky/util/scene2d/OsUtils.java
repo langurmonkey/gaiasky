@@ -24,6 +24,7 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import gaiasky.interafce.GSKeys;
 
 /**
  * Operating system related utils.
@@ -110,7 +111,7 @@ public class OsUtils {
             } else if (keycodes[i] == Keys.ALT_LEFT || keycodes[i] == Keys.ALT_RIGHT) {
                 builder.append(altKey);
             } else {
-                builder.append(Keys.toString(keycodes[i]));
+                builder.append(GSKeys.toString(keycodes[i]));
             }
 
             if (i < keycodes.length - 1) { // Is this NOT the last key

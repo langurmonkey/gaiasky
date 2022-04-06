@@ -33,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
+import gaiasky.interafce.GSKeys;
 
 /**
  * MenuItem contains text or text with icon. Best icon size is 22px. MenuItem
@@ -313,7 +314,7 @@ public class MenuItem extends Button {
      *            from {@link Keys}.
      */
     public MenuItem setShortcut(int keycode) {
-        return setShortcut(Keys.toString(keycode));
+        return setShortcut(GSKeys.toString(keycode));
     }
 
     public CharSequence getShortcut() {

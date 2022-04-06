@@ -144,7 +144,7 @@ public class KeyBindings {
             StringBuilder sb = new StringBuilder();
             Iterator<Integer> it = keys.descendingIterator();
             while (it.hasNext()) {
-                sb.append(Keys.toString(it.next()));
+                sb.append(GSKeys.toString(it.next()));
                 if (it.hasNext())
                     sb.append(join);
             }
@@ -161,7 +161,7 @@ public class KeyBindings {
             Iterator<Integer> it = keys.descendingIterator();
             int i = 0;
             while (it.hasNext()) {
-                result[i++] = Keys.toString(it.next());
+                result[i++] = GSKeys.toString(it.next());
             }
             return result;
         } else {

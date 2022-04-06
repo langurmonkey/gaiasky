@@ -77,8 +77,16 @@ public class I18n {
         }
     }
 
-    public static synchronized String txt(String key){
+    public static synchronized String txt(String key) {
         return bundle.get(key);
+    }
+
+    public static synchronized String txtOr(String key, String defaultValue) {
+        if (hasKey(key)) {
+            return bundle.get(key);
+        } else {
+            return defaultValue;
+        }
     }
 
     public static synchronized String txt(String key, Object... params) {
@@ -89,7 +97,7 @@ public class I18n {
         try {
             I18n.bundle.get(key);
             return true;
-        }catch(MissingResourceException e) {
+        } catch (MissingResourceException e) {
             // Void
         }
         return false;

@@ -150,13 +150,14 @@ public class TranslationStatus {
                         unknownKeys.add(key);
                     }
                 }
+                int extra = lang.size() - translatedKeys;
 
-                double percentage = 100.0 * ((double) translatedKeys / (double) totalKeys);
+                double percentage = 100.0 * ((double) (translatedKeys + extra) / (double) totalKeys);
                 int unknownCount = unknownKeys.size();
 
 
                 logger.info(locale.getDisplayName() + " (" + locale + ")");
-                logger.info("Translated: " + translatedKeys + "/" + totalKeys);
+                logger.info("Translated: " + translatedKeys + "/" + totalKeys + (extra > 0 ? " (+" + extra + " extra)" : ""));
                 logger.info(df.format(percentage) + "%");
                 if(cliArgs.showUnknown && translatedKeys < lang.size()) {
                     logger.info(unknownCount + " unknown keys:");

@@ -1,11 +1,13 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.i18n.I18nUtils;
 import gaiasky.util.math.StdRandom;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.Scanner;
 
 /**
@@ -14,6 +16,7 @@ import java.util.Scanner;
  * optionally localized, and an order file to compose random sentences.
  */
 public class LoadingTextGenerator {
+    private static final int MAX_KEYS = 100;
 
     private String[][] set;
     private final String[] verbs;
@@ -22,34 +25,40 @@ public class LoadingTextGenerator {
 
     public LoadingTextGenerator() {
         Locale locale = I18n.getLocaleFromLanguageTag(Settings.settings.program.locale);
-        verbs = read(I18nUtils.getI18nFile("text/verbs", locale));
-        adjectives = read(I18nUtils.getI18nFile("text/adjectives", locale), 4);
-        objects = read(I18nUtils.getI18nFile("text/objects", locale));
-        set = createOrder(I18nUtils.getI18nFile("text/order", locale));
+        verbs = read("funny.verb.");
+        adjectives = read("funny.adjective.", 4);
+        objects = read("funny.object.");
+        set = createOrder("funny.order");
     }
 
-    private String[] read(FileHandle fh) {
-        return read(fh, 0);
+    private String[] read(String keyPrefix) {
+        return read(keyPrefix, 0);
     }
 
-    private String[] read(FileHandle fh, int nBlanks) {
-        String[] fromFile = fh.readString().split("\\r\\n|\\n|\\r");
-        if (nBlanks <= 0) {
-            return fromFile;
-        }
-        String[] result = new String[fromFile.length + nBlanks];
-        for (int i = 0; i < result.length; i++) {
-            if (i < fromFile.length) {
-                result[i] = fromFile[i];
-            } else {
-                result[i] = "";
+    private String[] read(String keyPrefix, int nBlanks) {
+        Array<String> strings = new Array<>();
+        for(int i =0; i < MAX_KEYS; i++) {
+            try{
+                String s = I18n.txt(keyPrefix + i);
+                strings.add(s);
+            } catch (MissingResourceException e) {
+                // Skip
             }
         }
-        return result;
+        if(nBlanks > 0) {
+            for(int i =0; i < nBlanks; i++) {
+                strings.add("");
+            }
+        }
+        String[] out = new String[strings.size];
+        for(int i =0; i < strings.size; i++) {
+            out[i] = strings.get(i);
+        }
+        return out;
     }
 
-    private String[][] createOrder(FileHandle file) {
-        Scanner scanner = new Scanner(file.readString());
+    private String[][] createOrder(String key) {
+        Scanner scanner = new Scanner(I18n.txt(key));
         String order = null;
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine().trim();
