@@ -74,15 +74,16 @@ A stack trace can be obtained by simply copy-pasting the contents of the termina
 
 ### Translations
 
-The translation files are in `assets/i18n/gsbundle[lang-code].properties` for the main UI text strings.
+The translation files are in `assets/i18n/gsbundle[lang-code].properties` for the main UI text strings, and `assets/i18n/objects[lang-code].properties` for object names.
 
-In order to add a new translation, just copy the default file and use the code of your language and optionally your country (check [here](https://saimana.com/list-of-country-locale-code/) to find out your code). Files without language code correspond to English (GB).
+In order to add a new translation, just copy the default files and use the code of your language and optionally your country (check [here](https://saimana.com/list-of-country-locale-code/) to find out your code). Files without language code correspond to English (GB).
 
-For example, if you want to create a translation for Vietnamese (Vietnam), with language code `vi_VN`, copy the default English file to the Vietnamese like this:
+For example, if you want to create a translation for Vietnamese (Vietnam), with language code `vi_VN`, copy the default English files to the Vietnamese like this:
 
 ```commandline
 $  cd assets/i18n
 $  cp gsbundle.properties assets/i18n/gsbundle_vi_VN.properties
+$  cp objects.properties assets/i18n/objects_vi_VN.properties
 ```
 
 Now you are ready to start translating! Once you are done, create a merge request and we'll merge your file into the main repository after making sure everything is alright.
@@ -104,6 +105,8 @@ Right now we have translation files for Bulgarian, English (UK and US), German, 
 ```commandline
 gradlew core:runTranslationStatus
 ```
+
+The status is only checked for the main `gsbundle[lang-code].properties` file, as the objects file can't be complete because the number of objects that may, at some point, be loaded into Gaia Sky is infinite.
 
 There are some CLI arguments you can use:
 

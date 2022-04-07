@@ -60,7 +60,7 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 29,
+      "version": 30,
       "mingsversion": 30200,
       "size": 77433617,
       "nobjects": 53,
@@ -115,11 +115,11 @@
         "tex/cubemap/earth-cloud-low",
         "tex/cubemap/earth-cloud-med"
       ],
-      "sha256": "57ec1ef5d827075a565f63594e9ce2cc04f361f8b3ae6b3c4410346610a9159f",
-      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC12 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC12+.\\n- Add diffuse cubemap textures for Earth day and cloud layers.\\n- Remove old UV equirectangular Earth day and cloud textures.\\n- Adjust Saturn's shadow values to reduce shadow acne.",
+      "sha256": "a821e801f885466ab16bcb1389fea08f1246493f3be8cb271370c7f883effa1b",
+      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC13 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "- WARN: Some features in this pack will only work with 3.2.0-RC13+.\n- Fix title definition to use new I18n names, abandon old 'parentkey', 'namekey'.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v029_20220316/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v030_20220407/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
