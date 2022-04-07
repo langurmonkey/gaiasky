@@ -738,6 +738,10 @@ public class GuiRegistry implements IObserver {
         removeActorThread.start();
     }
 
+    /**
+     * This method updates the default skin and reloads the full UI.
+     * @param globalResources The global resources object to update.
+     */
     private void reloadUI(GlobalResources globalResources) {
         // Reinitialise user interface
         GaiaSky.postRunnable(() -> {
@@ -752,8 +756,6 @@ public class GuiRegistry implements IObserver {
             if (GaiaSky.instance.cameraManager.mode == CameraManager.CameraMode.FOCUS_MODE)
                 // Refocus
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, GaiaSky.instance.cameraManager.getFocus());
-            // Update names with new language
-            GaiaSky.instance.sceneGraph.getRoot().updateLocalizedNameRecursive();
             // UI theme reload broadcast
             EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));

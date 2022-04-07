@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
@@ -2159,7 +2158,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float factor = uiScale.getMappedValue();
         EventManager.publish(Event.UI_SCALE_CMD, this, factor);
 
-        boolean reloadUI = !settings.program.ui.theme.equals(newTheme.value) || !languageBean.locale.toLanguageTag().equals(settings.program.locale) || settings.program.minimap.size != minimapSize.getValue();
+        boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.locale);
+        boolean reloadUI = reloadLang || !settings.program.ui.theme.equals(newTheme.value) || settings.program.minimap.size != minimapSize.getValue();
         settings.program.locale = languageBean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/objects"));
         settings.program.ui.theme = newTheme.value;
@@ -2306,6 +2306,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             GaiaSky.postRunnable(() -> EventManager.publish(Event.REINITIALIZE_RENDERER, this));
         }
 
+        if (reloadLang) {
+            reloadLanguage();
+        }
+
         if (reloadUI) {
             reloadUI(globalResources);
         }
@@ -2337,6 +2341,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.TONEMAPPING_TYPE_CMD, this, toneMappingBak);
         EventManager.publish(Event.SHOW_DEBUG_CMD, this, debugInfoBak);
     }
+
+    private void reloadLanguage() {
+        EventManager.publish(Event.SCENE_GRAPH_RELOAD_NAMES_CMD, this);
+    }
+
 
     private void reloadUI(final GlobalResources globalResources) {
         EventManager.publish(Event.UI_RELOAD_CMD, this, globalResources);

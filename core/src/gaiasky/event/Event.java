@@ -915,6 +915,10 @@ public enum Event {
      * Boolean indicating whether to remove it from the index. Defaults to true.
      */
     SCENE_GRAPH_REMOVE_OBJECT_CMD,
+    /**
+     * Recomputes the names of the scene graph objects with the current locale.
+     */
+    SCENE_GRAPH_RELOAD_NAMES_CMD,
 
     /**
      * Takes a screenshot. contains the width, height (integers) and the folder name and filename
