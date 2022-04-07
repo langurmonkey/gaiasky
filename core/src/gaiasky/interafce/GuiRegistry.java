@@ -753,7 +753,7 @@ public class GuiRegistry implements IObserver {
                 // Refocus
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, GaiaSky.instance.cameraManager.getFocus());
             // Update names with new language
-            GaiaSky.instance.sceneGraph.getRoot().updateI18nNameRec();
+            GaiaSky.instance.sceneGraph.getRoot().updateLocalizedNameRecursive();
             // UI theme reload broadcast
             EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));

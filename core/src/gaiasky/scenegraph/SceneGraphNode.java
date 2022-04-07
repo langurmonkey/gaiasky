@@ -512,7 +512,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public void setNames(String... names) {
         this.names = names;
-        updateI18nName();
+        updateLocalizedName();
     }
 
     public void setName(String name) {
@@ -520,19 +520,38 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             names[0] = name;
         else
             names = new String[] { name };
-        updateI18nName();
+        updateLocalizedName();
     }
 
-    public void updateI18nName() {
+    public void updateLocalizedName() {
         if (names != null && names.length > 0) {
             String base = names[0].toLowerCase(Locale.ROOT).replace(' ', '_');
             if (I18n.hasObject(base)) {
                 String localizedName = I18n.obj(base);
-                if (!localizedName.equalsIgnoreCase(names[0])) {
-                    // Add second
-                    int idx = addName(localizedName);
-                    localizedNameIndex = idx;
-                    return;
+                if (!localizedName.equalsIgnoreCase(names[localizedNameIndex])) {
+                    if (localizedNameIndex == 0) {
+                        // Add localized name to list
+                        int idx = addName(localizedName);
+                        localizedNameIndex = idx;
+                    } else {
+                        // Update it
+                        setName(localizedName, localizedNameIndex);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Recursively updates the localized names for this node
+     * and its children using the current Locale setting.
+     */
+    public void updateLocalizedNameRecursive() {
+        updateLocalizedName();
+        if (children != null) {
+            for (SceneGraphNode child : children) {
+                if (child != null) {
+                    child.updateLocalizedNameRecursive();
                 }
             }
         }
@@ -577,6 +596,19 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         }
     }
 
+    /**
+     * Sets the given index in the names list to the given name.
+     * If the index is out of bounds, nothing happens.
+     *
+     * @param name  The new name.
+     * @param index The index in the names list.
+     */
+    public void setName(String name, int index) {
+        if (names != null && index >= 0 && index < names.length) {
+            names[index] = name;
+        }
+    }
+
     public String[] getNames() {
         return names;
     }
@@ -616,20 +648,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             }
         }
         return false;
-    }
-
-    /**
-     * Re-computes the names recursively using the current Locale setting.
-     */
-    public void updateI18nNameRec() {
-        updateI18nName();
-        if (children != null) {
-            for (SceneGraphNode child : children) {
-                if (child != null) {
-                    child.updateI18nNameRec();
-                }
-            }
-        }
     }
 
     public void setId(Long id) {
