@@ -800,7 +800,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setAmbientLight(final float ambientLight) {
-        if (checkNum(ambientLight, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "ambientLight"))
+        if (checkNum(ambientLight, Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, "ambientLight"))
             GaiaSky.postRunnable(() -> em.post(Event.AMBIENT_LIGHT_CMD, this, ambientLight));
     }
 
@@ -2898,7 +2898,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists)
-                EventManager.publish(Event.CATALOG_VISIBLE, this, dsName);
+                EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, false);
             else
                 logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
@@ -2911,7 +2911,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists)
-                EventManager.publish(Event.CATALOG_VISIBLE, this, dsName);
+                EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, true);
             else
                 logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;

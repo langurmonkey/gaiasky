@@ -74,7 +74,7 @@ public enum Event {
      **/
     ADD_GUI_COMPONENT,
     /**
-     * Contains a float with the intensity of the light in [0.1].
+     * Contains a float with the intensity of the light in [0,1].
      **/
     AMBIENT_LIGHT_CMD,
 
