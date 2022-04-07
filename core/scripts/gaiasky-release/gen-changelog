@@ -1,0 +1,51 @@
+#!/bin/bash
+
+if [[ $# -ne 2 ]]; then
+    echo 'Too many/few arguments, expecting two' >&2
+    echo "Usage: $0 low-id high-id"
+    echo "  low-id   first commit id in the range"
+    echo "  high-id  last commit id in the range"
+    exit 1
+fi
+
+low="$1"
+high="$2"
+
+# All git messages sorted by tag
+tmp_file="/tmp/prelog"
+
+# Run git log
+git log $low...$high --pretty=format:'%s ' | sort -u > $tmp_file
+
+tags=("feat:" "fix:" "docs:" "style:" "refactor:" "perf:" "build:")
+names=("Features" "Bug Fixes" "Documentation" "Style" "Refactoring" "Performance Improvements" "Build System")
+
+echo "# $high"
+echo
+
+# Process every line
+curr_tag=""
+while read -r line; do
+    # Get current tag
+    tag=$(echo $line | awk '{print $1;}')
+
+    if ! [[ ${tags[*]} =~ "$tag" ]]; then
+        continue
+    fi
+
+    # Create title if needed
+    if [ "$tag" != "$curr_tag" ]; then
+        curr_tag=$tag 
+        idx=$(expr $(echo ${tags[@]/$tag//} | cut -d/ -f1 | wc -w | tr -d ' ') + 0)
+        idx=$(($idx + 0))
+        title="names[$idx]"
+
+        echo
+        echo "## ${!title}"
+        echo
+    fi
+
+    # Print message
+    body=$(echo $line | awk '{$1=""; print $0}')
+    echo "- $body"
+done < $tmp_file
