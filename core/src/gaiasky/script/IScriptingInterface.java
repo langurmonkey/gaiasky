@@ -60,13 +60,15 @@ public interface IScriptingInterface {
 
     /**
      * Displays a popup notification on the screen for the default duration.
+     *
      * @param message The message text.
      */
     void displayPopupNotification(String message);
 
     /**
      * Displays a popup notification on the screen for the given duration.
-     * @param message The message text.
+     *
+     * @param message  The message text.
      * @param duration The duration in seconds until the notification is removed.
      */
     void displayPopupNotification(String message, float duration);
@@ -705,7 +707,8 @@ public interface IScriptingInterface {
      * This setting does not override the visibility of the object itself, or of
      * the label visibility component element.
      * Changes to the force display label flag are not persisted on restart.
-     * @param name The object name.
+     *
+     * @param name       The object name.
      * @param forceLabel Whether to force the label to render for this object or not.
      */
     void setForceDisplayLabel(String name, boolean forceLabel);
@@ -713,7 +716,8 @@ public interface IScriptingInterface {
     /**
      * Sets the label color of the object identified by the given name.
      * The label color must be an array of RGBA values in [0,1].
-     * @param name The object name.
+     *
+     * @param name  The object name.
      * @param color The label color as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
     void setLabelColor(String name, double[] color);
@@ -721,7 +725,9 @@ public interface IScriptingInterface {
     /**
      * Gets the value of the force display label flag for the object identified with the
      * given name.
+     *
      * @param name The name of the object.
+     *
      * @return The value of the force display label flag of the object, if it exists.
      */
     boolean getForceDisplayLabel(String name);
@@ -2169,13 +2175,14 @@ public interface IScriptingInterface {
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
-     * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param sync           Whether the load must happen synchronously or asynchronously.
+     * @param dsName The name of the dataset.
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param sync   Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadStarDataset(String dsName, String path, boolean sync);
+
     /**
      * Loads a star dataset from a VOTable file (<code>.vot</code>).
      * The dataset does not have a label.
@@ -2262,7 +2269,7 @@ public interface IScriptingInterface {
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
      * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
-     * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize  The size of the particles in pixels.
      * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
@@ -2529,6 +2536,14 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be found.
      */
     boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible);
+
+    /**
+     * Sets the dataset point size multiplier.
+     *
+     * @param dsName     The dataset name.
+     * @param multiplier The multiplier, as a positive floating point number.
+     */
+    void setDatasetPointSizeMultiplier(String dsName, double multiplier);
 
     /**
      * Creates a shape object of the given type with the given size around the object with the given name.

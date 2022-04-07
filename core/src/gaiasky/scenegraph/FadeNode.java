@@ -9,6 +9,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.GaiaSky;
 import gaiasky.render.IFadeObject;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
@@ -334,6 +335,9 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     }
 
     public float getPointscaling() {
+        if(parent instanceof OctreeWrapper) {
+            return ((OctreeWrapper) parent).getPointscaling() * pointscaling;
+        }
         return pointscaling;
     }
 

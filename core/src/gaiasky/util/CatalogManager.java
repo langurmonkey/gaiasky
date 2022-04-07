@@ -25,7 +25,7 @@ public class CatalogManager implements IObserver {
         super();
         ciMap = new HashMap<>();
         cis = new ArrayList<>(5);
-        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT);
+        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT, Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
     public Collection<CatalogInfo> getCatalogInfos() {
@@ -130,6 +130,16 @@ public class CatalogManager implements IObserver {
                     logger.info(I18n.msg("notif.highlight.on", ci.name));
                 else
                     logger.info(I18n.msg("notif.highlight.off", ci.name));
+            }
+            break;
+        case CATALOG_POINT_SIZE_SCALING_CMD:
+            dsName = (String) data[0];
+            double scaling = (Double) data[1];
+            if (ciMap.containsKey(dsName)) {
+                ci = ciMap.get(dsName);
+                if(ci.object != null) {
+                    ci.object.setPointscaling((float) scaling);
+                }
             }
             break;
         default:

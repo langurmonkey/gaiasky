@@ -211,6 +211,11 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         }
     }
 
+    @Override
+    public void setPointscaling(float pointscaling) {
+        this.pointscaling = pointscaling;
+    }
+
     /**
      * Gets a copy of this object but does not copy its parent or children
      *

@@ -3049,6 +3049,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setDatasetPointSizeMultiplier(String dsName, double multiplier) {
+        if (checkString(dsName, "datasetName")) {
+            boolean exists = this.catalogManager.contains(dsName);
+            if (exists) {
+                em.post(Event.CATALOG_POINT_SIZE_SCALING_CMD, this, dsName, multiplier);
+            } else {
+                logger.warn("Catalog does not exist: " + dsName);
+            }
+        }
+    }
+
+    @Override
     public void addShapeAroundObject(String shapeName, String shape, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject) {
         if (checkString(shapeName, "shapeName") && checkStringEnum(shape, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
             GaiaSky.postRunnable(() -> {

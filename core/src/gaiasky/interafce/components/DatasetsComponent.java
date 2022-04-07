@@ -41,6 +41,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
     private final Map<String, DatasetPreferencesWindow> prefsMap;
+    private final Map<String, OwnSliderPlus> scalingMap;
     private final CatalogManager catalogManager;
 
     public DatasetsComponent(final Skin skin, final Stage stage, final CatalogManager catalogManager) {
@@ -50,7 +51,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         imageMap = new HashMap<>();
         colorMap = new HashMap<>();
         prefsMap = new HashMap<>();
-        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT);
+        scalingMap = new HashMap<>();
+        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT, Event.CATALOG_POINT_SIZE_SCALING_CMD);
     }
 
     @Override
@@ -214,13 +216,15 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             sizeScaling.setMappedValue(ci.object.getPointscaling());
             sizeScaling.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    float val = sizeScaling.getMappedValue();
-                    ci.object.setPointscaling(val);
+                    double val = sizeScaling.getMappedValue();
+                    EventManager.publish(Event.CATALOG_POINT_SIZE_SCALING_CMD, sizeScaling, ci.name, val);
+                    return true;
                 }
                 return false;
             });
             t.row();
             t.add(sizeScaling).left().colspan(2).padTop(pad9);
+            scalingMap.put(ci.name, sizeScaling);
         }
         Container c = new Container(t);
         c.setFillParent(true);
@@ -362,6 +366,20 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                     OwnImageButton hig = imageMap.get(ci.name)[1];
                     hig.setCheckedNoFire(hl);
                 }
+            }
+            break;
+        case CATALOG_POINT_SIZE_SCALING_CMD:
+            ui = source == this;
+            if (!ui) {
+                ciName = (String) data[0];
+                double val = (Double) data[1];
+                if(scalingMap.containsKey(ciName)) {
+                    OwnSliderPlus slider = scalingMap.get(ciName);
+                    slider.setProgrammaticChangeEvents(false);
+                    slider.setMappedValue(val);
+                    slider.setProgrammaticChangeEvents(true);
+                }
+
             }
             break;
         default:

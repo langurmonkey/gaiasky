@@ -241,6 +241,12 @@ public enum Event {
      */
     CATALOG_VISIBLE,
     /**
+     * Sets the point size multiplier as a positive double for a catalog given its name.
+     * Contains the name of the catalog and the scaling value.
+     * This only has effect if the catalog has points.
+     */
+    CATALOG_POINT_SIZE_SCALING_CMD,
+    /**
      * Clears the headline message.
      **/
     CLEAR_HEADLINE_MESSAGE,
