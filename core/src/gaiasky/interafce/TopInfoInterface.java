@@ -53,13 +53,13 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         dfDate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
         dfTime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
 
-        date = new OwnLabel(I18n.txt("gui.top.date.ut"), skin, "mono");
+        date = new OwnLabel(I18n.msg("gui.top.date.ut"), skin, "mono");
         date.setName("label date tii");
 
-        time = new OwnLabel(I18n.txt("gui.top.time.ut"), skin, "mono");
+        time = new OwnLabel(I18n.msg("gui.top.time.ut"), skin, "mono");
         time.setName("label time tii");
 
-        pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.txt("gui.top.time.off")) + ")", skin, "mono");
+        pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.msg("gui.top.time.off")) + ")", skin, "mono");
         pace.setName("pace tii");
 
         focus = new OwnLabel("", skin, "mono");
@@ -74,7 +74,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         s2 = new OwnLabel("|", skin, "mono");
 
-        home = new OwnLabel(I18n.txt("gui.top.home", TextUtils.capString(Settings.settings.scene.homeObject, maxNameLen)), skin, "mono");
+        home = new OwnLabel(I18n.msg("gui.top.home", TextUtils.capString(Settings.settings.scene.homeObject, maxNameLen)), skin, "mono");
         home.setName("home tii");
         home.setColor(1f, 0.7f, 0.1f, 1f);
 
@@ -117,7 +117,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         case TIME_STATE_CMD:
             Boolean t = (Boolean) data[0];
             if (!t) {
-                pace.setText("(" + I18n.txt("gui.top.time.off") + ")");
+                pace.setText("(" + I18n.msg("gui.top.time.off") + ")");
             } else {
                 pace.setText("(" + TextUtils.getFormattedTimeWarp() + ")");
             }
@@ -126,7 +126,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             IFocus closestObject = (IFocus) data[0];
             if (closestObject != null) {
                 closest.setText(TextUtils.capString(closestObject.getClosestName(), maxNameLen));
-                closest.setText(I18n.txt("gui.top.closest", closest.getText()));
+                closest.setText(I18n.msg("gui.top.closest", closest.getText()));
             } else {
                 closest.setText("");
             }
@@ -137,7 +137,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
                 focus.setText("");
                 s1.setText("");
             } else {
-                focus.setText(I18n.txt("gui.top.focus", lastFocusName));
+                focus.setText(I18n.msg("gui.top.focus", lastFocusName));
                 s1.setText("|");
             }
             break;
@@ -153,7 +153,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             if (f != null) {
                 String candidate = f.getCandidateName();
                 lastFocusName = TextUtils.capString(candidate, maxNameLen);
-                focus.setText(I18n.txt("gui.top.focus", lastFocusName));
+                focus.setText(I18n.msg("gui.top.focus", lastFocusName));
                 s1.setText("|");
             }
             break;

@@ -31,13 +31,13 @@ public class PointDataWriter {
                 if (overwrite) {
                     fh.delete();
                 } else {
-                    logger.info(I18n.txt("error.file.exists", filePath));
+                    logger.info(I18n.msg("error.file.exists", filePath));
                     return;
                 }
             }
 
             if (fh.isDirectory()) {
-                throw new RuntimeException(I18n.txt("error.file.isdir", filePath));
+                throw new RuntimeException(I18n.msg("error.file.isdir", filePath));
             }
             f.createNewFile();
 
@@ -74,7 +74,7 @@ public class PointDataWriter {
 
             bw.close();
 
-            Logger.getLogger(GalaxyGenerator.class).info(I18n.txt("notif.written", n, filePath));
+            Logger.getLogger(GalaxyGenerator.class).info(I18n.msg("notif.written", n, filePath));
         }
 
     }

@@ -50,7 +50,7 @@ public class MilkyWayReshaper {
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
             // Initialize i18n
-            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"));
+            I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"), new FileHandle(ASSETS_LOC + "i18n/objects"));
 
             // Initialize configuration
             File dummyv = new File(ASSETS_LOC + "data/dummyversion");
@@ -108,7 +108,7 @@ public class MilkyWayReshaper {
                     }
                     fw.flush();
                     fw.close();
-                    logger.info(I18n.txt("notif.written", added, out));
+                    logger.info(I18n.msg("notif.written", added, out));
                 } else {
                     logger.info("No particles in input file");
                 }

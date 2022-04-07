@@ -111,14 +111,14 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
         String timeHotkey = KeyBindings.instance.getStringKeys("action.pauseresume");
-        playStop.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.playstop"), timeHotkey, skin));
+        playStop.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.playstop"), timeHotkey, skin));
 
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
 
         String shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.time");
 
-        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), getContentWidth(), skin, true, shortcut, playStop);
+        CollapsiblePane time = new CollapsiblePane(ui, I18n.msg("gui.time"), timeComponent.getActor(), getContentWidth(), skin, true, shortcut, playStop);
         time.align(Align.left);
         mainActors.add(time);
         panes.put(timeComponent.getClass().getSimpleName(), time);
@@ -135,7 +135,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        recCamera.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.reccamera"), skin));
+        recCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.reccamera"), skin));
 
         // Record camera (keyframes)
         recKeyframeCamera = new OwnImageButton(skin, "rec-key");
@@ -148,7 +148,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             }
             return false;
         });
-        recKeyframeCamera.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.reccamerakeyframe"), skin));
+        recKeyframeCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.reccamerakeyframe"), skin));
 
         // Play camera button
         playCamera = new OwnImageButton(skin, "play");
@@ -162,14 +162,14 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
 
-        playCamera.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera"), skin));
+        playCamera.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera"), skin));
 
         CameraComponent cameraComponent = new CameraComponent(skin, ui);
         cameraComponent.initialize();
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.camera");
 
-        CollapsiblePane camera = new CollapsiblePane(ui, I18n.txt("gui.camera"), cameraComponent.getActor(), getContentWidth(), skin, false, shortcut, recCamera, recKeyframeCamera, playCamera);
+        CollapsiblePane camera = new CollapsiblePane(ui, I18n.msg("gui.camera"), cameraComponent.getActor(), getContentWidth(), skin, false, shortcut, recCamera, recKeyframeCamera, playCamera);
         camera.align(Align.left);
         mainActors.add(camera);
         panes.put(cameraComponent.getClass().getSimpleName(), camera);
@@ -181,7 +181,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.visibility");
 
-        CollapsiblePane visibility = new CollapsiblePane(ui, I18n.txt("gui.visibility"), visibilityComponent.getActor(), getContentWidth(), skin, false, shortcut);
+        CollapsiblePane visibility = new CollapsiblePane(ui, I18n.msg("gui.visibility"), visibilityComponent.getActor(), getContentWidth(), skin, false, shortcut);
         visibility.align(Align.left);
         mainActors.add(visibility);
         panes.put(visibilityComponent.getClass().getSimpleName(), visibility);
@@ -192,7 +192,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.lighting");
 
-        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualSettingsComponent.getActor(), getContentWidth(), skin, false, shortcut);
+        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.msg("gui.lighting"), visualSettingsComponent.getActor(), getContentWidth(), skin, false, shortcut);
         visualEffects.align(Align.left);
         mainActors.add(visualEffects);
         panes.put(visualSettingsComponent.getClass().getSimpleName(), visualEffects);
@@ -203,7 +203,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.dataset.title");
 
-        CollapsiblePane datasets = new CollapsiblePane(ui, I18n.txt("gui.dataset.title"), datasetsComponent.getActor(), getContentWidth(), skin, false, shortcut);
+        CollapsiblePane datasets = new CollapsiblePane(ui, I18n.msg("gui.dataset.title"), datasetsComponent.getActor(), getContentWidth(), skin, false, shortcut);
         datasets.align(Align.left);
         mainActors.add(datasets);
         panes.put(datasetsComponent.getClass().getSimpleName(), datasets);
@@ -212,7 +212,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         LocationLogComponent locationLogComponent = new LocationLogComponent(skin, ui);
         locationLogComponent.initialize();
 
-        CollapsiblePane locationLog = new CollapsiblePane(ui, I18n.txt("gui.locationlog"), locationLogComponent.getActor(), getContentWidth(), skin, false, null);
+        CollapsiblePane locationLog = new CollapsiblePane(ui, I18n.msg("gui.locationlog"), locationLogComponent.getActor(), getContentWidth(), skin, false, null);
         locationLog.align(Align.left);
         mainActors.add(locationLog);
         panes.put(locationLogComponent.getClass().getSimpleName(), locationLog);
@@ -224,7 +224,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
 
-        CollapsiblePane bookmarks = new CollapsiblePane(ui, I18n.txt("gui.bookmarks"), bookmarksComponent.getActor(), getContentWidth(), skin, false, shortcut);
+        CollapsiblePane bookmarks = new CollapsiblePane(ui, I18n.msg("gui.bookmarks"), bookmarksComponent.getActor(), getContentWidth(), skin, false, shortcut);
         bookmarks.align(Align.left);
         mainActors.add(bookmarks);
         panes.put(bookmarksComponent.getClass().getSimpleName(), bookmarks);
@@ -247,7 +247,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
             shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.music");
 
-            CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), getContentWidth(), skin, false, shortcut, musicActors);
+            CollapsiblePane music = new CollapsiblePane(ui, I18n.msg("gui.music"), musicComponent.getActor(), getContentWidth(), skin, false, shortcut, musicActors);
             music.align(Align.left);
             mainActors.add(music);
             panes.put(musicComponent.getClass().getSimpleName(), music);
@@ -263,7 +263,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         map.setName("map");
         map.setChecked(Settings.settings.program.minimap.active);
         String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
-        map.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.map"), minimapHotkey, skin));
+        map.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.map"), minimapHotkey, skin));
         map.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_MINIMAP_ACTION, map, map.isChecked());
@@ -273,7 +273,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         Button load = new OwnTextIconButton("", skin, "load");
         load.setSize(bw, bh);
         load.setName("loadcatalog");
-        load.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
+        load.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
         load.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, load);
@@ -284,7 +284,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         preferences.setSize(bw, bh);
         preferences.setName("preferences");
         String prefsHotkey = kb.getStringKeys("action.preferences");
-        preferences.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.preferences"), prefsHotkey, skin));
+        preferences.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.preferences"), prefsHotkey, skin));
         preferences.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_PREFERENCES_ACTION, preferences);
@@ -294,7 +294,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         Button showLog = new OwnTextIconButton("", skin, "log");
         showLog.setSize(bw, bh);
         showLog.setName("show log");
-        showLog.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
+        showLog.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
         showLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LOG_ACTION, showLog);
@@ -305,7 +305,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         about.setSize(bw, bh);
         about.setName("about");
         String helpHotkey = kb.getStringKeys("action.help");
-        about.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.help"), helpHotkey, skin));
+        about.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.help"), helpHotkey, skin));
         about.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_ABOUT_ACTION, about);
@@ -315,7 +315,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         Button quit = new OwnTextIconButton("", skin, "quit");
         quit.setSize(bw, bh);
         quit.setName("quit");
-        quit.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
+        quit.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
         quit.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_QUIT_ACTION, quit);

@@ -113,8 +113,8 @@ public class FileChooser extends GenericDialog {
         // Browse directories
         this.directoryBrowsingEnabled = directoryBrowsingEnabled;
 
-        setCancelText(I18n.txt("gui.close"));
-        setAcceptText(I18n.txt("gui.select"));
+        setCancelText(I18n.msg("gui.close"));
+        setAcceptText(I18n.msg("gui.select"));
 
         buildSuper();
     }
@@ -133,7 +133,7 @@ public class FileChooser extends GenericDialog {
         // Controls
         Table controlsTable = new Table(skin);
         OwnTextIconButton home = new OwnTextIconButton("", skin, "home");
-        home.addListener(new OwnTextTooltip(I18n.txt("gui.fc.home"), skin));
+        home.addListener(new OwnTextTooltip(I18n.msg("gui.fc.home"), skin));
         home.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
@@ -148,7 +148,7 @@ public class FileChooser extends GenericDialog {
             return false;
         });
         OwnTextIconButton back = new OwnTextIconButton("", skin, "back");
-        back.addListener(new OwnTextTooltip(I18n.txt("gui.fc.back"), skin));
+        back.addListener(new OwnTextTooltip(I18n.msg("gui.fc.back"), skin));
         back.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
@@ -165,7 +165,7 @@ public class FileChooser extends GenericDialog {
             return false;
         });
         OwnTextIconButton fwd = new OwnTextIconButton("", skin, "forward");
-        fwd.addListener(new OwnTextTooltip(I18n.txt("gui.fc.forward"), skin));
+        fwd.addListener(new OwnTextTooltip(I18n.msg("gui.fc.forward"), skin));
         fwd.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
@@ -182,7 +182,7 @@ public class FileChooser extends GenericDialog {
             return false;
         });
         OwnTextIconButton parent = new OwnTextIconButton("", skin, "up");
-        parent.addListener(new OwnTextTooltip(I18n.txt("gui.fc.parent"), skin));
+        parent.addListener(new OwnTextTooltip(I18n.msg("gui.fc.parent"), skin));
         parent.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 try {
@@ -231,7 +231,7 @@ public class FileChooser extends GenericDialog {
 
         if (target == FileChooserTarget.DIRECTORIES || target == FileChooserTarget.ALL) {
             // New directory button
-            newDirectory = new OwnTextIconButton(I18n.txt("gui.fc.newdirectory"), skin, "add");
+            newDirectory = new OwnTextIconButton(I18n.msg("gui.fc.newdirectory"), skin, "add");
             newDirectory.setWidth(245f);
             newDirectory.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
@@ -246,11 +246,11 @@ public class FileChooser extends GenericDialog {
                                 // Update file chooser
                                 changeDirectory(currentDir);
                             } catch (IOException e) {
-                                logger.error(e, I18n.txt("notif.error", e.getLocalizedMessage()));
+                                logger.error(e, I18n.msg("notif.error", e.getLocalizedMessage()));
                             }
 
                         } else {
-                            logger.warn(I18n.txt("gui.fc.newdirecotory.invalid"));
+                            logger.warn(I18n.msg("gui.fc.newdirecotory.invalid"));
                         }
 
                     });
@@ -266,12 +266,12 @@ public class FileChooser extends GenericDialog {
         // In windows, we need to be able to change drives
         HorizontalGroup driveButtonsList = new HorizontalGroup();
         driveButtonsList.left().space(16f);
-        driveButtonsList.addActor(new OwnLabel(I18n.txt("gui.fc.drives") + ":", skin));
+        driveButtonsList.addActor(new OwnLabel(I18n.msg("gui.fc.drives") + ":", skin));
         Iterable<Path> drives = FileSystems.getDefault().getRootDirectories();
         Array<TextButton> driveButtons = new Array<>();
         for (Path drive : drives) {
             TextButton driveButton = new OwnTextIconButton(drive.toString(), skin, "drive");
-            driveButton.addListener(new OwnTextTooltip(I18n.txt("gui.fc.drive", drive.toString()), skin));
+            driveButton.addListener(new OwnTextTooltip(I18n.msg("gui.fc.drive", drive.toString()), skin));
             driveButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     try {
@@ -370,10 +370,10 @@ public class FileChooser extends GenericDialog {
         });
 
         fileNameInput = new TextField("", skin);
-        Label fileNameLabel = new Label(I18n.txt("gui.fc.filename") + ":", skin);
+        Label fileNameLabel = new Label(I18n.msg("gui.fc.filename") + ":", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
-        hidden = new OwnCheckBox(I18n.txt("gui.fc.showhidden"), skin, 8f);
+        hidden = new OwnCheckBox(I18n.msg("gui.fc.showhidden"), skin, 8f);
         hidden.setChecked(false);
         hidden.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -510,7 +510,7 @@ public class FileChooser extends GenericDialog {
     }
 
     public void setAcceptedFiles(String accepted) {
-        acceptedFiles.setText(I18n.txt("gui.fc.accepted", accepted));
+        acceptedFiles.setText(I18n.msg("gui.fc.accepted", accepted));
     }
 
     public Path getResult() {
@@ -638,10 +638,10 @@ public class FileChooser extends GenericDialog {
         public OwnTextField name;
 
         public NewDirectoryDialog(Skin skin, Stage ui) {
-            super(I18n.txt("gui.fc.newdirectory.title"), skin, ui);
+            super(I18n.msg("gui.fc.newdirectory.title"), skin, ui);
 
-            setAcceptText(I18n.txt("gui.ok"));
-            setCancelText(I18n.txt("gui.cancel"));
+            setAcceptText(I18n.msg("gui.ok"));
+            setCancelText(I18n.msg("gui.cancel"));
 
             buildSuper();
         }
@@ -650,11 +650,11 @@ public class FileChooser extends GenericDialog {
         protected void build() {
             content.clear();
 
-            content.add(new OwnLabel(I18n.txt("gui.fc.newdirectory.name"), skin)).left().padRight(pad10);
+            content.add(new OwnLabel(I18n.msg("gui.fc.newdirectory.name"), skin)).left().padRight(pad10);
 
             name = new OwnTextField("", skin);
             name.setWidth(350f);
-            name.setMessageText(I18n.txt("gui.fc.newdirectory"));
+            name.setMessageText(I18n.msg("gui.fc.newdirectory"));
             name.setValidator(new DirectoryNameValidator());
 
             content.add(name).left();
@@ -664,7 +664,7 @@ public class FileChooser extends GenericDialog {
             if (name != null && !name.getText().isEmpty()) {
                 return name.getText();
             } else {
-                return I18n.txt("gui.fc.newdirectory");
+                return I18n.msg("gui.fc.newdirectory");
             }
         }
 

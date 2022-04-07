@@ -78,13 +78,13 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         /* FPS */
         fps = new OwnLabel("", skin, "hud-big");
         fps.setColor(skin.getColor("green"));
-        fps.addListener(new OwnTextTooltip(I18n.txt("gui.debug.fps.info"), skin));
+        fps.addListener(new OwnTextTooltip(I18n.msg("gui.debug.fps.info"), skin));
         add(fps).colspan(2).right().padBottom(pad05);
         row();
 
         /* SPF */
         spf = new OwnLabel("", skin, "hud-med");
-        spf.addListener(new OwnTextTooltip(I18n.txt("gui.debug.spf.info"), skin));
+        spf.addListener(new OwnTextTooltip(I18n.msg("gui.debug.spf.info"), skin));
         add(spf).colspan(2).right().padBottom(pad10);
         row();
 
@@ -133,23 +133,23 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra.add(deviceGroup).colspan(2).right().padBottom(pad05).row();
 
         if (settings.program.net.master.active) {
-            OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.master.instance")), skin, "hud-big");
+            OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.master.instance")), skin, "hud-big");
             master.setColor(ColorUtils.gYellowC);
-            master.addListener(new OwnTextTooltip(I18n.txt("gui.master.instance.tooltip"), skin));
+            master.addListener(new OwnTextTooltip(I18n.msg("gui.master.instance.tooltip"), skin));
 
             extra.add(master).colspan(2).right().padBottom(pad10).row();
         }
         if (settings.program.net.slave.active) {
-            OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.slave.instance")), skin, "hud-big");
+            OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.slave.instance")), skin, "hud-big");
             slave.setColor(ColorUtils.gYellowC);
-            slave.addListener(new OwnTextTooltip(I18n.txt("gui.slave.instance.tooltip"), skin));
+            slave.addListener(new OwnTextTooltip(I18n.msg("gui.slave.instance.tooltip"), skin));
 
             extra.add(slave).colspan(2).right().padBottom(pad10).row();
         }
         if (settings.program.safeMode) {
-            OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.debug.safemode")), skin, "hud-big");
+            OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.debug.safemode")), skin, "hud-big");
             safeMode.setColor(ColorUtils.gRedC);
-            safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));
+            safeMode.addListener(new OwnTextTooltip(I18n.msg("gui.debug.safemode.tooltip"), skin));
 
             extra.add(safeMode).colspan(2).right().padBottom(pad10).row();
         }
@@ -159,8 +159,8 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         debugRuntime = new OwnLabel("", skin, "hud");
         Table timeTable = new Table(skin);
         timeTable.add(debugRuntime);
-        Label runTimeLabel = new OwnLabel(I18n.txt("gui.debug.runtime"), skin, "hud-big");
-        runTimeLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.runtime.info"), skin));
+        Label runTimeLabel = new OwnLabel(I18n.msg("gui.debug.runtime"), skin, "hud-big");
+        runTimeLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.runtime.info"), skin));
         runTimeLabel.setColor(skin.getColor("theme"));
         extra.add(timeTable).right().padRight(pad10).padBottom(pad20);
         extra.add(runTimeLabel).left().padBottom(pad20);
@@ -173,17 +173,17 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         debugRAMTotal = new OwnLabel("", skin, "hud");
 
         Table debugRAMTable = new Table(skin);
-        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.used"), skin, "hud")).right().padRight(pad10);
+        debugRAMTable.add(new OwnLabel(I18n.msg("gui.debug.ram.used"), skin, "hud")).right().padRight(pad10);
         debugRAMTable.add(debugRAMUsed).right().row();
-        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.free"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        debugRAMTable.add(new OwnLabel(I18n.msg("gui.debug.ram.free"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
         debugRAMTable.add(debugRAMFree).right().padBottom(pad05).row();
-        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.alloc"), skin, "hud")).right().padRight(pad10);
+        debugRAMTable.add(new OwnLabel(I18n.msg("gui.debug.ram.alloc"), skin, "hud")).right().padRight(pad10);
         debugRAMTable.add(debugRAMAlloc).right().row();
-        debugRAMTable.add(new OwnLabel(I18n.txt("gui.debug.ram.total"), skin, "hud")).right().padRight(pad10);
+        debugRAMTable.add(new OwnLabel(I18n.msg("gui.debug.ram.total"), skin, "hud")).right().padRight(pad10);
         debugRAMTable.add(debugRAMTotal).right();
 
-        Label memoryLabel = new OwnLabel(I18n.txt("gui.debug.ram"), skin, "hud-big");
-        memoryLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.ram.info"), skin));
+        Label memoryLabel = new OwnLabel(I18n.msg("gui.debug.ram"), skin, "hud-big");
+        memoryLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.ram.info"), skin));
         memoryLabel.setColor(skin.getColor("theme"));
         extra.add(debugRAMTable).right().padRight(pad10).padBottom(pad20);
         extra.add(memoryLabel).left().padBottom(pad20);
@@ -195,13 +195,13 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         debugVRAMTotal = new OwnLabel("", skin, "hud");
 
         Table debugVRAMTable = new Table(skin);
-        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.used"), skin, "hud")).right().padRight(pad10);
+        debugVRAMTable.add(new OwnLabel(I18n.msg("gui.debug.vram.used"), skin, "hud")).right().padRight(pad10);
         debugVRAMTable.add(debugVRAMUsed).right().row();
-        debugVRAMTable.add(new OwnLabel(I18n.txt("gui.debug.vram.total"), skin, "hud")).right().padRight(pad10);
+        debugVRAMTable.add(new OwnLabel(I18n.msg("gui.debug.vram.total"), skin, "hud")).right().padRight(pad10);
         debugVRAMTable.add(debugVRAMTotal).right();
 
-        Label vmemoryLabel = new OwnLabel(I18n.txt("gui.debug.vram"), skin, "hud-big");
-        vmemoryLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.vram.info"), skin));
+        Label vmemoryLabel = new OwnLabel(I18n.msg("gui.debug.vram"), skin, "hud-big");
+        vmemoryLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.vram.info"), skin));
         vmemoryLabel.setColor(skin.getColor("theme"));
         extra.add(debugVRAMTable).right().padRight(pad10).padBottom(pad20);
         extra.add(vmemoryLabel).left().padBottom(pad20);
@@ -212,13 +212,13 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         threadsSize = new OwnLabel("", skin, "hud");
 
         Table debugThreadsTable = new Table(skin);
-        debugThreadsTable.add(new OwnLabel(I18n.txt("gui.debug.threads.running"), skin, "hud")).right().padRight(pad10);
+        debugThreadsTable.add(new OwnLabel(I18n.msg("gui.debug.threads.running"), skin, "hud")).right().padRight(pad10);
         debugThreadsTable.add(threadsRunning).right().row();
-        debugThreadsTable.add(new OwnLabel(I18n.txt("gui.debug.threads.poolsize"), skin, "hud")).right().padRight(pad10);
+        debugThreadsTable.add(new OwnLabel(I18n.msg("gui.debug.threads.poolsize"), skin, "hud")).right().padRight(pad10);
         debugThreadsTable.add(threadsSize).right();
 
-        Label threadsLabel = new OwnLabel(I18n.txt("gui.debug.threads"), skin, "hud-big");
-        threadsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.threads.info"), skin));
+        Label threadsLabel = new OwnLabel(I18n.msg("gui.debug.threads"), skin, "hud-big");
+        threadsLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.threads.info"), skin));
         threadsLabel.setColor(skin.getColor("theme"));
         extra.add(debugThreadsTable).right().padRight(pad10).padBottom(pad20);
         extra.add(threadsLabel).left().padBottom(pad20);
@@ -226,7 +226,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
 
         /* DYN RES */
         debugDynRes = new OwnLabel("", skin, "hud");
-        Label dynResLabel = new OwnLabel(I18n.txt("gui.debug.dynres.short"), skin, "hud-big");
+        Label dynResLabel = new OwnLabel(I18n.msg("gui.debug.dynres.short"), skin, "hud-big");
         dynResLabel.setColor(skin.getColor("theme"));
         extra.add(debugDynRes).right().padRight(pad10).padBottom(pad20);
         extra.add(dynResLabel).left().padBottom(pad20);
@@ -237,13 +237,13 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         debugObjectsLoaded = new OwnLabel("", skin, "hud");
 
         Table objectsTable = new Table(skin);
-        objectsTable.add(new OwnLabel(I18n.txt("gui.debug.obj.display"), skin, "hud")).right().padRight(pad10);
+        objectsTable.add(new OwnLabel(I18n.msg("gui.debug.obj.display"), skin, "hud")).right().padRight(pad10);
         objectsTable.add(debugObjectsDisplay).right().row();
-        objectsTable.add(new OwnLabel(I18n.txt("gui.debug.obj.loaded"), skin, "hud")).right().padRight(pad10);
+        objectsTable.add(new OwnLabel(I18n.msg("gui.debug.obj.loaded"), skin, "hud")).right().padRight(pad10);
         objectsTable.add(debugObjectsLoaded).right();
 
-        Label objectsLabel = new OwnLabel(I18n.txt("gui.debug.obj"), skin, "hud-big");
-        objectsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.obj.info"), skin));
+        Label objectsLabel = new OwnLabel(I18n.msg("gui.debug.obj"), skin, "hud-big");
+        objectsLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.obj.info"), skin));
         objectsLabel.setColor(skin.getColor("theme"));
         extra.add(objectsTable).right().padRight(pad10).padBottom(pad20);
         extra.add(objectsLabel).left().padBottom(pad20);
@@ -256,14 +256,14 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         queueStatus.setValue(0);
 
         Table octantsTable = new Table(skin);
-        octantsTable.add(new OwnLabel(I18n.txt("gui.debug.lod.observed"), skin, "hud")).right().padRight(pad10);
+        octantsTable.add(new OwnLabel(I18n.msg("gui.debug.lod.observed"), skin, "hud")).right().padRight(pad10);
         octantsTable.add(debugOcObserved).right().row();
-        octantsTable.add(new OwnLabel(I18n.txt("gui.debug.lod.queue"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
+        octantsTable.add(new OwnLabel(I18n.msg("gui.debug.lod.queue"), skin, "hud")).right().padRight(pad10).padBottom(pad05);
         octantsTable.add(debugOcQueue).right().padBottom(pad05).row();
         octantsTable.add(queueStatus).center().colspan(2).padTop(pad05);
 
-        Label lodLabel = new OwnLabel(I18n.txt("gui.debug.lod"), skin, "hud-big");
-        lodLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.lod.info"), skin));
+        Label lodLabel = new OwnLabel(I18n.msg("gui.debug.lod"), skin, "hud-big");
+        lodLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.lod.info"), skin));
         lodLabel.setColor(skin.getColor("theme"));
         extra.add(octantsTable).right().padRight(pad10).padBottom(pad20);
         extra.add(lodLabel).left().padBottom(pad20);
@@ -273,8 +273,8 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         debugSamp = new OwnLabel("", skin, "hud");
         Table sampTable = new Table(skin);
         sampTable.add(debugSamp);
-        Label sampLabel = new OwnLabel(I18n.txt("gui.debug.samp"), skin, "hud-big");
-        sampLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.samp.info"), skin));
+        Label sampLabel = new OwnLabel(I18n.msg("gui.debug.samp"), skin, "hud-big");
+        sampLabel.addListener(new OwnTextTooltip(I18n.msg("gui.debug.samp.info"), skin));
         sampLabel.setColor(skin.getColor("theme"));
         extra.add(sampTable).right().padRight(pad10);
         extra.add(sampLabel).left();
@@ -324,7 +324,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     Double free = (Double) data[1];
                     Double alloc = (Double) data[2];
                     Double total = (Double) data[3];
-                    String unit = " " + I18n.txt("gui.debug.ram.unit");
+                    String unit = " " + I18n.msg("gui.debug.ram.unit");
                     debugRAMUsed.setText(memFormatter.format(used) + unit);
                     debugRAMUsed.setColor(getColor(used, alloc));
                     debugRAMFree.setText(memFormatter.format(free) + unit);
@@ -338,10 +338,10 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     Double used = (Double) data[0];
                     Double total = (Double) data[1];
                     if (used <= 0 || total <= 0) {
-                        debugVRAMUsed.setText(I18n.txt("gui.debug.na"));
-                        debugVRAMTotal.setText(I18n.txt("gui.debug.na"));
+                        debugVRAMUsed.setText(I18n.msg("gui.debug.na"));
+                        debugVRAMTotal.setText(I18n.msg("gui.debug.na"));
                     } else {
-                        String unit = " " + I18n.txt("gui.debug.vram.unit");
+                        String unit = " " + I18n.msg("gui.debug.vram.unit");
                         debugVRAMUsed.setText(memFormatter.format(used) + unit);
                         debugVRAMUsed.setColor(getColor(used, total));
                         debugVRAMTotal.setText(memFormatter.format(total) + unit);
@@ -390,8 +390,8 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 if (debug && data.length > 0) {
                     double dfps = (Float) data[0];
                     double dspf = 1000 / dfps;
-                    fps.setText(fpsFormatter.format(dfps).concat(" " + I18n.txt("gui.debug.fps")));
-                    spf.setText(spfFormatter.format(dspf).concat(" " + I18n.txt("gui.debug.ms")));
+                    fps.setText(fpsFormatter.format(dfps).concat(" " + I18n.msg("gui.debug.fps")));
+                    spf.setText(spfFormatter.format(dspf).concat(" " + I18n.msg("gui.debug.ms")));
                 }
                 break;
             case SAMP_INFO:

@@ -43,7 +43,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     public void initialize() {
         final float contentWidth = ControlsWindow.getContentWidth();
 
-        cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad8);
+        cinematic = new OwnCheckBox(I18n.msg("gui.camera.cinematic"), skin, pad8);
         cinematic.setName("cinematic camera");
         cinematic.setChecked(Settings.settings.scene.camera.cinematic);
         cinematic.addListener(event -> {
@@ -54,7 +54,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        final Label modeLabel = new Label(I18n.txt("gui.camera.mode"), skin, "default");
+        final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "default");
         final int cameraModes = CameraMode.values().length;
         final CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
         for (int i = 0; i < cameraModes; i++) {
@@ -79,7 +79,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
-            button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), hk3d, skin));
+            button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
             button3d.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -99,7 +99,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
             final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
-            buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), hkDome, skin));
+            buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
             buttonDome.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -121,7 +121,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
             buttonCubemap.setProgrammaticChangeEvents(false);
             final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
-            buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.360")), hkCubemap, skin));
+            buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
             buttonCubemap.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -145,7 +145,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 buttonMaster.setProgrammaticChangeEvents(false);
                 buttonMaster.setSize(28f, 29.6f);
                 final String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
-                buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.slave.config")), hkmaster, skin));
+                buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.slave.config")), hkmaster, skin));
                 buttonMaster.setName("master");
                 buttonMaster.addListener(event -> {
                     if (event instanceof ChangeEvent) {
@@ -158,7 +158,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
         }
 
-        fieldOfView = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
+        fieldOfView = new OwnSliderPlus(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(contentWidth);
@@ -175,25 +175,25 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         // CAMERA SPEED LIMIT
         final String[] speedLimits = new String[19];
-        speedLimits[0] = I18n.txt("gui.camera.speedlimit.100kmh");
-        speedLimits[1] = I18n.txt("gui.camera.speedlimit.cfactor", "0.5");
-        speedLimits[2] = I18n.txt("gui.camera.speedlimit.cfactor", "0.8");
-        speedLimits[3] = I18n.txt("gui.camera.speedlimit.cfactor", "0.9");
-        speedLimits[4] = I18n.txt("gui.camera.speedlimit.cfactor", "0.99");
-        speedLimits[5] = I18n.txt("gui.camera.speedlimit.cfactor", "0.99999");
-        speedLimits[6] = I18n.txt("gui.camera.speedlimit.c");
-        speedLimits[7] = I18n.txt("gui.camera.speedlimit.cfactor", 2);
-        speedLimits[8] = I18n.txt("gui.camera.speedlimit.cfactor", 10);
-        speedLimits[9] = I18n.txt("gui.camera.speedlimit.cfactor", 1000);
-        speedLimits[10] = I18n.txt("gui.camera.speedlimit.aus", 1);
-        speedLimits[11] = I18n.txt("gui.camera.speedlimit.aus", 10);
-        speedLimits[12] = I18n.txt("gui.camera.speedlimit.aus", 1000);
-        speedLimits[13] = I18n.txt("gui.camera.speedlimit.aus", 10000);
-        speedLimits[14] = I18n.txt("gui.camera.speedlimit.pcs", 1);
-        speedLimits[15] = I18n.txt("gui.camera.speedlimit.pcs", 2);
-        speedLimits[16] = I18n.txt("gui.camera.speedlimit.pcs", 10);
-        speedLimits[17] = I18n.txt("gui.camera.speedlimit.pcs", 1000);
-        speedLimits[18] = I18n.txt("gui.camera.speedlimit.nolimit");
+        speedLimits[0] = I18n.msg("gui.camera.speedlimit.100kmh");
+        speedLimits[1] = I18n.msg("gui.camera.speedlimit.cfactor", "0.5");
+        speedLimits[2] = I18n.msg("gui.camera.speedlimit.cfactor", "0.8");
+        speedLimits[3] = I18n.msg("gui.camera.speedlimit.cfactor", "0.9");
+        speedLimits[4] = I18n.msg("gui.camera.speedlimit.cfactor", "0.99");
+        speedLimits[5] = I18n.msg("gui.camera.speedlimit.cfactor", "0.99999");
+        speedLimits[6] = I18n.msg("gui.camera.speedlimit.c");
+        speedLimits[7] = I18n.msg("gui.camera.speedlimit.cfactor", 2);
+        speedLimits[8] = I18n.msg("gui.camera.speedlimit.cfactor", 10);
+        speedLimits[9] = I18n.msg("gui.camera.speedlimit.cfactor", 1000);
+        speedLimits[10] = I18n.msg("gui.camera.speedlimit.aus", 1);
+        speedLimits[11] = I18n.msg("gui.camera.speedlimit.aus", 10);
+        speedLimits[12] = I18n.msg("gui.camera.speedlimit.aus", 1000);
+        speedLimits[13] = I18n.msg("gui.camera.speedlimit.aus", 10000);
+        speedLimits[14] = I18n.msg("gui.camera.speedlimit.pcs", 1);
+        speedLimits[15] = I18n.msg("gui.camera.speedlimit.pcs", 2);
+        speedLimits[16] = I18n.msg("gui.camera.speedlimit.pcs", 10);
+        speedLimits[17] = I18n.msg("gui.camera.speedlimit.pcs", 1000);
+        speedLimits[18] = I18n.msg("gui.camera.speedlimit.nolimit");
 
         cameraSpeedLimit = new OwnSelectBox<>(skin);
         cameraSpeedLimit.setName("camera speed limit");
@@ -210,7 +210,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeedLimit.setSelectedIndex(Settings.settings.scene.camera.speedLimitIndex);
 
         // CAMERA SPEED
-        cameraSpeed = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
+        cameraSpeed = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(contentWidth);
         cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
@@ -223,7 +223,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // ROTATION SPEED
-        rotateSpeed = new OwnSliderPlus(I18n.txt("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
+        rotateSpeed = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(contentWidth);
         rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
@@ -236,7 +236,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // TURNING SPEED
-        turnSpeed = new OwnSliderPlus(I18n.txt("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
+        turnSpeed = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(contentWidth);
         turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);
@@ -249,12 +249,12 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // FOCUS_MODE lock
-        focusLock = new CheckBox(" " + I18n.txt("gui.camera.lock"), skin);
+        focusLock = new CheckBox(" " + I18n.msg("gui.camera.lock"), skin);
         focusLock.setName("focus lock");
         focusLock.setChecked(Settings.settings.scene.camera.focusLock.position);
         focusLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.FOCUS_LOCK_CMD, focusLock, I18n.txt("gui.camera.lock"), focusLock.isChecked());
+                EventManager.publish(Event.FOCUS_LOCK_CMD, focusLock, I18n.msg("gui.camera.lock"), focusLock.isChecked());
                 orientationLock.setVisible(focusLock.isChecked());
                 return true;
             }
@@ -262,13 +262,13 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // FOCUS_MODE orientation lock
-        orientationLock = new CheckBox(" " + I18n.txt("gui.camera.lock.orientation"), skin);
+        orientationLock = new CheckBox(" " + I18n.msg("gui.camera.lock.orientation"), skin);
         orientationLock.setName("orientation lock");
         orientationLock.setChecked(Settings.settings.scene.camera.focusLock.orientation);
         orientationLock.setVisible(Settings.settings.scene.camera.focusLock.position);
         orientationLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.ORIENTATION_LOCK_CMD, orientationLock, I18n.txt("gui.camera.lock.orientation"), orientationLock.isChecked());
+                EventManager.publish(Event.ORIENTATION_LOCK_CMD, orientationLock, I18n.msg("gui.camera.lock.orientation"), orientationLock.isChecked());
                 return true;
             }
             return false;
@@ -289,7 +289,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.align(Align.left);
 
         cameraGroup.add(group(modeLabel, cameraMode, pad3)).top().left().padBottom(pad9).row();
-        cameraGroup.add(group(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, pad3)).top().left().padBottom(pad9).row();
+        cameraGroup.add(group(new Label(I18n.msg("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, pad3)).top().left().padBottom(pad9).row();
         cameraGroup.add(fieldOfView).top().left().padBottom(pad9).row();
         cameraGroup.add(cameraSpeed).top().left().padBottom(pad9).row();
         cameraGroup.add(rotateSpeed).top().left().padBottom(pad9).row();

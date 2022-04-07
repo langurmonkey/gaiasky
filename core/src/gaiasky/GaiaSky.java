@@ -347,12 +347,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         window = headless ? null : ((Lwjgl3Graphics) graphics).getWindow();
 
         // Basic info
-        logger.info(settings.version.version, I18n.txt("gui.build", settings.version.build));
+        logger.info(settings.version.version, I18n.msg("gui.build", settings.version.build));
         logger.info("Display mode", graphics.getWidth() + "x" + graphics.getHeight(), "Fullscreen: " + Gdx.graphics.isFullscreen());
         logger.info("Device", GL30.glGetString(GL30.GL_RENDERER));
-        logger.info(I18n.txt("notif.glversion", GL30.glGetString(GL30.GL_VERSION)));
-        logger.info(I18n.txt("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
-        logger.info(I18n.txt("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
+        logger.info(I18n.msg("notif.glversion", GL30.glGetString(GL30.GL_VERSION)));
+        logger.info(I18n.msg("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
+        logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
 
         // Frame buffer map
         frameBufferMap = new HashMap<>();
@@ -361,7 +361,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
 
         if (!settings.initialized) {
-            logger.error(new RuntimeException(I18n.txt("notif.error", "global configuration not initialized")));
+            logger.error(new RuntimeException(I18n.msg("notif.error", "global configuration not initialized")));
             return;
         }
 
@@ -1472,11 +1472,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
                 String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
                 final ModePopupInfo mpi = new ModePopupInfo();
-                mpi.title = I18n.txt("gui.stereo.title");
-                mpi.header = I18n.txt("gui.stereo.notice.header");
+                mpi.title = I18n.msg("gui.stereo.title");
+                mpi.header = I18n.msg("gui.stereo.notice.header");
                 ;
-                mpi.addMapping(I18n.txt("gui.stereo.notice.back"), keysStrToggle);
-                mpi.addMapping(I18n.txt("gui.stereo.notice.profile"), keysStrProfile);
+                mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
+                mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
 
                 EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 120f);
             } else {
@@ -1551,14 +1551,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             String name = (String) data[1];
             boolean state = (boolean) data[2];
             vs.setVisible(state, name.toLowerCase());
-            logger.info(I18n.txt("notif.visibility.object.set", vs.getName(), I18n.txt("gui." + state)));
+            logger.info(I18n.msg("notif.visibility.object.set", vs.getName(), I18n.msg("gui." + state)));
             break;
         case FORCE_OBJECT_LABEL_CMD:
             final SceneGraphNode forceLabelObject = (SceneGraphNode) data[0];
             name = (String) data[1];
             state = (boolean) data[2];
             forceLabelObject.setForceLabel(state, name.toLowerCase());
-            logger.info(I18n.txt("notif.object.flag", "forceLabel", forceLabelObject.getName(), I18n.txt("gui." + state)));
+            logger.info(I18n.msg("notif.object.flag", "forceLabel", forceLabelObject.getName(), I18n.msg("gui." + state)));
             break;
         case LABEL_COLOR_CMD:
             final SceneGraphNode labelColorObject = (SceneGraphNode) data[0];

@@ -33,14 +33,14 @@ public class GaiaSkyHubConnector extends HubConnector {
             hubName = super.getConnection().getRegInfo().getHubId();
         }catch (NullPointerException | SampException ignored) {}
 
-        logger.info(isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
-        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
+        logger.info(isConnected ? I18n.msg("samp.connected", hubName) : I18n.msg("samp.disconnected"));
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, isConnected ? I18n.msg("samp.connected", hubName) : I18n.msg("samp.disconnected"));
     }
 
     @Override
     protected void disconnect() {
         super.disconnect();
-        logger.info(I18n.txt("samp.disconnected"));
+        logger.info(I18n.msg("samp.disconnected"));
     }
 
 }

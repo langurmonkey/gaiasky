@@ -271,7 +271,7 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

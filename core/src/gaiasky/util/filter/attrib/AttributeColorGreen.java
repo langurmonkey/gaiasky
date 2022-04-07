@@ -12,10 +12,10 @@ public class AttributeColorGreen extends AttributeAbstract implements IAttribute
 
     @Override
     public String getUnit() {
-        return I18n.txt("gui.attrib.color.unit");
+        return I18n.msg("gui.attrib.color.unit");
     }
 
     public String toString(){
-        return I18n.txt("gui.attrib.color.green");
+        return I18n.msg("gui.attrib.color.green");
     }
 }

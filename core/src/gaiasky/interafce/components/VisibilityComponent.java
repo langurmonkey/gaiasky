@@ -112,10 +112,10 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         /* Proper motions */
 
         // LABEL
-        pmLabel = new OwnLabel(I18n.txt("gui.velocityvectors"), skin, "header");
+        pmLabel = new OwnLabel(I18n.msg("gui.velocityvectors"), skin, "header");
 
         // ARROWHEADS
-        pmArrowheads = new OwnCheckBox(I18n.txt("gui.pm.arrowheads"), skin, space2);
+        pmArrowheads = new OwnCheckBox(I18n.msg("gui.pm.arrowheads"), skin, space2);
         pmArrowheads.setName("pm arrow caps");
         pmArrowheads.setChecked(Settings.settings.scene.properMotion.arrowHeads);
         pmArrowheads.addListener(event -> {
@@ -128,7 +128,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         });
 
         // NUM FACTOR
-        pmNumFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
+        pmNumFactorSlider = new OwnSliderPlus(I18n.msg("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
         pmNumFactorSlider.setName("proper motion vectors number factor");
         pmNumFactorSlider.setWidth(contentWidth);
         pmNumFactorSlider.setMappedValue(Settings.settings.scene.properMotion.number);
@@ -143,7 +143,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         });
 
         // LEN FACTOR
-        pmLenFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmlenfactor"), Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, Constants.SLIDER_STEP_SMALL, skin);
+        pmLenFactorSlider = new OwnSliderPlus(I18n.msg("gui.pmlenfactor"), Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, Constants.SLIDER_STEP_SMALL, skin);
         pmLenFactorSlider.setName("proper motion vectors number factor");
         pmLenFactorSlider.setWidth(contentWidth);
         pmLenFactorSlider.setValue(Settings.settings.scene.properMotion.length);
@@ -158,15 +158,15 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         });
 
         // PM COLOR MODE
-        Label pmColorModeLabel = new Label(I18n.txt("gui.pm.colormode"), skin, "default");
+        Label pmColorModeLabel = new Label(I18n.msg("gui.pm.colormode"), skin, "default");
 
         ComboBoxBean[] cms = new ComboBoxBean[] {
-                new ComboBoxBean(I18n.txt("gui.pm.colormode.dir"), 0),
-                new ComboBoxBean(I18n.txt("gui.pm.colormode.speed"), 1),
-                new ComboBoxBean(I18n.txt("gui.pm.colormode.hasrv"), 2),
-                new ComboBoxBean(I18n.txt("gui.pm.colormode.redshift"), 3),
-                new ComboBoxBean(I18n.txt("gui.pm.colormode.redshift.cam"), 4),
-                new ComboBoxBean(I18n.txt("gui.pm.colormode.single"), 5)
+                new ComboBoxBean(I18n.msg("gui.pm.colormode.dir"), 0),
+                new ComboBoxBean(I18n.msg("gui.pm.colormode.speed"), 1),
+                new ComboBoxBean(I18n.msg("gui.pm.colormode.hasrv"), 2),
+                new ComboBoxBean(I18n.msg("gui.pm.colormode.redshift"), 3),
+                new ComboBoxBean(I18n.msg("gui.pm.colormode.redshift.cam"), 4),
+                new ComboBoxBean(I18n.msg("gui.pm.colormode.single"), 5)
         };
         pmColorMode = new OwnSelectBox<>(skin);
         pmColorMode.setItems(cms);
@@ -205,7 +205,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         velocityVectorsEnabled(GaiaSky.instance.sgr.isOn(ComponentType.VelocityVectors));
 
         // INDIVIDUAL VISIBILITY
-        OwnTextIconButton individualVisibility = new OwnTextIconButton(I18n.txt("gui.visibility.individual"), skin, "eye");
+        OwnTextIconButton individualVisibility = new OwnTextIconButton(I18n.msg("gui.visibility.individual"), skin, "eye");
         individualVisibility.align(Align.center);
         individualVisibility.setWidth(contentWidth);
         individualVisibility.addListener(event -> {

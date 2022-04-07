@@ -1,9 +1,7 @@
 package gaiasky.util;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.i18n.I18nUtils;
 import gaiasky.util.math.StdRandom;
 
 import java.util.Locale;
@@ -39,7 +37,7 @@ public class LoadingTextGenerator {
         Array<String> strings = new Array<>();
         for(int i =0; i < MAX_KEYS; i++) {
             try{
-                String s = I18n.txt(keyPrefix + i);
+                String s = I18n.msg(keyPrefix + i);
                 strings.add(s);
             } catch (MissingResourceException e) {
                 // Skip
@@ -58,7 +56,7 @@ public class LoadingTextGenerator {
     }
 
     private String[][] createOrder(String key) {
-        Scanner scanner = new Scanner(I18n.txt(key));
+        Scanner scanner = new Scanner(I18n.msg(key));
         String order = null;
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine().trim();

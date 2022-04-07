@@ -20,11 +20,11 @@ public class UpdatePopup extends GenericDialog {
     private final String tagVersion;
 
     public UpdatePopup(String tagVersion, Stage ui, Skin skin) {
-        super(I18n.txt("gui.newversion.new"), skin, ui);
+        super(I18n.msg("gui.newversion.new"), skin, ui);
 
         this.tagVersion = tagVersion;
 
-        setAcceptText(I18n.txt("gui.close"));
+        setAcceptText(I18n.msg("gui.close"));
         setCancelText(null);
 
         buildSuper();
@@ -36,14 +36,14 @@ public class UpdatePopup extends GenericDialog {
         float padb = 8f;
         content.clear();
         content.pad(16f);
-        content.add(new OwnLabel(I18n.txt("gui.newversion.new.current") + ":", skin)).left().padRight(padb).padBottom(padb);
+        content.add(new OwnLabel(I18n.msg("gui.newversion.new.current") + ":", skin)).left().padRight(padb).padBottom(padb);
         content.add(new OwnLabel(Settings.settings.version.version, skin)).left().padBottom(padb).row();
 
-        content.add(new OwnLabel(I18n.txt("gui.newversion.new.new") + ":", skin)).left().padRight(padb).padBottom(padb * 2);
+        content.add(new OwnLabel(I18n.msg("gui.newversion.new.new") + ":", skin)).left().padRight(padb).padBottom(padb * 2);
         content.add(new OwnLabel(tagVersion, skin, "header")).left().padBottom(padb * 2).row();
 
         Label.LabelStyle linkStyle = skin.get("link", Label.LabelStyle.class);
-        content.add(new Link(I18n.txt("gui.newversion.getit"), linkStyle, Settings.WEBPAGE_DOWNLOADS)).center().colspan(2);
+        content.add(new Link(I18n.msg("gui.newversion.getit"), linkStyle, Settings.WEBPAGE_DOWNLOADS)).center().colspan(2);
     }
 
     @Override

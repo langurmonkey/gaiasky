@@ -83,7 +83,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) current / (float) count);
                     }
                     EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), 2f);
-                    logger.info(I18n.txt("notif.nodeloader", current, filePath));
+                    logger.info(I18n.msg("notif.nodeloader", current, filePath));
                 }
             } catch (Exception e) {
                 logger.error(e);
@@ -194,7 +194,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
             }
             attribute = attribute.next;
         }
-        logger.debug(I18n.txt("notif.loading", instance.getClass().getSimpleName() + ": " + instance.toString()));
+        logger.debug(I18n.msg("notif.loading", instance.getClass().getSimpleName() + ": " + instance.toString()));
         return instance;
     }
 

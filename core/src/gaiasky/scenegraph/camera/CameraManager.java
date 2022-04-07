@@ -78,7 +78,7 @@ public class CameraManager implements ICamera, IObserver {
         }
 
         public String toStringI18n() {
-            return I18n.txt(getKey());
+            return I18n.msg(getKey());
         }
 
         public boolean isGaiaFov() {

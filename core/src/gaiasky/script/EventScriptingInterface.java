@@ -275,7 +275,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraLock(final boolean lock) {
-        GaiaSky.postRunnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, I18n.txt("gui.camera.lock"), lock));
+        GaiaSky.postRunnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, I18n.msg("gui.camera.lock"), lock));
     }
 
     @Override
@@ -511,7 +511,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraOrientationLock(boolean lock) {
-        GaiaSky.postRunnable(() -> em.post(Event.ORIENTATION_LOCK_CMD, this, I18n.txt("gui.camera.lock.orientation"), lock));
+        GaiaSky.postRunnable(() -> em.post(Event.ORIENTATION_LOCK_CMD, this, I18n.msg("gui.camera.lock.orientation"), lock));
     }
 
     @Override
@@ -1641,12 +1641,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void enableGui() {
-        GaiaSky.postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, true, I18n.txt("notif.cleanmode")));
+        GaiaSky.postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode")));
     }
 
     @Override
     public void disableGui() {
-        GaiaSky.postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, false, I18n.txt("notif.cleanmode")));
+        GaiaSky.postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, false, I18n.msg("notif.cleanmode")));
     }
 
     @Override
@@ -2390,7 +2390,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setSmoothLodTransitions(boolean value) {
-        GaiaSky.postRunnable(() -> em.post(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.txt("element.octreeparticlefade"), value));
+        GaiaSky.postRunnable(() -> em.post(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.msg("element.octreeparticlefade"), value));
     }
 
     @Override
@@ -2784,7 +2784,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         try {
-            logger.info(I18n.txt("notif.catalog.loading", dsName));
+            logger.info(I18n.msg("notif.catalog.loading", dsName));
 
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
@@ -2800,9 +2800,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
                             EventManager.publish(Event.CATALOG_ADD, this, ci, true);
 
-                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.txt("gui.dsload.stars.name") : I18n.txt("gui.dsload.variablestars.name");
-                            logger.info(I18n.txt("notif.catalog.loaded", data.size(), typeStr));
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
+                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.msg("gui.dsload.stars.name") : I18n.msg("gui.dsload.variablestars.name");
+                            logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
@@ -2821,9 +2821,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
                             EventManager.publish(Event.CATALOG_ADD, this, ci, true);
 
-                            String typeStr = I18n.txt("gui.dsload.objects.name");
-                            logger.info(I18n.txt("notif.catalog.loaded", data.size(), typeStr));
-                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
+                            String typeStr = I18n.msg("gui.dsload.objects.name");
+                            logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
@@ -2849,9 +2849,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         scc.initialize();
                         SceneGraphNode.insert(scc, true);
                         scc.doneLoading(manager);
-                        String typeStr = I18n.txt("gui.dsload.clusters.name");
-                        logger.info(I18n.txt("notif.catalog.loaded", scc.children.size, typeStr));
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.txt("notif.catalog.loaded", scc.children.size, typeStr));
+                        String typeStr = I18n.msg("gui.dsload.clusters.name");
+                        logger.info(I18n.msg("notif.catalog.loaded", scc.children.size, typeStr));
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", scc.children.size, typeStr));
                     });
                     // Sync waiting until the node is in the scene graph
                     while (sync && (!scc.inSceneGraph)) {

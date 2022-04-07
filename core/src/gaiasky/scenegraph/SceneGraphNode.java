@@ -34,6 +34,7 @@ import net.jafama.FastMath;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -105,19 +106,14 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public String[] names;
 
     /**
-     * The key to the name in the i18n system.
+     * The index of the localized name in the {@link #names} array.
      */
-    protected String namekey = null;
+    public int localizedNameIndex = 0;
 
     /**
      * The first name of the parent object.
      */
     public String parentName = null;
-
-    /**
-     * The key of the parent
-     */
-    protected String parentkey = null;
 
     /**
      * The total number of descendants under this node.
@@ -516,6 +512,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public void setNames(String... names) {
         this.names = names;
+        updateI18nName();
     }
 
     public void setName(String name) {
@@ -523,6 +520,22 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             names[0] = name;
         else
             names = new String[] { name };
+        updateI18nName();
+    }
+
+    public void updateI18nName() {
+        if (names != null && names.length > 0) {
+            String base = names[0].toLowerCase(Locale.ROOT).replace(' ', '_');
+            if (I18n.hasObject(base)) {
+                String localizedName = I18n.obj(base);
+                if (!localizedName.equalsIgnoreCase(names[0])) {
+                    // Add second
+                    int idx = addName(localizedName);
+                    localizedNameIndex = idx;
+                    return;
+                }
+            }
+        }
     }
 
     @Override
@@ -538,18 +551,30 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * Adds a name to the list of names.
      *
      * @param name The name.
+     *
+     * @return The index of the added name.
      */
-    public void addName(String name) {
-        if (!hasName(name))
+    public int addName(String name) {
+        if (!hasName(name)) {
             if (names != null) {
                 // Extend array
                 String[] newNames = new String[names.length + 1];
                 System.arraycopy(names, 0, newNames, 0, names.length);
                 newNames[names.length] = name;
+                int idx = names.length;
                 names = newNames;
+                return idx;
             } else {
-                setName(name);
+                names = new String[] { name };
+                return 0;
             }
+        } else {
+            for (int i = 0; i < names.length; i++) {
+                if (names[i].equalsIgnoreCase(name))
+                    return i;
+            }
+            return -1;
+        }
     }
 
     public String[] getNames() {
@@ -558,6 +583,14 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public String getName() {
         return names != null ? names[0] : null;
+    }
+
+    public String getLocalizedName() {
+        if (localizedNameIndex >= 0 && names.length > localizedNameIndex) {
+            return names[localizedNameIndex];
+        } else {
+            return getName();
+        }
     }
 
     public String namesConcat() {
@@ -585,35 +618,17 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return false;
     }
 
-    public void setKey(String key) {
-        setNamekey(key);
-    }
-
-    public void setNamekey(String namekey) {
-        this.namekey = namekey;
-        updateNames();
-    }
-
     /**
-     * Updates the name using the key. This must be called when the language
-     * changes.
+     * Re-computes the names recursively using the current Locale setting.
      */
-    public void updateNames() {
-        if (namekey != null)
-            setName(I18n.txt(namekey));
-        if (parentkey != null)
-            this.parentName = I18n.txt(parentkey);
-    }
-
-    /**
-     * Recursively updates the name using the key. This must be called when the
-     * language changes.
-     */
-    public void updateNamesRec() {
-        this.updateNames();
-        if (children != null && children.size > 0) {
-            for (SceneGraphNode node : children)
-                node.updateNamesRec();
+    public void updateI18nNameRec() {
+        updateI18nName();
+        if (children != null) {
+            for (SceneGraphNode child : children) {
+                if (child != null) {
+                    child.updateI18nNameRec();
+                }
+            }
         }
     }
 
@@ -627,11 +642,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public void setParent(String parentName) {
         this.parentName = parentName;
-    }
-
-    public void setParentkey(String parentkey) {
-        this.parentkey = parentkey;
-        this.updateNames();
     }
 
     public void dispose() {

@@ -82,11 +82,11 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        dateEdit.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dateedit"), skin));
+        dateEdit.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dateedit"), skin));
 
         // Pace
         timeWarpVector = generateTimeWarpVector(warpSteps);
-        warp = new OwnSliderPlus(I18n.txt("gui.warp"), -warpSteps, warpSteps, 1, skin, "big-horizontal-arrow");
+        warp = new OwnSliderPlus(I18n.msg("gui.warp"), -warpSteps, warpSteps, 1, skin, "big-horizontal-arrow");
         warp.setValueLabelTransform((value) -> TextUtils.getFormattedTimeWarp(timeWarpVector[value.intValue() + warpSteps]));
         warp.setValue(getWarpIndex(GaiaSky.instance.time.getWarpFactor()) - warpSteps);
         warp.setWidth(300f);
@@ -110,7 +110,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        plus.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime"), skin));
+        plus.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpplus"), kb.getStringKeys("action.doubletime"), skin));
 
         minus = new OwnImageButton(skin, "minus");
         minus.setName("minus");
@@ -122,13 +122,13 @@ public class TimeComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        minus.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
+        minus.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
 
         /* Reset time */
-        OwnTextIconButton resetTime = new OwnTextIconButton(I18n.txt("gui.resettime"), skin, "reset");
+        OwnTextIconButton resetTime = new OwnTextIconButton(I18n.msg("gui.resettime"), skin, "reset");
         resetTime.align(Align.center);
         resetTime.setWidth(contentWidth);
-        resetTime.addListener(new OwnTextTooltip(I18n.txt("gui.resettime.tooltip"), skin));
+        resetTime.addListener(new OwnTextTooltip(I18n.msg("gui.resettime.tooltip"), skin));
         resetTime.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Events

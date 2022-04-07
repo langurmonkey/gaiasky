@@ -92,8 +92,8 @@ public class MinimapWidget implements Disposable {
         current = null;
 
         String minimapHotkey = KeyBindings.instance.getStringKeys("action.toggle/gui.minimap.title");
-        topProjection.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.minimap.title") + " - " + I18n.txt("gui.minimap.top"), minimapHotkey, skin));
-        sideProjection.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.minimap.title") + " - " + I18n.txt("gui.minimap.side"), minimapHotkey, skin));
+        topProjection.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.minimap.title") + " - " + I18n.msg("gui.minimap.top"), minimapHotkey, skin));
+        sideProjection.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.minimap.title") + " - " + I18n.msg("gui.minimap.side"), minimapHotkey, skin));
         aux3d = new Vector3d();
     }
 

@@ -116,9 +116,9 @@ public class CollapsiblePane extends Table {
             return false;
         });
         if (shortcut == null)
-            expandIcon.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.expandcollapse.group"), skin));
+            expandIcon.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.expandcollapse.group"), skin));
         else
-            expandIcon.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.expandcollapse.group"), shortcut, skin));
+            expandIcon.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.tooltip.expandcollapse.group"), shortcut, skin));
 
         // Detach icon
         detachIcon = new OwnImageButton(skin, detachButtonStyle);
@@ -131,7 +131,7 @@ public class CollapsiblePane extends Table {
             }
             return false;
         });
-        detachIcon.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.detach.group"), skin));
+        detachIcon.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.detach.group"), skin));
 
         // Question icon
         OwnLabel questionLabel = new OwnLabel("(?)", skin, "question");
@@ -266,7 +266,7 @@ public class CollapsiblePane extends Table {
         window.add(contentScroll).pad(8f).row();
 
         // Close button
-        OwnTextButton close = new OwnTextButton(I18n.txt("gui.close"), skin, "default");
+        OwnTextButton close = new OwnTextButton(I18n.msg("gui.close"), skin, "default");
         close.setName("close");
         close.addListener(event -> {
             if (event instanceof ChangeEvent) {

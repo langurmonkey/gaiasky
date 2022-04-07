@@ -100,7 +100,7 @@ public class ComponentTypes extends BitSet {
 
         public String getName() {
             try {
-                return I18n.txt(key);
+                return I18n.msg(key);
             } catch (MissingResourceException e) {
                 return null;
             }

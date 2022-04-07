@@ -101,7 +101,7 @@ public class FullGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        logger.info(I18n.txt("notif.gui.init"));
+        logger.info(I18n.msg("notif.gui.init"));
 
         interfaces = new Array<>();
 
@@ -206,7 +206,7 @@ public class FullGui extends AbstractGui {
                         Settings.settings.program.update.lastCheck = Instant.now();
 
                         if (versionNumber > Settings.settings.version.versionNumber) {
-                            logger.info(I18n.txt("gui.newversion.available", Settings.settings.version.version, tagVersion));
+                            logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion));
                             // There's a new version!
                             UpdatePopup newVersion = new UpdatePopup(tagVersion, ui, skin);
                             newVersion.pack();
@@ -216,13 +216,13 @@ public class FullGui extends AbstractGui {
                             ui.addActor(newVersion);
                         } else {
                             // No new version
-                            logger.info(I18n.txt("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
+                            logger.info(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
                         }
 
                     } else {
                         // Handle failed case
                         // Do nothing
-                        logger.info(I18n.txt("gui.newversion.fail"));
+                        logger.info(I18n.msg("gui.newversion.fail"));
                     }
                 }
                 return false;
@@ -233,7 +233,7 @@ public class FullGui extends AbstractGui {
             Timer.Task t = new Timer.Task() {
                 @Override
                 public void run() {
-                    logger.info(I18n.txt("gui.newversion.checking"));
+                    logger.info(I18n.msg("gui.newversion.checking"));
                     vct.start();
                 }
             };
@@ -380,10 +380,10 @@ public class FullGui extends AbstractGui {
             landAtLocation.show(ui);
             break;
         case SHOW_PLAYCAMERA_ACTION:
-            FileChooser fc = new FileChooser(I18n.txt("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+            FileChooser fc = new FileChooser(I18n.msg("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
             fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
             fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
-            fc.setAcceptText(I18n.txt("gui.camera.run"));
+            fc.setAcceptText(I18n.msg("gui.camera.run"));
             fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
             fc.setAcceptedFiles("*.dat, *.gsc");
             fc.setResultListener((success, result) -> {

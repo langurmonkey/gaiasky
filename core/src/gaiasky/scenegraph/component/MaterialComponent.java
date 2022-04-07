@@ -226,7 +226,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
-        logger.info(I18n.txt("notif.loading", tex));
+        logger.info(I18n.msg("notif.loading", tex));
         manager.load(tex, Texture.class, texParams);
 
         return tex;
@@ -245,7 +245,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
-        logger.info(I18n.txt("notif.loading", tex));
+        logger.info(I18n.msg("notif.loading", tex));
         AssetBean.addAsset(tex, Texture.class, texParams);
 
         return tex;
@@ -442,14 +442,14 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
                 long start = TimeUtils.millis();
-                GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.surface"), Integer.toString(N), Integer.toString(M))));
+                GaiaSky.postRunnable(() -> logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.surface"), Integer.toString(N), Integer.toString(M))));
 
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
                 }
-                Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.surface"), name));
+                Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, I18n.msg("gui.procedural.progress", I18n.msg("gui.procedural.surface"), name));
                 float[][] elevationData = trio.getFirst();
                 float[][] moistureData = trio.getSecond();
                 Pixmap heightPixmap = trio.getThird();
@@ -595,7 +595,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                     });
                 }
                 long elapsed = TimeUtils.millis() - start;
-                GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.surface"), Double.toString(elapsed / 1000d))));
+                GaiaSky.postRunnable(() -> logger.info(I18n.msg("gui.procedural.info.done", I18n.msg("gui.procedural.surface"), Double.toString(elapsed / 1000d))));
 
                 // End
                 EventManager.publish(Event.PROCEDURAL_GENERATION_SURFACE_INFO, this, false);

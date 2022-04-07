@@ -23,10 +23,10 @@ public class QuitWindow extends GenericDialog {
     private OwnCheckBox doNotAsk;
 
     public QuitWindow(Stage ui, Skin skin) {
-        super(I18n.txt("gui.quit.title"), skin, ui);
+        super(I18n.msg("gui.quit.title"), skin, ui);
 
-        setAcceptText(I18n.txt("gui.yes"));
-        setCancelText(I18n.txt("gui.no"));
+        setAcceptText(I18n.msg("gui.yes"));
+        setCancelText(I18n.msg("gui.no"));
 
         buildSuper();
     }
@@ -35,9 +35,9 @@ public class QuitWindow extends GenericDialog {
     protected void build() {
         content.clear();
 
-        content.add(new OwnLabel(I18n.txt("gui.quit.sure"), skin)).left().padBottom(pad10 * 2f).row();
+        content.add(new OwnLabel(I18n.msg("gui.quit.sure"), skin)).left().padBottom(pad10 * 2f).row();
 
-        doNotAsk = new OwnCheckBox(I18n.txt("gui.donotask"), skin, pad5);
+        doNotAsk = new OwnCheckBox(I18n.msg("gui.donotask"), skin, pad5);
         doNotAsk.setChecked(false);
 
         bottom.add(doNotAsk).right().row();

@@ -42,7 +42,7 @@ public class CubemapComponent implements Disposable {
                 String cubemapLocation = location == null ? Settings.settings.data.reflectionSkyboxLocation : location;
                 String cubemapLocationUnapacked = Settings.settings.data.dataFile(cubemapLocation);
                 cubemapLocationUnapacked = GlobalResources.unpackAssetPath(cubemapLocationUnapacked);
-                logger.info(I18n.txt("notif.loading", "cubemap: " + cubemapLocationUnapacked));
+                logger.info(I18n.msg("notif.loading", "cubemap: " + cubemapLocationUnapacked));
                 cmBack = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "bk", "back", "b");
                 cmFront = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "ft", "front", "f");
                 cmUp = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "up", "top", "u", "t");
@@ -99,7 +99,7 @@ public class CubemapComponent implements Disposable {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
-        logger.debug(I18n.txt("notif.loading", tex));
+        logger.debug(I18n.msg("notif.loading", tex));
         manager.load(tex, Texture.class, texParams);
 
         return tex;
@@ -118,7 +118,7 @@ public class CubemapComponent implements Disposable {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
-        logger.debug(I18n.txt("notif.loading", tex));
+        logger.debug(I18n.msg("notif.loading", tex));
         AssetBean.addAsset(tex, Texture.class, texParams);
 
         return tex;

@@ -142,7 +142,7 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
-        super(I18n.txt("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", serverDd.numUpdates) : ""), skin, stage);
+        super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates", serverDd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.serverDd = serverDd;
         this.highlight = ColorUtils.gYellowC;
@@ -163,7 +163,7 @@ public class DatasetManagerWindow extends GenericDialog {
         buildSuper();
 
         // Alternative accept button that checks the current downloads
-        OwnTextButton acceptButton = new OwnTextButton(I18n.txt("gui.close"), skin, "default");
+        OwnTextButton acceptButton = new OwnTextButton(I18n.msg("gui.close"), skin, "default");
         acceptButton.setName("accept-alt");
         acceptButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -198,12 +198,12 @@ public class DatasetManagerWindow extends GenericDialog {
 
         String tabInstalledText;
         if (serverDd != null && serverDd.updatesAvailable) {
-            tabInstalledText = I18n.txt("gui.download.tab.installed.updates", serverDd.numUpdates);
+            tabInstalledText = I18n.msg("gui.download.tab.installed.updates", serverDd.numUpdates);
         } else {
-            tabInstalledText = I18n.txt("gui.download.tab.installed");
+            tabInstalledText = I18n.msg("gui.download.tab.installed");
         }
 
-        final OwnTextButton tabAvail = new OwnTextButton(I18n.txt("gui.download.tab.available"), skin, "toggle-big");
+        final OwnTextButton tabAvail = new OwnTextButton(I18n.msg("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad5);
         tabAvail.setWidth(tabWidth);
         final OwnTextButton tabInstalled = new OwnTextButton(tabInstalledText, skin, "toggle-big");
@@ -275,7 +275,7 @@ public class DatasetManagerWindow extends GenericDialog {
             addDataLocation(content);
 
         // Add manual download
-        Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
+        Link manualDownload = new Link(I18n.msg("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
         content.add(manualDownload).center();
 
         initialized.set(true);
@@ -287,9 +287,9 @@ public class DatasetManagerWindow extends GenericDialog {
 
         Table dataLocTable = new Table(skin);
 
-        OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location"), skin);
+        OwnLabel catalogsLocLabel = new OwnLabel(I18n.msg("gui.download.location"), skin);
         OwnImageButton catalogsLocTooltip = new OwnImageButton(skin, "tooltip");
-        catalogsLocTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.download.location.info"), skin));
+        catalogsLocTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.download.location.info"), skin));
         HorizontalGroup catalogsLocGroup = new HorizontalGroup();
         catalogsLocGroup.space(pad10);
         catalogsLocGroup.addActor(catalogsLocLabel);
@@ -310,7 +310,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         dataLocationButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(Settings.settings.data.location), FileChooser.FileChooserTarget.DIRECTORIES);
+                FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"), skin, stage, Path.of(Settings.settings.data.location), FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setResultListener((success, result) -> {
@@ -330,7 +330,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 GaiaSky.instance.getGlobalResources().reloadDataFiles();
                             });
                         } else {
-                            Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
+                            Label warn = new OwnLabel(I18n.msg("gui.download.pickloc.permissions"), skin);
                             warn.setColor(ColorUtils.gRedC);
                             notice.setActor(warn);
                             return false;
@@ -365,9 +365,9 @@ public class DatasetManagerWindow extends GenericDialog {
         content.clear();
         if (dataDescriptor == null || dataDescriptor.datasets.isEmpty()) {
             if (mode == DatasetMode.AVAILABLE) {
-                content.add(new OwnLabel(I18n.txt("gui.download.noconnection.title"), skin)).center().padTop(pad20 * 2f).padBottom(pad10).row();
+                content.add(new OwnLabel(I18n.msg("gui.download.noconnection.title"), skin)).center().padTop(pad20 * 2f).padBottom(pad10).row();
             }
-            content.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
+            content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
         } else {
             Cell left = content.add().top().left().padRight(pad20);
             Cell right = content.add().top().left();
@@ -377,7 +377,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 reloadRightPane(right, selectedDataset[mode.ordinal()], mode);
             } else {
                 content.clear();
-                content.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
+                content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
             }
 
         }
@@ -412,7 +412,7 @@ public class DatasetManagerWindow extends GenericDialog {
             List<DatasetDesc> datasets = type.datasets;
             List<DatasetDesc> filtered = datasets.stream().filter(d -> mode == DatasetMode.AVAILABLE ? !d.exists : true).collect(Collectors.toList());
             if (!filtered.isEmpty()) {
-                OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
+                OwnLabel dsType = new OwnLabel(I18n.msg("gui.download.type." + type.typeStr), skin, "hud-header");
                 leftTable.add(dsType).left().padTop(pad10).row();
 
                 for (DatasetDesc dataset : filtered) {
@@ -435,7 +435,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     title.setWidth(width * 0.41f);
                     if (dataset.outdated) {
                         title.setColor(highlight);
-                        tooltipText = I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion));
+                        tooltipText = I18n.msg("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion));
                     }
 
                     // Install, update or enable/disable
@@ -444,7 +444,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     if (mode == DatasetMode.AVAILABLE || dataset.outdated) {
                         OwnTextIconButton install = new OwnTextIconButton("", skin, "install");
                         install.setContentAlign(Align.center);
-                        install.addListener(new OwnTextTooltip(I18n.txt(dataset.outdated ? "gui.download.update" : "gui.download.install"), skin));
+                        install.addListener(new OwnTextTooltip(I18n.msg(dataset.outdated ? "gui.download.update" : "gui.download.install"), skin));
                         install.addListener((event) -> {
                             if (event instanceof ChangeEvent) {
                                 if (dataset.outdated) {
@@ -470,14 +470,14 @@ public class DatasetManagerWindow extends GenericDialog {
                             select.setChecked(false);
                             select.setDisabled(true);
                             title.setColor(ColorUtils.gRedC);
-                            tooltipText = I18n.txt("gui.download.version.gs.mismatch", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion));
+                            tooltipText = I18n.msg("gui.download.version.gs.mismatch", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion));
                             select.getStyle().disabledFontColor = ColorUtils.gRedC;
 
                             // Remove from selected, if it is
                             String filePath = dataset.catalogFile.path();
                             if (Settings.settings.data.dataFiles.contains(filePath)) {
                                 Settings.settings.data.dataFiles.remove(filePath);
-                                logger.info(I18n.txt("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
+                                logger.info(I18n.msg("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
                             }
                         } else {
                             select.setChecked(TextUtils.contains("data/" + dataset.checkStr, currentSetting));
@@ -500,19 +500,19 @@ public class DatasetManagerWindow extends GenericDialog {
 
                     // Size
                     OwnLabel size = new OwnLabel(dataset.size, skin, "grey-large");
-                    size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+                    size.addListener(new OwnTextTooltip(I18n.msg("gui.download.size.tooltip"), skin, 10));
                     size.setWidth(88f);
 
                     // Version
                     OwnLabel version = null;
                     if (mode == DatasetMode.AVAILABLE) {
-                        version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
+                        version = new OwnLabel(I18n.msg("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
                     } else if (mode == DatasetMode.INSTALLED) {
                         if (dataset.outdated) {
-                            version = new OwnLabel(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
+                            version = new OwnLabel(I18n.msg("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
                             version.setColor(highlight);
                         } else {
-                            version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
+                            version = new OwnLabel(I18n.msg("gui.download.version.local", dataset.myVersion), skin, "grey-large");
                         }
                     }
                     HorizontalGroup versionSize = new HorizontalGroup();
@@ -556,7 +556,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                             if (mode == DatasetMode.INSTALLED) {
                                                 if (dataset.outdated) {
                                                     // Update
-                                                    MenuItem update = new MenuItem(I18n.txt("gui.download.update"), skin, skin.getDrawable("iconic-arrow-circle-bottom"));
+                                                    MenuItem update = new MenuItem(I18n.msg("gui.download.update"), skin, skin.getDrawable("iconic-arrow-circle-bottom"));
                                                     update.addListener(new ChangeListener() {
                                                         @Override
                                                         public void changed(ChangeEvent event, Actor actor) {
@@ -569,7 +569,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
                                                     if (enabled) {
                                                         // Disable
-                                                        MenuItem disable = new MenuItem(I18n.txt("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
+                                                        MenuItem disable = new MenuItem(I18n.msg("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
                                                         disable.addListener(new ChangeListener() {
                                                             @Override
                                                             public void changed(ChangeEvent event, Actor actor) {
@@ -586,7 +586,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                         datasetContext.addItem(disable);
                                                     } else {
                                                         // Enable
-                                                        MenuItem enable = new MenuItem(I18n.txt("gui.download.enable"), skin, skin.getDrawable("check-on"));
+                                                        MenuItem enable = new MenuItem(I18n.msg("gui.download.enable"), skin, skin.getDrawable("check-on"));
                                                         enable.addListener(new ChangeListener() {
                                                             @Override
                                                             public void changed(ChangeEvent event, Actor actor) {
@@ -605,7 +605,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     datasetContext.addSeparator();
                                                 }
                                                 // Delete
-                                                MenuItem delete = new MenuItem(I18n.txt("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
+                                                MenuItem delete = new MenuItem(I18n.msg("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
                                                 delete.addListener(new ClickListener() {
                                                     @Override
                                                     public void clicked(InputEvent event, float x, float y) {
@@ -616,7 +616,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                 datasetContext.addItem(delete);
                                             } else if (mode == DatasetMode.AVAILABLE) {
                                                 // Install
-                                                MenuItem install = new MenuItem(I18n.txt("gui.download.install"), skin, skin.getDrawable("iconic-cloud-download"));
+                                                MenuItem install = new MenuItem(I18n.msg("gui.download.install"), skin, skin.getDrawable("iconic-cloud-download"));
                                                 install.addListener(new ChangeListener() {
                                                     @Override
                                                     public void changed(ChangeEvent event, Actor actor) {
@@ -665,7 +665,7 @@ public class DatasetManagerWindow extends GenericDialog {
         Table t = new Table(skin);
 
         if (dataset == null) {
-            OwnLabel l = new OwnLabel(I18n.txt("gui.download.noselected"), skin);
+            OwnLabel l = new OwnLabel(I18n.msg("gui.download.noselected"), skin);
             t.add(l).center().padTop(pad20 * 3);
         } else {
             // Type icon
@@ -691,57 +691,57 @@ public class DatasetManagerWindow extends GenericDialog {
             // Status
             OwnLabel status = null;
             if (mode == DatasetMode.AVAILABLE) {
-                status = new OwnLabel(I18n.txt("gui.download.available"), skin, "mono");
+                status = new OwnLabel(I18n.msg("gui.download.available"), skin, "mono");
             } else if (mode == DatasetMode.INSTALLED) {
                 if (dataset.baseData || dType.equals("texture-pack")) {
                     // Always enabled
-                    status = new OwnLabel(I18n.txt("gui.download.enabled"), skin, "mono");
+                    status = new OwnLabel(I18n.msg("gui.download.enabled"), skin, "mono");
                 } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
                     // Notify version mismatch
-                    status = new OwnLabel(I18n.txt("gui.download.version.gs.mismatch.short", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
+                    status = new OwnLabel(I18n.msg("gui.download.version.gs.mismatch.short", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
                     status.setColor(ColorUtils.gRedC);
                 } else {
                     // Notify status
                     java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
                     boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
-                    status = new OwnLabel(I18n.txt(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
+                    status = new OwnLabel(I18n.msg(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
                 }
             }
 
             // Type
             String typeString;
-            if (I18n.hasKey("gui.download.type." + dType)) {
-                typeString = I18n.txt("gui.download.type." + dType);
+            if (I18n.hasMessage("gui.download.type." + dType)) {
+                typeString = I18n.msg("gui.download.type." + dType);
             } else {
                 typeString = dType;
             }
-            OwnLabel type = new OwnLabel(I18n.txt("gui.download.type", typeString), skin, "grey-large");
+            OwnLabel type = new OwnLabel(I18n.msg("gui.download.type", typeString), skin, "grey-large");
             type.addListener(new OwnTextTooltip(dType, skin, 10));
 
             // Version
             OwnLabel version = null;
             if (mode == DatasetMode.AVAILABLE) {
-                version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
+                version = new OwnLabel(I18n.msg("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
             } else if (mode == DatasetMode.INSTALLED) {
                 if (dataset.outdated) {
-                    version = new OwnLabel(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
+                    version = new OwnLabel(I18n.msg("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
                     version.setColor(highlight);
                 } else {
-                    version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
+                    version = new OwnLabel(I18n.msg("gui.download.version.local", dataset.myVersion), skin, "grey-large");
                 }
             }
 
             // Key
-            OwnLabel key = new OwnLabel(I18n.txt("gui.download.name", dataset.key), skin, "grey-large");
+            OwnLabel key = new OwnLabel(I18n.msg("gui.download.name", dataset.key), skin, "grey-large");
 
             // Size
-            OwnLabel size = new OwnLabel(I18n.txt("gui.download.size", dataset.size), skin, "grey-large");
-            size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+            OwnLabel size = new OwnLabel(I18n.msg("gui.download.size", dataset.size), skin, "grey-large");
+            size.addListener(new OwnTextTooltip(I18n.msg("gui.download.size.tooltip"), skin, 10));
 
             // Num objects
-            String nObjStr = dataset.nObjects > 0 ? I18n.txt("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.txt("gui.dataset.nobjects.none");
+            String nObjStr = dataset.nObjects > 0 ? I18n.msg("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.msg("gui.dataset.nobjects.none");
             OwnLabel nObjects = new OwnLabel(nObjStr, skin, "grey-large");
-            nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
+            nObjects.addListener(new OwnTextTooltip(I18n.msg("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
 
             // Link
             Link link = null;
@@ -764,7 +764,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 releaseNotesString = "-";
             }
             releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
-            OwnLabel releaseNotes = new OwnLabel(I18n.txt("gui.download.releasenotes", releaseNotesString), skin);
+            OwnLabel releaseNotes = new OwnLabel(I18n.msg("gui.download.releasenotes", releaseNotesString), skin);
             releaseNotes.setWidth(1000f);
 
             // Files
@@ -774,7 +774,7 @@ public class DatasetManagerWindow extends GenericDialog {
             } else {
                 filesString = TextUtils.arrayToStr(dataset.files, "", "", "\n");
             }
-            OwnLabel files = new OwnLabel(I18n.txt("gui.download.files", filesString), skin, "grey-large");
+            OwnLabel files = new OwnLabel(I18n.msg("gui.download.files", filesString), skin, "grey-large");
 
             infoTable.add(desc).top().left().padBottom(pad20).row();
             infoTable.add(releaseNotes).top().left().padBottom(pad20).row();
@@ -792,7 +792,7 @@ public class DatasetManagerWindow extends GenericDialog {
             if (currentDownloads.containsKey(dataset.key)) {
                 Pair<DatasetDesc, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
                 HttpRequest request = pair.getSecond();
-                cancelDownloadButton = new OwnTextIconButton(I18n.txt("gui.download.cancel"), skin, "quit");
+                cancelDownloadButton = new OwnTextIconButton(I18n.msg("gui.download.cancel"), skin, "quit");
                 cancelDownloadButton.pad(14.4f);
                 cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
                 cancelDownloadButton.addListener(new ChangeListener() {
@@ -855,7 +855,7 @@ public class DatasetManagerWindow extends GenericDialog {
             try {
                 double readMb = (double) read / 1e6d;
                 double totalMb = (double) total / 1e6d;
-                final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.downloading", nf.format(progress));
+                final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.downloading", nf.format(progress));
                 double mbPerSecond = speed / 1000d;
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
                 // Since we are downloading on a background thread, post a runnable to touch UI
@@ -863,13 +863,13 @@ public class DatasetManagerWindow extends GenericDialog {
                     EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
                 });
             } catch (Exception e) {
-                logger.warn(I18n.txt("gui.download.error.progress"));
+                logger.warn(I18n.msg("gui.download.error.progress"));
             }
         };
         ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
             double readMb = (double) read / 1e6d;
             double totalMb = (double) total / 1e6d;
-            final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.checksumming", nf.format(progress));
+            final String progressString = progress >= 100 ? I18n.msg("gui.done") : I18n.msg("gui.download.checksumming", nf.format(progress));
             double mbPerSecond = speed / 1000d;
             final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI
@@ -936,7 +936,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         successRunnable.run();
                     }
                     resetSelectedDataset();
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.finished", name), 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.finished", name), 10f);
                     com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                         @Override
                         public void run() {
@@ -944,7 +944,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         }
                     }, 0.5f);
                 } else {
-                    logger.error(I18n.txt("gui.download.failed", name + " - " + url));
+                    logger.error(I18n.msg("gui.download.failed", name + " - " + url));
                     tempDownload.delete();
                     if (errorMessage != null)
                         setStatusError(dataset, errorMessage);
@@ -952,7 +952,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         setStatusError(dataset);
                     currentDownloads.remove(dataset.key);
                     resetSelectedDataset();
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.failed", name), 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), 10f);
                     com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                         @Override
                         public void run() {
@@ -965,12 +965,12 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         Runnable fail = () -> {
-            logger.error(I18n.txt("gui.download.failed", name + " - " + url));
+            logger.error(I18n.msg("gui.download.failed", name + " - " + url));
             tempDownload.delete();
             setStatusError(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.failed", name), 10f);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), 10f);
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
                 public void run() {
@@ -980,11 +980,11 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         Runnable cancel = () -> {
-            logger.error(I18n.txt("gui.download.cancelled", name + " - " + url));
+            logger.error(I18n.msg("gui.download.cancelled", name + " - " + url));
             setStatusCancelled(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.cancelled", name), 10f);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.cancelled", name), 10f);
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
                 public void run() {
@@ -1025,7 +1025,7 @@ public class DatasetManagerWindow extends GenericDialog {
             if (elapsed > 250) {
                 GaiaSky.postRunnable(() -> {
                     float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
-                    String progressString = I18n.txt("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
+                    String progressString = I18n.msg("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
                     EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, val, progressString, null);
                 });
                 last = current;
@@ -1131,13 +1131,13 @@ public class DatasetManagerWindow extends GenericDialog {
         copy.putAll(currentDownloads);
 
         if (!copy.isEmpty()) {
-            GenericDialog question = new GenericDialog(I18n.txt("gui.download.close.title"), skin, stage) {
+            GenericDialog question = new GenericDialog(I18n.msg("gui.download.close.title"), skin, stage) {
 
                 @Override
                 protected void build() {
                     content.clear();
-                    content.add(new OwnLabel(I18n.txt("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad20).row();
-                    content.add(new OwnLabel(I18n.txt("gui.download.close.current"), skin)).left().padBottom(pad10).row();
+                    content.add(new OwnLabel(I18n.msg("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad20).row();
+                    content.add(new OwnLabel(I18n.msg("gui.download.close.current"), skin)).left().padBottom(pad10).row();
                     for (String key : copy.keySet()) {
                         DatasetDesc dd = copy.get(key).getFirst();
                         content.add(new OwnLabel(dd.name, skin, "warp")).center().padBottom(pad5).row();
@@ -1168,8 +1168,8 @@ public class DatasetManagerWindow extends GenericDialog {
                     // Nothing
                 }
             };
-            question.setAcceptText(I18n.txt("gui.yes"));
-            question.setCancelText(I18n.txt("gui.no"));
+            question.setAcceptText(I18n.msg("gui.yes"));
+            question.setCancelText(I18n.msg("gui.no"));
             question.buildSuper();
             question.show(stage);
         } else {
@@ -1289,13 +1289,13 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void actionDeleteDataset(DatasetDesc dataset) {
-        GenericDialog question = new GenericDialog(I18n.txt("gui.download.delete.title"), skin, stage) {
+        GenericDialog question = new GenericDialog(I18n.msg("gui.download.delete.title"), skin, stage) {
 
             @Override
             protected void build() {
                 content.clear();
                 String title = dataset.name;
-                content.add(new OwnLabel(I18n.txt("gui.download.delete.text"), skin)).left().padBottom(pad10 * 2f).row();
+                content.add(new OwnLabel(I18n.msg("gui.download.delete.text"), skin)).left().padBottom(pad10 * 2f).row();
                 content.add(new OwnLabel(title, skin, "warp")).center().padBottom(pad10 * 2f).row();
             }
 
@@ -1361,8 +1361,8 @@ public class DatasetManagerWindow extends GenericDialog {
                 // Nothing
             }
         };
-        question.setAcceptText(I18n.txt("gui.yes"));
-        question.setCancelText(I18n.txt("gui.no"));
+        question.setAcceptText(I18n.msg("gui.yes"));
+        question.setCancelText(I18n.msg("gui.no"));
         question.buildSuper();
         question.show(stage);
     }

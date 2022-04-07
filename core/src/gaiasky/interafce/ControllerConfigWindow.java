@@ -117,13 +117,13 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
             this.mappings = new ControllerMappings(this.controllerName);
         }
 
-        none = "-" + I18n.txt("gui.none").toLowerCase() + "-";
-        button = I18n.txt("gui.controller.button");
-        axis = I18n.txt("gui.controller.axis");
+        none = "-" + I18n.msg("gui.none").toLowerCase() + "-";
+        button = I18n.msg("gui.controller.button");
+        axis = I18n.msg("gui.controller.axis");
 
         setModal(true);
-        setAcceptText(I18n.txt("gui.save"));
-        setCancelText(I18n.txt("gui.cancel"));
+        setAcceptText(I18n.msg("gui.save"));
+        setCancelText(I18n.msg("gui.cancel"));
 
         // Initialize textures
         Texture rb;
@@ -168,32 +168,32 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         inputFields = new HashMap<>();
         inputInfo = new HashMap<>();
         // Buttons
-        inputInfo.put(Gamepad.A, new Trio<>(a, new float[]{310, -50}, I18n.txt("gui.controller.action.primary")));
-        inputInfo.put(Gamepad.B, new Trio<>(b, new float[]{397, -120}, I18n.txt("gui.controller.action.back")));
-        inputInfo.put(Gamepad.X, new Trio<>(x, new float[]{227, -120}, I18n.txt("gui.controller.action.secondary")));
-        inputInfo.put(Gamepad.Y, new Trio<>(y, new float[]{310, -190}, I18n.txt("gui.controller.action.tertiary")));
+        inputInfo.put(Gamepad.A, new Trio<>(a, new float[]{310, -50}, I18n.msg("gui.controller.action.primary")));
+        inputInfo.put(Gamepad.B, new Trio<>(b, new float[]{397, -120}, I18n.msg("gui.controller.action.back")));
+        inputInfo.put(Gamepad.X, new Trio<>(x, new float[]{227, -120}, I18n.msg("gui.controller.action.secondary")));
+        inputInfo.put(Gamepad.Y, new Trio<>(y, new float[]{310, -190}, I18n.msg("gui.controller.action.tertiary")));
         // Left stick
-        inputInfo.put(Gamepad.LSTICK, new Trio<>(stick, new float[]{-322, -122}, I18n.txt("gui.controller.lstick.click")));
-        inputInfo.put(Gamepad.LSTICK_H, new Trio<>(stickH, new float[]{-322, -122}, I18n.txt("gui.controller.lstick.horizontal")));
-        inputInfo.put(Gamepad.LSTICK_V, new Trio<>(stickV, new float[]{-322, -122}, I18n.txt("gui.controller.lstick.vertical")));
+        inputInfo.put(Gamepad.LSTICK, new Trio<>(stick, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.click")));
+        inputInfo.put(Gamepad.LSTICK_H, new Trio<>(stickH, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.horizontal")));
+        inputInfo.put(Gamepad.LSTICK_V, new Trio<>(stickV, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.vertical")));
         // Right stick
-        inputInfo.put(Gamepad.RSTICK, new Trio<>(stick, new float[]{160, 50}, I18n.txt("gui.controller.rstick.click")));
-        inputInfo.put(Gamepad.RSTICK_H, new Trio<>(stickH, new float[]{160, 50}, I18n.txt("gui.controller.rstick.horizontal")));
-        inputInfo.put(Gamepad.RSTICK_V, new Trio<>(stickV, new float[]{160, 50}, I18n.txt("gui.controller.rstick.vertical")));
+        inputInfo.put(Gamepad.RSTICK, new Trio<>(stick, new float[]{160, 50}, I18n.msg("gui.controller.rstick.click")));
+        inputInfo.put(Gamepad.RSTICK_H, new Trio<>(stickH, new float[]{160, 50}, I18n.msg("gui.controller.rstick.horizontal")));
+        inputInfo.put(Gamepad.RSTICK_V, new Trio<>(stickV, new float[]{160, 50}, I18n.msg("gui.controller.rstick.vertical")));
         // Dpad
-        inputInfo.put(Gamepad.DPAD_UP, new Trio<>(dPadU, new float[]{-155, 10}, I18n.txt("gui.controller.dpad.up")));
-        inputInfo.put(Gamepad.DPAD_DOWN, new Trio<>(dPadD, new float[]{-155, 85}, I18n.txt("gui.controller.dpad.down")));
-        inputInfo.put(Gamepad.DPAD_LEFT, new Trio<>(dPadL, new float[]{-194, 49}, I18n.txt("gui.controller.dpad.left")));
-        inputInfo.put(Gamepad.DPAD_RIGHT, new Trio<>(dPadR, new float[]{-120, 49}, I18n.txt("gui.controller.dpad.right")));
+        inputInfo.put(Gamepad.DPAD_UP, new Trio<>(dPadU, new float[]{-155, 10}, I18n.msg("gui.controller.dpad.up")));
+        inputInfo.put(Gamepad.DPAD_DOWN, new Trio<>(dPadD, new float[]{-155, 85}, I18n.msg("gui.controller.dpad.down")));
+        inputInfo.put(Gamepad.DPAD_LEFT, new Trio<>(dPadL, new float[]{-194, 49}, I18n.msg("gui.controller.dpad.left")));
+        inputInfo.put(Gamepad.DPAD_RIGHT, new Trio<>(dPadR, new float[]{-120, 49}, I18n.msg("gui.controller.dpad.right")));
         // Start/select
-        inputInfo.put(Gamepad.START, new Trio<>(startSelect, new float[]{75, -170}, I18n.txt("gui.controller.start")));
-        inputInfo.put(Gamepad.SELECT, new Trio<>(startSelect, new float[]{-75, -170}, I18n.txt("gui.controller.select")));
+        inputInfo.put(Gamepad.START, new Trio<>(startSelect, new float[]{75, -170}, I18n.msg("gui.controller.start")));
+        inputInfo.put(Gamepad.SELECT, new Trio<>(startSelect, new float[]{-75, -170}, I18n.msg("gui.controller.select")));
         // Bumpers
-        inputInfo.put(Gamepad.LB, new Trio<>(lb, new float[]{-322, -282}, I18n.txt("gui.controller.lb")));
-        inputInfo.put(Gamepad.RB, new Trio<>(rb, new float[]{322, -282}, I18n.txt("gui.controller.rb")));
+        inputInfo.put(Gamepad.LB, new Trio<>(lb, new float[]{-322, -282}, I18n.msg("gui.controller.lb")));
+        inputInfo.put(Gamepad.RB, new Trio<>(rb, new float[]{322, -282}, I18n.msg("gui.controller.rb")));
         // Triggers
-        inputInfo.put(Gamepad.LT, new Trio<>(lt, new float[]{-354, -265}, I18n.txt("gui.controller.lt")));
-        inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[]{354, -265}, I18n.txt("gui.controller.rt")));
+        inputInfo.put(Gamepad.LT, new Trio<>(lt, new float[]{-354, -265}, I18n.msg("gui.controller.lt")));
+        inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[]{354, -265}, I18n.msg("gui.controller.rt")));
 
         // Remove all controller listeners
         Settings.settings.controls.gamepad.removeAllControllerListeners();
@@ -214,7 +214,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         float iw = 176f;
 
         // Main tips
-        OwnLabel tip = new OwnLabel(I18n.txt("gui.controller.tip.config"), skin);
+        OwnLabel tip = new OwnLabel(I18n.msg("gui.controller.tip.config"), skin);
         content.add(tip).colspan(2).padBottom(pad10 * 2f).row();
 
         // Controller
@@ -227,7 +227,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         elementCell = controllerTable.add((Image) null);
 
         // Last input
-        OwnLabel currentInputLabel = new OwnLabel(I18n.txt("gui.controller.lastinput") + ":", skin, "header");
+        OwnLabel currentInputLabel = new OwnLabel(I18n.msg("gui.controller.lastinput") + ":", skin, "header");
         currentInput = new OwnLabel(none, skin, "default-blue");
 
         HorizontalGroup lastInputGroup = new HorizontalGroup();
@@ -236,12 +236,12 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         lastInputGroup.addActor(currentInput);
 
         // File name
-        OwnLabel fileLabel = new OwnLabel(I18n.txt("gui.controller.filename") + ":", skin, "header");
+        OwnLabel fileLabel = new OwnLabel(I18n.msg("gui.controller.filename") + ":", skin, "header");
         LengthValidator lv = new LengthValidator(3, 100);
         filename = new OwnTextField(this.controllerName.replaceAll("\\s+", "_"), skin, lv);
         filename.setWidth(384f);
         OwnImageButton filenameTooltip = new OwnImageButton(skin, "tooltip");
-        filenameTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.controller.filename.tooltip", SysUtils.getDefaultMappingsDir().toAbsolutePath()), skin));
+        filenameTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.controller.filename.tooltip", SysUtils.getDefaultMappingsDir().toAbsolutePath()), skin));
 
         HorizontalGroup filenameGroup = new HorizontalGroup();
         filenameGroup.space(pad20);
@@ -306,22 +306,22 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         Table sensitivityTable01 = new Table(skin);
         Table sensitivityTable02 = new Table(skin);
 
-        OwnLabel titleSensitivity = new OwnLabel(I18n.txt("gui.controller.sensitivity"), skin, "header-s");
+        OwnLabel titleSensitivity = new OwnLabel(I18n.msg("gui.controller.sensitivity"), skin, "header-s");
 
-        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.lstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.lstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
         sensitivityTable01.add(lsx).left().padBottom(pad5).row();
-        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.lstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.lstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
         sensitivityTable01.add(lsy).left().padBottom(pad5).row();
-        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.rstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.rstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
         sensitivityTable01.add(rsx).left().padBottom(pad5).row();
-        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.rstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.rstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
         sensitivityTable01.add(rsy).left().padBottom(pad5).row();
 
-        sensitivityTable02.add(new OwnLabel(I18n.txt("gui.controller.lt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.lt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
         sensitivityTable02.add(lts).left().padBottom(pad5).row();
-        sensitivityTable02.add(new OwnLabel(I18n.txt("gui.controller.rt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad20);
+        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.rt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad20);
         sensitivityTable02.add(rts).left().padBottom(pad20).row();
-        sensitivityTable02.add(new OwnLabel(I18n.txt("gui.controller.axis.pow") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.axis.pow") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
         sensitivityTable02.add(axisPower).left();
 
         // Add inputs and the rest

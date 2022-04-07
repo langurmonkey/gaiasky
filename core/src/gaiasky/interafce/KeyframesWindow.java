@@ -212,7 +212,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private final Editing editing;
 
     public KeyframesWindow(Stage stage, Skin skin) {
-        super(I18n.txt("gui.keyframes.title"), skin, stage);
+        super(I18n.msg("gui.keyframes.title"), skin, stage);
 
         buttonSize = 26f;
         buttonSizeL = 28f;
@@ -228,7 +228,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         this.dateFormat = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
         setModal(false);
 
-        setCancelText(I18n.txt("gui.close"));
+        setCancelText(I18n.msg("gui.close"));
 
         // Build UI
         buildSuper();
@@ -261,8 +261,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         /* LEFT - CONTROLS */
 
         // ADD
-        OwnTextIconButton addKeyframe = new OwnTextIconButton(I18n.txt("gui.keyframes.add.end"), skin, "add");
-        addKeyframe.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.add.end"), skin));
+        OwnTextIconButton addKeyframe = new OwnTextIconButton(I18n.msg("gui.keyframes.add.end"), skin, "add");
+        addKeyframe.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.add.end"), skin));
         addKeyframe.pad(pad5);
         left.add(addKeyframe).left().colspan(2).padBottom(pad5).row();
         addKeyframe.addListener(event -> {
@@ -285,7 +285,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
         secondsInput = new OwnTextField("1.0", skin, secondsValidator);
         secondsInput.setWidth(96f);
-        OwnLabel secondsLabel = new OwnLabel(I18n.txt("gui.keyframes.secsafter") + ":", skin);
+        OwnLabel secondsLabel = new OwnLabel(I18n.msg("gui.keyframes.secsafter") + ":", skin);
         left.add(secondsLabel).center().left().padRight(pad10).padBottom(pad10);
         left.add(secondsInput).center().left().padBottom(pad10).row();
 
@@ -294,14 +294,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]*$");
         nameInput = new OwnTextField("", skin, nameValidator);
         nameInput.setWidth(96f);
-        OwnLabel nameLabel = new OwnLabel(I18n.txt("gui.keyframes.name") + ":", skin);
+        OwnLabel nameLabel = new OwnLabel(I18n.msg("gui.keyframes.name") + ":", skin);
         left.add(nameLabel).center().left().padRight(pad10).padBottom(pad10);
         left.add(nameInput).center().left().padBottom(pad10).row();
 
         left.pack();
 
         /* RIGHT - KEYFRAMES */
-        OwnLabel keyframesTitle = new OwnLabel(I18n.txt("gui.keyframes.list"), skin, "hud-header");
+        OwnLabel keyframesTitle = new OwnLabel(I18n.msg("gui.keyframes.list"), skin, "hud-header");
 
         // KEYFRAMES TABLE
         keyframesTable = buildKeyframesTable();
@@ -320,8 +320,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         right.pack();
 
         /* RE-NORMALIZE TIME */
-        OwnTextButton normalizeTime = new OwnTextButton(I18n.txt("gui.keyframes.normalize"), skin);
-        normalizeTime.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.normalize"), skin));
+        OwnTextButton normalizeTime = new OwnTextButton(I18n.msg("gui.keyframes.normalize"), skin);
+        normalizeTime.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.normalize"), skin));
         normalizeTime.pad(pad10);
         normalizeTime.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -346,7 +346,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     // Reload window contents
                     reinitialiseKeyframes(keyframes, null);
                     keyframesPathObject.unselect();
-                    logger.info(I18n.txt("gui.keyframes.normalize.done"));
+                    logger.info(I18n.msg("gui.keyframes.normalize.done"));
 
                 }
                 return true;
@@ -360,12 +360,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         buttons.space(pad10);
 
         // Open keyframes
-        OwnTextIconButton open = new OwnTextIconButton(I18n.txt("gui.keyframes.load"), skin, "open");
-        open.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.load"), skin));
+        OwnTextIconButton open = new OwnTextIconButton(I18n.msg("gui.keyframes.load"), skin, "open");
+        open.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.load"), skin));
         open.pad(pad5);
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+                FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden)-> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));
@@ -380,18 +380,18 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                 reinitialiseKeyframes(kfs, null);
                                 keyframesPathObject.unselect();
                                 lastKeyframeFileName = result.getFileName().toString();
-                                logger.info(I18n.txt("gui.keyframes.load.success", keyframes.size, result.getFileName()));
+                                logger.info(I18n.msg("gui.keyframes.load.success", keyframes.size, result.getFileName()));
                             } catch (RuntimeException e) {
-                                logger.error(I18n.txt("gui.keyframes.load.error", result.getFileName()), e);
-                                Label warn = new OwnLabel(I18n.txt("error.loading.format", result.getFileName()), skin);
+                                logger.error(I18n.msg("gui.keyframes.load.error", result.getFileName()), e);
+                                Label warn = new OwnLabel(I18n.msg("error.loading.format", result.getFileName()), skin);
                                 warn.setColor(1f, .4f, .4f, 1f);
                                 notice.setActor(warn);
                                 return false;
                             }
 
                         } else {
-                            logger.error(I18n.txt("error.loading.notexistent", result.getFileName()));
-                            Label warn = new OwnLabel(I18n.txt("error.loading.notexistent", result.getFileName()), skin);
+                            logger.error(I18n.msg("error.loading.notexistent", result.getFileName()));
+                            Label warn = new OwnLabel(I18n.msg("error.loading.notexistent", result.getFileName()), skin);
                             warn.setColor(1f, .4f, .4f, 1f);
                             notice.setActor(warn);
                             return false;
@@ -408,8 +408,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
 
         // Save keyframes
-        OwnTextIconButton save = new OwnTextIconButton(I18n.txt("gui.keyframes.save"), skin, "save");
-        save.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.save"), skin));
+        OwnTextIconButton save = new OwnTextIconButton(I18n.msg("gui.keyframes.save"), skin, "save");
+        save.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.save"), skin));
         save.pad(pad5);
         save.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -422,7 +422,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         lastKeyframeFileName = textField.getText();
                         notice.clearActor();
                     } else {
-                        Label warn = new OwnLabel(I18n.txt("error.file.name.notvalid", textField.getText()), skin);
+                        Label warn = new OwnLabel(I18n.msg("error.file.name.notvalid", textField.getText()), skin);
                         warn.setColor(1f, .4f, .4f, 1f);
                         notice.setActor(warn);
                     }
@@ -434,8 +434,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
 
         // Export to camera path
-        OwnTextIconButton export = new OwnTextIconButton(I18n.txt("gui.keyframes.export"), skin, "export");
-        export.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.export"), skin));
+        OwnTextIconButton export = new OwnTextIconButton(I18n.msg("gui.keyframes.export"), skin, "export");
+        export.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.export"), skin));
         export.pad(pad5);
         export.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -447,7 +447,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, keyframes, textField.getText());
                         notice.clearActor();
                     } else {
-                        Label warn = new OwnLabel(I18n.txt("error.file.name.notvalid", textField.getText()), skin);
+                        Label warn = new OwnLabel(I18n.msg("error.file.name.notvalid", textField.getText()), skin);
                         warn.setColor(1f, .4f, .4f, 1f);
                         notice.setActor(warn);
                     }
@@ -459,10 +459,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         });
 
         // Keyframe preferences
-        Button preferences = new OwnTextIconButton(I18n.txt("gui.preferences"), skin, "preferences");
+        Button preferences = new OwnTextIconButton(I18n.msg("gui.preferences"), skin, "preferences");
         preferences.setName("keyframe preferences");
         preferences.pad(pad5);
-        preferences.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.editprefs"), skin));
+        preferences.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.editprefs"), skin));
         preferences.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
@@ -496,7 +496,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         content.add(buttons).colspan(2).bottom().right().row();
 
         // CLEAR
-        OwnTextButton clear = new OwnTextButton(I18n.txt("gui.clear"), skin);
+        OwnTextButton clear = new OwnTextButton(I18n.msg("gui.clear"), skin);
         clear.setName("clear");
         clear.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -508,7 +508,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         buttonGroup.addActorAt(0, clear);
 
         // HIDE
-        OwnTextButton hide = new OwnTextButton(I18n.txt("gui.hide"), skin);
+        OwnTextButton hide = new OwnTextButton(I18n.msg("gui.hide"), skin);
         hide.setName("hide");
         hide.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -573,10 +573,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 });
 
             } else {
-                logger.info(I18n.txt("gui.keyframes.notadded") + "-" + I18n.txt("gui.keyframes.error.values", secOk ? I18n.txt("gui.ok") : I18n.txt("gui.wrong"), nameOk ? I18n.txt("gui.ok") : I18n.txt("gui.wrong")));
+                logger.info(I18n.msg("gui.keyframes.notadded") + "-" + I18n.msg("gui.keyframes.error.values", secOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong"), nameOk ? I18n.msg("gui.ok") : I18n.msg("gui.wrong")));
             }
         } catch (Exception e) {
-            logger.error(I18n.txt("gui.keyframes.notadded") + " - " + I18n.txt("gui.keyframes.error.input"), e);
+            logger.error(I18n.msg("gui.keyframes.notadded") + " - " + I18n.msg("gui.keyframes.error.input"), e);
             return false;
         }
         return true;
@@ -650,7 +650,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             secondsCells.put(kf, secondsCell);
         }
         secondsCell.setActor(secondsL).left().padRight(pad10 / 2f).padBottom(pad5);
-        secondsL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.seconds", kf.seconds, Settings.settings.frame.targetFps), skin));
+        secondsL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seconds", kf.seconds, Settings.settings.frame.targetFps), skin));
         // Can't modify time of first keyframe; it's always zero
         if (index > 0)
             secondsL.addListener((event) -> {
@@ -722,7 +722,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         nameCell.clearActor();
         nameCell.setActor(nameL).left().padRight(pad10 / 2f).padBottom(pad5);
         keyframeNames.put(kf, nameL);
-        nameL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.name"), skin));
+        nameL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.name"), skin));
         nameL.addListener((event) -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -781,7 +781,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
         framesL.setWidth(64f);
-        framesL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.frames", frame, (1d / Settings.settings.frame.targetFps)), skin));
+        framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / Settings.settings.frame.targetFps)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad10).padBottom(pad5);
 
@@ -799,7 +799,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Go to
         OwnTextIconButton goTo = new OwnTextIconButton("", skin, "go-to");
         goTo.setSize(buttonSize, buttonSize);
-        goTo.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.goto"), skin));
+        goTo.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.goto"), skin));
         goTo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Go to keyframe
@@ -821,7 +821,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         OwnTextIconButton seam = new OwnTextIconButton("", skin, "seam", "toggle");
         seam.setSize(buttonSize, buttonSize);
         seam.setChecked(kf.seam);
-        seam.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.seam"), skin));
+        seam.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seam"), skin));
         seam.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Make seam
@@ -846,7 +846,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Add after
         OwnTextIconButton addKeyframe = new OwnTextIconButton("", skin, "add");
         addKeyframe.setSize(buttonSizeL, buttonSize);
-        addKeyframe.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.add.after"), skin));
+        addKeyframe.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.add.after"), skin));
         addKeyframe.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Work out keyframe properties
@@ -881,7 +881,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Rubbish
         OwnTextIconButton rubbish = new OwnTextIconButton("", skin, "rubbish");
         rubbish.setSize(buttonSizeL, buttonSize);
-        rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.remove"), skin));
+        rubbish.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.remove"), skin));
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Remove keyframe
@@ -896,7 +896,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     newKfs.get(0).seconds = 0;
 
                 reinitialiseKeyframes(newKfs, null);
-                logger.info(I18n.txt("gui.keyframes.removed", kf.name));
+                logger.info(I18n.msg("gui.keyframes.removed", kf.name));
                 return true;
             }
             return false;

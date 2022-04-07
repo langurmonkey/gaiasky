@@ -57,7 +57,7 @@ public class MusicManager implements IObserver {
             for (Path folder : folders) {
                 GlobalResources.listRecursive(folder, musicFiles, new MusicFileFilter());
             }
-            logger.debug(I18n.txt("gui.music.load", musicFiles.size));
+            logger.debug(I18n.msg("gui.music.load", musicFiles.size));
         } else {
             musicFiles = new Array<>();
         }
@@ -100,7 +100,7 @@ public class MusicManager implements IObserver {
 
             currentMusic.play();
             EventManager.publish(Event.MUSIC_TRACK_INFO, this, musicFiles.get(i).getFileName().toString());
-            logger.info(I18n.txt("gui.music.playing", musicFiles.get(i).getFileName().toString()));
+            logger.info(I18n.msg("gui.music.playing", musicFiles.get(i).getFileName().toString()));
         } catch (Exception e) {
             logger.error(e);
         }

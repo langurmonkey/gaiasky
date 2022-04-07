@@ -34,7 +34,7 @@ import java.util.Arrays;
 public class ColorPicker extends ColorPickerAbstract {
 
     public ColorPicker(Stage stage, Skin skin) {
-        super(I18n.txt("gui.colorpicker.title"), stage, skin);
+        super(I18n.msg("gui.colorpicker.title"), stage, skin);
         this.skin = skin;
         this.stage = stage;
         initialize();
@@ -102,7 +102,7 @@ public class ColorPicker extends ColorPickerAbstract {
         private final ColorPickerDialog cpd;
 
         public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
-            super(I18n.txt("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
+            super(I18n.msg("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
             this.cpd = this;
             this.color = new float[4];
             this.colorBak = new float[4];
@@ -113,8 +113,8 @@ public class ColorPicker extends ColorPickerAbstract {
 
             this.nf = NumberFormatFactory.getFormatter("0.00");
 
-            setAcceptText(I18n.txt("gui.ok"));
-            setCancelText(I18n.txt("gui.cancel"));
+            setAcceptText(I18n.msg("gui.ok"));
+            setCancelText(I18n.msg("gui.cancel"));
             setModal(true);
 
             buildSuper();
@@ -247,23 +247,23 @@ public class ColorPicker extends ColorPickerAbstract {
 
             content.add(hg).padBottom(pad10 * 2f).colspan(3).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.red"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(new OwnLabel(I18n.msg("gui.colorpicker.red"), skin)).padRight(pad10).padBottom(pad10);
             content.add(sRed).left().padRight(pad10).padBottom(pad10);
             content.add(tRed).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.green"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(new OwnLabel(I18n.msg("gui.colorpicker.green"), skin)).padRight(pad10).padBottom(pad10);
             content.add(sGreen).left().padRight(pad10).padBottom(pad10);
             content.add(tGreen).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.blue"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(new OwnLabel(I18n.msg("gui.colorpicker.blue"), skin)).padRight(pad10).padBottom(pad10);
             content.add(sBlue).left().padRight(pad10).padBottom(pad10);
             content.add(tBlue).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.alpha"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(new OwnLabel(I18n.msg("gui.colorpicker.alpha"), skin)).padRight(pad10).padBottom(pad10);
             content.add(sAlpha).left().padRight(pad10).padBottom(pad10);
             content.add(tAlpha).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.hex"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(new OwnLabel(I18n.msg("gui.colorpicker.hex"), skin)).padRight(pad10).padBottom(pad10);
             content.add(hexfield).colspan(2).left().padBottom(pad10).row();
 
             content.add(colTable).colspan(3).padBottom(pad10).row();

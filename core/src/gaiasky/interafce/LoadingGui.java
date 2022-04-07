@@ -190,12 +190,12 @@ public class LoadingGui extends AbstractGui {
 
     private void randomFunnyText() {
         if (Settings.settings.runtime.openVr) {
-            spin.setText(I18n.txt("gui.loading"));
+            spin.setText(I18n.msg("gui.loading"));
         } else {
             try {
                 spin.setText(loadingTextGenerator.next());
             } catch (Exception e) {
-                spin.setText(I18n.txt("gui.loading"));
+                spin.setText(I18n.msg("gui.loading"));
             }
         }
     }

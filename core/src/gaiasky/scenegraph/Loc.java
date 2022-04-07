@@ -200,7 +200,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     @Override
     public void setName(String name) {
         super.setName(name);
-        this.displayName = "˟ " + name;
+        this.displayName = "˟ " + getLocalizedName();
     }
 
     @Override

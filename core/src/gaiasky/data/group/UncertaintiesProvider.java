@@ -40,7 +40,7 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
         List<IParticleRecord> pointData = loadData(f.read(), factor);
 
         if (pointData != null)
-            logger.info(I18n.txt("notif.nodeloader", pointData.size(), file));
+            logger.info(I18n.msg("notif.nodeloader", pointData.size(), file));
 
         return pointData;
     }

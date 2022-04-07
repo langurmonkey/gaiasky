@@ -21,11 +21,11 @@ public class ReleaseNotesWindow extends GenericDialog {
     private final Path releaseNotesFile;
 
     public ReleaseNotesWindow(Stage stage, Skin skin, Path file) {
-        super(I18n.txt("gui.releasenotes.title"), skin, stage);
+        super(I18n.msg("gui.releasenotes.title"), skin, stage);
 
         this.releaseNotesFile = file;
         this.setResizable(true);
-        setAcceptText(I18n.txt("gui.ok"));
+        setAcceptText(I18n.msg("gui.ok"));
 
         // Build
         buildSuper();
@@ -64,7 +64,7 @@ public class ReleaseNotesWindow extends GenericDialog {
 
         } catch (IOException e) {
             // Show error
-            OwnLabel error = new OwnLabel(I18n.txt("error.file.read", releaseNotesFile.toString()), skin);
+            OwnLabel error = new OwnLabel(I18n.msg("error.file.read", releaseNotesFile.toString()), skin);
             content.add(error).center();
         }
     }

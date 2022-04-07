@@ -135,8 +135,8 @@ public class CatalogInfo {
                 EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, this.object, true);
             }
             this.object.dispose();
-            logger.info(I18n.txt("gui.dataset.remove.info",  name));
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.dataset.remove.info",  name));
+            logger.info(I18n.msg("gui.dataset.remove.info",  name));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.dataset.remove.info",  name));
         }
     }
 

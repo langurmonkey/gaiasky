@@ -49,11 +49,11 @@ public class DownloadHelper {
                     // Run finish with empty digest
                     finish.run("");
                 } catch (IOException e) {
-                    logger.error(I18n.txt("error.file.copy", srcString, to.path()));
+                    logger.error(I18n.msg("error.file.copy", srcString, to.path()));
                 }
 
             } else {
-                logger.error(I18n.txt("error.loading.notexistent", srcString));
+                logger.error(I18n.msg("error.loading.notexistent", srcString));
                 if (fail != null)
                     fail.run();
             }
@@ -126,7 +126,7 @@ public class DownloadHelper {
                     double bytesPerMs = 0;
                     try {
                         long totalLength = length + startSize;
-                        logger.info(I18n.txt("gui.download.starting", url));
+                        logger.info(I18n.msg("gui.download.starting", url));
                         logger.info("Reading " + length + " bytes " + (resume ? "(resuming from " + startSize + ", total is " + totalLength + ")" : ""));
                         MessageDigest md = MessageDigest.getInstance("SHA-256");
                         DigestInputStream dis = new DigestInputStream(is, md);
@@ -160,7 +160,7 @@ public class DownloadHelper {
                         }
                         is.close();
                         os.close();
-                        logger.info(I18n.txt("gui.download.finished", to.file().toPath()));
+                        logger.info(I18n.msg("gui.download.finished", to.file().toPath()));
 
                         // Get digest and run finish runnable
                         if (finish != null && !cancelled) {
@@ -209,7 +209,7 @@ public class DownloadHelper {
                             fail.run();
                     }
                 } else {
-                    logger.error(I18n.txt("gui.download.error.httpstatus", status));
+                    logger.error(I18n.msg("gui.download.error.httpstatus", status));
                     if (fail != null)
                         fail.run();
                 }
@@ -229,14 +229,14 @@ public class DownloadHelper {
 
             @Override
             public void failed(Throwable t) {
-                logger.error(I18n.txt("gui.download.fail"));
+                logger.error(I18n.msg("gui.download.fail"));
                 if (fail != null)
                     fail.run();
             }
 
             @Override
             public void cancelled() {
-                logger.error(I18n.txt("gui.download.cancelled", url));
+                logger.error(I18n.msg("gui.download.cancelled", url));
                 cancelled = true;
                 if (cancel != null)
                     cancel.run();

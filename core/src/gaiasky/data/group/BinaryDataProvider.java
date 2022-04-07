@@ -62,9 +62,9 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadData(String file, double factor) {
-        logger.info(I18n.txt("notif.datafile", file));
+        logger.info(I18n.msg("notif.datafile", file));
         loadDataMapped(file, factor);
-        logger.info(I18n.txt("notif.nodeloader", list.size(), file));
+        logger.info(I18n.msg("notif.nodeloader", list.size(), file));
 
         return list;
     }

@@ -266,7 +266,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

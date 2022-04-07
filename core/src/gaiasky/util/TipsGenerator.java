@@ -29,7 +29,7 @@ public class TipsGenerator {
         this.tips = new ArrayList<>();
         for (int j = 0; j < MAX_KEYS; j++) {
             try {
-                String tipStr = I18n.txt("tip." + j);
+                String tipStr = I18n.msg("tip." + j);
                 String[] lines = tipStr.split("\\r\\n|\\n|\\r");
                 KeyBindings kb = KeyBindings.instance;
                 for (String line : lines) {
@@ -121,8 +121,8 @@ public class TipsGenerator {
                 int n = keys.length;
                 for (int i = 0; i < n; i++) {
                     String t = keys[i];
-                    if(I18n.hasKey("key." + keys[i])){
-                       t = I18n.txt("key." + keys[i]);
+                    if(I18n.hasMessage("key." + keys[i])){
+                       t = I18n.msg("key." + keys[i]);
                     }
                     OwnTextButton button = new OwnTextButton(t, skin, style);
                     button.pad(pad2, pad5, pad2, pad5);

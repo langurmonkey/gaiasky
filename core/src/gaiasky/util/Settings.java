@@ -1008,7 +1008,7 @@ public class Settings {
                     modeStereo.active = (boolean) (Boolean) data[0];
                     if (modeStereo.active && modeCubemap.active) {
                         modeStereo.active = false;
-                        EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.txt("notif.cleanmode"));
+                        EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                     }
                 }
                 break;
@@ -1025,18 +1025,18 @@ public class Settings {
                     if (modeCubemap.projection.isPanorama()) {
                         String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.360");
                         String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.projection");
-                        mpi.title = I18n.txt("gui.360.title");
-                        mpi.header = I18n.txt("gui.360.notice.header");
-                        mpi.addMapping(I18n.txt("gui.360.notice.back"), keysStrToggle);
-                        mpi.addMapping(I18n.txt("gui.360.notice.projection"), keysStrProj);
+                        mpi.title = I18n.msg("gui.360.title");
+                        mpi.header = I18n.msg("gui.360.notice.header");
+                        mpi.addMapping(I18n.msg("gui.360.notice.back"), keysStrToggle);
+                        mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
                         if (settings.scene.renderer.pointCloud.isPoints()) {
-                            mpi.warn = I18n.txt("gui.360.notice.renderer");
+                            mpi.warn = I18n.msg("gui.360.notice.renderer");
                         }
                     } else if (modeCubemap.projection.isPlanetarium()) {
                         String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
-                        mpi.title = I18n.txt("gui.planetarium.title");
-                        mpi.header = I18n.txt("gui.planetarium.notice.header");
-                        mpi.addMapping(I18n.txt("gui.planetarium.notice.back"), keysStr);
+                        mpi.title = I18n.msg("gui.planetarium.title");
+                        mpi.header = I18n.msg("gui.planetarium.notice.header");
+                        mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
                     }
 
                     EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 120f);
@@ -1046,7 +1046,7 @@ public class Settings {
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 modeCubemap.projection = (CubemapProjections.CubemapProjection) data[0];
-                logger.info(I18n.txt("gui.360.projection", modeCubemap.projection.toString()));
+                logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
                 break;
             case CUBEMAP_RESOLUTION_CMD:
                 modeCubemap.faceResolution = (int) data[0];
@@ -1409,9 +1409,9 @@ public class Settings {
                 if (fisheye) {
                     String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
                     ModePopupInfo mpi = new ModePopupInfo();
-                    mpi.title = I18n.txt("gui.planetarium.title");
-                    mpi.header = I18n.txt("gui.planetarium.notice.header");
-                    mpi.addMapping(I18n.txt("gui.planetarium.notice.back"), keysStr);
+                    mpi.title = I18n.msg("gui.planetarium.title");
+                    mpi.header = I18n.msg("gui.planetarium.notice.header");
+                    mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
 
                     EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "planetarium", 120f);
                 } else {
@@ -1815,7 +1815,7 @@ public class Settings {
         }
 
         public String getUnitString() {
-            return I18n.txt("gui.unit." + this.unitString);
+            return I18n.msg("gui.unit." + this.unitString);
         }
     }
 }

@@ -18,6 +18,6 @@ public class AttributeAppmag extends AttributeAbstract implements IAttribute {
         return "mag";
     }
     public String toString(){
-        return I18n.txt("gui.focusinfo.appmag");
+        return I18n.msg("gui.focusinfo.appmag");
     }
 }

@@ -73,7 +73,7 @@ public class SceneGraph implements ISceneGraph {
      */
     @Override
     public void initialize(Array<SceneGraphNode> nodes, ITimeFrameProvider time, boolean hasOctree, boolean hasStarGroup) {
-        logger.info(I18n.txt("notif.sg.insert", nodes.size));
+        logger.info(I18n.msg("notif.sg.insert", nodes.size));
 
         // Octree
         this.hasOctree = hasOctree;
@@ -103,7 +103,7 @@ public class SceneGraph implements ISceneGraph {
             insert(node, false);
         }
 
-        logger.info(I18n.txt("notif.sg.init", root.numChildren));
+        logger.info(I18n.msg("notif.sg.init", root.numChildren));
     }
 
     public void update(ITimeFrameProvider time, ICamera camera) {
@@ -125,13 +125,13 @@ public class SceneGraph implements ISceneGraph {
             ok = addToIndex(node);
         }
         if (!ok) {
-            logger.warn(I18n.txt("error.object.exists", node.getName() + "(" + node.getClass().getSimpleName().toLowerCase() +")"));
+            logger.warn(I18n.msg("error.object.exists", node.getName() + "(" + node.getClass().getSimpleName().toLowerCase() +")"));
         } else {
             if (parent != null) {
                 parent.addChild(node, true);
                 node.setUp(this);
             } else {
-                throw new RuntimeException(I18n.txt("error.parent.notfound", node.names[0], node.parentName));
+                throw new RuntimeException(I18n.msg("error.parent.notfound", node.names[0], node.parentName));
             }
         }
     }
@@ -159,7 +159,7 @@ public class SceneGraph implements ISceneGraph {
                     CelestialBody s = (CelestialBody) node;
                     if (s instanceof Star && ((Star) s).hip > 0) {
                         if (hipMap.containsKey(((Star) s).hip)) {
-                            logger.debug(I18n.txt("error.id.hip.duplicate", ((Star) s).hip));
+                            logger.debug(I18n.msg("error.id.hip.duplicate", ((Star) s).hip));
                         } else {
                             hipMap.put(((Star) s).hip, s);
                         }
@@ -222,7 +222,7 @@ public class SceneGraph implements ISceneGraph {
                             index.put(nameLowerCase, node);
                         } else if (!nameLowerCase.isEmpty()) {
                             SceneGraphNode conflict = index.get(nameLowerCase);
-                            logger.debug(I18n.txt("error.name.conflict", name + " (" + node.getClass().getSimpleName().toLowerCase() + ")", conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")"));
+                            logger.debug(I18n.msg("error.name.conflict", name + " (" + node.getClass().getSimpleName().toLowerCase() + ")", conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")"));
                             String[] names1 = node.getNames();
                             String[] names2 = conflict.getNames();
                             boolean same = names1.length == names2.length;

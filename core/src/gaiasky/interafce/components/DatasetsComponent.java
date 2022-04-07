@@ -110,7 +110,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         controls.space(pad6);
         OwnImageButton eye = new OwnImageButton(skin, "eye-toggle");
         eye.setCheckedNoFire(!ci.isVisible(true));
-        eye.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.toggle"), skin));
+        eye.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.toggle"), skin));
         eye.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 setDatasetVisibility(ci, eye, !ci.isVisible(true), eye);
@@ -121,7 +121,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         OwnImageButton mark = new OwnImageButton(skin, "highlight-ds-s");
         mark.setCheckedNoFire(ci.highlighted);
-        mark.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.highlight"), skin));
+        mark.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight"), skin));
         mark.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 setDatasetHighlight(ci, mark, mark.isChecked(), mark);
@@ -131,7 +131,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         OwnImageButton prefs = new OwnImageButton(skin, "prefs");
-        prefs.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.preferences"), skin));
+        prefs.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.preferences"), skin));
         prefs.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 showDatasetPreferences(ci);
@@ -141,7 +141,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
 
         ImageButton rubbish = new OwnImageButton(skin, "rubbish-bin");
-        rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
+        rubbish.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.remove"), skin));
         rubbish.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Remove dataset
@@ -166,13 +166,13 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         ColorPickerAbstract cp;
         if (ci.hasParticleAttributes()) {
             ColormapPicker cmp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
-            cmp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
+            cmp.addListener(new TextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
             cmp.setNewColorRunnable(() -> ci.setHlColor(cmp.getPickedColor()));
             cmp.setNewColormapRunnable(() -> ci.setHlColormap(cmp.getPickedCmapIndex(), cmp.getPickedCmapAttribute(), cmp.getPickedCmapMin(), cmp.getPickedCmapMax()));
             cp = cmp;
         } else {
             ColorPicker clp = new ColorPicker(ci.name, ci.hlColor, stage, skin);
-            clp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
+            clp.addListener(new TextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
             clp.setNewColorRunnable(() -> ci.setHlColor(clp.getPickedColor()));
             cp = clp;
         }
@@ -201,14 +201,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         if (ci.nParticles > 0) {
             t.row();
-            OwnLabel nObjects = new OwnLabel(I18n.txt("gui.objects") + ": " + ci.nParticles, skin);
-            String bytes = ci.sizeBytes > 0 ? I18n.txt("gui.size") + ": " + GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "";
+            OwnLabel nObjects = new OwnLabel(I18n.msg("gui.objects") + ": " + ci.nParticles, skin);
+            String bytes = ci.sizeBytes > 0 ? I18n.msg("gui.size") + ": " + GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "";
             nObjects.addListener(new OwnTextTooltip(nObjects.getText() + ", " + bytes, skin));
             t.add(nObjects).left();
         }
 
         if (ci.isHighlightable()) {
-            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.txt("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
+            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
             sizeScaling.setName("star brightness");
             sizeScaling.setWidth(320f);
             sizeScaling.setMappedValue(ci.object.getPointscaling());
@@ -256,7 +256,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 ContextMenu datasetContext = new ContextMenu(skin, "default");
                                 // Visibility
                                 boolean currentVisibility = ci.isVisible(true);
-                                MenuItem visibility = new MenuItem(I18n.txt(currentVisibility ? "gui.hide" : "gui.show"), skin, skin.getDrawable(currentVisibility ? "eye-s-off" : "eye-s-on"));
+                                MenuItem visibility = new MenuItem(I18n.msg(currentVisibility ? "gui.hide" : "gui.show"), skin, skin.getDrawable(currentVisibility ? "eye-s-off" : "eye-s-on"));
                                 visibility.addListener(new ChangeListener() {
                                     @Override
                                     public void changed(ChangeEvent event, Actor actor) {
@@ -267,7 +267,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 if (ci.isHighlightable()) {
                                     // Highlight
                                     boolean currentHighlight = ci.highlighted;
-                                    MenuItem highlight = new MenuItem(I18n.txt(currentHighlight ? "gui.deemphasize" : "gui.highlight"), skin, skin.getDrawable(currentHighlight ? "highlight-s-off" : "highlight-s-on"));
+                                    MenuItem highlight = new MenuItem(I18n.msg(currentHighlight ? "gui.deemphasize" : "gui.highlight"), skin, skin.getDrawable(currentHighlight ? "highlight-s-off" : "highlight-s-on"));
                                     highlight.addListener(new ChangeListener() {
                                         @Override
                                         public void changed(ChangeEvent event, Actor actor) {
@@ -276,7 +276,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                     });
                                     datasetContext.addItem(highlight);
                                     // Settings
-                                    MenuItem settings = new MenuItem(I18n.txt("gui.settings.dataset"), skin, skin.getDrawable("prefs-icon"));
+                                    MenuItem settings = new MenuItem(I18n.msg("gui.settings.dataset"), skin, skin.getDrawable("prefs-icon"));
                                     settings.addListener(new ChangeListener() {
                                         @Override
                                         public void changed(ChangeEvent event, Actor actor) {
@@ -286,7 +286,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                     datasetContext.addItem(settings);
                                 }
                                 // Delete
-                                MenuItem delete = new MenuItem(I18n.txt("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
+                                MenuItem delete = new MenuItem(I18n.msg("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
                                 delete.addListener(new ChangeListener() {
                                     @Override
                                     public void changed(ChangeEvent event, Actor actor) {

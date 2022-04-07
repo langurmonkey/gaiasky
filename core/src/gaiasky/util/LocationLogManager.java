@@ -58,7 +58,7 @@ public class LocationLogManager implements IObserver {
             if (entryTime != null) {
                 elapsedStr = elapsedString();
             }
-            return name + " (" + I18n.txt("gui.locationlog.ago", elapsedStr) + ")";
+            return name + " (" + I18n.msg("gui.locationlog.ago", elapsedStr) + ")";
         }
 
         public String elapsedString() {
@@ -133,7 +133,7 @@ public class LocationLogManager implements IObserver {
                 }
                 locations.add(record);
                 EventManager.publish(Event.NEW_LOCATION_RECORD, this, locations);
-                logger.debug(I18n.txt("gui.locationlog.newrecord", record.toStringFull()));
+                logger.debug(I18n.msg("gui.locationlog.newrecord", record.toStringFull()));
             }
         }
     }

@@ -72,11 +72,11 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             name.addListener(new OwnTextTooltip(lr.name, skin));
             name.setWidth(165f);
             Label time = new OwnLabel("(" + lr.elapsedString() + ")", skin, "default-pink");
-            time.addListener(new OwnTextTooltip(I18n.txt("gui.locationlog.visited", lr.entryTime), skin));
+            time.addListener(new OwnTextTooltip(I18n.msg("gui.locationlog.visited", lr.entryTime), skin));
             time.setWidth(40f);
 
             OwnTextIconButton goToLoc = new OwnTextIconButton("", skin, "go-to");
-            goToLoc.addListener(new OwnTextTooltip(I18n.txt("gui.locationlog.goto.location", lr.entryTime), skin));
+            goToLoc.addListener(new OwnTextTooltip(I18n.msg("gui.locationlog.goto.location", lr.entryTime), skin));
             goToLoc.setSize(30f, 30f);
             goToLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
@@ -92,7 +92,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             });
 
             OwnTextIconButton goToObj = new OwnTextIconButton("", skin, "land-on");
-            goToObj.addListener(new OwnTextTooltip(I18n.txt("gui.locationlog.goto.object", lr.entryTime), skin));
+            goToObj.addListener(new OwnTextTooltip(I18n.msg("gui.locationlog.goto.object", lr.entryTime), skin));
             goToObj.setSize(30f, 30f);
             goToObj.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
@@ -115,7 +115,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
         }
 
         if (locations.size() == 0) {
-            this.locations.addActor(new OwnLabel(I18n.txt("gui.locationlog.empty"), skin));
+            this.locations.addActor(new OwnLabel(I18n.msg("gui.locationlog.empty"), skin));
         }
 
     }

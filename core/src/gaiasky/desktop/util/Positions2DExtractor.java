@@ -33,7 +33,8 @@ public class Positions2DExtractor {
         Positions2DExtractor p2d = new Positions2DExtractor();
         new ConsoleLogger();
 
-        I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/util/gdx/shader/loader/i18n/gsbundle"));
+        I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/util/gdx/shader/loader/i18n/gsbundle"),
+                new FileHandle(System.getenv("PROJECTS") + "/gaiasky/util/gdx/shader/loader/i18n/objects"));
 
         Gdx.files = new Lwjgl3Files();
         try {

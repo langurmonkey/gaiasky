@@ -698,7 +698,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

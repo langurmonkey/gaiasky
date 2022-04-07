@@ -129,7 +129,7 @@ public class SlaveManager {
                 // Assume mpcdi folder
                 mpcdiPath = SysUtils.getDefaultMpcdiDir().resolve(mpcdi);
             }
-            logger.info(I18n.txt("notif.loading", mpcdiPath));
+            logger.info(I18n.msg("notif.loading", mpcdiPath));
 
             String unpackDirName = "mpcdi_" + System.nanoTime();
             Path unzipLocation = SysUtils.getTempDir(Settings.settings.data.location).resolve(unpackDirName);

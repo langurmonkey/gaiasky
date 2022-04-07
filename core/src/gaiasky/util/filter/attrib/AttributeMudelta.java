@@ -17,6 +17,6 @@ public class AttributeMudelta extends AttributeAbstract implements IAttribute {
         return "mas/yr";
     }
     public String toString(){
-        return I18n.txt("gui.focusinfo.mudelta");
+        return I18n.msg("gui.focusinfo.mudelta");
     }
 }

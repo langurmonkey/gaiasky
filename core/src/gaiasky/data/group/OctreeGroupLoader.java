@@ -62,14 +62,14 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         /*
          * LOAD METADATA
          */
-        logger.info(I18n.txt("notif.loading", metadata));
+        logger.info(I18n.msg("notif.loading", metadata));
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
         OctreeNode root = metadataReader.readMetadataMapped(metadata);
 
         if (root != null) {
-            logger.info(I18n.txt("notif.nodeloader", root.numNodesRec(), metadata));
-            logger.info(I18n.txt("notif.loading", particles));
+            logger.info(I18n.msg("notif.nodeloader", root.numNodesRec(), metadata));
+            logger.info(I18n.msg("notif.loading", particles));
 
             /*
              * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default

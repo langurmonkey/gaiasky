@@ -98,7 +98,7 @@ public class ScreenshotsManager implements IObserver {
             if (file != null) {
                 screenshot.active = false;
                 EventManager.publish(Event.SCREENSHOT_INFO, this, file);
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.screenshot", file));
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.screenshot", file));
             }
 
         }
@@ -108,7 +108,7 @@ public class ScreenshotsManager implements IObserver {
         String f = ImageRenderer.renderToImageGl20(folder, file, w, h, Settings.settings.screenshot.format, Settings.settings.screenshot.quality);
         if (f != null) {
             EventManager.publish(Event.SCREENSHOT_INFO, this, f);
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.screenshot", file));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.screenshot", file));
         }
     }
 

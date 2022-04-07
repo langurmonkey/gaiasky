@@ -22,7 +22,7 @@ public class DesktopMusicActors implements IMusicActors {
     public Actor[] getActors(Skin skin) {
 	ImageButton musicTooltip = new OwnImageButton(skin, "tooltip");
 	musicTooltip.addListener(new OwnTextTooltip(
-		I18n.txt("gui.tooltip.music", SysUtils.getDefaultMusicDir()), skin));
+		I18n.msg("gui.tooltip.music", SysUtils.getDefaultMusicDir()), skin));
 
 	ImageButton reloadMusic = new OwnImageButton(skin, "reload");
 	reloadMusic.setName("reload music");
@@ -33,7 +33,7 @@ public class DesktopMusicActors implements IMusicActors {
 	}
 	return false;
 	});
-	reloadMusic.addListener(new OwnTextTooltip(I18n.txt("gui.music.reload"), skin));
+	reloadMusic.addListener(new OwnTextTooltip(I18n.msg("gui.music.reload"), skin));
 
 	return new Actor[] { musicTooltip, reloadMusic };
     }

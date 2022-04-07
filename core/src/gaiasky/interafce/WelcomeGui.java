@@ -121,16 +121,16 @@ public class WelcomeGui extends AbstractGui {
                 // Fail?
                 downloadError = true;
                 if (Settings.settings.program.offlineMode) {
-                    logger.error(I18n.txt("gui.welcome.error.offlinemode"));
+                    logger.error(I18n.msg("gui.welcome.error.offlinemode"));
                 } else {
-                    logger.error(I18n.txt("gui.welcome.error.nointernet"));
+                    logger.error(I18n.msg("gui.welcome.error.nointernet"));
                 }
                 if (baseDataPresent()) {
                     // Go on all in
                     GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI()));
                 } else {
                     // Error and exit
-                    logger.error(I18n.txt("gui.welcome.error.nobasedata"));
+                    logger.error(I18n.msg("gui.welcome.error.nobasedata"));
                     GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, ui));
                 }
             }, null);
@@ -181,7 +181,7 @@ public class WelcomeGui extends AbstractGui {
 
         Set<String> removed = removeNonExistent();
         if (removed.size() > 0) {
-            logger.warn(I18n.txt("gui.welcome.warn.nonexistent", removed.size()));
+            logger.warn(I18n.msg("gui.welcome.warn.nonexistent", removed.size()));
             logger.warn(TextUtils.setToStr(removed));
         }
         int numCatalogsAvailable = numCatalogsAvailable();
@@ -202,7 +202,7 @@ public class WelcomeGui extends AbstractGui {
         String textStyle = "main-title-s";
 
         // Start Gaia Sky button
-        OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
+        OwnTextIconButton startButton = new OwnTextIconButton(I18n.msg("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
         startButton.setSpace(pad18);
         startButton.setContentAlign(Align.center);
         startButton.align(Align.center);
@@ -215,31 +215,31 @@ public class WelcomeGui extends AbstractGui {
             return true;
         });
         Table startGroup = new Table(skin);
-        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
+        OwnLabel startLabel = new OwnLabel(I18n.msg("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
         startGroup.add(startLabel).top().left().padBottom(pad16).row();
         if (!baseDataPresent) {
             // No basic data, can't start!
             startButton.setDisabled(true);
 
-            OwnLabel noBaseData = new OwnLabel(I18n.txt("gui.welcome.start.nobasedata"), skin, textStyle);
+            OwnLabel noBaseData = new OwnLabel(I18n.msg("gui.welcome.start.nobasedata"), skin, textStyle);
             noBaseData.setColor(ColorUtils.gRedC);
             startGroup.add(noBaseData).bottom().left();
         } else if (numCatalogsAvailable > 0 && numTotalCatalogsEnabled == 0) {
-            OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
+            OwnLabel noCatsSelected = new OwnLabel(I18n.msg("gui.welcome.start.nocatalogs"), skin, textStyle);
             noCatsSelected.setColor(ColorUtils.gRedC);
             startGroup.add(noCatsSelected).bottom().left();
         } else if (numGaiaDRCatalogsEnabled > 1 || numStarCatalogsEnabled == 0) {
-            OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.start.check"), skin, textStyle);
+            OwnLabel tooManyDR = new OwnLabel(I18n.msg("gui.welcome.start.check"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             startGroup.add(tooManyDR).bottom().left();
         } else {
-            OwnLabel ready = new OwnLabel(I18n.txt("gui.welcome.start.ready"), skin, textStyle);
+            OwnLabel ready = new OwnLabel(I18n.msg("gui.welcome.start.ready"), skin, textStyle);
             ready.setColor(ColorUtils.gGreenC);
             startGroup.add(ready).bottom().left();
         }
 
         // Dataset manager button
-        OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
+        OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.msg("gui.welcome.dsmanager"), skin, "cloud-download");
         datasetManagerButton.setSpace(pad18);
         datasetManagerButton.setContentAlign(Align.center);
         datasetManagerButton.align(Align.center);
@@ -251,21 +251,21 @@ public class WelcomeGui extends AbstractGui {
             return true;
         });
         Table datasetManagerInfo = new Table(skin);
-        OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
+        OwnLabel downloadLabel = new OwnLabel(I18n.msg("gui.welcome.dsmanager.desc"), skin, textStyle);
         datasetManagerInfo.add(downloadLabel).top().left().padBottom(pad16);
         if (serverDatasets != null && serverDatasets.updatesAvailable) {
             datasetManagerInfo.row();
-            OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin, textStyle);
+            OwnLabel updates = new OwnLabel(I18n.msg("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
             datasetManagerInfo.add(updates).bottom().left();
         } else if (!baseDataPresent) {
             datasetManagerInfo.row();
-            OwnLabel getBasedata = new OwnLabel(I18n.txt("gui.welcome.dsmanager.info"), skin, textStyle);
+            OwnLabel getBasedata = new OwnLabel(I18n.msg("gui.welcome.dsmanager.info"), skin, textStyle);
             getBasedata.setColor(ColorUtils.gGreenC);
             datasetManagerInfo.add(getBasedata).bottom().left();
         } else {
             // Number selected
-            OwnLabel numCatalogsEnabled = new OwnLabel(I18n.txt("gui.welcome.enabled", numTotalCatalogsEnabled, numCatalogsAvailable), skin, textStyle);
+            OwnLabel numCatalogsEnabled = new OwnLabel(I18n.msg("gui.welcome.enabled", numTotalCatalogsEnabled, numCatalogsAvailable), skin, textStyle);
             numCatalogsEnabled.setColor(ColorUtils.gBlueC);
             datasetManagerInfo.row().padBottom(pad16);
             datasetManagerInfo.add(numCatalogsEnabled).left().padBottom(pad18);
@@ -275,25 +275,25 @@ public class WelcomeGui extends AbstractGui {
         Table selectionInfo = new Table(skin);
         if (numCatalogsAvailable == 0) {
             // No catalog files, disable and add notice
-            OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
+            OwnLabel noCatalogs = new OwnLabel(I18n.msg("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
             noCatalogs.setColor(ColorUtils.aOrangeC);
             selectionInfo.add(noCatalogs);
         } else if (numGaiaDRCatalogsEnabled > 1) {
-            OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
+            OwnLabel tooManyDR = new OwnLabel(I18n.msg("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             selectionInfo.add(tooManyDR);
         } else if (numStarCatalogsEnabled > 1) {
-            OwnLabel warn2Star = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
+            OwnLabel warn2Star = new OwnLabel(I18n.msg("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
             warn2Star.setColor(ColorUtils.aOrangeC);
             selectionInfo.add(warn2Star);
         } else if (numStarCatalogsEnabled == 0) {
-            OwnLabel noStarCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
+            OwnLabel noStarCatalogs = new OwnLabel(I18n.msg("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
             noStarCatalogs.setColor(ColorUtils.aOrangeC);
             selectionInfo.add(noStarCatalogs);
         }
 
         // Exit button
-        OwnTextIconButton quitButton = new OwnTextIconButton(I18n.txt("gui.exit"), skin, "quit");
+        OwnTextIconButton quitButton = new OwnTextIconButton(I18n.msg("gui.exit"), skin, "quit");
         quitButton.setSpace(pad16);
         quitButton.align(Align.center);
         quitButton.setSize(bw * 0.5f, bh * 0.6f);
@@ -324,14 +324,14 @@ public class WelcomeGui extends AbstractGui {
 
         // Bottom icons
         OwnTextIconButton quit = new OwnTextIconButton("", skin, "quit");
-        quit.addListener(new OwnTextTooltip(I18n.txt("gui.exit"), skin, 10));
+        quit.addListener(new OwnTextTooltip(I18n.msg("gui.exit"), skin, 10));
         quit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.exit();
             }
         });
         OwnTextIconButton preferences = new OwnTextIconButton("", skin, "preferences");
-        preferences.addListener(new OwnTextTooltip(I18n.txt("gui.preferences"), skin, 10));
+        preferences.addListener(new OwnTextTooltip(I18n.msg("gui.preferences"), skin, 10));
         preferences.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 if (preferencesWindow == null) {
@@ -365,16 +365,16 @@ public class WelcomeGui extends AbstractGui {
                 DatasetDesc baseData = serverDatasets.findDataset("default-data");
                 if (baseData != null && baseData.myVersion < baseData.serverVersion) {
                     // We have a base data update, show notice
-                    GenericDialog baseDataNotice = new GenericDialog(I18n.txt("gui.basedata.title"), skin, ui) {
+                    GenericDialog baseDataNotice = new GenericDialog(I18n.msg("gui.basedata.title"), skin, ui) {
 
                         @Override
                         protected void build() {
                             content.clear();
                             content.pad(pad20, pad28 * 2f, pad20, pad28 * 2f);
-                            content.add(new OwnLabel(I18n.txt("gui.basedata.default", baseData.name, I18n.txt("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
-                            content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
+                            content.add(new OwnLabel(I18n.msg("gui.basedata.default", baseData.name, I18n.msg("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
+                            content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
                             content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad20);
-                            content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
+                            content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
                         }
 
                         @Override
@@ -392,7 +392,7 @@ public class WelcomeGui extends AbstractGui {
                             // Nothing
                         }
                     };
-                    baseDataNotice.setAcceptText(I18n.txt("gui.ok"));
+                    baseDataNotice.setAcceptText(I18n.msg("gui.ok"));
                     baseDataNotice.buildSuper();
                     baseDataNotice.show(ui);
                 }
@@ -601,7 +601,7 @@ public class WelcomeGui extends AbstractGui {
                 GenericDialog.updatePads();
                 // UI theme reload broadcast
                 EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.ui.reload"));
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));
                 // Reload window
                 this.skin = globalResources.getSkin();
                 reloadView();

@@ -150,7 +150,7 @@ public class OctreeGeneratorRun {
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
             // Initialize i18n
-            I18n.initialize(Path.of(ASSETS_LOC, "i18n/gsbundle"));
+            I18n.initialize(Path.of(ASSETS_LOC, "i18n/gsbundle"), Path.of(ASSETS_LOC, "i18n/objects"));
 
             // Initialize configuration
             Path dummyv = Path.of(ASSETS_LOC, "data/dummyversion");

@@ -19,11 +19,11 @@ public class MinimapWindow extends GenericDialog {
 
 
     public MinimapWindow(final Stage stage, final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
-        super(I18n.txt("gui.minimap.title"), skin, stage);
+        super(I18n.msg("gui.minimap.title"), skin, stage);
         minimap = new MinimapWidget(skin, shapeShader, spriteShader);
 
         setModal(false);
-        setCancelText(I18n.txt("gui.close"));
+        setCancelText(I18n.msg("gui.close"));
 
         // Build
         buildSuper();
@@ -35,10 +35,10 @@ public class MinimapWindow extends GenericDialog {
     protected void build() {
         float pb = 16f;
         mapName = new OwnLabel("", skin, "header");
-        OwnLabel headerSide = new OwnLabel(I18n.txt("gui.minimap.side"), skin);
+        OwnLabel headerSide = new OwnLabel(I18n.msg("gui.minimap.side"), skin);
         Container<TextureWidget> mapSide = new Container<>();
         mapSide.setActor(minimap.getSideProjection());
-        OwnLabel headerTop = new OwnLabel(I18n.txt("gui.minimap.top"), skin);
+        OwnLabel headerTop = new OwnLabel(I18n.msg("gui.minimap.top"), skin);
         Container<TextureWidget> mapTop = new Container<>();
         mapTop.setActor(minimap.getTopProjection());
 

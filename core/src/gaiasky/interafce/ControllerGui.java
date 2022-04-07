@@ -259,7 +259,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Cinematic
-        cameraCinematic = new OwnTextButton(I18n.txt("gui.camera.cinematic"), skin, "toggle-big");
+        cameraCinematic = new OwnTextButton(I18n.msg("gui.camera.cinematic"), skin, "toggle-big");
         cameraModel[0][2] = cameraCinematic;
         cameraCinematic.setWidth(ww);
         cameraCinematic.setChecked(Settings.settings.scene.camera.cinematic);
@@ -272,7 +272,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // FOV
-        fovSlider = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
+        fovSlider = new OwnSliderPlus(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
         cameraModel[1][0] = fovSlider;
         fovSlider.setValueSuffix("°");
         fovSlider.setName("field of view");
@@ -290,7 +290,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Speed
-        camSpeedSlider = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
+        camSpeedSlider = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraModel[1][1] = camSpeedSlider;
         camSpeedSlider.setName("camera speed");
         camSpeedSlider.setWidth(sw);
@@ -305,7 +305,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Rot
-        camRotSlider = new OwnSliderPlus(I18n.txt("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
+        camRotSlider = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         cameraModel[1][2] = camRotSlider;
         camRotSlider.setName("rotate speed");
         camRotSlider.setWidth(sw);
@@ -320,7 +320,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Turn
-        camTurnSlider = new OwnSliderPlus(I18n.txt("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
+        camTurnSlider = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         cameraModel[1][3] = camTurnSlider;
         camTurnSlider.setName("turn speed");
         camTurnSlider.setWidth(sw);
@@ -356,19 +356,19 @@ public class ControllerGui extends AbstractGui {
         timeT = new Table(skin);
 
         boolean timeOn = Settings.settings.runtime.timeOn;
-        timeStartStop = new OwnTextButton(I18n.txt(timeOn ? "gui.time.pause" : "gui.time.start"), skin, "toggle-big");
+        timeStartStop = new OwnTextButton(I18n.msg(timeOn ? "gui.time.pause" : "gui.time.start"), skin, "toggle-big");
         timeModel[1][0] = timeStartStop;
         timeStartStop.setWidth(ww);
         timeStartStop.setChecked(timeOn);
         timeStartStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 em.post(Event.TIME_STATE_CMD, timeStartStop, timeStartStop.isChecked());
-                timeStartStop.setText(I18n.txt(timeStartStop.isChecked() ? "gui.time.pause" : "gui.time.start"));
+                timeStartStop.setText(I18n.msg(timeStartStop.isChecked() ? "gui.time.pause" : "gui.time.start"));
                 return true;
             }
             return false;
         });
-        timeUp = new OwnTextIconButton(I18n.txt("gui.time.speedup"), Align.right, skin, "fwd");
+        timeUp = new OwnTextIconButton(I18n.msg("gui.time.speedup"), Align.right, skin, "fwd");
         timeModel[2][0] = timeUp;
         timeUp.setWidth(ww);
         timeUp.addListener(event -> {
@@ -378,7 +378,7 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        timeDown = new OwnTextIconButton(I18n.txt("gui.time.slowdown"), skin, "bwd");
+        timeDown = new OwnTextIconButton(I18n.msg("gui.time.slowdown"), skin, "bwd");
         timeModel[0][0] = timeDown;
         timeDown.setWidth(ww);
         timeDown.addListener(event -> {
@@ -388,7 +388,7 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        timeReset = new OwnTextIconButton(I18n.txt("action.resettime"), Align.center, skin, "reload");
+        timeReset = new OwnTextIconButton(I18n.msg("action.resettime"), Align.center, skin, "reload");
         timeModel[1][1] = timeReset;
         timeReset.setWidth(ww);
         timeReset.addListener(event -> {
@@ -473,7 +473,7 @@ public class ControllerGui extends AbstractGui {
         optT = new Table(skin);
 
         // Slider
-        bloomSlider = new OwnSliderPlus(I18n.txt("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-19");
+        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-19");
         bloomSlider.setWidth(sw);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity * 10f);
@@ -488,7 +488,7 @@ public class ControllerGui extends AbstractGui {
         optT.add(bloomSlider).padBottom(pad10).row();
 
         // Lens flare
-        flareButton = new OwnTextButton(I18n.txt("gui.lensflare"), skin, "toggle-big");
+        flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
         optionsModel[0][1] = flareButton;
         flareButton.setWidth(ww);
         flareButton.setChecked(Settings.settings.postprocess.lensFlare);
@@ -502,7 +502,7 @@ public class ControllerGui extends AbstractGui {
         optT.add(flareButton).padBottom(pad10).row();
 
         // Star glow
-        starGlowButton = new OwnTextButton(I18n.txt("gui.lightscattering"), skin, "toggle-big");
+        starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
         optionsModel[0][2] = starGlowButton;
         starGlowButton.setWidth(ww);
         starGlowButton.setChecked(Settings.settings.postprocess.lightGlow);
@@ -516,7 +516,7 @@ public class ControllerGui extends AbstractGui {
         optT.add(starGlowButton).padBottom(pad10).row();
 
         // Motion blur
-        motionBlurButton = new OwnTextButton(I18n.txt("gui.motionblur"), skin, "toggle-big");
+        motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
         optionsModel[0][3] = motionBlurButton;
         motionBlurButton.setWidth(ww);
         motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur);
@@ -538,7 +538,7 @@ public class ControllerGui extends AbstractGui {
 
         sysT = new Table(skin);
 
-        quit = new OwnTextIconButton(I18n.txt("gui.quit.title"), Align.center, skin, "quit");
+        quit = new OwnTextIconButton(I18n.msg("gui.quit.title"), Align.center, skin, "quit");
         systemModel[0][0] = quit;
         quit.setWidth(ww);
         quit.addListener(event -> {
@@ -554,7 +554,7 @@ public class ControllerGui extends AbstractGui {
         updatePads(sysT);
 
         // Create tab buttons
-        searchButton = new OwnTextButton(I18n.txt("gui.search"), skin, "toggle-big");
+        searchButton = new OwnTextButton(I18n.msg("gui.search"), skin, "toggle-big");
         tabButtons.add(searchButton);
         searchButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -564,7 +564,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        cameraButton = new OwnTextButton(I18n.txt("gui.camera"), skin, "toggle-big");
+        cameraButton = new OwnTextButton(I18n.msg("gui.camera"), skin, "toggle-big");
         tabButtons.add(cameraButton);
         cameraButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -574,7 +574,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        timeButton = new OwnTextButton(I18n.txt("gui.time"), skin, "toggle-big");
+        timeButton = new OwnTextButton(I18n.msg("gui.time"), skin, "toggle-big");
         tabButtons.add(timeButton);
         timeButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -584,7 +584,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        typesButton = new OwnTextButton(I18n.txt("gui.types"), skin, "toggle-big");
+        typesButton = new OwnTextButton(I18n.msg("gui.types"), skin, "toggle-big");
         tabButtons.add(typesButton);
         typesButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -594,7 +594,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        optionsButton = new OwnTextButton(I18n.txt("gui.options"), skin, "toggle-big");
+        optionsButton = new OwnTextButton(I18n.msg("gui.options"), skin, "toggle-big");
         tabButtons.add(optionsButton);
         optionsButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -604,7 +604,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        systemButton = new OwnTextButton(I18n.txt("gui.system"), skin, "toggle-big");
+        systemButton = new OwnTextButton(I18n.msg("gui.system"), skin, "toggle-big");
         tabButtons.add(systemButton);
         systemButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -718,11 +718,11 @@ public class ControllerGui extends AbstractGui {
                         });
                         info(null);
                     } else if (timeOverflow) {
-                        info(I18n.txt("gui.objects.search.timerange", text));
+                        info(I18n.msg("gui.objects.search.timerange", text));
                     } else if (!canSelect) {
-                        info(I18n.txt("gui.objects.search.filter", text));
+                        info(I18n.msg("gui.objects.search.filter", text));
                     } else {
-                        info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
+                        info(I18n.msg("gui.objects.search.invisible", text, focus.getCt().toString()));
                     }
                     return true;
                 }

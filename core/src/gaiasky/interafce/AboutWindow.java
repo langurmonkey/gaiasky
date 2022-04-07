@@ -53,10 +53,10 @@ public class AboutWindow extends GenericDialog {
     private OwnLabel checkLabel;
 
     public AboutWindow(Stage stage, Skin skin) {
-        super(I18n.txt("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.txt("gui.build", Settings.settings.version.build), skin, stage);
+        super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build), skin, stage);
         this.linkStyle = skin.get("link", LabelStyle.class);
 
-        setCancelText(I18n.txt("gui.close"));
+        setCancelText(I18n.msg("gui.close"));
 
         // Build
         buildSuper();
@@ -78,16 +78,16 @@ public class AboutWindow extends GenericDialog {
         HorizontalGroup group = new HorizontalGroup();
         group.align(Align.left);
 
-        final Button tabHelp = new OwnTextButton(I18n.txt("gui.help.help"), skin, "toggle-big");
+        final Button tabHelp = new OwnTextButton(I18n.msg("gui.help.help"), skin, "toggle-big");
         tabHelp.pad(pad5);
         tabHelp.setWidth(tabWidth);
-        final Button tabAbout = new OwnTextButton(I18n.txt("gui.help.about"), skin, "toggle-big");
+        final Button tabAbout = new OwnTextButton(I18n.msg("gui.help.about"), skin, "toggle-big");
         tabAbout.pad(pad5);
         tabAbout.setWidth(tabWidth);
-        final Button tabSystem = new OwnTextButton(I18n.txt("gui.help.system"), skin, "toggle-big");
+        final Button tabSystem = new OwnTextButton(I18n.msg("gui.help.system"), skin, "toggle-big");
         tabSystem.pad(pad5);
         tabSystem.setWidth(tabWidth);
-        final Button tabUpdates = showUpdateTab ? new OwnTextButton(I18n.txt("gui.newversion"), skin, "toggle-big") : null;
+        final Button tabUpdates = showUpdateTab ? new OwnTextButton(I18n.msg("gui.newversion"), skin, "toggle-big") : null;
         if (showUpdateTab) {
             tabUpdates.pad(pad5);
             tabUpdates.setWidth(tabWidth);
@@ -113,13 +113,13 @@ public class AboutWindow extends GenericDialog {
         OwnLabel gaiasky = new OwnLabel(Settings.settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
 
         // User manual
-        Label homepageTitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
-        Label homepageTxt = new OwnLabel(I18n.txt("gui.help.help1"), skin);
+        Label homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
+        Label homepageTxt = new OwnLabel(I18n.msg("gui.help.help1"), skin);
         Link homepageLink = new Link(Settings.settings.WEBPAGE, linkStyle, Settings.settings.WEBPAGE);
 
         // Wiki
-        Label docsTitle = new OwnLabel(I18n.txt("gui.help.docs"), skin);
-        Label docsTxt = new OwnLabel(I18n.txt("gui.help.help2"), skin);
+        Label docsTitle = new OwnLabel(I18n.msg("gui.help.docs"), skin);
+        Label docsTxt = new OwnLabel(I18n.msg("gui.help.help2"), skin);
         Link docsLink = new Link(Settings.settings.DOCUMENTATION, linkStyle, Settings.settings.DOCUMENTATION);
 
         // Icon
@@ -152,21 +152,21 @@ public class AboutWindow extends GenericDialog {
         contentAbout.top().left();
 
         // Intro
-        TextArea intro = new OwnTextArea(I18n.txt("gui.help.gscredits", Settings.settings.version.version), skin.get("regular", TextFieldStyle.class));
+        TextArea intro = new OwnTextArea(I18n.msg("gui.help.gscredits", Settings.settings.version.version), skin.get("regular", TextFieldStyle.class));
         intro.setDisabled(true);
         intro.setPrefRows(3);
         intro.setWidth(contentHelp.getWidth());
 
         // Home page
-        Label homepagetitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
+        Label homepagetitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
         Link homepage = new Link(Settings.settings.WEBPAGE, linkStyle, Settings.settings.WEBPAGE);
 
         // Twitter
-        Label twtitle = new OwnLabel(I18n.txt("gui.help.twitter"), skin);
+        Label twtitle = new OwnLabel(I18n.msg("gui.help.twitter"), skin);
         Link tw = new Link("@GaiaSky_Dev", linkStyle, "https://twitter.com/GaiaSky_Dev");
 
         // Author
-        Label authortitle = new OwnLabel(I18n.txt("gui.help.author"), skin);
+        Label authortitle = new OwnLabel(I18n.msg("gui.help.author"), skin);
 
         Table author = new Table(skin);
         Label authorname = new OwnLabel(Settings.settings.AUTHOR_NAME, skin);
@@ -179,7 +179,7 @@ public class AboutWindow extends GenericDialog {
         author.add(authormasto).left().row();
 
         // Contributor
-        Label contribtitle = new OwnLabel(I18n.txt("gui.help.contributors"), skin);
+        Label contribtitle = new OwnLabel(I18n.msg("gui.help.contributors"), skin);
 
         Table contrib = new Table(skin);
         contrib.align(Align.left);
@@ -193,7 +193,7 @@ public class AboutWindow extends GenericDialog {
         licenseh.space(pad10);
 
         VerticalGroup licensev = new VerticalGroup();
-        TextArea licensetext = new OwnTextArea(I18n.txt("gui.help.license"), skin.get("regular", TextFieldStyle.class));
+        TextArea licensetext = new OwnTextArea(I18n.msg("gui.help.license"), skin.get("regular", TextFieldStyle.class));
         licensetext.setDisabled(true);
         licensetext.setPrefRows(3);
         licensetext.setWidth(taWidth2 / 2f);
@@ -243,63 +243,63 @@ public class AboutWindow extends GenericDialog {
         contentSystem.top().left();
 
         // Build info
-        Label buildinfo = new OwnLabel(I18n.txt("gui.help.buildinfo"), skin, "header");
+        Label buildinfo = new OwnLabel(I18n.msg("gui.help.buildinfo"), skin, "header");
 
-        Label versiontitle = new OwnLabel(I18n.txt("gui.help.version", Settings.settings.APPLICATION_NAME), skin);
+        Label versiontitle = new OwnLabel(I18n.msg("gui.help.version", Settings.settings.APPLICATION_NAME), skin);
         Label version = new OwnLabel(Settings.settings.version.version, skin);
 
-        Label revisiontitle = new OwnLabel(I18n.txt("gui.help.buildnumber"), skin);
+        Label revisiontitle = new OwnLabel(I18n.msg("gui.help.buildnumber"), skin);
         Label revision = new OwnLabel(Settings.settings.version.build, skin);
 
-        Label timetitle = new OwnLabel(I18n.txt("gui.help.buildtime"), skin);
+        Label timetitle = new OwnLabel(I18n.msg("gui.help.buildtime"), skin);
         Label time = new OwnLabel(Settings.settings.version.buildTime.toString(), skin);
 
-        Label systemtitle = new OwnLabel(I18n.txt("gui.help.buildsys"), skin);
+        Label systemtitle = new OwnLabel(I18n.msg("gui.help.buildsys"), skin);
         TextArea system = new OwnTextArea(Settings.settings.version.system, skin.get("regular", TextFieldStyle.class));
         system.setDisabled(true);
         system.setPrefRows(3);
         system.setWidth(taWidth * 2f / 3f);
 
-        Label buildertitle = new OwnLabel(I18n.txt("gui.help.builder"), skin);
+        Label buildertitle = new OwnLabel(I18n.msg("gui.help.builder"), skin);
         Label builder = new OwnLabel(Settings.settings.version.builder, skin);
 
         // Paths
-        Label paths = new OwnLabel(I18n.txt("gui.help.paths"), skin, "header");
+        Label paths = new OwnLabel(I18n.msg("gui.help.paths"), skin, "header");
 
-        Label configtitle = new OwnLabel(I18n.txt("gui.help.paths.config"), skin);
+        Label configtitle = new OwnLabel(I18n.msg("gui.help.paths.config"), skin);
         Label config = new OwnLabel(SysUtils.getConfigDir().toAbsolutePath().toString(), skin);
-        Label datatitle = new OwnLabel(I18n.txt("gui.help.paths.data"), skin);
+        Label datatitle = new OwnLabel(I18n.msg("gui.help.paths.data"), skin);
         Label data = new OwnLabel(SysUtils.getDataDir().toAbsolutePath().toString(), skin);
-        Label screenshotstitle = new OwnLabel(I18n.txt("gui.help.paths.screenshots"), skin);
+        Label screenshotstitle = new OwnLabel(I18n.msg("gui.help.paths.screenshots"), skin);
         Label screenshots = new OwnLabel(SysUtils.getDefaultScreenshotsDir().toAbsolutePath().toString(), skin);
-        Label framestitle = new OwnLabel(I18n.txt("gui.help.paths.frames"), skin);
+        Label framestitle = new OwnLabel(I18n.msg("gui.help.paths.frames"), skin);
         Label frames = new OwnLabel(SysUtils.getDefaultFramesDir().toAbsolutePath().toString(), skin);
-        Label musictitle = new OwnLabel(I18n.txt("gui.help.paths.music"), skin);
+        Label musictitle = new OwnLabel(I18n.msg("gui.help.paths.music"), skin);
         Label music = new OwnLabel(SysUtils.getDefaultMusicDir().toAbsolutePath().toString(), skin);
-        Label mappingstitle = new OwnLabel(I18n.txt("gui.help.paths.mappings"), skin);
+        Label mappingstitle = new OwnLabel(I18n.msg("gui.help.paths.mappings"), skin);
         Label mappings = new OwnLabel(SysUtils.getDefaultMappingsDir().toAbsolutePath().toString(), skin);
-        Label cameratitle = new OwnLabel(I18n.txt("gui.help.paths.camera"), skin);
+        Label cameratitle = new OwnLabel(I18n.msg("gui.help.paths.camera"), skin);
         Label camera = new OwnLabel(SysUtils.getDefaultCameraDir().toAbsolutePath().toString(), skin);
 
         // Java info
-        Label javainfo = new OwnLabel(I18n.txt("gui.help.javainfo"), skin, "header");
+        Label javainfo = new OwnLabel(I18n.msg("gui.help.javainfo"), skin, "header");
 
-        Label javaversiontitle = new OwnLabel(I18n.txt("gui.help.javaversion"), skin);
+        Label javaversiontitle = new OwnLabel(I18n.msg("gui.help.javaversion"), skin);
         Label javaversion = new OwnLabel(System.getProperty("java.version"), skin);
 
-        Label javaruntimetitle = new OwnLabel(I18n.txt("gui.help.javaname"), skin);
+        Label javaruntimetitle = new OwnLabel(I18n.msg("gui.help.javaname"), skin);
         Label javaruntime = new OwnLabel(System.getProperty("java.runtime.name"), skin);
 
-        Label javavmnametitle = new OwnLabel(I18n.txt("gui.help.javavmname"), skin);
+        Label javavmnametitle = new OwnLabel(I18n.msg("gui.help.javavmname"), skin);
         Label javavmname = new OwnLabel(System.getProperty("java.vm.name"), skin);
 
-        Label javavmversiontitle = new OwnLabel(I18n.txt("gui.help.javavmversion"), skin);
+        Label javavmversiontitle = new OwnLabel(I18n.msg("gui.help.javavmversion"), skin);
         Label javavmversion = new OwnLabel(System.getProperty("java.vm.version"), skin);
 
-        Label javavmvendortitle = new OwnLabel(I18n.txt("gui.help.javavmvendor"), skin);
+        Label javavmvendortitle = new OwnLabel(I18n.msg("gui.help.javavmvendor"), skin);
         Label javavmvendor = new OwnLabel(System.getProperty("java.vm.vendor"), skin);
 
-        TextButton memInfoButton = new OwnTextButton(I18n.txt("gui.help.meminfo"), skin, "default");
+        TextButton memInfoButton = new OwnTextButton(I18n.msg("gui.help.meminfo"), skin, "default");
         memInfoButton.setName("memoryinfo");
         memInfoButton.pad(0, pad10, 0, pad10);
         memInfoButton.setHeight(buttonHeight);
@@ -312,9 +312,9 @@ public class AboutWindow extends GenericDialog {
         });
 
         // System info
-        Label sysinfo = new OwnLabel(I18n.txt("gui.help.sysinfo"), skin, "header");
+        Label sysinfo = new OwnLabel(I18n.msg("gui.help.sysinfo"), skin, "header");
 
-        Label sysostitle = new OwnLabel(I18n.txt("gui.help.os"), skin);
+        Label sysostitle = new OwnLabel(I18n.msg("gui.help.os"), skin);
         Label sysos;
 
         try {
@@ -324,22 +324,22 @@ public class AboutWindow extends GenericDialog {
             sysos = new OwnLabel(System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"), skin);
         }
 
-        Label glrenderertitle = new OwnLabel(I18n.txt("gui.help.graphicsdevice"), skin);
+        Label glrenderertitle = new OwnLabel(I18n.msg("gui.help.graphicsdevice"), skin);
         Label glrenderer = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin);
 
         // OpenGL info
-        Label glinfo = new OwnLabel(I18n.txt("gui.help.openglinfo"), skin, "header");
+        Label glinfo = new OwnLabel(I18n.msg("gui.help.openglinfo"), skin, "header");
 
-        Label glvendortitle = new OwnLabel(I18n.txt("gui.help.glvendor"), skin);
+        Label glvendortitle = new OwnLabel(I18n.msg("gui.help.glvendor"), skin);
         Label glvendor = new OwnLabel(Gdx.gl.glGetString(GL20.GL_VENDOR), skin);
 
-        Label glversiontitle = new OwnLabel(I18n.txt("gui.help.openglversion"), skin);
+        Label glversiontitle = new OwnLabel(I18n.msg("gui.help.openglversion"), skin);
         Label glversion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_VERSION), skin);
 
-        Label glslversiontitle = new OwnLabel(I18n.txt("gui.help.glslversion"), skin);
+        Label glslversiontitle = new OwnLabel(I18n.msg("gui.help.glslversion"), skin);
         Label glslversion = new OwnLabel(Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION), skin);
 
-        Label glextensionstitle = new OwnLabel(I18n.txt("gui.help.glextensions"), skin);
+        Label glextensionstitle = new OwnLabel(I18n.msg("gui.help.glextensions"), skin);
         String extensions = GlobalResources.getGLExtensions();
 
         IntBuffer buf = BufferUtils.newIntBuffer(16);
@@ -432,14 +432,14 @@ public class AboutWindow extends GenericDialog {
             HardwareAbstractionLayer hal = si.getHardware();
             CentralProcessor cp = hal.getProcessor();
 
-            Label cpuTitle = new OwnLabel(I18n.txt("gui.help.cpu"), skin);
+            Label cpuTitle = new OwnLabel(I18n.msg("gui.help.cpu"), skin);
             Label cpu = new OwnLabel(cp.toString(), skin);
 
             contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
             contentSystem.add(cpu).align(Align.left).padTop(pad5);
             contentSystem.row();
         } catch (Error e) {
-            contentSystem.add(new OwnLabel(I18n.txt("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad10).padBottom(pad10).row();
+            contentSystem.add(new OwnLabel(I18n.msg("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad10).padBottom(pad10).row();
         }
         contentSystem.add(sysostitle).align(Align.topLeft).padRight(pad10);
         contentSystem.add(sysos).align(Align.left);
@@ -485,7 +485,7 @@ public class AboutWindow extends GenericDialog {
             checkTable.add(checkLabel).top().left().padBottom(pad5).row();
             if (Settings.settings.program.update.lastCheck == null || new Date().getTime() - Settings.settings.program.update.lastCheck.toEpochMilli() > Settings.ProgramSettings.UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
                 // Check!
-                checkLabel.setText(I18n.txt("gui.newversion.checking"));
+                checkLabel.setText(I18n.msg("gui.newversion.checking"));
                 getCheckVersionThread().start();
             } else {
                 // Inform latest
@@ -578,13 +578,13 @@ public class AboutWindow extends GenericDialog {
         if (versionNumber > Settings.settings.version.versionNumber) {
             IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
             if (log) {
-                logger.info(I18n.txt("gui.newversion.available", Settings.settings.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
+                logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
             }
             // There's a new version!
-            checkLabel.setText(I18n.txt("gui.newversion.available", Settings.settings.version, tagVersion + " [" + df.format(tagDate) + "]"));
+            checkLabel.setText(I18n.msg("gui.newversion.available", Settings.settings.version, tagVersion + " [" + df.format(tagDate) + "]"));
             final String uri = Settings.settings.WEBPAGE_DOWNLOADS;
 
-            OwnTextButton getNewVersion = new OwnTextButton(I18n.txt("gui.newversion.getit"), skin);
+            OwnTextButton getNewVersion = new OwnTextButton(I18n.msg("gui.newversion.getit"), skin);
             getNewVersion.pad(0, pad10, 0, pad10);
             getNewVersion.setHeight(40f);
             getNewVersion.addListener(event -> {
@@ -601,15 +601,15 @@ public class AboutWindow extends GenericDialog {
 
         } else {
             if (log)
-                logger.info(I18n.txt("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
-            checkLabel.setText(I18n.txt("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
+                logger.info(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
+            checkLabel.setText(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
             // Add check now button
-            OwnTextButton checkNewVersion = new OwnTextButton(I18n.txt("gui.newversion.checknow"), skin);
+            OwnTextButton checkNewVersion = new OwnTextButton(I18n.msg("gui.newversion.checknow"), skin);
             checkNewVersion.pad(pad5, pad10, pad5, pad10);
             checkNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    checkLabel.setText(I18n.txt("gui.newversion.checking"));
-                    logger.info(I18n.txt("gui.newversion.checking"));
+                    checkLabel.setText(I18n.msg("gui.newversion.checking"));
+                    logger.info(I18n.msg("gui.newversion.checking"));
                     getCheckVersionThread().start();
                     return true;
                 }
@@ -633,8 +633,8 @@ public class AboutWindow extends GenericDialog {
 
                 } else {
                     // Handle failed case
-                    logger.info(I18n.txt("gui.newversion.fail"));
-                    checkLabel.setText(I18n.txt("notif.error", "Could not get last version"));
+                    logger.info(I18n.msg("gui.newversion.fail"));
+                    checkLabel.setText(I18n.msg("notif.error", "Could not get last version"));
                     checkLabel.setColor(Color.RED);
                 }
             }

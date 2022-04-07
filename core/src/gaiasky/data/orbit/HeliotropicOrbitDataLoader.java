@@ -48,7 +48,7 @@ public class HeliotropicOrbitDataLoader {
 
             SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
 
-            I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"));
+            I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"), new FileHandle(ASSETS_LOC + "/i18n/objects"));
 
             // Initialize math manager
             MathManager.initialize();

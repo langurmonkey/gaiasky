@@ -63,7 +63,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     public Constellation(String name, String parentName) {
         this();
-        this.names = new String[] { name };
+        setName(name);
         this.parentName = parentName;
     }
 
@@ -219,7 +219,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

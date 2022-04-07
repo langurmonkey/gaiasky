@@ -17,6 +17,6 @@ public class AttributeRA extends AttributeAbstract implements IAttribute {
         return "deg";
     }
     public String toString(){
-        return "Right ascension (" + I18n.txt("gui.focusinfo.alpha") + ")";
+        return "Right ascension (" + I18n.msg("gui.focusinfo.alpha") + ")";
     }
 }

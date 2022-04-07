@@ -120,15 +120,15 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(jupc);
-        font.draw(sb, I18n.txt("gui.minimap.jupiter"), jupf[0] - px(20), jupf[1] - px(10));
+        font.draw(sb, I18n.msg("gui.minimap.jupiter"), jupf[0] - px(20), jupf[1] - px(10));
         font.setColor(satc);
-        font.draw(sb, I18n.txt("gui.minimap.saturn"), satf[0] - px(20), satf[1] + px(25));
+        font.draw(sb, I18n.msg("gui.minimap.saturn"), satf[0] - px(20), satf[1] + px(25));
         font.setColor(urac);
-        font.draw(sb, I18n.txt("gui.minimap.uranus"), uraf[0] - px(20), uraf[1] - px(25));
+        font.draw(sb, I18n.msg("gui.minimap.uranus"), uraf[0] - px(20), uraf[1] - px(25));
         font.setColor(nepc);
-        font.draw(sb, I18n.txt("gui.minimap.neptune"), nepf[0] - px(20), nepf[1] + px(40));
+        font.draw(sb, I18n.msg("gui.minimap.neptune"), nepf[0] - px(20), nepf[1] + px(40));
         font.setColor(sunc);
-        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
+        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
 
         fb.end();
@@ -215,15 +215,15 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         font.draw(sb, "30 AU", side2, u2Px(30 + 3, side2));
 
         font.setColor(jupc);
-        font.draw(sb, I18n.txt("gui.minimap.jupiter"), jupf[2] - px(20), jupf[3] - px(8));
+        font.draw(sb, I18n.msg("gui.minimap.jupiter"), jupf[2] - px(20), jupf[3] - px(8));
         font.setColor(satc);
-        font.draw(sb, I18n.txt("gui.minimap.saturn"), satf[2] - px(20), satf[3] - px(8));
+        font.draw(sb, I18n.msg("gui.minimap.saturn"), satf[2] - px(20), satf[3] - px(8));
         font.setColor(urac);
-        font.draw(sb, I18n.txt("gui.minimap.uranus"), uraf[2] - px(20), uraf[3] - px(8));
+        font.draw(sb, I18n.msg("gui.minimap.uranus"), uraf[2] - px(20), uraf[3] - px(8));
         font.setColor(nepc);
-        font.draw(sb, I18n.txt("gui.minimap.neptune"), nepf[2] - px(20), nepf[3] - px(8));
+        font.draw(sb, I18n.msg("gui.minimap.neptune"), nepf[2] - px(20), nepf[3] - px(8));
         font.setColor(sunc);
-        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(5), side2 - px(5));
+        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(5), side2 - px(5));
 
         sb.end();
 
@@ -233,6 +233,6 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
     @Override
     public String getName() {
-        return I18n.txt("gui.minimap.outerss");
+        return I18n.msg("gui.minimap.outerss");
     }
 }

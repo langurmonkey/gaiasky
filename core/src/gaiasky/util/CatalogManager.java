@@ -117,7 +117,7 @@ public class CatalogManager implements IObserver {
                 if (!visible)
                     EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.object);
                 ci.setVisibility(visible);
-                logger.info(I18n.txt("notif.visibility." + (visible ? "on" : "off"), ci.name));
+                logger.info(I18n.msg("notif.visibility." + (visible ? "on" : "off"), ci.name));
             }
             break;
         case CATALOG_HIGHLIGHT:
@@ -127,9 +127,9 @@ public class CatalogManager implements IObserver {
                 ci.highlight(highlight);
 
                 if (ci.highlighted)
-                    logger.info(I18n.txt("notif.highlight.on", ci.name));
+                    logger.info(I18n.msg("notif.highlight.on", ci.name));
                 else
-                    logger.info(I18n.txt("notif.highlight.off", ci.name));
+                    logger.info(I18n.msg("notif.highlight.off", ci.name));
             }
             break;
         default:

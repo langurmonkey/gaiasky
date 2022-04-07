@@ -40,7 +40,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     public List<IParticleRecord> loadData(String file, double factor) {
         List<IParticleRecord> pointData = loadDataMapped(Settings.settings.data.dataFile(file), factor);
         if (pointData != null)
-            logger.info(I18n.txt("notif.nodeloader", pointData.size(), file));
+            logger.info(I18n.msg("notif.nodeloader", pointData.size(), file));
 
         return pointData;
     }

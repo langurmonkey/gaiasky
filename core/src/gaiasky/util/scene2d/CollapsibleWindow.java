@@ -146,7 +146,7 @@ public class CollapsibleWindow extends OwnWindow {
             }
             return false;
         });
-        getTitleTable().addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.expandcollapse"), skin));
+        getTitleTable().addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.expandcollapse"), skin));
     }
 
     protected void drawBackground(Batch batch, float parentAlpha, float x, float y) {

@@ -78,7 +78,7 @@ public class GalaxyGenerator {
 
             SettingsManager.initialize(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
 
-            I18n.initialize(new FileHandle("assets/i18n/gsbundle"));
+            I18n.initialize(new FileHandle("assets/i18n/gsbundle"), new FileHandle("assets/i18n/objects"));
 
             // Add notifications watch
             new ConsoleLogger();
@@ -360,7 +360,7 @@ public class GalaxyGenerator {
 
         bw.close();
 
-        Logger.getLogger(GalaxyGenerator.class).info(I18n.txt("notif.written", gal.size(), filePath));
+        Logger.getLogger(GalaxyGenerator.class).info(I18n.msg("notif.written", gal.size(), filePath));
     }
 
 }

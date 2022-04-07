@@ -58,7 +58,7 @@ public class DatasetWatcher implements IObserver {
                             this.button.setDisabled(true);
                         }
                         if (this.status != null) {
-                            this.status.setText(I18n.txt("gui.download.starting", dataset.name));
+                            this.status.setText(I18n.msg("gui.download.starting", dataset.name));
                         }
 
                         // Add cancel button
@@ -66,7 +66,7 @@ public class DatasetWatcher implements IObserver {
                             Net.HttpRequest request = (Net.HttpRequest) data[1];
 
                             Skin skin = GaiaSky.instance.getGlobalResources().getSkin();
-                            OwnTextButton cancelDownloadButton = new OwnTextIconButton(I18n.txt("gui.download.cancel"), skin, "quit");
+                            OwnTextButton cancelDownloadButton = new OwnTextIconButton(I18n.msg("gui.download.cancel"), skin, "quit");
                             cancelDownloadButton.pad(14.4f);
                             cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
                             cancelDownloadButton.addListener(new ChangeListener() {
@@ -92,9 +92,9 @@ public class DatasetWatcher implements IObserver {
                         };
                         if (this.status != null) {
                             if(data.length > 2 && data[2] != null) {
-                                this.status.setText(I18n.txt(messageKey) + " " + data[2]);
+                                this.status.setText(I18n.msg(messageKey) + " " + data[2]);
                             } else {
-                                this.status.setText(I18n.txt(messageKey));
+                                this.status.setText(I18n.msg(messageKey));
                             }
                         }
                     }

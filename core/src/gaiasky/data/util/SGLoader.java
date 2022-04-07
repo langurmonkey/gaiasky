@@ -74,7 +74,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
             });
         }
 
-        logger.info(I18n.txt("notif.render.init"));
+        logger.info(I18n.msg("notif.render.init"));
     }
 
     /**

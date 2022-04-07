@@ -336,7 +336,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

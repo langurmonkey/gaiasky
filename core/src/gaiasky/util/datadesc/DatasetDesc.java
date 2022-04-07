@@ -157,7 +157,7 @@ public class DatasetDesc {
         // Number objects
         try {
             nObjects = source.getLong("nobjects");
-            nObjectsStr = I18n.txt("gui.dataset.nobjects", GlobalResources.nObjectsToString(nObjects));
+            nObjectsStr = I18n.msg("gui.dataset.nobjects", GlobalResources.nObjectsToString(nObjects));
         } catch (IllegalArgumentException e) {
             nObjects = -1;
             nObjectsStr = "N/A";

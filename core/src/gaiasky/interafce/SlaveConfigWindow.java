@@ -44,10 +44,10 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
     private OwnLabel slaveStatusLabel;
 
     public SlaveConfigWindow(Stage stage, Skin skin) {
-        super(I18n.txt("gui.slave.config.title"), skin, stage);
+        super(I18n.msg("gui.slave.config.title"), skin, stage);
 
         setModal(false);
-        setCancelText(I18n.txt("gui.close"));
+        setCancelText(I18n.msg("gui.close"));
 
         // Build UI
         buildSuper();
@@ -64,7 +64,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
         float tw = 96f;
 
         // Send button (does not close dialog)
-        OwnTextButton sendButton = new OwnTextButton(I18n.txt("gui.send"), skin, "default");
+        OwnTextButton sendButton = new OwnTextButton(I18n.msg("gui.send"), skin, "default");
         sendButton.setName("send");
         sendButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -82,7 +82,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
 
         // Status
         slaveStatuses = new OwnLabel[slaves.size()];
-        OwnLabel statusLabel = new OwnLabel(I18n.txt("gui.slave.config.status") + ":", skin);
+        OwnLabel statusLabel = new OwnLabel(I18n.msg("gui.slave.config.status") + ":", skin);
         Table statusTable = new Table(skin);
         for (int i = 0; i < slaves.size(); i++) {
             OwnLabel slaveMarker = new OwnLabel("[" + (i + 1) + "]", skin);
@@ -112,7 +112,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
-        OwnLabel slaveLabel = new OwnLabel(I18n.txt("gui.slave.config.instance") + ":", skin);
+        OwnLabel slaveLabel = new OwnLabel(I18n.msg("gui.slave.config.instance") + ":", skin);
         content.add(slaveLabel).center().left().padRight(pad10).padBottom(pad10);
         content.add(slaveSelect).center().left().padBottom(pad10).row();
 
@@ -125,25 +125,25 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
         // Yaw
         yaw = new OwnTextField("", skin, angleVal);
         yaw.setWidth(tw);
-        OwnLabel yawLabel = new OwnLabel(I18n.txt("gui.slave.config.yaw") + ":", skin);
+        OwnLabel yawLabel = new OwnLabel(I18n.msg("gui.slave.config.yaw") + ":", skin);
         content.add(yawLabel).center().left().padRight(pad10).padBottom(pad10);
         content.add(yaw).center().left().padBottom(pad10).row();
         // Pitch
         pitch = new OwnTextField("", skin, angleVal);
         pitch.setWidth(tw);
-        OwnLabel pitchLabel = new OwnLabel(I18n.txt("gui.slave.config.pitch") + ":", skin);
+        OwnLabel pitchLabel = new OwnLabel(I18n.msg("gui.slave.config.pitch") + ":", skin);
         content.add(pitchLabel).center().left().padRight(pad10).padBottom(pad10);
         content.add(pitch).center().left().padBottom(pad10).row();
         // Roll
         roll = new OwnTextField("", skin, angleVal);
         roll.setWidth(tw);
-        OwnLabel rollLabel = new OwnLabel(I18n.txt("gui.slave.config.roll") + ":", skin);
+        OwnLabel rollLabel = new OwnLabel(I18n.msg("gui.slave.config.roll") + ":", skin);
         content.add(rollLabel).center().left().padRight(pad10).padBottom(pad10);
         content.add(roll).center().left().padBottom(pad10).row();
         // FOV
         fov = new OwnTextField("", skin, fovVal);
         fov.setWidth(tw);
-        OwnLabel fovLabel = new OwnLabel(I18n.txt("gui.slave.config.fov") + ":", skin);
+        OwnLabel fovLabel = new OwnLabel(I18n.msg("gui.slave.config.fov") + ":", skin);
         content.add(fovLabel).center().left().padRight(pad10).padBottom(pad10);
         content.add(fov).center().left().padBottom(pad10).row();
 

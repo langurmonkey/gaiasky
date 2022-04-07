@@ -92,7 +92,7 @@ public class SAMPClient implements IObserver {
                 boolean loaded = loadVOTable(url, id, name, skin);
 
                 if (!loaded) {
-                    logger.info(I18n.txt("samp.error.votable", name));
+                    logger.info(I18n.msg("samp.error.votable", name));
                 }
 
                 return null;
@@ -198,16 +198,16 @@ public class SAMPClient implements IObserver {
 
     public String getStatus() {
         if (conn == null) {
-            return I18n.txt("gui.debug.samp.notinit");
+            return I18n.msg("gui.debug.samp.notinit");
         } else {
             if (conn.isConnected()) {
                 try {
-                    return I18n.txt("gui.debug.samp.connected", conn.getConnection().getRegInfo().getHubId());
+                    return I18n.msg("gui.debug.samp.connected", conn.getConnection().getRegInfo().getHubId());
                 } catch (Exception e) {
-                    return I18n.txt("gui.debug.samp.error");
+                    return I18n.msg("gui.debug.samp.error");
                 }
             } else {
-                return I18n.txt("gui.debug.samp.notconnected");
+                return I18n.msg("gui.debug.samp.notconnected");
             }
         }
     }
@@ -228,7 +228,7 @@ public class SAMPClient implements IObserver {
             DataSource dataSource = new URLDataSource(new URL(url));
             Stage ui = GaiaSky.instance.mainGui.getGuiStage();
             String fileName = dataSource.getName();
-            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
+            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
             Runnable doLoad = () -> {
                 try {
                     DatasetOptions datasetOptions = dld.generateDatasetOptions();
@@ -256,7 +256,7 @@ public class SAMPClient implements IObserver {
                         }
                     }
                 } catch (Exception e) {
-                    logger.error(I18n.txt("notif.error", fileName), e);
+                    logger.error(I18n.msg("notif.error", fileName), e);
                 }
             };
             dld.setAcceptRunnable(() -> {
@@ -266,7 +266,7 @@ public class SAMPClient implements IObserver {
             dld.show(ui);
             return true;
         } catch (Exception e) {
-            logger.error(I18n.txt("notif.error", url), e);
+            logger.error(I18n.msg("notif.error", url), e);
             return false;
         }
 

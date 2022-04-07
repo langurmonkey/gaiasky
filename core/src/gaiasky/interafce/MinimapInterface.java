@@ -28,11 +28,11 @@ public class MinimapInterface extends TableGuiInterface {
         top.add(minimap.getTopProjection());
 
         mapName = new OwnLabel("", skin, "header");
-        OwnLabel sideLabel = new OwnLabel(I18n.txt("gui.minimap.vert.side"), skin, "header");
+        OwnLabel sideLabel = new OwnLabel(I18n.msg("gui.minimap.vert.side"), skin, "header");
         Table sideLabelTable = new Table(skin);
         sideLabelTable.setBackground("table-bg");
         sideLabelTable.add(sideLabel).pad(pad);
-        OwnLabel topLabel = new OwnLabel(I18n.txt("gui.minimap.vert.top"), skin, "header");
+        OwnLabel topLabel = new OwnLabel(I18n.msg("gui.minimap.vert.top"), skin, "header");
         Table topLabelTable = new Table(skin);
         topLabelTable.setBackground("table-bg");
         topLabelTable.add(topLabel).pad(pad);

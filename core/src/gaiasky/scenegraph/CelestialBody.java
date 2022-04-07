@@ -292,7 +292,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

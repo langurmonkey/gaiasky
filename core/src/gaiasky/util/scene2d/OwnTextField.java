@@ -139,10 +139,10 @@ public class OwnTextField extends TextField {
         if (validator != null) {
             if (validator instanceof FloatValidator) {
                 FloatValidator fv = (FloatValidator) validator;
-                addListener(new OwnTextTooltip(I18n.txt("gui.validator.values", fv.getMin(), fv.getMax()), skin));
+                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", fv.getMin(), fv.getMax()), skin));
             } else if (validator instanceof IntValidator) {
                 IntValidator iv = (IntValidator) validator;
-                addListener(new OwnTextTooltip(I18n.txt("gui.validator.values", iv.getMin(), iv.getMax()), skin));
+                addListener(new OwnTextTooltip(I18n.msg("gui.validator.values", iv.getMin(), iv.getMax()), skin));
             }
             if (validator instanceof CallbackValidator) {
                 CallbackValidator cv = (CallbackValidator) validator;

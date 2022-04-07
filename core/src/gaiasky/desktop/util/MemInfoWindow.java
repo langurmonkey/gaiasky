@@ -18,9 +18,9 @@ import java.lang.management.MemoryPoolMXBean;
 public class MemInfoWindow extends GenericDialog {
 
     public MemInfoWindow(Stage stg, Skin skin) {
-        super(I18n.txt("gui.help.meminfo"), skin, stg);
+        super(I18n.msg("gui.help.meminfo"), skin, stg);
 
-        setCancelText(I18n.txt("gui.close"));
+        setCancelText(I18n.msg("gui.close"));
 
         // Build
         buildSuper();
@@ -34,7 +34,7 @@ public class MemInfoWindow extends GenericDialog {
 
         StringBuilder memInfoStr = new StringBuilder();
         for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
-            memInfoStr.append(I18n.txt("gui.help.name")).append(": ").append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n");
+            memInfoStr.append(I18n.msg("gui.help.name")).append(": ").append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n");
         }
 
         OwnTextArea memInfo = new OwnTextArea(memInfoStr.toString(), skin, "disabled-nobg");

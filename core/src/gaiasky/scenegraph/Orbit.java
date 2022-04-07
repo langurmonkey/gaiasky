@@ -325,7 +325,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     }
 
     public String text() {
-        return getName();
+        return getLocalizedName();
     }
 
     @Override
@@ -659,7 +659,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         try {
             this.model = OrientationModel.valueOf(model);
         } catch (IllegalArgumentException e) {
-            logger.error(I18n.txt("notif.error", e.getLocalizedMessage()));
+            logger.error(I18n.msg("notif.error", e.getLocalizedMessage()));
         }
     }
 

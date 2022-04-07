@@ -306,7 +306,7 @@ public class MeshObject extends GenericCatalog implements IModelRenderable, I3DT
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

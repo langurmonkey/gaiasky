@@ -201,7 +201,7 @@ public class GaiaSkyDesktop implements IObserver {
             SettingsManager.initialize(cliArgs.vr);
 
             // Initialize i18n (only for global config logging)
-            I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
+            I18n.initialize(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"));
 
             // Safe mode
             if (cliArgs.safeMode && !Settings.settings.program.safeMode) {
@@ -210,7 +210,7 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             // Reinitialize with user-defined locale
-            I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"));
+            I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
 
             // -v or --version
             if (cliArgs.version) {
@@ -224,13 +224,13 @@ public class GaiaSkyDesktop implements IObserver {
                     }
                 }
                 out.println();
-                out.println(I18n.txt("gui.help.license"));
-                out.println(I18n.txt("gui.help.writtenby", Settings.AUTHOR_NAME, Settings.AUTHOR_EMAIL));
+                out.println(I18n.msg("gui.help.license"));
+                out.println(I18n.msg("gui.help.writtenby", Settings.AUTHOR_NAME, Settings.AUTHOR_EMAIL));
                 out.println();
-                out.println(I18n.txt("gui.help.homepage") + "\t<" + Settings.WEBPAGE + ">");
-                out.println(I18n.txt("gui.help.docs") + "\t\t<" + Settings.DOCUMENTATION + ">");
+                out.println(I18n.msg("gui.help.homepage") + "\t<" + Settings.WEBPAGE + ">");
+                out.println(I18n.msg("gui.help.docs") + "\t\t<" + Settings.DOCUMENTATION + ">");
                 out.println();
-                out.println(I18n.txt("gui.help.javaversion") + " " + System.getProperty("java.vm.version"));
+                out.println(I18n.msg("gui.help.javaversion") + " " + System.getProperty("java.vm.version"));
                 out.println();
                 out.println("ZAH/DLR/BWT/DPAC");
                 return;
@@ -312,7 +312,7 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 if (myMode == null) {
                     // Fall back to windowed
-                    logger.warn(I18n.txt("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
+                    logger.warn(I18n.msg("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
                     cfg.setWindowedMode(s.graphics.getScreenWidth(), s.graphics.getScreenHeight());
                     cfg.setResizable(s.graphics.resizable);
                 } else {
@@ -364,33 +364,33 @@ public class GaiaSkyDesktop implements IObserver {
                 try {
                     gs.dispose();
                 } catch (Exception e1) {
-                    logger.error(I18n.txt("error.dispose"), e1);
+                    logger.error(I18n.msg("error.dispose"), e1);
                 }
             }
             if (!JAVA_VERSION_FLAG) {
                 if (gs != null && !gs.windowCreated) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
-                    logger.error(I18n.txt("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
+                    logger.error(I18n.msg("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
                     setSafeMode(cfg);
                     consoleLogger.unsubscribe();
 
                     try {
                         runGaiaSky(cfg);
                     } catch (GdxRuntimeException e1) {
-                        logger.error(I18n.txt("error.opengl", MIN_OPENGL, MIN_GLSL));
-                        showDialogOGL(e, I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
+                        logger.error(I18n.msg("error.opengl", MIN_OPENGL, MIN_GLSL));
+                        showDialogOGL(e, I18n.msg("dialog.opengl.title"), I18n.msg("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
                     }
                 } else {
-                    logger.error(I18n.txt("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
-                    showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    logger.error(I18n.msg("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                 }
             } else {
-                logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
-                showDialogOGL(e, I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
+                logger.error(I18n.msg("error.java", REQUIRED_JAVA_VERSION));
+                showDialogOGL(e, I18n.msg("dialog.java.title"), I18n.msg("dialog.java.message", REQUIRED_JAVA_VERSION));
             }
         } catch (Exception e) {
             logger.error(e);
-            showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+            showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash.exception", e, Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
         }
     }
 
@@ -408,7 +408,7 @@ public class GaiaSkyDesktop implements IObserver {
                     Settings.settings.graphics.resolution[0] = w;
                     Settings.settings.graphics.resolution[1] = h;
                 } catch (HeadlessException he) {
-                    logger.error(I18n.txt("error.screensize.gd"));
+                    logger.error(I18n.msg("error.screensize.gd"));
                     logger.debug(he);
                 }
             }
@@ -426,7 +426,7 @@ public class GaiaSkyDesktop implements IObserver {
                     h = 900;
                     Settings.settings.graphics.resolution[0] = w;
                     Settings.settings.graphics.resolution[1] = h;
-                    logger.error(I18n.txt("error.screensize.toolkit", w, h));
+                    logger.error(I18n.msg("error.screensize.toolkit", w, h));
                     logger.debug(e);
                 }
             }
@@ -447,7 +447,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void setSafeMode(final Lwjgl3ApplicationConfiguration cfg) {
-        logger.info(I18n.txt("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
+        logger.info(I18n.msg("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
         Settings.settings.scene.renderer.elevation.type = ElevationType.NONE;
         Settings.settings.program.safeMode = true;
         cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);

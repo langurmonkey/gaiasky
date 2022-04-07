@@ -56,7 +56,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         searchBox = new OwnTextField("", skin);
         searchBox.setName("search box");
         searchBox.setWidth(contentWidth);
-        searchBox.setMessageText(I18n.txt("gui.objects.search"));
+        searchBox.setMessageText(I18n.msg("gui.objects.search"));
         searchBox.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -74,9 +74,9 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                                     EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
                                 });
                             } else if (timeOverflow) {
-                                info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
+                                info(I18n.msg("gui.objects.search.timerange.1", text), I18n.msg("gui.objects.search.timerange.2"));
                             } else {
-                                info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
+                                info(I18n.msg("gui.objects.search.invisible.1", text), I18n.msg("gui.objects.search.invisible.2", focus.getCt().toString()));
                             }
                         }
                     } else {
@@ -153,9 +153,9 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
                             });
                         } else if (timeOverflow) {
-                            info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
+                            info(I18n.msg("gui.objects.search.timerange.1", text), I18n.msg("gui.objects.search.timerange.2"));
                         } else {
-                            info(I18n.txt("gui.objects.search.invisible.1", text), I18n.txt("gui.objects.search.invisible.2", focus.getCt().toString()));
+                            info(I18n.msg("gui.objects.search.invisible.1", text), I18n.msg("gui.objects.search.invisible.2", focus.getCt().toString()));
                         }
                     }
                 } else {

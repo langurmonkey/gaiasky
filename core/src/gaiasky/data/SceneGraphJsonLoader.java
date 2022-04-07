@@ -36,11 +36,11 @@ public class SceneGraphJsonLoader {
 
     public synchronized static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException {
         ISceneGraph sg;
-        logger.info(I18n.txt("notif.loading", "JSON data descriptor files:"));
+        logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
         for (FileHandle fh : jsonFiles) {
             logger.info("\t" + fh.path() + " - exists: " + fh.exists());
             if (!fh.exists()) {
-                logger.error(I18n.txt("error.loading.notexistent", fh.path()));
+                logger.error(I18n.msg("error.loading.notexistent", fh.path()));
             }
         }
 

@@ -90,7 +90,7 @@ public class HighZMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(sunc);
-        font.draw(sb, I18n.txt("gui.minimap.localgroup"), side2 + px(7), sideshort2 - px(4));
+        font.draw(sb, I18n.msg("gui.minimap.localgroup"), side2 + px(7), sideshort2 - px(4));
         font.setColor(textyc);
         font.draw(sb, "SDSS", side2 - px(20), sideshort - px(22));
 
@@ -136,7 +136,7 @@ public class HighZMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
-        font.draw(sb, I18n.txt("gui.minimap.localgroup"), side2 + px(10), side2 + px(20));
+        font.draw(sb, I18n.msg("gui.minimap.localgroup"), side2 + px(10), side2 + px(20));
 
 
         font.setColor(textmc);
@@ -156,6 +156,6 @@ public class HighZMinimapScale extends AbstractMinimapScale {
 
     @Override
     public String getName() {
-        return I18n.txt("gui.minimap.highz");
+        return I18n.msg("gui.minimap.highz");
     }
 }

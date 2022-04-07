@@ -201,7 +201,7 @@ public class SpacecraftGui extends AbstractGui {
             }
             return false;
         });
-        stabilise.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.stabilise"), skin));
+        stabilise.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.sc.stabilise"), skin));
 
         stop = new OwnImageButton(skin, "sc-stop");
         stop.setProgrammaticChangeEvents(false);
@@ -215,7 +215,7 @@ public class SpacecraftGui extends AbstractGui {
             }
             return false;
         });
-        stop.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.stop"), skin));
+        stop.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.sc.stop"), skin));
 
         exit = new OwnImageButton(skin, "sc-exit");
         exit.setProgrammaticChangeEvents(false);
@@ -227,7 +227,7 @@ public class SpacecraftGui extends AbstractGui {
             }
             return false;
         });
-        exit.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.exit"), skin));
+        exit.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.sc.exit"), skin));
 
         buttonRow.addActor(stabilise);
         buttonRow.addActor(stop);
@@ -248,7 +248,7 @@ public class SpacecraftGui extends AbstractGui {
         engineControls.pad(0f);
 
         enginePlus = new OwnImageButton(skin, "sc-engine-power-up");
-        enginePlus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.powerup"), skin));
+        enginePlus.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.sc.powerup"), skin));
         enginePlus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(gaiasky.event.Event.SPACECRAFT_THRUST_INCREASE_CMD, enginePlus);
@@ -257,7 +257,7 @@ public class SpacecraftGui extends AbstractGui {
             return false;
         });
         engineMinus = new OwnImageButton(skin, "sc-engine-power-down");
-        enginePlus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.powerdown"), skin));
+        enginePlus.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.sc.powerdown"), skin));
         engineMinus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(gaiasky.event.Event.SPACECRAFT_THRUST_DECREASE_CMD, engineMinus);
@@ -267,7 +267,7 @@ public class SpacecraftGui extends AbstractGui {
         });
 
         Group engineLabelRotated = new Group();
-        Label engineLabel = new OwnLabel(I18n.txt("gui.sc.enginepower"), skin);
+        Label engineLabel = new OwnLabel(I18n.msg("gui.sc.enginepower"), skin);
         engineLabelRotated.addActor(engineLabel);
         float engineLabelH = enginePowerH - enginePlus.getHeight() - engineMinus.getHeight() - 2;
         engineLabelRotated.addAction(Actions.rotateBy(-90));
@@ -317,7 +317,7 @@ public class SpacecraftGui extends AbstractGui {
         });
 
         // Whether to keep the velocity pointing in the direction vector
-        velToDir = new OwnCheckBox(I18n.txt("gui.sc.veltodir"), skin, 16f);
+        velToDir = new OwnCheckBox(I18n.msg("gui.sc.veltodir"), skin, 16f);
         velToDir.setName("sc veltodir");
         velToDir.setChecked(Settings.settings.spacecraft.velocityDirection);
         velToDir.addListener(event -> {
@@ -327,7 +327,7 @@ public class SpacecraftGui extends AbstractGui {
             return false;
         });
 
-        controlsGroup.add(new OwnLabel(I18n.txt("gui.sc.spaceship"), skin, "sc-header")).left().padRight(16f).padBottom(8f);
+        controlsGroup.add(new OwnLabel(I18n.msg("gui.sc.spaceship"), skin, "sc-header")).left().padRight(16f).padBottom(8f);
         controlsGroup.add(machineSelector).left().padBottom(8f).row();
         controlsGroup.add(velToDir).left().colspan(2);
         controlsGroup.pack();
@@ -344,7 +344,7 @@ public class SpacecraftGui extends AbstractGui {
         mainvel.setWidth(valueWidth);
         HorizontalGroup mvg = new HorizontalGroup();
         mvg.space(groupspacing);
-        Label speed = new OwnLabel(I18n.txt("gui.sc.velocity") + ":", skin, "sc-header");
+        Label speed = new OwnLabel(I18n.msg("gui.sc.velocity") + ":", skin, "sc-header");
         speed.setWidth(labelWidth);
         mvg.addActor(speed);
         mvg.addActor(mainvel);
@@ -352,7 +352,7 @@ public class SpacecraftGui extends AbstractGui {
         yawvel.setWidth(valueWidth);
         HorizontalGroup yvg = new HorizontalGroup();
         yvg.space(groupspacing);
-        Label yaw = new OwnLabel(I18n.txt("gui.sc.yaw") + ":", skin, "sc-header");
+        Label yaw = new OwnLabel(I18n.msg("gui.sc.yaw") + ":", skin, "sc-header");
         yaw.setWidth(labelWidth);
         yvg.addActor(yaw);
         yvg.addActor(yawvel);
@@ -360,7 +360,7 @@ public class SpacecraftGui extends AbstractGui {
         pitchvel.setWidth(valueWidth);
         HorizontalGroup pvg = new HorizontalGroup();
         pvg.space(groupspacing);
-        Label pitch = new OwnLabel(I18n.txt("gui.sc.pitch") + ":", skin, "sc-header");
+        Label pitch = new OwnLabel(I18n.msg("gui.sc.pitch") + ":", skin, "sc-header");
         pitch.setWidth(labelWidth);
         pvg.addActor(pitch);
         pvg.addActor(pitchvel);
@@ -368,7 +368,7 @@ public class SpacecraftGui extends AbstractGui {
         rollvel.setWidth(valueWidth);
         HorizontalGroup rvg = new HorizontalGroup();
         rvg.space(groupspacing);
-        Label roll = new OwnLabel(I18n.txt("gui.sc.roll") + ":", skin, "sc-header");
+        Label roll = new OwnLabel(I18n.msg("gui.sc.roll") + ":", skin, "sc-header");
         roll.setWidth(labelWidth);
         rvg.addActor(roll);
         rvg.addActor(rollvel);
@@ -392,13 +392,13 @@ public class SpacecraftGui extends AbstractGui {
         HorizontalGroup cng = new HorizontalGroup();
         cng.align(Align.left);
         cng.space(groupspacing);
-        cng.addActor(new OwnLabel(I18n.txt("gui.sc.nearest") + ":", skin, "sc-header"));
+        cng.addActor(new OwnLabel(I18n.msg("gui.sc.nearest") + ":", skin, "sc-header"));
         cng.addActor(closestname);
 
         HorizontalGroup cdg = new HorizontalGroup();
         cdg.align(Align.left);
         cdg.space(groupspacing);
-        cdg.addActor(new OwnLabel(I18n.txt("gui.sc.distance") + ":", skin, "sc-header"));
+        cdg.addActor(new OwnLabel(I18n.msg("gui.sc.distance") + ":", skin, "sc-header"));
         cdg.addActor(closestdist);
 
         nearestGroup.add(cng).left().row();

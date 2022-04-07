@@ -52,9 +52,9 @@ public class ArchiveViewWindow extends GenericDialog {
 
 
     public ArchiveViewWindow(Stage stage, Skin skin){
-        super(I18n.txt("gui.data.catalog", "Gaia", "?"), skin, stage);
+        super(I18n.msg("gui.data.catalog", "Gaia", "?"), skin, stage);
 
-        setAcceptText(I18n.txt("gui.close"));
+        setAcceptText(I18n.msg("gui.close"));
         setModal(false);
 
         // Build
@@ -70,7 +70,7 @@ public class ArchiveViewWindow extends GenericDialog {
         updating = true;
         this.st = st;
 
-        this.getTitleLabel().setText(I18n.txt("gui.data.catalog", "Gaia", st.getName()));
+        this.getTitleLabel().setText(I18n.msg("gui.data.catalog", "Gaia", st.getName()));
 
         table.clear();
         requestData(new GaiaDataListener(st));
@@ -113,12 +113,12 @@ public class ArchiveViewWindow extends GenericDialog {
     private void requestData(GaiaDataListener listener) {
         if (st.getCatalogSource() > 0) {
             if (st.getId() > 5000000) {
-                this.getTitleLabel().setText(I18n.txt("gui.data.catalog", "Gaia", st.getName()));
+                this.getTitleLabel().setText(I18n.msg("gui.data.catalog", "Gaia", st.getName()));
                 // Sourceid
                 getDataBySourceId(st.getId(), listener);
                 return;
             } else if (st.getHip() > 0) {
-                this.getTitleLabel().setText(I18n.txt("gui.data.catalog", "Hipparcos", st.getName()));
+                this.getTitleLabel().setText(I18n.msg("gui.data.catalog", "Hipparcos", st.getName()));
                 // HIP
                 getDataByHipId(st.getHip(), listener);
                 return;
@@ -279,17 +279,17 @@ public class ArchiveViewWindow extends GenericDialog {
                 links.space(pad);
 
                 if (hip)
-                    links.addActor(new Link(I18n.txt("gui.data.json"), skin, Constants.URL_HIP_JSON_SOURCE + st.getHip()));
+                    links.addActor(new Link(I18n.msg("gui.data.json"), skin, Constants.URL_HIP_JSON_SOURCE + st.getHip()));
                 else {
-                    links.addActor(new Link(I18n.txt("gui.data.json"), skin, Constants.URL_GAIA_JSON_SOURCE + st.getId()));
+                    links.addActor(new Link(I18n.msg("gui.data.json"), skin, Constants.URL_GAIA_JSON_SOURCE + st.getId()));
                     links.addActor(new OwnLabel("|", skin));
-                    links.addActor(new Link(I18n.txt("gui.data.archive"), skin, Constants.URL_GAIA_WEB_SOURCE + st.getId()));
+                    links.addActor(new Link(I18n.msg("gui.data.archive"), skin, Constants.URL_GAIA_WEB_SOURCE + st.getId()));
                 }
 
                 table.add(links).colspan(2).padTop(pad * 2).padBottom(pad * 2);
                 table.row();
 
-                table.add(new OwnLabel(I18n.txt("gui.data.name"), skin, "msg-21")).padLeft(pad * 2).left();
+                table.add(new OwnLabel(I18n.msg("gui.data.name"), skin, "msg-21")).padLeft(pad * 2).left();
                 table.add(new OwnLabel(st.getName(), skin, "msg-21")).padLeft(pad * 2).padRight(pad * 2).left();
                 table.row().padTop(pad * 2);
                 for (int col = 0; col < data[0].length; col++) {
@@ -321,7 +321,7 @@ public class ArchiveViewWindow extends GenericDialog {
         public void ko() {
             // Error getting data
             GaiaSky.postRunnable(() -> {
-                String msg = I18n.txt("error.gaiacatalog.data", st.getName());
+                String msg = I18n.msg("error.gaiacatalog.data", st.getName());
                 table.add(new OwnLabel(msg, skin, "ui-21"));
                 finish();
             });
@@ -338,7 +338,7 @@ public class ArchiveViewWindow extends GenericDialog {
 
         public void notFound() {
             // Not found
-            String msg = I18n.txt("error.gaiacatalog.notfound", st.getName());
+            String msg = I18n.msg("error.gaiacatalog.notfound", st.getName());
             table.add(new OwnLabel(msg, skin, "ui-21"));
             finish();
         }

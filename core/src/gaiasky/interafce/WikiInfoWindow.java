@@ -48,12 +48,12 @@ public class WikiInfoWindow extends GenericDialog {
     private boolean updating = false;
 
     public WikiInfoWindow(Stage stg, Skin skin) {
-        super(I18n.txt("gui.wiki.title", "?"), skin, stg);
+        super(I18n.msg("gui.wiki.title", "?"), skin, stg);
 
         this.reader = new JsonReader();
         this.pad = 8f;
 
-        setCancelText(I18n.txt("gui.close"));
+        setCancelText(I18n.msg("gui.close"));
         setModal(false);
 
         // Build
@@ -66,7 +66,7 @@ public class WikiInfoWindow extends GenericDialog {
 
     public void update(String searchName) {
         updating = true;
-        this.getTitleLabel().setText(I18n.txt("gui.wiki.title", searchName));
+        this.getTitleLabel().setText(I18n.msg("gui.wiki.title", searchName));
 
         table.clear();
         getWikipediaSummary(searchName, new WikiDataListener(searchName));
@@ -113,7 +113,7 @@ public class WikiInfoWindow extends GenericDialog {
         request.setTimeOut(5000);
 
         if(Settings.settings.program.offlineMode) {
-            listener.ko(I18n.txt("gui.system.offlinemode.tooltip"));
+            listener.ko(I18n.msg("gui.system.offlinemode.tooltip"));
         } else {
             Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
                 @Override
@@ -176,11 +176,11 @@ public class WikiInfoWindow extends GenericDialog {
 
         public void ok(JsonValue root) {
             if (!root.has("displaytitle")) {
-                ko(I18n.txt("gui.wiki.attributemissing", "displaytitle"));
+                ko(I18n.msg("gui.wiki.attributemissing", "displaytitle"));
                 return;
             }
             String title = TextUtils.html2text(root.getString("displaytitle"));
-            getTitleLabel().setText(I18n.txt("gui.wiki.title", title));
+            getTitleLabel().setText(I18n.msg("gui.wiki.title", title));
 
             // Thumbnail
             if (root.has("thumbnail")) {
@@ -202,7 +202,7 @@ public class WikiInfoWindow extends GenericDialog {
                             request.setUrl(thumbUrl);
                             request.setTimeOut(5000);
 
-                            logger.info(I18n.txt("gui.download.starting", thumbUrl));
+                            logger.info(I18n.msg("gui.download.starting", thumbUrl));
                             Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
                                 @Override
                                 public void handleHttpResponse(Net.HttpResponse httpResponse) {
@@ -223,29 +223,29 @@ public class WikiInfoWindow extends GenericDialog {
                                         // Convert to RGB if necessary
                                         try {
                                             if (ImageUtils.monochromeToRGB(imageFile.toFile())) {
-                                                logger.info(I18n.txt("gui.wiki.imageconverted", imageFile.toString()));
+                                                logger.info(I18n.msg("gui.wiki.imageconverted", imageFile.toString()));
                                             }
                                             // And send to UI
                                             buildImage(imageFile);
                                         } catch (Exception e) {
-                                            logger.error(I18n.txt("error.wiki.rgbconversion", imageFile.toString()));
+                                            logger.error(I18n.msg("error.wiki.rgbconversion", imageFile.toString()));
                                         }
                                     } else {
                                         // Ko with code
-                                        logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
+                                        logger.error(I18n.msg("error.wiki.thumbnail", thumbUrl));
                                     }
                                 }
 
                                 @Override
                                 public void failed(Throwable t) {
                                     // Failed
-                                    logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
+                                    logger.error(I18n.msg("error.wiki.thumbnail", thumbUrl));
                                 }
 
                                 @Override
                                 public void cancelled() {
                                     // Cancelled
-                                    logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
+                                    logger.error(I18n.msg("error.wiki.thumbnail", thumbUrl));
                                 }
                             });
                         } else {
@@ -264,7 +264,7 @@ public class WikiInfoWindow extends GenericDialog {
             OwnLabel titleLabel = new OwnLabel(title, skin, "header-large");
             // Text
             if (!root.has("extract")) {
-                ko(I18n.txt("gui.wiki.attributemissing", "extract"));
+                ko(I18n.msg("gui.wiki.attributemissing", "extract"));
                 return;
             }
             String text = TextUtils.html2text(root.getString("extract"));
@@ -292,7 +292,7 @@ public class WikiInfoWindow extends GenericDialog {
         public void ko() {
             // Error getting data
             GaiaSky.postRunnable(() -> {
-                String msg = I18n.txt("error.wiki.data", wikiName);
+                String msg = I18n.msg("error.wiki.data", wikiName);
                 table.add(new OwnLabel(msg, skin, "ui-21"));
                 table.pack();
                 finish();

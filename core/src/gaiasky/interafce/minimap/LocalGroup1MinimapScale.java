@@ -121,7 +121,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(sunc);
-        font.draw(sb, I18n.txt("gui.minimap.milkyway"), side2 + px(7), sideshort2 - px(2));
+        font.draw(sb, I18n.msg("gui.minimap.milkyway"), side2 + px(7), sideshort2 - px(2));
 
         font.setColor(galc);
         for(int i = 0; i < ngals; i++) {
@@ -178,7 +178,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
-        font.draw(sb, I18n.txt("gui.minimap.milkyway"), side2 + px(10), side2 + px(10));
+        font.draw(sb, I18n.msg("gui.minimap.milkyway"), side2 + px(10), side2 + px(10));
 
         font.setColor(galc);
         for(int i = 0; i < ngals; i++) {
@@ -202,6 +202,6 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
 
     @Override
     public String getName() {
-        return I18n.txt("gui.minimap.localgroup") + " (1)";
+        return I18n.msg("gui.minimap.localgroup") + " (1)";
     }
 }

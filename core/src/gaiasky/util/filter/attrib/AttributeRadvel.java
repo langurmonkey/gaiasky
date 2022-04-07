@@ -17,6 +17,6 @@ public class AttributeRadvel extends AttributeAbstract implements IAttribute {
         return "km/s";
     }
     public String toString(){
-        return I18n.txt("gui.focusinfo.radvel");
+        return I18n.msg("gui.focusinfo.radvel");
     }
 }

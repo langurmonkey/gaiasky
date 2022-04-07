@@ -35,7 +35,7 @@ public class DateDialog extends CollapsibleWindow {
     private final Color defaultColor;
 
     public DateDialog(Stage stage, Skin skin) {
-        super(I18n.txt("gui.pickdate"), skin);
+        super(I18n.msg("gui.pickdate"), skin);
         this.me = this;
         this.stage = stage;
 
@@ -43,7 +43,7 @@ public class DateDialog extends CollapsibleWindow {
         float pad = 8f;
 
         // SET NOW
-        OwnTextButton setNow = new OwnTextButton(I18n.txt("gui.pickdate.setcurrent"), skin);
+        OwnTextButton setNow = new OwnTextButton(I18n.msg("gui.pickdate.setcurrent"), skin);
         setNow.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 updateTime(Instant.now(), ZoneOffset.UTC);
@@ -73,7 +73,7 @@ public class DateDialog extends CollapsibleWindow {
         });
 
         month = new SelectBox<>(skin);
-        month.setItems(I18n.txt("gui.date.jan"), I18n.txt("gui.date.feb"), I18n.txt("gui.date.mar"), I18n.txt("gui.date.apr"), I18n.txt("gui.date.may"), I18n.txt("gui.date.jun"), I18n.txt("gui.date.jul"), I18n.txt("gui.date.aug"), I18n.txt("gui.date.sep"), I18n.txt("gui.date.oct"), I18n.txt("gui.date.nov"), I18n.txt("gui.date.dec"));
+        month.setItems(I18n.msg("gui.date.jan"), I18n.msg("gui.date.feb"), I18n.msg("gui.date.mar"), I18n.msg("gui.date.apr"), I18n.msg("gui.date.may"), I18n.msg("gui.date.jun"), I18n.msg("gui.date.jul"), I18n.msg("gui.date.aug"), I18n.msg("gui.date.sep"), I18n.msg("gui.date.oct"), I18n.msg("gui.date.nov"), I18n.msg("gui.date.dec"));
         month.setWidth(inputWidth);
 
         year = new OwnTextField("", skin);
@@ -96,7 +96,7 @@ public class DateDialog extends CollapsibleWindow {
         dayGroup.addActor(new OwnLabel("/", skin));
         dayGroup.addActor(year);
 
-        add(new OwnLabel(I18n.txt("gui.time.date") + " (" + I18n.txt("gui.time.date.format") + ":", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.msg("gui.time.date") + " (" + I18n.msg("gui.time.date.format") + ":", skin)).pad(pad, pad, 0, pad * 2).right();
         add(dayGroup).pad(pad, 0, 0, pad);
         row();
 
@@ -151,7 +151,7 @@ public class DateDialog extends CollapsibleWindow {
         hourGroup.addActor(new OwnLabel(":", skin));
         hourGroup.addActor(sec);
 
-        add(new OwnLabel(I18n.txt("gui.time.time")+ " (" + I18n.txt("gui.time.time.format")+ ":", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.msg("gui.time.time")+ " (" + I18n.msg("gui.time.time.format")+ ":", skin)).pad(pad, pad, 0, pad * 2).right();
         add(hourGroup).pad(pad, 0, pad, pad);
         row();
 
@@ -159,7 +159,7 @@ public class DateDialog extends CollapsibleWindow {
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.pad(pad);
         buttonGroup.space(pad);
-        TextButton ok = new OwnTextButton(I18n.txt("gui.ok"), skin, "default");
+        TextButton ok = new OwnTextButton(I18n.msg("gui.ok"), skin, "default");
         ok.addListener(event -> {
             if (event instanceof ChangeEvent) {
 
@@ -184,7 +184,7 @@ public class DateDialog extends CollapsibleWindow {
 
             return false;
         });
-        TextButton cancel = new OwnTextButton(I18n.txt("gui.cancel"), skin, "default");
+        TextButton cancel = new OwnTextButton(I18n.msg("gui.cancel"), skin, "default");
         cancel.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 me.remove();

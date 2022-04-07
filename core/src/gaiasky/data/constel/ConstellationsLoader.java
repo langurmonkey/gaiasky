@@ -13,9 +13,9 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import uk.ac.starlink.util.DataSource;
 
@@ -52,12 +52,12 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
                 constellationsFadeNode.setName("Constellations");
                 constellations.add(constellationsFadeNode);
 
-                // load constellations
+                // Load constellations
                 FileHandle file = Settings.settings.data.dataFileHandle(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
 
                 try {
-                    //Skip first line
+                    // Skip first line
                     String lastName = "";
                     Array<int[]> partial = null;
                     int lastid = -1;
@@ -116,7 +116,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
             }
         }
 
-        Logger.getLogger(this.getClass()).info(I18n.txt("notif.constellations.init", constellations.size));
+        Logger.getLogger(this.getClass()).info(I18n.msg("notif.constellations.init", constellations.size));
         return constellations;
     }
 

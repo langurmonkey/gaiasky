@@ -29,12 +29,12 @@ public class KeyframePreferencesWindow extends GenericDialog {
     private final INumberFormat nf3;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
-        super(I18n.txt("gui.keyframes.preferences"), skin, stage);
+        super(I18n.msg("gui.keyframes.preferences"), skin, stage);
         setModal(true);
         this.nf3 = NumberFormatFactory.getFormatter("0.000");
 
-        setAcceptText(I18n.txt("gui.saveprefs"));
-        setCancelText(I18n.txt("gui.cancel"));
+        setAcceptText(I18n.msg("gui.saveprefs"));
+        setCancelText(I18n.msg("gui.cancel"));
 
         buildSuper();
     }
@@ -42,19 +42,19 @@ public class KeyframePreferencesWindow extends GenericDialog {
     @Override
     protected void build() {
 
-        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.interpolation.linear"), CameraKeyframeManager.PathType.LINEAR.ordinal()), new ComboBoxBean(I18n.txt("gui.interpolation.catmull"), CameraKeyframeManager.PathType.SPLINE.ordinal()) };
+        ComboBoxBean[] interpolation = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.interpolation.linear"), CameraKeyframeManager.PathType.LINEAR.ordinal()), new ComboBoxBean(I18n.msg("gui.interpolation.catmull"), CameraKeyframeManager.PathType.SPLINE.ordinal()) };
 
-        OwnLabel generalTitle = new OwnLabel(I18n.txt("gui.general"), skin, "hud-header");
+        OwnLabel generalTitle = new OwnLabel(I18n.msg("gui.general"), skin, "hud-header");
 
         // fps
-        OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
+        OwnLabel camfpsLabel = new OwnLabel(I18n.msg("gui.target.fps"), skin);
         camrecFps = new OwnTextField(nf3.format(Settings.settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
         camrecFps.setWidth(240f);
 
-        OwnLabel interpTitle = new OwnLabel(I18n.txt("gui.keyframes.interp"), skin, "hud-header");
+        OwnLabel interpTitle = new OwnLabel(I18n.msg("gui.keyframes.interp"), skin, "hud-header");
 
         // Camera position
-        OwnLabel pos = new OwnLabel(I18n.txt("gui.cam.pos"), skin);
+        OwnLabel pos = new OwnLabel(I18n.msg("gui.cam.pos"), skin);
         posMethod = new OwnSelectBox<>(skin);
         posMethod.setItems(interpolation);
         posMethod.setSelectedIndex(Settings.settings.camrecorder.keyframe.position.ordinal());
@@ -62,7 +62,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         posMethod.setWidth(240f);
 
         // Camera orientation
-        OwnLabel orientation = new OwnLabel(I18n.txt("gui.cam.orientation"), skin);
+        OwnLabel orientation = new OwnLabel(I18n.msg("gui.cam.orientation"), skin);
         orientationMethod = new OwnSelectBox<>(skin);
         orientationMethod.setItems(interpolation);
         orientationMethod.setSelectedIndex(Settings.settings.camrecorder.keyframe.orientation.ordinal());
@@ -70,8 +70,8 @@ public class KeyframePreferencesWindow extends GenericDialog {
         orientationMethod.setWidth(240f);
 
         // Time
-        OwnLabel time = new OwnLabel(I18n.txt("gui.time"), skin);
-        OwnLabel timeMethod = new OwnLabel(I18n.txt("gui.interpolation.linear"), skin);
+        OwnLabel time = new OwnLabel(I18n.msg("gui.time"), skin);
+        OwnLabel timeMethod = new OwnLabel(I18n.msg("gui.interpolation.linear"), skin);
 
         content.add(generalTitle).left().top().colspan(2).padBottom(pad10).row();
 

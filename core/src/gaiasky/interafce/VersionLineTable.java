@@ -29,70 +29,70 @@ public class VersionLineTable extends Table {
 
         // Gaia Sky version
         OwnLabel gsVersion = new OwnLabel(settings.version.version, skin, "hud-big");
-        gsVersion.addListener(new OwnTextTooltip(I18n.txt("gui.help.version", Settings.APPLICATION_NAME), skin));
+        gsVersion.addListener(new OwnTextTooltip(I18n.msg("gui.help.version", Settings.APPLICATION_NAME), skin));
         add(gsVersion).bottom().left().padRight(pad16);
 
         // Gaia Sky build
-        OwnLabel gsBuild = new OwnLabel(I18n.txt("gui.buildandtime", settings.version.build, settings.version.getBuildTimePretty()), skin, "hud-med");
-        gsBuild.addListener(new OwnTextTooltip(I18n.txt("gui.help.buildandtime"), skin));
+        OwnLabel gsBuild = new OwnLabel(I18n.msg("gui.buildandtime", settings.version.build, settings.version.getBuildTimePretty()), skin, "hud-med");
+        gsBuild.addListener(new OwnTextTooltip(I18n.msg("gui.help.buildandtime"), skin));
         gsBuild.setColor(ColorUtils.oLightGrayC);
         add(gsBuild).bottom().left().padRight(pad32 * 2f);
 
         // Graphics device
         OwnLabel device = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-med");
-        device.addListener(new OwnTextTooltip(I18n.txt("gui.help.graphicsdevice"), skin));
+        device.addListener(new OwnTextTooltip(I18n.msg("gui.help.graphicsdevice"), skin));
         device.setColor(ColorUtils.oDarkGrayC);
         add(device).bottom().left().padRight(pad32);
 
         // OpenGL version
-        OwnLabel glVersion = new OwnLabel(I18n.txt("notif.glversion", Gdx.gl.glGetString(GL20.GL_VERSION)), skin, "hud-med");
-        glVersion.addListener(new OwnTextTooltip(I18n.txt("gui.help.openglversion"), skin));
+        OwnLabel glVersion = new OwnLabel(I18n.msg("notif.glversion", Gdx.gl.glGetString(GL20.GL_VERSION)), skin, "hud-med");
+        glVersion.addListener(new OwnTextTooltip(I18n.msg("gui.help.openglversion"), skin));
         glVersion.setColor(ColorUtils.oDarkGrayC);
         add(glVersion).bottom().left().padRight(pad32);
 
         // GLSL version
-        OwnLabel glslVersion = new OwnLabel(I18n.txt("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)), skin, "hud-med");
-        glslVersion.addListener(new OwnTextTooltip(I18n.txt("gui.help.glslversion"), skin));
+        OwnLabel glslVersion = new OwnLabel(I18n.msg("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)), skin, "hud-med");
+        glslVersion.addListener(new OwnTextTooltip(I18n.msg("gui.help.glslversion"), skin));
         glslVersion.setColor(ColorUtils.oDarkGrayC);
         add(glslVersion).bottom().left().padRight(pad32);
 
         // VR
         if (settings.runtime.openVr) {
-            OwnLabel vr = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.vr.mode")), skin, "hud-med");
+            OwnLabel vr = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.vr.mode")), skin, "hud-med");
             vr.setColor(ColorUtils.gPinkC);
-            vr.addListener(new OwnTextTooltip(I18n.txt("gui.vr.mode.tooltip"), skin));
+            vr.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mode.tooltip"), skin));
             add(vr).bottom().left().padRight(pad32);
         }
 
         // Master instance
         if (settings.program.net.master.active) {
-            OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.master.instance")), skin, "hud-med");
+            OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.master.instance")), skin, "hud-med");
             master.setColor(ColorUtils.gBlueC);
-            master.addListener(new OwnTextTooltip(I18n.txt("gui.master.instance.tooltip"), skin));
+            master.addListener(new OwnTextTooltip(I18n.msg("gui.master.instance.tooltip"), skin));
             add(master).bottom().left().padRight(pad32);
         }
 
         // Slave instance
         if (settings.program.net.slave.active) {
-            OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.slave.instance")), skin, "hud-med");
+            OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.slave.instance")), skin, "hud-med");
             slave.setColor(ColorUtils.gYellowC);
-            slave.addListener(new OwnTextTooltip(I18n.txt("gui.slave.instance.tooltip"), skin));
+            slave.addListener(new OwnTextTooltip(I18n.msg("gui.slave.instance.tooltip"), skin));
             add(slave).colspan(2).bottom().right().padBottom(pad16).row();
         }
 
         // Safe graphics mode
         if (settings.program.safeMode) {
-            OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.debug.safemode")), skin, "hud-med");
+            OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.debug.safemode")), skin, "hud-med");
             safeMode.setColor(ColorUtils.gRedC);
-            safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));
+            safeMode.addListener(new OwnTextTooltip(I18n.msg("gui.debug.safemode.tooltip"), skin));
             add(safeMode).bottom().left().padRight(pad32);
         }
 
         // Offline mode
         if(settings.program.offlineMode) {
-            OwnLabel offlineMode = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.system.offlinemode")), skin, "hud-med");
+            OwnLabel offlineMode = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.system.offlinemode")), skin, "hud-med");
             offlineMode.setColor(ColorUtils.gRedC);
-            offlineMode.addListener(new OwnTextTooltip(I18n.txt("gui.system.offlinemode.tooltip"), skin));
+            offlineMode.addListener(new OwnTextTooltip(I18n.msg("gui.system.offlinemode.tooltip"), skin));
             add(offlineMode).bottom().left().padRight(pad32);
         }
 

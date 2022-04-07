@@ -46,8 +46,8 @@ public class AddShapeDialog extends GenericDialog {
         titleWidth = 150f;
         cpSize = 32f;
 
-        setAcceptText(I18n.txt("gui.ok"));
-        setCancelText(I18n.txt("gui.cancel"));
+        setAcceptText(I18n.msg("gui.ok"));
+        setCancelText(I18n.msg("gui.cancel"));
 
         buildSuper();
     }
@@ -56,7 +56,7 @@ public class AddShapeDialog extends GenericDialog {
     protected void build() {
         content.clear();
 
-        OwnLabel info = new OwnLabel(I18n.txt("gui.shape.info", object.getName()), skin, "hud-subheader");
+        OwnLabel info = new OwnLabel(I18n.msg("gui.shape.info", object.getName()), skin, "hud-subheader");
         content.add(info).left().padBottom(pad15).row();
 
         // Name
@@ -86,16 +86,16 @@ public class AddShapeDialog extends GenericDialog {
         sizeGroup.space(15f);
         sizeGroup.addActor(size);
         sizeGroup.addActor(units);
-        content.add(new OwnLabel(I18n.txt("gui.shape.size"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
+        content.add(new OwnLabel(I18n.msg("gui.shape.size"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         content.add(sizeGroup).left().padBottom(pad10).row();
 
         // Show label
-        showLabel = new OwnCheckBox(I18n.txt("gui.shape.label"), skin, pad5);
+        showLabel = new OwnCheckBox(I18n.msg("gui.shape.label"), skin, pad5);
         showLabel.setChecked(true);
         content.add(showLabel).left().colspan(2).padRight(pad10).padBottom(pad10).row();
 
         // Track
-        track = new OwnCheckBox(I18n.txt("gui.shape.track"), skin, pad5);
+        track = new OwnCheckBox(I18n.msg("gui.shape.track"), skin, pad5);
         track.setChecked(true);
         content.add(track).left().colspan(2).padRight(pad10).padBottom(pad5);
 
@@ -107,7 +107,7 @@ public class AddShapeDialog extends GenericDialog {
         shape.setWidth(fieldWidth);
         shape.setItems(Shape.values());
         shape.setSelected(Shape.SPHERE);
-        content.add(new OwnLabel(I18n.txt("gui.shape.shape"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
+        content.add(new OwnLabel(I18n.msg("gui.shape.shape"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         content.add(shape).left().padBottom(pad10).row();
 
         // Color
@@ -118,7 +118,7 @@ public class AddShapeDialog extends GenericDialog {
         primitive.setWidth(fieldWidth);
         primitive.setItems(Primitive.values());
         primitive.setSelected(Primitive.LINES);
-        content.add(new OwnLabel(I18n.txt("gui.shape.primitive"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
+        content.add(new OwnLabel(I18n.msg("gui.shape.primitive"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         content.add(primitive).left().padBottom(pad10).row();
 
     }
@@ -134,13 +134,13 @@ public class AddShapeDialog extends GenericDialog {
             }
             return true;
         });
-        container.add(new OwnLabel(I18n.txt("gui.shape.name"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
+        container.add(new OwnLabel(I18n.msg("gui.shape.name"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         container.add(name).left().padBottom(pad10).row();
     }
 
     private void addColor(Table container) {
         color = new ColorPicker(new float[] { 0.3f, 0.4f, 1f, 1f }, stage, skin);
-        container.add(new OwnLabel(I18n.txt("gui.shape.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
+        container.add(new OwnLabel(I18n.msg("gui.shape.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         Table lc = new Table(skin);
         lc.add(color).size(cpSize);
         container.add(lc).left().padBottom(pad5).row();

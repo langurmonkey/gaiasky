@@ -45,7 +45,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
         List<IParticleRecord> pointData = loadData(is, factor);
 
         if (pointData != null)
-            logger.info(I18n.txt("notif.nodeloader", pointData.size(), file));
+            logger.info(I18n.msg("notif.nodeloader", pointData.size(), file));
 
         return pointData;
     }

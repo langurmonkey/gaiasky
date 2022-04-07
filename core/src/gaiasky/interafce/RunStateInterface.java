@@ -43,30 +43,30 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
         float pad = 3.2f;
 
         keyboardImg = new Image(skin.getDrawable("no-input"));
-        keyboardImg.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.noinput"), skin));
+        keyboardImg.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.noinput"), skin));
         frameoutputImg = new Image(skin.getDrawable("frameoutput"));
-        frameoutputImg.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.frameoutputon"), skin));
+        frameoutputImg.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.frameoutputon"), skin));
 
         bgLoading = new OwnTextIconButton("", skin, "dataload-bg", "toggle");
-        OwnTextTooltip pauseBgTT = new OwnTextTooltip(I18n.txt("gui.tooltip.pausebg"), skin);
+        OwnTextTooltip pauseBgTT = new OwnTextTooltip(I18n.msg("gui.tooltip.pausebg"), skin);
         bgLoading.addListener(pauseBgTT);
         bgLoading.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (loadingPaused) {
                     EventManager.publish(Event.RESUME_BACKGROUND_LOADING, bgLoading);
                     loadingPaused = false;
-                    pauseBgTT.getActor().setText(I18n.txt("gui.tooltip.pausebg"));
+                    pauseBgTT.getActor().setText(I18n.msg("gui.tooltip.pausebg"));
                 } else {
                     EventManager.publish(Event.PAUSE_BACKGROUND_LOADING, bgLoading);
                     loadingPaused = true;
-                    pauseBgTT.getActor().setText(I18n.txt("gui.tooltip.resumebg"));
+                    pauseBgTT.getActor().setText(I18n.msg("gui.tooltip.resumebg"));
                 }
             }
             return false;
         });
 
         cancelCamera = new OwnTextIconButton("", skin, "camera-stop");
-        cancelCamera.addListener(new OwnTextTooltip(I18n.txt("gui.stop"), skin));
+        cancelCamera.addListener(new OwnTextTooltip(I18n.msg("gui.stop"), skin));
         cancelCamera.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.STOP_CAMERA_PLAY, cancelCamera);

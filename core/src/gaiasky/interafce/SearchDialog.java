@@ -63,7 +63,7 @@ public class SearchDialog extends GenericDialog {
     private final Array<Task> tasks;
 
     public SearchDialog(Skin skin, Stage ui, final ISceneGraph sg, boolean suggestions) {
-        super(I18n.txt("gui.objects.search"), skin, ui);
+        super(I18n.msg("gui.objects.search"), skin, ui);
         this.sg = sg;
         this.aux = new Vector2();
         this.matching = new TreeSet<>();
@@ -71,7 +71,7 @@ public class SearchDialog extends GenericDialog {
         this.tasks = new Array<>(20);
 
         setModal(false);
-        setAcceptText(I18n.txt("gui.close"));
+        setAcceptText(I18n.msg("gui.close"));
 
         this.addListener(new InputListener() {
 
@@ -105,7 +105,7 @@ public class SearchDialog extends GenericDialog {
         // Info message
         searchInput = new OwnTextField("", skin);
         searchInput.setWidth(480f);
-        searchInput.setMessageText(I18n.txt("gui.objects.search"));
+        searchInput.setMessageText(I18n.msg("gui.objects.search"));
         searchInput.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -284,13 +284,13 @@ public class SearchDialog extends GenericDialog {
                         });
                         info(null);
                     } else if (timeOverflow) {
-                        info(I18n.txt("gui.objects.search.timerange", text));
+                        info(I18n.msg("gui.objects.search.timerange", text));
                     } else if (!canSelect) {
-                        info(I18n.txt("gui.objects.search.filter", text));
+                        info(I18n.msg("gui.objects.search.filter", text));
                     } else if (!datasetVisible) {
-                        info(I18n.txt("gui.objects.search.dataset.invisible", text, ci.get().name));
+                        info(I18n.msg("gui.objects.search.dataset.invisible", text, ci.get().name));
                     } else {
-                        info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
+                        info(I18n.msg("gui.objects.search.invisible", text, focus.getCt().toString()));
                     }
                     return true;
                 }

@@ -22,27 +22,30 @@ import java.util.MissingResourceException;
 public class I18n {
     private static final Log logger = Logger.getLogger(I18n.class);
 
-    public static I18NBundle bundle;
+    public static I18NBundle messages;
+    public static I18NBundle objects;
     public static Locale locale;
 
     /**
-     * Initialises the i18n system
+     * Initializes the i18n system with the main and the objects bundle.
+     * The main bundle contains the application messages. The objects bundle
+     * contains the object names.
      */
     public static void initialize() {
-        if (bundle == null) {
-            forceInit(Gdx.files.internal("i18n/gsbundle"));
+        if (messages == null || objects == null) {
+            forceInit(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"));
         }
     }
 
-    public static void initialize(Path path) {
-        forceInit(Gdx.files.absolute(path.toAbsolutePath().toString()));
+    public static void initialize(Path main, Path objects) {
+        forceInit(Gdx.files.absolute(main.toAbsolutePath().toString()), Gdx.files.absolute(objects.toAbsolutePath().toString()));
     }
 
-    public static void initialize(FileHandle fh) {
-        forceInit(fh);
+    public static void initialize(FileHandle main, FileHandle objects) {
+        forceInit(main, objects);
     }
 
-    public static boolean forceInit(FileHandle baseFileHandle) {
+    public static boolean forceInit(FileHandle main, FileHandle objects) {
         if (Settings.settings.program == null || Settings.settings.program.locale == null || Settings.settings.program.locale.isEmpty()) {
             // Use system default
             locale = Locale.getDefault();
@@ -51,21 +54,41 @@ public class I18n {
             // Set as default locale
             Locale.setDefault(locale);
         }
+
+        boolean found;
+        // Messages
         try {
-            bundle = I18NBundle.createBundle(baseFileHandle, locale, "UTF-8");
-            return true;
+            I18n.messages = I18NBundle.createBundle(main, locale, "UTF-8");
+            found = true;
         } catch (MissingResourceException e) {
             logger.info(e.getLocalizedMessage());
             // Use default locale - en_GB
             locale = new Locale("en", "GB");
             try {
-                bundle = I18NBundle.createBundle(baseFileHandle, locale, "UTF-8");
+                I18n.messages = I18NBundle.createBundle(main, locale, "UTF-8");
             } catch (Exception e2) {
                 logger.error(e);
             }
-            return false;
+            found = false;
         }
 
+        // Objects
+        try {
+            I18n.objects = I18NBundle.createBundle(objects, locale, "UTF-8");
+            found = found && true;
+        } catch (MissingResourceException e) {
+            logger.info(e.getLocalizedMessage());
+            // Use default locale - en_GB
+            locale = new Locale("en", "GB");
+            try {
+                I18n.objects = I18NBundle.createBundle(objects, locale, "UTF-8");
+            } catch (Exception e2) {
+                logger.error(e);
+            }
+            found = found && false;
+        }
+
+        return found;
     }
 
     public static Locale getLocaleFromLanguageTag(String languageTag) {
@@ -77,25 +100,53 @@ public class I18n {
         }
     }
 
-    public static synchronized String txt(String key) {
-        return bundle.get(key);
+    public static synchronized String msg(String key) {
+        return get(messages, key);
     }
 
-    public static synchronized String txtOr(String key, String defaultValue) {
-        if (hasKey(key)) {
-            return bundle.get(key);
+    public static synchronized String msgOr(String key, String defaultValue) {
+        return getOr(messages, key, defaultValue);
+    }
+
+    public static synchronized String obj(String key) {
+        return get(objects, key);
+    }
+
+    public static synchronized String objOr(String key, String defaultValue) {
+        return getOr(objects, key, defaultValue);
+    }
+
+    public static synchronized String msg(String key, Object... params) {
+        return I18n.messages.format(key, params);
+    }
+
+    public static synchronized String obj(String key, Object... params) {
+        return I18n.objects.format(key, params);
+    }
+
+    public static synchronized boolean hasMessage(String key) {
+        return has(messages, key);
+    }
+
+    public static synchronized boolean hasObject(String key) {
+        return has(objects, key);
+    }
+
+    private static String get(I18NBundle b, String key) {
+        return b.get(key);
+    }
+
+    private static String getOr(I18NBundle b, String key, String defaultValue) {
+        if (has(b, key)) {
+            return b.get(key);
         } else {
             return defaultValue;
         }
     }
 
-    public static synchronized String txt(String key, Object... params) {
-        return I18n.bundle.format(key, params);
-    }
-
-    public static synchronized boolean hasKey(String key) {
+    private static boolean has(I18NBundle b, String key) {
         try {
-            I18n.bundle.get(key);
+            b.get(key);
             return true;
         } catch (MissingResourceException e) {
             // Void

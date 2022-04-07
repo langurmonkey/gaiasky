@@ -19,12 +19,12 @@ public class FileNameWindow extends GenericDialog{
     private OwnTextField fileName;
 
     public FileNameWindow(String defaultName, Stage stage, Skin skin){
-        super(I18n.txt("gui.filename.choose"), skin, stage);
+        super(I18n.msg("gui.filename.choose"), skin, stage);
         setModal(true);
         this.defaultName = defaultName;
 
-        setAcceptText(I18n.txt("gui.ok"));
-        setCancelText(I18n.txt("gui.cancel"));
+        setAcceptText(I18n.msg("gui.ok"));
+        setCancelText(I18n.msg("gui.cancel"));
 
         buildSuper();
 
@@ -33,7 +33,7 @@ public class FileNameWindow extends GenericDialog{
 
     @Override
     protected void build() {
-        OwnLabel label = new OwnLabel(I18n.txt("gui.filename.filename")+ ": ", skin);
+        OwnLabel label = new OwnLabel(I18n.msg("gui.filename.filename")+ ": ", skin);
         LengthValidator lengthValidator = new LengthValidator(3, 40);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]+$");
         fileName = new OwnTextField(defaultName, skin, nameValidator);

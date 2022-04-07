@@ -273,7 +273,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IStat
 
     @Override
     public String text() {
-        return names[0];
+        return getLocalizedName();
     }
 
     @Override

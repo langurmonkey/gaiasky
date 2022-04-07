@@ -84,7 +84,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
     private void build() {
         Drawable rulerDwb = skin.getDrawable("icon-elem-ruler");
         if (candidate != null) {
-            MenuItem select = new MenuItem(I18n.txt("context.select", candidateNameShort), skin, skin.getDrawable("highlight-off"));
+            MenuItem select = new MenuItem(I18n.msg("context.select", candidateNameShort), skin, skin.getDrawable("highlight-off"));
             select.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.CAMERA_MODE_CMD, select, CameraMode.FOCUS_MODE);
@@ -94,7 +94,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(select);
 
-            MenuItem go = new MenuItem(I18n.txt("context.goto", candidateNameShort), skin, skin.getDrawable("go-to"));
+            MenuItem go = new MenuItem(I18n.msg("context.goto", candidateNameShort), skin, skin.getDrawable("go-to"));
             go.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     candidate.makeFocus();
@@ -107,7 +107,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addSeparator();
 
             // Tracking object
-            MenuItem track = new MenuItem(I18n.txt("context.track", candidateNameShort), skin, skin.getDrawable("highlight-on"));
+            MenuItem track = new MenuItem(I18n.msg("context.track", candidateNameShort), skin, skin.getDrawable("highlight-on"));
             track.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.CAMERA_TRACKING_OBJECT_CMD, track, candidate, candidateName);
@@ -116,7 +116,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(track);
 
-            MenuItem noTrack = new MenuItem(I18n.txt("context.notrack", candidateNameShort), skin, skin.getDrawable("iconic-delete"));
+            MenuItem noTrack = new MenuItem(I18n.msg("context.notrack", candidateNameShort), skin, skin.getDrawable("iconic-delete"));
             noTrack.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.CAMERA_TRACKING_OBJECT_CMD, noTrack, (Object) null, (Object) null);
@@ -128,10 +128,10 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addSeparator();
 
             // Add bounding shape at object position
-            MenuItem addShape = new MenuItem(I18n.txt("context.shape.new", candidateNameShort), skin, skin.getDrawable("icon-elem-grids"));
+            MenuItem addShape = new MenuItem(I18n.msg("context.shape.new", candidateNameShort), skin, skin.getDrawable("icon-elem-grids"));
             addShape.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    AddShapeDialog dialog = new AddShapeDialog(I18n.txt("context.shape.new", candidateNameShort), candidate, candidateName, skin, getStage());
+                    AddShapeDialog dialog = new AddShapeDialog(I18n.msg("context.shape.new", candidateNameShort), candidate, candidateName, skin, getStage());
                     dialog.setAcceptRunnable(() -> {
                         double size = dialog.units.getSelected().toKm(dialog.size.getDoubleValue(1)) * 2.0;
                         float[] color = dialog.color.getPickedColor();
@@ -148,7 +148,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(addShape);
 
-            MenuItem removeShapesObj = new MenuItem(I18n.txt("context.shape.remove", candidateNameShort), skin, skin.getDrawable("iconic-delete"));
+            MenuItem removeShapesObj = new MenuItem(I18n.msg("context.shape.remove", candidateNameShort), skin, skin.getDrawable("iconic-delete"));
             removeShapesObj.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     ISceneGraph sg = GaiaSky.instance.sceneGraph;
@@ -173,7 +173,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(removeShapesObj);
 
-            MenuItem removeShapesAll = new MenuItem(I18n.txt("context.shape.remove.all"), skin, skin.getDrawable("iconic-delete"));
+            MenuItem removeShapesAll = new MenuItem(I18n.msg("context.shape.remove.all"), skin, skin.getDrawable("iconic-delete"));
             removeShapesAll.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     ISceneGraph sg = GaiaSky.instance.sceneGraph;
@@ -194,7 +194,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             if (candidate instanceof Planet) {
                 addSeparator();
 
-                MenuItem landOn = new MenuItem(I18n.txt("context.landon", candidateNameShort), skin, skin.getDrawable("land-on"));
+                MenuItem landOn = new MenuItem(I18n.msg("context.landon", candidateNameShort), skin, skin.getDrawable("land-on"));
                 landOn.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.publish(Event.LAND_ON_OBJECT, landOn, candidate);
@@ -210,7 +210,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     final Double pointerLon = lonlat[0];
                     final Double pointerLat = lonlat[1];
                     // Add mouse pointer
-                    MenuItem landOnPointer = new MenuItem(I18n.txt("context.landatpointer", candidateNameShort), skin, skin.getDrawable("land-on"));
+                    MenuItem landOnPointer = new MenuItem(I18n.msg("context.landatpointer", candidateNameShort), skin, skin.getDrawable("land-on"));
                     landOnPointer.addListener(event -> {
                         if (event instanceof ChangeEvent) {
                             EventManager.publish(Event.LAND_AT_LOCATION_OF_OBJECT, landOnPointer, candidate, pointerLon, pointerLat);
@@ -221,7 +221,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     addItem(landOnPointer);
                 }
 
-                MenuItem landOnCoord = new MenuItem(I18n.txt("context.landatcoord", candidateNameShort), skin, skin.getDrawable("land-at"));
+                MenuItem landOnCoord = new MenuItem(I18n.msg("context.landatcoord", candidateNameShort), skin, skin.getDrawable("land-at"));
                 landOnCoord.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.publish(Event.SHOW_LAND_AT_LOCATION_ACTION, landOnCoord, candidate);
@@ -233,7 +233,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
                 addSeparator();
 
-                MenuItem proceduralSurface = new MenuItem(I18n.txt("context.proceduralmenu", candidateNameShort), skin, skin.getDrawable("iconic-infinity"));
+                MenuItem proceduralSurface = new MenuItem(I18n.msg("context.proceduralmenu", candidateNameShort), skin, skin.getDrawable("iconic-infinity"));
                 proceduralSurface.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.publish(Event.SHOW_PROCEDURAL_GEN_ACTION, proceduralSurface, candidate);
@@ -251,7 +251,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     addSeparator();
                     sep = true;
 
-                    MenuItem showUncertainties = new MenuItem(I18n.txt("context.showuncertainties"), skin, "default");
+                    MenuItem showUncertainties = new MenuItem(I18n.msg("context.showuncertainties"), skin, "default");
                     showUncertainties.addListener(event -> {
                         if (event instanceof ChangeEvent) {
                             EventManager.publish(Event.SHOW_UNCERTAINTIES, showUncertainties, candidate);
@@ -266,7 +266,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     if (!sep)
                         addSeparator();
 
-                    MenuItem hideUncertainties = new MenuItem(I18n.txt("context.hideuncertainties"), skin, "default");
+                    MenuItem hideUncertainties = new MenuItem(I18n.msg("context.hideuncertainties"), skin, "default");
                     hideUncertainties.addListener(event -> {
                         if (event instanceof ChangeEvent) {
                             EventManager.publish(Event.HIDE_UNCERTAINTIES, hideUncertainties, candidate);
@@ -289,7 +289,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem rulerAttach0 = null, rulerAttach1 = null;
             if (!cr.hasObject0() && !cr.hasObject1()) {
                 // No objects attached
-                rulerAttach0 = new MenuItem(I18n.txt("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
+                rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
                 final MenuItem ra = rulerAttach0;
                 rulerAttach0.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
@@ -300,7 +300,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 });
             } else if (cr.hasObject0() && !cr.hasObject1()) {
                 // Only 0 is attached
-                rulerAttach1 = new MenuItem(I18n.txt("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
+                rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
                 final MenuItem ra = rulerAttach1;
                 rulerAttach1.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
@@ -311,7 +311,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 });
             } else {
                 // All attached, show both
-                rulerAttach0 = new MenuItem(I18n.txt("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
+                rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
                 final MenuItem ra0 = rulerAttach0;
                 rulerAttach0.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
@@ -322,7 +322,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                     }
                     return false;
                 });
-                rulerAttach1 = new MenuItem(I18n.txt("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
+                rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
                 final MenuItem ra1 = rulerAttach1;
                 rulerAttach1.addListener((ev) -> {
                     if (ev instanceof ChangeEvent) {
@@ -346,7 +346,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             sg.insert((cr = new CosmicRuler()), true);
         }
         if (cr.rulerOk() || cr.hasAttached()) {
-            MenuItem clearRuler = new MenuItem(I18n.txt("context.ruler.clear"), skin, rulerDwb);
+            MenuItem clearRuler = new MenuItem(I18n.msg("context.ruler.clear"), skin, rulerDwb);
             clearRuler.addListener((evt) -> {
                 if (evt instanceof ChangeEvent) {
                     GaiaSky.postRunnable(() -> {
@@ -360,7 +360,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         }
 
         // Load
-        MenuItem dsLoad = new MenuItem(I18n.txt("context.dataset.load"), skin, skin.getDrawable("open-icon"));
+        MenuItem dsLoad = new MenuItem(I18n.msg("context.dataset.load"), skin, skin.getDrawable("open-icon"));
         dsLoad.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, dsLoad);
@@ -373,7 +373,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         // Dataset highlight
         Collection<CatalogInfo> cis = catalogManager.getCatalogInfos();
         if (cis != null && cis.size() > 0) {
-            MenuItem dsHighlight = new MenuItem(I18n.txt("context.dataset.highlight"), skin, skin.getDrawable("highlight-on"));
+            MenuItem dsHighlight = new MenuItem(I18n.msg("context.dataset.highlight"), skin, skin.getDrawable("highlight-on"));
             ContextMenu dsHighlightSubmenu = new ContextMenu(skin, "default");
             for (CatalogInfo ci : cis) {
                 if (ci.isVisible()) {
@@ -398,7 +398,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
         // Dataset visibility
         if (cis != null && cis.size() > 0) {
-            MenuItem dsVisibility = new MenuItem(I18n.txt("context.dataset.visibility"), skin, skin.getDrawable("eye-icon"));
+            MenuItem dsVisibility = new MenuItem(I18n.msg("context.dataset.visibility"), skin, skin.getDrawable("eye-icon"));
             ContextMenu dsVisibilitySubmenu = new ContextMenu(skin, "default");
             for (CatalogInfo ci : cis) {
                 MenuItem cim = new MenuItem(ci.name, skin, "default");
@@ -422,7 +422,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
         if (relativisticEffects) {
             // Spawn gravitational waves
-            MenuItem gravWaveStart = new MenuItem(I18n.txt("context.startgravwave"), skin, "default");
+            MenuItem gravWaveStart = new MenuItem(I18n.msg("context.startgravwave"), skin, "default");
             gravWaveStart.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     EventManager.publish(Event.GRAV_WAVE_START, gravWaveStart, screenX, screenY);
@@ -434,7 +434,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
             if (RelativisticEffectsManager.getInstance().gravWavesOn()) {
                 // Cancel gravitational waves
-                MenuItem gravWaveStop = new MenuItem(I18n.txt("context.stopgravwave"), skin, "default");
+                MenuItem gravWaveStop = new MenuItem(I18n.msg("context.stopgravwave"), skin, "default");
                 gravWaveStop.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.publish(Event.GRAV_WAVE_STOP, gravWaveStop);
@@ -450,7 +450,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addSeparator();
         }
         // Quit
-        MenuItem quit = new MenuItem(I18n.txt("context.quit"), skin, skin.getDrawable("quit-icon"));
+        MenuItem quit = new MenuItem(I18n.msg("context.quit"), skin, skin.getDrawable("quit-icon"));
         quit.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_QUIT_ACTION, quit);

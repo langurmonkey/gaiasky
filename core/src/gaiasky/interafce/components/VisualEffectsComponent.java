@@ -45,7 +45,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
         /* Star brightness */
-        starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
+        starBrightness = new OwnSliderPlus(I18n.msg("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
         starBrightness.setName("star brightness");
         starBrightness.setWidth(contentWidth);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
@@ -58,7 +58,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star brightness power */
-        starBrightnessPower = new OwnSliderPlus(I18n.txt("gui.starbrightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
+        starBrightnessPower = new OwnSliderPlus(I18n.msg("gui.starbrightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
         starBrightnessPower.setName("star brightness power");
         starBrightnessPower.setWidth(contentWidth);
         starBrightnessPower.setMappedValue(Settings.settings.scene.star.power);
@@ -71,7 +71,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star size */
-        starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
+        starSize = new OwnSliderPlus(I18n.msg("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
         starSize.setName("star size");
         starSize.setWidth(contentWidth);
         starSize.setMappedValue(Settings.settings.scene.star.pointSize);
@@ -84,7 +84,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star min opacity */
-        starMinOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
+        starMinOpacity = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
         starMinOpacity.setName("star min opacity");
         starMinOpacity.setWidth(contentWidth);
         starMinOpacity.setMappedValue(Settings.settings.scene.star.opacity[0]);
@@ -97,7 +97,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Ambient light */
-        ambientLight = new OwnSliderPlus(I18n.txt("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
+        ambientLight = new OwnSliderPlus(I18n.msg("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
         ambientLight.setName("ambient light");
         ambientLight.setWidth(contentWidth);
         ambientLight.setMappedValue(Settings.settings.scene.renderer.ambient);
@@ -110,7 +110,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Label size */
-        labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
+        labelSize = new OwnSliderPlus(I18n.msg("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
         labelSize.setName("label size");
         labelSize.setWidth(contentWidth);
         labelSize.setMappedValue(Settings.settings.scene.label.size);
@@ -124,7 +124,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Line width */
-        lineWidth = new OwnSliderPlus(I18n.txt("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
+        lineWidth = new OwnSliderPlus(I18n.msg("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setName("line width");
         lineWidth.setWidth(contentWidth);
         lineWidth.setMappedValue(Settings.settings.scene.lineWidth);
@@ -138,7 +138,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Elevation multiplier */
-        elevMult = new OwnSliderPlus(I18n.txt("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, 0.1f, false, skin);
+        elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, 0.1f, false, skin);
         elevMult.setName("elevation mult");
         elevMult.setWidth(contentWidth);
         elevMult.setValue((float) MathUtilsd.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
@@ -152,10 +152,10 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Reset defaults */
-        OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.txt("gui.resetdefaults"), skin, "reset");
+        OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
         resetDefaults.align(Align.center);
         resetDefaults.setWidth(contentWidth);
-        resetDefaults.addListener(new OwnTextTooltip(I18n.txt("gui.resetdefaults.tooltip"), skin));
+        resetDefaults.addListener(new OwnTextTooltip(I18n.msg("gui.resetdefaults.tooltip"), skin));
         resetDefaults.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Read defaults from internal settings file

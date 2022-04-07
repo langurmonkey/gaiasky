@@ -17,6 +17,6 @@ public class AttributeDEC extends AttributeAbstract implements IAttribute {
         return "deg";
     }
     public String toString(){
-        return "Declination (" + I18n.txt("gui.focusinfo.delta") + ")";
+        return "Declination (" + I18n.msg("gui.focusinfo.delta") + ")";
     }
 }

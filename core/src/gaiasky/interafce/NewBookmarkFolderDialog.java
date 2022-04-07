@@ -21,10 +21,10 @@ public class NewBookmarkFolderDialog extends GenericDialog {
     public OwnTextField input;
 
     public NewBookmarkFolderDialog(String parent, Skin skin, Stage ui) {
-        super(I18n.txt("gui.bookmark.context.newfolder", parent), skin, ui);
+        super(I18n.msg("gui.bookmark.context.newfolder", parent), skin, ui);
 
-        setAcceptText(I18n.txt("gui.ok"));
-        setCancelText(I18n.txt("gui.cancel"));
+        setAcceptText(I18n.msg("gui.ok"));
+        setCancelText(I18n.msg("gui.cancel"));
 
         // Build
         buildSuper();

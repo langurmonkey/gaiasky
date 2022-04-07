@@ -304,7 +304,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         if (localTransform != null && Settings.settings.scene.initialization.lazyMesh && !modelInitialised) {
             if (!modelLoading) {
                 String mf = Settings.settings.data.dataFile(modelFile);
-                logger.info(I18n.txt("notif.loading", mf));
+                logger.info(I18n.msg("notif.loading", mf));
                 AssetBean.addAsset(mf, IntModel.class);
                 modelLoading = true;
             } else if (manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {

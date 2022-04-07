@@ -34,7 +34,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     protected Map<String, CheckBox> cbMap;
 
     public IndividualVisibilityWindow(ISceneGraph sg, Stage stage, Skin skin) {
-        super(I18n.txt("gui.visibility.individual"), skin, stage);
+        super(I18n.msg("gui.visibility.individual"), skin, stage);
 
         this.sg = sg;
         space8 = 12.8f;
@@ -43,7 +43,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         cbMap = new HashMap<>();
 
-        setAcceptText(I18n.txt("gui.close"));
+        setAcceptText(I18n.msg("gui.close"));
         setModal(false);
 
         // Build
@@ -154,7 +154,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         names.sort();
 
         if (names.isEmpty()) {
-            objectsGroup.addActor(new OwnLabel(I18n.txt("gui.elements.type.none"), skin));
+            objectsGroup.addActor(new OwnLabel(I18n.msg("gui.elements.type.none"), skin));
         } else {
             for (String name : names) {
                 HorizontalGroup objectHgroup = new HorizontalGroup();
@@ -195,7 +195,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         if (ct.equals(ComponentType.Stars)) {
             objectsGroup.addActor(new OwnLabel("", skin));
-            objectsGroup.addActor(new OwnLabel(I18n.txt("notif.visibility.stars"), skin));
+            objectsGroup.addActor(new OwnLabel(I18n.msg("notif.visibility.stars"), skin));
         }
 
         objectsGroup.pack();
@@ -224,7 +224,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         // Filter
         OwnTextField filter = new OwnTextField("", skin);
         filter.setWidth(componentWidth);
-        filter.setMessageText(I18n.txt("gui.dataset.filter"));
+        filter.setMessageText(I18n.msg("gui.dataset.filter"));
         filter.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 addObjects(objectsGroup, checkBoxes, ct, filter.getText().trim().toLowerCase(Locale.ROOT));
@@ -237,7 +237,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(pad5);
         OwnTextIconButton selAll = new OwnTextIconButton("", skin, "audio");
-        selAll.addListener(new OwnTextTooltip(I18n.txt("gui.select.all"), skin));
+        selAll.addListener(new OwnTextTooltip(I18n.msg("gui.select.all"), skin));
         selAll.pad(space2);
         selAll.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
@@ -247,7 +247,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             return false;
         });
         OwnTextIconButton selNone = new OwnTextIconButton("", skin, "ban");
-        selNone.addListener(new OwnTextTooltip(I18n.txt("gui.select.none"), skin));
+        selNone.addListener(new OwnTextTooltip(I18n.msg("gui.select.none"), skin));
         selNone.pad(space2);
         selNone.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {

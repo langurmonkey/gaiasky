@@ -8,8 +8,6 @@ package gaiasky.desktop.render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Graphics.Monitor;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -62,7 +60,7 @@ public class ScreenModeCmd implements IObserver {
                 // set the window to full screen mode
                 boolean good = Gdx.graphics.setFullscreenMode(myMode);
                 if (!good) {
-                    logger.error(I18n.txt("notif.error", I18n.txt("gui.fullscreen")));
+                    logger.error(I18n.msg("notif.error", I18n.msg("gui.fullscreen")));
                 }
 
             } else {
@@ -71,7 +69,7 @@ public class ScreenModeCmd implements IObserver {
 
                 boolean good = Gdx.graphics.setWindowedMode(width, height);
                 if (!good) {
-                    logger.error(I18n.txt("notif.error", I18n.txt("gui.windowed")));
+                    logger.error(I18n.msg("notif.error", I18n.msg("gui.windowed")));
                 }
 
             }

@@ -96,9 +96,9 @@ public class CloudComponent extends NamedComponent implements IObserver {
                 cloudUnpacked = addToLoad(cloud);
                 cloudtransUnpacked = addToLoad(cloudtrans);
                 if (cloudUnpacked != null)
-                    logger.info(I18n.txt("notif.loading", cloudUnpacked));
+                    logger.info(I18n.msg("notif.loading", cloudUnpacked));
                 if (cloudtransUnpacked != null)
-                    logger.info(I18n.txt("notif.loading", cloudtransUnpacked));
+                    logger.info(I18n.msg("notif.loading", cloudtransUnpacked));
             }
             if (diffuseCubemap != null)
                 diffuseCubemap.initialize(manager);
@@ -214,14 +214,14 @@ public class CloudComponent extends NamedComponent implements IObserver {
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
                 long start = TimeUtils.millis();
-                GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.cloud"), N, M)));
+                GaiaSky.postRunnable(() -> logger.info(I18n.msg("gui.procedural.info.generate", I18n.msg("gui.procedural.cloud"), N, M)));
 
                 if (nc == null) {
                     nc = new NoiseComponent();
                     Random noiseRandom = new Random();
                     nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
                 }
-                Pixmap cloudPixmap = nc.generateData(N, M, color, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.cloud"), name));
+                Pixmap cloudPixmap = nc.generateData(N, M, color, I18n.msg("gui.procedural.progress", I18n.msg("gui.procedural.cloud"), name));
                 // Write to disk if necessary
                 if (Settings.settings.program.saveProceduralTextures) {
                     SysUtils.saveProceduralPixmap(cloudPixmap, this.name + "-cloud");
@@ -233,7 +233,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
                         material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
                     }
                     long elapsed = TimeUtils.millis() - start;
-                    logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.cloud"), elapsed / 1000d));
+                    logger.info(I18n.msg("gui.procedural.info.done", I18n.msg("gui.procedural.cloud"), elapsed / 1000d));
                 });
 
                 // End

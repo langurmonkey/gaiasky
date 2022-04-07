@@ -183,8 +183,8 @@ public class GSKeys {
     public static String toString(int keycode) {
         String eng = Keys.toString(keycode);
         String key = "key." + eng.replaceAll(" ", "_");
-        if (I18n.hasKey(key)) {
-            return I18n.txt(key);
+        if (I18n.hasMessage(key)) {
+            return I18n.msg(key);
         } else {
             return eng;
         }

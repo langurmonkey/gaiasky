@@ -107,7 +107,7 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(sunc);
-        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(7), sideshort2);
+        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(7), sideshort2);
         font.setColor(textgc);
         font.draw(sb, "To\nGalactic\nCenter", side - px(50), sideshort2 + px(15));
         font.draw(sb, "To\nOuter\nGalaxy", 0, sideshort2 + px(15));
@@ -158,7 +158,7 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
-        font.draw(sb, I18n.txt("gui.minimap.sun"), side2 + px(10), side2 + px(10));
+        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(10), side2 + px(10));
         font.setColor(textgc);
         font.draw(sb, "Hyades", side2 + px(5), side2 - px(5));
         font.draw(sb, "Pleiades", side2, side2 - px(20));
@@ -192,6 +192,6 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
 
     @Override
     public String getName() {
-        return I18n.txt("gui.minimap.solarneighbourhood");
+        return I18n.msg("gui.minimap.solarneighbourhood");
     }
 }

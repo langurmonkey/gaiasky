@@ -36,11 +36,11 @@ public class LogWindow extends GenericDialog {
     private float w, h, pad;
 
     public LogWindow(Stage stage, Skin skin) {
-        super(I18n.txt("gui.log.title"), skin, stage);
+        super(I18n.msg("gui.log.title"), skin, stage);
 
         this.format = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
         this.setResizable(true);
-        setCancelText(I18n.txt("gui.close"));
+        setCancelText(I18n.msg("gui.close"));
 
         // Build
         buildSuper();
@@ -75,7 +75,7 @@ public class LogWindow extends GenericDialog {
         Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("update log");
         reload.pad(pad5);
-        reload.addListener(new OwnTextTooltip(I18n.txt("gui.log.update"), skin));
+        reload.addListener(new OwnTextTooltip(I18n.msg("gui.log.update"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 update();
@@ -84,7 +84,7 @@ public class LogWindow extends GenericDialog {
         });
         buttons.addActor(reload);
 
-        Button export = new OwnTextButton(I18n.txt("gui.log.export"), skin);
+        Button export = new OwnTextButton(I18n.msg("gui.log.export"), skin);
         export.setName("export log");
         export.pad(pad5);
         export.addListener((event) -> {

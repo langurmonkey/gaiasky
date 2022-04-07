@@ -105,7 +105,7 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
             }
         }
 
-        Logger.getLogger(this.getClass()).info(I18n.txt("notif.boundaries.init", n));
+        Logger.getLogger(this.getClass()).info(I18n.msg("notif.boundaries.init", n));
 
         return boundaries;
     }

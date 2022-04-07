@@ -58,7 +58,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        prev.addListener(new OwnTextTooltip(I18n.txt("gui.music.previous"), skin));
+        prev.addListener(new OwnTextTooltip(I18n.msg("gui.music.previous"), skin));
 
         /* Play/pause */
         play = new OwnImageButton(skin, "audio-playpause");
@@ -70,7 +70,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        play.addListener(new OwnTextTooltip(I18n.txt("gui.music.playpause"), skin));
+        play.addListener(new OwnTextTooltip(I18n.msg("gui.music.playpause"), skin));
 
         /* Next track */
         next = new OwnImageButton(skin, "audio-fwd");
@@ -81,11 +81,11 @@ public class MusicComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        next.addListener(new OwnTextTooltip(I18n.txt("gui.music.next"), skin));
+        next.addListener(new OwnTextTooltip(I18n.msg("gui.music.next"), skin));
 
         /* Volume */
-        vol = new OwnLabel(I18n.txt("gui.music.volume.short")+ ": " + nf.format(getVolumePercentage()) + "%", skin, "mono-pink");
-        vol.addListener(new OwnTextTooltip(I18n.txt("gui.music.volume"), skin));
+        vol = new OwnLabel(I18n.msg("gui.music.volume.short")+ ": " + nf.format(getVolumePercentage()) + "%", skin, "mono-pink");
+        vol.addListener(new OwnTextTooltip(I18n.msg("gui.music.volume"), skin));
         vol.receiveScrollEvents();
         vol.addListener(event -> {
             if (event instanceof InputEvent) {
@@ -95,7 +95,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
                     float currentVol = getVolume();
                     float newVol = Math.max(0f, Math.min(1f, currentVol + scroll));
                     EventManager.publish(Event.MUSIC_VOLUME_CMD, vol, newVol);
-                    vol.setText(I18n.txt("gui.music.volume.short") + ": " + nf.format(getVolumePercentage()) + "%");
+                    vol.setText(I18n.msg("gui.music.volume.short") + ": " + nf.format(getVolumePercentage()) + "%");
                     return true;
                 }
             }

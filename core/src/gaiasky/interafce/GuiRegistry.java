@@ -253,7 +253,7 @@ public class GuiRegistry implements IObserver {
                 String contents = Files.readString(releaseNotesRev).trim();
                 releaseNotesVersion = Parser.parseInt(contents);
             } catch (Exception e) {
-                logger.warn(I18n.txt("error.file.read", releaseNotesRev.toString()));
+                logger.warn(I18n.msg("error.file.read", releaseNotesRev.toString()));
             }
         }
 
@@ -411,10 +411,10 @@ public class GuiRegistry implements IObserver {
                     lastOpenLocation = SysUtils.getHomeDir();
                 }
 
-                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
-                fc.setAcceptText(I18n.txt("gui.loadcatalog"));
+                fc.setAcceptText(I18n.msg("gui.loadcatalog"));
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
                 fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
                 fc.setResultListener((success, result) -> {
@@ -427,9 +427,9 @@ public class GuiRegistry implements IObserver {
                                     // Load internal JSON catalog file
                                     GaiaSky.instance.getExecutorService().execute(() -> {
                                         try {
-                                            logger.info(I18n.txt("notif.catalog.loading", fileName));
+                                            logger.info(I18n.msg("notif.catalog.loading", fileName));
                                             final Array<SceneGraphNode> objects = SceneGraphJsonLoader.loadJsonFile(Gdx.files.absolute(result.toAbsolutePath().toString()));
-                                            logger.info(I18n.txt("notif.catalog.loaded", objects.size, I18n.txt("gui.objects")));
+                                            logger.info(I18n.msg("notif.catalog.loaded", objects.size, I18n.msg("gui.objects")));
                                             GaiaSky.postRunnable(() -> {
                                                 // THIS WILL BLOCK
                                                 for (SceneGraphNode node : objects) {
@@ -452,12 +452,12 @@ public class GuiRegistry implements IObserver {
                                                 GaiaSky.postRunnable(GaiaSky.instance::touchSceneGraph);
                                             });
                                         } catch (Exception e) {
-                                            logger.error(I18n.txt("notif.error", fileName), e);
+                                            logger.error(I18n.msg("notif.error", fileName), e);
                                         }
                                     });
 
                                 } else {
-                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
+                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
                                     Runnable doLoad = () -> {
                                         GaiaSky.instance.getExecutorService().execute(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
@@ -492,7 +492,7 @@ public class GuiRegistry implements IObserver {
                                 Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
                                 return true;
                             } catch (Exception e) {
-                                logger.error(I18n.txt("notif.error", result.getFileName()), e);
+                                logger.error(I18n.msg("notif.error", result.getFileName()), e);
                                 return false;
                             }
 
@@ -575,7 +575,7 @@ public class GuiRegistry implements IObserver {
                         if (mpi.warn != null && !mpi.warn.isEmpty()) {
                             modeChangeTable.add(new OwnLabel(mpi.warn, skin, "mono-pink")).left().padTop(pad10).padBottom(pad5).row();
                         }
-                        OwnTextButton closeButton = new OwnTextButton(I18n.txt("gui.ok") + " [esc]", skin);
+                        OwnTextButton closeButton = new OwnTextButton(I18n.msg("gui.ok") + " [esc]", skin);
                         closeButton.pad(pad3, pad10, pad3, pad10);
                         closeButton.addListener(event1 -> {
                             if (event1 instanceof ChangeEvent) {
@@ -620,9 +620,9 @@ public class GuiRegistry implements IObserver {
                 if (data.length > 0) {
                     text = (String) data[0];
                 } else {
-                    text = I18n.txt("gui.restart.default");
+                    text = I18n.msg("gui.restart.default");
                 }
-                GenericDialog restart = new GenericDialog(I18n.txt("gui.restart.title"), skin, ui) {
+                GenericDialog restart = new GenericDialog(I18n.msg("gui.restart.title"), skin, ui) {
 
                     @Override
                     protected void build() {
@@ -679,8 +679,8 @@ public class GuiRegistry implements IObserver {
                         // Nothing
                     }
                 };
-                restart.setAcceptText(I18n.txt("gui.yes"));
-                restart.setCancelText(I18n.txt("gui.no"));
+                restart.setAcceptText(I18n.msg("gui.yes"));
+                restart.setCancelText(I18n.msg("gui.no"));
                 restart.buildSuper();
                 restart.show(ui);
                 break;
@@ -753,10 +753,10 @@ public class GuiRegistry implements IObserver {
                 // Refocus
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, GaiaSky.instance.cameraManager.getFocus());
             // Update names with new language
-            GaiaSky.instance.sceneGraph.getRoot().updateNamesRec();
+            GaiaSky.instance.sceneGraph.getRoot().updateI18nNameRec();
             // UI theme reload broadcast
             EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.ui.reload"));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));
         });
     }
 

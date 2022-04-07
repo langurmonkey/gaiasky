@@ -358,7 +358,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // toggle particle fade
-        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.txt("element.octreeparticlefade"), !Settings.settings.scene.octree.fade)));
+        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.msg("element.octreeparticlefade"), !Settings.settings.scene.octree.fade)));
 
         // toggle stereoscopic mode
         addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active)));
@@ -371,7 +371,7 @@ public class KeyBindings {
         }));
 
         // Toggle clean (no GUI) mode
-        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.publish(Event.DISPLAY_GUI_CMD, this, !Settings.settings.runtime.displayGui, I18n.txt("notif.cleanmode"))));
+        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.publish(Event.DISPLAY_GUI_CMD, this, !Settings.settings.runtime.displayGui, I18n.msg("notif.cleanmode"))));
 
         // Travel to focus object
         addAction(new ProgramAction("action.gotoobject", () -> EventManager.publish(Event.GO_TO_OBJECT_CMD, this)));
@@ -436,7 +436,7 @@ public class KeyBindings {
                 logger.error(e);
             }
         }
-        logger.info(I18n.txt("notif.kbd.mappings.file.use", customMappings));
+        logger.info(I18n.msg("notif.kbd.mappings.file.use", customMappings));
 
         try {
             Array<Pair<String, String>> mappings = readMappingsFile(customMappings);
@@ -455,12 +455,12 @@ public class KeyBindings {
                     addMapping(action, keyCodes);
 
                 } else {
-                    logger.warn(I18n.txt("notif.kbd.mappings.action.notfound", key));
+                    logger.warn(I18n.msg("notif.kbd.mappings.action.notfound", key));
                 }
             }
 
         } catch (Exception e) {
-            logger.error(e, I18n.txt("notif.kbd.mappings.error", customMappings));
+            logger.error(e, I18n.msg("notif.kbd.mappings.error", customMappings));
         }
 
     }
@@ -507,9 +507,9 @@ public class KeyBindings {
             try {
                 if (actionId.contains("/")) {
                     String[] actions = actionId.split("/");
-                    actionName = I18n.txt(actions[0], I18n.txt(actions[1]));
+                    actionName = I18n.msg(actions[0], I18n.msg(actions[1]));
                 } else {
-                    actionName = I18n.txt(actionId);
+                    actionName = I18n.msg(actionId);
                 }
             } catch (MissingResourceException e) {
                 actionName = actionId;

@@ -106,6 +106,7 @@ public class Proximity {
      * Updates the list of proximal objects with the given {@link NearbyRecord}
      *
      * @param object The record to use for updating
+     *
      * @return Whether this proximity array was modified
      */
     public boolean update(NearbyRecord object) {
@@ -131,6 +132,7 @@ public class Proximity {
      *
      * @param object The record to use for updating
      * @param camera The camera
+     *
      * @return Whether this proximity array was modified
      */
     public boolean update(IFocus object, ICamera camera) {
@@ -164,9 +166,9 @@ public class Proximity {
 
     /**
      * Swaps the arrays in this double-buffer implementation
-      */
+     */
     public void swapBuffers() {
-        if(updating == array0){
+        if (updating == array0) {
             // updating <- array1
             // effective <- array0
             updating = array1;
@@ -181,7 +183,7 @@ public class Proximity {
         }
     }
 
-    private void clear(NearbyRecord[] arr){
+    private void clear(NearbyRecord[] arr) {
         for (int i = 0; i < arr.length; i++) {
             arr[i] = null;
         }
@@ -269,13 +271,18 @@ public class Proximity {
         }
 
         @Override
+        public String getLocalizedName() {
+            return name;
+        }
+
+        @Override
         public String getName() {
             return name;
         }
 
         @Override
         public String[] getNames() {
-            return new String[]{name};
+            return new String[] { name };
         }
 
         @Override
