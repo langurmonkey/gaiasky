@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#
+# gen-changelog - Generate a list of changes between commits in markdown
+#
+# This script generates a list of changes in markdown format between to git
+# commit IDs and separates them into sections according to
+# tags found in the git commits. It needs the commits in the
+# current repository to use semantic messages, annotated with:
+# feat:, fix:, perf:, style:, build:, docs:, refactor:
+
 if [[ $# -ne 2 ]]; then
     echo 'Too many/few arguments, expecting two' >&2
     echo "Usage: $0 low-id high-id"
@@ -14,14 +23,20 @@ high="$2"
 # All git messages sorted by tag
 tmp_file="/tmp/prelog"
 
+# Title is the higher tag if $title is not set
+[[ -z $title ]] && title=$high
+
+# Use default $repo_url if it is not set
+[[ -z $repo_url ]] && repo_url="https://gitlab.com/langurmonkey/gaiasky"
+
 # Run git log
 git log $low...$high --pretty=format:'%s ' | sort -u > $tmp_file
 
 tags=("feat:" "fix:" "docs:" "style:" "refactor:" "perf:" "build:")
 names=("Features" "Bug Fixes" "Documentation" "Style" "Refactoring" "Performance Improvements" "Build System")
 
-echo "# $high"
-echo
+# Print title
+echo "# $title"
 
 # Process every line
 curr_tag=""
@@ -45,7 +60,17 @@ while read -r line; do
         echo
     fi
 
-    # Print message
+    # Get message body (no tag)
     body=$(echo $line | awk '{$1=""; print $0}')
+
+    # Substitute issues (remove leading # and put in issue_num)
+    issue_num=$(echo $body | grep -o '#[0-9][0-9]*')
+    issue_num=${issue_num:1}
+    body=$(echo $body | sed -r "s|#([0-9]+)|[&]($repo_url\/issues\/$issue_num)|g")
+
+    # Add point at the end if needed
+    body=$(echo $body | sed 's/\.$//g')
+    body=$(echo $body | sed 's/$/.&/g')
+
     echo "- $body"
 done < $tmp_file
