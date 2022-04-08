@@ -1,13 +1,16 @@
 #!/bin/bash
 
 #
-# gen-changelog - Generate a list of changes between commits in markdown
+# git-changelist - Generate a list of changes between commits in markdown
 #
 # This script generates a list of changes in markdown format between to git
-# commit IDs and separates them into sections according to
-# tags found in the git commits. It needs the commits in the
-# current repository to use semantic messages, annotated with:
+# commit IDs and separates them into sections according to tags found in the
+# git commits. It needs the commits in the current repository to use semantic 
+# messages, annotated with:
+#
 # feat:, fix:, perf:, style:, build:, docs:, refactor:
+#
+# Author: Toni Sagrista Selles <tonisagrista.com>
 
 if [[ $# -ne 2 ]]; then
     echo 'Too many/few arguments, expecting two' >&2
