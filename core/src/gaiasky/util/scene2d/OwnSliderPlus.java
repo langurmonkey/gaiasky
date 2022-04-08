@@ -133,6 +133,13 @@ public class OwnSliderPlus extends Slider {
         return (valuePrefix != null ? valuePrefix : "") + valueString + (valueSuffix != null ? valueSuffix : "");
     }
 
+    @Override
+    public boolean setValue(float value) {
+        boolean result = super.setValue(value);
+        this.valueLabel.setText(getValueString());
+        return result;
+    }
+
     public float getMappedValue() {
         if (map) {
             return MathUtilsd.lint(getValue(), getMinValue(), getMaxValue(), mapMin, mapMax);
