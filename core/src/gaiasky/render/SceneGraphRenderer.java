@@ -413,9 +413,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         BitmapFontParameter bfp = new BitmapFontParameter();
         bfp.magFilter = TextureFilter.Linear;
         bfp.minFilter = TextureFilter.Linear;
-        manager.load("font/main-font.fnt", BitmapFont.class, bfp);
-        manager.load("font/font2d.fnt", BitmapFont.class, bfp);
-        manager.load("font/font-titles.fnt", BitmapFont.class, bfp);
+        manager.load("skins/fonts/main-font.fnt", BitmapFont.class, bfp);
+        manager.load("skins/fonts/font2d.fnt", BitmapFont.class, bfp);
+        manager.load("skins/fonts/font-titles.fnt", BitmapFont.class, bfp);
 
         stars = new Array<>();
 
@@ -622,10 +622,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         IntModelBatch mbCloud = new IntModelBatch(cloud, noSorter);
 
         // Fonts - all of these are distance field fonts
-        BitmapFont font3d = manager.get("font/main-font.fnt");
-        BitmapFont font2d = manager.get("font/font2d.fnt");
+        BitmapFont font3d = manager.get("skins/fonts/main-font.fnt");
+        BitmapFont font2d = manager.get("skins/fonts/font2d.fnt");
         font2d.getData().setScale(0.5f);
-        BitmapFont fontTitles = manager.get("font/font-titles.fnt");
+        BitmapFont fontTitles = manager.get("skins/fonts/font-titles.fnt");
 
         // Sprites
         spriteBatch = globalResources.getExtSpriteBatch();
