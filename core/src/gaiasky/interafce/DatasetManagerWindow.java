@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
@@ -58,7 +59,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -937,7 +943,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     }
                     resetSelectedDataset();
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.finished", name), 10f);
-                    com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
+                    Timer.schedule(new Timer.Task() {
                         @Override
                         public void run() {
                             reloadAll();
@@ -953,7 +959,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     currentDownloads.remove(dataset.key);
                     resetSelectedDataset();
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), 10f);
-                    com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
+                    Timer.schedule(new Timer.Task() {
                         @Override
                         public void run() {
                             reloadAll();
@@ -971,7 +977,7 @@ public class DatasetManagerWindow extends GenericDialog {
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), 10f);
-            com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
+            Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
                     reloadAll();
@@ -985,7 +991,7 @@ public class DatasetManagerWindow extends GenericDialog {
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.cancelled", name), 10f);
-            com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
+            Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
                     reloadAll();

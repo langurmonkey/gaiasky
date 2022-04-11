@@ -97,12 +97,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /**
-     * Current render process.
-     * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
-     **/
-    private Runnable renderProcess;
-
-    /**
      * Singleton instance
      **/
     public static GaiaSky instance;
@@ -115,6 +109,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Graphics
      **/
     public Graphics graphics;
+
+    /**
+     * Current update-render implementation.
+     * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
+     **/
+    private Runnable updateRenderProcess;
 
     /**
      * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
@@ -327,7 +327,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.parkedRunnablesMap = new HashMap<>();
         this.parkedRunnables = new ArrayList<>();
 
-        this.renderProcess = runnableInitialGui;
+        this.updateRenderProcess = runnableInitialGui;
     }
 
     @Override
@@ -1065,7 +1065,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
         if (finished) {
             doneLoading();
-            renderProcess = runnableRender;
+            updateRenderProcess = runnableRender;
         } else {
             // Display loading screen
             if (settings.runtime.openVr) {
@@ -1115,7 +1115,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         try {
             if (running.get() && !crashed.get()) {
                 // Run the render process
-                renderProcess.run();
+                updateRenderProcess.run();
 
                 // Run parked runnables
                 synchronized (parkedRunnables) {
@@ -1414,7 +1414,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
             }
 
-            this.renderProcess = runnableLoadingGui;
+            this.updateRenderProcess = runnableLoadingGui;
 
             /* LOAD SCENE GRAPH */
             if (sceneGraph == null) {
