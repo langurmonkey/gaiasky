@@ -584,7 +584,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         } else {
             // Copy existing
             clc.copyFrom(initClc);
-            clc.setCloud("generate");
+            clc.setDiffuse("generate");
         }
         // Fog color
         ColorPicker cloudColor = new ColorPicker(new float[] { clc.color[0], clc.color[1], clc.color[2], clc.color[3] }, stage, skin);

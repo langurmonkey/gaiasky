@@ -62,7 +62,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
     private AtomicBoolean generated = new AtomicBoolean(false);
     private Texture cloudTex;
 
-    public String cloud, cloudtrans, cloudUnpacked, cloudtransUnpacked;
+    public String diffuse, diffuseUnpacked;
 
     private Material material;
 
@@ -91,14 +91,11 @@ public class CloudComponent extends NamedComponent implements IObserver {
 
     private void initialize(boolean force) {
         if (!Settings.settings.scene.initialization.lazyTexture || force) {
-            if (cloud != null && !cloud.endsWith(Constants.GEN_KEYWORD)) {
+            if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD)) {
                 // Add textures to load
-                cloudUnpacked = addToLoad(cloud);
-                cloudtransUnpacked = addToLoad(cloudtrans);
-                if (cloudUnpacked != null)
-                    logger.info(I18n.msg("notif.loading", cloudUnpacked));
-                if (cloudtransUnpacked != null)
-                    logger.info(I18n.msg("notif.loading", cloudtransUnpacked));
+                diffuseUnpacked = addToLoad(diffuse);
+                if (diffuseUnpacked != null)
+                    logger.info(I18n.msg("notif.loading", diffuseUnpacked));
             }
             if (diffuseCubemap != null)
                 diffuseCubemap.initialize(manager);
@@ -107,17 +104,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(cloudUnpacked, manager) && isFL(cloudtransUnpacked, manager) && isFL(diffuseCubemap, manager);
-    }
-
-    public boolean isFL(String tex, AssetManager manager) {
-        if (tex == null)
-            return true;
-        return manager.isLoaded(tex);
-    }
-
-    public boolean isFL(CubemapComponent cubemap, AssetManager manager) {
-        return cubemap == null || cubemap.isLoaded(manager);
+        return TextureUtils.isLoaded(diffuseUnpacked, manager) && TextureUtils.isLoaded(diffuseCubemap, manager);
     }
 
     /**
@@ -179,17 +166,13 @@ public class CloudComponent extends NamedComponent implements IObserver {
     public void initMaterial() {
         material = mc.instance.materials.first();
 
-        if (cloud != null && material.get(TextureAttribute.Diffuse) == null) {
-            if (!cloud.endsWith(Constants.GEN_KEYWORD)) {
-                Texture tex = manager.get(cloudUnpacked, Texture.class);
+        if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
+            if (!diffuse.endsWith(Constants.GEN_KEYWORD)) {
+                Texture tex = manager.get(diffuseUnpacked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
             } else {
                 initializeGenCloudData();
             }
-        }
-        if (cloudtrans != null && manager.isLoaded(cloudtransUnpacked)) {
-            Texture tex = manager.get(cloudtransUnpacked, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
         if (diffuseCubemap != null) {
             diffuseCubemap.prepareCubemap(manager);
@@ -272,8 +255,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
      * @param manager The asset manager
      **/
     public void disposeTextures(AssetManager manager) {
-        disposeTexture(manager, material, cloud, cloudUnpacked, TextureAttribute.Diffuse, cloudTex);
-        disposeTexture(manager, material, cloudtrans, cloudtransUnpacked, TextureAttribute.Normal, null);
+        disposeTexture(manager, material, diffuse, diffuseUnpacked, TextureAttribute.Diffuse, cloudTex);
         disposeCubemap(manager, material, CubemapAttribute.DiffuseCubemap, diffuseCubemap);
         texLoading = false;
         texInitialised = false;
@@ -314,12 +296,12 @@ public class CloudComponent extends NamedComponent implements IObserver {
         this.params = params;
     }
 
-    public void setCloud(String cloud) {
-        this.cloud = Settings.settings.data.dataFile(cloud);
+    public void setCloud(String diffuse) {
+       setDiffuse(diffuse);
     }
 
-    public void setCloudtrans(String cloudtrans) {
-        this.cloudtrans = cloudtrans;
+    public void setDiffuse(String diffuse) {
+        this.diffuse = Settings.settings.data.dataFile(diffuse);
     }
 
     public void setNoise(NoiseComponent noise) {
@@ -359,7 +341,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
         double sizeKm = size * Constants.U_TO_KM;
         setSize(sizeKm + gaussian(rand, 30.0, 8.0, 12.0));
         // Cloud
-        setCloud("generate");
+        setDiffuse("generate");
         // Color
         if (rand.nextBoolean()) {
             // White
@@ -384,7 +366,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
 
     public void copyFrom(CloudComponent other) {
         this.size = other.size;
-        this.cloud = other.cloud;
+        this.diffuse = other.diffuse;
         this.params = other.params;
         this.nc = new NoiseComponent();
         if (other.color != null) {

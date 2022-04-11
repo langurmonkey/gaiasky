@@ -27,10 +27,6 @@ uniform sampler2D u_diffuseTexture;
 uniform samplerCube u_diffuseCubemap;
 #endif
 
-#ifdef normalTextureFlag
-uniform sampler2D u_normalTexture;
-#endif
-
 // AMBIENT LIGHT
 in vec3 v_ambientLight;
 
@@ -42,15 +38,7 @@ in vec3 v_ambientLight;
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_diffuseCubemap, UVtoXYZ(texCoord));
 }
-#elif defined(diffuseTextureFlag) && defined(normalTextureFlag)
-// We have clouds and transparency
-vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
-    vec4 cloud = texture(u_diffuseTexture, texCoord);
-    vec4 trans = texture(u_normalTexture, texCoord);
-    return vec4(cloud.rgb, 1.0 - luma(trans.rgb));
-}
 #elif defined(diffuseTextureFlag)
-// Only clouds, we use value as transp
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_diffuseTexture, texCoord);
 }
@@ -58,7 +46,7 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return defaultValue;
 }
-#endif// diffuseTextureFlag && diffuseColorFlag
+#endif// diffuseCubemapFlag && diffuseTextureFlag
 
 in vec3 v_lightDir;
 in vec3 v_lightCol;

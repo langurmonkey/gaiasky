@@ -181,33 +181,23 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(diffuseUnpacked, manager)
-                && isFL(normalUnpacked, manager)
-                && isFL(specularUnpacked, manager)
-                && isFL(emissiveUnpacked, manager)
-                && isFL(ringUnpacked, manager)
-                && isFL(ringnormalUnpacked, manager)
-                && isFL(heightUnpacked, manager)
-                && isFL(roughnessUnapcked, manager)
-                && isFL(metallicUnpacked, manager)
-                && isFL(aoUnapcked, manager)
-                && isFL(diffuseCubemap, manager)
-                && isFL(normalCubemap, manager)
-                && isFL(emissiveCubemap, manager)
-                && isFL(specularCubemap, manager)
-                && isFL(roughnessCubemap, manager)
-                && isFL(metallicCubemap, manager)
-                && isFL(heightCubemap, manager);
-    }
-
-    public boolean isFL(String tex, AssetManager manager) {
-        if (tex == null)
-            return true;
-        return manager.isLoaded(tex);
-    }
-
-    public boolean isFL(CubemapComponent skybox, AssetManager manager) {
-        return skybox == null || skybox.isLoaded(manager);
+        return TextureUtils.isLoaded(diffuseUnpacked, manager)
+                && TextureUtils.isLoaded(normalUnpacked, manager)
+                && TextureUtils.isLoaded(specularUnpacked, manager)
+                && TextureUtils.isLoaded(emissiveUnpacked, manager)
+                && TextureUtils.isLoaded(ringUnpacked, manager)
+                && TextureUtils.isLoaded(ringnormalUnpacked, manager)
+                && TextureUtils.isLoaded(heightUnpacked, manager)
+                && TextureUtils.isLoaded(roughnessUnapcked, manager)
+                && TextureUtils.isLoaded(metallicUnpacked, manager)
+                && TextureUtils.isLoaded(aoUnapcked, manager)
+                && TextureUtils.isLoaded(diffuseCubemap, manager)
+                && TextureUtils.isLoaded(normalCubemap, manager)
+                && TextureUtils.isLoaded(emissiveCubemap, manager)
+                && TextureUtils.isLoaded(specularCubemap, manager)
+                && TextureUtils.isLoaded(roughnessCubemap, manager)
+                && TextureUtils.isLoaded(metallicCubemap, manager)
+                && TextureUtils.isLoaded(heightCubemap, manager);
     }
 
     /**
