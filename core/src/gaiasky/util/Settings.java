@@ -174,6 +174,7 @@ public class Settings {
          * This method keeps compatibility with older versions of the configuration file where
          * the setting {@link DataSettings#reflectionSkyboxLocation} was called
          * <code>skyboxLocation</code>.
+         *
          * @param location The reflection skybox location.
          */
         public void setSkyboxLocation(String location) {
@@ -757,7 +758,22 @@ public class Settings {
         }
 
         @JsonIgnore
-        public boolean isStereoOrCubemap(){
+        public String getDefaultLocale() {
+            return "en-GB";
+        }
+
+        public String getLocale() {
+            if (locale == null || locale.isEmpty()) {
+                locale = Locale.getDefault().toLanguageTag();
+            }
+            if (locale == null) {
+                locale = getDefaultLocale();
+            }
+            return locale;
+        }
+
+        @JsonIgnore
+        public boolean isStereoOrCubemap() {
             return modeStereo.active || modeCubemap.active;
         }
 
@@ -827,7 +843,7 @@ public class Settings {
             }
 
             @JsonIgnore
-            public boolean isStereoVR(){
+            public boolean isStereoVR() {
                 return active && profile.isVR();
             }
 

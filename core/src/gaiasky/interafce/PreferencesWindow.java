@@ -801,20 +801,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lang = new OwnSelectBox<>(skin);
         lang.setWidth(textWidth * 3f);
         lang.setItems(langs);
-        if (settings.program.locale != null) {
-            lang.setSelected(langs.get(idxLang(settings.program.locale, langs)));
-        } else {
-            // Empty locale
-            int localeIndex = idxLang(null, langs);
-            if (localeIndex < 0 || localeIndex >= langs.size) {
-                localeIndex = idxLang(Locale.getDefault().toLanguageTag(), langs);
-                if (localeIndex < 0 || localeIndex >= langs.size) {
-                    // Default is en_GB
-                    localeIndex = 2;
-                }
-            }
-            lang.setSelected(langs.get(localeIndex));
+
+        String locale = settings.program.getLocale();
+        int localeIndex = idxLang(locale, langs);
+        if (localeIndex < 0 || localeIndex >= langs.size) {
+            // Default is en_GB
+            localeIndex = 2;
         }
+        lang.setSelected(langs.get(localeIndex));
 
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.msg("gui.ui.theme"), skin);
@@ -2158,7 +2152,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float factor = uiScale.getMappedValue();
         EventManager.publish(Event.UI_SCALE_CMD, this, factor);
 
-        boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.locale);
+        boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.getLocale());
         boolean reloadUI = reloadLang || !settings.program.ui.theme.equals(newTheme.value) || settings.program.minimap.size != minimapSize.getValue();
         settings.program.locale = languageBean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/objects"));

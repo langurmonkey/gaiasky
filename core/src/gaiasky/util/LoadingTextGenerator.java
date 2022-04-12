@@ -22,7 +22,7 @@ public class LoadingTextGenerator {
     private final String[] objects;
 
     public LoadingTextGenerator() {
-        Locale locale = I18n.getLocaleFromLanguageTag(Settings.settings.program.locale);
+        Locale locale = I18n.getLocaleFromLanguageTag(Settings.settings.program.getLocale());
         verbs = read("funny.verb.");
         adjectives = read("funny.adjective.", 4);
         objects = read("funny.object.");
