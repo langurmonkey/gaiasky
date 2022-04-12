@@ -859,6 +859,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return super.getName();
     }
 
+    // Particles and stars are not localized yet
+    public String getLocalizedName() {
+        return getName();
+    }
+
     public String[] getNames() {
         if (focus != null && focus.names() != null)
             return focus.names();
@@ -1205,8 +1210,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return false;
     }
 
-    public void markForUpdate(){
-       EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, this);
+    public void markForUpdate() {
+        EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, this);
     }
 
     @Override
