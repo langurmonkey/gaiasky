@@ -203,7 +203,7 @@ public class CrashReporter {
 
     private static void appendSystemInfo(Array<String> strArray) {
         /* Gaia Sky info */
-        if (Settings.settings.version != null) {
+        if (Settings.settings != null && Settings.settings.version != null) {
             strArray.add("");
             strArray.add("## GAIA SKY INFORMATION");
             strArray.add("Version: " + Settings.settings.version.version);
@@ -211,6 +211,10 @@ public class CrashReporter {
             strArray.add("Builder: " + Settings.settings.version.builder);
             strArray.add("System: " + Settings.settings.version.system);
             strArray.add("Build time: " + Settings.settings.version.buildTime);
+        } else {
+            strArray.add("");
+            strArray.add("## Can't get Gaia Sky version information");
+            strArray.add("## Settings.settings[.version] is null!");
         }
 
         /* Java info */
