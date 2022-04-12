@@ -52,6 +52,7 @@ import gaiasky.script.ScriptingServer;
 import gaiasky.util.Logger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
@@ -97,19 +98,23 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /**
-     * Singleton instance
+     * Singleton instance.
      **/
     public static GaiaSky instance;
 
     /**
-     * Window
+     * Window.
      **/
     public Lwjgl3Window window;
     /**
-     * Graphics
+     * Graphics.
      **/
     public Graphics graphics;
 
+    /**
+     * The scene graph update process.
+     */
+    private Runnable updateProcess;
     /**
      * Current update-render implementation.
      * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
@@ -117,54 +122,62 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private Runnable updateRenderProcess;
 
     /**
+     * This thread updates the scene graph object.
+     */
+    private ServiceThread updateScenegraphThread;
+
+    /**
      * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
-     * present or SteamVR is not installed
+     * present or SteamVR is not installed.
      */
     public VRContext vrContext;
 
     /**
-     * Loading frame buffers
+     * Loading frame buffers.
      **/
     public FrameBuffer vrLoadingLeftFb, vrLoadingRightFb;
     /**
-     * Loading texture
+     * Loading texture.
      **/
     public Texture vrLoadingLeftTex, vrLoadingRightTex;
 
     /**
-     * Maps the VR devices to model objects
+     * Maps the VR devices to model objects.
      */
     private HashMap<VRDevice, StubModel> vrDeviceToModel;
 
-    // Asset manager
+    /**
+     * The asset manager.
+     */
     public AssetManager assetManager;
 
-    // Camera
+    /**
+     * The main camera manager.
+     */
     public CameraManager cameraManager;
 
-    // Data load string
     private String dataLoadString;
-
-    // Reference to the scene graph
     public ISceneGraph sceneGraph;
-    // Scene graph renderer
     public SceneGraphRenderer sgr;
-    // Main post processor
     private IPostProcessor postProcessor;
 
-    // Start time
+    /**
+     * The session start time, in milliseconds.
+     */
     private long startTime;
 
-    // Time since the start in seconds
+    /**
+     * Holds the session run time in seconds.
+     */
     private double t;
 
-    // The frame number
+    /**
+     * Holds the number of frames produced in this session.
+     */
     public long frames;
 
-    // Frame buffer map
     private Map<Integer, FrameBuffer> frameBufferMap;
 
-    // Registry
     private GuiRegistry guiRegistry;
 
     /**
@@ -615,6 +628,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
 
         /*
+         * SCENE GRAPH UPDATER
+         */
+        updateProcess = () -> {
+            sceneGraph.update(time, cameraManager);
+            // Swap proximity buffers
+            cameraManager.swapBuffers();
+        };
+        //updateScenegraphThread = new ServiceThread("scenegraph-updater");
+        //updateScenegraphThread.setDaemon(true);
+        //updateScenegraphThread.start();
+
+        /*
          * SCENE GRAPH RENDERER
          */
         AbstractRenderer.initialize(sceneGraph);
@@ -754,7 +779,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         time.update(1e-5);
         // Update whole scene graph
         sceneGraph.update(time, cameraManager);
-        sgr.clearLists();
+        sgr.swapRenderLists();
         time.update(0);
         settings.runtime.timeOn = timeOnBak;
         OctreeNode.LOAD_ACTIVE = true;
@@ -873,7 +898,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void dispose() {
         // Stop
-        running.set(false);
+        if(running != null) {
+            running.set(false);
+        }
+
+        // Stop thread
+        if (updateScenegraphThread != null) {
+            updateScenegraphThread.stopDaemon();
+        }
 
         // Revert back-buffer resolution
         if (dynamicResolutionLevel > 0 && settings.graphics.backBufferScale == settings.graphics.dynamicResolutionScale[0]) {
@@ -983,6 +1015,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 int h = (int) (th * settings.graphics.backBufferScale);
                 /* RENDER THE SCENE */
                 preRenderScene();
+
                 if (settings.runtime.openVr) {
                     renderSgr(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null, postProcessor.getPostProcessBean(RenderType.screen));
                 } else {
@@ -1000,7 +1033,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
         }
         // Clean lists
-        sgr.clearLists();
+        sgr.swapRenderLists();
         // Number of frames
         frames++;
 
@@ -1215,7 +1248,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         this.t += dtGs;
 
-        // Update GUI 
+        // Update GUI
         guiRegistry.update(dtGs);
         EventManager.publish(Event.UPDATE_GUI, this, dtGs);
 
@@ -1231,11 +1264,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Update GravWaves params
         RelativisticEffectsManager.getInstance().update(time, cameraManager.current);
 
-        // Update scene graph
-        sceneGraph.update(time, cameraManager);
-
-        // Swap proximity buffers
-        cameraManager.swapBuffers();
+        // Update scene graph in a thread (sync for now).
+        updateProcess.run();
+        // Use service thread
+        //updateScenegraphThread.offerTask(updateProcess);
+        //updateScenegraphThread.waitCurrentTask();
 
     }
 

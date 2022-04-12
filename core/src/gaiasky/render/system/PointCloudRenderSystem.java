@@ -32,12 +32,14 @@ public abstract class PointCloudRenderSystem extends ImmediateModeRenderSystem i
 
     /**
      * Adds the required vertex attributes for this renderer to the given list
+     *
      * @param attributes The list of attributes
      */
     protected abstract void addVertexAttributes(Array<VertexAttribute> attributes);
 
     /**
      * Builds the vertex attributes array and returns it
+     *
      * @return The vertex attributes array
      */
     protected VertexAttribute[] buildVertexAttributes() {
@@ -53,6 +55,7 @@ public abstract class PointCloudRenderSystem extends ImmediateModeRenderSystem i
     /**
      * Computes the offset for each vertex attribute. The offsets will be
      * used later in the render stage.
+     *
      * @param curr The current mesh data
      */
     protected abstract void offsets(MeshData curr);
@@ -111,12 +114,13 @@ public abstract class PointCloudRenderSystem extends ImmediateModeRenderSystem i
             // Pre-render
             preRenderObjects(shaderProgram, camera);
             // Render
-            renderables.forEach((r) -> renderObject(shaderProgram, r));
+            for (IRenderable r : renderables) {
+                renderObject(shaderProgram, r);
+            }
             // Post-render
             postRenderObjects(shaderProgram, camera);
             shaderProgram.end();
         }
     }
-
 
 }

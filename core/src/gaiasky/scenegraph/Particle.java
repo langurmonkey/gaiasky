@@ -262,7 +262,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         if (shouldRender()) {
-            GaiaSky.instance.sgr.renderLists().get(rg.ordinal()).add(renderable);
+            GaiaSky.instance.sgr.renderListsFront().get(rg.ordinal()).add(renderable);
             return true;
         }
         return false;

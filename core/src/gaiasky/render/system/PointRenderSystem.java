@@ -72,7 +72,6 @@ public class PointRenderSystem extends ImmediateModeRenderSystem {
         }
     }
 
-
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attribs = new Array<>();
         attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
@@ -94,7 +93,7 @@ public class PointRenderSystem extends ImmediateModeRenderSystem {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         addEffectsUniforms(shaderProgram, camera);
 
-        renderables.forEach(r ->{
+        renderables.forEach(r -> {
             IPointRenderable renderable = (IPointRenderable) r;
             renderable.render(this, camera, getAlpha(renderable));
 

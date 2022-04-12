@@ -66,7 +66,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static gaiasky.render.SceneGraphRenderer.RenderGroup.*;
 
 /**
- * Renders the scene graph
+ * Initializes the render infrastructure renders the scene using different render systems.
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
 
@@ -269,7 +269,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      **/
     public long[] times;
     /**
-     * Alpha values for each type
+     * Alpha values for each type.
      **/
     public float[] alphas;
 
@@ -278,9 +278,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /**
-     * Render lists for all render groups
+     * Render lists for all render groups.
+     * The front render lists contain the objects which are actually rendered in the current cycle. The back
+     * render lists get updated by the update thread.
      **/
-    public Array<Array<IRenderable>> renderLists;
+    private Array<Array<IRenderable>> renderLists;
 
     private Array<IRenderSystem> renderSystems;
 
@@ -900,7 +902,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         this.rendering.set(rendering);
     }
 
-    public Array<Array<IRenderable>> renderLists() {
+    public Array<Array<IRenderable>> renderListsFront() {
+        return renderLists;
+    }
+    public Array<Array<IRenderable>> renderListsBack() {
         return renderLists;
     }
 
@@ -1315,7 +1320,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * This must be called when all the rendering for the current frame has
      * finished.
      */
-    public void clearLists() {
+    public void swapRenderLists() {
+        // Clear lists to get them ready for update pass.
         for (RenderGroup rg : values()) {
             renderLists.get(rg.ordinal()).clear();
         }
@@ -1340,19 +1346,19 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * @return Whether the components are all on
      */
     public boolean allOn(ComponentTypes comp) {
-        boolean allon = comp.length() == 0 || comp.allSetLike(visible);
+        boolean allOn = comp.length() == 0 || comp.allSetLike(visible);
 
-        if (!allon) {
-            allon = true;
+        if (!allOn) {
+            allOn = true;
             for (int i = comp.nextSetBit(0); i >= 0; i = comp.nextSetBit(i + 1)) {
                 // operate on index i here
-                allon = allon && alphas[i] > 0;
+                allOn = allOn && alphas[i] > 0;
                 if (i == Integer.MAX_VALUE) {
                     break; // or (i+1) would overflow
                 }
             }
         }
-        return allon;
+        return allOn;
     }
 
     public boolean isOn(int ordinal) {
@@ -1368,11 +1374,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 int idx = ct.ordinal();
                 if (data.length == 2) {
                     // We have the boolean
-                    boolean currvis = visible.get(ct.ordinal());
-                    boolean newvis = (boolean) data[1];
-                    if (currvis != newvis) {
+                    boolean currentVisibility = visible.get(ct.ordinal());
+                    boolean newVisibility = (boolean) data[1];
+                    if (currentVisibility != newVisibility) {
                         // Only update if visibility different
-                        if (newvis)
+                        if (newVisibility)
                             visible.set(ct.ordinal());
                         else
                             visible.clear(ct.ordinal());

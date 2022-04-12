@@ -60,9 +60,9 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 30,
+      "version": 31,
       "mingsversion": 30200,
-      "size": 79783705,
+      "size": 79888994,
       "nobjects": 53,
       "check": "data-main.json",
       "data": [
@@ -78,7 +78,7 @@
         "locations-moon.json",
         "models",
         "moons.json",
-        "orbit",
+        "orbit/orb.GAIA.dat",
         "orbits-asteroid.json",
         "orbits-moon.json",
         "orbits-planet.json",
@@ -115,11 +115,11 @@
         "tex/cubemap/earth-cloud-low",
         "tex/cubemap/earth-cloud-med"
       ],
-      "sha256": "d04f3fc66dfc3e39fa5a279ebad31aed9daa5bf15b74926145962112334809d1",
+      "sha256": "0f41ad2403e851cc1dfbc7bf2d147d352f35a6c9d9a75a4fcfb6c5a4677fa403",
       "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC13 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: Some features in this pack will only work with 3.2.0-RC13+.\n- Fix title definition to use new I18n names, abandon old 'parentkey', 'namekey'.\n- Change earth-cloud image mode from grayscale to RGB.",
+      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC13+.\n- Update Gaia orbit data.\n- Fix title definition to use new I18n names, abandon old 'parentkey', 'namekey'.\n- Change earth-cloud image mode from grayscale to RGB.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v030_20220407/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v031_20220412/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",

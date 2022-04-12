@@ -69,6 +69,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
      * @param nVertices The max number of vertices this mesh data can hold
+     *
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
@@ -97,7 +98,6 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         this.camera = camera;
         renderables.forEach(r -> {
             T renderable = (T) r;
-
             /*
              * ADD LINES
              */
@@ -114,7 +114,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
                 // Initialize or fetch mesh data
                 if (getOffset(renderable) < 0) {
-                    setOffset(renderable,addMeshData(nPoints));
+                    setOffset(renderable, addMeshData(nPoints));
                 } else {
                     curr = meshes.get(getOffset(renderable));
                     // Check we still have capacity, otherwise, reinitialize.
@@ -122,7 +122,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                         curr.clear();
                         curr.mesh.dispose();
                         meshes.set(getOffset(renderable), null);
-                        setOffset(renderable,addMeshData(nPoints));
+                        setOffset(renderable, addMeshData(nPoints));
                     }
                 }
                 // Coord maps time
@@ -209,10 +209,10 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if(event == Event.GPU_DISPOSE_VERTS_OBJECT) {
+        if (event == Event.GPU_DISPOSE_VERTS_OBJECT) {
             IRenderable renderable = (IRenderable) source;
             RenderGroup rg = (RenderGroup) data[0];
-            if(rg == RenderGroup.LINE_GPU || rg == RenderGroup.POINT_GPU) {
+            if (rg == RenderGroup.LINE_GPU || rg == RenderGroup.POINT_GPU) {
                 setInGpu(renderable, false);
             }
         }

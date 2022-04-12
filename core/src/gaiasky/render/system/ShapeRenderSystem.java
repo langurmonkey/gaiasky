@@ -33,7 +33,7 @@ public class ShapeRenderSystem extends AbstractRenderSystem {
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         shapeRenderer.begin(ShapeType.Line);
-        renderables.forEach(r ->{
+        renderables.forEach(r -> {
             IShapeRenderable sr = (IShapeRenderable) r;
             sr.render(shapeRenderer, rc, getAlpha(r), camera);
         });

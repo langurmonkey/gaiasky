@@ -118,7 +118,7 @@ public class NBGalaxy extends Particle {
     }
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        GaiaSky.instance.sgr.renderLists().get(rg.ordinal()).add(renderable);
+        GaiaSky.instance.sgr.renderListsFront().get(rg.ordinal()).add(renderable);
         return true;
     }
 

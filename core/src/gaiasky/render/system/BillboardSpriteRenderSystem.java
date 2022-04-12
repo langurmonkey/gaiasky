@@ -32,15 +32,11 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     /**
      * Creates a new billboard quad render component
-     * 
-     * @param rg
-     *            The render group
-     * @param alphas
-     *            The alphas list
-     * @param programs
-     *            The shader programs to render the quad with
-     * @param ctIndex
-     *            The component type index
+     *
+     * @param rg       The render group
+     * @param alphas   The alphas list
+     * @param programs The shader programs to render the quad with
+     * @param ctIndex  The component type index
      */
     public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int ctIndex) {
         this(rg, alphas, programs, ctIndex, 2, 2);
@@ -53,7 +49,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         float[] vertices = new float[20];
         fillVertices(vertices, w, h);
 
-        mesh = new IntMesh(true, 4, 6, new VertexAttribute[]{new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0")});
+        mesh = new IntMesh(true, 4, 6, new VertexAttribute[] { new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0") });
 
         mesh.setVertices(vertices, 0, vertices.length);
         mesh.getIndicesBuffer().position(0);

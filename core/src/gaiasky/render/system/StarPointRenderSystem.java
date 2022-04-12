@@ -49,7 +49,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
-        EventManager.instance.subscribe(this,  Event.STAR_MIN_OPACITY_CMD, Event.STAR_TEXTURE_IDX_CMD, Event.STAR_POINT_UPDATE_FLAG);
+        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.STAR_TEXTURE_IDX_CMD, Event.STAR_POINT_UPDATE_FLAG);
         this.ct = ct;
         this.alphaSizeBrRc = new float[4];
         initializing = true;
@@ -140,7 +140,6 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
                 tempVerts[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ();
 
                 curr.vertexIdx += curr.vertexSize;
-
             });
             curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
             // Put flag down

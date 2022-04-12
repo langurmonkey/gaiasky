@@ -12,39 +12,33 @@ import gaiasky.render.IAnnotationsRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.Settings;
-import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-
-import java.util.Comparator;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
     private final ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
-    private final Comparator<IRenderable> comp;
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
-        // Init comparator
-        comp = new DistToCameraComparator<>();
     }
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
         this(rg, alphas, batch, program);
 
-        this.fontDistanceField = fontDistanceField;
         this.font2d = font2d;
         this.fontTitles = fontTitles;
-
+        if (fontDistanceField != null) {
+            this.fontDistanceField = fontDistanceField;
+            this.fontDistanceField.getData().setScale(0.6f);
+        }
     }
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        renderables.sort(comp);
         batch.begin();
 
         int size = renderables.size;
@@ -59,12 +53,10 @@ public class FontRenderSystem extends AbstractRenderSystem {
             renderFont3D(renderables, program, camera, alphas[ComponentType.Labels.ordinal()]);
         }
         batch.end();
-
     }
 
     private void renderFont3D(Array<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float alpha) {
 
-        fontDistanceField.getData().setScale(0.6f);
         renderables.forEach(r -> {
             I3DTextRenderable lr = (I3DTextRenderable) r;
 

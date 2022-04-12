@@ -33,12 +33,13 @@ public class FileDataLoader {
 
         Timestamp last = new Timestamp(0);
         while ((line = br.readLine()) != null) {
-            if (!line.isEmpty() && !line.startsWith("#")) {
+            line = line.trim();
+            if (!line.isBlank() && !line.startsWith("#")) {
                 // Read line
                 String[] tokens = line.split("\\s+");
                 if (tokens.length >= 4) {
                     // Valid data line
-                    Timestamp t = Timestamp.valueOf(tokens[0].replace('_', ' '));
+                    Timestamp t = Timestamp.valueOf(tokens[0].trim().replace('_', ' '));
                     Matrix4d transform = new Matrix4d();
                     transform.scl(Constants.KM_TO_U);
                     if (!t.equals(last)) {
