@@ -73,7 +73,6 @@ public class SceneGraphJsonLoader {
         }
 
         sg = new SceneGraph(nodes.size);
-
         sg.initialize(nodes, time, hasOctree, hasStarGroup);
 
         return sg;
