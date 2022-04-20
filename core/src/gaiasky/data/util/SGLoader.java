@@ -87,6 +87,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoaderParam
 
     static public class SGLoaderParameter extends AssetLoaderParameters<ISceneGraph> {
         public String[] files;
+        public ITimeFrameProvider time;
 
         public SGLoaderParameter(String[] files) {
             this.files = files;
