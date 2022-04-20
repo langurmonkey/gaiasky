@@ -10,7 +10,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.data.util.WorldLoader.EntityLoaderParameter;
+import gaiasky.data.util.SceneLoader.EntityLoaderParameter;
 import gaiasky.util.CrashReporter;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -26,13 +26,14 @@ import java.util.Objects;
 /**
  * Loads the world and all its entities from a list of JSON descriptor files.
  */
-public class WorldLoader extends AsynchronousAssetLoader<World, EntityLoaderParameter> {
-    private static final Log logger = Logger.getLogger(WorldLoader.class);
+public class SceneLoader extends AsynchronousAssetLoader<World, EntityLoaderParameter> {
+    private static final Log logger = Logger.getLogger(SceneLoader.class);
 
-    World world;
+    final World scene;
 
-    public WorldLoader(FileHandleResolver resolver) {
+    public SceneLoader(FileHandleResolver resolver, World scene) {
         super(resolver);
+        this.scene = scene;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class WorldLoader extends AsynchronousAssetLoader<World, EntityLoaderPara
 
     @Override
     public World loadSync(AssetManager manager, String fileName, FileHandle file, EntityLoaderParameter parameter) {
-        return world;
+        return scene;
     }
 
     @Override

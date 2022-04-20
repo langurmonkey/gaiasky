@@ -26,11 +26,8 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
 import gaiasky.data.StreamingOctreeLoader;
-import gaiasky.data.util.GaiaAttitudeLoader;
+import gaiasky.data.util.*;
 import gaiasky.data.util.GaiaAttitudeLoader.GaiaAttitudeLoaderParameter;
-import gaiasky.data.util.OrbitDataLoader;
-import gaiasky.data.util.PointCloudData;
-import gaiasky.data.util.SGLoader;
 import gaiasky.data.util.SGLoader.SGLoaderParameter;
 import gaiasky.render.MainPostProcessor;
 import gaiasky.util.CrashReporter;
@@ -164,7 +161,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public CameraManager cameraManager;
 
     private String dataLoadString;
-    public World world;
+    public World scene;
     public ISceneGraph sceneGraph;
     public SceneGraphRenderer sgr;
     private IPostProcessor postProcessor;
@@ -386,26 +383,38 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             return;
         }
 
-        // Initialise times
+        // Initialize times
         final ITimeFrameProvider clock = new GlobalClock(1, Instant.now());
         final ITimeFrameProvider real = new RealTimeClock();
         time = settings.runtime.realTime ? real : clock;
         t = 0;
 
-        // Initialise i18n
+        // Initialize i18n
         I18n.initialize();
 
         // Tooltips
         TooltipManager.getInstance().initialTime = 1f;
         TooltipManager.getInstance().hideAll();
 
-        // Initialise asset manager
+        /*
+         *  ECS world
+         */
+        // 1. Register any plugins, set up the world.
+        WorldConfiguration setup = new WorldConfigurationBuilder()
+                .with(new HelloWorldSystem())
+                .build();
+
+        // 2. Create the world
+        scene = new World(setup);
+
+        // Initialize asset manager
         final FileHandleResolver internalResolver = new InternalFileHandleResolver();
         final FileHandleResolver dataResolver = fileName -> settings.data.dataFileHandle(fileName);
         assetManager = new AssetManager(internalResolver);
         assetManager.setLoader(com.badlogic.gdx.graphics.Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
         assetManager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
+        assetManager.setLoader(World.class, new SceneLoader(dataResolver, scene));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         assetManager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(dataResolver));
         assetManager.setLoader(ExtShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
@@ -476,21 +485,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Post-processor
         postProcessor = new MainPostProcessor();
 
-        /*
-         *  ECS
-         */
-        // 1. Register any plugins, set up the world.
-        WorldConfiguration setup = new WorldConfigurationBuilder()
-                .with(new HelloWorldSystem())
-                .build();
-
-        // 2. Create the world
-        world = new World(setup);
 
         // 3. Add an entity
-        int entityId = world.create();
-        world.edit(entityId).create(Base.class).id = 1234;
-        world.edit(entityId).create(GraphNode.class).children = new Array<>();
+        int entityId = scene.create();
+        scene.edit(entityId).create(Base.class).id = 1234;
+        scene.edit(entityId).create(GraphNode.class).children = new Array<>();
 
         // Scene graph renderer
         sgr = new SceneGraphRenderer(vrContext, globalResources);
@@ -658,8 +657,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         updateProcess = () -> {
             // Process ECS
-            world.setDelta((float) time.getDt());
-            world.process();
+            scene.setDelta((float) time.getDt());
+            scene.process();
 
             sceneGraph.update(time, cameraManager);
             // Swap proximity buffers
