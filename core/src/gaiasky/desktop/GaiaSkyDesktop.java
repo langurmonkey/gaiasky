@@ -17,7 +17,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
-import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
