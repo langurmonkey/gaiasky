@@ -41,6 +41,8 @@ allprojects {
         apfloatVersion = "1.10.+"
         jacksonVersion = "2.13.2"
         joiseVersion = "1.+"
+        artemisVersion = "2.2.0"
+        artemisContribVersion = "2.4.0"
     }
 
     repositories {
@@ -129,6 +131,9 @@ project(":core") {
         // gdx-controllers:2.+ bases up on SDL 2.0.12
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
         api "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
+
+        // Artemis-odb ECS
+        api "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
 
         // STIL library to load datasets
         api group: "uk.ac.starlink", name: "stil", version: "$stilVersion"

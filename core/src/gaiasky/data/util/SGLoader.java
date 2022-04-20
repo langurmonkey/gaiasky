@@ -16,6 +16,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.SceneGraphJsonLoader;
+import gaiasky.data.util.SGLoader.SGLoaderParameter;
 import gaiasky.desktop.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -34,7 +35,7 @@ import java.util.Objects;
  * {@link AssetLoader} for all the {@link SceneGraphNode} instances. Loads all
  * the entities in the scene graph.
  */
-public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLoaderParameter> {
+public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoaderParameter> {
     private static final Log logger = Logger.getLogger(SGLoader.class);
 
     ISceneGraph sg;

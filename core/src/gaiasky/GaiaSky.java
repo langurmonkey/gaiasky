@@ -5,6 +5,9 @@
 
 package gaiasky;
 
+import com.artemis.World;
+import com.artemis.WorldConfiguration;
+import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
@@ -39,6 +42,9 @@ import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.IPostProcessor.RenderType;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.GraphNode;
+import gaiasky.scene.system.HelloWorldSystem;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -157,6 +163,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public CameraManager cameraManager;
 
     private String dataLoadString;
+    public World world;
     public ISceneGraph sceneGraph;
     public SceneGraphRenderer sgr;
     private IPostProcessor postProcessor;
@@ -468,6 +475,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Post-processor
         postProcessor = PostProcessorFactory.instance.getPostProcessor();
 
+        /*
+         *  ECS
+         */
+        // 1. Register any plugins, set up the world.
+        WorldConfiguration setup = new WorldConfigurationBuilder()
+                .with(new HelloWorldSystem())
+                .build();
+
+        // 2. Create the world
+        world = new World(setup);
+
+        // 3. Add an entity
+        int entityId = world.create();
+        world.edit(entityId).create(Base.class).id = 1234;
+        world.edit(entityId).create(GraphNode.class).children = new Array<>();
+
         // Scene graph renderer
         sgr = new SceneGraphRenderer(vrContext, globalResources);
         sgr.initialize(assetManager);
@@ -618,6 +641,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         postProcessor.doneLoading(assetManager);
 
+
+
         /*
          * GET SCENE GRAPH
          */
@@ -631,6 +656,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          * SCENE GRAPH UPDATER
          */
         updateProcess = () -> {
+            // Process ECS
+            world.setDelta((float) time.getDt());
+            world.process();
+
             sceneGraph.update(time, cameraManager);
             // Swap proximity buffers
             cameraManager.swapBuffers();

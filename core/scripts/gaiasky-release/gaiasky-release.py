@@ -167,6 +167,7 @@ if __name__ == '__main__':
         print(" > Create new docs tag (%s) and generate the docs: make versions publish" % arguments.tag)
         print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
         print(" > Update flatpak repo and do pull request. See here: https://gitlab.com/langurmonkey/gaiasky/-/issues/337#note_460878130")
+        print(" > Update linux (*linux_[vers].tar.gz) and windows (windows-x64_[vers].zip) archive builds to itch.io")
         print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
         print()
         print(">DONE<")
