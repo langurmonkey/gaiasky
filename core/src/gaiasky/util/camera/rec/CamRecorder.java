@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.desktop.util.camera;
+package gaiasky.util.camera.rec;
 
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;

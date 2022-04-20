@@ -3,15 +3,12 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.desktop.util;
+package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
-import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
-import gaiasky.util.TextUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;

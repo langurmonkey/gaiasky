@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.desktop.util.DesktopMusicActors;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -243,7 +244,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             MusicComponent musicComponent = new MusicComponent(skin, ui);
             musicComponent.initialize();
 
-            Actor[] musicActors = MusicActorsManager.getMusicActors() != null ? MusicActorsManager.getMusicActors().getActors(skin) : null;
+            DesktopMusicActors dma = new DesktopMusicActors();
+            Actor[] musicActors = dma.getActors(skin);
 
             shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.music");
 

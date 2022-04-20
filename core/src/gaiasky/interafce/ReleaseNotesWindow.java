@@ -2,7 +2,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.SysUtils;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;

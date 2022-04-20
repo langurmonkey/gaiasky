@@ -5,7 +5,7 @@
 
 package gaiasky.interafce;
 
-import gaiasky.desktop.util.SortedProperties;
+import gaiasky.util.properties.SortedProperties;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;

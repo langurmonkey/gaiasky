@@ -19,7 +19,7 @@ import gaiasky.data.cluster.StarClusterLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.EventManager.TimeFrame;

@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.Array;
 import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
 import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;

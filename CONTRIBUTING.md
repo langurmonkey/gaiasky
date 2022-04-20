@@ -172,6 +172,17 @@ First, copy the default [gsbundle.properties](assets/i18n/gsbundle.properties) f
 
 `gsbundle_<language_code>[<_country_code>].properties`
 
+
+### Formatting properties files
+
+The default English properties file has lots of comments, which sometimes are not kept with some i18n editors. You can recover the comments by running our `I18nFormatter`.
+
+```commandline
+gradlew core:runI18nFormatter --args="gsbundle.properties gsbundle_<lang_code>[<_country_code>].properties"
+```
+
+This produces a new file in the root of the project with the contents of your language file formatted using the format in the first specified file.
+
 ### Data
 
 Contributing data files is always welcome. Have a look at the current data files in the [data](assets/data) folder, most of them should be pretty self-explanatory. Also, you might want to have a look at the documentation on [data files and format](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/Data-catalogs-formats.html).

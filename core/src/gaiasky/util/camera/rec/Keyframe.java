@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.desktop.util.camera;
+package gaiasky.util.camera.rec;
 
 import gaiasky.util.math.Vector3d;
 

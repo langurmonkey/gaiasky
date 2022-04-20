@@ -7,12 +7,12 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
+import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnLabel;

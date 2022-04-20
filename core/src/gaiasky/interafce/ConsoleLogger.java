@@ -84,7 +84,7 @@ public class ConsoleLogger implements IObserver {
      * @return The tag
      */
     private String tag(Instant date, LoggerLevel level) {
-        String lvl = level.ordinal() != LoggerLevel.INFO.ordinal() ? " " + level.toString() : "";
+        String lvl = level.ordinal() != LoggerLevel.INFO.ordinal() ? " " + level : "";
         return df.format(date) + lvl;
     }
 

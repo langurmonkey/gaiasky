@@ -1,4 +1,4 @@
-package gaiasky.desktop.util;
+package gaiasky.util.properties;
 
 import java.util.*;
 

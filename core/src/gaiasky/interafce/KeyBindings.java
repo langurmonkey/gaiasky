@@ -8,7 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
