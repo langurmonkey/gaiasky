@@ -17,8 +17,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
-import gaiasky.data.DesktopSceneGraphImplementationProvider;
-import gaiasky.data.SceneGraphImplementationProvider;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.render.DesktopPostProcessorFactory;
@@ -264,9 +262,6 @@ public class GaiaSkyDesktop implements IObserver {
 
             // Key mappings
             KeyBindings.initialize();
-
-            // Scene graph implementation provider
-            SceneGraphImplementationProvider.initialize(new DesktopSceneGraphImplementationProvider());
 
             // Math
             MathManager.initialize();

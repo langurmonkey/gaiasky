@@ -67,7 +67,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoaderParam
         }
 
         try {
-            sg = SceneGraphJsonLoader.loadSceneGraph(fileHandles, parameter.time, parameter.multithreading, parameter.maxThreads);
+            sg = SceneGraphJsonLoader.loadSceneGraph(fileHandles, parameter.time);
         } catch (Exception e) {
             GaiaSky.postRunnable(() -> {
                 CrashReporter.reportCrash(e, logger);
@@ -88,14 +88,10 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoaderParam
     static public class SGLoaderParameter extends AssetLoaderParameters<ISceneGraph> {
         public String[] files;
         public ITimeFrameProvider time;
-        public boolean multithreading;
-        public int maxThreads;
 
-        public SGLoaderParameter(String[] files, ITimeFrameProvider time, boolean multithreading, int maxThreads) {
+        public SGLoaderParameter(String[] files, ITimeFrameProvider time) {
             this.files = files;
             this.time = time;
-            this.multithreading = multithreading;
-            this.maxThreads = maxThreads;
         }
     }
 }

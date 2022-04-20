@@ -1489,7 +1489,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     dataFilesToLoad[i] = dataFile;
                     i++;
                 }
-                assetManager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad, time, settings.performance.multithreading, settings.performance.getNumberOfThreads()));
+                assetManager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad, time));
             }
             break;
         case TOGGLE_AMBIENT_LIGHT:
