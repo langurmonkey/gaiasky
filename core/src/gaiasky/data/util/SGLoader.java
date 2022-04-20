@@ -20,6 +20,7 @@ import gaiasky.data.util.SGLoader.SGLoaderParameter;
 import gaiasky.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.CrashReporter;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
