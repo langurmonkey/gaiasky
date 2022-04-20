@@ -29,8 +29,9 @@ import gaiasky.data.util.OrbitDataLoader;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.data.util.SGLoader;
 import gaiasky.data.util.SGLoader.SGLoaderParameter;
-import gaiasky.desktop.util.CrashReporter;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.render.MainPostProcessor;
+import gaiasky.util.CrashReporter;
+import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -466,7 +467,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         guis = new ArrayList<>(3);
 
         // Post-processor
-        postProcessor = PostProcessorFactory.instance.getPostProcessor();
+        postProcessor = new MainPostProcessor();
 
         // Scene graph renderer
         sgr = new SceneGraphRenderer(vrContext, globalResources);
@@ -1619,7 +1620,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (postProcessor != null) {
                 postProcessor.dispose();
             } else {
-                postProcessor = PostProcessorFactory.instance.getPostProcessor();
+                postProcessor = new MainPostProcessor();
             }
             // Initialize
             postProcessor.initialize(assetManager);

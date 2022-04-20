@@ -1,4 +1,4 @@
-package gaiasky.util.i18n;
+package gaiasky.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
@@ -9,6 +9,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
+import gaiasky.util.i18n.I18n;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,8 +25,8 @@ import java.util.stream.Collectors;
 /**
  * This class computes the translation status for each language.
  */
-public class TranslationStatus {
-    private static final Log logger = Logger.getLogger(TranslationStatus.class);
+public class I18nStatus {
+    private static final Log logger = Logger.getLogger(I18nStatus.class);
 
     private static CLIArgs cliArgs;
     private static class CLIArgs {
@@ -52,6 +53,7 @@ public class TranslationStatus {
         }
         // Assets location
         String ASSETS_LOC = Settings.ASSETS_LOC;
+        I18n.locale = Locale.getDefault();
 
         Gdx.files = new Lwjgl3Files();
 

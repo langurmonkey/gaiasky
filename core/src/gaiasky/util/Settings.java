@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.util.camera.CameraKeyframeManager;
+import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;

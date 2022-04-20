@@ -16,7 +16,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.SceneGraphJsonLoader;
-import gaiasky.desktop.util.CrashReporter;
+import gaiasky.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Logger;

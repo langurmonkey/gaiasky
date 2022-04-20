@@ -1,4 +1,4 @@
 /**
- * Implementations and utilities specific to the desktop application
+ * Contains classes that implement the main method, to be run directly.
  */
 package gaiasky.desktop;

@@ -17,23 +17,18 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.render.DesktopPostProcessorFactory;
-import gaiasky.desktop.render.ScreenModeCmd;
-import gaiasky.desktop.util.CrashReporter;
-import gaiasky.desktop.util.DesktopMusicActors;
-import gaiasky.desktop.util.SysUtils;
-import gaiasky.desktop.util.camera.CamRecorder;
+import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.KeyBindings;
-import gaiasky.interafce.MusicActorsManager;
-import gaiasky.render.PostProcessorFactory;
+import gaiasky.render.ScreenModeCmd;
 import gaiasky.rest.RESTServer;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
+import gaiasky.util.camera.rec.CamRecorder;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
 import org.yaml.snakeyaml.Yaml;
@@ -241,14 +236,8 @@ public class GaiaSkyDesktop implements IObserver {
             // Init cam recorder
             CamRecorder.initialize();
 
-            // Music actors
-            MusicActorsManager.initialize(new DesktopMusicActors());
-
             // Init music manager
             MusicManager.initialize(Paths.get(Settings.ASSETS_LOC, "music"), SysUtils.getDefaultMusicDir());
-
-            // Initialize post processor factory
-            PostProcessorFactory.initialize(new DesktopPostProcessorFactory());
 
             // Key mappings
             KeyBindings.initialize();

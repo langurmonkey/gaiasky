@@ -7,7 +7,7 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.SysUtils;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;

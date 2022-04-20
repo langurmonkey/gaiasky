@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.desktop.render;
+package gaiasky.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -16,11 +16,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.IPostProcessor;
 import gaiasky.scenegraph.BackgroundModel;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.component.MaterialComponent;
@@ -47,8 +46,8 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DesktopPostProcessor implements IPostProcessor, IObserver {
-    private static final Log logger = Logger.getLogger(DesktopPostProcessor.class);
+public class MainPostProcessor implements IPostProcessor, IObserver {
+    private static final Log logger = Logger.getLogger(MainPostProcessor.class);
 
     private AssetManager manager;
     private PostProcessBean[] pps;
@@ -84,7 +83,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             raymarchingDef.put(name, list);
     }
 
-    public DesktopPostProcessor() {
+    public MainPostProcessor() {
         ShaderLoader.BasePath = "shader/postprocess/";
 
         auxb = new Vector3b();

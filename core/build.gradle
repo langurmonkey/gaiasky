@@ -105,8 +105,16 @@ task runTranslationStatus(dependsOn: jar, type: JavaExec, description: "Runs the
     classpath += project.files(project.ext.assetsDir)
     standardInput = System.in
     workingDir = project.ext.workDir
-    mainClass = "gaiasky.util.i18n.TranslationStatus"
+    mainClass = "gaiasky.desktop.util.I18nStatus"
+}
 
+task runI18nFormatter(dependsOn: jar, type: JavaExec, description: "Formats i18n files according to a reference file") {
+    systemProperties['assets.location'] = './assets/'
+    classpath = project.ext.sourceSets.main.runtimeClasspath
+    classpath += project.files(project.ext.assetsDir)
+    standardInput = System.in
+    workingDir = project.ext.workDir
+    mainClass = "gaiasky.desktop.util.I18nFormatter"
 }
 
 task createDistDir(description: "Creates the releases/dist folder") {

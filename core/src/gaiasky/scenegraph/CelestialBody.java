@@ -108,7 +108,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         shader.setUniformf("u_thpoint", (float) THRESHOLD_POINT() * camera.getFovFactor());
 
         // Whether light scattering is enabled or not
-        shader.setUniformi("u_lightScattering", (this instanceof Star && PostProcessorFactory.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
+        shader.setUniformi("u_lightScattering", (this instanceof Star && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
 
         shader.setUniformf("u_radius", (float) getRadius());
 

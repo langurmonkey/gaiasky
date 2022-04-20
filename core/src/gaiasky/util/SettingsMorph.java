@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
-import gaiasky.desktop.util.camera.CameraKeyframeManager.PathType;
 import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.CamrecorderSettings.KeyframeSettings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
@@ -25,6 +24,7 @@ import gaiasky.util.Settings.SceneSettings.RendererSettings.ElevationSettings;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.ShadowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.GroupSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.ThresholdSettings;
+import gaiasky.util.camera.rec.CameraKeyframeManager.PathType;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.parse.Parser;
 

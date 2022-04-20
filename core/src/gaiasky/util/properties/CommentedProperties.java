@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.desktop.util;
+package gaiasky.util.properties;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -31,23 +31,22 @@ public class CommentedProperties extends java.util.Properties {
     public Vector<String> keyData = new Vector<>(0, 1);
 
     /**
-     * Load properties from the specified InputStream.
+     * Load properties from the specified InputStreamReader.
      * Overload the load method in Properties so we can keep comment and blank lines.
      *
-     * @param inStream The InputStream to read.
+     * @param isr The InputStreamReader to read.
      */
-    public void load(InputStream inStream) throws IOException {
-        // The spec says that the file must be encoded using ISO-8859-1.
+    public void load(InputStreamReader isr) throws IOException {
         BufferedReader reader =
-                new BufferedReader(new InputStreamReader(inStream, StandardCharsets.ISO_8859_1));
+                new BufferedReader(isr);
         String line;
-
         while ((line = reader.readLine()) != null) {
+            line = line.trim();
             char c = 0;
             int pos = 0;
-            // Leading whitespaces must be deleted first.
-            while (pos < line.length()
-                    && Character.isWhitespace(c = line.charAt(pos))) {
+
+            // Skip BOM character
+            if(!line.isEmpty() && line.charAt(0) == '\uFEFF') {
                 pos++;
             }
 
@@ -85,26 +84,26 @@ public class CommentedProperties extends java.util.Properties {
                     } else {
                         c = line.charAt(pos++);
                         switch (c) {
-                            case 'n':
-                                key.append('\n');
-                                break;
-                            case 't':
-                                key.append('\t');
-                                break;
-                            case 'r':
-                                key.append('\r');
-                                break;
-                            case 'u':
-                                if (pos + 4 <= line.length()) {
-                                    char uni = (char) Integer.parseInt
-                                            (line.substring(pos, pos + 4), 16);
-                                    key.append(uni);
-                                    pos += 4;
-                                } // else throw exception?
-                                break;
-                            default:
-                                key.append(c);
-                                break;
+                        case 'n':
+                            key.append('\n');
+                            break;
+                        case 't':
+                            key.append('\t');
+                            break;
+                        case 'r':
+                            key.append('\r');
+                            break;
+                        case 'u':
+                            if (pos + 4 <= line.length()) {
+                                char uni = (char) Integer.parseInt
+                                        (line.substring(pos, pos + 4), 16);
+                                key.append(uni);
+                                pos += 4;
+                            } // else throw exception?
+                            break;
+                        default:
+                            key.append(c);
+                            break;
                         }
                     }
                 } else if (needsEscape)
@@ -166,26 +165,26 @@ public class CommentedProperties extends java.util.Properties {
                     } else {
                         c = line.charAt(pos++);
                         switch (c) {
-                            case 'n':
-                                element.append('\n');
-                                break;
-                            case 't':
-                                element.append('\t');
-                                break;
-                            case 'r':
-                                element.append('\r');
-                                break;
-                            case 'u':
-                                if (pos + 4 <= line.length()) {
-                                    char uni = (char) Integer.parseInt
-                                            (line.substring(pos, pos + 4), 16);
-                                    element.append(uni);
-                                    pos += 4;
-                                } // else throw exception?
-                                break;
-                            default:
-                                element.append(c);
-                                break;
+                        case 'n':
+                            element.append('\n');
+                            break;
+                        case 't':
+                            element.append('\t');
+                            break;
+                        case 'r':
+                            element.append('\r');
+                            break;
+                        case 'u':
+                            if (pos + 4 <= line.length()) {
+                                char uni = (char) Integer.parseInt
+                                        (line.substring(pos, pos + 4), 16);
+                                element.append(uni);
+                                pos += 4;
+                            } // else throw exception?
+                            break;
+                        default:
+                            element.append(c);
+                            break;
                         }
                     }
                 } else
@@ -199,9 +198,19 @@ public class CommentedProperties extends java.util.Properties {
         }
     }
 
+    /**
+     * Load properties from the specified InputStream.
+     * Overload the load method in Properties so we can keep comment and blank lines.
+     *
+     * @param inStream The InputStream to read.
+     */
+    public void load(InputStream inStream) throws IOException {
+        load(new InputStreamReader(inStream, StandardCharsets.UTF_8));
+    }
+
     public void store(OutputStream out, String header) throws IOException {
-        // The spec says that the file must be encoded using ISO-8859-1.
-        store(out, header, "ISO-8859-1");
+        // The spec says that the file must be encoded using UTF-8.
+        store(out, header, "UTF-8");
     }
 
     /**
@@ -312,7 +321,7 @@ public class CommentedProperties extends java.util.Properties {
                     var6.append(' ');
                     continue;
                 }
-                case '!', '#', ':', '=' -> {
+                case '=' -> {
                     var6.append('\\');
                     var6.append(var8);
                     continue;
