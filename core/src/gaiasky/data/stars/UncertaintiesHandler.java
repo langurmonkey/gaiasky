@@ -39,7 +39,7 @@ public class UncertaintiesHandler implements IObserver {
     private UncertaintiesHandler() {
         path = "/media/tsagrista/Daten/Gaia/Coryn-data/data3/";
 
-        particleGroups = new Array<ParticleGroup>();
+        particleGroups = new Array<>();
         colors = new double[][] { { 0, 1, 0, 1 }, { 1, 0, 0, 1 }, { 0, 0, 1, 1 }, { 1, 1, 0, 1 }, { 1, 0, 1, 1 }, { 0, 1, 1, 1 }, { 0.5, 1, 1, 1 } };
 
         // Generate set with starids for which we have uncertainties
@@ -84,29 +84,21 @@ public class UncertaintiesHandler implements IObserver {
         case SHOW_UNCERTAINTIES:
             if (data[0] instanceof IStarFocus) {
                 final IStarFocus s = (IStarFocus) data[0];
-                GaiaSky.postRunnable(new Runnable() {
+                GaiaSky.postRunnable(() -> {
+                    ParticleGroup pg = load(s.getCandidateId());
 
-                    @Override
-                    public void run() {
-                        ParticleGroup pg = load(s.getCandidateId());
-
-                        GaiaSky.instance.sceneGraph.getRoot().addChild(pg, true);
-                        particleGroups.add(pg);
-                    }
-
+                    GaiaSky.instance.sceneGraph.getRoot().addChild(pg, true);
+                    particleGroups.add(pg);
                 });
 
             }
             break;
         case HIDE_UNCERTAINTIES:
-            GaiaSky.postRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    for (ParticleGroup pg : particleGroups) {
-                        GaiaSky.instance.sceneGraph.getRoot().removeChild(pg, true);
-                    }
-                    particleGroups.clear();
+            GaiaSky.postRunnable(() -> {
+                for (ParticleGroup pg : particleGroups) {
+                    GaiaSky.instance.sceneGraph.getRoot().removeChild(pg, true);
                 }
+                particleGroups.clear();
             });
             break;
         default:
