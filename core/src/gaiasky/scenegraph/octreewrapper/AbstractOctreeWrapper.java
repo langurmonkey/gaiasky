@@ -37,7 +37,7 @@ import static gaiasky.render.SceneGraphRenderer.RenderGroup.LINE;
  * Abstract Octree wrapper with the common parts of the regular Octree wrapper
  * and the concurrent one
  */
-public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable<OctreeNode> {
+public abstract class AbstractOctreeWrapper extends FadeNode {
 
     public OctreeNode root;
     /** Roulette list with the objects to process **/
@@ -183,11 +183,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     }
 
     @Override
-    /* Not implemented */ public Iterator<OctreeNode> iterator() {
-        return null;
-    }
-
-    @Override
     public int getStarCount() {
         return root.numObjectsRec;
     }
@@ -210,11 +205,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         for (SceneGraphNode n : l) {
             ((StarGroup) n).highlight(hl, cmi, cma, cmmin, cmmax, allVisible);
         }
-    }
-
-    @Override
-    public void setPointscaling(float pointscaling) {
-        this.pointscaling = pointscaling;
     }
 
     /**

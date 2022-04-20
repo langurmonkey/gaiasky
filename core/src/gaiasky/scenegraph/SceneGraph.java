@@ -34,8 +34,6 @@ public class SceneGraph implements ISceneGraph {
      * constellations
      **/
     protected final Map<Integer, IPosition> hipMap;
-    /** Number of objects per thread **/
-    protected int[] objectsPerThread;
     /** Does it contain an octree **/
     protected boolean hasOctree;
     /** Does it contain a star group **/
@@ -51,9 +49,6 @@ public class SceneGraph implements ISceneGraph {
         // Id = -1 for root
         root = new SceneGraphNode(-1);
         root.names = new String[] { SceneGraphNode.ROOT_NAME };
-
-        // Objects per thread
-        objectsPerThread = new int[1];
 
         // String-to-node map
         index = new HashMap<>((int)(numNodes * 1.25));
@@ -108,7 +103,6 @@ public class SceneGraph implements ISceneGraph {
     public void update(ITimeFrameProvider time, ICamera camera) {
         root.translation.set(camera.getInversePos());
         root.update(time, null, camera);
-        objectsPerThread[0] = root.numChildren;
 
         if (!hasOctree) {
             if (nObjects < 0)
