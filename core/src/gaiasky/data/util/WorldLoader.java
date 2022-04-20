@@ -11,7 +11,13 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.data.util.WorldLoader.EntityLoaderParameter;
 import gaiasky.util.time.ITimeFrameProvider;
 
+/**
+ * Loads the world and all its entities from a list of JSON descriptor files.
+ */
 public class WorldLoader extends AsynchronousAssetLoader<World, EntityLoaderParameter> {
+
+    World world;
+
     public WorldLoader(FileHandleResolver resolver) {
         super(resolver);
     }
