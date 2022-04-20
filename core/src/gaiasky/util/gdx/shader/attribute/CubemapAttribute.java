@@ -17,7 +17,6 @@
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.gdx.OwnCubemap;
 
 public class CubemapAttribute extends Attribute {

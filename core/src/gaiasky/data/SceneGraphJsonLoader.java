@@ -18,11 +18,11 @@ import gaiasky.scenegraph.SceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.IBodyCoordinates;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.FileNotFoundException;

@@ -8,11 +8,11 @@ package gaiasky.screenshot;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 import gaiasky.render.BufferedFrame;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ImageFormat;
+import gaiasky.util.i18n.I18n;
 
 import java.util.ArrayList;
 import java.util.List;

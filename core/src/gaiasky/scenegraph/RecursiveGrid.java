@@ -32,8 +32,6 @@ import gaiasky.util.*;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -45,6 +43,7 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +78,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     // Regime: 1 - normal with depth buffer, 2 - rescaling quad
     private byte regime = 1;
 
-    private INumberFormat nf;
+    private DecimalFormat nf;
 
     private RenderGroup renderGroupModel = RenderGroup.MODEL_VERT_RECGRID;
 
@@ -97,7 +96,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         scalingFading = new Pair<>(0d, 0d);
         updateCoordinateSystem();
 
-        nf = NumberFormatFactory.getFormatter("0.###E0");
+        nf = new DecimalFormat("0.###E0");
 
         cc = Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? ccGal : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? ccEcl : ccEq);
         labelcolor = cc;

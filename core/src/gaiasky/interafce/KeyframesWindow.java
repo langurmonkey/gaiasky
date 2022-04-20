@@ -26,12 +26,10 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Invisible;
 import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Interpolationd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -43,6 +41,7 @@ import gaiasky.util.validator.RegexpValidator;
 
 import java.nio.file.Files;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -55,7 +54,7 @@ import java.util.Map;
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
 
-    private final INumberFormat secondsFormatter;
+    private final DecimalFormat secondsFormatter;
     private final DateTimeFormatter dateFormat;
 
     /**
@@ -224,7 +223,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         this.secondsCells = new HashMap<>();
         this.namesCells = new HashMap<>();
         this.keyframeNames = new HashMap<>();
-        this.secondsFormatter = NumberFormatFactory.getFormatter("000.00");
+        this.secondsFormatter = new DecimalFormat("000.00");
         this.df = new SimpleDateFormat("yyyyMMdd_HH-mm-ss-SSS");
         this.dateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         setModal(false);

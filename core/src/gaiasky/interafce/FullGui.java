@@ -9,8 +9,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -21,16 +24,14 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.desktop.util.MemInfoWindow;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
@@ -38,6 +39,7 @@ import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
 
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.time.Instant;
 
 /**
@@ -67,7 +69,7 @@ public class FullGui extends AbstractGui {
     protected WikiInfoWindow wikiInfoWindow;
     protected ArchiveViewWindow archiveViewWindow;
 
-    protected INumberFormat nf;
+    protected DecimalFormat nf;
     protected Label pointerXCoord, pointerYCoord;
 
     protected float pad, pad5;
@@ -118,7 +120,7 @@ public class FullGui extends AbstractGui {
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
         }
-        nf = NumberFormatFactory.getFormatter("##0.##");
+        nf = new DecimalFormat("##0.##");
 
         // NOTIFICATIONS INTERFACE - BOTTOM LEFT
         notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);

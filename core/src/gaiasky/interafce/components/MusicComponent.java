@@ -18,20 +18,20 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.MusicManager;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
+
+import java.text.DecimalFormat;
 
 public class MusicComponent extends GuiComponent implements IObserver {
 
     protected ImageButton prev, play, next;
     protected OwnLabel vol, track, position;
-    protected INumberFormat nf;
-    protected INumberFormat intf;
+    protected DecimalFormat nf;
+    protected DecimalFormat intf;
 
     private String currentTrack;
     private int si = 0;
@@ -46,8 +46,8 @@ public class MusicComponent extends GuiComponent implements IObserver {
     @Override
     public void initialize() {
         float componentWidth = 264f;
-        nf = NumberFormatFactory.getFormatter("##0");
-        intf = NumberFormatFactory.getFormatter("#00");
+        nf = new DecimalFormat("##0");
+        intf = new DecimalFormat("#00");
 
         /* Previous track */
         prev = new OwnImageButton(skin, "audio-bwd");

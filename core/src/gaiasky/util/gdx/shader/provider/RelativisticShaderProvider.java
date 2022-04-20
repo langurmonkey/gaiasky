@@ -6,14 +6,13 @@
 package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.DefaultIntShader.Config;
 import gaiasky.util.gdx.shader.IntShader;
 import gaiasky.util.gdx.shader.RelativisticShader;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
-import gaiasky.util.gdx.IntRenderable;
-import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 
 public class RelativisticShaderProvider extends DefaultIntShaderProvider {
     public final Config config;

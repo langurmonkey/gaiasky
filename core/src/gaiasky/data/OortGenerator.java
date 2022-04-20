@@ -9,12 +9,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3d;
 
@@ -37,9 +35,6 @@ public class OortGenerator {
     public static void main(String[] args) {
         try {
             Gdx.files = new Lwjgl3Files();
-
-            // Initialize number format
-            NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
 
             SettingsManager.initialize(new FileInputStream("../assets/conf/config.yaml"), new FileInputStream("../assets/data/dummyversion"));
 

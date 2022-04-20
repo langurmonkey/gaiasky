@@ -13,7 +13,6 @@ import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.ILineRenderable;
-import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;

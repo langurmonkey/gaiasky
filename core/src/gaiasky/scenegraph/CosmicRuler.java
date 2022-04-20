@@ -8,9 +8,8 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.format.DesktopNumberFormat;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.ILineRenderable;
@@ -22,12 +21,13 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
-import gaiasky.util.format.INumberFormat;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
+
+import java.text.DecimalFormat;
 
 /**
  * Cosmic ruler between two objects
@@ -42,7 +42,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
     private boolean rulerOk = false;
     private String dist;
     private final ISceneGraph sg;
-    private final INumberFormat nf;
+    private final DecimalFormat nf;
 
     public CosmicRuler() {
         super();
@@ -55,7 +55,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
         this.sg = GaiaSky.instance.sceneGraph;
         this.setName("Cosmicruler");
         this.cc = new float[] { 1f, 1f, 0f };
-        this.nf = new DesktopNumberFormat("0.#########E0");
+        this.nf = new DecimalFormat("0.#########E0");
         setCt("Ruler");
         EventManager.instance.subscribe(this, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR);
     }

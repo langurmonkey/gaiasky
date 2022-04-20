@@ -13,11 +13,11 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.data.AssetBean;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.OwnCubemap;
+import gaiasky.util.i18n.I18n;
 
 public class CubemapComponent implements Disposable {
     private static final Log logger = Logger.getLogger(CubemapComponent.class);

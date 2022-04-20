@@ -9,13 +9,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.group.PointDataProvider;
-import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 
 import java.io.*;
@@ -40,9 +38,6 @@ public class MilkyWayReshaper {
 
             // Add notification watch
             new ConsoleLogger();
-
-            // Initialize number format
-            NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
 
             // Initialize i18n
             I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"), new FileHandle(ASSETS_LOC + "i18n/objects"));

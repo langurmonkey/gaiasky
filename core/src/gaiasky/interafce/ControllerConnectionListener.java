@@ -7,8 +7,8 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerAdapter;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 
 public class ControllerConnectionListener extends ControllerAdapter {

@@ -9,8 +9,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.galaxy.GalaxyGenerator;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.i18n.I18n;
 
 import java.io.BufferedWriter;
 import java.io.File;

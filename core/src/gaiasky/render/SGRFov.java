@@ -7,7 +7,6 @@ package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.IPostProcessor.PostProcessBean;
-import gaiasky.render.system.*;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;

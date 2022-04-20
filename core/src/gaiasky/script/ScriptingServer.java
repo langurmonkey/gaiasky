@@ -6,8 +6,8 @@
 package gaiasky.script;
 
 import gaiasky.GaiaSky;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import py4j.ClientServer;

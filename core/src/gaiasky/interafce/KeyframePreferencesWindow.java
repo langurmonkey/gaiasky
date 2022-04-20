@@ -8,30 +8,30 @@ package gaiasky.interafce;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.util.Constants;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnSelectBox;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.DoubleValidator;
 
+import java.text.DecimalFormat;
+
 public class KeyframePreferencesWindow extends GenericDialog {
 
     private OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
     public OwnTextField camrecFps;
-    private final INumberFormat nf3;
+    private final DecimalFormat nf3;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.keyframes.preferences"), skin, stage);
         setModal(true);
-        this.nf3 = NumberFormatFactory.getFormatter("0.000");
+        this.nf3 = new DecimalFormat("0.000");
 
         setAcceptText(I18n.msg("gui.saveprefs"));
         setCancelText(I18n.msg("gui.cancel"));

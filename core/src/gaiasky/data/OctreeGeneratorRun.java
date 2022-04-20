@@ -23,16 +23,17 @@ import gaiasky.data.octreegen.generator.IOctreeGenerator;
 import gaiasky.data.octreegen.generator.OctreeGeneratorMag;
 import gaiasky.data.octreegen.generator.OctreeGeneratorParams;
 import gaiasky.data.util.HipNames;
-import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
+import gaiasky.util.SettingsManager;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -140,9 +141,6 @@ public class OctreeGeneratorRun {
 
             // Add notification watch
             new ConsoleLogger();
-
-            // Initialize number format
-            NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
 
             // Initialize i18n
             I18n.initialize(Path.of(ASSETS_LOC, "i18n/gsbundle"), Path.of(ASSETS_LOC, "i18n/objects"));

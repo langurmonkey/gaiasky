@@ -20,10 +20,10 @@ import gaiasky.data.util.SGLoader.SGLoaderParameter;
 import gaiasky.desktop.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.File;

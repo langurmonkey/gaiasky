@@ -35,8 +35,6 @@ import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntModelBuilder;
 import gaiasky.util.gdx.g3d.decals.CameraGroupStrategy;
@@ -50,6 +48,8 @@ import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
+
+import java.text.DecimalFormat;
 
 public class SpacecraftGui extends AbstractGui {
 
@@ -70,8 +70,8 @@ public class SpacecraftGui extends AbstractGui {
     private Spacecraft sc;
 
     // Number format
-    private final INumberFormat nf;
-    private final INumberFormat sf;
+    private final DecimalFormat nf;
+    private final DecimalFormat sf;
 
     // Camera to render the attitude indicator system
     private PerspectiveCamera aiCam;
@@ -108,8 +108,8 @@ public class SpacecraftGui extends AbstractGui {
         aux3f1 = new Vector3();
         aux3f2 = new Vector3();
 
-        nf = NumberFormatFactory.getFormatter("##0.##");
-        sf = NumberFormatFactory.getFormatter("#0.###E0");
+        nf = new DecimalFormat("##0.##");
+        sf = new DecimalFormat("#0.###E0");
     }
 
     public void initialize(AssetManager assetManager, SpriteBatch sb) {

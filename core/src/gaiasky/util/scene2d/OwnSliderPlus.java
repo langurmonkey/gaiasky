@@ -12,10 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
 
+import java.text.DecimalFormat;
 import java.util.function.Function;
 
 /**
@@ -33,7 +32,7 @@ public class OwnSliderPlus extends Slider {
     private String valuePrefix, valueSuffix;
     private final float padX = 4.8f;
     private final float padY = 3.2f;
-    private INumberFormat nf;
+    private DecimalFormat nf;
     // This function is applied to the value of this slider in order to
     // produce the label to be displayed.
     private Function<Float, String> valueLabelTransform;
@@ -68,10 +67,10 @@ public class OwnSliderPlus extends Slider {
     }
 
     public void setUp(String title, float mapMin, float mapMax, String labelStyleName) {
-        setUp(title, mapMin, mapMax, NumberFormatFactory.getFormatter("####0.##"), labelStyleName);
+        setUp(title, mapMin, mapMax, new DecimalFormat("####0.##"), labelStyleName);
     }
 
-    public void setUp(String title, float mapMin, float mapMax, INumberFormat nf, String labelStyleName) {
+    public void setUp(String title, float mapMin, float mapMax, DecimalFormat nf, String labelStyleName) {
         this.me = this;
         this.nf = nf;
         setMapValues(mapMin, mapMax);
@@ -107,7 +106,7 @@ public class OwnSliderPlus extends Slider {
         this.valueLabelTransform = transform;
     }
 
-    public void setNumberFormatter(INumberFormat nf) {
+    public void setNumberFormatter(DecimalFormat nf) {
         this.nf = nf;
     }
 

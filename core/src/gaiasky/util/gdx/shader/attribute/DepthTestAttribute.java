@@ -18,7 +18,6 @@ package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class DepthTestAttribute extends Attribute {

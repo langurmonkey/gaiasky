@@ -36,7 +36,6 @@ import gaiasky.util.Bits;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
-import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gdx.shader.attribute.Attributes;
 
 /** @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does

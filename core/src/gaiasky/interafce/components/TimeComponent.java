@@ -19,8 +19,8 @@ import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.DateDialog;
 import gaiasky.interafce.KeyBindings;
 import gaiasky.util.Constants;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.TextUtils;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.time.Instant;

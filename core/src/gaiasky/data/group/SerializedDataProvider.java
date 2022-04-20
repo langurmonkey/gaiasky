@@ -7,8 +7,8 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;

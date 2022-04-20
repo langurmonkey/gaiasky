@@ -27,12 +27,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.Bits;
-import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntNode;
 import gaiasky.util.gdx.model.IntNodePart;
+import gaiasky.util.gdx.shader.Material;
 
 /**
  * Helper class to create {@link IntModel}s from code. To start building use the

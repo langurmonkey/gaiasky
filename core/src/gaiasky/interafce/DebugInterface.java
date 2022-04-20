@@ -14,13 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+
+import java.text.DecimalFormat;
 
 public class DebugInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel debugRuntime;
@@ -51,10 +51,10 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final Table extra;
     private boolean maximized;
 
-    private final INumberFormat fpsFormatter;
-    private final INumberFormat spfFormatter;
-    private final INumberFormat memFormatter;
-    private final INumberFormat timeFormatter;
+    private final DecimalFormat fpsFormatter;
+    private final DecimalFormat spfFormatter;
+    private final DecimalFormat memFormatter;
+    private final DecimalFormat timeFormatter;
 
     public DebugInterface(Skin skin, Object lock) {
         super(skin);
@@ -70,10 +70,10 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         pad(pad05);
 
         // Formatters
-        fpsFormatter = NumberFormatFactory.getFormatter("#.00");
-        spfFormatter = NumberFormatFactory.getFormatter("#.00##");
-        memFormatter = NumberFormatFactory.getFormatter("#000.00");
-        timeFormatter = NumberFormatFactory.getFormatter("00");
+        fpsFormatter = new DecimalFormat("#.00");
+        spfFormatter = new DecimalFormat("#.00##");
+        memFormatter = new DecimalFormat("#000.00");
+        timeFormatter = new DecimalFormat("00");
 
         /* FPS */
         fps = new OwnLabel("", skin, "hud-big");

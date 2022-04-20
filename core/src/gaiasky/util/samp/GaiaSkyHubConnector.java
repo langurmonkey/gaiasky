@@ -7,9 +7,9 @@ package gaiasky.util.samp;
 
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.client.SampException;

@@ -35,8 +35,6 @@ import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.datadesc.DatasetType;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.io.FileInfoInputStream;
 import gaiasky.util.scene2d.*;
@@ -58,13 +56,9 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -136,7 +130,7 @@ public class DatasetManagerWindow extends GenericDialog {
     // Whether to show the data location chooser
     private final boolean dataLocation;
 
-    private final INumberFormat nf;
+    private final DecimalFormat nf;
 
     private final Set<DatasetWatcher> watchers;
     private DatasetWatcher rightPaneWatcher;
@@ -149,7 +143,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
         super(I18n.msg("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.msg("gui.download.updates", serverDd.numUpdates) : ""), skin, stage);
-        this.nf = NumberFormatFactory.getFormatter("##0.0");
+        this.nf = new DecimalFormat("##0.0");
         this.serverDd = serverDd;
         this.highlight = ColorUtils.gYellowC;
         this.watchers = new HashSet<>();

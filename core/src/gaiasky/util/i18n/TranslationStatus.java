@@ -4,13 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
-import gaiasky.util.format.NumberFormatFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,9 +54,6 @@ public class TranslationStatus {
         String ASSETS_LOC = Settings.ASSETS_LOC;
 
         Gdx.files = new Lwjgl3Files();
-
-        // Initialize number format
-        NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
 
         // Add notification watch
         new ConsoleLogger();

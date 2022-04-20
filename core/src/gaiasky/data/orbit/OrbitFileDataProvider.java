@@ -8,8 +8,8 @@ package gaiasky.data.orbit;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 

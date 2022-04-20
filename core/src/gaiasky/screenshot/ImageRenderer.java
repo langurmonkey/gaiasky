@@ -12,11 +12,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.PixmapIO;
 import gaiasky.util.Settings.ImageFormat;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 /**
@@ -120,7 +119,7 @@ public class ImageRenderer {
         char[] zeros = new char[digits];
         Arrays.fill(zeros, '0');
         // format number as String
-        INumberFormat df = NumberFormatFactory.getFormatter(String.valueOf(zeros));
+        DecimalFormat df = new DecimalFormat(String.valueOf(zeros));
 
         return df.format(num);
     }

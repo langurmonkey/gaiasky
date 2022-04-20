@@ -7,12 +7,11 @@ package gaiasky.util.gdx;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,7 +110,7 @@ public abstract class ModelCreator {
      * @param os The output stream.
      */
     public void dumpObj(OutputStream os) throws IOException {
-        INumberFormat nf = NumberFormatFactory.getFormatter("########0.000000");
+        DecimalFormat nf = new DecimalFormat("########0.000000");
         OutputStreamWriter osw = new OutputStreamWriter(os);
         osw.append("# Created by ").append(this.getClass().getSimpleName()).append(" - ARI - ZAH - Heidelberg Universitat\n");
         osw.append("o ").append(name).append("\n");

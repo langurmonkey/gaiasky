@@ -5,8 +5,8 @@
 
 package gaiasky.util;
 
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import org.apfloat.Apfloat;
 
 /**
