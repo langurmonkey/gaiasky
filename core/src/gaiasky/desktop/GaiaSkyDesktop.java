@@ -17,7 +17,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.render.DesktopPostProcessorFactory;
 import gaiasky.desktop.render.ScreenModeCmd;
 import gaiasky.desktop.util.CrashReporter;
@@ -35,7 +34,6 @@ import gaiasky.rest.RESTServer;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
 import org.yaml.snakeyaml.Yaml;
@@ -177,9 +175,6 @@ public class GaiaSkyDesktop implements IObserver {
             GaiaSkyDesktop gaiaSkyDesktop = new GaiaSkyDesktop();
 
             Gdx.files = new Lwjgl3Files();
-
-            // Initialize number format
-            NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
 
             // Init Gaia Sky directories
             SysUtils.mkdirs();

@@ -39,14 +39,17 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
-import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.loader.IntModelLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.data.IntModelData;
 import gaiasky.util.gdx.model.data.IntModelMesh;
 import gaiasky.util.gdx.model.data.IntModelMeshPart;
 import gaiasky.util.gdx.model.data.IntModelNode;
-import gaiasky.util.gdx.shader.attribute.*;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 
 /**
  * This implementation uses {@link IntMesh} and {@link IntMeshPart} instead of {@link Mesh} and {@link MeshPart}.

@@ -5,11 +5,10 @@
 
 package gaiasky.util;
 
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;
 import gaiasky.util.gdx.IntModelBuilder;
-import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.shader.Material;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -9,11 +9,11 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 

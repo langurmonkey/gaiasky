@@ -19,8 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.TextUtils;
+import gaiasky.util.i18n.I18n;
 
 /**
  * A collapsible pane with a detach-to-window button.

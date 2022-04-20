@@ -7,10 +7,10 @@ package gaiasky.data.group;
 
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.PointParticleRecord;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 
 import java.io.BufferedReader;
 import java.io.IOException;

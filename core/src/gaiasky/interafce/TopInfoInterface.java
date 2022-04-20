@@ -7,15 +7,15 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;

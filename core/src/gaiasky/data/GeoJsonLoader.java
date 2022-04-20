@@ -12,9 +12,9 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scenegraph.Area;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 import uk.ac.starlink.util.DataSource;
 
 import java.util.Map;

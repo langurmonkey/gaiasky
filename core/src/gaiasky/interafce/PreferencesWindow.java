@@ -34,8 +34,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.parse.Parser;
@@ -47,6 +45,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
@@ -67,7 +66,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final Array<Actor> contents;
     private final Array<OwnLabel> labels;
 
-    private final INumberFormat nf3;
+    private final DecimalFormat nf3;
 
     private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
@@ -109,7 +108,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         this.globalResources = globalResources;
         this.welcomeScreen = welcomeScreen;
 
-        this.nf3 = NumberFormatFactory.getFormatter("0.000");
+        this.nf3 = new DecimalFormat("0.000");
 
         setAcceptText(I18n.msg("gui.saveprefs"));
         setCancelText(I18n.msg("gui.cancel"));

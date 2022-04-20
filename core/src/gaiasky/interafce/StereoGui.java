@@ -16,11 +16,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings.StereoProfile;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
+
+import java.text.DecimalFormat;
 
 /**
  * Full OpenGL GUI with all the controls and whistles.
@@ -31,7 +31,7 @@ public class StereoGui extends AbstractGui {
     protected NotificationsInterface notificationsOne, notificationsTwo;
     protected CustomInterface customInterface;
 
-    protected INumberFormat nf;
+    protected DecimalFormat nf;
 
     public StereoGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
@@ -65,7 +65,7 @@ public class StereoGui extends AbstractGui {
             ct.getName();
         }
 
-        nf = NumberFormatFactory.getFormatter("##0.###");
+        nf = new DecimalFormat("##0.###");
 
         // NOTIFICATIONS ONE - BOTTOM LEFT
         notificationsOne = new NotificationsInterface(skin, lock, true, true, false, false);

@@ -14,10 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnSlider;
 import gaiasky.util.scene2d.OwnTextField;
@@ -25,6 +23,7 @@ import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.HexColorValidator;
 import gaiasky.util.validator.IValidator;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 /**
@@ -93,7 +92,7 @@ public class ColorPicker extends ColorPickerAbstract {
     /** A color picker dialog **/
     private class ColorPickerDialog extends GenericDialog {
         private float[] color, colorBak;
-        private final INumberFormat nf;
+        private final DecimalFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
@@ -111,7 +110,7 @@ public class ColorPicker extends ColorPickerAbstract {
             this.color[2] = color[2];
             this.color[3] = color[3];
 
-            this.nf = NumberFormatFactory.getFormatter("0.00");
+            this.nf = new DecimalFormat("0.00");
 
             setAcceptText(I18n.msg("gui.ok"));
             setCancelText(I18n.msg("gui.cancel"));

@@ -30,7 +30,10 @@ import gaiasky.util.gdx.contrib.postprocess.effects.AnaglyphEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.math.Vector3d;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Renders all the 3D/stereoscopic modes. Renders basically two scenes, one for

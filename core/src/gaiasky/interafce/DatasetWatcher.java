@@ -10,9 +10,12 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.datadesc.DatasetDesc;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnProgressBar;
+import gaiasky.util.scene2d.OwnTextButton;
+import gaiasky.util.scene2d.OwnTextIconButton;
 
 /**
  * Listens to dataset manager events and relays them to the

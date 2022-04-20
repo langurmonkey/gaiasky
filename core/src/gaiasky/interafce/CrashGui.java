@@ -15,9 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.io.PrintWriter;

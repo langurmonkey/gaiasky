@@ -17,8 +17,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import gaiasky.GaiaSky;
 import gaiasky.scenegraph.Planet;
 import gaiasky.util.Constants;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.i18n.I18n;
 
 public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 

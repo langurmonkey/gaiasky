@@ -18,7 +18,6 @@ import com.badlogic.gdx.utils.Array;
 import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
 import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.format.DesktopNumberFormat;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -26,17 +25,17 @@ import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.*;
 import gaiasky.util.Constants;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.format.INumberFormat;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.LongValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -677,7 +676,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(eSun).colspan(2).left().padBottom(pad10).padRight(pad5);
         content.add(esunTooltip).left().padBottom(pad10).row();
 
-        INumberFormat nf = new DesktopNumberFormat("#0.0000##");
+        DecimalFormat nf = new DecimalFormat("#0.0000##");
         // Kr
         OwnSliderPlus kr = new OwnSliderPlus(I18n.msg("gui.procedural.kr"), 0.0f, 0.01f, 0.0001f, skin);
         kr.setWidth(fieldWidthAll);

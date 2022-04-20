@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
+
+import java.text.DecimalFormat;
 
 public class OwnSlider extends Slider {
     private float ownwidth = 0f, ownheight = 0f;
@@ -24,7 +24,7 @@ public class OwnSlider extends Slider {
     private String valuePrefix, valueSuffix;
     private float padX = 4.8f;
     private float padY = 4.8f;
-    private INumberFormat nf;
+    private DecimalFormat nf;
 
     public OwnSlider(float min, float max, float stepSize, float mapMin, float mapMax, boolean vertical, Skin skin) {
         super(min, max, stepSize, vertical, skin);
@@ -54,10 +54,10 @@ public class OwnSlider extends Slider {
     }
 
     public void setUp(float mapMin, float mapMax) {
-        setUp(mapMin, mapMax, NumberFormatFactory.getFormatter("####0.0#"));
+        setUp(mapMin, mapMax, new DecimalFormat("####0.0#"));
     }
 
-    public void setUp(float mapMin, float mapMax, INumberFormat nf) {
+    public void setUp(float mapMin, float mapMax, DecimalFormat nf) {
         this.nf = nf;
         setMapValues(mapMin, mapMax);
 

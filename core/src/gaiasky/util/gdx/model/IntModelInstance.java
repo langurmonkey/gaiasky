@@ -32,8 +32,8 @@ import com.badlogic.gdx.utils.Pool;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.IntRenderableProvider;
-import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.shader.Material;
 
 /** An instance of a {@link IntModel}, allows to specify global transform and modify the materials, as it has a copy of the model's
  * materials. Multiple instances can be created from the same IntModel, all sharing the meshes and textures of the IntModel. The IntModel

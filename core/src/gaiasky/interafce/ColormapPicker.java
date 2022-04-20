@@ -26,13 +26,11 @@ import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.attrib.*;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.ucd.UCD;
@@ -40,6 +38,7 @@ import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.HexColorValidator;
 import gaiasky.util.validator.IValidator;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -214,7 +213,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         private Cell cmapImageCell;
         private float[] color;
         private OwnTextField minMap, maxMap;
-        private final INumberFormat nf;
+        private final DecimalFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
@@ -235,7 +234,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             this.pgarray = new Array<>();
             this.apearray = new Array<>();
-            this.nf = NumberFormatFactory.getFormatter("0.00");
+            this.nf = new DecimalFormat("0.00");
 
             cmapImages = new HashMap<>();
             for (Pair<String, Integer> cmapDef : cmapList) {

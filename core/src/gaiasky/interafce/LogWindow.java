@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.io.BufferedWriter;

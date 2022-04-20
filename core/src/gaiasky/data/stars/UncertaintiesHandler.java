@@ -7,8 +7,8 @@ package gaiasky.data.stars;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IStarFocus;
 import gaiasky.scenegraph.ParticleGroup;

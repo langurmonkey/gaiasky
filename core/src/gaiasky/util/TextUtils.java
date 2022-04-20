@@ -9,10 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 
-import java.io.File;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -274,12 +272,12 @@ public class TextUtils {
     }
 
     /** Decimal format **/
-    private static final INumberFormat nf;
-    private static final INumberFormat nfsci;
+    private static final DecimalFormat nf;
+    private static final DecimalFormat nfsci;
 
     static {
-        nf = NumberFormatFactory.getFormatter("#########.###");
-        nfsci = NumberFormatFactory.getFormatter("0.#E0");
+        nf = new DecimalFormat("#########.###");
+        nfsci = new DecimalFormat("0.#E0");
     }
 
     public static String getFormattedTimeWarp(double warp) {

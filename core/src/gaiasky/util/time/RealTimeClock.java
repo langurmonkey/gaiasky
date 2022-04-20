@@ -6,8 +6,8 @@
 package gaiasky.util.time;
 
 import com.badlogic.gdx.utils.TimeUtils;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 
 import java.time.Instant;
 

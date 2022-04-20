@@ -19,8 +19,6 @@ import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.format.INumberFormat;
-import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
@@ -30,6 +28,8 @@ import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
+
+import java.text.DecimalFormat;
 
 /**
  * Part of the user interface which holds the information on the current focus
@@ -61,7 +61,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private Vector3d pos;
     private Vector3b posb;
 
-    INumberFormat nf, sf;
+    DecimalFormat nf, sf;
 
     float pad1, pad3, pad5, pad10, pad15, bw;
 
@@ -76,8 +76,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         // Widget width
         float width = 360f;
 
-        nf = NumberFormatFactory.getFormatter("##0.##");
-        sf = NumberFormatFactory.getFormatter("0.###E0");
+        nf = new DecimalFormat("##0.##");
+        sf = new DecimalFormat("0.###E0");
 
         float buttonSize = 24f;
         float imgSize = 28.8f;
