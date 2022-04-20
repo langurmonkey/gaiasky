@@ -21,19 +21,18 @@ import gaiasky.interafce.KeyBindings;
 import gaiasky.util.Constants;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.TextUtils;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.DateFormatFactory.DateType;
-import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.*;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 public class TimeComponent extends GuiComponent implements IObserver {
 
     /** Date format **/
-    private final IDateFormat dfDate;
-    private final IDateFormat dfTime;
+    private final DateTimeFormatter dfDate;
+    private final DateTimeFormatter dfTime;
 
     protected OwnLabel date;
     protected OwnLabel time;
@@ -51,8 +50,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
     public TimeComponent(Skin skin, Stage stage) {
         super(skin, stage);
 
-        dfDate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
-        dfTime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
+        dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
+        dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
     }
 

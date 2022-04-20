@@ -22,12 +22,12 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings.StereoProfile;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
     static LinkedList<MessageBean> historical = new LinkedList<>();
-    IDateFormat df;
+    DateTimeFormatter df;
     long msTimeout;
     Label message1, message2;
     Cell<Label> c1, c2;
@@ -125,7 +125,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         message1 = new OwnLabel("", skin, "hud-med");
         c1 = this.add(message1).left();
 
-        this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
+        this.df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.TOGGLE_AMBIENT_LIGHT, Event.FOV_CHANGE_NOTIFICATION, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD, Event.SCREEN_NOTIFICATION_CMD, Event.MODE_POPUP_CMD);
     }
 

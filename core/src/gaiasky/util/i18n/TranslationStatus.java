@@ -4,14 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
-import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 
 import java.io.FileInputStream;
@@ -61,9 +59,6 @@ public class TranslationStatus {
 
         // Initialize number format
         NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
-
-        // Initialize date format
-        DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
         // Add notification watch
         new ConsoleLogger();

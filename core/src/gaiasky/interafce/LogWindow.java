@@ -13,20 +13,20 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.DateFormatFactory.DateType;
-import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 
 public class LogWindow extends GenericDialog {
 
-    private final IDateFormat format;
+    private final DateTimeFormatter format;
     private Table logs;
     private ScrollPane scroll;
 
@@ -38,7 +38,7 @@ public class LogWindow extends GenericDialog {
     public LogWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.log.title"), skin, stage);
 
-        this.format = DateFormatFactory.getFormatter(I18n.locale, DateType.DATETIME);
+        this.format = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         this.setResizable(true);
         setCancelText(I18n.msg("gui.close"));
 

@@ -9,16 +9,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.group.PointDataProvider;
-import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
-import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.i18n.I18n;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -45,9 +43,6 @@ public class MilkyWayReshaper {
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
-
-            // Initialize date format
-            DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
             // Initialize i18n
             I18n.initialize(new FileHandle(ASSETS_LOC + "i18n/gsbundle"), new FileHandle(ASSETS_LOC + "i18n/objects"));

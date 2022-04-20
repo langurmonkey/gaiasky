@@ -6,15 +6,15 @@
 package gaiasky.interafce;
 
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.DateFormatFactory.DateType;
-import gaiasky.util.format.IDateFormat;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 public class MessageBean {
     private static final String TAG_SEPARATOR = " - ";
-    private static final IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
+    private static final DateTimeFormatter df = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
     String msg;
     Instant date;
 

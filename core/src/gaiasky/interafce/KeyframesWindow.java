@@ -30,8 +30,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.Interpolationd;
@@ -47,6 +45,9 @@ import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
 
     private final INumberFormat secondsFormatter;
-    private final IDateFormat dateFormat;
+    private final DateTimeFormatter dateFormat;
 
     /**
      * Seconds
@@ -225,7 +226,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         this.keyframeNames = new HashMap<>();
         this.secondsFormatter = NumberFormatFactory.getFormatter("000.00");
         this.df = new SimpleDateFormat("yyyyMMdd_HH-mm-ss-SSS");
-        this.dateFormat = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
+        this.dateFormat = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         setModal(false);
 
         setCancelText(I18n.msg("gui.close"));

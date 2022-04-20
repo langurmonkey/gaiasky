@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.SceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
@@ -71,7 +72,7 @@ public class SceneGraphJsonLoader {
                 hasStarGroup = true;
         }
 
-        sg = SceneGraphImplementationProvider.provider.getImplementation(hasOctree, hasStarGroup, nodes.size);
+        sg = new SceneGraph(nodes.size);
 
         sg.initialize(nodes, time, hasOctree, hasStarGroup);
 

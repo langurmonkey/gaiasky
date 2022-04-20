@@ -23,14 +23,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.update.VersionCheckEvent;
 import gaiasky.util.update.VersionChecker;
@@ -40,6 +38,9 @@ import oshi.hardware.HardwareAbstractionLayer;
 
 import java.nio.IntBuffer;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date;
 
 /**
@@ -576,7 +577,7 @@ public class AboutWindow extends GenericDialog {
     private void newVersionCheck(String tagVersion, Integer versionNumber, Instant tagDate, boolean log) {
         Settings.settings.program.update.lastCheck = Instant.now();
         if (versionNumber > Settings.settings.version.versionNumber) {
-            IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
+            DateTimeFormatter df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
             if (log) {
                 logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
             }

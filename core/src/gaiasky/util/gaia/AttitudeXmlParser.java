@@ -8,11 +8,12 @@ package gaiasky.util.gaia;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
-import gaiasky.util.*;
+import gaiasky.util.BinarySearchTree;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
 import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.gaia.time.Hours;
 import gaiasky.util.i18n.I18n;
@@ -22,6 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,12 +37,12 @@ public class AttitudeXmlParser {
     private static final Log logger = Logger.getLogger(AttitudeXmlParser.class);
 
     private static final Instant endOfMission;
-    private static final IDateFormat format;
-    private static final IDateFormat formatWithMs;
+    private static final DateTimeFormatter format;
+    private static final DateTimeFormatter formatWithMs;
 
     static {
-        format = DateFormatFactory.getFormatter("yyyy-MM-dd HH:mm:ss");
-        formatWithMs = DateFormatFactory.getFormatter("yyyy-MM-dd HH:mm:ss.SS");
+        format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
+        formatWithMs = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SS").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         endOfMission = getDate("2026-09-14 17:44:20");
     }
 
@@ -197,9 +201,11 @@ public class AttitudeXmlParser {
 
     private static Instant getDate(String date) {
         try {
-            return format.parse(date);
+            LocalDateTime ldt = LocalDateTime.parse(date, format);
+            return ldt.toInstant(ZoneOffset.UTC);
         } catch (Exception e) {
-            return formatWithMs.parse(date);
+            LocalDateTime ldt = LocalDateTime.parse(date, formatWithMs);
+            return ldt.toInstant(ZoneOffset.UTC);
         }
     }
 
