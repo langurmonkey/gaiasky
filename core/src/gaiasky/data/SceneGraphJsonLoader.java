@@ -34,7 +34,7 @@ import java.util.Map;
 public class SceneGraphJsonLoader {
     private static final Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 
-    public synchronized static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException {
+    public synchronized static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time) throws FileNotFoundException, ReflectionException {
         ISceneGraph sg;
         logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
         for (FileHandle fh : jsonFiles) {
@@ -71,7 +71,7 @@ public class SceneGraphJsonLoader {
                 hasStarGroup = true;
         }
 
-        sg = SceneGraphImplementationProvider.provider.getImplementation(multithreading, hasOctree, hasStarGroup, maxThreads, nodes.size);
+        sg = SceneGraphImplementationProvider.provider.getImplementation(hasOctree, hasStarGroup, nodes.size);
 
         sg.initialize(nodes, time, hasOctree, hasStarGroup);
 
