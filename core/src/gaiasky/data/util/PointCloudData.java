@@ -13,6 +13,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Contains a point cloud dataset, with cartesian XYZ positions in the equatorial
+ * system with the origin in the barycenter of the solar system, and optionally times
+ * for each of those.
+ */
 public class PointCloudData {
     // Values of x, y, z in world coordinates
     public List<Double> x, y, z;
