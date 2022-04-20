@@ -8,14 +8,12 @@ package gaiasky.desktop.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.*;
 import gaiasky.util.coord.MoonAACoordinates;
 import gaiasky.util.coord.vsop87.AbstractVSOP87;
 import gaiasky.util.coord.vsop87.VSOP87;
-import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
@@ -39,7 +37,6 @@ public class Positions2DExtractor {
         Gdx.files = new Lwjgl3Files();
         try {
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
-            DateFormatFactory.initialize(new DesktopDateFormatFactory());
             SettingsManager.initialize(false);
         } catch (Exception e) {
             Logger.getLogger(Positions2DExtractor.class).error(e);

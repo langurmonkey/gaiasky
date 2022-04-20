@@ -15,11 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Event;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Only for frame output mode, it displays the current time.
@@ -30,7 +31,7 @@ public class RenderGui extends AbstractGui {
 
     protected MessagesInterface messagesInterface;
 
-    protected IDateFormat df;
+    protected DateTimeFormatter df;
 
     public RenderGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
@@ -42,7 +43,7 @@ public class RenderGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
+        df = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
     }
 
     @Override

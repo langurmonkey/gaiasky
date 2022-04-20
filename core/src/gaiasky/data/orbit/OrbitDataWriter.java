@@ -7,13 +7,14 @@ package gaiasky.data.orbit;
 
 import gaiasky.data.util.PointCloudData;
 import gaiasky.util.Constants;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class OrbitDataWriter {
     /**
@@ -26,7 +27,7 @@ public class OrbitDataWriter {
      * @throws IOException
      */
     public static void writeOrbitData(String filePath, PointCloudData data) throws IOException {
-        IDateFormat df = DateFormatFactory.getFormatter("yyyy-MM-dd_HH:mm:ss");
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss").withLocale(Locale.US).withZone(ZoneOffset.UTC);
 
         File f = new File(filePath);
         if (f.exists() && f.isFile()) {

@@ -9,14 +9,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
@@ -42,9 +40,6 @@ public class HeliotropicOrbitDataLoader {
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
-
-            // Initialize date format
-            DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
             SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
 

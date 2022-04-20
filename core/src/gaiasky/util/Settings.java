@@ -21,8 +21,6 @@ import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
@@ -35,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
@@ -1004,7 +1003,7 @@ public class Settings {
 
             @JsonIgnore
             public String getLastCheckedString() {
-                IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
+                DateTimeFormatter df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
                 return df.format(lastCheck);
             }
         }

@@ -16,12 +16,12 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.DateFormatFactory.DateType;
-import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 /**
  * The HUD UI at the top of the regular view
@@ -29,8 +29,8 @@ import java.time.Instant;
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     /** Date format **/
-    private final IDateFormat dfDate;
-    private final IDateFormat dfTime;
+    private final DateTimeFormatter dfDate;
+    private final DateTimeFormatter dfTime;
 
     private final int maxNameLen = 15;
 
@@ -50,8 +50,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         float pad = 18f;
 
-        dfDate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
-        dfTime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
+        dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
+        dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
 
         date = new OwnLabel(I18n.msg("gui.top.date.ut"), skin, "mono");
         date.setName("label date tii");

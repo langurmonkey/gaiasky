@@ -23,7 +23,6 @@ import gaiasky.data.octreegen.generator.IOctreeGenerator;
 import gaiasky.data.octreegen.generator.OctreeGeneratorMag;
 import gaiasky.data.octreegen.generator.OctreeGeneratorParams;
 import gaiasky.data.util.HipNames;
-import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.MessageBean;
@@ -33,7 +32,6 @@ import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
@@ -145,9 +143,6 @@ public class OctreeGeneratorRun {
 
             // Initialize number format
             NumberFormatFactory.initialize(new DesktopNumberFormatFactory());
-
-            // Initialize date format
-            DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
             // Initialize i18n
             I18n.initialize(Path.of(ASSETS_LOC, "i18n/gsbundle"), Path.of(ASSETS_LOC, "i18n/objects"));

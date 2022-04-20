@@ -8,22 +8,22 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.desktop.format.DesktopDateFormat;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings;
-import gaiasky.util.format.DateFormatFactory;
-import gaiasky.util.format.IDateFormat;
+import gaiasky.util.i18n.I18n;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 /**
  * Widget that captures and displays messages in a GUI.
@@ -31,7 +31,7 @@ import java.time.Instant;
 public class ConsoleLogger implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
-    IDateFormat df;
+    DateTimeFormatter df;
     long msTimeout;
     boolean useHistorical;
 
@@ -53,9 +53,9 @@ public class ConsoleLogger implements IObserver {
         this.useHistorical = useHistorical;
 
         try {
-            this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
+            this.df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         } catch (Exception e) {
-            this.df = new DesktopDateFormat(I18n.locale, true, true);
+            this.df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         }
         subscribe();
     }
