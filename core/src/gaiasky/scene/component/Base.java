@@ -1,8 +1,10 @@
 package gaiasky.scene.component;
 
 import com.artemis.Component;
+import com.artemis.annotations.PooledWeaver;
 import gaiasky.render.ComponentTypes;
 
+@PooledWeaver
 public class Base extends Component {
     /**
      * The internal identifier

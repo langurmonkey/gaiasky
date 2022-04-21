@@ -32,7 +32,7 @@ import java.util.TreeMap;
 
 /**
  * Implements the loading of scene graph nodes using libgdx's json library.
- * It loads entities in the JSON format described in <a href="https://github.com/ari-zah/gaiasandbox/wiki/Non-particle-data-loading">this link</a>.
+ * It loads entities from JSON files.
  */
 public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(JsonLoader.class);

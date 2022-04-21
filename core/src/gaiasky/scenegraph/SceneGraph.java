@@ -67,12 +67,11 @@ public class SceneGraph implements ISceneGraph {
      * Builds the scene graph using the given nodes.
      *
      * @param nodes        The list of nodes
-     * @param time         The time provider
      * @param hasOctree    Whether the list of nodes contains an octree
      * @param hasStarGroup Whether the list contains a star group
      */
     @Override
-    public void initialize(Array<SceneGraphNode> nodes, ITimeFrameProvider time, boolean hasOctree, boolean hasStarGroup) {
+    public void initialize(Array<SceneGraphNode> nodes, boolean hasOctree, boolean hasStarGroup) {
         logger.info(I18n.msg("notif.sg.insert", nodes.size));
 
         // Octree

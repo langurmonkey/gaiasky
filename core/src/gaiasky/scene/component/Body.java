@@ -14,11 +14,6 @@ public class Body extends Component {
     public Vector3b pos;
 
     /**
-     * Coordinates provider. Provides position coordinates depending on time.
-     **/
-    protected IBodyCoordinates coordinates;
-
-    /**
      * Position in the equatorial system; ra, dec.
      */
     public Vector2d posSph;

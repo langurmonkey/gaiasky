@@ -42,7 +42,6 @@ allprojects {
         jacksonVersion = "2.13.2"
         joiseVersion = "1.+"
         artemisVersion = "2.2.0"
-        artemisContribVersion = "2.4.0"
     }
 
     repositories {

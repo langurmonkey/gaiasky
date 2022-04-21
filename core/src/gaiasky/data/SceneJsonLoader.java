@@ -1,10 +1,6 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 package gaiasky.data;
 
+import com.artemis.World;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -13,30 +9,25 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.scenegraph.SceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Loads Gaia Sky JSON files into a scene graph.
+ * Loads JSON files into a scene object, which contains an
+ * Artemis ECS world.
  */
-public class SceneGraphJsonLoader {
-    private static final Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
+public class SceneJsonLoader {
+    private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
 
-    public synchronized static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles) throws FileNotFoundException, ReflectionException {
-        ISceneGraph sg;
+    public synchronized static void loadScene(FileHandle[] jsonFiles, World world) throws FileNotFoundException, ReflectionException {
         logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
         for (FileHandle fh : jsonFiles) {
             logger.info("\t" + fh.path() + " - exists: " + fh.exists());
@@ -45,41 +36,13 @@ public class SceneGraphJsonLoader {
             }
         }
 
-        Array<SceneGraphNode> nodes = new Array<>(false, 20600);
-
+        // Load files
         for (FileHandle jsonFile : jsonFiles) {
-            nodes.addAll(loadJsonFile(jsonFile));
+            loadJsonFile(jsonFile, world);
         }
-
-        // Initialize nodes and look for octrees
-        boolean hasOctree = false;
-        boolean hasStarGroup = false;
-        for (SceneGraphNode node : nodes) {
-            node.initialize();
-            if (node instanceof AbstractOctreeWrapper) {
-                hasOctree = true;
-                AbstractOctreeWrapper aow = (AbstractOctreeWrapper) node;
-                if (aow.children != null)
-                    for (SceneGraphNode n : aow.children) {
-                        if (n instanceof StarGroup) {
-                            hasStarGroup = true;
-                            break;
-                        }
-                    }
-            }
-
-            if (node instanceof StarGroup)
-                hasStarGroup = true;
-        }
-
-        sg = new SceneGraph(nodes.size);
-        sg.initialize(nodes, hasOctree, hasStarGroup);
-
-        return sg;
     }
+    public synchronized static void loadJsonFile(FileHandle jsonFile, World world) throws ReflectionException, FileNotFoundException {
 
-    public synchronized static Array<SceneGraphNode> loadJsonFile(FileHandle jsonFile) throws ReflectionException, FileNotFoundException {
-        Array<SceneGraphNode> nodes = new Array<>(false, 20600);
         JsonReader jsonReader = new JsonReader();
         JsonValue model = jsonReader.parse(jsonFile.read());
 
@@ -97,6 +60,13 @@ public class SceneGraphJsonLoader {
             JsonValue child = model.get("data").child;
             while (child != null) {
                 String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                if(clazzName.equals("gaiasky.data.JsonLoader")) {
+                    clazzName = "gaiasky.data.NewJsonLoader";
+                } else {
+                    // Unsupported for now
+                    logger.info("Skipping " + jsonFile.name() + ": unsupported");
+                    continue;
+                }
                 @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
                 JsonValue filesJson = child.get("files");
@@ -104,7 +74,7 @@ public class SceneGraphJsonLoader {
                     String[] files = filesJson.asStringArray();
 
                     Constructor c = ClassReflection.getConstructor(clazz);
-                    ISceneGraphLoader loader = (ISceneGraphLoader) c.newInstance();
+                    ISceneLoader loader = (ISceneLoader) c.newInstance();
 
                     if (name != null)
                         loader.setName(name);
@@ -143,25 +113,18 @@ public class SceneGraphJsonLoader {
                     }
 
                     // Load data
-                    Array<? extends SceneGraphNode> data = loader.loadData();
-                    for (SceneGraphNode elem : data) {
-                        nodes.add(elem);
-                    }
+                    loader.loadData(world);
                 }
 
                 child = child.next;
             }
         } else {
             // Use regular JsonLoader
-            JsonLoader loader = new JsonLoader();
+            NewJsonLoader loader = new NewJsonLoader();
             loader.initialize(new String[] { jsonFile.file().getAbsolutePath() });
             // Load data
-            Array<? extends SceneGraphNode> data = loader.loadData();
-            for (SceneGraphNode elem : data) {
-                nodes.add(elem);
-            }
+            loader.loadData(world);
         }
-        return nodes;
     }
 
     /**
@@ -184,5 +147,4 @@ public class SceneGraphJsonLoader {
         }
         return m;
     }
-
 }

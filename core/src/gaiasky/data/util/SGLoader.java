@@ -67,7 +67,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoaderParam
         }
 
         try {
-            sg = SceneGraphJsonLoader.loadSceneGraph(fileHandles, parameter.time);
+            sg = SceneGraphJsonLoader.loadSceneGraph(fileHandles);
         } catch (Exception e) {
             GaiaSky.postRunnable(() -> {
                 CrashReporter.reportCrash(e, logger);
@@ -87,11 +87,9 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoaderParam
 
     static public class SGLoaderParameter extends AssetLoaderParameters<ISceneGraph> {
         public String[] files;
-        public ITimeFrameProvider time;
 
-        public SGLoaderParameter(String[] files, ITimeFrameProvider time) {
+        public SGLoaderParameter(String[] files) {
             this.files = files;
-            this.time = time;
         }
     }
 }

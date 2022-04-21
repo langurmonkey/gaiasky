@@ -5,9 +5,6 @@
 
 package gaiasky;
 
-import com.artemis.World;
-import com.artemis.WorldConfiguration;
-import com.artemis.WorldConfigurationBuilder;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
@@ -29,7 +26,9 @@ import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.util.*;
 import gaiasky.data.util.GaiaAttitudeLoader.GaiaAttitudeLoaderParameter;
 import gaiasky.data.util.SGLoader.SGLoaderParameter;
+import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
 import gaiasky.render.MainPostProcessor;
+import gaiasky.scene.Scene;
 import gaiasky.util.CrashReporter;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
@@ -40,9 +39,6 @@ import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.IPostProcessor.RenderType;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.system.HelloWorldSystem;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -160,8 +156,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public CameraManager cameraManager;
 
-    private String dataLoadString;
-    public World scene;
+    private final String sceneGraphName = "SceneGraphData";
+    private final String sceneName = "SceneData";
+    public Scene scene;
     public ISceneGraph sceneGraph;
     public SceneGraphRenderer sgr;
     private IPostProcessor postProcessor;
@@ -396,17 +393,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         TooltipManager.getInstance().initialTime = 1f;
         TooltipManager.getInstance().hideAll();
 
-        /*
-         *  ECS world
-         */
-        // 1. Register any plugins, set up the world.
-        WorldConfiguration setup = new WorldConfigurationBuilder()
-                .with(new HelloWorldSystem())
-                .build();
-
-        // 2. Create the world
-        scene = new World(setup);
-
         // Initialize asset manager
         final FileHandleResolver internalResolver = new InternalFileHandleResolver();
         final FileHandleResolver dataResolver = fileName -> settings.data.dataFileHandle(fileName);
@@ -414,7 +400,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         assetManager.setLoader(com.badlogic.gdx.graphics.Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
         assetManager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
-        assetManager.setLoader(World.class, new SceneLoader(dataResolver, scene));
+        assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         assetManager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(dataResolver));
         assetManager.setLoader(ExtShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
@@ -484,12 +470,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Post-processor
         postProcessor = new MainPostProcessor();
-
-
-        // 3. Add an entity
-        int entityId = scene.create();
-        scene.edit(entityId).create(Base.class).id = 1234;
-        scene.edit(entityId).create(GraphNode.class).children = new Array<>();
 
         // Scene graph renderer
         sgr = new SceneGraphRenderer(vrContext, globalResources);
@@ -646,10 +626,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         /*
          * GET SCENE GRAPH
          */
-        if (assetManager.isLoaded(dataLoadString)) {
-            sceneGraph = assetManager.get(dataLoadString);
+        if (assetManager.isLoaded(sceneGraphName)) {
+            sceneGraph = assetManager.get(sceneGraphName);
         } else {
-            throw new RuntimeException("Error loading scene graph from data load string: " + dataLoadString + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
+            throw new RuntimeException("Error loading scene graph from data load string: " + sceneGraphName + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
         }
 
         /*
@@ -657,8 +637,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         updateProcess = () -> {
             // Process ECS
-            scene.setDelta((float) time.getDt());
-            scene.process();
+            scene.world.setDelta((float) time.getDt());
+            scene.world.process();
 
             sceneGraph.update(time, cameraManager);
             // Swap proximity buffers
@@ -1478,9 +1458,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             this.updateRenderProcess = runnableLoadingGui;
 
-            /* LOAD SCENE GRAPH */
+            // Load scene graph
             if (sceneGraph == null) {
-                dataLoadString = "SceneGraphData";
                 final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
                 int i = 0;
                 // Add data files
@@ -1489,7 +1468,20 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     dataFilesToLoad[i] = dataFile;
                     i++;
                 }
-                assetManager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad, time));
+                assetManager.load(sceneGraphName, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad));
+            }
+
+            // Load scene
+            if(scene == null) {
+                final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
+                int i = 0;
+                // Add data files
+                // Our resolver in the SGLoader itself will resolve their full paths
+                for (String dataFile : settings.data.dataFiles) {
+                    dataFilesToLoad[i] = dataFile;
+                    i++;
+                }
+                assetManager.load(sceneName, Scene.class, new SceneLoaderParameters(dataFilesToLoad));
             }
             break;
         case TOGGLE_AMBIENT_LIGHT:

@@ -1,6 +1,5 @@
 package gaiasky.data.util;
 
-import com.artemis.World;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
@@ -10,7 +9,9 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.data.util.SceneLoader.EntityLoaderParameter;
+import gaiasky.data.SceneJsonLoader;
+import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
+import gaiasky.scene.Scene;
 import gaiasky.util.CrashReporter;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -26,18 +27,17 @@ import java.util.Objects;
 /**
  * Loads the world and all its entities from a list of JSON descriptor files.
  */
-public class SceneLoader extends AsynchronousAssetLoader<World, EntityLoaderParameter> {
+public class SceneLoader extends AsynchronousAssetLoader<Scene, SceneLoaderParameters> {
     private static final Log logger = Logger.getLogger(SceneLoader.class);
 
-    final World scene;
+    private Scene scene;
 
-    public SceneLoader(FileHandleResolver resolver, World scene) {
+    public SceneLoader(FileHandleResolver resolver) {
         super(resolver);
-        this.scene = scene;
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, EntityLoaderParameter parameter) {
+    public void loadAsync(AssetManager manager, String fileName, FileHandle file, SceneLoaderParameters parameter) {
         // Add autoload files to the mix
         Array<String> filePaths = new Array<>(parameter.files);
         Path dataFolder = Paths.get(Settings.settings.data.location);
@@ -53,7 +53,9 @@ public class SceneLoader extends AsynchronousAssetLoader<World, EntityLoaderPara
         }
 
         try {
-            //sg = SceneGraphJsonLoader.loadSceneGraph(fileHandles, parameter.time);
+            scene = new Scene();
+            scene.initialize();
+            SceneJsonLoader.loadScene(fileHandles, scene.world);
 
         } catch (Exception e) {
             GaiaSky.postRunnable(() -> {
@@ -66,22 +68,20 @@ public class SceneLoader extends AsynchronousAssetLoader<World, EntityLoaderPara
     }
 
     @Override
-    public World loadSync(AssetManager manager, String fileName, FileHandle file, EntityLoaderParameter parameter) {
+    public Scene loadSync(AssetManager manager, String fileName, FileHandle file, SceneLoaderParameters parameter) {
         return scene;
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, EntityLoaderParameter parameter) {
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, SceneLoaderParameters parameter) {
         return null;
     }
 
-    static public class EntityLoaderParameter extends AssetLoaderParameters<World> {
+    static public class SceneLoaderParameters extends AssetLoaderParameters<Scene> {
         public String[] files;
-        public ITimeFrameProvider time;
 
-        public EntityLoaderParameter(String[] files, ITimeFrameProvider time) {
+        public SceneLoaderParameters(String[] files) {
             this.files = files;
-            this.time = time;
         }
     }
 }
