@@ -33,7 +33,6 @@ public class SceneLoader extends AsynchronousAssetLoader<Scene, SceneLoaderParam
 
     public SceneLoader(FileHandleResolver resolver) {
         super(resolver);
-        this.scene = scene;
     }
 
     @Override
