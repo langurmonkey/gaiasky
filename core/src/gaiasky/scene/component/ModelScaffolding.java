@@ -4,6 +4,7 @@ import com.artemis.Component;
 import gaiasky.render.ShadowMapImpl;
 import gaiasky.scenegraph.component.ITransform;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,4 +47,39 @@ public class ModelScaffolding extends Component {
 
     /** The components to randomize---possible values are ["model", "cloud", "atmosphere"] **/
     protected List<String> randomize;
+
+    /**
+     * Sets the shadow mapping values for this object
+     *
+     * @param shadowMapValues The values
+     */
+    public void setShadowvalues(double[] shadowMapValues) {
+        this.shadowMapValues = shadowMapValues;
+    }
+
+    public void setSizescalefactor(Double sizescalefactor) {
+        this.sizeScaleFactor = sizescalefactor.floatValue();
+    }
+    public void setRandomize(String[] randomize) {
+        this.randomize = Arrays.asList(randomize);
+    }
+
+    public void setSeed(Long seed) {
+        this.seed = Arrays.asList(seed);
+    }
+
+    public void setSeed(int[] seed) {
+        this.seed = new ArrayList<>(seed.length);
+        for (int s : seed) {
+            this.seed.add((long) s);
+        }
+    }
+    public void setRandomize(String randomize) {
+        this.randomize = Arrays.asList(randomize);
+    }
+    public void setRefplane(String refplane) {
+        this.refPlane = refplane;
+        this.refPlaneTransform = refplane + "toequatorial";
+        this.inverseRefPlaneTransform = "equatorialto" + refplane;
+    }
 }

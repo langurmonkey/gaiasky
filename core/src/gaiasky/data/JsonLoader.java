@@ -290,13 +290,13 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
      * with the class' interfaces and superclasses recursively.
      *
      * @param methodName The method name.
-     * @param clazz The class.
+     * @param parameterType The type of the parameter.
      * @return The method, if found. Null otherwise.
      */
-    private Method searchMethod(String methodName, Class<?> clazz, Class<?> source) {
+    private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source) {
         Method m = null;
         try {
-            m = ClassReflection.getMethod(source, methodName, clazz);
+            m = ClassReflection.getMethod(source, methodName, parameterType);
         } catch (ReflectionException e) {
             try {
                 if (methodName.contains("setCoordinates")) {

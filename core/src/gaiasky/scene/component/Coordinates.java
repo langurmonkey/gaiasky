@@ -8,7 +8,7 @@ public class Coordinates extends Component {
     /**
      * Coordinates provider. Provides position coordinates depending on time.
      **/
-    protected IBodyCoordinates coordinates;
+    public IBodyCoordinates coordinates;
 
     /**
      * Whether the current time puts the coordinates are out of time range.

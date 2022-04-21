@@ -15,4 +15,11 @@ public class Celestial extends Component {
 
     /** B-V color index **/
     public float colorbv;
+
+    /** Component alpha mirror **/
+    public float compalpha;
+
+    public void setColorbv(Double colorbv) {
+        this.colorbv = colorbv.floatValue();
+    }
 }

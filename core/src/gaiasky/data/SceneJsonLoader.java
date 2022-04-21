@@ -84,7 +84,7 @@ public class SceneJsonLoader {
                         loader.setParams(params);
 
                     // Init loader
-                    loader.initialize(files);
+                    loader.initialize(files, world);
 
                     JsonValue curr = filesJson;
                     while (curr.next != null) {
@@ -113,7 +113,7 @@ public class SceneJsonLoader {
                     }
 
                     // Load data
-                    loader.loadData(world);
+                    loader.loadData();
                 }
 
                 child = child.next;
@@ -121,9 +121,9 @@ public class SceneJsonLoader {
         } else {
             // Use regular JsonLoader
             NewJsonLoader loader = new NewJsonLoader();
-            loader.initialize(new String[] { jsonFile.file().getAbsolutePath() });
+            loader.initialize(new String[] { jsonFile.file().getAbsolutePath() }, world);
             // Load data
-            loader.loadData(world);
+            loader.loadData();
         }
     }
 

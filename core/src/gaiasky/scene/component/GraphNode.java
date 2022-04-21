@@ -2,21 +2,26 @@ package gaiasky.scene.component;
 
 import com.artemis.Component;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.SceneGraphNode;
+import com.badlogic.gdx.utils.IntArray;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 
 public class GraphNode extends Component {
+
+    /**
+     * The first name of the parent object.
+     */
+    public String parentName = null;
+
     /**
      * The parent entity.
      */
-    public SceneGraphNode parent;
+    public int parent;
 
     /**
      * List of children entities.
      */
-    public Array<SceneGraphNode> children;
+    public IntArray children;
 
     /**
      * Cumulative translation object. In contrast with the position, which contains
@@ -44,4 +49,12 @@ public class GraphNode extends Component {
      * The total number of descendants under this node.
      */
     public int numChildren;
+
+    /**
+     * Sets the name of the parent.
+     * @param parentName The parent name.
+     */
+    public void setParent(String parentName) {
+        this.parentName = parentName;
+    }
 }

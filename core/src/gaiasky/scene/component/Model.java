@@ -13,4 +13,7 @@ public class Model extends Component {
     /** The model **/
     public ModelComponent model;
 
+    public void setModel(ModelComponent model) {
+        this.model = model;
+    }
 }

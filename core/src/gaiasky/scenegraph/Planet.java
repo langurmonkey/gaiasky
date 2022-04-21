@@ -52,8 +52,6 @@ public class Planet extends ModelBody implements ILineRenderable {
         return TH_ANGLE_QUAD;
     }
 
-    ICamera camera;
-
     /** ATMOSPHERE **/
     AtmosphereComponent ac;
 
@@ -113,7 +111,6 @@ public class Planet extends ModelBody implements ILineRenderable {
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
-        this.camera = camera;
     }
 
     @Override

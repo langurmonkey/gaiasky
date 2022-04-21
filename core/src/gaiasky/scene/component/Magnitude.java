@@ -7,4 +7,11 @@ public class Magnitude extends Component {
     public float absmag = Float.NaN;
     /** Apparent magnitude, m = -2.5 log10(flux) **/
     public float appmag;
+
+    public void setAbsmag(Double absmag) {
+        this.absmag = absmag.floatValue();
+    }
+    public void setAppmag(Double appmag) {
+        this.appmag = appmag.floatValue();
+    }
 }

@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public interface ISceneLoader {
 
-    void loadData(World world) throws FileNotFoundException;
+    void loadData() throws FileNotFoundException;
 
     void setName(String name);
 
@@ -26,8 +26,8 @@ public interface ISceneLoader {
 
     void setParams(Map<String, Object> params);
 
-    void initialize(String[] files) throws RuntimeException;
+    void initialize(String[] files, World world) throws RuntimeException;
 
-    void initialize(DataSource ds);
+    void initialize(DataSource ds, World world);
 
 }
