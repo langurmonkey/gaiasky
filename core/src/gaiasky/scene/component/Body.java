@@ -45,6 +45,11 @@ public class Body extends Component {
     public float[] cc;
     public float[] labelcolor = Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
 
+
+    public void setSize(Double size) {
+        this.size = size.floatValue();
+    }
+
     /**
      * Sets the object color, as an RGBA double array.
      *

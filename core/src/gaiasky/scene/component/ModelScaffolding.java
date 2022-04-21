@@ -82,4 +82,12 @@ public class ModelScaffolding extends Component {
         this.refPlaneTransform = refplane + "toequatorial";
         this.inverseRefPlaneTransform = "equatorialto" + refplane;
     }
+
+    public void setLocvamultiplier(Double locvamultiplier) {
+        this.locVaMultiplier = locvamultiplier.floatValue();
+    }
+
+    public void setLocthoverfactor(Double locthoverfactor) {
+        this.locThOverFactor = locthoverfactor.floatValue();
+    }
 }

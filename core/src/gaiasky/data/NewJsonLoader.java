@@ -141,6 +141,10 @@ public class NewJsonLoader implements ISceneLoader {
             putAll(Coordinates.class,
                     "coordinates");
 
+            // Rotation
+            putAll(Rotation.class,
+                    "rotation");
+
             // Celestial
             putAll(Celestial.class,
                     "wikiname",
@@ -158,6 +162,8 @@ public class NewJsonLoader implements ISceneLoader {
                     "randomize",
                     "seed",
                     "sizescalefactor",
+                    "locvamultiplier",
+                    "locthoverfactor",
                     "shadowvalues");
 
             // Model
@@ -202,17 +208,17 @@ public class NewJsonLoader implements ISceneLoader {
 
                         @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
                         if (!archetypes.containsKey(clazzName)) {
+                            // Do not know what to do
                             if (!loggedArchetypes.contains(clazzName)) {
-                                logger.warn("No archetype found for " + clazz.getSimpleName() + ": skipping.");
+                                logger.warn("Skipping " + clazz.getSimpleName() + ": no suitable archetype found.");
                                 loggedArchetypes.add(clazzName);
                             }
-                            continue;
+                        } else {
+                            // Create entity and fill it up
+                            Archetype archetype = archetypes.get(clazzName);
+                            Entity entity = world.createEntity(archetype);
+                            fillEntity(child, entity, clazz.getSimpleName());
                         }
-
-                        // Create entity and fill it up
-                        Archetype archetype = archetypes.get(clazzName);
-                        Entity entity = world.createEntity(archetype);
-                        fillEntity(child, entity, clazz.getSimpleName());
 
                         child = child.next;
                         EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) current / (float) count);

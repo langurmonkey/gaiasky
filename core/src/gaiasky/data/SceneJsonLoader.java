@@ -64,7 +64,8 @@ public class SceneJsonLoader {
                     clazzName = "gaiasky.data.NewJsonLoader";
                 } else {
                     // Unsupported for now
-                    logger.info("Skipping " + jsonFile.name() + ": unsupported");
+                    logger.info("Skipping " + clazzName + ": unsupported");
+                    child = child.next;
                     continue;
                 }
                 @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
