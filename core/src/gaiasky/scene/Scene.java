@@ -195,6 +195,10 @@ public class Scene {
             // StarGroup
             addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class);
 
+            // Constellation
+            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(),
+                    Constel.class);
+
         } else {
             logger.error("World is null, can't initialize archetypes.");
         }
