@@ -13,6 +13,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.component.*;
 import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.Satellite;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
@@ -25,7 +26,6 @@ import uk.ac.starlink.util.DataSource;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Function;
 
 public class NewJsonLoader implements ISceneLoader {
     private static final Log logger = Logger.getLogger(NewJsonLoader.class);
@@ -92,6 +92,74 @@ public class NewJsonLoader implements ISceneLoader {
             // Star
             addArchetype(Star.class.getName(), CelestialBody.class.getName(),
                     ProperMotion.class);
+
+            // Satellite
+            addArchetype(Satellite.class.getName(), ModelBody.class.getName(),
+                    ParentOrientation.class);
+
+            // Gaia
+            addArchetype(Gaia.class.getName(), Satellite.class.getName(),
+                    Attitude.class);
+
+            // GenericSpacecraft
+            addArchetype(GenericSpacecraft.class.getName(), Satellite.class.getName(),
+                    RenderFlags.class);
+
+            // Spacecraft
+            addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(),
+                    Machine.class);
+
+            // VertsObject
+            addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(),
+                    Verts.class);
+
+            // Polyline
+            addArchetype(Polyline.class.getName(), VertsObject.class.getName(),
+                    Arrow.class);
+
+            // Orbit
+            addArchetype(Orbit.class.getName(), Polyline.class.getName(),
+                    Trajectory.class, Transform.class);
+
+            // HeliotropicOrbit
+            addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(),
+                    Heliotropic.class);
+
+            // FadeNode
+            addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(),
+                    Fade.class, Label.class, DatasetDescription.class, Highlight.class);
+
+            // BackgroundModel
+            addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(),
+                    Transform.class, Model.class, Label.class, Coordinates.class,
+                    RenderType.class);
+
+            // SphericalGrid
+            addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(),
+                    GridUV.class);
+
+            // RecursiveGrid
+            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(),
+                    GridRecursive.class, Fade.class, Transform.class, Model.class,
+                    Label.class, RenderType.class);
+
+            // BillboardGroup
+            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(),
+                    BillboardDatasets.class, Transform.class, Label.class, Fade.class,
+                    Coordinates.class);
+
+            // Text2D
+            addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(),
+                    Fade.class, Title.class);
+
+            // Axes
+            addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(),
+                    Axis.class, Transform.class);
+
+            // Loc
+            addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(),
+                    LocationMark.class);
+
         } else {
             logger.error("World is null, can't initialize archetypes.");
         }
@@ -128,7 +196,7 @@ public class NewJsonLoader implements ISceneLoader {
 
             // Body
             putAll(Body.class,
-                    "pos",
+                    "position",
                     "size",
                     "color",
                     "labelcolor");
@@ -176,6 +244,63 @@ public class NewJsonLoader implements ISceneLoader {
             // Cloud
             putAll(Cloud.class,
                     "cloud");
+
+            // RenderFlags
+            putAll(RenderFlags.class,
+                    "renderquad");
+
+            // Machine
+            putAll(Machine.class,
+                    "machines");
+
+            // Trajectory
+            putAll(Trajectory.class,
+                    "provider",
+                    "orbit",
+                    "model:Orbit",
+                    "trail",
+                    "newmethod");
+
+            // Transform
+            putAll(Transform.class,
+                    "transformName",
+                    "transformFunction",
+                    "transformValues");
+
+            // Fade
+            putAll(Fade.class,
+                    "fadein",
+                    "fadeout",
+                    "positionobjectname");
+
+            // Label
+            putAll(Label.class,
+                    "label",
+                    "label2d",
+                    "labelposition");
+
+            // RenderType
+            putAll(RenderType.class,
+                    "rendergroup");
+
+            // BillboardDataset
+            putAll(BillboardDatasets.class,
+                    "data:BillboardGroup");
+
+            // Title
+            putAll(Title.class,
+                    "scale:Text2D",
+                    "lines:Text2D",
+                    "align:Text2D");
+
+            // Axis
+            putAll(Axis.class,
+                    "axesColors");
+
+            // LocationMark
+            putAll(LocationMark.class,
+                    "location",
+                    "distFactor");
         } else {
             logger.error("World is null, can't initialize attributes.");
         }
@@ -183,7 +308,12 @@ public class NewJsonLoader implements ISceneLoader {
 
     private void putAll(Class<? extends Component> clazz, String... attributes) {
         for (String attribute : attributes) {
-            attributeMap.put(attribute, clazz);
+            if(attributeMap.containsKey(attribute)) {
+                logger.warn("Attribute already defined: " + attribute);
+                throw new RuntimeException("Attribute already defined: " + attribute);
+            } else {
+                attributeMap.put(attribute, clazz);
+            }
         }
     }
 
@@ -313,10 +443,11 @@ public class NewJsonLoader implements ISceneLoader {
         }
     }
 
-    public void fillEntity(final JsonValue json, Entity entity, String className) throws ReflectionException {
+    public void fillEntity(final JsonValue json, final Entity entity, final String className) throws ReflectionException {
         processJson(json, (valueClass, value, attribute) -> {
-            if (attributeMap.containsKey(attribute.name)) {
-                Class<? extends Component> componentClass = attributeMap.get(attribute.name);
+            String key = findAttribute(attribute.name, className);
+            if (key != null) {
+                Class<? extends Component> componentClass = attributeMap.get(key);
                 Component comp = entity.getComponent(componentClass);
 
                 if (!set(comp, attribute.name, value)) {
@@ -325,11 +456,21 @@ public class NewJsonLoader implements ISceneLoader {
                 }
                 return true;
             } else {
-                logger.warn("Component not found for attribute: " + attribute.name);
+                logger.warn("Component not found for attribute '" + attribute.name + "' and class '" + className + "'");
                 return false;
             }
         });
         logger.debug(I18n.msg("notif.loading", className + ": " + entity.getComponent(Base.class).names[0]));
+    }
+
+    public String findAttribute(String attributeName, String className){
+        String mixedKey = attributeName + ":" + className;
+        if(attributeMap.containsKey(mixedKey)) {
+            return mixedKey;
+        } else if(attributeMap.containsKey(attributeName)) {
+            return attributeName;
+        }
+        return null;
     }
 
     /**

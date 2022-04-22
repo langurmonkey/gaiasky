@@ -14,7 +14,6 @@ import java.time.Instant;
  * Orbit in the heliotropic reference system. Must be corrected using the longitude of the Sun.
  */
 public class HeliotropicOrbit extends Orbit {
-    double angle;
 
     public HeliotropicOrbit() {
         super();
@@ -26,8 +25,8 @@ public class HeliotropicOrbit extends Orbit {
      * and size.
      */
     protected void updateLocalTransform(Instant date) {
-        angle = AstroUtils.getSunLongitude(date);
-        translation.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, angle + 180);
+        double sunLongitude = AstroUtils.getSunLongitude(date);
+        translation.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);
 
         localTransformD.putIn(localTransform);
     }

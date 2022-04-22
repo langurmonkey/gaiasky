@@ -221,7 +221,7 @@ public class AttitudeConverter {
      * @return
      */
     public static HeliotropicAnglesRates getHeliotropicAnglesRates(long gt,
-            Attitude att) {
+            IAttitude att) {
         HeliotropicAnglesRates anglesAndRates = new HeliotropicAnglesRates();
 
         // k is a unit vector (in ICRS) towards the north ecliptic pole:

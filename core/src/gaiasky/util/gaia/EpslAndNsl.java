@@ -89,7 +89,7 @@ public class EpslAndNsl extends AnalyticalAttitudeDataServer {
 	 * @return attitude for the given time
 	 */
 	@Override
-	public Attitude getAttitudeNative(long tNow)  {
+	public IAttitude getAttitudeNative(long tNow)  {
 		if (!initialized) {
 			copyRefValues();
 			super.setInitialized(true);

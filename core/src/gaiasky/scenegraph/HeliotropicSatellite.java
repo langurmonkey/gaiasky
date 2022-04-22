@@ -11,7 +11,7 @@ import gaiasky.GaiaSky;
 import gaiasky.scenegraph.component.ITransform;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gaia.Attitude;
+import gaiasky.util.gaia.IAttitude;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -19,7 +19,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 public class HeliotropicSatellite extends Satellite {
 
     public Vector3d unrotatedPos;
-    Attitude attitude;
+    IAttitude attitude;
     Quaterniond quaterniond;
     Quaternion quaternion;
 

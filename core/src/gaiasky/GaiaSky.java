@@ -633,6 +633,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
 
         /*
+         * GET SCENE
+         */
+        if (assetManager.isLoaded(sceneName)) {
+            scene = assetManager.get(sceneName);
+        } else {
+            throw new RuntimeException("Error loading scene from data load string: " + sceneName + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
+        }
+
+
+        /*
          * SCENE GRAPH UPDATER
          */
         updateProcess = () -> {

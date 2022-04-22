@@ -10,7 +10,7 @@ import gaiasky.util.math.Vector3d;
 
 /**
  * This is the basic interface for all attitude representations and scanning
- * laws. An {@linkplain Attitude} represents the three-dimensional orientation
+ * laws. An {@linkplain IAttitude} represents the three-dimensional orientation
  * of the SRS of Gaia at a specific instant in time as well as its inertial
  * angular rotation at that moment.
  * 
@@ -23,7 +23,7 @@ import gaiasky.util.math.Vector3d;
  * 
  * @author Lennart Lindegren, Uwe Lammers
  */
-public interface Attitude {
+public interface IAttitude {
     /**
      * Get the time that this attitude is valid for as a single long value. The
      * meaning of the time depends on the TimeContext of the AttitudeDataServer

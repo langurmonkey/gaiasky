@@ -24,4 +24,9 @@ public class Flags extends Component {
      * Is this just a copy?
      */
     public boolean copy = false;
+
+    /**
+     * Has this been updated at least once?
+     */
+    public boolean initialUpdate = false;
 }

@@ -10,8 +10,11 @@ public class HelloWorldSystem extends IteratingSystem {
 
     protected ComponentMapper<Base> mBase;
 
+    private long runs = 0;
+
     @Override
     protected void process(int id) {
-        System.out.println(mBase.get(id).id);
+        //System.out.println(mBase.get(id).id);
+        runs++;
     }
 }

@@ -45,7 +45,7 @@ import java.util.Date;
  * @param <A>
  *            type of Attitude that the server is serving
  */
-public abstract class BaseAttitudeDataServer<A extends Attitude> {
+public abstract class BaseAttitudeDataServer<A extends IAttitude> {
 
     /**
      * Some scanning laws have constants or tables for interpolation that need

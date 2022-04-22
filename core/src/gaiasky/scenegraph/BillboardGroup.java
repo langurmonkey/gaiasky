@@ -48,7 +48,6 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
 
     public BillboardDataset[] datasets;
 
-    protected String provider;
     public GalaxydataComponent gc;
 
     /** Status of data in the GPU **/
@@ -283,14 +282,6 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
     @Override
     public boolean isLabel() {
         return true;
-    }
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
     }
 
     public void setGalaxydata(GalaxydataComponent gc) {

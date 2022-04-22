@@ -36,7 +36,6 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
     private static final int divisionsU = 36;
     private static final int divisionsV = 18;
 
-    public ModelComponent mc;
     private final Vector3 auxf;
     private final Vector3d auxd;
     private final Matrix4 annotTransform;

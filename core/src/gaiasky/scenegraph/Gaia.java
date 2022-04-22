@@ -12,7 +12,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gaia.Attitude;
+import gaiasky.util.gaia.IAttitude;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
@@ -26,7 +26,7 @@ import java.util.Date;
 public class Gaia extends Satellite {
 
     public Vector3d unrotatedPos;
-    Attitude attitude;
+    IAttitude attitude;
     Quaterniond quaterniond;
     Quaternion quaternion;
 

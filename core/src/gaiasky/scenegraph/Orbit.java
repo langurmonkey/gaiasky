@@ -56,7 +56,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     private static OrbitRefresher orbitRefresher;
 
-    private static enum OrientationModel {
+    private enum OrientationModel {
         DEFAULT,
         EXTRASOLAR_SYSTEM
     }

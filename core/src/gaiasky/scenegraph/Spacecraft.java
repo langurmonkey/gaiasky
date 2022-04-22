@@ -124,9 +124,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     private final Quaternion qf;
 
-    private ModelComponent thruster;
-    private Matrix4 thrusterTransform;
-
     private int currentMachine = 0;
     private MachineDefinition[] machines;
 
@@ -287,12 +284,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
 
-        // Time in shader
-        if (this.thruster != null && this.thruster.instance != null) {
-            double t = (TimeUtils.millis() / 1000d) % 10d;
-            ((FloatAttribute) thruster.instance.materials.get(0).get(FloatAttribute.Shininess)).value = (float) t;
-        }
-
         if (render) {
             EventManager.publish(Event.SPACECRAFT_INFO, this, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], currentEnginePower, yawp, pitchp, rollp);
         }
@@ -309,11 +300,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             // Rotation for attitude indicator
             rotationMatrix.idt().setToLookAt(directionf, upf);
             rotationMatrix.getRotation(qf);
-
-            // Thruster
-            //float thSize = size * 0.3f;
-            //Vector3 thPos = aux3f1.get().set(posf).add((float) (4.5f * Constants.M_TO_U), (float) (0 * Constants.M_TO_U), (float) (-1f * Constants.M_TO_U));
-            //thrusterTransform.idt().rotate(upf, (float) -yaw).translate(thPos).scale(thSize, thSize, thSize);
 
         } catch (Exception e) {
         }
@@ -598,10 +584,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             super.addToRenderLists(camera);
             if (Settings.settings.spacecraft.showAxes)
                 addToRender(this, RenderGroup.LINE);
-
-            // Thrusters
-            //if (isInRender(this, RenderGroup.MODEL_PIX))
-            //    addToRender(this, RenderGroup.MODEL_VERT_THRUSTER);
         }
     }
 
@@ -655,10 +637,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         if (group == RenderGroup.MODEL_PIX) {
             render(modelBatch, alpha, t, true);
-        } else if (group == RenderGroup.MODEL_VERT_THRUSTER) {
-            thruster.touch();
-            thruster.setTransparency(alpha * fadeOpacity);
-            modelBatch.render(thruster.instance, thruster.env);
         }
     }
 
