@@ -1,12 +1,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import gaiasky.render.ShadowMapImpl;
-import gaiasky.scenegraph.component.ITransform;
 import gaiasky.scenegraph.component.ModelComponent;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class Model implements Component {
 
