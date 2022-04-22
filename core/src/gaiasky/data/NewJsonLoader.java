@@ -160,6 +160,10 @@ public class NewJsonLoader implements ISceneLoader {
             addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(),
                     LocationMark.class);
 
+            // Area
+            addArchetype(Area.class.getName(), SceneGraphNode.class.getName(),
+                    Perimeter.class, AuxVec.class);
+
         } else {
             logger.error("World is null, can't initialize archetypes.");
         }
