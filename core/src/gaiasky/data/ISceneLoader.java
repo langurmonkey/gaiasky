@@ -7,6 +7,7 @@ package gaiasky.data;
 
 import com.artemis.World;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.scene.Scene;
 import gaiasky.scenegraph.SceneGraphNode;
 import uk.ac.starlink.util.DataSource;
 
@@ -18,6 +19,11 @@ import java.util.Map;
  */
 public interface ISceneLoader {
 
+
+    void initialize(String[] files, Scene scene) throws RuntimeException;
+
+    void initialize(DataSource ds, Scene scene);
+
     void loadData() throws FileNotFoundException;
 
     void setName(String name);
@@ -25,9 +31,5 @@ public interface ISceneLoader {
     void setDescription(String description);
 
     void setParams(Map<String, Object> params);
-
-    void initialize(String[] files, World world) throws RuntimeException;
-
-    void initialize(DataSource ds, World world);
 
 }

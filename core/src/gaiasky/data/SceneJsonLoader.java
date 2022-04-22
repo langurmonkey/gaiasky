@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import gaiasky.scene.Scene;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -17,7 +18,9 @@ import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.i18n.I18n;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,7 +30,9 @@ import java.util.Map;
 public class SceneJsonLoader {
     private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
 
-    public synchronized static void loadScene(FileHandle[] jsonFiles, World world) throws FileNotFoundException, ReflectionException {
+    private static List<String> supportedLoaders = Arrays.asList("gaiasky.data.JsonLoader", "gaiasky.data.GeoJsonLoader");
+
+    public synchronized static void loadScene(FileHandle[] jsonFiles, Scene scene) throws FileNotFoundException, ReflectionException {
         logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
         for (FileHandle fh : jsonFiles) {
             logger.info("\t" + fh.path() + " - exists: " + fh.exists());
@@ -38,10 +43,10 @@ public class SceneJsonLoader {
 
         // Load files
         for (FileHandle jsonFile : jsonFiles) {
-            loadJsonFile(jsonFile, world);
+            loadJsonFile(jsonFile, scene);
         }
     }
-    public synchronized static void loadJsonFile(FileHandle jsonFile, World world) throws ReflectionException, FileNotFoundException {
+    public synchronized static void loadJsonFile(FileHandle jsonFile, Scene scene) throws ReflectionException, FileNotFoundException {
 
         JsonReader jsonReader = new JsonReader();
         JsonValue model = jsonReader.parse(jsonFile.read());
@@ -60,14 +65,20 @@ public class SceneJsonLoader {
             JsonValue child = model.get("data").child;
             while (child != null) {
                 String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
-                if(clazzName.equals("gaiasky.data.JsonLoader")) {
-                    clazzName = "gaiasky.data.NewJsonLoader";
-                } else {
-                    // Unsupported for now
+
+                if(!supportedLoaders.contains(clazzName)){
                     logger.info("Skipping " + clazzName + ": unsupported");
                     child = child.next;
                     continue;
                 }
+
+                // Update name
+                if(clazzName.equals("gaiasky.data.JsonLoader")) {
+                    clazzName = "gaiasky.data.NewJsonLoader";
+                } else if (clazzName.equals("gaiasky.data.GeoJsonLoader")) {
+                    clazzName = "gaiasky.data.NewGeoJsonLoader";
+                }
+
                 @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
                 JsonValue filesJson = child.get("files");
@@ -85,7 +96,7 @@ public class SceneJsonLoader {
                         loader.setParams(params);
 
                     // Init loader
-                    loader.initialize(files, world);
+                    loader.initialize(files, scene);
 
                     JsonValue curr = filesJson;
                     while (curr.next != null) {
@@ -122,7 +133,7 @@ public class SceneJsonLoader {
         } else {
             // Use regular JsonLoader
             NewJsonLoader loader = new NewJsonLoader();
-            loader.initialize(new String[] { jsonFile.file().getAbsolutePath() }, world);
+            loader.initialize(new String[] { jsonFile.file().getAbsolutePath() }, scene);
             // Load data
             loader.loadData();
         }

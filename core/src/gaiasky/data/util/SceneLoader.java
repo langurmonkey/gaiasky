@@ -55,7 +55,7 @@ public class SceneLoader extends AsynchronousAssetLoader<Scene, SceneLoaderParam
         try {
             scene = new Scene();
             scene.initialize();
-            SceneJsonLoader.loadScene(fileHandles, scene.world);
+            SceneJsonLoader.loadScene(fileHandles, scene);
 
         } catch (Exception e) {
             GaiaSky.postRunnable(() -> {

@@ -1,45 +1,29 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 package gaiasky.data;
 
+import com.artemis.Archetype;
+import com.artemis.Entity;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.GraphNode;
+import gaiasky.scene.component.Perimeter;
 import gaiasky.scenegraph.Area;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
-import uk.ac.starlink.util.DataSource;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 
 /**
- * Loads GeoJson files into Area objects.
+ * Loads GeoJson files into ECS entities.
  */
-public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
-
-    // Contains all the files to be loaded by this loader.
-    private String[] filePaths;
+public class NewGeoJsonLoader extends AbstractSceneLoader {
+    private static final Logger.Log logger = Logger.getLogger(NewGeoJsonLoader.class);
 
     @Override
-    public void initialize(String[] files) {
-        filePaths = files;
-    }
-
-    @Override
-    public void initialize(DataSource ds) {
-    }
-
-    @Override
-    public Array<? extends SceneGraphNode> loadData() {
-        Array<T> bodies = new Array<T>();
-
+    public void loadData() throws FileNotFoundException {
         try {
             JsonReader json = new JsonReader();
             for (String filePath : filePaths) {
@@ -50,11 +34,7 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
                 while (child != null) {
                     size++;
 
-                    // Convert to object and add to list
-                    @SuppressWarnings("unchecked")
-                    T object = (T) convertJsonToArea(child);
-
-                    bodies.add(object);
+                    loadJsonObject(child);
 
                     child = child.next;
                 }
@@ -64,37 +44,53 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
-
-        return bodies;
     }
 
-    private Area convertJsonToArea(JsonValue json) throws ReflectionException {
-        Area instance = new Area();
-        instance.setParent("Earth");
-        instance.setCt("Countries");
-        instance.setName(json.get("properties").getString("name"));
-
-        JsonValue jsonArray = json.get("geometry").get("coordinates");
-
-        JsonValue firstelem;
-        int size;
-        int d;
-
-        int depth = depth(jsonArray);
-
-        if (depth == 4) {
-            firstelem = jsonArray.child;
-            size = jsonArray.size;
-            d = 1;
+    private void loadJsonObject(JsonValue json) {
+        Class clazz = Area.class;
+        String className = clazz.getName();
+        if (!scene.archetypes().containsKey(className)) {
+            // Do not know what to do
+            if (!loggedArchetypes.contains(className)) {
+                logger.warn("Skipping " + clazz.getSimpleName() + ": no suitable archetype found.");
+                loggedArchetypes.add(className);
+            }
         } else {
-            firstelem = jsonArray.child;
-            size = jsonArray.size;
-            d = 2;
+            // Create entity and fill it up
+            Archetype archetype = scene.archetypes().get(className);
+            Entity entity = scene.world.createEntity(archetype);
+
+            // Components
+            Base base = entity.getComponent(Base.class);
+            GraphNode graphNode = entity.getComponent(GraphNode.class);
+            Perimeter perimeter = entity.getComponent(Perimeter.class);
+
+            // Set base info
+            base.setName(json.get("properties").getString("name"));
+            base.setCt("Countries");
+            graphNode.setParent("Earth");
+
+            JsonValue jsonArray = json.get("geometry").get("coordinates");
+
+            JsonValue firstelem;
+            int size;
+            int d;
+
+            int depth = depth(jsonArray);
+
+            if (depth == 4) {
+                firstelem = jsonArray.child;
+                size = jsonArray.size;
+                d = 1;
+            } else {
+                firstelem = jsonArray.child;
+                size = jsonArray.size;
+                d = 2;
+            }
+
+            // Set to component
+            perimeter.setPerimeter(convertToDoubleArray(firstelem, size, d));
         }
-
-        instance.setPerimeter(convertToDoubleArray(firstelem, size, d));
-
-        return instance;
     }
 
     public double[][][] convertToDoubleArray(JsonValue json, int size, int d) {
@@ -141,10 +137,12 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
 
     @Override
     public void setName(String name) {
+
     }
 
     @Override
     public void setDescription(String description) {
+
     }
 
     @Override
