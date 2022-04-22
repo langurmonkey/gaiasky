@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * Loads JSON files into a scene object, which contains an
- * Artemis ECS world.
+ * ECS world.
  */
 public class SceneJsonLoader {
     private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
