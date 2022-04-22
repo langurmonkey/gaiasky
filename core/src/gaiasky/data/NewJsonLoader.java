@@ -51,10 +51,12 @@ public class NewJsonLoader extends AbstractSceneLoader {
                 if (model.has("objects")) {
                     JsonValue child = model.get("objects").child;
                     final int count = model.get("objects").size;
-                    int current = 0;
+                    int processed = 0;
+                    int loaded = 0;
                     while (child != null) {
-                        current++;
+                        processed++;
                         String clazzName = child.getString("impl");
+                        clazzName = clazzName.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
                         @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
                         if (!scene.archetypes().containsKey(clazzName)) {
@@ -64,6 +66,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                                 loggedArchetypes.add(clazzName);
                             }
                         } else {
+                            loaded++;
                             // Create entity and fill it up
                             Archetype archetype = scene.archetypes().get(clazzName);
                             Entity entity = world.createEntity(archetype);
@@ -71,10 +74,10 @@ public class NewJsonLoader extends AbstractSceneLoader {
                         }
 
                         child = child.next;
-                        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) current / (float) count);
+                        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) processed / (float) count);
                     }
                     EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), 2f);
-                    logger.info(I18n.msg("notif.nodeloader", current, filePath));
+                    logger.info(I18n.msg("notif.nodeloader", loaded, filePath));
                 }
             } catch (Exception e) {
                 logger.error(e);

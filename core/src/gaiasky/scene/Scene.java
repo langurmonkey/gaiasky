@@ -139,6 +139,10 @@ public class Scene {
             addArchetype(Area.class.getName(), SceneGraphNode.class.getName(),
                     Perimeter.class, AuxVec.class);
 
+            // Constellation
+            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(),
+                    Constel.class);
+
         } else {
             logger.error("World is null, can't initialize archetypes.");
         }
@@ -280,6 +284,10 @@ public class Scene {
             putAll(LocationMark.class,
                     "location",
                     "distFactor");
+
+            // Constel
+            putAll(Constel.class,
+                    "ids");
         } else {
             logger.error("World is null, can't initialize attributes.");
         }

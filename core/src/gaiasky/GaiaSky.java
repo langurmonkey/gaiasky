@@ -85,6 +85,8 @@ import org.lwjgl.openvr.VR;
 import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
@@ -917,7 +919,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void dispose() {
         // Stop
-        if(running != null) {
+        if (running != null) {
             running.set(false);
         }
 
@@ -1482,7 +1484,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
 
             // Load scene
-            if(scene == null) {
+            if (scene == null) {
                 final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
                 int i = 0;
                 // Add data files
