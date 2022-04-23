@@ -147,6 +147,15 @@ public class Scene {
             addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(),
                     Boundaries.class);
 
+            // ParticleGroup
+            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(),
+                    ParticleSet.class);
+
+            // StarGroup
+            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(),
+                    StarSet.class);
+
+
         } else {
             logger.error("World is null, can't initialize archetypes.");
         }
@@ -260,6 +269,11 @@ public class Scene {
                     "fadeout",
                     "positionobjectname");
 
+            // DatasetDescription
+            putAll(DatasetDescription.class,
+                    "catalogInfo",
+                    "cataloginfo");
+
             // Label
             putAll(Label.class,
                     "label",
@@ -296,6 +310,26 @@ public class Scene {
             // Boundaries
             putAll(Boundaries.class,
                     "boundaries");
+
+            // ParticleSet
+            putAll(ParticleSet.class,
+                    "provider:ParticleGroup",
+                    "datafile",
+                    "providerparams",
+                    "factor",
+                    "profiledecay",
+                    "colornoise",
+                    "particlesizelimits");
+
+            // StarSet
+            putAll(StarSet.class,
+                    "provider:StarGroup",
+                    "datafile:StarGroup",
+                    "providerparams:StarGroup",
+                    "factor:StarGroup",
+                    "profiledecay:StarGroup",
+                    "colornoise:StarGroup",
+                    "particlesizelimits:StarGroup");
         } else {
             logger.error("World is null, can't initialize attributes.");
         }

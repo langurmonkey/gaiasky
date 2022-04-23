@@ -23,9 +23,12 @@ public class CatalogInfo {
     private static final Log logger = Logger.getLogger(CatalogInfo.class);
     private static int colorIndexSequence = 0;
 
-
     public enum CatalogInfoSource {
-        INTERNAL, LOD, SAMP, SCRIPT, UI
+        INTERNAL,
+        LOD,
+        SAMP,
+        SCRIPT,
+        UI
     }
 
     // Base properties
@@ -45,7 +48,6 @@ public class CatalogInfo {
     public int hlCmapIndex = 0;
     public IAttribute hlCmapAttribute;
     public double hlCmapMin = 0, hlCmapMax = 0;
-
 
     // The filtering object. May be null
     public Filter filter;
@@ -70,7 +72,8 @@ public class CatalogInfo {
         this.hlAllVisible = true;
         System.arraycopy(ColorUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
 
-        this.object.setCatalogInfo(this);
+        if (this.object != null)
+            this.object.setCatalogInfo(this);
     }
 
     public void setVisibility(boolean visibility) {
@@ -131,12 +134,12 @@ public class CatalogInfo {
      */
     public void removeCatalog() {
         if (this.object != null) {
-            if(!isHighlightable()) {
+            if (!isHighlightable()) {
                 EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, this.object, true);
             }
             this.object.dispose();
-            logger.info(I18n.msg("gui.dataset.remove.info",  name));
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.dataset.remove.info",  name));
+            logger.info(I18n.msg("gui.dataset.remove.info", name));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.dataset.remove.info", name));
         }
     }
 
