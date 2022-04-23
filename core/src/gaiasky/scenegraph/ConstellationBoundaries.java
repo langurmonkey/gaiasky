@@ -6,6 +6,7 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
@@ -13,11 +14,12 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConstellationBoundaries extends SceneGraphNode implements ILineRenderable {
     private final float alpha = .2f;
-    private List<List<Vector3d>> boundaries;
+    public List<List<Vector3d>> boundaries;
 
     public ConstellationBoundaries() {
         super();
@@ -45,6 +47,19 @@ public class ConstellationBoundaries extends SceneGraphNode implements ILineRend
 
     public void setBoundaries(List<List<Vector3d>> boundaries) {
         this.boundaries = boundaries;
+    }
+
+    public void setBoundaries(double[][][] ids) {
+        this.boundaries = new ArrayList<>(ids.length);
+        for(double[][] dd : ids) {
+            List<Vector3d> ii = new ArrayList<>(dd.length);
+            for(int j =0; j < dd.length; j++) {
+                double[] v = dd[j];
+                Vector3d vec = new Vector3d(v);
+                ii.add(vec);
+            }
+            this.boundaries.add(ii);
+        }
     }
 
     @Override

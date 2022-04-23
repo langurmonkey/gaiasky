@@ -45,7 +45,7 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
 
     @Override
     public Array<? extends SceneGraphNode> loadData() {
-        Array<ConstellationBoundaries> boundaries = new Array<ConstellationBoundaries>();
+        Array<ConstellationBoundaries> boundaries = new Array<>();
         int n = 0;
         for (String f : files) {
             try {
