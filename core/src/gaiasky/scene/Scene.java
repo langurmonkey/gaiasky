@@ -346,6 +346,10 @@ public class Scene {
             addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(),
                     Constel.class);
 
+            // Constellation
+            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(),
+                    Boundaries.class);
+
         } else {
             logger.error("World is null, can't initialize archetypes.");
         }
