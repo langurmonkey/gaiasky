@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Represents a constellation object.
  */
-public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable {
+public class Constellation extends SceneGraphNode implements ILineRenderable, I3DTextRenderable {
     private static final Array<Constellation> allConstellations = new Array<>(false, 88);
     private double deltaYears;
 
@@ -181,6 +181,16 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
+    }
+
+    public void setIds(double[][] ids) {
+        this.ids = new Array<>(ids.length);
+        for(double[] dd : ids) {
+            int[] ii = new int[dd.length];
+            for(int j =0; j < dd.length; j++)
+                ii[j] = (int) Math.round(dd[j]);
+            this.ids.add(ii);
+        }
     }
 
     @Override
