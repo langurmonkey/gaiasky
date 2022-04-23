@@ -324,12 +324,6 @@ public class Scene {
             // Area
             addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class, AuxVec.class);
 
-            // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class);
-
-            // Constellation
-            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
-
             // ParticleGroup
             addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class);
 
@@ -341,18 +335,6 @@ public class Scene {
 
             // ConstellationBoundaries
             addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
-
-            // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(),
-                    Constel.class);
-
-            // Constellation
-            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(),
-                    Boundaries.class);
-
-            // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(),
-                    Constel.class);
 
         } else {
             logger.error("World is null, can't initialize archetypes.");
