@@ -35,6 +35,19 @@ public class Scene {
     // Archetypes map, links old scene graph model objects to artemis archetypes
     protected Map<String, Archetype> archetypes;
 
+    // Systems that load data -- run a the very beginning
+    protected Set<EntitySystem> loadingSystems;
+    // Systems that initialize entities -- run after loading systems
+    protected Set<EntitySystem> initSystems;
+    // Systems that contain update logic -- run every cycle
+    protected Set<EntitySystem> updateSystems;
+    // Systems that contain render logic -- run every cycle
+    protected Set<EntitySystem> renderSystems;
+    // Systems that dispose resources -- run at the end
+    protected Set<EntitySystem> disposeSystems;
+    // All systems container
+    protected Set<Set<EntitySystem>> allSystems;
+
     // Maps old attributes to components
     protected Map<String, Class<? extends Component>> attributeMap;
 
@@ -252,6 +265,59 @@ public class Scene {
     private boolean mustAddToIndex(Entity entity) {
         // All entities except the ones who have perimeter, location mark and particle or star set
         return entity.getComponent(Perimeter.class) == null && entity.getComponent(LocationMark.class) == null && entity.getComponent(ParticleSet.class) == null && entity.getComponent(StarSet.class) == null;
+    }
+
+    /**
+     * Enables the given groups of systems.
+     *
+     * @param systemBags An array with the system bags to enable.
+     */
+    public void enableSystems(Set<EntitySystem>... systemBags) {
+        setEnabled(true, systemBags);
+    }
+
+    /**
+     * Disables the given groups of systems.
+     *
+     * @param systemBags An array with the system bags to disable.
+     */
+    public void disableSystems(Set<EntitySystem>... systemBags) {
+        setEnabled(false, systemBags);
+    }
+
+    /**
+     * Enables or disables a group of system bags.
+     *
+     * @param enabled    The enabled status.
+     * @param systemBags The array of groups of systems to enable or disable.
+     */
+    public void setEnabled(boolean enabled, Set<EntitySystem>... systemBags) {
+        for (Set<EntitySystem> systemBag : systemBags) {
+            if (systemBag != null) {
+                for (EntitySystem system : systemBag) {
+                    if (enabled) {
+                        engine.addSystem(system);
+                    } else {
+                        engine.removeSystem(system);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Enables or disables a given group of systems.
+     *
+     * @param enabled The enabled status.
+     * @param systems The group of systems to enable or disable.
+     */
+    public void setEnabled(boolean enabled, Set<EntitySystem> systems) {
+        for (EntitySystem system : systems)
+            if (enabled) {
+                engine.addSystem(system);
+            } else {
+                engine.removeSystem(system);
+            }
     }
 
     protected void initializeArchetypes() {
