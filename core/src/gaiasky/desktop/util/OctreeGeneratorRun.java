@@ -26,6 +26,7 @@ import gaiasky.data.util.HipNames;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
@@ -37,6 +38,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
+import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
 import java.io.*;
@@ -477,7 +479,12 @@ public class OctreeGeneratorRun {
         if (current.numObjects > 0) {
             File particles = new File(outFolder + "/particles/", "particles_" + String.format("%06d", current.pageId) + ".bin");
             logger.info("Writing " + current.numObjects + " particles of node " + current.pageId + " to " + particles.getAbsolutePath());
-            particleWriter.writeParticles(current.objects, new BufferedOutputStream(new FileOutputStream(particles)), version);
+            List<SceneGraphNode> objects = new ArrayList<>(current.objects.size());
+            current.objects.forEach(o -> {
+                if(o instanceof SceneGraphNode)
+                    objects.add((SceneGraphNode) o);
+            });
+            particleWriter.writeParticles(objects, new BufferedOutputStream(new FileOutputStream(particles)), version);
         }
 
         // Write each child

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * An archetype is a class of entity containing a pre-defined set of components for easy
+ * An archetype is a class of {@link Entity} containing a pre-defined set of {@link Component}s for convenient
  * creation and extension.
  */
 public class Archetype {

@@ -19,6 +19,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
 import uk.ac.starlink.util.DataSource;
@@ -377,13 +378,14 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * Unloads the given octant.
      */
     public void unloadOctant(OctreeNode octant, final AbstractOctreeWrapper octreeWrapper) {
-        List<SceneGraphNode> objects = octant.objects;
+        List<IOctreeObject> objects = octant.objects;
         if (objects != null) {
             GaiaSky.postRunnable(() -> {
                 synchronized (octant) {
                     try {
                         int unloaded = 0;
-                        for (SceneGraphNode object : objects) {
+                        for (IOctreeObject octreeObject : objects) {
+                            SceneGraphNode object = (SceneGraphNode) octreeObject;
                             int count = object.getStarCount();
                             object.dispose();
                             object.octant = null;
@@ -468,7 +470,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                                 loader.unloadOctant(octant, octreeWrapper);
                             }
                             if (octant != null && octant.objects != null && octant.objects.size() > 0) {
-                                SceneGraphNode sg = octant.objects.get(0);
+                                SceneGraphNode sg = (SceneGraphNode) octant.objects.get(0);
                                 nUnloaded += sg.getStarCount();
                                 if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
                                     break;

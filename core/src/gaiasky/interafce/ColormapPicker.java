@@ -33,6 +33,7 @@ import gaiasky.util.filter.attrib.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
+import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.ucd.UCD;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.HexColorValidator;
@@ -221,7 +222,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         private boolean changeEvents = true;
         private final ColorPickerColormapDialog cpd;
         private final Array<ParticleGroup> pgarray;
-        private final Array<SceneGraphNode> apearray;
+        private final Array<IOctreeObject> apearray;
 
         public ColorPickerColormapDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.msg("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
@@ -486,7 +487,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 if (ci.object instanceof OctreeWrapper) {
                     OctreeWrapper ow = (OctreeWrapper) ci.object;
                     ow.root.addParticlesTo(apearray);
-                    for (SceneGraphNode ape : apearray) {
+                    for (IOctreeObject ape : apearray) {
                         if (ape instanceof ParticleGroup)
                             pgarray.add((ParticleGroup) ape);
                     }

@@ -15,7 +15,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
@@ -73,7 +72,7 @@ public class OctreeNode implements ILineRenderable {
     /** Children nodes **/
     public OctreeNode[] children = new OctreeNode[8];
     /** List of objects **/
-    public List<SceneGraphNode> objects;
+    public List<IOctreeObject> objects;
 
     private final double radius;
     /** If observed, the view angle in radians of this octant **/
@@ -196,7 +195,7 @@ public class OctreeNode implements ILineRenderable {
         return 0;
     }
 
-    public boolean containsObject(SceneGraphNode object) {
+    public boolean containsObject(IOctreeObject object) {
         boolean has = this.objects.contains(object);
         if (!has && children != null && numChildren > 0) {
             for (OctreeNode child : children) {
@@ -247,7 +246,7 @@ public class OctreeNode implements ILineRenderable {
         return opacity;
     }
 
-    public boolean add(SceneGraphNode e) {
+    public boolean add(IOctreeObject e) {
         if (objects == null)
             objects = new ArrayList<>(1);
         objects.add(e);
@@ -255,7 +254,7 @@ public class OctreeNode implements ILineRenderable {
         return true;
     }
 
-    public boolean addAll(List<SceneGraphNode> l) {
+    public boolean addAll(List<IOctreeObject> l) {
         if (objects == null)
             objects = new ArrayList<>(l.size());
         objects.addAll(l);
@@ -263,12 +262,12 @@ public class OctreeNode implements ILineRenderable {
         return true;
     }
 
-    public void setObjects(List<SceneGraphNode> l) {
+    public void setObjects(List<IOctreeObject> l) {
         this.objects = l;
         numObjects = objects.size();
     }
 
-    public boolean insert(SceneGraphNode e, int level) {
+    public boolean insert(IOctreeObject e, int level) {
         int node = 0;
         if (e.getPosition().y.doubleValue() > min.y + ((max.y - min.y) / 2))
             node += 4;
@@ -283,7 +282,7 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
-    public void toTree(TreeSet<SceneGraphNode> tree) {
+    public void toTree(TreeSet<IOctreeObject> tree) {
         tree.addAll(objects);
         if (children != null) {
             for (int i = 0; i < 8; i++) {
@@ -314,9 +313,9 @@ public class OctreeNode implements ILineRenderable {
      *
      * @param particles The list of particles.
      */
-    public void addParticlesTo(Array<SceneGraphNode> particles) {
+    public void addParticlesTo(Array<IOctreeObject> particles) {
         if (this.objects != null) {
-            for (SceneGraphNode elem : this.objects)
+            for (IOctreeObject elem : this.objects)
                 particles.add(elem);
         }
         for (int i = 0; i < 8; i++) {
@@ -501,7 +500,7 @@ public class OctreeNode implements ILineRenderable {
      * @param roulette        List where the nodes to be processed are to be added.
      * @param opacity         The opacity to set.
      */
-    public void update(Vector3b parentTransform, ICamera cam, List<SceneGraphNode> roulette, float opacity) {
+    public void update(Vector3b parentTransform, ICamera cam, List<IOctreeObject> roulette, float opacity) {
         this.opacity = opacity;
         this.observed = false;
 
@@ -553,10 +552,10 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
-    private void addObjectsTo(List<SceneGraphNode> roulette) {
+    private void addObjectsTo(List<IOctreeObject> roulette) {
         if (objects != null) {
             roulette.addAll(objects);
-            for (SceneGraphNode obj : objects) {
+            for (IOctreeObject obj : objects) {
                 nObjectsObserved += obj.getStarCount();
             }
         }
@@ -674,7 +673,7 @@ public class OctreeNode implements ILineRenderable {
         // Number of own objects
         this.numObjects = 0;
         if (objects != null) {
-            for (SceneGraphNode ape : objects) {
+            for (IOctreeObject ape : objects) {
                 this.numObjects += ape.getStarCount();
             }
         }
@@ -698,7 +697,7 @@ public class OctreeNode implements ILineRenderable {
     public int countObjects() {
         int n = 0;
         if (objects != null) {
-            for (SceneGraphNode obj : objects) {
+            for (IOctreeObject obj : objects) {
                 n += obj.getStarCount();
             }
         }
@@ -828,7 +827,7 @@ public class OctreeNode implements ILineRenderable {
      */
     public void dispose() {
         if (objects != null)
-            for (SceneGraphNode object : objects) {
+            for (IOctreeObject object : objects) {
                 if (object != null)
                     object.dispose();
             }

@@ -23,6 +23,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     public OctreeNode root;
     /** Roulette list with the objects to process **/
-    protected List<SceneGraphNode> roulette;
+    protected List<IOctreeObject> roulette;
     public Map<SceneGraphNode, OctreeNode> parenthood;
     /** The number of objects added to render in the last frame **/
     protected int lastNumberObjects = 0;
@@ -83,8 +84,9 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
      */
     private void addObjectsDeep(OctreeNode octant, SceneGraphNode root) {
         if (octant.objects != null) {
-            root.add(octant.objects);
-            for (SceneGraphNode sgn : octant.objects) {
+            root.addOctreeObjects(octant.objects);
+            for (IOctreeObject object : octant.objects) {
+                SceneGraphNode sgn = (SceneGraphNode) object;
                 parenthood.put(sgn, octant);
             }
         }

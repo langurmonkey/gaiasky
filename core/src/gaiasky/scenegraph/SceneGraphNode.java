@@ -28,6 +28,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.IPosition;
 import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
@@ -40,7 +41,7 @@ import java.util.Map;
 /**
  * An object in the scene graph. Serves as a top class which provides the basic functionality.
  */
-public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwitch {
+public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwitch, IOctreeObject {
     public static final String ROOT_NAME = "Universe";
 
     protected static TLV3D D31 = new TLV3D(), D32 = new TLV3D(), D33 = new TLV3D(), D34 = new TLV3D();
@@ -246,7 +247,24 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     /**
-     * Adds the given SceneGraphNode list as children to this node.
+     * Adds the given {@link IOctreeObject} list as children to this node.
+     *
+     * @param children The children nodes to add.
+     */
+    public final void add(IOctreeObject... children) {
+        if (this.children == null) {
+            initChildren(this.parent == null || this instanceof AbstractOctreeWrapper ? 300000 : children.length * 5, this.parent == null ? 1000 : children.length);
+        }
+        for (IOctreeObject child : children) {
+            SceneGraphNode sgn = (SceneGraphNode) child;
+            this.children.add(sgn);
+            sgn.parent = this;
+        }
+        numChildren += children.length;
+    }
+
+    /**
+     * Adds the given {@link SceneGraphNode} list as children to this node.
      *
      * @param children The children nodes to add.
      */
@@ -332,6 +350,15 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
                 ancestor = ancestor.parent;
             }
         }
+    }
+
+    /**
+     * Adds the given list of children as child nodes.
+     *
+     * @param children The children nodes to add.
+     */
+    public void addOctreeObjects(List<IOctreeObject> children) {
+        add(children.toArray(new SceneGraphNode[0]));
     }
 
     /**
