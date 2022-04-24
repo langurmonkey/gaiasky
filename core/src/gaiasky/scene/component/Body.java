@@ -1,6 +1,6 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
@@ -8,7 +8,7 @@ import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 
-public class Body extends Component {
+public class Body implements Component {
     /**
      * Position of this entity in the local reference system. The units are
      * {@link gaiasky.util.Constants#U_TO_KM} by default.

@@ -1,8 +1,8 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 
-public class Arrow extends Component {
+public class Arrow implements Component {
     /**
      * Paint arrow caps
      */

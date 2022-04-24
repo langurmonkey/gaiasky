@@ -1,10 +1,10 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.component.RotationComponent;
 
-public class ParentOrientation extends Component {
+public class ParentOrientation implements Component {
     public static final double TH_ANGLE_NONE = Model.TH_ANGLE_POINT / 1e18;
     public static final double TH_ANGLE_POINT = Model.TH_ANGLE_POINT / 3.3e10;
     public static final double TH_ANGLE_QUAD = Model.TH_ANGLE_POINT / 8;

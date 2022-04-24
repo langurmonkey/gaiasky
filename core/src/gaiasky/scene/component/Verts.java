@@ -1,10 +1,10 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 
-public class Verts extends Component {
+public class Verts implements Component {
     protected boolean blend = true, depth = true, additive = true;
 
     protected int glPrimitive;

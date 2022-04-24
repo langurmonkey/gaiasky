@@ -5,10 +5,7 @@
 
 package gaiasky.data;
 
-import com.artemis.World;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Scene;
-import gaiasky.scenegraph.SceneGraphNode;
 import uk.ac.starlink.util.DataSource;
 
 import java.io.FileNotFoundException;

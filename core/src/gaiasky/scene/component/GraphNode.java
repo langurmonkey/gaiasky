@@ -1,12 +1,12 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.IntArray;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 
-public class GraphNode extends Component {
+public class GraphNode implements Component {
 
     /**
      * The first name of the parent object.

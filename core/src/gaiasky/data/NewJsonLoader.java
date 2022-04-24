@@ -1,6 +1,7 @@
 package gaiasky.data;
 
-import com.artemis.*;
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -11,7 +12,8 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scene.component.*;
+import gaiasky.scene.Archetype;
+import gaiasky.scene.component.Base;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
@@ -21,7 +23,10 @@ import gaiasky.util.i18n.I18n;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class NewJsonLoader extends AbstractSceneLoader {
     private static final Logger.Log logger = Logger.getLogger(NewJsonLoader.class);
@@ -39,7 +44,6 @@ public class NewJsonLoader extends AbstractSceneLoader {
     @Override
     public void loadData() throws FileNotFoundException {
         Array<String> filePaths = new Array<>(this.filePaths);
-        World world = scene.world;
 
         // Actually load the files.
         JsonReader json = new JsonReader();
@@ -69,7 +73,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                             loaded++;
                             // Create entity and fill it up
                             Archetype archetype = scene.archetypes().get(clazzName);
-                            Entity entity = world.createEntity(archetype);
+                            Entity entity = archetype.createEntity();
                             fillEntity(child, entity, clazz.getSimpleName());
                         }
 

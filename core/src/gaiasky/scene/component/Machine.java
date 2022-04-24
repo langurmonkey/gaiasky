@@ -1,6 +1,6 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -11,7 +11,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.stream.Stream;
 
-public class Machine extends Component {
+public class Machine implements Component {
     /** Max speed in relativistic mode **/
     private static final double relativisticSpeedCap = Constants.C_US * 0.99999;
 

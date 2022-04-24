@@ -1,8 +1,8 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 
-public class Title extends Component {
+public class Title implements Component {
 
     public float scale = 1f;
     public int align;

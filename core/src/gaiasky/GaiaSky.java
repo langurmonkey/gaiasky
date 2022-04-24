@@ -70,7 +70,6 @@ import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -86,8 +85,6 @@ import org.lwjgl.openvr.VR;
 import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
@@ -650,8 +647,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         updateProcess = () -> {
             // Process ECS
-            scene.world.setDelta((float) time.getDt());
-            scene.world.process();
+            scene.engine.update((float) time.getDt());
 
             sceneGraph.update(time, cameraManager);
             // Swap proximity buffers

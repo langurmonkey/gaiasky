@@ -1,9 +1,9 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.scenegraph.component.CloudComponent;
 
-public class Cloud extends Component {
+public class Cloud implements Component {
 
     public CloudComponent cloud;
 }

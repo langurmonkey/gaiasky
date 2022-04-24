@@ -1,7 +1,7 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 
-public class Heliotropic extends Component {
+public class Heliotropic implements Component {
     // Empty
 }

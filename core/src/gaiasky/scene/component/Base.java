@@ -1,15 +1,13 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
-import com.artemis.annotations.PooledWeaver;
+import com.badlogic.ashley.core.Component;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.i18n.I18n;
 
 import java.util.Locale;
 
-@PooledWeaver
-public class Base extends Component {
+public class Base implements Component {
     /**
      * The internal identifier
      **/

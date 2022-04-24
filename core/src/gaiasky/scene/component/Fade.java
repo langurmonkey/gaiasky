@@ -1,11 +1,11 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
-import com.artemis.Entity;
+import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector2d;
 
-public class Fade extends Component {
+public class Fade implements Component {
     /**
      * Fade in low and high limits
      */

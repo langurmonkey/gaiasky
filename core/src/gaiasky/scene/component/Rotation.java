@@ -1,9 +1,9 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.scenegraph.component.RotationComponent;
 
-public class Rotation extends Component {
+public class Rotation implements Component {
 
     /** Holds information about the rotation of the body **/
     public RotationComponent rc;

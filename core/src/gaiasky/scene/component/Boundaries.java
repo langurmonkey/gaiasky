@@ -1,12 +1,12 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.math.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Boundaries extends Component {
+public class Boundaries implements Component {
 
     public List<List<Vector3d>> boundaries;
 

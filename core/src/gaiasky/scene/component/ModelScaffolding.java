@@ -1,6 +1,6 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.render.ShadowMapImpl;
 import gaiasky.scenegraph.component.ITransform;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ModelScaffolding extends Component {
+public class ModelScaffolding implements Component {
 
     /** Transformations, applied each cycle **/
     public ITransform[] transformations;

@@ -1,10 +1,10 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3b;
 
-public class Label extends Component {
+public class Label implements Component {
 
     /**
      * Position of label.

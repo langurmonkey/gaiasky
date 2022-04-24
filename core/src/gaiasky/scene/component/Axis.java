@@ -1,10 +1,10 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
-public class Axis extends Component {
+public class Axis implements Component {
     private static final double LINE_SIZE_RAD = Math.tan(Math.toRadians(2.9));
     public Vector3d o;
     public Vector3d x;

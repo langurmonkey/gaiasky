@@ -1,12 +1,12 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.parse.Parser;
 
 import java.util.Map;
 
-public class DatasetDescription extends Component {
+public class DatasetDescription implements Component {
     /**
      * Information on the catalog this fade node represents (particle group, octree, etc.)
      */

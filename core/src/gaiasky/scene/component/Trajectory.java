@@ -1,6 +1,6 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
@@ -16,7 +16,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
-public class Trajectory extends Component {
+public class Trajectory implements Component {
     private static final Log logger = Logger.getLogger(Trajectory.class);
 
     private enum OrientationModel {

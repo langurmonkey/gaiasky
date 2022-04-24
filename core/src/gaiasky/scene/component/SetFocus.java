@@ -1,11 +1,11 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 
-public class SetFocus extends Component {
+public class SetFocus implements Component {
 
     /**
      * Reference to the current focus.

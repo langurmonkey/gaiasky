@@ -1,10 +1,10 @@
 package gaiasky.data;
 
-import com.artemis.Archetype;
-import com.artemis.Entity;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import gaiasky.scene.Archetype;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Perimeter;
@@ -58,7 +58,7 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
         } else {
             // Create entity and fill it up
             Archetype archetype = scene.archetypes().get(className);
-            Entity entity = scene.world.createEntity(archetype);
+            Entity entity = archetype.createEntity();
 
             // Components
             Base base = entity.getComponent(Base.class);

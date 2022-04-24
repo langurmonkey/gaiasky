@@ -1,9 +1,9 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import org.lwjgl.system.CallbackI.V;
 
-public class Celestial extends Component {
+public class Celestial implements Component {
     /** Threshold over fov factor **/
     public float thOverFactor;
 

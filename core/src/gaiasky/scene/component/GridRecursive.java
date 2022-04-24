@@ -1,13 +1,13 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Vector3d;
 
 import java.util.List;
 
-public class GridRecursive extends Component {
+public class GridRecursive implements Component {
     public final float[] ccEq = ColorUtils.gRed;
     public final float[] ccEcl = ColorUtils.gGreen;
     public final float[] ccGal = ColorUtils.gBlue;

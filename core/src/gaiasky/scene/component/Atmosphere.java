@@ -1,8 +1,8 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 
-public class Atmosphere extends Component {
+public class Atmosphere implements Component {
     public AtmosphereComponent atmosphere;
 }

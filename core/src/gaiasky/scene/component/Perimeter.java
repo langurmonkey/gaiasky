@@ -1,10 +1,10 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-public class Perimeter extends Component {
+public class Perimeter implements Component {
 
     public float[][][] loc2d, loc3d;
 

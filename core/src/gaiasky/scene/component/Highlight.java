@@ -1,9 +1,9 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.filter.attrib.IAttribute;
 
-public class Highlight extends Component {
+public class Highlight implements Component {
     /**
      * Is it highlighted?
      */

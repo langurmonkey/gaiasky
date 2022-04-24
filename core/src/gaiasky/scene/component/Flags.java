@@ -1,8 +1,8 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 
-public class Flags extends Component {
+public class Flags implements Component {
 
     /**
      * Flag indicating whether the object has been computed in this step.

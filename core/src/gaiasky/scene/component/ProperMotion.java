@@ -1,9 +1,9 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector3;
 
-public class ProperMotion extends Component {
+public class ProperMotion implements Component {
     /**
      * Proper motion in cartesian coordinates [U/yr]
      **/

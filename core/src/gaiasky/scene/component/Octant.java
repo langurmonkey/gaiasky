@@ -1,9 +1,9 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.util.tree.OctreeNode;
 
-public class Octant extends Component {
+public class Octant implements Component {
 
     /**
      * The id of the octant it belongs to, if any

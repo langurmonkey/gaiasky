@@ -1,6 +1,6 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public class ParticleSet extends Component {
+public class ParticleSet implements Component {
 
     public static long idSeq = 0;
 

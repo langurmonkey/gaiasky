@@ -1,6 +1,6 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
@@ -9,7 +9,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
 
-public class Transform extends Component {
+public class Transform implements Component {
     private static final Log logger = Logger.getLogger(Transform.class);
     public String transformName;
     public Matrix4d transformFunction;

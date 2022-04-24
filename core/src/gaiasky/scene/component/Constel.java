@@ -1,13 +1,13 @@
 package gaiasky.scene.component;
 
-import com.artemis.Component;
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
-public class Constel extends Component {
+public class Constel implements Component {
     public static final Array<Constellation> allConstellations = new Array<>(false, 88);
     public double deltaYears;
 
