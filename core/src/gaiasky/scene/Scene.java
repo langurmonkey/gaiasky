@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a scene, contains and manages the world. The world contains
- * and manages all entities and systems.
+ * Represents a scene, contains and manages the engine. The engine contains
+ * and manages all entities and systems in the world.
  */
 public class Scene {
     private static final Logger.Log logger = Logger.getLogger(Scene.class);
@@ -63,10 +63,10 @@ public class Scene {
     /**
      * Enables the given groups of systems.
      *
-     * @param systemBags An array with the system bags to enable.
+     * @param systemGroups An array with the system groups to enable.
      */
-    public void enableSystems(Set<EntitySystem>... systemBags) {
-        setEnabled(true, systemBags);
+    public void enableSystems(Set<EntitySystem>... systemGroups) {
+        setEnabled(true, systemGroups);
     }
 
     /**
