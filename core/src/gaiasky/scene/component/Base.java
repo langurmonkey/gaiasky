@@ -39,6 +39,10 @@ public class Base implements Component {
     public ComponentTypes ct;
 
 
+    public String getName() {
+        return names != null ? names[0] : null;
+    }
+
     public void setName(String name) {
         if (names != null)
             names[0] = name;

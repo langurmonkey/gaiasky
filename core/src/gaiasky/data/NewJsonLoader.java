@@ -75,6 +75,8 @@ public class NewJsonLoader extends AbstractSceneLoader {
                             Archetype archetype = scene.archetypes().get(clazzName);
                             Entity entity = archetype.createEntity();
                             fillEntity(child, entity, clazz.getSimpleName());
+                            // Add to engine
+                            scene.engine.addEntity(entity);
                         }
 
                         child = child.next;
@@ -107,6 +109,9 @@ public class NewJsonLoader extends AbstractSceneLoader {
                 if (attribute.isValue()) {
                     valueClass = getValueClass(attribute);
                     value = getValue(attribute);
+                    if(value instanceof String) {
+                        value = ((String) value).replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                    }
                 } else if (attribute.isArray()) {
                     // We suppose our children are of the same type
                     switch (attribute.child.type()) {

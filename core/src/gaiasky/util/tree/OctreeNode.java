@@ -518,11 +518,10 @@ public class OctreeNode implements ILineRenderable {
             setChildrenObserved(false);
         } else if (this.observed = computeObserved(cam)) {
             nOctantsObserved++;
-            //int L_DEPTH = 5;
             /*
              * Load lists of pages
              */
-            if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE /*&& depth == L_DEPTH*/) {
+            if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE) {
                 // Add to load and go on
                 StreamingOctreeLoader.queue(this);
             } else if (status == LoadStatus.LOADED) {
@@ -530,7 +529,6 @@ public class OctreeNode implements ILineRenderable {
                 StreamingOctreeLoader.touch(this);
 
                 // Add objects
-                //if (depth == L_DEPTH)
                 addObjectsTo(roulette);
             }  // What do? Move first in queue?
 
@@ -544,7 +542,7 @@ public class OctreeNode implements ILineRenderable {
             // Update children
             for (int i = 0; i < 8; i++) {
                 OctreeNode child = children[i];
-                if (child != null /*&& child.depth <= L_DEPTH*/) {
+                if (child != null) {
                     child.update(parentTransform, cam, roulette, this.opacity);
                 }
             }

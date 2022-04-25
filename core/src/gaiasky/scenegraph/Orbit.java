@@ -679,9 +679,4 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     }
 
-    @Override
-    public boolean mustAddToIndex() {
-        return true;
-    }
-
 }

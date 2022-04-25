@@ -7,9 +7,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.math.Vector3d;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ParticleSet implements Component {
 
@@ -137,8 +135,56 @@ public class ParticleSet implements Component {
     public Vector3d lastSortCameraPos, cPosD;
 
 
-    public void setProvider(String provider) {
-        this.provider = provider.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+    /**
+     * Returns the list of particles.
+     */
+    public List<IParticleRecord> data() {
+        return pointData;
+    }
+
+    public void setData(List<IParticleRecord> pointData) {
+        setData(pointData, true);
+    }
+
+    public void setData(List<IParticleRecord> pointData, boolean regenerateIndex) {
+        this.pointData = pointData;
+
+        // Regenerate index
+        if (regenerateIndex)
+            regenerateIndex();
+        // Initialize visibility - all visible
+        this.visibilityArray = new byte[pointData.size()];
+        for (int i = 0; i < pointData.size(); i++) {
+            this.visibilityArray[i] = (byte) 1;
+        }
+    }
+
+    /**
+     * Regenerates the name index
+     */
+    public void regenerateIndex() {
+        index = generateIndex(data());
+    }
+
+    /**
+     * Generates the index (maps name to array index)
+     * and computes the geometric center of this group
+     *
+     * @param pointData The data
+     *
+     * @return An map{string,int} mapping names to indices
+     */
+    public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
+        Map<String, Integer> index = new HashMap<>((int) (pointData.size() * 1.25));
+        int n = pointData.size();
+        for (int i = 0; i < n; i++) {
+            IParticleRecord pb = pointData.get(i);
+            if (pb.names() != null) {
+                final int idx = i;
+                Arrays.stream(pb.names()).forEach(name -> index.put(name.toLowerCase(), idx));
+            }
+        }
+        return index;
     }
 
     public void setDatafile(String datafile) {

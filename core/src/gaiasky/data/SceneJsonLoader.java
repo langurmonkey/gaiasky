@@ -42,6 +42,15 @@ public class SceneJsonLoader {
         for (FileHandle jsonFile : jsonFiles) {
             loadJsonFile(jsonFile, scene);
         }
+
+        // Initialize nodes, look for octrees and star groups.
+        scene.initializeEntities();
+
+        // Initialize index and hip map with names.
+        scene.initializeIndex();
+
+        // Construct scene graph in GraphNodes.
+        scene.buildSceneGraph();
     }
     public synchronized static void loadJsonFile(FileHandle jsonFile, Scene scene) throws ReflectionException, FileNotFoundException {
 

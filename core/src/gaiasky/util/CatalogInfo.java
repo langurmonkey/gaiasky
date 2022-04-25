@@ -5,8 +5,10 @@
 
 package gaiasky.util;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.OrbitalElementsGroup;
 import gaiasky.scenegraph.ParticleGroup;
@@ -57,6 +59,17 @@ public class CatalogInfo {
 
     // Reference to scene graph object
     public FadeNode object;
+
+    // Reference to the entity
+    public Entity entity;
+
+    public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, Entity entity) {
+        this(name, description, source, type, hlSizeFactor, (FadeNode) null);
+        this.entity = entity;
+        if(Mapper.datasetDescription.has(entity)) {
+            Mapper.datasetDescription.get(entity).setCatalogInfo(this);
+        }
+    }
 
     public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, FadeNode object) {
         super();

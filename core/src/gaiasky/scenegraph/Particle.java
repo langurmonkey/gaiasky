@@ -184,7 +184,8 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     public void initialize() {
         setDerivedAttributes();
-        ct = new ComponentTypes(ComponentType.Galaxies);
+        if (ct == null)
+            ct = new ComponentTypes(ComponentType.Galaxies);
         // Relation between our star size and actual star size (normalized for
         // the Sun, 695700 Km of radius
         radius = size * Constants.STAR_SIZE_FACTOR;

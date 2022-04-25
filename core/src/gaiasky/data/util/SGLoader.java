@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.SceneGraphJsonLoader;
 import gaiasky.data.util.SGLoader.SGLoaderParameter;
-import gaiasky.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.CrashReporter;

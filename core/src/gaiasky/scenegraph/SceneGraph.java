@@ -74,7 +74,7 @@ public class SceneGraph implements ISceneGraph {
         // Star group
         this.hasStarGroup = hasStarGroup;
 
-        // Initialize stringToNode and starMap maps
+        // Initialize index and starMap maps
         index.put(root.names[0].toLowerCase().trim(), root);
         for (SceneGraphNode node : nodes) {
             addToIndex(node);

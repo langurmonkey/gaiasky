@@ -90,6 +90,9 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
 
             // Set to component
             perimeter.setPerimeter(convertToDoubleArray(firstelem, size, d));
+
+            // Add to engine
+            scene.engine.addEntity(entity);
         }
     }
 

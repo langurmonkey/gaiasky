@@ -9,7 +9,7 @@ public class Label implements Component {
     /**
      * Position of label.
      */
-    protected Vector3b labelPosition;
+    public Vector3b labelPosition;
 
     /**
      * Whether to draw 2D and 3D labels.

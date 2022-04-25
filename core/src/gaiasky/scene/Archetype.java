@@ -3,6 +3,7 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 
@@ -17,20 +18,22 @@ public class Archetype {
 
     private Engine engine;
     private Archetype parent;
+    private String name;
     private Set<Class<? extends Component>> components;
 
-    public Archetype(final Engine engine, final Archetype parent, Class<? extends Component>... componentClasses) {
+    public Archetype(final Engine engine, final Archetype parent, final String name, Class<? extends Component>... componentClasses) {
         this.engine = engine;
         this.parent = parent;
+        int lastIndex = name.lastIndexOf('.');
+        this.name = lastIndex >= 0 ? name.substring(lastIndex + 1) : name;
         this.components = new HashSet<>(componentClasses.length);
         for (Class<? extends Component> componentClass : componentClasses) {
             this.components.add(componentClass);
         }
-
     }
 
-    public Archetype(final Engine engine, Class<? extends Component>... componentClasses) {
-        this(engine, null, componentClasses);
+    public Archetype(final Engine engine, final String name, Class<? extends Component>... componentClasses) {
+        this(engine, null, name, componentClasses);
     }
 
     public Entity createEntity() {
@@ -51,5 +54,37 @@ public class Archetype {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    /**
+     * Checks whether the given entity matches this archetype.
+     *
+     * @param entity The entity.
+     *
+     * @return True if the entity is of this archetype (has the same components), false otherwise.
+     */
+    public boolean matches(Entity entity) {
+        ImmutableArray<Component> entityComponents = entity.getComponents();
+        if (entityComponents.size() != components.size()) {
+            return false;
+        }
+
+        for (Component component : entityComponents) {
+            boolean found = false;
+            for (Class<? extends Component> componentClass : components) {
+                if (component.getClass().equals(componentClass)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String getName() {
+        return name;
     }
 }
