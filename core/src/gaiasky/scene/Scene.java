@@ -5,9 +5,9 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.system.initialize.BaseInitializationSystem;
 import gaiasky.scene.system.initialize.IndexInitializationSystem;
 import gaiasky.scene.system.initialize.ParticleSetInitializationSystem;
+import gaiasky.scene.system.initialize.StarInitializationSystem;
 import gaiasky.scene.view.PositionEntity;
 import gaiasky.scenegraph.*;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
@@ -36,19 +36,6 @@ public class Scene {
     protected Map<Integer, IPosition> hipMap;
     // Archetypes map, links old scene graph model objects to artemis archetypes
     protected Map<String, Archetype> archetypes;
-
-    // Systems that load data -- run a the very beginning
-    protected Set<EntitySystem> loadingSystems;
-    // Systems that initialize entities -- run after loading systems
-    protected Set<EntitySystem> initSystems;
-    // Systems that contain update logic -- run every cycle
-    protected Set<EntitySystem> updateSystems;
-    // Systems that contain render logic -- run every cycle
-    protected Set<EntitySystem> renderSystems;
-    // Systems that dispose resources -- run at the end
-    protected Set<EntitySystem> disposeSystems;
-    // All systems container
-    protected Set<Set<EntitySystem>> allSystems;
 
     // Maps old attributes to components
     protected Map<String, Class<? extends Component>> attributeMap;
@@ -80,6 +67,38 @@ public class Scene {
     }
 
     /**
+     * Runs the given entity systems only once with a dummy
+     * delta time of 0. Useful for running one-time initialization and
+     * loading tasks.
+     * @param systems The systems.
+     */
+    public void runOnce(EntitySystem... systems) {
+        enable(systems);
+        engine.update(0f);
+        disable(systems);
+    }
+
+    /**
+     * Enables the given entity systems.
+     * @param systems The systems.
+     */
+    public void enable(EntitySystem... systems) {
+        for(EntitySystem system : systems){
+            engine.addSystem(system);
+        }
+    }
+
+    /**
+     * Disables the given entity systems.
+     * @param systems The systems.
+     */
+    public void disable(EntitySystem... systems) {
+        for(EntitySystem system : systems){
+            engine.removeSystem(system);
+        }
+    }
+
+    /**
      * Sets up the initializing systems and runs them. These systems perform the
      * initial entity initialization.
      */
@@ -88,16 +107,10 @@ public class Scene {
             // Prepare systems
             EntitySystem baseInit = new BaseInitializationSystem(Family.all(Base.class).get(), 0);
             EntitySystem particleInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), 1);
+            EntitySystem starInit = new StarInitializationSystem(Family.all(Body.class, Size.class, Celestial.class, Magnitude.class, ProperMotion.class).get(), 2);
 
-            engine.addSystem(baseInit);
-            engine.addSystem(particleInit);
-
-            // Run engine
-            engine.update(1f);
-
-            // Remove systems
-            engine.removeSystem(baseInit);
-            engine.removeSystem(particleInit);
+            // Run once
+            runOnce(baseInit, particleInit, starInit);
         }
 
     }
@@ -116,13 +129,9 @@ public class Scene {
 
             // Prepare system
             IndexInitializationSystem indexSystem = new IndexInitializationSystem(Family.all(Base.class).get(), 0, this);
-            engine.addSystem(indexSystem);
 
-            // Run engine
-            engine.update(1f);
-
-            // Remove system
-            engine.removeSystem(indexSystem);
+            // Run once
+            runOnce(indexSystem);
         }
     }
 
@@ -131,60 +140,9 @@ public class Scene {
      * components of the current entities.
      */
     public void buildSceneGraph() {
+        if (engine != null) {
 
-    }
-
-    /**
-     * Enables the given groups of systems.
-     *
-     * @param systemGroups An array with the system groups to enable.
-     */
-    public void enableSystems(Set<EntitySystem>... systemGroups) {
-        setEnabled(true, systemGroups);
-    }
-
-    /**
-     * Disables the given groups of systems.
-     *
-     * @param systemBags An array with the system bags to disable.
-     */
-    public void disableSystems(Set<EntitySystem>... systemBags) {
-        setEnabled(false, systemBags);
-    }
-
-    /**
-     * Enables or disables a group of system bags.
-     *
-     * @param enabled    The enabled status.
-     * @param systemBags The array of groups of systems to enable or disable.
-     */
-    public void setEnabled(boolean enabled, Set<EntitySystem>... systemBags) {
-        for (Set<EntitySystem> systemBag : systemBags) {
-            if (systemBag != null) {
-                for (EntitySystem system : systemBag) {
-                    if (enabled) {
-                        engine.addSystem(system);
-                    } else {
-                        engine.removeSystem(system);
-                    }
-                }
-            }
         }
-    }
-
-    /**
-     * Enables or disables a given group of systems.
-     *
-     * @param enabled The enabled status.
-     * @param systems The group of systems to enable or disable.
-     */
-    public void setEnabled(boolean enabled, Set<EntitySystem> systems) {
-        for (EntitySystem system : systems)
-            if (enabled) {
-                engine.addSystem(system);
-            } else {
-                engine.removeSystem(system);
-            }
     }
 
     /**
@@ -192,13 +150,12 @@ public class Scene {
      * with the same object (same class and same names).
      *
      * @param entity The entity to add.
-     *
      * @return False if the object already exists.
      */
     public boolean addToIndex(Entity entity) {
         boolean ok = true;
         Base base;
-        if((base = Mapper.base.get(entity)) != null) {
+        if ((base = Mapper.base.get(entity)) != null) {
             synchronized (index) {
                 if (base.names != null) {
                     if (mustAddToIndex(entity)) {
@@ -239,7 +196,7 @@ public class Scene {
 
                     // HIP stars add "HIP + hipID"
                     Archetype starArchetype = archetypes.get(Star.class.getName());
-                    if(starArchetype.matches(entity)) {
+                    if (starArchetype.matches(entity)) {
                         // Hip
                         Hip hip = Mapper.hip.get(entity);
                         if (hip.hip > 0) {
@@ -250,7 +207,7 @@ public class Scene {
 
                     // Particle sets add names of each particle
                     ParticleSet particleSet = Mapper.particleSet.get(entity);
-                    if(particleSet != null) {
+                    if (particleSet != null) {
                         if (particleSet.index != null) {
                             Set<String> keys = particleSet.index.keySet();
                             for (String key : keys) {
@@ -295,12 +252,8 @@ public class Scene {
 
     private boolean mustAddToIndex(Entity entity) {
         // All entities except the ones who have perimeter, location mark and particle or star set
-        return entity.getComponent(Perimeter.class) == null &&
-                entity.getComponent(LocationMark.class) == null &&
-                entity.getComponent(ParticleSet.class) == null &&
-                entity.getComponent(StarSet.class) == null;
+        return entity.getComponent(Perimeter.class) == null && entity.getComponent(LocationMark.class) == null && entity.getComponent(ParticleSet.class) == null && entity.getComponent(StarSet.class) == null;
     }
-
 
     protected void initializeArchetypes() {
         if (this.engine != null) {
@@ -310,7 +263,7 @@ public class Scene {
             addArchetype(SceneGraphNode.class.getName(), Base.class, Flags.class, Body.class, GraphNode.class, Octant.class);
 
             // Celestial
-            addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class, Coordinates.class, ProperMotion.class, Rotation.class);
+            addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class, Coordinates.class, Rotation.class);
 
             // ModelBody
             addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class);
@@ -319,7 +272,7 @@ public class Scene {
             addArchetype(Planet.class.getName(), ModelBody.class.getName(), Atmosphere.class, Cloud.class);
 
             // Star
-            addArchetype(Star.class.getName(), CelestialBody.class.getName(), ProperMotion.class, Hip.class);
+            addArchetype(Star.class.getName(), CelestialBody.class.getName(), ProperMotion.class, Hip.class, Size.class);
 
             // Satellite
             addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);
@@ -385,12 +338,10 @@ public class Scene {
             addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class);
 
             // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(),
-                    Constel.class);
+            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class);
 
             // Constellation
-            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(),
-                    Boundaries.class);
+            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
 
         } else {
             logger.error("World is null, can't initialize archetypes.");
@@ -405,26 +356,27 @@ public class Scene {
         this.archetypes.put(archetypeName, new Archetype(engine, parent, archetypeName, classes));
     }
 
-    protected void addArchetype(String archetypeName, Class<? extends Component>... classes) {
+    private void addArchetype(String archetypeName, Class<? extends Component>... classes) {
         addArchetype(archetypeName, null, classes);
     }
 
     /**
      * Find a matching archetype given an entity.
+     *
      * @param entity The entity.
      * @return The matching archetype if it exists, or null if it does not.
      */
-    protected Archetype findArchetype(Entity entity) {
-         Collection<Archetype> archetypes = this.archetypes.values();
-         for(Archetype archetype : archetypes) {
-             if(archetype.matches(entity)) {
-                 return archetype;
-             }
-         }
-         return null;
+    private Archetype findArchetype(Entity entity) {
+        Collection<Archetype> archetypes = this.archetypes.values();
+        for (Archetype archetype : archetypes) {
+            if (archetype.matches(entity)) {
+                return archetype;
+            }
+        }
+        return null;
     }
 
-    protected void initializeAttributes() {
+    private void initializeAttributes() {
         if (this.engine != null) {
             this.attributeMap = new HashMap<>();
 
@@ -512,7 +464,7 @@ public class Scene {
         }
     }
 
-    protected void putAll(Class<? extends Component> clazz, String... attributes) {
+    private void putAll(Class<? extends Component> clazz, String... attributes) {
         for (String attribute : attributes) {
             if (attributeMap.containsKey(attribute)) {
                 logger.warn("Attribute already defined: " + attribute);

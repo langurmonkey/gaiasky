@@ -21,4 +21,6 @@ public class Mapper {
     public static final ComponentMapper<DatasetDescription> datasetDescription = ComponentMapper.getFor(DatasetDescription.class);
     public static final ComponentMapper<ParticleSet> particleSet = ComponentMapper.getFor(ParticleSet.class);
     public static final ComponentMapper<StarSet> starSet = ComponentMapper.getFor(StarSet.class);
+    public static final ComponentMapper<Magnitude> magnitude = ComponentMapper.getFor(Magnitude.class);
+    public static final ComponentMapper<Size> size = ComponentMapper.getFor(Size.class);
 }

@@ -12,6 +12,8 @@ public class Celestial implements Component {
 
     /** Color for billboard rendering **/
     public float[] ccBillboard;
+    /** Red, green and blue colors and their revamped cousins **/
+    public float[] ccPale;
 
     /** B-V color index **/
     public float colorbv;

@@ -128,7 +128,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     public double computedSize;
     double radius;
-    boolean randomName = false;
     boolean hasPm = false;
 
     public Particle() {
@@ -159,7 +158,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.id = starid;
 
         if (this.names == null || this.names.length == 0) {
-            randomName = true;
             this.setName("star_" + rnd.nextInt(10000000));
         }
         this.pm = new Vector3();
