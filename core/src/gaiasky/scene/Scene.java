@@ -35,19 +35,6 @@ public class Scene {
     // Archetypes map, links old scene graph model objects to artemis archetypes
     protected Map<String, Archetype> archetypes;
 
-    // Systems that load data -- run a the very beginning
-    protected Set<EntitySystem> loadingSystems;
-    // Systems that initialize entities -- run after loading systems
-    protected Set<EntitySystem> initSystems;
-    // Systems that contain update logic -- run every cycle
-    protected Set<EntitySystem> updateSystems;
-    // Systems that contain render logic -- run every cycle
-    protected Set<EntitySystem> renderSystems;
-    // Systems that dispose resources -- run at the end
-    protected Set<EntitySystem> disposeSystems;
-    // All systems container
-    protected Set<Set<EntitySystem>> allSystems;
-
     // Maps old attributes to components
     protected Map<String, Class<? extends Component>> attributeMap;
 
