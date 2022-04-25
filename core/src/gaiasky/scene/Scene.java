@@ -9,7 +9,6 @@ import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
-import org.w3c.dom.Attr;
 
 import java.util.*;
 
