@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -65,7 +66,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         float pad05 = 5f;
         float pad10 = 10f;
         float pad20 = 20f;
-        float pad40 = 40f;
+        float minWidth = 120f;
 
         pad(pad05);
 
@@ -77,15 +78,17 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
 
         /* FPS */
         fps = new OwnLabel("", skin, "hud-big");
+        fps.setAlignment(Align.right);
         fps.setColor(skin.getColor("green"));
         fps.addListener(new OwnTextTooltip(I18n.msg("gui.debug.fps.info"), skin));
-        add(fps).colspan(2).right().padBottom(pad05);
+        add(fps).colspan(2).right().minWidth(minWidth).padBottom(pad05);
         row();
 
         /* SPF */
         spf = new OwnLabel("", skin, "hud-med");
+        spf.setAlignment(Align.right);
         spf.addListener(new OwnTextTooltip(I18n.msg("gui.debug.spf.info"), skin));
-        add(spf).colspan(2).right().padBottom(pad10);
+        add(spf).colspan(2).right().minWidth(minWidth).padBottom(pad10);
         row();
 
 
