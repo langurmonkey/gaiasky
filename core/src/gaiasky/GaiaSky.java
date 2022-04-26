@@ -358,11 +358,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Basic info
         logger.info(settings.version.version, I18n.msg("gui.build", settings.version.build));
-        logger.info("Display mode", graphics.getWidth() + "x" + graphics.getHeight(), "Fullscreen: " + Gdx.graphics.isFullscreen());
-        logger.info("Device", GL30.glGetString(GL30.GL_RENDERER));
+        logger.info(I18n.msg("notif.info.displaymode", graphics.getWidth(), graphics.getHeight(), Gdx.graphics.isFullscreen()));
+        logger.info(I18n.msg("notif.info.device", GL30.glGetString(GL30.GL_RENDERER)));
         logger.info(I18n.msg("notif.glversion", GL30.glGetString(GL30.GL_VERSION)));
         logger.info(I18n.msg("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
         logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
+        logger.info(I18n.msg("notif.info.maxattribs", GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
 
         // Frame buffer map
         frameBufferMap = new HashMap<>();
