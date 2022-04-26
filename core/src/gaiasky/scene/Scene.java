@@ -22,7 +22,7 @@ public class Scene {
     public static final String ROOT_NAME = "Universe";
 
     /** The engine, containing all entities, components and systems **/
-    public Engine engine;
+    public com.badlogic.ashley.core.Engine engine;
 
     /** Quick lookup map. Name to node. **/
     protected Map<String, Entity> index;
