@@ -21,7 +21,7 @@ import gaiasky.util.math.Vector3d;
  *          ulammers $
  *
  */
-public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServer<Attitude> {
+public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServer<IAttitude> {
 
     /** Mathematical constants **/
     protected static final double PI = Math.PI;

@@ -21,7 +21,7 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
     public String file;
     public BaseAttitudeDataServer attitude;
 
-    public Map<Long, Attitude> cache;
+    public Map<Long, IAttitude> cache;
     public long hits = 0, misses = 0;
 
     public AttitudeIntervalBean(String name, Date activationTime, BaseAttitudeDataServer attitude, String file) {
@@ -33,10 +33,10 @@ public class AttitudeIntervalBean implements Comparable<AttitudeIntervalBean> {
         cache = new LruCache<>(10);
     }
 
-    public synchronized Attitude get(Date date) {
+    public synchronized IAttitude get(Date date) {
         Long time = date.getTime();
         if (!cache.containsKey(time)) {
-            Attitude att = attitude.getAttitude(date);
+            IAttitude att = attitude.getAttitude(date);
             cache.put(time, att);
             misses++;
             return att;

@@ -5,6 +5,7 @@
 
 package gaiasky.util.gaia;
 
+import gaiasky.data.attitude.IAttitudeServer;
 import gaiasky.util.BinarySearchTree;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -19,15 +20,13 @@ import java.util.Date;
  * calculating the attitude only once in each time step and using it in several
  * points in the processing.
  */
-public class GaiaAttitudeServer {
+public class GaiaAttitudeServer implements IAttitudeServer {
     private static final Log logger = Logger.getLogger(GaiaAttitudeServer.class);
-
-    public static GaiaAttitudeServer instance;
 
     // List of attitudes in a BST sorted by activation date
     private BinarySearchTree attitudes;
     // Dummy attitude for launch sequence
-    Attitude dummyAttitude;
+    IAttitude dummyAttitude;
     Nsl37 nsl;
 
     // The previous attitude
@@ -59,8 +58,8 @@ public class GaiaAttitudeServer {
      * @param date The date
      * @return The attitude
      */
-    public synchronized Attitude getAttitude(Date date) {
-        Attitude result;
+    public synchronized IAttitude getAttitude(final Date date) {
+        IAttitude result;
         if (Settings.settings.data.realGaiaAttitude) {
             // Find AttitudeType in timeSlots
             if (date.before(initialDate)) {

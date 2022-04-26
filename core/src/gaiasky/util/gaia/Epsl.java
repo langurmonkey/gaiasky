@@ -71,7 +71,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
      * @return attitude for the given time
      */
     @Override
-    public synchronized Attitude getAttitudeNative(long t) {
+    public synchronized IAttitude getAttitudeNative(long t) {
         // Set time to calculate solar longitude and rate of longitude
         nslSun.setTime(t);
 

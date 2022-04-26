@@ -71,7 +71,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
      *            The julian date
      * @return The attidue object
      */
-    public Attitude getAttitudeNative(double julianDate) {
+    public IAttitude getAttitudeNative(double julianDate) {
         long tNs = (long) ((julianDate - AstroUtils.JD_J2010) * Nature.D_TO_NS);
         return getAttitudeNative(tNs);
     }
@@ -82,7 +82,7 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
      *            The time elapsed in nanoseconds since epoch J2010
      * @return The attitude object
      */
-    protected Attitude getAttitudeNative(long tNow) {
+    protected IAttitude getAttitudeNative(long tNow) {
         if (!initialized) {
             recomputeConstants();
             setInitialized(true);

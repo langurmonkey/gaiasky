@@ -174,7 +174,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
      * @return attitude for the given time
      */
     @Override
-    public Attitude getAttitudeNative(long time) {
+    public IAttitude getAttitudeNative(long time) {
 
         if (!isInitialized()) {
             initialize();

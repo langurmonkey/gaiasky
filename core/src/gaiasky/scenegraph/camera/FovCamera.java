@@ -19,13 +19,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import gaiasky.data.attitude.IAttitudeServer;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.scenegraph.CelestialBody;
-import gaiasky.scenegraph.Gaia;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
 import gaiasky.util.gaia.GaiaAttitudeServer;
@@ -59,7 +57,8 @@ public class FovCamera extends AbstractCamera implements IObserver {
     private PerspectiveCamera camera2;
     private Frustumd frustum2;
 
-    public Gaia gaia;
+    private HeliotropicSatellite gaia;
+    private IAttitudeServer attitudeServer;
 
     Vector3d dirMiddle, up;
     public Vector3d[] directions;
@@ -137,7 +136,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         fpStages[1] = fov2;
         fpStages[2] = fov12;
 
-        EventManager.instance.subscribe(this, Event.GAIA_LOADED);
+        EventManager.instance.subscribe(this, Event.SCENE_GRAPH_LOADED);
     }
 
     public void update(double dt, ITimeFrameProvider time) {
@@ -188,7 +187,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         currentTime = time.getTime().toEpochMilli();
         trf = matrix;
         trf.idt();
-        Quaterniond quat = GaiaAttitudeServer.instance.getAttitude(new Date(time.getTime().toEpochMilli())).getQuaternion();
+        Quaterniond quat = attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli())).getQuaternion();
         trf.rotate(quat).rotate(0, 0, 1, 180);
         directions[0].set(0, 0, 1).rotate(BAM_2, 0, 1, 0).mul(trf).nor();
         directions[1].set(0, 0, 1).rotate(-BAM_2, 0, 1, 0).mul(trf).nor();
@@ -200,7 +199,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     public Vector3d[] getDirections(Date d) {
         trf = matrix;
         trf.idt();
-        Quaterniond quat = GaiaAttitudeServer.instance.getAttitude(d).getQuaternion();
+        Quaterniond quat = attitudeServer.getAttitude(d).getQuaternion();
         trf.rotate(quat).rotate(0, 0, 1, 180);
         dir1.set(0, 0, 1).rotate(BAM_2, 0, 1, 0).mul(trf).nor();
         dir2.set(0, 0, 1).rotate(-BAM_2, 0, 1, 0).mul(trf).nor();
@@ -270,8 +269,10 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event == Event.GAIA_LOADED) {
-            this.gaia = (Gaia) data[0];
+        if (event == Event.SCENE_GRAPH_LOADED) {
+            ISceneGraph sg = (ISceneGraph) data[0];
+            this.gaia = (HeliotropicSatellite) sg.getNode("Gaia");
+            this.attitudeServer = gaia.getAttitudeServer();
         }
     }
 

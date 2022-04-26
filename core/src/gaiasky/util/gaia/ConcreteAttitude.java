@@ -27,7 +27,7 @@ import gaiasky.util.math.Vector3d;
  *
  * @author Lennart Lindegren, Uwe Lammers
  */
-public class ConcreteAttitude implements Attitude {
+public class ConcreteAttitude implements IAttitude {
 
     private static final double BASICANGLE_DEGREE = 106.5;
     private static final Vector3d[] xyz = new Vector3d[]{new Vector3d(), new Vector3d(), new Vector3d()};
@@ -244,7 +244,7 @@ public class ConcreteAttitude implements Attitude {
     }
 
     /**
-     * @see gaiasky.util.gaia.Attitude#getSrsAxes(Vector3d[])
+     * @see IAttitude#getSrsAxes(Vector3d[])
      */
     @Override
     public Vector3d[] getSrsAxes(Vector3d[] xyz) {

@@ -43,11 +43,6 @@ public abstract class Satellite extends ModelBody {
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-    }
-
-    @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
 

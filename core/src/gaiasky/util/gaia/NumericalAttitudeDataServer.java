@@ -17,7 +17,7 @@ import gaiasky.util.gaia.time.GtiList;
  * @param <A> type of Attitude this server is serving
  * 
  */
-public abstract class NumericalAttitudeDataServer<A extends Attitude> extends BaseAttitudeDataServer<A> {
+public abstract class NumericalAttitudeDataServer<A extends IAttitude> extends BaseAttitudeDataServer<A> {
     //	protected boolean initialized = false;
 
     /**

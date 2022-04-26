@@ -21,7 +21,7 @@ import gaiasky.util.math.Quaterniond;
  *
  */
 public abstract class HermiteInterpolatedAttitudeDataServer extends
-        NumericalAttitudeDataServer<Attitude> {
+        NumericalAttitudeDataServer<IAttitude> {
     protected int nT;
     protected long[] tNs;
     protected double[] qX, qY, qZ, qW, rateX, rateY, rateZ;
@@ -60,7 +60,7 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
      * @return attitude for the given time
      */
     @Override
-    public Attitude getAttitudeNative(final long t) throws RuntimeException {
+    public IAttitude getAttitudeNative(final long t) throws RuntimeException {
 
         int left = AttitudeUtils.findLeftIndexVar(t, tNs, 0);
         if (left < 0 || left > nT - 2) {

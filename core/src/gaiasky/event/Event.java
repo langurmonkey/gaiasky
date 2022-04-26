@@ -466,10 +466,6 @@ public enum Event {
      * </ol>
      */
     FREE_MODE_COORD_CMD,
-    /**
-     * Contains the Gaia object [0].
-     **/
-    GAIA_LOADED,
     GAIA_POSITION,
     /**
      * Contains the gamma level (float) in [0,3].

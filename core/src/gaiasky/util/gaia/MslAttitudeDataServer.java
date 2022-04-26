@@ -330,13 +330,13 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     /**
      * @see gaiasky.util.gaia.HermiteInterpolatedAttitudeDataServer#getAttitude(long)
      */
-    public Attitude getAttitudeNative(long t) throws RuntimeException {
+    public IAttitude getAttitudeNative(long t) throws RuntimeException {
 
         if (!initialized) {
             initialize();
         }
 
-        Attitude att = super.getAttitudeNative(t);
+        IAttitude att = super.getAttitudeNative(t);
 
         // modify attitude through post-multiplication by qExtraOmega
         if (extraOmega != 0.0) {
