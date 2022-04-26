@@ -319,8 +319,6 @@ public class GaiaSkyDesktop implements IObserver {
         if (cliArgs.debugGpu) {
             cfg.enableGLDebugOutput(true, System.out);
         }
-        // Color, Depth, stencil buffers, MSAA
-        cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
 
         // Launch app
         try {
