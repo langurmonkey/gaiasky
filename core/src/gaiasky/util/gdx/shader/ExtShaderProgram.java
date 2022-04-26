@@ -169,6 +169,7 @@ public class ExtShaderProgram implements Disposable {
         this.vertexShaderSource = vertexShaderCode;
         this.fragmentShaderSource = fragmentShaderCode;
 
+        logger.debug("Loading shaders: " + vertexFile + ", " + fragmentFile);
         compileShaders(vertexShaderCode, fragmentShaderCode);
         if (isCompiled()) {
             fetchAttributes();
@@ -208,7 +209,9 @@ public class ExtShaderProgram implements Disposable {
      */
     private void compileShaders(String vertexShader, String fragmentShader) {
         vertexShaderHandle = loadShader(GL20.GL_VERTEX_SHADER, vertexShader);
+        logger.debug("Vertex shader loaded with handle: " + vertexShaderHandle);
         fragmentShaderHandle = loadShader(GL20.GL_FRAGMENT_SHADER, fragmentShader);
+        logger.debug("Fragment shader loaded with handle: " + fragmentShaderHandle);
 
         if (vertexShaderHandle == -1 || fragmentShaderHandle == -1) {
             isCompiled = false;
