@@ -67,7 +67,7 @@
       "check": "data-main.json",
       "data": [
         "asteroids.json",
-        "attitudexml",
+        "attitude/gaia",
         "constellations",
         "countries",
         "data-main.json",
@@ -117,9 +117,9 @@
         "tex/cubemap/earth-cloud-low",
         "tex/cubemap/earth-cloud-med"
       ],
-      "sha256": "e0f55ab8052625779f58e883df733226b01575c017b35a53edfbd7b75a7d7f45",
-      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC14 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC14+.\\n- Move constellations and constellation boundaries to JSON format.\\n- General JSON cleanup.",
+      "sha256": "ac2884f2cdc68d92200f7ca39906407c54c5c8244d23363e99b570ef3bb8a28f",
+      "description": "Required data pack.\nFor Gaia Sky 3.2.0-RC14 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC14+.\n- Move constellations and constellation boundaries to JSON format.\n- General JSON cleanup.\n- Move attitude data location, integrate Gaia object as a heliotropic satellite.",
       "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v032_20220425/basedata.tar.gz"
     },
@@ -164,7 +164,7 @@
         "tex/cubemap/*-ultra"
       ],
       "description": "High resolution texture pack including some 4K and 8K textures and cubemaps for planet surfaces and asteroids",
-      "releasenotes": "- Add high-resolution Earth day and cloud cubemaps.\\n- Remove Earth day and cloud equirectangular textures.",
+      "releasenotes": "- Add high-resolution Earth day and cloud cubemaps.\n- Remove Earth day and cloud equirectangular textures.",
       "sha256": "d880a8946e68d1dbfee386634548099201741883fce23db34b8dc677e3d1e49d",
       "link": "@mirror-url@tex",
       "file": "@mirror-url@tex/008_20220316/hi-res-texture-pack.tar.gz"
