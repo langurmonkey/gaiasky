@@ -23,8 +23,8 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
 import gaiasky.data.StreamingOctreeLoader;
+import gaiasky.data.attitude.IAttitudeServer;
 import gaiasky.data.util.*;
-import gaiasky.data.util.GaiaAttitudeLoader.GaiaAttitudeLoaderParameter;
 import gaiasky.data.util.SGLoader.SGLoaderParameter;
 import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
 import gaiasky.render.MainPostProcessor;
@@ -70,7 +70,6 @@ import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -86,8 +85,6 @@ import org.lwjgl.openvr.VR;
 import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
@@ -405,7 +402,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         assetManager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
-        assetManager.setLoader(GaiaAttitudeServer.class, new GaiaAttitudeLoader(dataResolver));
+        assetManager.setLoader(IAttitudeServer.class, new AttitudeLoader(dataResolver));
         assetManager.setLoader(ExtShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
         assetManager.setLoader(BitmapFont.class, new BitmapFontLoader(internalResolver));
         assetManager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(internalResolver));
@@ -458,9 +455,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Tooltip to 1s
         TooltipManager.getInstance().initialTime = 1f;
-
-        // Initialise Gaia attitudes
-        assetManager.load(Constants.ATTITUDE_FOLDER, GaiaAttitudeServer.class, new GaiaAttitudeLoaderParameter());
 
         // Initialise hidden helper user
         HiddenHelperUser.initialize();
@@ -606,11 +600,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             vrLoadingRightFb.dispose();
             vrLoadingRightTex = null;
             vrLoadingRightFb = null;
-        }
-
-        // Get attitude
-        if (assetManager.isLoaded(Constants.ATTITUDE_FOLDER)) {
-            GaiaAttitudeServer.instance = assetManager.get(Constants.ATTITUDE_FOLDER);
         }
 
         /*

@@ -343,10 +343,6 @@ public class Constants {
 
 
     /**
-     * Attitude folder
-     **/
-    public static final String ATTITUDE_FOLDER = "data/attitudexml/";
-    /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
      * algorithms.
      *
