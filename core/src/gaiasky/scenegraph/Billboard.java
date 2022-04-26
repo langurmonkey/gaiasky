@@ -53,11 +53,6 @@ public class Billboard extends ModelBody {
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-    }
-
-    @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if(mc != null && mc.instance != null){

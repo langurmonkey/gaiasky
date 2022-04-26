@@ -10,9 +10,6 @@ import java.util.List;
 
 public class ModelScaffolding implements Component {
 
-    /** Transformations, applied each cycle **/
-    public ITransform[] transformations;
-
     /** Multiplier for Loc view angle **/
     public float locVaMultiplier = 1f;
     /** ThOverFactor for Locs **/
@@ -43,10 +40,10 @@ public class ModelScaffolding implements Component {
     public double[] shadowMapValues;
 
     /** The seed for random components **/
-    protected List<Long> seed = Arrays.asList(1L);
+    public List<Long> seed = Arrays.asList(1L);
 
     /** The components to randomize---possible values are ["model", "cloud", "atmosphere"] **/
-    protected List<String> randomize;
+    public List<String> randomize;
 
     /**
      * Sets the shadow mapping values for this object
@@ -89,5 +86,24 @@ public class ModelScaffolding implements Component {
 
     public void setLocthoverfactor(Double locthoverfactor) {
         this.locThOverFactor = locthoverfactor.floatValue();
+    }
+
+    /**
+     * Gets the seed corresponding to the given component by matching it using
+     * the position in the randomize vector.
+     *
+     * @param component The component name.
+     *
+     * @return The seed.
+     */
+    public long getSeed(String component) {
+        if (randomize != null && randomize.contains(component)) {
+            int idx;
+            if ((idx = randomize.indexOf(component)) >= 0 && seed.size() > idx) {
+                return seed.get(idx);
+            }
+        }
+        // Get first otherwise
+        return this.seed.get(0);
     }
 }

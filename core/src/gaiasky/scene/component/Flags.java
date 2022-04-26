@@ -29,4 +29,5 @@ public class Flags implements Component {
      * Has this been updated at least once?
      */
     public boolean initialUpdate = false;
+
 }

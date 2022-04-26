@@ -54,7 +54,6 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.ds.GaiaSkyExecutorService;
-import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.loader.*;

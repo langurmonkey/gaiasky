@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Matrix4;
 public class TranslateTransform implements ITransform {
     /** Translation **/
     float[] vector;
-    
 
     public void apply(Matrix4 mat){
         mat.translate(vector[0], vector[1], vector[2]);

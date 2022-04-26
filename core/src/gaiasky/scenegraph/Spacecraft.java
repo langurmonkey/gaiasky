@@ -180,39 +180,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             mc.doneLoading(manager, localTransform, null);
         }
 
-        // Initialize thruster
-        //        try {
-        //            Texture tex = manager.get(GlobalConf.data.dataFile("tex/base/thruster.png"));
-        //            tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        //
-        //            Map<String, Object> params = new TreeMap<>();
-        //            params.put("width", 1d);
-        //            params.put("height", 3d);
-        //            params.put("depth", 1d);
-        //            params.put("divisions", 8L);
-        //
-        //            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("cone", params, Usage.Position | Usage.TextureCoordinates);
-        //            IntModel model = pair.getFirst();
-        //            Material mat = pair.getSecond().get("base");
-        //            mat.clear();
-        //            mat.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
-        //            mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
-        //            // Only to activate view vector (camera position)
-        //            mat.set(new BlendingAttribute(true, 1));
-        //            thrusterTransform = new Matrix4();
-        //            thruster = new ModelComponent();
-        //            thruster.initialize();
-        //            thruster.env = new Environment();
-        //            thruster.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        //            thruster.env.set(new ColorAttribute(ColorAttribute.Diffuse, 1f, 1f, 1f, 1f));
-        //            thruster.instance = new IntModelInstance(model, thrusterTransform);
-        //            // Relativistic effects
-        //            if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
-        //                thruster.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
-        //        } catch (GdxRuntimeException e) {
-        //            logger.debug("Skipping thruster initialization");
-        //        }
-
         // Broadcast me
         EventManager.publish(Event.SPACECRAFT_LOADED, this, this);
 

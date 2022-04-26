@@ -17,9 +17,9 @@ public class Gaia extends HeliotropicSatellite {
     }
 
     public void initialize() {
-        super.initialize();
         provider = "gaiasky.util.gaia.GaiaAttitudeServer";
         attitudeLocation = "data/attitudexml";
+        super.initialize();
     }
 
 }

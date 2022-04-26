@@ -31,8 +31,6 @@ public class HeliotropicSatellite extends Satellite {
     protected String attitudeLocation;
     private IAttitudeServer attitudeServer;
     private IAttitude attitude;
-    /** Use this flag if the attitude server provides an upside-down flipped attitude **/
-    private boolean flipAttitude;
 
     public Vector3d unrotatedPos;
 

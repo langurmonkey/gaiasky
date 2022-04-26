@@ -11,7 +11,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.stream.Stream;
 
-public class Machine implements Component {
+public class MotorEngine implements Component {
     /** Max speed in relativistic mode **/
     private static final double relativisticSpeedCap = Constants.C_US * 0.99999;
 
@@ -28,7 +28,7 @@ public class Machine implements Component {
     }
 
     /** The current name of this spacecraft **/
-    private String machineName;
+    public String machineName;
 
     /** Seconds to reach full power **/
     public double fullPowerTime;
@@ -49,18 +49,18 @@ public class Machine implements Component {
     /** Engine thrust vector **/
     public Vector3d thrust;
 
-    private static final double thrustBase = 1e12d;
+    public static final double thrustBase = 1e12d;
     /** This is the magnitude of the thrust **/
     public double thrustMagnitude;
 
     /** Mass in kg **/
-    private double mass;
+    public double mass;
 
 
     /** Responsiveness in [{@link Constants#MIN_SC_RESPONSIVENESS}, {@link Constants#MAX_SC_RESPONSIVENESS}] **/
-    private double responsiveness;
+    public double responsiveness;
     /** Responsiveness in [0, 1] **/
-    private double drag;
+    public double drag;
 
     /** Only the rotation matrix **/
     public Matrix4 rotationMatrix;

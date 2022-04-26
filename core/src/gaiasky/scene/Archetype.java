@@ -3,6 +3,7 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -18,6 +19,7 @@ public class Archetype {
 
     private Engine engine;
     private Archetype parent;
+    private Family family;
     private String name;
     private Set<Class<? extends Component>> components;
 
@@ -30,10 +32,15 @@ public class Archetype {
         for (Class<? extends Component> componentClass : componentClasses) {
             this.components.add(componentClass);
         }
+        this.family = Family.all(componentClasses).get();
     }
 
     public Archetype(final Engine engine, final String name, Class<? extends Component>... componentClasses) {
         this(engine, null, name, componentClasses);
+    }
+
+    public Family getFamily() {
+        return family;
     }
 
     public Entity createEntity() {

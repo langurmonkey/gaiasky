@@ -2,10 +2,8 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
 import gaiasky.scene.component.*;
-import gaiasky.scene.system.initialize.BaseInitializationSystem;
-import gaiasky.scene.system.initialize.IndexInitializationSystem;
-import gaiasky.scene.system.initialize.ParticleSetInitializationSystem;
-import gaiasky.scene.system.initialize.StarInitializationSystem;
+import gaiasky.scene.component.MotorEngine;
+import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.view.PositionEntity;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -25,7 +23,7 @@ public class Scene {
     public static final String ROOT_NAME = "Universe";
 
     /** The engine, containing all entities, components and systems **/
-    public Engine engine;
+    public com.badlogic.ashley.core.Engine engine;
 
     /** Quick lookup map. Name to node. **/
     protected Map<String, Entity> index;
@@ -108,6 +106,7 @@ public class Scene {
             EntitySystem baseInit = new BaseInitializationSystem(Family.all(Base.class).get(), 0);
             EntitySystem particleInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), 1);
             EntitySystem starInit = new StarInitializationSystem(Family.all(Body.class, Size.class, Celestial.class, Magnitude.class, ProperMotion.class).get(), 2);
+            EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), 2);
 
             // Run once
             runOnce(baseInit, particleInit, starInit);
@@ -266,7 +265,7 @@ public class Scene {
             addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class, Coordinates.class, Rotation.class);
 
             // ModelBody
-            addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class);
+            addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class, AffineTransformations.class);
 
             // Planet
             addArchetype(Planet.class.getName(), ModelBody.class.getName(), Atmosphere.class, Cloud.class);
@@ -277,14 +276,14 @@ public class Scene {
             // Satellite
             addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);
 
-            // Gaia
-            addArchetype(Gaia.class.getName(), Satellite.class.getName(), Attitude.class);
+            // HeliotropicSatellite
+            addArchetype(HeliotropicSatellite.class.getName(), Satellite.class.getName(), Attitude.class);
 
             // GenericSpacecraft
             addArchetype(GenericSpacecraft.class.getName(), Satellite.class.getName(), RenderFlags.class);
 
             // Spacecraft
-            addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), Machine.class);
+            addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
 
             // VertsObject
             addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);
@@ -293,7 +292,7 @@ public class Scene {
             addArchetype(Polyline.class.getName(), VertsObject.class.getName(), Arrow.class);
 
             // Orbit
-            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, Transform.class);
+            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class);
 
             // HeliotropicOrbit
             addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), Heliotropic.class);
@@ -302,22 +301,22 @@ public class Scene {
             addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);
 
             // BackgroundModel
-            addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), Transform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
+            addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
 
             // SphericalGrid
             addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(), GridUV.class);
 
             // RecursiveGrid
-            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, Transform.class, Model.class, Label.class, RenderType.class);
+            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, RenderType.class);
 
             // BillboardGroup
-            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardDatasets.class, Transform.class, Label.class, Fade.class, Coordinates.class);
+            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardDatasets.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
 
             // Text2D
             addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class);
 
             // Axes
-            addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, Transform.class);
+            addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, RefSysTransform.class);
 
             // Loc
             addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class);
@@ -340,7 +339,7 @@ public class Scene {
             // Constellation
             addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class);
 
-            // Constellation
+            // ConstellationBoundaries
             addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
 
         } else {
@@ -402,7 +401,7 @@ public class Scene {
             putAll(Magnitude.class, "appmag", "absmag");
 
             // ModelScaffolding
-            putAll(ModelScaffolding.class, "refplane", "transformations", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locthoverfactor", "shadowvalues");
+            putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locthoverfactor", "shadowvalues");
 
             // Model
             putAll(Model.class, "model");
@@ -416,13 +415,16 @@ public class Scene {
             putAll(RenderFlags.class, "renderquad");
 
             // Machine
-            putAll(Machine.class, "machines");
+            putAll(MotorEngine.class, "machines");
 
             // Trajectory
             putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "trail", "newmethod");
 
-            // Transform
-            putAll(Transform.class, "transformName", "transformFunction", "transformValues");
+            // RefSysTransform
+            putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues");
+
+            // AffineTransformations
+            putAll(AffineTransformations.class, "transformations");
 
             // Fade
             putAll(Fade.class, "fadein", "fadeout", "positionobjectname");
@@ -459,6 +461,9 @@ public class Scene {
 
             // StarSet
             putAll(StarSet.class, "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup");
+
+            // Attitude
+            putAll(Attitude.class, "provider:HeliotropicSatellite", "attitudeLocation");
         } else {
             logger.error("World is null, can't initialize attributes.");
         }

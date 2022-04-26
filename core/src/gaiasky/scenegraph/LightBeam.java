@@ -45,11 +45,6 @@ public class LightBeam extends ModelBody {
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-    }
-
-    @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
     }
 

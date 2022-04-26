@@ -9,8 +9,8 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
 
-public class Transform implements Component {
-    private static final Log logger = Logger.getLogger(Transform.class);
+public class RefSysTransform implements Component {
+    private static final Log logger = Logger.getLogger(RefSysTransform.class);
     public String transformName;
     public Matrix4d transformFunction;
 
