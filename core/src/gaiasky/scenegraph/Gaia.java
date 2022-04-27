@@ -10,6 +10,7 @@ package gaiasky.scenegraph;
  * @deprecated Use {@link HeliotropicSatellite} instead.
  * TODO Remove this when possible.
  */
+@Deprecated
 public class Gaia extends HeliotropicSatellite {
 
     public Gaia() {
