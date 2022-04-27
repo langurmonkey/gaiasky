@@ -106,10 +106,10 @@ public class Scene {
             EntitySystem baseInit = new BaseInitializationSystem(Family.all(Base.class).get(), 0);
             EntitySystem particleInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), 1);
             EntitySystem starInit = new StarInitializationSystem(Family.all(Body.class, Size.class, Celestial.class, Magnitude.class, ProperMotion.class).get(), 2);
-            EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), 2);
+            EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), 3);
 
             // Run once
-            runOnce(baseInit, particleInit, starInit);
+            runOnce(baseInit, particleInit, starInit, modelInit);
         }
 
     }

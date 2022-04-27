@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Component;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
-import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 
@@ -13,12 +12,12 @@ public class Body implements Component {
      * Position of this entity in the local reference system. The units are
      * {@link gaiasky.util.Constants#U_TO_KM} by default.
      */
-    public Vector3b pos;
+    public Vector3b pos = new Vector3b();
 
     /**
      * Position in the equatorial system; ra, dec.
      */
-    public Vector2d posSph;
+    public Vector2d posSph = new Vector2d();
 
     /**
      * Size factor in internal units.
@@ -48,17 +47,14 @@ public class Body implements Component {
 
 
     public void setPosition(double[] pos) {
-        this.pos = new Vector3b();
         this.pos.set(pos[0], pos[1], pos[2]);
     }
 
     public void setPositionKm(double[] pos) {
-        this.pos = new Vector3b();
         this.pos.set(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
     }
 
     public void setPositionPc(double[] pos) {
-        this.pos = new Vector3b();
         this.pos.set(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
     }
 
