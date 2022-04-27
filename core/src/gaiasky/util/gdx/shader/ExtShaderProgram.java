@@ -729,7 +729,7 @@ public class ExtShaderProgram implements Disposable {
      * Sets the vertex attribute with the given name. The {@link ExtShaderProgram} must be bound for this to work.
      *
      * @param name      the attribute name
-     * @param size      the number of components. If > 4, it must be a multiple of 4, as it is interpreted as vec4[].
+     * @param size      the number of components, must be >= 1 and <= 4
      * @param type      the type, must be one of GL20.GL_BYTE, GL20.GL_UNSIGNED_BYTE, GL20.GL_SHORT,
      *                  GL20.GL_UNSIGNED_SHORT,GL20.GL_FIXED, or GL20.GL_FLOAT. GL_FIXED will not work on the desktop
      * @param normalize whether fixed point data should be normalized. Will not work on the desktop
@@ -742,31 +742,13 @@ public class ExtShaderProgram implements Disposable {
         int location = fetchAttributeLocation(name);
         if (location == -1)
             return;
-        if (size <= 4) {
-            // Single attribute
-            gl.glVertexAttribPointer(location, size, type, normalize, stride, offset);
-        } else {
-            // Only array of vec4 supported
-            int n = size / 4;
-            for (int i = 0; i < n; i++) {
-                gl.glVertexAttribPointer(location + i, 4, type, normalize, stride, offset + i * 16);
-            }
-        }
+        gl.glVertexAttribPointer(location, size, type, normalize, stride, offset);
     }
 
     public void setVertexAttribute(int location, int size, int type, boolean normalize, int stride, int offset) {
         GL20 gl = Gdx.gl20;
         checkManaged();
-        if (size <= 4) {
-            // Single attribute
-            gl.glVertexAttribPointer(location, size, type, normalize, stride, offset);
-        } else {
-            // Only array of vec4 supported
-            int n = size / 4;
-            for (int i = 0; i < n; i++) {
-                gl.glVertexAttribPointer(location + i, 4, type, normalize, stride, offset + i * 16);
-            }
-        }
+        gl.glVertexAttribPointer(location, size, type, normalize, stride, offset);
     }
 
     /**
