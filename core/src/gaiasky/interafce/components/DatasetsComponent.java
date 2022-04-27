@@ -44,6 +44,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, OwnSliderPlus> scalingMap;
     private final CatalogManager catalogManager;
 
+    private OwnLabel noDatasetsLabel = null;
+
     public DatasetsComponent(final Skin skin, final Stage stage, final CatalogManager catalogManager) {
         super(skin, stage);
         this.catalogManager = catalogManager;
@@ -69,6 +71,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         }
 
         component = group;
+
+        addNoDatasets();
     }
 
     private void setDatasetVisibility(CatalogInfo ci, OwnImageButton eye, boolean visible, Actor source) {
@@ -77,7 +81,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 eye.setCheckedNoFire(!visible);
             }
             EventManager.publish(Event.CATALOG_VISIBLE, this, ci.name, visible);
-            if(ci.object != null && ci.object instanceof MeshObject) {
+            if (ci.object != null && ci.object instanceof MeshObject) {
                 EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, ci.object, ci.object.getName(), visible);
             }
         }
@@ -315,10 +319,35 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         groupMap.put(ci.name, catalogWidget);
     }
 
+    /**
+     * Removes the notice.
+     */
+    private void removeNoDatasets() {
+        if (noDatasetsLabel != null) {
+            noDatasetsLabel.remove();
+            noDatasetsLabel = null;
+            group.pack();
+        }
+    }
+
+    /**
+     * Adds notice if there are no catalogs in the component.
+     */
+    private void addNoDatasets() {
+        if (groupMap != null && groupMap.isEmpty() && noDatasetsLabel == null) {
+            noDatasetsLabel = new OwnLabel(I18n.msg("gui.dataset.notfound"), skin);
+            noDatasetsLabel.setWidth(ControlsWindow.getContentWidth() * 0.94f);
+            noDatasetsLabel.setAlignment(Align.left, Align.left);
+            group.addActor(noDatasetsLabel);
+            group.pack();
+        }
+    }
+
     @Override
     public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
         switch (event) {
         case CATALOG_ADD:
+            removeNoDatasets();
             addCatalogInfo((CatalogInfo) data[0]);
             break;
         case CATALOG_REMOVE:
@@ -330,6 +359,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 colorMap.remove(ciName);
                 EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
             }
+            addNoDatasets();
             break;
         case CATALOG_VISIBLE:
             boolean ui = source == this;
@@ -373,7 +403,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             if (!ui) {
                 ciName = (String) data[0];
                 double val = (Double) data[1];
-                if(scalingMap.containsKey(ciName)) {
+                if (scalingMap.containsKey(ciName)) {
                     OwnSliderPlus slider = scalingMap.get(ciName);
                     slider.setProgrammaticChangeEvents(false);
                     slider.setMappedValue(val);
