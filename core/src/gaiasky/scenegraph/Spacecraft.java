@@ -160,6 +160,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         leveling = false;
 
         qf = new Quaternion();
+
+        this.labelFactor = 0;
     }
 
     public void initialize() {
@@ -547,7 +549,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
      * camera and the view angle have been determined.
      */
     protected void addToRenderLists(ICamera camera) {
-        if (this.shouldRender() && this.viewAngleApparent > TH_ANGLE_POINT * camera.getFovFactor()) {
+        if (this.shouldRender() && this.viewAngleApparent > thresholdPoint * camera.getFovFactor()) {
             super.addToRenderLists(camera);
             if (Settings.settings.spacecraft.showAxes)
                 addToRender(this, RenderGroup.LINE);
@@ -686,11 +688,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         copy.stopping = this.stopping;
 
         return (T) copy;
-    }
-
-    @Override
-    protected float labelFactor() {
-        return 0;
     }
 
     @Override

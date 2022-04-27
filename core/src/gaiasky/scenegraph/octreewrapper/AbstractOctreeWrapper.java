@@ -6,7 +6,6 @@
 package gaiasky.scenegraph.octreewrapper;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -18,7 +17,6 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
-import gaiasky.util.MyPools;
 import gaiasky.util.Settings;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.Vector3b;
@@ -27,7 +25,6 @@ import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -214,10 +211,8 @@ public abstract class AbstractOctreeWrapper extends FadeNode {
      */
     @Override
     public <T extends SceneGraphNode> T getSimpleCopy() {
-        Class<? extends AbstractOctreeWrapper> clazz = this.getClass();
-        Pool<? extends AbstractOctreeWrapper> pool = MyPools.get(clazz);
         try {
-            AbstractOctreeWrapper instance = pool.obtain();
+            AbstractOctreeWrapper instance = this.getClass().getConstructor().newInstance();
             instance.copy = true;
             instance.names = this.names;
             instance.translation.set(this.translation);

@@ -15,31 +15,25 @@ import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import org.lwjgl.system.CallbackI.V;
 
 public abstract class Satellite extends ModelBody {
-
-    protected static final double TH_ANGLE_NONE = ModelBody.TH_ANGLE_POINT / 1e18;
-    protected static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 3.3e10;
-    protected static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 8;
 
     protected boolean parentOrientation = false;
     protected boolean hidden = false;
     protected Matrix4 orientationf;
     protected RotationComponent parentrc;
 
-    @Override
-    public double THRESHOLD_NONE() {
-        return TH_ANGLE_NONE;
-    }
+    public Satellite() {
+        super();
 
-    @Override
-    public double THRESHOLD_POINT() {
-        return TH_ANGLE_POINT;
-    }
+        double thPoint = this.thresholdPoint;
+        this.thresholdNone = thPoint / 1e18;
+        this.thresholdPoint = thPoint / 3.3e10;
+        this.thresholdQuad = thPoint / 8;
 
-    @Override
-    public double THRESHOLD_QUAD() {
-        return TH_ANGLE_QUAD;
+        this.labelFactor = 0.5e1f;
+        this.labelMax = this.labelMax * 2;
     }
 
     @Override
@@ -91,19 +85,10 @@ public abstract class Satellite extends ModelBody {
     }
 
     @Override
-    protected float labelFactor() {
-        return .5e1f;
-    }
-
-    @Override
     public boolean renderText() {
         return !hidden && super.renderText();
     }
 
-    @Override
-    protected float labelMax() {
-        return super.labelMax() * 2;
-    }
 
     protected float getViewAnglePow() {
         return 1f;
@@ -114,9 +99,9 @@ public abstract class Satellite extends ModelBody {
     }
 
     public float getFuzzyRenderSize(ICamera camera) {
-        float thAngleQuad = (float) THRESHOLD_QUAD() * camera.getFovFactor();
+        float thAngleQuad = (float) thresholdQuad * camera.getFovFactor();
         double size = 0f;
-        if (viewAngle >= THRESHOLD_POINT() * camera.getFovFactor()) {
+        if (viewAngle >= thresholdPoint * camera.getFovFactor()) {
             size = Math.tan(thAngleQuad) * distToCamera * 10f;
         }
         return (float) size;

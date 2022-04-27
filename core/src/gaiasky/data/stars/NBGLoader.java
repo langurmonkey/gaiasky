@@ -8,9 +8,10 @@ package gaiasky.data.stars;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.ISceneGraphLoader;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.BillboardGalaxy;
 import gaiasky.scenegraph.CelestialBody;
-import gaiasky.scenegraph.NBGalaxy;
+import gaiasky.scenegraph.Particle;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -79,13 +80,6 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                             double distMpc = Parser.parseDouble(tokens[4]);
                             double distPc = distMpc * 1e6d;
                             double kmag = Parser.parseDouble(tokens[5]);
-                            double bmag = Parser.parseDouble(tokens[6]);
-                            double a26 = Parser.parseDouble(tokens[7]);
-                            double ba = Parser.parseDouble(tokens[8]);
-                            int hrv = Parser.parseInt(tokens[9]);
-                            int i = Parser.parseInt(tokens[10]);
-                            int tt = Parser.parseInt(tokens[11]);
-                            String Mcl = tokens[12];
                             String img = tokens[13];
                             double sizepc = Parser.parseDouble(tokens[14]);
 
@@ -94,10 +88,10 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                                 // Regular shaded light point
                                 Apfloat dist = new Apfloat(distMpc * Constants.MPC_TO_U, Constants.PREC);
                                 Vector3b pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3b());
+                                float absMag = (float) (kmag - 2.5 * Math.log10(Math.pow(distPc / 10d, 2d)));
                                 float colorbv = 0;
-                                float absmag = (float) (kmag - 2.5 * Math.log10(Math.pow(distPc / 10d, 2d)));
 
-                                NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, altname.isBlank() ? new String[] { name } : new String[] { name, altname }, (float) ra, (float) dec, (float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseId + offset);
+                                Particle gal = new Particle(pos, (float) kmag, absMag, colorbv, altname.isBlank() ? new String[] { name } : new String[] { name, altname }, (float) ra, (float) dec, baseId + offset, 0, 2e-10, 1.7e-12, 0.15f, 1.2e1f, 0.00004f, 3.3f, RenderGroup.BILLBOARD_GAL);
                                 gal.setParent("NBG");
                                 g = gal;
                             } else {

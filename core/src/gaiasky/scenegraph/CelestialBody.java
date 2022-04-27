@@ -40,19 +40,19 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
      * radius/distance limit for rendering at all. If angle is smaller than this
      * quantity, no rendering happens.
      */
-    public abstract double THRESHOLD_NONE();
+    public double thresholdNone;
 
     /**
      * radius/distance limit for rendering as shader. If angle is any bigger, we
      * render as a model.
      */
-    public abstract double THRESHOLD_QUAD();
+    public double thresholdQuad;
 
     /**
      * radius/distance limit for rendering as point. If angle is any bigger, we
      * render with shader.
      */
-    public abstract double THRESHOLD_POINT();
+    public  double thresholdPoint;
 
     public float TH_OVER_FACTOR;
 
@@ -76,18 +76,24 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     /** Component alpha mirror **/
     public float compalpha;
 
+    public float labelFactor;
+    public float labelMax;
+    public float textScale = -1;
+
     /**
      * Whether we are out of the time baseline range in the algorithm that works
      * out the coordinates of this body
      **/
     protected boolean coordinatesTimeOverflow = false;
 
+    /** Render scale. **/
+    protected float primitiveRenderScale = 1f;
+
     /**
      * Simple constructor
      */
     public CelestialBody() {
         super();
-        TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / Settings.settings.scene.label.number);
     }
 
     /**
@@ -97,7 +103,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
         compalpha = alpha;
 
-        float size = getFuzzyRenderSize(camera);
+        float size = getFuzzyRenderSize(camera) * primitiveRenderScale;
         shader.setUniformf("u_pos", translation.put(F31.get()));
         shader.setUniformf("u_size", size);
 
@@ -105,7 +111,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         shader.setUniformf("u_inner_rad", getInnerRad());
         shader.setUniformf("u_distance", (float) distToCamera);
         shader.setUniformf("u_apparent_angle", (float) viewAngleApparent);
-        shader.setUniformf("u_thpoint", (float) THRESHOLD_POINT() * camera.getFovFactor());
+        shader.setUniformf("u_thpoint", (float) thresholdPoint * camera.getFovFactor());
 
         // Whether light scattering is enabled or not
         shader.setUniformi("u_lightScattering", (this instanceof Star && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
@@ -117,9 +123,9 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     public float getFuzzyRenderSize(ICamera camera) {
-        float thAngleQuad = (float) THRESHOLD_QUAD() * camera.getFovFactor();
+        float thAngleQuad = (float) thresholdQuad * camera.getFovFactor();
         double size = 0f;
-        if (viewAngle >= THRESHOLD_POINT() * camera.getFovFactor()) {
+        if (viewAngle >= thresholdPoint * camera.getFovFactor()) {
             if (viewAngle < thAngleQuad) {
                 size = FastMath.tan(thAngleQuad) * distToCamera;
             } else {
@@ -254,21 +260,17 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     @Override
     public float textScale() {
-        return (float) FastMath.atan(labelMax()) * labelFactor() * 4e2f;
+        return textScale >= 0 ? textScale : (float) FastMath.atan(labelMax) * labelFactor * 4e2f;
     }
 
     @Override
     public float textSize() {
-        return (float) (labelMax() * distToCamera * labelFactor());
+        return (float) (labelMax * distToCamera * labelFactor);
     }
 
     protected float labelSizeConcrete() {
         return this.size;
     }
-
-    protected abstract float labelFactor();
-
-    protected abstract float labelMax();
 
     public void textPosition(ICamera cam, Vector3d out) {
         translation.put(out);
@@ -464,6 +466,10 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     public String getWikiname() {
         return wikiname;
+    }
+
+    public void setPrimitiveRenderScale(float primitiveRenderScale) {
+        this.primitiveRenderScale = primitiveRenderScale;
     }
 
     public void setWikiname(String wikiname) {

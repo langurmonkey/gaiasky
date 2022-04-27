@@ -146,6 +146,16 @@ public class Star extends Particle {
         modelDistance = 172.4643429 * radius;
     }
 
+    protected void setDerivedAttributes() {
+        double flux = Math.pow(10, -absmag / 2.5f);
+        setRGB(colorbv);
+
+        // Calculate size - This contains arbitrary boundary values to make
+        // things nice on the render side
+        size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / DISC_FACTOR);
+        computedSize = 0;
+    }
+
     @Override
     public void doneLoading(final AssetManager manager) {
         super.doneLoading(manager);

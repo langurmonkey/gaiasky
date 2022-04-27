@@ -597,9 +597,9 @@
       "key": "catalog-nbg",
       "name": "NBG catalog",
       "type": "catalog-gal",
-      "version": 8,
+      "version": 9,
       "mingsversion": 30200,
-      "size": 15787183,
+      "size": 15787347,
       "nobjects": 875,
       "check": "catalog-nbg.json",
       "data": [
@@ -609,9 +609,9 @@
         "tex/extragal"
       ],
       "description": "Nearby Galaxies Catalog, containing more than 800 close-by galaxies. It also contains the M87 black hole",
-      "releasenotes" : "- Add NBG hook object as part of the dataset.",
-      "sha256": "2eca28fc73eb14705aa362ddec61f0ec8b347e3373f6c844b2d852ce48cc4dc0",
-      "file": "@mirror-url@galaxies/nbg/v08_20220126/galaxies-nbg.tar.gz"
+      "releasenotes" : "- Add catalog info so taht NBG appears in the datasets pane.",
+      "sha256": "dcc7ab6277c7a46bf6da446af0d30fe1bdf6434a82b5bdd8d198a427248e9d5a",
+      "file": "@mirror-url@galaxies/nbg/v09_20220427/galaxies-nbg.tar.gz"
     },
     {
       "name": "catalog-sdss-12",

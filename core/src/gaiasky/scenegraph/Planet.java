@@ -31,26 +31,8 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public class Planet extends ModelBody implements ILineRenderable {
-    private static final double TH_ANGLE_NONE = ModelBody.TH_ANGLE_POINT / 1e6;
-    private static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 3e4;
-    private static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 2f;
 
     private final Vector3d endLine = new Vector3d();
-
-    @Override
-    public double THRESHOLD_NONE() {
-        return TH_ANGLE_NONE;
-    }
-
-    @Override
-    public double THRESHOLD_POINT() {
-        return TH_ANGLE_POINT;
-    }
-
-    @Override
-    public double THRESHOLD_QUAD() {
-        return TH_ANGLE_QUAD;
-    }
 
     /** ATMOSPHERE **/
     AtmosphereComponent ac;
@@ -60,6 +42,13 @@ public class Planet extends ModelBody implements ILineRenderable {
 
     public Planet() {
         super();
+
+        double thPoint = this.thresholdPoint;
+        this.thresholdNone = thPoint / 1e6;
+        this.thresholdPoint = thPoint / 3e4;
+        this.thresholdQuad = thPoint / 2;
+
+        this.labelFactor = (float) (1.5e1 * Constants.DISTANCE_SCALE_FACTOR);
     }
 
     @Override
@@ -227,11 +216,6 @@ public class Planet extends ModelBody implements ILineRenderable {
 
     public void setCloud(CloudComponent clc) {
         this.clc = clc;
-    }
-
-    @Override
-    protected float labelFactor() {
-        return (float) (1.5e1 * Constants.DISTANCE_SCALE_FACTOR);
     }
 
     public void dispose() {
