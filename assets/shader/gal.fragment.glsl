@@ -5,9 +5,6 @@ uniform sampler2D u_texture0;
 uniform float u_distance;
 // Apparent angle in deg
 uniform float u_apparent_angle;
-// Component alpha (galaxies)
-uniform float u_alpha;
-uniform float u_time;
 
 // v_texCoords are UV coordinates in [0..1]
 in vec2 v_texCoords;
@@ -45,7 +42,8 @@ vec4 drawSimple(vec2 tc) {
 
 
 void main() {
-	fragColor = drawSimple(v_texCoords) * u_alpha;
+	fragColor = drawSimple(v_texCoords);
+	fragColor *= fragColor.a;
 
 	#ifdef ssrFlag
 	ssrBuffers();

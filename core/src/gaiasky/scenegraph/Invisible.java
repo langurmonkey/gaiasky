@@ -64,33 +64,9 @@ public class Invisible extends CelestialBody {
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
     }
 
-    @Override
-    public double THRESHOLD_NONE() {
-        return 0;
-    }
-
-    @Override
-    public double THRESHOLD_QUAD() {
-        return 0;
-    }
-
-    @Override
-    public double THRESHOLD_POINT() {
-        return 0;
-    }
 
     @Override
     public float getInnerRad() {
-        return 0;
-    }
-
-    @Override
-    protected float labelFactor() {
-        return 0;
-    }
-
-    @Override
-    protected float labelMax() {
         return 0;
     }
 

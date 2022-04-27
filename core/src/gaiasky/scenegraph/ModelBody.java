@@ -44,15 +44,6 @@ import java.util.List;
  * model
  */
 public abstract class ModelBody extends CelestialBody {
-    protected static final double TH_ANGLE_POINT = Math.toRadians(0.30);
-
-    /**
-     * Solid angle limit for rendering as point. If angle is any bigger, we render
-     * with shader.
-     */
-    public double THRESHOLD_POINT() {
-        return TH_ANGLE_POINT;
-    }
 
     /** MODEL **/
     public ModelComponent mc;
@@ -97,8 +88,13 @@ public abstract class ModelBody extends CelestialBody {
 
     public ModelBody() {
         super();
-        localTransform = new Matrix4();
-        orientation = new Matrix4d();
+        this.localTransform = new Matrix4();
+        this.orientation = new Matrix4d();
+
+        this.thresholdPoint = Math.toRadians(0.30);
+        this.TH_OVER_FACTOR = (float) (this.thresholdPoint / Settings.settings.scene.label.number);
+
+        this.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
     }
 
     public void initialize() {
@@ -201,9 +197,9 @@ public abstract class ModelBody extends CelestialBody {
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender() && this.isValidPosition() && parent.isValidPosition()) {
             camera.checkClosestBody(this);
-            double thPoint = (THRESHOLD_POINT() * camera.getFovFactor()) / sizeScaleFactor;
+            double thPoint = (thresholdPoint * camera.getFovFactor()) / sizeScaleFactor;
             if (viewAngleApparent >= thPoint) {
-                double thQuad2 = THRESHOLD_QUAD() * camera.getFovFactor() * 2 / sizeScaleFactor;
+                double thQuad2 = thresholdQuad * camera.getFovFactor() * 2 / sizeScaleFactor;
                 double thQuad1 = thQuad2 / 8.0 / sizeScaleFactor;
                 if (viewAngleApparent < thPoint * 4) {
                     fadeOpacity = (float) MathUtilsd.lint(viewAngleApparent, thPoint, thPoint * 4, 1, 0);
@@ -271,7 +267,7 @@ public abstract class ModelBody extends CelestialBody {
         shader.setUniformf("u_inner_rad", getInnerRad());
         shader.setUniformf("u_distance", (float) distToCamera);
         shader.setUniformf("u_apparent_angle", (float) viewAngleApparent);
-        shader.setUniformf("u_thpoint", (float) THRESHOLD_POINT() * camera.getFovFactor());
+        shader.setUniformf("u_thpoint", (float) thresholdPoint * camera.getFovFactor());
 
         // Whether light scattering is enabled or not
         shader.setUniformi("u_lightScattering", 0);
@@ -299,19 +295,14 @@ public abstract class ModelBody extends CelestialBody {
         }
     }
 
-    @Override
-    protected float labelMax() {
-        return (float) (.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
-    }
-
     public void setModel(ModelComponent mc) {
         this.mc = mc;
     }
 
     public float getFuzzyRenderSize(ICamera camera) {
-        float thAngleQuad = (float) THRESHOLD_QUAD() * camera.getFovFactor();
+        float thAngleQuad = (float) thresholdQuad * camera.getFovFactor();
         double size = 0f;
-        if (viewAngle >= THRESHOLD_POINT() * camera.getFovFactor()) {
+        if (viewAngle >= thresholdPoint * camera.getFovFactor()) {
             size = Math.tan(thAngleQuad) * distToCamera * 2f;
         }
         return (float) size;
@@ -503,7 +494,7 @@ public abstract class ModelBody extends CelestialBody {
      */
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
-            if (viewAngleApparent < THRESHOLD_QUAD() * camera.getFovFactor()) {
+            if (viewAngleApparent < thresholdQuad * camera.getFovFactor()) {
                 super.addHit(screenX, screenY, w, h, minPixDist, camera, hits);
             } else {
                 Vector3 auxf = F31.get();
@@ -539,7 +530,7 @@ public abstract class ModelBody extends CelestialBody {
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
-            if (viewAngleApparent < THRESHOLD_QUAD() * camera.getFovFactor()) {
+            if (viewAngleApparent < thresholdQuad * camera.getFovFactor()) {
                 super.addHit(p0, p1, camera, hits);
             } else {
                 Vector3d aux1d = D31.get();

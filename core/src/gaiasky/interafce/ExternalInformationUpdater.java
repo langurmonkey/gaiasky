@@ -183,10 +183,12 @@ public class ExternalInformationUpdater {
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
             String url = Constants.URL_WIKIPEDIA;
-            if (focus instanceof NBGalaxy) {
+            if (focus instanceof Star) {
+                urlCheck(url, wikiname, suffixes_star, listener);
+            } else if (focus instanceof Particle) {
                 urlCheck(url, wikiname, suffixes_gal, listener);
             } else if (focus instanceof BillboardGalaxy) {
-                urlCheck(url, wikiname, suffixes_star, listener);
+                urlCheck(url, wikiname, suffixes_gal, listener);
             } else if (focus instanceof CelestialBody) {
                 CelestialBody f = (CelestialBody) focus;
                 if (f.wikiname != null) {

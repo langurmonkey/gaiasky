@@ -23,10 +23,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 public class Billboard extends ModelBody {
 
-    protected static final double TH_ANGLE_NONE = 0.002;
-    protected static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 1e9;
-    protected static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 8;
-
     protected boolean hidden = false;
     protected double[] fade;
 
@@ -35,21 +31,13 @@ public class Billboard extends ModelBody {
     public Billboard() {
         super();
         q = new Quaternion();
-    }
 
-    @Override
-    public double THRESHOLD_NONE() {
-        return TH_ANGLE_NONE;
-    }
+        double thPoint = this.thresholdPoint;
+        this.thresholdNone = 0.002;
+        this.thresholdPoint = thPoint / 1e9;
+        this.thresholdQuad = thPoint / 8;
 
-    @Override
-    public double THRESHOLD_POINT() {
-        return TH_ANGLE_POINT;
-    }
-
-    @Override
-    public double THRESHOLD_QUAD() {
-        return TH_ANGLE_QUAD;
+        this.labelFactor = 1e1f;
     }
 
     @Override
@@ -117,7 +105,7 @@ public class Billboard extends ModelBody {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
-            if (viewAngleApparent >= TH_ANGLE_NONE) {
+            if (viewAngleApparent >= thresholdNone) {
                 addToRender(this, RenderGroup.MODEL_DIFFUSE);
                 if (renderText()) {
                     addToRender(this, RenderGroup.FONT_LABEL);
@@ -130,11 +118,6 @@ public class Billboard extends ModelBody {
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         render(modelBatch, group, alpha, t, false);
-    }
-
-    @Override
-    protected float labelFactor() {
-        return 1e1f;
     }
 
     @Override

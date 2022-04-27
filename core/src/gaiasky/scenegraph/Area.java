@@ -75,20 +75,12 @@ public class Area extends SceneGraphNode implements ILineRenderable {
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
-
-        float angleLow = (float) ((ModelBody) parent).THRESHOLD_QUAD() * camera.getFovFactor() * 100f;
-        float angleHigh = (float) ((ModelBody) parent).THRESHOLD_QUAD() * camera.getFovFactor() * 200f;
+        float angleLow = (float) ((ModelBody) parent).thresholdQuad * camera.getFovFactor() * 100f;
+        float angleHigh = (float) ((ModelBody) parent).thresholdQuad * camera.getFovFactor() * 200f;
 
         if (isVisibilityOn() && parent.viewAngleApparent > angleLow) {
-            //ModelBody papa = (ModelBody) parent;
             localTransform.idt();
             toCartesian(loc2d[0][0][0], loc2d[0][0][1], cart0, localTransform);
-
-            //            Vector3d auxi = aux3d1.get();
-            //            transform.getTranslation(auxi).scl(-1);
-            //            double cosalpha = auxi.add(cart0.x, cart0.y, cart0.z).nor().dot(GaiaSky.instance.cam.getDirection().nor());
-            //
-            //            if (cosalpha < -0.1) {
 
             updateLocalValues(time, camera);
             this.translation.add(pos);

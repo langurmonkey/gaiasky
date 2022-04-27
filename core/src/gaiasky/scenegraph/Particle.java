@@ -41,7 +41,7 @@ import java.util.Random;
  */
 public class Particle extends CelestialBody implements IStarFocus, ILineRenderable {
 
-    private static final float DISC_FACTOR = 1.5f;
+    protected static final float DISC_FACTOR = 1.5f;
 
     private static final Random rnd = new Random();
 
@@ -91,21 +91,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         paramUpdater = new ParamUpdater();
     }
 
-    @Override
-    public double THRESHOLD_NONE() {
-        return (float) Settings.settings.scene.star.threshold.none;
-    }
-
-    @Override
-    public double THRESHOLD_POINT() {
-        return (float) Settings.settings.scene.star.threshold.point;
-    }
-
-    @Override
-    public double THRESHOLD_QUAD() {
-        return (float) Settings.settings.scene.star.threshold.quad;
-    }
-
     /**
      * Proper motion in cartesian coordinates [U/yr]
      **/
@@ -131,11 +116,65 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     boolean randomName = false;
     boolean hasPm = false;
 
+    RenderGroup billboardRenderGroup;
+
     public Particle() {
         super();
         this.pm = new Vector3();
         this.pmSph = new Vector3();
         this.parentName = ROOT_NAME;
+
+        // Defaults
+        this.thresholdNone = Settings.settings.scene.star.threshold.none;
+        this.thresholdPoint = Settings.settings.scene.star.threshold.point;
+        this.thresholdQuad = Settings.settings.scene.star.threshold.quad;
+
+        this.textScale = 0.2f;
+        this.labelFactor = 1.3e-1f;
+        this.labelMax = 0.01f;
+
+        this.primitiveRenderScale = 1;
+        this.billboardRenderGroup = RenderGroup.BILLBOARD_STAR;
+
+        this.TH_OVER_FACTOR = (float) (thresholdPoint / Settings.settings.scene.label.number);
+    }
+
+    public Particle(double thNone, double thPoint, double thQuad, float textScale, float labelFactor, float labelMax, float primitiveRenderScale, RenderGroup bbRenderGroup) {
+        super();
+        this.pm = new Vector3();
+        this.pmSph = new Vector3();
+        this.parentName = ROOT_NAME;
+
+        this.thresholdNone = thNone;
+        this.thresholdPoint = thPoint;
+        this.thresholdQuad = thQuad;
+
+        this.textScale = textScale;
+        this.labelFactor = labelFactor;
+        this.labelMax = labelMax;
+
+        this.primitiveRenderScale = primitiveRenderScale;
+        this.billboardRenderGroup = bbRenderGroup;
+
+        this.TH_OVER_FACTOR = (float) (thresholdPoint / Settings.settings.scene.label.number);
+    }
+
+    public Particle(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, double thNone, double thPoint, double thQuad, float textScale, float labelFactor, float labelMax, float primitiveRenderScale, RenderGroup bbRenderGroup) {
+        this(thNone, thPoint, thQuad, textScale, labelFactor, labelMax, primitiveRenderScale, bbRenderGroup);
+
+        this.pos = pos;
+        this.names = names;
+        this.appmag = appmag;
+        this.absmag = absmag;
+        this.colorbv = colorbv;
+        this.id = starid;
+
+        if (this.names == null || this.names.length == 0) {
+            this.setName("star_" + rnd.nextInt(10000000));
+        }
+        this.pm = new Vector3();
+        this.pmSph = new Vector3();
+        this.posSph = new Vector2d(ra, dec);
     }
 
     /**
@@ -196,7 +235,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
         // Calculate size - This contains arbitrary boundary values to make
         // things nice on the render side
-        size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / DISC_FACTOR);
+        size = (float) (Math.log(Math.pow(flux, 10.0)) * Constants.PC_TO_U);
         computedSize = 0;
     }
 
@@ -243,17 +282,17 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
+            camera.checkClosestBody(this);
+
             addToRender(this, RenderGroup.POINT_STAR);
             if (!(camera.getCurrent() instanceof FovCamera)) {
 
-                if (viewAngleApparent >= thpointTimesFovfactor) {
-                    addToRender(this, RenderGroup.BILLBOARD_STAR);
-                }
+                addToRender(this, billboardRenderGroup);
+
                 if (viewAngleApparent >= thpointTimesFovfactor / Settings.settings.scene.properMotion.number && this.hasPm) {
                     addToRender(this, RenderGroup.LINE);
                 }
             }
-
             if (renderText() && camera.isVisible(this)) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
@@ -314,21 +353,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         return textSize * 1e2f;
     }
 
-    @Override
-    public float textScale() {
-        return 0.2f;
-    }
-
-    @Override
-    protected float labelFactor() {
-        return 1.3e-1f;
-    }
-
-    @Override
-    protected float labelMax() {
-        return 0.01f;
-    }
-
     public float getFuzzyRenderSize(ICamera camera) {
         computedSize = this.size;
         if (viewAngle > thdownOverFovfactor) {
@@ -340,7 +364,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         }
 
         computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
-        return (float) computedSize;
+        return (float) (computedSize / Constants.DISTANCE_SCALE_FACTOR);
     }
 
     @Override
