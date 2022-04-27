@@ -265,16 +265,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             computeMeanPosition();
             setLabelPosition();
 
-            if (createCatalogInfo) {
-                // Create catalog info and broadcast
-                CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoSource.INTERNAL, 1f, this);
-                ci.nParticles = pointData != null ? pointData.size() : -1;
-                Path df = Path.of(Settings.settings.data.dataFile(datafile));
-                ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
-
-                // Insert
-                EventManager.publish(Event.CATALOG_ADD, this, ci, false);
-            }
+            initializeCatalogInfo(createCatalogInfo, names[0], names[0], pointData != null ? pointData.size() : -1, datafile);
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);

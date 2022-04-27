@@ -72,12 +72,7 @@ public class GenericCatalog extends FadeNode {
             }
 
             // Create catalog info
-            if (createCatalogInfo) {
-                if(catalogInfo == null) {
-                    catalogInfo = new CatalogInfo(dsName, description, null, CatalogInfoSource.INTERNAL, 1f, this);
-                }
-                EventManager.publish(Event.CATALOG_ADD, this, catalogInfo, false);
-            }
+            initializeCatalogInfo(createCatalogInfo, dsName, description, -1, null);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
