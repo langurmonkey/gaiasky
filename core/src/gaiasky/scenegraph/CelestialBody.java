@@ -468,6 +468,10 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         return wikiname;
     }
 
+    public void setPrimitiveRenderScale(float primitiveRenderScale) {
+        this.primitiveRenderScale = primitiveRenderScale;
+    }
+
     public void setWikiname(String wikiname) {
         this.wikiname = wikiname;
     }
