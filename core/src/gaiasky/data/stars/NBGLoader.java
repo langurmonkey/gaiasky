@@ -18,15 +18,15 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import org.apfloat.Apfloat;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Loads the NBG catalog in csv format.
