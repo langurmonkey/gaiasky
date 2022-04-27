@@ -7,12 +7,15 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.IFadeObject;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
@@ -21,6 +24,8 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -103,6 +108,23 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         this.hlc = new float[4];
     }
 
+    protected void initializeCatalogInfo(boolean create, String name, String desc, int nParticles, String dataFile) {
+        if (this.catalogInfo == null && create) {
+            // Create catalog info and broadcast
+            CatalogInfo ci = new CatalogInfo(name, desc, dataFile, CatalogInfoSource.INTERNAL, 1f, this);
+            ci.nParticles = nParticles;
+            if(dataFile != null) {
+                Path df = Path.of(Settings.settings.data.dataFile(dataFile));
+                ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
+            } else {
+                ci.sizeBytes = -1;
+            }
+        }
+        if (this.catalogInfo != null) {
+            // Insert
+            EventManager.publish(Event.CATALOG_ADD, this, this.catalogInfo, false);
+        }
+    }
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
