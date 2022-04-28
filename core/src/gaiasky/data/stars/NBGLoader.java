@@ -8,6 +8,7 @@ package gaiasky.data.stars;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.ISceneGraphLoader;
+import gaiasky.data.JsonLoader;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.BillboardGalaxy;
 import gaiasky.scenegraph.CelestialBody;
@@ -17,15 +18,15 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import org.apfloat.Apfloat;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.Arrays;
 
 /**
  * Loads the NBG catalog in csv format.
@@ -49,7 +50,9 @@ import java.io.InputStreamReader;
  * <li>Img - path to billboard image</li>
  * <li>Size - the size [pc]</li>
  * </ul>
+ * @deprecated Use JSON format instead, with {@link JsonLoader}.
  */
+@Deprecated
 public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(NBGLoader.class);
 
@@ -60,7 +63,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
         Array<CelestialBody> galaxies = new Array<>(false, 900);
         long baseId = 8500000;
         long offset = 0;
-        if (active)
+        if (active) {
             for (String file : files) {
                 FileHandle f = Settings.settings.data.dataFileHandle(file);
                 InputStream data = f.read();
@@ -92,6 +95,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                                 float colorbv = 0;
 
                                 Particle gal = new Particle(pos, (float) kmag, absMag, colorbv, altname.isBlank() ? new String[] { name } : new String[] { name, altname }, (float) ra, (float) dec, baseId + offset, 0, 2e-10, 1.7e-12, 0.15f, 1.2e1f, 0.00004f, 3.3f, RenderGroup.BILLBOARD_GAL);
+                                gal.setCt("Galaxies");
                                 gal.setParent("NBG");
                                 g = gal;
                             } else {
@@ -117,6 +121,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 
                 }
             }
+        }
 
         logger.info(I18n.msg("notif.catalog.init", galaxies.size));
         return galaxies;

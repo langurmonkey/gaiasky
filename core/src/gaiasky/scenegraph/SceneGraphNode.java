@@ -1246,6 +1246,14 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         coordinates = coord;
     }
 
+    public IBodyCoordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setPos(double[] pos) {
+        this.pos.set(pos);
+    }
+
     @Override
     public Vector3b getPosition() {
         return pos;

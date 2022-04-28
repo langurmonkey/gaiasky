@@ -222,6 +222,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public void initialize() {
+        this.TH_OVER_FACTOR = (float) (thresholdPoint / Settings.settings.scene.label.number);
         setDerivedAttributes();
         ct = new ComponentTypes(ComponentType.Galaxies);
         // Relation between our star size and actual star size (normalized for
@@ -510,6 +511,10 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     public float getLineWidth() {
         return 1;
+    }
+
+    public void setBillboardRenderGroup(String bbRG) {
+        this.billboardRenderGroup = RenderGroup.valueOf(bbRG);
     }
 
 }
