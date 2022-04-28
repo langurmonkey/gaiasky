@@ -33,7 +33,7 @@ public class BillboardGalaxy extends Billboard {
        super();
     }
 
-    public BillboardGalaxy(String[] names, double alpha, double delta, double dist, double sizePc, String tex) {
+    public BillboardGalaxy(String[] names, double alphaDeg, double deltaDeg, double distPc, double sizePc, String tex) {
         super();
         setNames(names);
         setColor(new double[] { 1, 1, 1, 1 });
@@ -41,7 +41,7 @@ public class BillboardGalaxy extends Billboard {
         setCt("Galaxies");
         setParent("NBG");
         StaticCoordinates sc = new StaticCoordinates();
-        sc.setEquatorial(new double[] { alpha, delta, dist });
+        sc.setEquatorial(new double[] { alphaDeg, deltaDeg, distPc });
         setCoordinates(sc);
         ModelComponent mc = new ModelComponent(true);
         mc.setType("twofacedbillboard");

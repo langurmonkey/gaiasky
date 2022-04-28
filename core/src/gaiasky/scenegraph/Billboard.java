@@ -136,7 +136,7 @@ public class Billboard extends ModelBody {
     }
 
     protected float getThOverFactorScl() {
-        return 5e3f;
+        return 1f;
     }
 
     @Override

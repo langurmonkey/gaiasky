@@ -87,7 +87,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     protected boolean coordinatesTimeOverflow = false;
 
     /** Render scale. **/
-    protected float primitiveRenderScale = 1f;
+    public float primitiveRenderScale = 1f;
 
     /**
      * Simple constructor
@@ -468,11 +468,36 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         return wikiname;
     }
 
-    public void setPrimitiveRenderScale(float primitiveRenderScale) {
-        this.primitiveRenderScale = primitiveRenderScale;
-    }
-
     public void setWikiname(String wikiname) {
         this.wikiname = wikiname;
     }
+
+    public void setPrimitiveRenderScale(Double primitiveRenderScale) {
+        this.primitiveRenderScale = primitiveRenderScale.floatValue();
+    }
+
+    public void setThresholdNone(Double thresholdNone) {
+        this.thresholdNone = thresholdNone;
+    }
+
+    public void setThresholdQuad(Double thresholdQuad) {
+        this.thresholdQuad = thresholdQuad;
+    }
+
+    public void setThresholdPoint(Double thresholdPoint) {
+        this.thresholdPoint = thresholdPoint;
+    }
+
+    public void setLabelFactor(Double labelFactor) {
+        this.labelFactor = labelFactor.floatValue();
+    }
+
+    public void setLabelMax(Double labelMax) {
+        this.labelMax = labelMax.floatValue();
+    }
+
+    public void setTextScale(Double textScale) {
+        this.textScale = textScale.floatValue();
+    }
+
 }
