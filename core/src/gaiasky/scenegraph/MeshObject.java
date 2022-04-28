@@ -67,7 +67,7 @@ public class MeshObject extends GenericCatalog implements IModelRenderable, I3DT
     }
 
     public void initialize() {
-        super.initialize(false, true);
+        super.initialize();
         if (mc != null) {
             mc.initialize(true);
         }

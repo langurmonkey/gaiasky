@@ -151,11 +151,15 @@ public class Constants {
         EventManager.publish(Event.NEW_DISTANCE_SCALE_FACTOR, null);
     }
 
-    public static final double STAR_SIZE_FACTOR = 1.31526e-6;
 
     /** Threshold radius/distance where star size remains constant. **/
     public static final double THRESHOLD_DOWN = 5e-7;
     public static final double THRESHOLD_UP = 1e-2;
+
+    /** Disc factor for single particles and stars. **/
+    public static final double PARTICLE_DISC_FACTOR = 1.5;
+    /** Size factor for single stars. **/
+    public static final double STAR_SIZE_FACTOR = 1.31526e-6;
 
     /*
      *

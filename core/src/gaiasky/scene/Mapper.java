@@ -23,12 +23,17 @@ public class Mapper {
     public static final ComponentMapper<ParticleSet> particleSet = ComponentMapper.getFor(ParticleSet.class);
     public static final ComponentMapper<StarSet> starSet = ComponentMapper.getFor(StarSet.class);
     public static final ComponentMapper<Magnitude> magnitude = ComponentMapper.getFor(Magnitude.class);
-    public static final ComponentMapper<Size> size = ComponentMapper.getFor(Size.class);
+    public static final ComponentMapper<ParticleExtra> extra = ComponentMapper.getFor(ParticleExtra.class);
+    public static final ComponentMapper<Distance> distance = ComponentMapper.getFor(Distance.class);
+    public static final ComponentMapper<ProperMotion> pm = ComponentMapper.getFor(ProperMotion.class);
     public static final ComponentMapper<Model> model = ComponentMapper.getFor(Model.class);
+    public static final ComponentMapper<SolidAngle> sa = ComponentMapper.getFor(SolidAngle.class);
+    public static final ComponentMapper<Text> text = ComponentMapper.getFor(Text.class);
     public static final ComponentMapper<Atmosphere> atmosphere = ComponentMapper.getFor(Atmosphere.class);
     public static final ComponentMapper<Cloud> cloud = ComponentMapper.getFor(Cloud.class);
     public static final ComponentMapper<ModelScaffolding> modelScaffolding = ComponentMapper.getFor(ModelScaffolding.class);
     public static final ComponentMapper<Attitude> attitude = ComponentMapper.getFor(Attitude.class);
     public static final ComponentMapper<MotorEngine> engine = ComponentMapper.getFor(MotorEngine.class);
+    public static final ComponentMapper<RenderType> render = ComponentMapper.getFor(RenderType.class);
 
 }

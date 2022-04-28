@@ -104,12 +104,12 @@ public class Scene {
         if (engine != null) {
             // Prepare systems
             EntitySystem baseInit = new BaseInitializationSystem(Family.all(Base.class).get(), 0);
-            EntitySystem particleInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), 1);
-            EntitySystem starInit = new StarInitializationSystem(Family.all(Body.class, Size.class, Celestial.class, Magnitude.class, ProperMotion.class).get(), 2);
+            EntitySystem particleSetInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), 1);
+            EntitySystem particleInit = new ParticleInitializationSystem(Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), 2);
             EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), 3);
 
             // Run once
-            runOnce(baseInit, particleInit, starInit, modelInit);
+            runOnce(baseInit, particleSetInit, particleInit, modelInit);
         }
 
     }
@@ -315,7 +315,8 @@ public class Scene {
             addArchetype(SceneGraphNode.class.getName(), Base.class, Flags.class, Body.class, GraphNode.class, Octant.class);
 
             // Celestial
-            addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class, Coordinates.class, Rotation.class);
+            addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class,
+                    Coordinates.class, Rotation.class, Text.class, SolidAngle.class);
 
             // ModelBody
             addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class, AffineTransformations.class);
@@ -323,8 +324,11 @@ public class Scene {
             // Planet
             addArchetype(Planet.class.getName(), ModelBody.class.getName(), Atmosphere.class, Cloud.class);
 
+            // Particle
+            addArchetype(Particle.class.getName(), CelestialBody.class.getName(), ProperMotion.class, RenderType.class, ParticleExtra.class);
+
             // Star
-            addArchetype(Star.class.getName(), CelestialBody.class.getName(), ProperMotion.class, Hip.class, Size.class);
+            addArchetype(Star.class.getName(), Particle.class.getName(), Hip.class, Distance.class);
 
             // Satellite
             addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);
@@ -337,6 +341,9 @@ public class Scene {
 
             // Spacecraft
             addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
+
+            // Billboard
+            addArchetype(Billboard.class.getName(), ModelBody.class.getName(), Fade.class);
 
             // VertsObject
             addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);
@@ -447,6 +454,12 @@ public class Scene {
             // Magnitude
             putAll(Magnitude.class, "appmag", "absmag");
 
+            // SolidAngleThresholds
+            putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
+
+            // Text
+            putAll(Text.class, "labelFactor", "labelMax", "textScale");
+
             // ModelScaffolding
             putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locthoverfactor", "shadowvalues");
 
@@ -455,6 +468,7 @@ public class Scene {
 
             // Atmosphere
             putAll(Atmosphere.class, "atmosphere");
+
             // Cloud
             putAll(Cloud.class, "cloud");
 
@@ -474,7 +488,7 @@ public class Scene {
             putAll(AffineTransformations.class, "transformations");
 
             // Fade
-            putAll(Fade.class, "fadein", "fadeout", "positionobjectname");
+            putAll(Fade.class, "fadein", "fadeout", "fade", "fadepc", "positionobjectname");
 
             // DatasetDescription
             putAll(DatasetDescription.class, "catalogInfo", "cataloginfo");

@@ -70,6 +70,11 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     public boolean inSceneGraph = false;
 
     /**
+     * Allows specifying the description at object level in JSON.
+     */
+    protected String description;
+
+    /**
      * Information on the catalog this fade node represents (particle group, octree, etc.)
      */
     protected CatalogInfo catalogInfo = null;
@@ -106,6 +111,12 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     public FadeNode(String name, SceneGraphNode parent) {
         super(name, parent);
         this.hlc = new float[4];
+    }
+
+    public void initialize() {
+        super.initialize();
+        // Create catalog info
+        initializeCatalogInfo(false, getName(), description, -1, null);
     }
 
     protected void initializeCatalogInfo(boolean create, String name, String desc, int nParticles, String dataFile) {
@@ -365,5 +376,9 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
 
     public void setPointscaling(float pointscaling) {
         this.pointscaling = pointscaling;
+    }
+
+    public void setDescription(String desc) {
+        this.description = desc;
     }
 }

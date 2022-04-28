@@ -11,7 +11,12 @@ public class DatasetDescription implements Component {
     /**
      * Information on the catalog this fade node represents (particle group, octree, etc.)
      */
-    protected CatalogInfo catalogInfo = null;
+    public CatalogInfo catalogInfo = null;
+
+    /**
+     * A description.
+     */
+    public String description;
 
     public void setCatalogInfoBare(CatalogInfo info) {
         this.catalogInfo = info;
@@ -19,6 +24,10 @@ public class DatasetDescription implements Component {
 
     public void setCatalogInfo(CatalogInfo info) {
         this.catalogInfo = info;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setCataloginfo(Map<String, String> map) {

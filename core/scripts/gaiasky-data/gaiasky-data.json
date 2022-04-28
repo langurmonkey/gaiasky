@@ -610,8 +610,8 @@
         "tex/extragal"
       ],
       "description": "Nearby Galaxies Catalog, containing more than 800 close-by galaxies. It also contains the M87 black hole",
-      "releasenotes" : "- Move NBG to JSON format.\n- Add catalog info so taht NBG appears in the datasets pane.",
-      "sha256": "e9d3d1856a7e1322fb541aaf1ba7af8e0764b9a16de084e3d0f116e9751da264",
+      "releasenotes" : "- Move NBG to JSON format.\n- Add catalog info so that NBG appears in the datasets pane.",
+      "sha256": "ccff2fc2893594fb8b38b2cccb38d82c7d8deb644e8ff4f7f439ae325c4cbda0",
       "file": "@mirror-url@galaxies/nbg/v09_20220427/galaxies-nbg.tar.gz"
     },
     {
@@ -703,23 +703,24 @@
       "file": "@mirror-url@clusters/ocdr2/v01_20201027/ocdr2-clusters.tar.gz"
     },
     {
-      "name": "catalog-ocdr2",
+      "key": "catalog-ocdr2",
+      "name": "Open Clusters DR2",
+      "description": "Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al.",
       "type": "catalog-cluster",
-      "version": 4,
-      "mingsversion": 30000,
+      "version": 5,
+      "mingsversion": 30200,
       "size": 58503,
       "nobjects":2017,
       "check": "catalog-ocdr2.json",
       "data": [
         "catalog-ocdr2.json",
-        "particles-ocdr2.json",
+        "particles-ocdr2-hook.json",
         "ocdr2"
       ],
-      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al.",
-      "releasenotes" : "Add type in catalog descriptor file",
+      "releasenotes" : "- Move loading out of generic catalog to JSON driven process.",
       "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
-      "sha256" : "6682c3abf8ffb7657cc180f5f8ade036809936056f33c74835c3f8ee35e9a14c",
-      "file": "@mirror-url@clusters/ocdr2/v04_20201216/clusters-ocdr2.tar.gz"
+      "sha256" : "0de38a509f1f9ec4953e1e7613dc128f50c5ffe352e6912ae7fc22fbad90e085",
+      "file": "@mirror-url@clusters/ocdr2/v05_20220428/clusters-ocdr2.tar.gz"
     },
     {
       "name": "catalog-mwsc",
@@ -741,23 +742,24 @@
       "file": "@mirror-url@clusters/mwsc/v03_20201216/clusters-mwsc.tar.gz"
     },
     {
-      "name": "catalog-mwsc",
+      "key": "catalog-mwsc",
+      "name": "MWSC",
+      "description" : "Milky Way Star Clusters catalog",
       "type": "catalog-cluster",
-      "version": 4,
-      "mingsversion": 30000,
+      "version": 5,
+      "mingsversion": 30200,
       "size": 77993,
       "nobjects": 3017,
       "check": "catalog-mwsc.json",
       "data": [
         "catalog-mwsc.json",
-        "particles-mwsc.json",
+        "particles-mwsc-hook.json",
         "mwsc"
       ],
-      "description" : "MWSC - Milky Way Star Clusters catalog",
-      "releasenotes" : "Fix 'S 242' and 'Herbig 1'",
+      "releasenotes" : "- Move loading out of generic catalog to JSON driven process.",
       "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
-      "sha256" : "95e5feffbb470e76c436671f361baa9da1cc490286121ec3e3400ef6d8c3ae6e",
-      "file": "@mirror-url@clusters/mwsc/v04_20210519/clusters-mwsc.tar.gz"
+      "sha256" : "d8efe4fc977a7369f7f0be3b6fafe3f0381b10431ea01f37f13d3b7cf8e1da22",
+      "file": "@mirror-url@clusters/mwsc/v05_20220428/clusters-mwsc.tar.gz"
     },
     {
       "name": "catalog-nebulae",

@@ -51,6 +51,17 @@ public class Fade implements Component {
             fadeOut = null;
     }
 
+    public void setFade(double[] fade) {
+        setFadepc(fade);
+    }
+
+    public void setFadepc(double[] fade) {
+        if(fadeIn == null) {
+            fadeIn = new Vector2d();
+        }
+        fadeIn.set(fade).scl(Constants.PC_TO_U);
+    }
+
     public void setPositionobjectname(String po) {
         this.positionObjectName = po;
     }

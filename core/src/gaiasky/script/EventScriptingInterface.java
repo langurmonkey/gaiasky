@@ -2842,13 +2842,34 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     scc.setLabelcolor(datasetOptions.labelColor);
                     scc.setCt(datasetOptions.ct.toString());
                     scc.setPosition(new double[] { 0, 0, 0 });
-                    scc.setDataSource(ds);
-                    scc.setProvider(StarClusterLoader.class.getName());
 
                     GaiaSky.postRunnable(() -> {
+                        // Load data
+                        StarClusterLoader scl = new StarClusterLoader();
+                        scl.initialize(ds);
+                        scl.setParentName(dsName);
+                        Array<StarCluster> clusters = scl.loadData();
+
+                        // Initialize
                         scc.initialize();
+                        for(StarCluster cluster : clusters) {
+                            cluster.initialize();
+                            cluster.setColor(datasetOptions.particleColor);
+                            cluster.setLabelcolor(datasetOptions.labelColor);
+                        }
+
+                        // Insert
                         SceneGraphNode.insert(scc, true);
+                        for(StarCluster cluster : clusters) {
+                            SceneGraphNode.insert(cluster, true);
+                        }
+
+                        // Finalize
                         scc.doneLoading(manager);
+                        for(StarCluster cluster : clusters) {
+                            cluster.doneLoading(manager);
+                        }
+
                         String typeStr = I18n.msg("gui.dsload.clusters.name");
                         logger.info(I18n.msg("notif.catalog.loaded", scc.children.size, typeStr));
                         EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", scc.children.size, typeStr));

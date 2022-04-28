@@ -155,7 +155,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.primitiveRenderScale = primitiveRenderScale;
         this.billboardRenderGroup = bbRenderGroup;
 
-        this.TH_OVER_FACTOR = (float) (thresholdPoint / Settings.settings.scene.label.number);
     }
 
     public Particle(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, double thNone, double thPoint, double thQuad, float textScale, float labelFactor, float labelMax, float primitiveRenderScale, RenderGroup bbRenderGroup) {

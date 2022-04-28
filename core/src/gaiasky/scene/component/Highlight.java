@@ -11,7 +11,7 @@ public class Highlight implements Component {
     // Plain color for highlighting
     public boolean hlplain = false;
     // Highlight color
-    public float[] hlc;
+    public float[] hlc = new float[4];
     // Highlight all visible
     public boolean hlallvisible = true;
     // Highlight colormap index
