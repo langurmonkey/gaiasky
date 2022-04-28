@@ -22,6 +22,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Initializes old ParticleGroup and StarGroup objects.
+ */
 public class ParticleSetInitializationSystem extends IteratingSystem {
     private static final Log logger = Logger.getLogger(ParticleSetInitializationSystem.class);
 

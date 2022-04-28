@@ -25,10 +25,13 @@ import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
 /**
- * Initializes model entities, including planets.
+ * Initializes the old ModelBody objects, together with Planet, Satellite,
+ * HeliotropicSatellite, GenericSpacecraft, Spacecraft, Billboard and
+ * BillboardGalaxy.
  */
 public class ModelInitializationSystem extends IteratingSystem {
 
@@ -44,6 +47,8 @@ public class ModelInitializationSystem extends IteratingSystem {
         Celestial celestial = Mapper.celestial.get(entity);
         Model model = Mapper.model.get(entity);
         ModelScaffolding scaffolding = Mapper.modelScaffolding.get(entity);
+        SolidAngle sa = Mapper.sa.get(entity);
+        Text text = Mapper.text.get(entity);
 
         Atmosphere atmosphere = Mapper.atmosphere.get(entity);
         Cloud cloud = Mapper.cloud.get(entity);
@@ -52,9 +57,12 @@ public class ModelInitializationSystem extends IteratingSystem {
 
         MotorEngine engine = Mapper.engine.get(entity);
 
+        Fade fade = Mapper.fade.get(entity);
+
         boolean isPlanet = atmosphere != null || cloud != null;
         boolean isSatellite = attitude != null;
         boolean isSpacecraft = engine != null;
+        boolean isBillboard = fade != null;
 
         // First init spacecraft if needed
         if (isSpacecraft) {
@@ -62,7 +70,12 @@ public class ModelInitializationSystem extends IteratingSystem {
         }
 
         // Initialize model body
-        initializeModel(base, body, model, scaffolding);
+        initializeModel(base, body, model, sa, text, scaffolding, graph);
+
+        // Init billboard
+        if(isBillboard) {
+            initializeBillboard(sa, text);
+        }
 
         if (isPlanet) {
             // Initialize planet
@@ -111,7 +124,16 @@ public class ModelInitializationSystem extends IteratingSystem {
         setToMachine(engine.machines[engine.currentMachine], false, body, model, scaffolding, engine);
     }
 
-    private void initializeModel(Base base, Body body, Model model, ModelScaffolding scaffolding) {
+    private void initializeModel(Base base, Body body, Model model, SolidAngle sa, Text text, ModelScaffolding scaffolding, GraphNode graph) {
+        // Default values
+        graph.localTransform = new Matrix4();
+        graph.orientation = new Matrix4d();
+
+        sa.thresholdPoint = Math.toRadians(0.30);
+        sa.thresholdFactor = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
+
+        text.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
+
         if (isRandomizeModel(scaffolding)) {
             // Ignore current model component (if any) and create a random one
             model.model = new ModelComponent(true);
@@ -125,6 +147,15 @@ public class ModelInitializationSystem extends IteratingSystem {
         if (model.model != null) {
             model.model.initialize(base.getName());
         }
+    }
+
+    private void initializeBillboard(SolidAngle sa, Text text){
+        double thPoint = sa.thresholdPoint;
+        sa.thresholdNone = 0.002;
+        sa.thresholdPoint = thPoint / 1e9;
+        sa.thresholdQuad = thPoint / 8;
+
+        text.labelFactor = 1e1f;
     }
 
     private void initializePlanet(Base base, Body body, ModelScaffolding scaffolding, Atmosphere atmosphere, Cloud cloud) {
