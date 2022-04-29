@@ -303,7 +303,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             PFMData data;
             if (warpFile != null) {
                 // Load from file
-                data = manager.get(warpFile.toString());
+                // TODO remove the .replace() once the next Libgdx version is released
+                // Check that AssetDescriptor#L41 does not contain a replace anymore (libgdx 791a6bf5)
+                data = manager.get(warpFile.toString().replace('\\', '/'));
             } else {
                 // Generate identity
                 data = PFMReader.constructPFMData(50, 50, val -> val);
@@ -311,7 +313,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             GeometryWarp geometryWarp;
             if (blendFile != null) {
                 // Set up blend texture
-                Texture blendTex = manager.get(blendFile.toString());
+                // TODO remove the .replace() once the next Libgdx version is released
+                // Check that AssetDescriptor#L41 does not contain a replace anymore (libgdx 791a6bf5)
+                Texture blendTex = manager.get(blendFile.toString().replace('\\', '/'));
                 geometryWarp = new GeometryWarp(data, blendTex);
             } else {
                 // No blend
