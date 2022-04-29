@@ -398,10 +398,6 @@ public class TextUtils {
      * Octal escapes: \0 \0N \0NN \N \NN \NNN
      *    Can range up to !\777 not \377
      *
-     *      TODO: add !\o{NNNNN}
-     *          last Unicode is 4177777
-     *          maxint is 37777777777
-     *
      * Control chars: ?\cX
      *      Means: ord(X) ^ ord('@')
      *

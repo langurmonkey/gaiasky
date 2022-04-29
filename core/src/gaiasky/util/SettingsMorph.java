@@ -300,7 +300,6 @@ public class SettingsMorph {
         program.net.restPort = i32("program.restport", p);
         program.net.master = new MasterSettings();
         program.net.master.active = bool("program.net.master", p);
-        // TODO slave list in "program.net.master.slave.n"
         program.net.slave = new SlaveSettings();
         program.net.slave.active = bool("program.net.slave", p);
         program.net.slave.configFile = str("program.net.slave.config", p);

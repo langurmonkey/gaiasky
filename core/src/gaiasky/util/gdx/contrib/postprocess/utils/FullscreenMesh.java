@@ -51,8 +51,6 @@ public class FullscreenMesh {
                 float u = i / (w - 1f);
                 float v = j / (h - 1f);
 
-                // TODO Use indices
-
                 // V00
                 verts[k + 0] = p[p00 + 0] * 2f - 1f;
                 verts[k + 1] = p[p00 + 1] * 2f - 1f;

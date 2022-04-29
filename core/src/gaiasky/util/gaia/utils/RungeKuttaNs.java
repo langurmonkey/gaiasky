@@ -24,7 +24,6 @@ package gaiasky.util.gaia.utils;
  *         Modified by L. Lindegren to include only one method, and using long
  *         (e.g., time in ns) as independent variable
  *         
- * TODO: Remove and use RK integrator from ACM.
  */
 public class RungeKuttaNs {
 

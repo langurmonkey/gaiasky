@@ -56,9 +56,6 @@ public class DefaultIntRenderableSorter implements IntRenderableSorter, Comparat
         final boolean b2 = o2.material.has(BlendingAttribute.Type) && ((BlendingAttribute) o2.material.get(BlendingAttribute.Type)).blended;
         if (b1 != b2)
             return b1 ? 1 : -1;
-        // FIXME implement better sorting algorithm
-        // final boolean same = o1.shader == o2.shader && o1.mesh == o2.mesh && (o1.lights == null) == (o2.lights == null) &&
-        // o1.material.equals(o2.material);
         getTranslation(o1.worldTransform, o1.meshPart.center, tmpV1);
         getTranslation(o2.worldTransform, o2.meshPart.center, tmpV2);
         final float dst = (int) (1000f * camera.position.dst2(tmpV1)) - (int) (1000f * camera.position.dst2(tmpV2));

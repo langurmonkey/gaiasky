@@ -437,8 +437,7 @@ public class AttitudeUtils {
      *            First quaternion
      * @param q1
      *            Second quaternion
-     * @return Array of length 3 with angle between principal axes TODO: Move
-     *         this the Quaternion class
+     * @return Array of length 3 with angle between principal axes
      */
     @Deprecated
     public static double[] smallAngularDifferences(final double[] q0, final double[] q1) {

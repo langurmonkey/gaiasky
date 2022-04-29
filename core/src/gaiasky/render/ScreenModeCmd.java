@@ -38,7 +38,6 @@ public class ScreenModeCmd implements IObserver {
         if (event == Event.SCREEN_MODE_CMD) {
             boolean toFullScreen = Settings.settings.graphics.fullScreen.active;
             if (toFullScreen) {
-                // TODO hack
                 Monitor m = Gdx.graphics.getPrimaryMonitor();
                 // Available modes for this monitor
                 DisplayMode[] modes = Gdx.graphics.getDisplayModes(m);

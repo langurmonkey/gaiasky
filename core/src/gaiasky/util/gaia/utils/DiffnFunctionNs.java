@@ -19,7 +19,6 @@ package gaiasky.util.gaia.utils;
  *         Modified by L. Lindegren to use long (e.g. time in ns) as independent
  *         variable
  * 
- * TODO: Remove when Runge Kutta from ACM is used
  */
 public interface DiffnFunctionNs {
     /**

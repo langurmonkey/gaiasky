@@ -21,7 +21,6 @@ public class SphereCreator extends ModelCreator {
     public static void create(IntIntMeshBuilder builder, final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         axisY.set(0, 1, 0);
         axisZ.set(0, 0, 1);
-        // FIXME create better sphere method (- only one vertex for each pole, - position)
         final float hw = width * 0.5f;
         final float hh = height * 0.5f;
         final float hd = depth * 0.5f;

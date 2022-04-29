@@ -127,8 +127,7 @@ public class ScreenshotsManager implements IObserver {
      */
     public String renderToImage(IMainRenderer mr, ICamera camera, double dt, PostProcessBean ppb, int width, int height, String folder, String filename, IFileImageRenderer renderer, ImageFormat format, float quality) {
         FrameBuffer frameBuffer = mr.getFrameBuffer(width, height);
-        // TODO That's a dirty trick, we should find a better way (i.e. making
-        // buildEnabledEffectsList() method public)
+        // TODO That's a dirty trick, we should find a better way (i.e. making buildEnabledEffectsList() method public)
         boolean postprocessing = ppb.pp.buildEnabledEffectsList() > 0;
         if (!postprocessing) {
             // If post-processing is not active, we must start the buffer now.

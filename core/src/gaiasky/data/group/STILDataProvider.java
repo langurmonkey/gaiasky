@@ -639,7 +639,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadData(InputStream is, double factor) {
-        // TODO Auto-generated method stub
         return null;
     }
 
