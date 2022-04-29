@@ -8,12 +8,15 @@ package gaiasky.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMDataLoader.PFMDataParameter;
 import gaiasky.util.i18n.I18n;
+import org.lwjgl.glfw.GLFW;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -27,6 +30,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN;
 
 /**
  * Manages a slave instance configured with an MPCDI file.
@@ -55,7 +61,9 @@ public class SlaveManager {
         if (projectionActive()) {
             instance.loadAssets(manager);
             // Mute cursor
-            Gdx.graphics.setSystemCursor(null);
+            // TODO uncomment when libgdx 1.10.1 is released
+            //Gdx.graphics.setSystemCursor(SystemCursor.None);
+            GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
         }
     }
 
