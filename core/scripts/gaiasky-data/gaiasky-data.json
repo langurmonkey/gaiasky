@@ -117,9 +117,9 @@
         "tex/cubemap/earth-cloud-low",
         "tex/cubemap/earth-cloud-med"
       ],
-      "sha256": "ac2884f2cdc68d92200f7ca39906407c54c5c8244d23363e99b570ef3bb8a28f",
+      "sha256": "76a884b2fbffcfbbb7ac5c6500d8b5ede740376235ce2d8592eca0646ccc122b",
       "description": "Required data pack.\nFor Gaia Sky 3.2.0-RC14 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC14+.\n- Move constellations and constellation boundaries to JSON format.\n- General JSON cleanup.\n- Move attitude data location, integrate Gaia object as a heliotropic satellite.",
+      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC14+.\n- Move constellations and constellation boundaries to JSON format.\n- General JSON cleanup.\n- Move attitude data location, integrate Gaia object as a heliotropic satellite.\n- Move cosmic ruler to JSON format.",
       "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v032_20220425/basedata.tar.gz"
     },
