@@ -38,7 +38,6 @@ import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
  * and rendering the surfaces side by side to the companion window on the
  * desktop. Wrapper around OpenVR.
  * <p>
- * FIXME add multisampling plus draw/resolve buffers
  */
 public class VRContext implements Disposable {
     private static final Log logger = getLogger(VRContext.class);
@@ -157,7 +156,6 @@ public class VRContext implements Disposable {
         DeviceIsWireless_Bool(1010),
         DeviceIsCharging_Bool(1011),
         DeviceBatteryPercentage_Float(1012), // 0 is empty), 1 is full
-        // FIXME
         // StatusDisplayTransform_Matrix34		(1013),
         Firmware_UpdateAvailable_Bool(1014),
         Firmware_ManualUpdate_Bool(1015),

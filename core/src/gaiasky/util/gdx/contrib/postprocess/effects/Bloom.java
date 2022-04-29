@@ -207,7 +207,6 @@ public final class Bloom extends PostProcessorEffect {
         }
 
         if (blending) {
-            // TODO support for Gdx.gl.glBlendFuncSeparate(sfactor, dfactor, GL20.GL_ONE, GL20.GL_ONE );
             //Gdx.gl.glBlendFuncSeparate(sfactor, dfactor, GL30.GL_ONE, GL30.GL_ONE);
             Gdx.gl.glBlendFunc(sfactor, dfactor);
         }

@@ -88,7 +88,6 @@ public abstract class Filter3<T> {
         program.dispose();
     }
 
-    /** FIXME add comment */
     public abstract void rebind();
 
     /*

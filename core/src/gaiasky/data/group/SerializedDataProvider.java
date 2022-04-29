@@ -52,7 +52,6 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadDataMapped(String file, double factor) {
-        // TODO Auto-generated method stub
         return null;
     }
 

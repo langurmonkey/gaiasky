@@ -936,7 +936,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     /** Add a cylinder */
     public void cylinder(float width, float height, float depth, int divisions, float angleFrom, float angleTo, boolean close) {
-        // FIXME create better cylinder method (- axis on which to create the cylinder (matrix?))
         final float hw = width * 0.5f;
         final float hh = height * 0.5f;
         final float hd = depth * 0.5f;
@@ -966,7 +965,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             i2 = vertex(curr1);
             i1 = vertex(curr2);
             if (i != 0)
-                rect(i3, i1, i2, i4); // FIXME don't duplicate lines and points
+                rect(i3, i1, i2, i4);
             i4 = i2;
             i3 = i1;
         }
@@ -983,7 +982,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void cone(float width, float height, float depth, int divisions, float angleFrom, float angleTo) {
-        // FIXME create better cylinder method (- axis on which to create the cone (matrix?))
         ensureTriangles(divisions + 2, divisions);
 
         final float hw = width * 0.5f;
@@ -1008,7 +1006,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             curr1.uv.set(u, 1);
             i1 = vertex(curr1);
             if (i != 0)
-                triangle(base, i1, i2); // FIXME don't duplicate lines and points
+                triangle(base, i1, i2);
             i2 = i1;
         }
         ellipse(width, depth, 0, 0, divisions, 0, -hh, 0, 0, -1, 0, -1, 0, 0, 0, 0, 1, 180f - angleTo, 180f - angleFrom);
@@ -1016,7 +1014,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void cone(float width, float height, float depth, int divisions, int hdivisions, float angleFrom, float angleTo) {
-        // FIXME create better cylinder method (- axis on which to create the cone (matrix?))
         ensureTriangles(divisions * hdivisions + 2, divisions);
 
         final float hw = width * 0.5f;
@@ -1041,7 +1038,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             curr1.uv.set(u, 1);
             i1 = vertex(curr1);
             if (i != 0)
-                triangle(base, i1, i2); // FIXME don't duplicate lines and points
+                triangle(base, i1, i2);
             i2 = i1;
         }
         ellipse(width, depth, 0, 0, divisions, 0, -hh, 0, 0, -1, 0, -1, 0, 0, 0, 0, 1, 180f - angleTo, 180f - angleFrom);
@@ -1209,7 +1206,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void cylinder(float width, float height, float depth, int divisions, float angleFrom, float angleTo, boolean close, boolean flipNormals) {
-        // FIXME create better cylinder method (- axis on which to create the cylinder (matrix?))
         final float hw = width * 0.5f;
         final float hh = height * 0.5f;
         final float hd = depth * 0.5f;
