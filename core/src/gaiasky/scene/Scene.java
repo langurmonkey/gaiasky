@@ -2,7 +2,6 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
 import gaiasky.scene.component.*;
-import gaiasky.scene.component.MotorEngine;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.view.PositionEntity;
 import gaiasky.scenegraph.*;
@@ -23,7 +22,7 @@ public class Scene {
     public static final String ROOT_NAME = "Universe";
 
     /** The engine, containing all entities, components and systems **/
-    public com.badlogic.ashley.core.Engine engine;
+    public Engine engine;
 
     /** Quick lookup map. Name to node. **/
     protected Map<String, Entity> index;
@@ -103,10 +102,11 @@ public class Scene {
     public void initializeEntities() {
         if (engine != null) {
             // Prepare systems
-            EntitySystem baseInit = new BaseInitializationSystem(Family.all(Base.class).get(), 0);
-            EntitySystem particleSetInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), 1);
-            EntitySystem particleInit = new ParticleInitializationSystem(Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), 2);
-            EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), 3);
+            int priority = 0;
+            EntitySystem baseInit = new BaseInitializationSystem(Family.all(Base.class).get(), priority++);
+            EntitySystem particleInit = new ParticleInitializationSystem(Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
+            EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
+            EntitySystem particleSetInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit, modelInit);
