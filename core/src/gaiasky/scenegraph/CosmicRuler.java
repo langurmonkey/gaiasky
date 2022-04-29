@@ -30,32 +30,24 @@ import net.jafama.FastMath;
 import java.text.DecimalFormat;
 
 /**
- * Cosmic ruler between two objects
+ * Cosmic ruler that shows the distance between two objects.
  */
 public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, ILineRenderable, IObserver {
     private String name0, name1;
-    private final double[] pos0;
-    private final double[] pos1;
-    private final Vector3d p0;
-    private final Vector3d p1;
-    private final Vector3d m;
+    private final double[] pos0 = new double[3];
+    private final double[] pos1 = new double[3];
+    private final Vector3d p0 = new Vector3d();
+    private final Vector3d p1 = new Vector3d();
+    private final Vector3d m = new Vector3d();
     private boolean rulerOk = false;
     private String dist;
-    private final ISceneGraph sg;
-    private final DecimalFormat nf;
+    private final DecimalFormat nf = new DecimalFormat("0.#########E0");
 
     public CosmicRuler() {
         super();
         this.parentName = "Universe";
-        this.pos0 = new double[3];
-        this.pos1 = new double[3];
-        this.p0 = new Vector3d();
-        this.p1 = new Vector3d();
-        this.m = new Vector3d();
-        this.sg = GaiaSky.instance.sceneGraph;
         this.setName("Cosmicruler");
         this.cc = new float[] { 1f, 1f, 0f };
-        this.nf = new DecimalFormat("0.#########E0");
         setCt("Ruler");
         EventManager.instance.subscribe(this, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR);
     }
@@ -123,8 +115,8 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         // Update positions
-        rulerOk = (sg.getObjectPosition(name0, pos0) != null);
-        rulerOk = rulerOk && (sg.getObjectPosition(name1, pos1) != null);
+        rulerOk = (GaiaSky.instance.sceneGraph.getObjectPosition(name0, pos0) != null);
+        rulerOk = rulerOk && (GaiaSky.instance.sceneGraph.getObjectPosition(name1, pos1) != null);
 
         if (rulerOk) {
             p0.set(pos0).add(translation);
@@ -190,7 +182,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
 
     @Override
     public float[] textColour() {
-        return new float[] { 1f, 1f, 0f, 1f };
+        return labelcolor;
     }
 
     @Override
