@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.Logger.Log;
@@ -155,11 +154,8 @@ public class SlaveManager {
     /**
      * Parses the mpcdi.xml file and extracts the relevant information
      *
-     * @param mpcdi
-     * @param loc
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
+     * @param mpcdi The name of the MPCDI file.
+     * @param loc The directory of the MPCDI file to load.
      */
     private void parseMpcdi(String mpcdi, Path loc) throws IOException, ParserConfigurationException, SAXException {
         if (loc != null) {
@@ -238,7 +234,6 @@ public class SlaveManager {
                                 cameraFov = upAngle - downAngle;
 
                                 initialized = true;
-
                             }
                         }
                     }
