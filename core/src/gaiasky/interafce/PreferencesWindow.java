@@ -134,7 +134,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final float taWidth = 960f;
         final float textWidth = 104f;
         final float scrollHeight = 640f;
-        final float controlsScrollWidth = 880f;
+        final float controlsScrollWidth = 1000f;
         final float controlsScrollHeight = 560f;
         final float sliderWidth = textWidth * 3f;
         final float buttonHeight = 40f;
