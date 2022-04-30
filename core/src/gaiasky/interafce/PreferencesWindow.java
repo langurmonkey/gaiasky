@@ -1173,7 +1173,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             for (int j = 1; j < action.length; j++) {
                 String[] keys = action[j].split("\\+");
                 for (int k = 0; k < keys.length; k++) {
-                    keysGroup.addActor(new OwnLabel(keys[k].trim(), skin, "mono-pink"));
+                    keysGroup.addActor(new OwnLabel(keys[k].trim().replace('_', '-'), skin, "mono-pink"));
                     if (k < keys.length - 1)
                         keysGroup.addActor(new OwnLabel("+", skin));
                 }
