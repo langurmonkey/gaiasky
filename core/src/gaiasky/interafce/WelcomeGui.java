@@ -61,6 +61,7 @@ public class WelcomeGui extends AbstractGui {
     private final boolean skipWelcome;
 
     protected DatasetManagerWindow ddw;
+    private AboutWindow aboutWindow;
     private PreferencesWindow preferencesWindow;
 
     private FileHandle dataDescriptor;
@@ -323,13 +324,20 @@ public class WelcomeGui extends AbstractGui {
         Table topLeft = new VersionLineTable(skin);
 
         // Bottom icons
-        OwnTextIconButton quit = new OwnTextIconButton("", skin, "quit");
-        quit.addListener(new OwnTextTooltip(I18n.msg("gui.exit"), skin, 10));
-        quit.addListener(new ClickListener() {
+        OwnTextIconButton about = new OwnTextIconButton("", skin, "help");
+        about.addListener(new OwnTextTooltip(I18n.msg("gui.help.about"), skin, 10));
+        about.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit();
+                if (aboutWindow == null) {
+                    aboutWindow = new AboutWindow(ui, skin);
+                }
+                if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
+                    aboutWindow.show(ui);
+                }
             }
         });
+        about.pack();
+
         OwnTextIconButton preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.addListener(new OwnTextTooltip(I18n.msg("gui.preferences"), skin, 10));
         preferences.addListener(new ClickListener() {
@@ -343,11 +351,11 @@ public class WelcomeGui extends AbstractGui {
             }
         });
         preferences.pack();
-        quit.setSize(preferences.getWidth(), preferences.getWidth());
+        preferences.setSize(about.getWidth(), about.getWidth());
         HorizontalGroup bottomRight = new HorizontalGroup();
         bottomRight.space(pad18);
         bottomRight.addActor(preferences);
-        bottomRight.addActor(quit);
+        bottomRight.addActor(about);
         bottomRight.setFillParent(true);
         bottomRight.bottom().right().pad(pad28);
 
