@@ -52,6 +52,7 @@ public class AboutWindow extends GenericDialog {
     private final LabelStyle linkStyle;
     private Table checkTable;
     private OwnLabel checkLabel;
+    private MemInfoWindow memInfoWindow;
 
     public AboutWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build), skin, stage);
@@ -133,16 +134,16 @@ public class AboutWindow extends GenericDialog {
         // Add all to content
         contentHelp.add(gaiasky).pad(pad10).padBottom(pad10 * 5f).colspan(2);
         contentHelp.row();
-        contentHelp.add(homepageTitle).align(Align.left).padRight(pad10);
+        contentHelp.add(homepageTitle).align(Align.left).padRight(pad20);
         contentHelp.add(homepageTxt).align(Align.left);
         contentHelp.row();
-        contentHelp.add(new OwnLabel("", skin));
+        contentHelp.add(new OwnLabel("", skin)).padBottom(pad10);
         contentHelp.add(homepageLink).align(Align.left).padBottom(pad10);
         contentHelp.row();
-        contentHelp.add(docsTitle).align(Align.left).padRight(pad10).padBottom(pad10);
+        contentHelp.add(docsTitle).align(Align.left).padRight(pad20);
         contentHelp.add(docsTxt).align(Align.left);
         contentHelp.row();
-        contentHelp.add(new OwnLabel("", skin));
+        contentHelp.add(new OwnLabel("", skin)).padBottom(pad10 * 4f);
         contentHelp.add(docsLink).align(Align.left).padBottom(pad10 * 4f);
         contentHelp.row();
         contentHelp.add(gaiaskyIcon).colspan(2).align(Align.center);
@@ -306,7 +307,11 @@ public class AboutWindow extends GenericDialog {
         memInfoButton.setHeight(buttonHeight);
         memInfoButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.DISPLAY_MEM_INFO_WINDOW, memInfoButton);
+                if (memInfoWindow == null) {
+                    memInfoWindow = new MemInfoWindow(stage, skin);
+                }
+                if (!memInfoWindow.isVisible() || !memInfoWindow.hasParent())
+                    memInfoWindow.show(stage);
                 return true;
             }
             return false;
@@ -347,7 +352,7 @@ public class AboutWindow extends GenericDialog {
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
         int lines = GlobalResources.countOccurrences(extensions, '\n');
-        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "monospace-txt");
+        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "default");
         maxTexSize.setDisabled(true);
         maxTexSize.setPrefRows(lines);
         maxTexSize.clearListeners();

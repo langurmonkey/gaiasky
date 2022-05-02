@@ -41,6 +41,8 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.time.Instant;
 
+import static gaiasky.event.Event.*;
+
 /**
  * Full OpenGL GUI with all the controls and whistles.
  */
@@ -63,7 +65,6 @@ public class FullGui extends AbstractGui {
     protected MinimapInterface minimapInterface;
     protected LoadProgressInterface loadProgressInterface;
 
-    protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
     protected WikiInfoWindow wikiInfoWindow;
     protected ArchiveViewWindow archiveViewWindow;
@@ -109,7 +110,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, gaiasky.event.Event.FOV_CHANGED_CMD, gaiasky.event.Event.SHOW_WIKI_INFO_ACTION, gaiasky.event.Event.UPDATE_WIKI_INFO_ACTION, gaiasky.event.Event.SHOW_ARCHIVE_VIEW_ACTION, gaiasky.event.Event.UPDATE_ARCHIVE_VIEW_ACTION, gaiasky.event.Event.SHOW_PLAYCAMERA_ACTION, gaiasky.event.Event.DISPLAY_MEM_INFO_WINDOW, gaiasky.event.Event.REMOVE_KEYBOARD_FOCUS, gaiasky.event.Event.REMOVE_GUI_COMPONENT, gaiasky.event.Event.ADD_GUI_COMPONENT, gaiasky.event.Event.SHOW_LOG_ACTION, gaiasky.event.Event.RA_DEC_UPDATED, gaiasky.event.Event.LON_LAT_UPDATED, gaiasky.event.Event.POPUP_MENU_FOCUS, gaiasky.event.Event.SHOW_LAND_AT_LOCATION_ACTION, Event.DISPLAY_POINTER_COORDS_CMD, Event.TOGGLE_MINIMAP, gaiasky.event.Event.SHOW_MINIMAP_ACTION, Event.SHOW_PROCEDURAL_GEN_ACTION);
+        EventManager.instance.subscribe(this, FOV_CHANGED_CMD, SHOW_WIKI_INFO_ACTION, UPDATE_WIKI_INFO_ACTION, SHOW_ARCHIVE_VIEW_ACTION, UPDATE_ARCHIVE_VIEW_ACTION, SHOW_PLAYCAMERA_ACTION, REMOVE_KEYBOARD_FOCUS, REMOVE_GUI_COMPONENT, ADD_GUI_COMPONENT, SHOW_LOG_ACTION, RA_DEC_UPDATED, LON_LAT_UPDATED, POPUP_MENU_FOCUS, SHOW_LAND_AT_LOCATION_ACTION, DISPLAY_POINTER_COORDS_CMD, TOGGLE_MINIMAP, SHOW_MINIMAP_ACTION, SHOW_PROCEDURAL_GEN_ACTION);
     }
 
     protected void buildGui() {
@@ -390,7 +391,7 @@ public class FullGui extends AbstractGui {
             fc.setResultListener((success, result) -> {
                 if (success) {
                     if (Files.exists(result) && Files.exists(result)) {
-                        EventManager.publish(gaiasky.event.Event.PLAY_CAMERA_CMD, fc, result);
+                        EventManager.publish(PLAY_CAMERA_CMD, fc, result);
                         return true;
                     } else {
                         logger.error("Selection must be a file: " + result.toAbsolutePath());
@@ -399,13 +400,6 @@ public class FullGui extends AbstractGui {
                 return false;
             });
             fc.show(ui);
-            break;
-        case DISPLAY_MEM_INFO_WINDOW:
-            if (memInfoWindow == null) {
-                memInfoWindow = new MemInfoWindow(ui, skin);
-            }
-            if (!memInfoWindow.isVisible() || !memInfoWindow.hasParent())
-                memInfoWindow.show(ui);
             break;
         case SHOW_LOG_ACTION:
             if (logWindow == null) {
