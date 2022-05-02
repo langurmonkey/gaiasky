@@ -55,8 +55,8 @@ public class Scene {
         initializeAttributes();
 
         // Add root element
-        Archetype sgn = archetypes.get(SceneGraphNode.class.getName());
-        Entity root = sgn.createEntity();
+        Archetype rootArchetype = archetypes.get(ROOT_NAME);
+        Entity root = rootArchetype.createEntity();
         Base base = root.getComponent(Base.class);
         base.setName(ROOT_NAME);
         engine.addEntity(root);
@@ -107,9 +107,10 @@ public class Scene {
             EntitySystem particleInit = new ParticleInitializationSystem(Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
             EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
             EntitySystem particleSetInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), priority++);
+            EntitySystem locInit = new LocInitializationSystem(Family.one(LocationMark.class).get(), priority++);
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, modelInit);
+            runOnce(baseInit, particleSetInit, particleInit, modelInit, locInit);
         }
 
     }
@@ -141,6 +142,29 @@ public class Scene {
     public void buildSceneGraph() {
         if (engine != null) {
 
+            // Prepare system
+            SceneGraphBuilderSystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(Family.all(GraphNode.class).get(), 0, this.index);
+
+            // Run once
+            runOnce(sceneGraphBuilderSystem);
+
+            GraphNode rootGraph = Mapper.graph.get(getNode("Universe"));
+            logger.info("Initialized " + (rootGraph.numChildren + 1) + " into the scene graph.");
+
+        }
+    }
+
+    /**
+     * Returns the entity identified with the given name, or null if
+     * it is not found.
+     * @param name The name of the entity.
+     * @return The entity, or null if it does not exist.
+     */
+    public Entity getNode(String name) {
+        synchronized (index) {
+            name = name.toLowerCase().strip();
+            Entity entity = index.get(name);
+            return entity;
         }
     }
 
@@ -217,6 +241,9 @@ public class Scene {
 
                 }
             }
+        }
+        if(!ok) {
+            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + findArchetype(entity).getName() +")"));
         }
         return ok;
     }
@@ -314,6 +341,9 @@ public class Scene {
             // SceneGraphNode
             addArchetype(SceneGraphNode.class.getName(), Base.class, Flags.class, Body.class, GraphNode.class, Octant.class);
 
+            // Universe
+            addArchetype(ROOT_NAME, Base.class, Body.class, GraphNode.class, GraphRoot.class);
+
             // Celestial
             addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class,
                     Coordinates.class, Rotation.class, Text.class, SolidAngle.class);
@@ -395,6 +425,9 @@ public class Scene {
 
             // ConstellationBoundaries
             addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
+
+            // CosmicRuler
+            addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class);
 
         } else {
             logger.error("World is null, can't initialize archetypes.");

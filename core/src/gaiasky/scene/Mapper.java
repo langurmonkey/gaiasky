@@ -35,5 +35,6 @@ public class Mapper {
     public static final ComponentMapper<Attitude> attitude = ComponentMapper.getFor(Attitude.class);
     public static final ComponentMapper<MotorEngine> engine = ComponentMapper.getFor(MotorEngine.class);
     public static final ComponentMapper<RenderType> render = ComponentMapper.getFor(RenderType.class);
+    public static final ComponentMapper<LocationMark> loc = ComponentMapper.getFor(LocationMark.class);
 
 }
