@@ -1,8 +1,6 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -16,16 +14,12 @@ import gaiasky.util.color.ColorUtils;
 /**
  * Initializes the old Particle and Star objects.
  */
-public class ParticleInitializationSystem extends IteratingSystem {
+public class ParticleInitializer implements EntityInitializer {
 
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
 
-    public ParticleInitializationSystem(Family family, int priority) {
-        super(family, priority);
-    }
-
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    public void initializeEntity(Entity entity) {
         Base base = Mapper.base.get(entity);
         Body body = Mapper.body.get(entity);
         Celestial celestial = Mapper.celestial.get(entity);
@@ -46,8 +40,6 @@ public class ParticleInitializationSystem extends IteratingSystem {
             // Initialize particle
             initializeParticle(base, body, celestial, mag, pm, extra, sa, text, render);
         }
-
-
     }
 
     private void baseInitialization(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
@@ -124,4 +116,5 @@ public class ParticleInitializationSystem extends IteratingSystem {
         final float plus = .1f;
         celestial.ccPale = new float[] { Math.min(1, body.cc[0] + plus), Math.min(1, body.cc[1] + plus), Math.min(1, body.cc[2] + plus) };
     }
+
 }

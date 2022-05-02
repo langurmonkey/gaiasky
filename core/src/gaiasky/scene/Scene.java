@@ -103,14 +103,15 @@ public class Scene {
         if (engine != null) {
             // Prepare systems
             int priority = 0;
-            EntitySystem baseInit = new BaseInitializationSystem(Family.all(Base.class).get(), priority++);
-            EntitySystem particleInit = new ParticleInitializationSystem(Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
-            EntitySystem modelInit = new ModelInitializationSystem(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
-            EntitySystem particleSetInit = new ParticleSetInitializationSystem(Family.one(ParticleSet.class, StarSet.class).get(), priority++);
-            EntitySystem locInit = new LocInitializationSystem(Family.one(LocationMark.class).get(), priority++);
+            EntitySystem baseInit = new InitSystem(new BaseInitializer(), Family.all(Base.class).get(), priority++);
+            EntitySystem particleInit = new InitSystem(new ParticleInitializer(), Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
+            EntitySystem modelInit = new InitSystem(new ModelInitializer(), Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
+            EntitySystem particleSetInit = new InitSystem(new ParticleSetInitializer(), Family.one(ParticleSet.class, StarSet.class).get(), priority++);
+            EntitySystem locInit = new InitSystem(new LocInitializer(), Family.one(LocationMark.class).get(), priority++);
+            EntitySystem billboardInit = new InitSystem(new BillboardSetInitializer(), Family.one(BillboardSet.class).get(), priority++);
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, modelInit, locInit);
+            runOnce(baseInit, particleSetInit, particleInit, modelInit, locInit, billboardInit);
         }
 
     }
@@ -128,7 +129,7 @@ public class Scene {
             hipMap = new HashMap<>(151250);
 
             // Prepare system
-            IndexInitializationSystem indexSystem = new IndexInitializationSystem(Family.all(Base.class).get(), 0, this);
+            EntitySystem indexSystem = new InitSystem(new IndexInitializer(this), Family.all(Base.class).get(), 0);
 
             // Run once
             runOnce(indexSystem);
@@ -143,7 +144,7 @@ public class Scene {
         if (engine != null) {
 
             // Prepare system
-            SceneGraphBuilderSystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(Family.all(GraphNode.class).get(), 0, this.index);
+            EntitySystem sceneGraphBuilderSystem = new InitSystem(new SceneGraphBuilderSystem(this.index), Family.all(GraphNode.class).get(), 0);
 
             // Run once
             runOnce(sceneGraphBuilderSystem);
@@ -400,7 +401,7 @@ public class Scene {
             addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, RenderType.class);
 
             // BillboardGroup
-            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardDatasets.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
+            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
 
             // Text2D
             addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class);
@@ -533,7 +534,7 @@ public class Scene {
             putAll(RenderType.class, "rendergroup");
 
             // BillboardDataset
-            putAll(BillboardDatasets.class, "data:BillboardGroup");
+            putAll(BillboardSet.class, "data:BillboardGroup");
 
             // Title
             putAll(Title.class, "scale:Text2D", "lines:Text2D", "align:Text2D");

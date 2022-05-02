@@ -1,31 +1,23 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
-import gaiasky.render.ComponentTypes;
-import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Octant;
-import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 
 /**
  * Initializes the name and id indices.
  */
-public class IndexInitializationSystem extends IteratingSystem {
+public class IndexInitializer implements EntityInitializer {
 
     private Scene scene;
 
-    public IndexInitializationSystem(Family family, int priority, Scene scene) {
-        super(family, priority);
+    public IndexInitializer(Scene scene) {
         this.scene = scene;
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    public void initializeEntity(Entity entity) {
         // Add entity to index
         scene.addToIndex(entity);
 

@@ -15,18 +15,17 @@ import java.util.Map;
 /**
  * Builds the scene graph once all nodes are in the index.
  */
-public class SceneGraphBuilderSystem extends IteratingSystem {
+public class SceneGraphBuilderSystem implements EntityInitializer {
 
     /** The index. **/
     private Map<String, Entity> index;
 
-    public SceneGraphBuilderSystem(Family family, int priority, Map<String, Entity> index) {
-        super(family, priority);
+    public SceneGraphBuilderSystem(final Map<String, Entity> index) {
         this.index = index;
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    public void initializeEntity(Entity entity) {
         GraphNode graph = Mapper.graph.get(entity);
         if (graph.localTransform == null) {
             graph.localTransform = new Matrix4();

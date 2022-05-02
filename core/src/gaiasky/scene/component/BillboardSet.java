@@ -3,7 +3,7 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import gaiasky.scenegraph.particle.BillboardDataset;
 
-public class BillboardDatasets implements Component {
+public class BillboardSet implements Component {
     public BillboardDataset[] datasets;
 
     protected String provider;

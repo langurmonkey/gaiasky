@@ -1,8 +1,6 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
@@ -14,17 +12,9 @@ import gaiasky.util.Constants;
 /**
  * Initializes location mark entities.
  */
-public class LocInitializationSystem extends IteratingSystem {
-
-    public LocInitializationSystem(Family family, int priority) {
-        super(family, priority);
-    }
+public class LocInitializer implements EntityInitializer {
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        initializeEntity(entity);
-    }
-
     public void initializeEntity(Entity entity) {
         Body body = Mapper.body.get(entity);
         GraphNode graph = Mapper.graph.get(entity);

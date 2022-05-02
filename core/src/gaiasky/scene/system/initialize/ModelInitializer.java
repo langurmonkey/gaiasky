@@ -1,16 +1,12 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.data.AssetBean;
 import gaiasky.data.attitude.IAttitudeServer;
 import gaiasky.data.util.AttitudeLoader.AttitudeLoaderParameters;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
@@ -33,14 +29,10 @@ import gaiasky.util.math.Vector3d;
  * HeliotropicSatellite, GenericSpacecraft, Spacecraft, Billboard and
  * BillboardGalaxy.
  */
-public class ModelInitializationSystem extends IteratingSystem {
-
-    public ModelInitializationSystem(Family family, int priority) {
-        super(family, priority);
-    }
+public class ModelInitializer implements EntityInitializer {
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    public void initializeEntity(Entity entity) {
         Base base = Mapper.base.get(entity);
         Body body = Mapper.body.get(entity);
         GraphNode graph = Mapper.graph.get(entity);

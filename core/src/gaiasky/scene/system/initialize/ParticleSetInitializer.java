@@ -1,8 +1,6 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.data.group.IParticleGroupDataProvider;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.event.Event;
@@ -25,15 +23,11 @@ import java.util.List;
 /**
  * Initializes old ParticleGroup and StarGroup objects.
  */
-public class ParticleSetInitializationSystem extends IteratingSystem {
-    private static final Log logger = Logger.getLogger(ParticleSetInitializationSystem.class);
-
-    public ParticleSetInitializationSystem(Family family, int priority) {
-        super(family, priority);
-    }
+public class ParticleSetInitializer implements EntityInitializer {
+    private static final Log logger = Logger.getLogger(ParticleSetInitializer.class);
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
+    public void initializeEntity(Entity entity) {
         ParticleSet particleSet = Mapper.particleSet.get(entity);
         StarSet starSet = Mapper.starSet.get(entity);
 
@@ -173,5 +167,4 @@ public class ParticleSetInitializationSystem extends IteratingSystem {
     private double len(double x, double y, double z) {
         return Math.sqrt(x * x + y * y + z * z);
     }
-
 }
