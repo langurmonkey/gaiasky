@@ -14,6 +14,11 @@ import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 
+/**
+ * Provides coordiantes for the Gaia object.
+ * @deprecated Use {@link HeliotropicOrbitCoordinates} instead.
+ */
+@Deprecated
 public class GaiaCoordinates extends AbstractOrbitCoordinates {
     PointCloudData data;
 
