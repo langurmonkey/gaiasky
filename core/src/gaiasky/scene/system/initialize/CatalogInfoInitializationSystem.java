@@ -17,16 +17,17 @@ import java.nio.file.Path;
 /**
  * Initializes systems which contain a {@link gaiasky.util.CatalogInfo} object.
  */
-public class CatalogInfoInitializationSystem extends IteratingSystem {
+public class CatalogInfoInitializationSystem implements EntityInitializer {
 
-    public CatalogInfoInitializationSystem(Family family, int priority) {
-        super(family, priority);
+    @Override
+    public void initializeEntity(Entity entity) {
+        DatasetDescription dataset = Mapper.datasetDescription.get(entity);
+        initializeCatalogInfo(dataset);
+
     }
 
     @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        DatasetDescription dataset = Mapper.datasetDescription.get(entity);
-        initializeCatalogInfo(dataset);
+    public void setUpEntity(Entity entity) {
 
     }
 

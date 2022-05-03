@@ -5,18 +5,18 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 
 public class Verts implements Component {
-    protected boolean blend = true, depth = true, additive = true;
+    public boolean blend = true, depth = true, additive = true;
 
-    protected int glPrimitive;
+    public int glPrimitive;
 
     /** The render group **/
-    protected RenderGroup renderGroup;
+    public RenderGroup renderGroup;
 
     /** Whether to close the polyline (connect end point to start point) or not **/
-    protected boolean closedLoop = true;
+    public boolean closedLoop = true;
 
     // Line width
-    protected float primitiveSize = 1f;
+    public float primitiveSize = 1f;
 
-    protected PointCloudData pointCloudData;
+    public PointCloudData pointCloudData;
 }

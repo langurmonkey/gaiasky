@@ -1,6 +1,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
@@ -17,9 +18,9 @@ import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
 public class Trajectory implements Component {
-    private static final Log logger = Logger.getLogger(Trajectory.class);
+    public static final Log logger = Logger.getLogger(Trajectory.class);
 
-    private enum OrientationModel {
+    public enum OrientationModel {
         DEFAULT,
         EXTRASOLAR_SYSTEM
     }
@@ -27,18 +28,18 @@ public class Trajectory implements Component {
     /**
      * Special overlap factor
      */
-    protected static final float SHADER_MODEL_OVERLAP_FACTOR = 20f;
+    public static final float SHADER_MODEL_OVERLAP_FACTOR = 20f;
 
-    protected CelestialBody body;
-    protected Vector3d prev, curr;
+    public Entity body;
+    public Vector3d prev, curr;
     public double alpha;
     public Matrix4d localTransformD, auxMat;
-    protected String provider;
-    protected Double multiplier = 1.0d;
-    protected Class<? extends IOrbitDataProvider> providerClass;
+    public String provider;
+    public Double multiplier = 1.0d;
+    public Class<? extends IOrbitDataProvider> providerClass;
     public OrbitComponent oc;
     // Only adds the body, not the orbit
-    protected boolean onlyBody = false;
+    public boolean onlyBody = false;
     // Use new method for orbital elements
     public boolean newMethod = false;
     // Current orbit completion -- current delta from t0

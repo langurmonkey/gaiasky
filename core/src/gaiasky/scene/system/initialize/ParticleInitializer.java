@@ -42,6 +42,11 @@ public class ParticleInitializer implements EntityInitializer {
         }
     }
 
+    @Override
+    public void setUpEntity(Entity entity) {
+
+    }
+
     private void baseInitialization(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
         pm.pm = new Vector3();
         pm.pmSph = new Vector3();

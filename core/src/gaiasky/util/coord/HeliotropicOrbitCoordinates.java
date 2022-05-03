@@ -5,10 +5,16 @@
 
 package gaiasky.util.coord;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
+import gaiasky.scene.component.Trajectory;
+import gaiasky.scene.component.Verts;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.HeliotropicOrbit;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.SceneGraph;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -17,16 +23,28 @@ import java.time.Instant;
 public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
     PointCloudData data;
 
-    public HeliotropicOrbitCoordinates(){
+    public HeliotropicOrbitCoordinates() {
         super();
     }
 
     @Override
     public void doneLoading(Object... params) {
-        orbit = (HeliotropicOrbit) ((ISceneGraph) params[0]).getNode(orbitname);
-        if (params[1] instanceof CelestialBody)
+        if (params[0] instanceof SceneGraph) {
+            orbit = (HeliotropicOrbit) ((ISceneGraph) params[0]).getNode(orbitname);
+        } else if (params[0] instanceof Scene) {
+            entity = ((Scene) params[0]).getNode(orbitname);
+        }
+        if (params[1] instanceof CelestialBody) {
             orbit.setBody((CelestialBody) params[1]);
-        data = orbit.getPointCloud();
+            data = orbit.getPointCloud();
+        } else if (params[1] instanceof Entity) {
+            Trajectory trajectory = Mapper.trajectory.get(entity);
+            Verts verts = Mapper.verts.get(entity);
+            if(trajectory != null) {
+                trajectory.body = (Entity) params[1];
+                data = verts.pointCloudData;
+            }
+        }
     }
 
     @Override

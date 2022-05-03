@@ -22,7 +22,7 @@ import org.apfloat.Apfloat;
 import java.time.Instant;
 
 /**
- * A position that never changes
+ * A position that never changes.
  */
 public class StaticCoordinates implements IBodyCoordinates {
 

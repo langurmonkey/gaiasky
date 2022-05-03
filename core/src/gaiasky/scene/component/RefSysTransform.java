@@ -12,18 +12,18 @@ import gaiasky.util.math.Matrix4d;
 public class RefSysTransform implements Component {
     private static final Log logger = Logger.getLogger(RefSysTransform.class);
     public String transformName;
-    public Matrix4d transformFunction;
+    public Matrix4d matrix;
 
     public void setTransformName(String transformFunction) {
         this.transformName = transformFunction;
-        setTransformFunction(transformFunction);
+        setMatrix(transformFunction);
     }
 
-    public void setTransformFunction(String transformFunction) {
-        this.transformName = transformFunction;
-        if (transformFunction != null && !transformFunction.isEmpty()) {
+    public void setMatrix(String matrix) {
+        this.transformName = matrix;
+        if (matrix != null && !matrix.isEmpty()) {
             try {
-                Method m = ClassReflection.getMethod(Coordinates.class, transformFunction);
+                Method m = ClassReflection.getMethod(Coordinates.class, matrix);
                 Object obj = m.invoke(null);
 
                 Matrix4d trf = null;
@@ -32,7 +32,7 @@ public class RefSysTransform implements Component {
                 } else if (obj instanceof Matrix4d) {
                     trf = new Matrix4d((Matrix4d) obj);
                 }
-                this.transformFunction = trf;
+                this.matrix = trf;
             } catch (Exception e) {
                 logger.error(e);
             }
@@ -46,6 +46,6 @@ public class RefSysTransform implements Component {
      * must have at least 16 elements; the first 16 will be copied.
      **/
     public void setTransformValues(double[] transformValues) {
-        this.transformFunction = new Matrix4d(transformValues);
+        this.matrix = new Matrix4d(transformValues);
     }
 }

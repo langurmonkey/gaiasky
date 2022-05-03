@@ -41,6 +41,11 @@ public class SceneGraphBuilderSystem implements EntityInitializer {
 
     }
 
+    @Override
+    public void setUpEntity(Entity entity) {
+
+    }
+
     /**
      * Adds a child to the given node and updates the number of children in this
      * node and in all ancestors.

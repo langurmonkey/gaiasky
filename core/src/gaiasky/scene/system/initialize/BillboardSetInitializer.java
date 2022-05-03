@@ -14,6 +14,11 @@ public class BillboardSetInitializer implements EntityInitializer {
         reloadData(billboard);
     }
 
+    @Override
+    public void setUpEntity(Entity entity) {
+
+    }
+
     private boolean reloadData(BillboardSet billboard) {
         try {
             PointDataProvider provider = new PointDataProvider();

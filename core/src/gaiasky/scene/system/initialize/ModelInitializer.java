@@ -82,6 +82,11 @@ public class ModelInitializer implements EntityInitializer {
         }
     }
 
+    @Override
+    public void setUpEntity(Entity entity) {
+
+    }
+
     private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, GraphNode graph, MotorEngine engine) {
         base.ct = new ComponentTypes(ComponentType.Satellites);
         graph.localTransform = new Matrix4();

@@ -12,6 +12,7 @@ public class Mapper {
     public static final ComponentMapper<Hip> hip = ComponentMapper.getFor(Hip.class);
     public static final ComponentMapper<Body> body = ComponentMapper.getFor(Body.class);
     public static final ComponentMapper<Celestial> celestial = ComponentMapper.getFor(Celestial.class);
+    public static final ComponentMapper<Coordinates> coordinates = ComponentMapper.getFor(Coordinates.class);
     public static final ComponentMapper<Flags> flags = ComponentMapper.getFor(Flags.class);
     public static final ComponentMapper<Label> label = ComponentMapper.getFor(Label.class);
     public static final ComponentMapper<RefSysTransform> transform = ComponentMapper.getFor(RefSysTransform.class);
@@ -19,6 +20,7 @@ public class Mapper {
     public static final ComponentMapper<GraphNode> graph = ComponentMapper.getFor(GraphNode.class);
     public static final ComponentMapper<Octant> octant = ComponentMapper.getFor(Octant.class);
     public static final ComponentMapper<Fade> fade = ComponentMapper.getFor(Fade.class);
+    public static final ComponentMapper<Rotation> rotation = ComponentMapper.getFor(Rotation.class);
     public static final ComponentMapper<DatasetDescription> datasetDescription = ComponentMapper.getFor(DatasetDescription.class);
     public static final ComponentMapper<ParticleSet> particleSet = ComponentMapper.getFor(ParticleSet.class);
     public static final ComponentMapper<StarSet> starSet = ComponentMapper.getFor(StarSet.class);
@@ -37,5 +39,11 @@ public class Mapper {
     public static final ComponentMapper<RenderType> render = ComponentMapper.getFor(RenderType.class);
     public static final ComponentMapper<LocationMark> loc = ComponentMapper.getFor(LocationMark.class);
     public static final ComponentMapper<BillboardSet> billboardSet = ComponentMapper.getFor(BillboardSet.class);
+    public static final ComponentMapper<Axis> axis = ComponentMapper.getFor(Axis.class);
+    public static final ComponentMapper<Cluster> cluster = ComponentMapper.getFor(Cluster.class);
+    public static final ComponentMapper<SingleMatrix> matrix = ComponentMapper.getFor(SingleMatrix.class);
+    public static final ComponentMapper<SingleTexture> texture = ComponentMapper.getFor(SingleTexture.class);
+    public static final ComponentMapper<Trajectory> trajectory = ComponentMapper.getFor(Trajectory.class);
+    public static final ComponentMapper<Verts> verts = ComponentMapper.getFor(Verts.class);
 
 }

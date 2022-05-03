@@ -34,4 +34,9 @@ public class IndexInitializer implements EntityInitializer {
         scene.addToHipMap(entity);
 
     }
+
+    @Override
+    public void setUpEntity(Entity entity) {
+
+    }
 }

@@ -39,6 +39,11 @@ public class ParticleSetInitializer implements EntityInitializer {
         }
     }
 
+    @Override
+    public void setUpEntity(Entity entity) {
+
+    }
+
     private void initializeParticleSet(Entity entity, ParticleSet set) {
         initializeParticleSet(entity, set, true, true);
     }

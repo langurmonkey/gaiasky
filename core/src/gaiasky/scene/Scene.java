@@ -103,15 +103,16 @@ public class Scene {
         if (engine != null) {
             // Prepare systems
             int priority = 0;
-            EntitySystem baseInit = new InitSystem(new BaseInitializer(), Family.all(Base.class).get(), priority++);
+            EntitySystem baseInit = new InitSystem(new BaseInitializer(this), Family.all(Base.class).get(), priority++);
             EntitySystem particleInit = new InitSystem(new ParticleInitializer(), Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
             EntitySystem modelInit = new InitSystem(new ModelInitializer(), Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
             EntitySystem particleSetInit = new InitSystem(new ParticleSetInitializer(), Family.one(ParticleSet.class, StarSet.class).get(), priority++);
-            EntitySystem locInit = new InitSystem(new LocInitializer(), Family.one(LocationMark.class).get(), priority++);
-            EntitySystem billboardInit = new InitSystem(new BillboardSetInitializer(), Family.one(BillboardSet.class).get(), priority++);
+            EntitySystem locInit = new InitSystem(new LocInitializer(), Family.all(LocationMark.class).get(), priority++);
+            EntitySystem billboardInit = new InitSystem(new BillboardSetInitializer(), Family.all(BillboardSet.class).get(), priority++);
+            EntitySystem axesInit = new InitSystem(new AxesInitializer(), Family.all(Axis.class, RefSysTransform.class).get(), priority++);
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, modelInit, locInit, billboardInit);
+            runOnce(baseInit, particleSetInit, particleInit, modelInit, locInit, billboardInit, axesInit);
         }
 
     }
@@ -372,6 +373,9 @@ public class Scene {
 
             // Spacecraft
             addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
+
+            // StarCluster
+            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class);
 
             // Billboard
             addArchetype(Billboard.class.getName(), ModelBody.class.getName(), Fade.class);

@@ -26,4 +26,9 @@ public class LocInitializer implements EntityInitializer {
         loc.sizeKm = (float) (body.size * Constants.U_TO_KM);
 
     }
+
+    @Override
+    public void setUpEntity(Entity entity) {
+
+    }
 }

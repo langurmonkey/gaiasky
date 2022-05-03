@@ -5,10 +5,9 @@
 
 package gaiasky.util.coord;
 
-import gaiasky.scenegraph.CelestialBody;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.scenegraph.Orbit;
-import gaiasky.scenegraph.SceneGraphNode;
+import com.badlogic.ashley.core.Entity;
+import gaiasky.scene.Scene;
+import gaiasky.scenegraph.*;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -25,6 +24,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected String orbitname;
     protected Vector3d center;
     protected Orbit orbit;
+    protected Entity entity;
     protected double scaling = 1d;
 
     public AbstractOrbitCoordinates(){
@@ -42,8 +42,12 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
             logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
         } else {
             if (orbitname != null && !orbitname.isEmpty()) {
-                SceneGraphNode sgn = ((ISceneGraph) params[0]).getNode(orbitname);
-                orbit = (Orbit) sgn;
+                if(params[0] instanceof SceneGraph) {
+                    SceneGraphNode sgn = ((ISceneGraph) params[0]).getNode(orbitname);
+                    orbit = (Orbit) sgn;
+                } else if(params[0] instanceof Scene) {
+                    entity = ((Scene) params[0]).getNode(orbitname);
+                }
                 if (params[1] instanceof CelestialBody)
                     orbit.setBody((CelestialBody) params[1]);
             }
