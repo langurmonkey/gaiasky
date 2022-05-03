@@ -14,6 +14,9 @@ public class RefSysTransform implements Component {
     public String transformName;
     public Matrix4d matrix;
 
+    public void setTransformFunction(String transformFunction) {
+        setTransformName(transformFunction);
+    }
     public void setTransformName(String transformFunction) {
         this.transformName = transformFunction;
         setMatrix(transformFunction);
