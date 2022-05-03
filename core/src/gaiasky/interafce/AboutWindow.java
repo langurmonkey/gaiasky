@@ -161,7 +161,7 @@ public class AboutWindow extends GenericDialog {
 
         // Home page
         Label homepagetitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
-        Link homepage = new Link(Settings.settings.WEBPAGE, linkStyle, Settings.settings.WEBPAGE);
+        Link homepage = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
 
         // Twitter
         Label twtitle = new OwnLabel(I18n.msg("gui.help.twitter"), skin);
@@ -171,8 +171,8 @@ public class AboutWindow extends GenericDialog {
         Label authortitle = new OwnLabel(I18n.msg("gui.help.author"), skin);
 
         Table author = new Table(skin);
-        Label authorname = new OwnLabel(Settings.settings.AUTHOR_NAME, skin);
-        Link authormail = new Link(Settings.settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.settings.AUTHOR_EMAIL);
+        Label authorname = new OwnLabel(Settings.AUTHOR_NAME, skin);
+        Link authormail = new Link(Settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.AUTHOR_EMAIL);
         Link authorpage = new Link("www.tonisagrista.com", linkStyle, "https://tonisagrista.com");
         Link authormasto = new Link("@jumpinglangur@mastodont.cat", linkStyle, "https://mastodont.cat/@jumpinglangur");
         author.add(authorname).left().row();
@@ -199,7 +199,7 @@ public class AboutWindow extends GenericDialog {
         licensetext.setDisabled(true);
         licensetext.setPrefRows(3);
         licensetext.setWidth(taWidth2 / 2f);
-        Link licenselink = new Link("https://opensource.org/licenses/MPL-2.0", linkStyle, "https://opensource.org/licenses/MPL-2.0");
+        Link licenselink = new Link(Settings.LICENSE_URL, linkStyle, Settings.LICENSE_URL);
 
         licensev.addActor(licensetext);
         licensev.addActor(licenselink);
@@ -247,7 +247,7 @@ public class AboutWindow extends GenericDialog {
         // Build info
         Label buildinfo = new OwnLabel(I18n.msg("gui.help.buildinfo"), skin, "header");
 
-        Label versiontitle = new OwnLabel(I18n.msg("gui.help.version", Settings.settings.APPLICATION_NAME), skin);
+        Label versiontitle = new OwnLabel(I18n.msg("gui.help.version", Settings.APPLICATION_NAME), skin);
         Label version = new OwnLabel(Settings.settings.version.version, skin);
 
         Label revisiontitle = new OwnLabel(I18n.msg("gui.help.buildnumber"), skin);

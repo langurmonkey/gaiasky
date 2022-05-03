@@ -1442,6 +1442,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             /* LOAD SCENE GRAPH */
             if (sceneGraph == null) {
                 dataLoadString = "SceneGraphData";
+                settings.data.dataFiles = null;
+                if(settings.data.dataFiles == null) {
+                    throw new RuntimeException("Please set the data::dataFiles property in your configuration file, as it is null!");
+                }
                 final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
                 int i = 0;
                 // Add data files
