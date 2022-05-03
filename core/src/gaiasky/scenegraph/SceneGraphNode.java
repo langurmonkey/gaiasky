@@ -246,6 +246,16 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         this((String[]) null, parent);
     }
 
+    public void initialize() {
+        if (ct == null)
+            ct = new ComponentTypes(ComponentType.Others.ordinal());
+    }
+
+    public void doneLoading(AssetManager manager) {
+        if (coordinates != null)
+            coordinates.doneLoading(GaiaSky.instance.sceneGraph, this);
+    }
+
     /**
      * Adds the given {@link IOctreeObject} list as children to this node.
      *
@@ -506,16 +516,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * updated. Position, rotations and scale must be updated in here.
      */
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-    }
-
-    public void initialize() {
-        if (ct == null)
-            ct = new ComponentTypes(ComponentType.Others.ordinal());
-    }
-
-    public void doneLoading(AssetManager manager) {
-        if (coordinates != null)
-            coordinates.doneLoading(GaiaSky.instance.sceneGraph, this);
     }
 
     public Vector3b getPos() {

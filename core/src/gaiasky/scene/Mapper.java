@@ -13,7 +13,6 @@ public class Mapper {
     public static final ComponentMapper<Body> body = ComponentMapper.getFor(Body.class);
     public static final ComponentMapper<Celestial> celestial = ComponentMapper.getFor(Celestial.class);
     public static final ComponentMapper<Coordinates> coordinates = ComponentMapper.getFor(Coordinates.class);
-    public static final ComponentMapper<Flags> flags = ComponentMapper.getFor(Flags.class);
     public static final ComponentMapper<Label> label = ComponentMapper.getFor(Label.class);
     public static final ComponentMapper<RefSysTransform> transform = ComponentMapper.getFor(RefSysTransform.class);
     public static final ComponentMapper<AffineTransformations> affine = ComponentMapper.getFor(AffineTransformations.class);

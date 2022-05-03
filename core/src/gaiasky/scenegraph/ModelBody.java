@@ -150,7 +150,6 @@ public abstract class ModelBody extends CelestialBody {
                             mc.directional(i).direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
                             mc.directional(i).color.set(1f, 1f, 1f, 1f);
                         }
-
                     }
                 } else {
                     // Disable light

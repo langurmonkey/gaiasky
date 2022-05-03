@@ -23,6 +23,7 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -173,7 +174,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scaccel.set(sc.accel);
         scvel.set(sc.vel);
         scpos.set(sc.pos);
-        scpos = sc.computePosition(dt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
+        scpos = ((SpacecraftCoordinates)sc.getCoordinates()).computePosition(dt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
         scdir.set(sc.direction);
         scup.set(sc.up);
         sc.computeDirectionUp(dt, dirup);

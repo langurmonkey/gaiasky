@@ -24,6 +24,7 @@ import gaiasky.render.ILineRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
+import gaiasky.scene.api.ISpacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -32,6 +33,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.Intersectord;
@@ -45,7 +47,7 @@ import java.util.stream.Stream;
 /**
  * The spacecraft
  */
-public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IObserver {
+public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineRenderable, IObserver {
     private static final Log logger = Logger.getLogger(Spacecraft.class);
 
 
@@ -168,11 +170,13 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         // Use first model
         setToMachine(machines[currentMachine], false);
 
+        // Coordinates
+        SpacecraftCoordinates scc = new SpacecraftCoordinates();
+        scc.setSpacecraft(this);
+        this.coordinates = scc;
+
         // Initialize model
         super.initialize();
-
-        // Load thruster
-        //GaiaSky.instance.manager.load(GlobalConf.data.dataFile("tex/base/thruster.png"), Texture.class);
     }
 
     @Override
@@ -274,82 +278,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
     }
 
-    public Vector3b computePosition(double dt, IFocus closest, double currentEnginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3b posb) {
-        currentEnginePower = Math.signum(currentEnginePower);
-        // Compute force from thrust
-        thrust.set(direction).scl(thrustMagnitude * thrustFactor[thrustFactorIndex] * currentEnginePower);
-        force.set(thrust);
-
-        // Scale force if relativistic effects are on
-        if (Settings.settings.runtime.relativisticAberration) {
-            double speed = vel.len();
-            double scale = (relativisticSpeedCap - speed) / relativisticSpeedCap;
-            force.scl(scale);
-        }
-
-        double friction = (drag * 2e16) * dt;
-        force.add(D31.get().set(vel).scl(-friction));
-
-        if (stopping) {
-            double speed = vel.len();
-            if (speed != 0) {
-                currentEnginePower = -1;
-                thrust.set(vel).nor().scl(thrustMagnitude * thrustFactor[thrustFactorIndex] * currentEnginePower);
-                force.set(thrust);
-            }
-
-            Vector3d nextVel = D33.get().set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
-
-            if (vel.angle(nextVel) > 90) {
-                setCurrentEnginePower(0);
-                force.scl(0);
-                vel.scl(0);
-                EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
-            }
-        }
-
-        // Compute new acceleration in m/s^2
-        accel.set(force).scl(1d / mass);
-
-        // Integrate other quantities
-        // convert metres to internal units so we have the velocity in u/s
-        Vector3d acc = D31.get().set(accel).scl(Constants.M_TO_U);
-
-        if (Settings.settings.spacecraft.velocityDirection) {
-            double velocityLength = vel.len();
-            vel.set(direction).nor().scl(velocityLength);
-        }
-        vel.add(acc.scl(dt));
-
-        Vector3b velocity = B32.get().set(vel);
-        Vector3b newPosition = B33.get().set(posb).add(velocity.scl(dt));
-        Vector3b pos = posb.put(B34.get());
-        // Check collision!
-        if (closest != null && closest != this && !this.copy) {
-            double twoRadii = closest.getRadius() + this.getRadius();
-            // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(D31.get()), newPosition.put(D32.get()), closest.getPos().put(D33.get())) < twoRadii) {
-                logger.info("Crashed against " + closest.getName() + "!");
-
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(D31.get()), newPosition.put(D32.get()), closest.getPos().put(D31.get()), twoRadii);
-
-                // Teleport outside
-                if (intersections.size >= 1) {
-                    posb.set(intersections.get(0));
-                }
-
-                stopAllMovement();
-            } else if (posb.dstd(closest.getPos()) < twoRadii) {
-                posb.set(B31.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos(), B32.get())));
-            } else {
-                posb.set(newPosition);
-            }
-        } else {
-            posb.set(newPosition);
-        }
-
-        return posb;
-    }
 
     public double computeDirectionUp(double dt, Pair<Vector3d, Vector3d> pair) {
         // Yaw, pitch and roll
@@ -406,7 +334,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             double dt = time.getDt();
 
             // POSITION
-            pos = computePosition(dt, camera.getSecondClosestBody(), currentEnginePower, thrust, direction, force, accel, vel, pos);
+            coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos);
 
             if (leveling) {
                 // No velocity, we just stop Euler angle motions
@@ -471,6 +399,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         if (Gdx.input.isKeyPressed(Keys.RIGHT))
             setYawPower(yawp - powerStep);
     }
+
 
     public void stopAllMovement() {
         setCurrentEnginePower(0);
@@ -723,5 +652,85 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     public int getCurrentMachine() {
         return currentMachine;
+    }
+
+    @Override
+    public Vector3d force() {
+        return force;
+    }
+
+    @Override
+    public Vector3d accel() {
+        return accel;
+    }
+
+    @Override
+    public Vector3d vel() {
+        return vel;
+    }
+
+    @Override
+    public Vector3d direction() {
+        return direction;
+    }
+
+    @Override
+    public Vector3d up() {
+        return up;
+    }
+
+    @Override
+    public Vector3d thrust() {
+        return thrust;
+    }
+
+    @Override
+    public double currentEnginePower() {
+        return currentEnginePower;
+    }
+
+    @Override
+    public void currentEnginePower(double power) {
+        setCurrentEnginePower(power);
+    }
+
+    @Override
+    public double thrustMagnitude() {
+        return thrustMagnitude;
+    }
+
+    @Override
+    public double[] thrustFactor() {
+        return thrustFactor;
+    }
+
+    @Override
+    public double relativisticSpeedCap() {
+        return relativisticSpeedCap;
+    }
+
+    @Override
+    public double drag() {
+        return drag;
+    }
+
+    @Override
+    public double mass() {
+        return mass;
+    }
+
+    @Override
+    public int thrustFactorIndex() {
+        return thrustFactorIndex;
+    }
+
+    @Override
+    public boolean leveling() {
+        return leveling;
+    }
+
+    @Override
+    public boolean stopping() {
+        return stopping;
     }
 }

@@ -6,7 +6,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.StubModel;
+import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Logger;
@@ -28,7 +28,7 @@ public class OpenVRListener implements VRDeviceListener {
     /** Focus comparator **/
     private final Comparator<IFocus> comp;
     /** Map from VR device to model object **/
-    private HashMap<VRDevice, StubModel> vrDeviceToModel;
+    private HashMap<VRDevice, VRDeviceModel> vrDeviceToModel;
     /** Aux vectors **/
     private final Vector3d p0;
     private final Vector3d p1;
@@ -186,7 +186,7 @@ public class OpenVRListener implements VRDeviceListener {
      */
     private void select(VRDevice device) {
         // Selection
-        StubModel sm = vrDeviceToModel.get(device);
+        VRDeviceModel sm = vrDeviceToModel.get(device);
         if (sm != null) {
             p0.set(sm.getBeamP0());
             p1.set(sm.getBeamP1());
@@ -247,7 +247,7 @@ public class OpenVRListener implements VRDeviceListener {
 
         lazyInit();
 
-        StubModel sm;
+        VRDeviceModel sm;
         switch (axis) {
         case VRControllerAxes.Axis1:
             // Forward

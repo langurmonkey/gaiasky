@@ -31,7 +31,7 @@ import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
-import gaiasky.scenegraph.StubModel;
+import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
@@ -934,7 +934,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    Array<StubModel> controllers = new Array<>();
+    Array<VRDeviceModel> controllers = new Array<>();
 
     public void renderGlowPass(ICamera camera, FrameBuffer frameBuffer) {
         if (frameBuffer == null) {
@@ -959,7 +959,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (Settings.settings.runtime.openVr) {
                 SGROpenVR sgrVR = (SGROpenVR) sgrList[SGR_OPENVR_IDX];
                 if (vrContext != null) {
-                    for (StubModel m : sgrVR.controllerObjects) {
+                    for (VRDeviceModel m : sgrVR.controllerObjects) {
                         if (!models.contains(m, true))
                             controllers.add(m);
                     }

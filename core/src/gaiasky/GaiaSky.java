@@ -140,7 +140,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Maps the VR devices to model objects.
      */
-    private HashMap<VRDevice, StubModel> vrDeviceToModel;
+    private HashMap<VRDevice, VRDeviceModel> vrDeviceToModel;
 
     /**
      * The asset manager.
@@ -1379,7 +1379,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return 31 * h + w;
     }
 
-    public HashMap<VRDevice, StubModel> getVRDeviceToModel() {
+    public HashMap<VRDevice, VRDeviceModel> getVRDeviceToModel() {
         return vrDeviceToModel;
     }
 

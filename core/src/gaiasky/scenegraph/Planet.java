@@ -98,11 +98,6 @@ public class Planet extends ModelBody implements ILineRenderable {
     }
 
     @Override
-    public void updateLocal(ITimeFrameProvider time, ICamera camera) {
-        super.updateLocal(time, camera);
-    }
-
-    @Override
     protected void updateLocalTransform() {
         super.updateLocalTransform();
         if (ac != null) {

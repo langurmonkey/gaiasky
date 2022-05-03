@@ -26,7 +26,7 @@ public class Base implements Component {
     /**
      * Time of last visibility change in milliseconds
      */
-    protected long lastStateChangeTimeMs = 0;
+    public long lastStateChangeTimeMs = 0;
 
     /**
      * The ownOpacity value (alpha)
@@ -37,6 +37,32 @@ public class Base implements Component {
      * Component types, for managing visibility
      */
     public ComponentTypes ct;
+
+    /**
+     * Flag indicating whether the object has been computed in this step.
+     */
+    public boolean computed = true;
+
+    /**
+     * Is this node visible?
+     */
+    public boolean visible = true;
+
+    /**
+     * Force to render the label of this entity,
+     * bypassing the solid angle check
+     */
+    public boolean forceLabel = false;
+
+    /**
+     * Is this just a copy?
+     */
+    public boolean copy = false;
+
+    /**
+     * Has this been updated at least once?
+     */
+    public boolean initialUpdate = false;
 
 
     public String getName() {

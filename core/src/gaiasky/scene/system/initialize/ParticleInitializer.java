@@ -1,15 +1,32 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.util.Constants;
-import gaiasky.util.Settings;
+import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.Environment;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Initializes the old Particle and Star objects.
@@ -44,10 +61,14 @@ public class ParticleInitializer implements EntityInitializer {
 
     @Override
     public void setUpEntity(Entity entity) {
+        Hip hip = Mapper.hip.get(entity);
+        if(hip != null) {
+
+        }
 
     }
 
-    private void baseInitialization(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
+    private void baseInitialization(ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
         pm.pm = new Vector3();
         pm.pmSph = new Vector3();
 
@@ -67,7 +88,7 @@ public class ParticleInitializer implements EntityInitializer {
     }
 
     private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
-        baseInitialization(base, body, celestial, mag, pm, extra, sa, text, render);
+        baseInitialization(pm, extra, sa, text, render);
 
         // Actual initialization
         setDerivedAttributes(body, celestial, mag, extra, false);
@@ -81,7 +102,7 @@ public class ParticleInitializer implements EntityInitializer {
     }
 
     private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render, Distance dist) {
-        baseInitialization(base, body, celestial, mag, pm, extra, sa, text, render);
+        baseInitialization(pm, extra, sa, text, render);
 
         setDerivedAttributes(body, celestial, mag, extra, true);
 
@@ -122,4 +143,35 @@ public class ParticleInitializer implements EntityInitializer {
         celestial.ccPale = new float[] { Math.min(1, body.cc[0] + plus), Math.min(1, body.cc[1] + plus), Math.min(1, body.cc[2] + plus) };
     }
 
+    private void initModel(final AssetManager manager, final Model m) {
+        Texture tex = manager.get(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
+        Texture lut = manager.get(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
+        tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+        Map<String, Object> params = new TreeMap<>();
+        params.put("quality", 120L);
+        params.put("diameter", 1d);
+        params.put("flip", false);
+
+        Pair<IntModel, Map<String, gaiasky.util.gdx.shader.Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
+        IntModel model = pair.getFirst();
+        Material mat = pair.getSecond().get("base");
+        mat.clear();
+        mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+        mat.set(new TextureAttribute(TextureAttribute.Normal, lut));
+        // Only to activate view vector (camera position)
+        mat.set(new ColorAttribute(ColorAttribute.Specular));
+        mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
+        Matrix4 modelTransform = new Matrix4();
+        m.model = new ModelComponent(false);
+        m.model.initialize(null);
+        m.model.env = new Environment();
+        m.model.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
+        m.model.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
+        m.model.instance = new IntModelInstance(model, modelTransform);
+        // Relativistic effects
+        if (Settings.settings.runtime.relativisticAberration)
+            m.model.rec.setUpRelativisticEffectsMaterial(m.model.instance.materials);
+        m.model.setModelInitialized(true);
+    }
 }

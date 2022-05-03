@@ -51,6 +51,7 @@ public class SceneJsonLoader {
 
         // Construct scene graph in GraphNodes.
         scene.buildSceneGraph();
+
     }
     public synchronized static void loadJsonFile(FileHandle jsonFile, Scene scene) throws ReflectionException, FileNotFoundException {
 

@@ -19,7 +19,10 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 
-public class StubModel extends SceneGraphNode implements IModelRenderable, ILineRenderable {
+/**
+ * A model representing a VR device, typically a controller.
+ */
+public class VRDeviceModel extends SceneGraphNode implements IModelRenderable, ILineRenderable {
 
     public IntModelInstance instance;
     private final Environment env;
@@ -27,7 +30,7 @@ public class StubModel extends SceneGraphNode implements IModelRenderable, ILine
     private final Vector3 beamP0;
     private final Vector3 beamP1;
 
-    public StubModel(VRDevice device, Environment env) {
+    public VRDeviceModel(VRDevice device, Environment env) {
         super();
         this.env = env;
         this.instance = device.getModelInstance();
@@ -73,7 +76,7 @@ public class StubModel extends SceneGraphNode implements IModelRenderable, ILine
     }
 
     /**
-     * Occlusion rendering
+     * Occlusion rendering.
      */
     public void renderOpaque(IntModelBatch modelBatch, float alpha, double t) {
         setTransparency(alpha);
@@ -125,18 +128,18 @@ public class StubModel extends SceneGraphNode implements IModelRenderable, ILine
     }
 
     /**
-     * Gets the initial point of the controller beam in camera space
+     * Gets the initial point of the controller beam in camera space.
      *
-     * @return Initial point of controller beam
+     * @return Initial point of controller beam.
      */
     public Vector3 getBeamP0() {
         return beamP0;
     }
 
     /**
-     * Gets the end point of the controller beam in camera space
+     * Gets the end point of the controller beam in camera space.
      *
-     * @return End point of controller beam
+     * @return End point of controller beam.
      */
     public Vector3 getBeamP1() {
         return beamP1;

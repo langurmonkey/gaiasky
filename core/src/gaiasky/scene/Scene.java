@@ -9,6 +9,7 @@ import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
+import org.w3c.dom.Attr;
 
 import java.util.*;
 
@@ -67,6 +68,7 @@ public class Scene {
      * Runs the given entity systems only once with a dummy
      * delta time of 0. Useful for running one-time initialization and
      * loading tasks.
+     *
      * @param systems The systems.
      */
     public void runOnce(EntitySystem... systems) {
@@ -77,20 +79,22 @@ public class Scene {
 
     /**
      * Enables the given entity systems.
+     *
      * @param systems The systems.
      */
     public void enable(EntitySystem... systems) {
-        for(EntitySystem system : systems){
+        for (EntitySystem system : systems) {
             engine.addSystem(system);
         }
     }
 
     /**
      * Disables the given entity systems.
+     *
      * @param systems The systems.
      */
     public void disable(EntitySystem... systems) {
-        for(EntitySystem system : systems){
+        for (EntitySystem system : systems) {
             engine.removeSystem(system);
         }
     }
@@ -157,9 +161,19 @@ public class Scene {
     }
 
     /**
+     * Runs the set up initialization stage for all entities. This happens when all
+     * asset loading has finished.
+     */
+    public void setUpEntities() {
+
+    }
+
+    /**
      * Returns the entity identified with the given name, or null if
      * it is not found.
+     *
      * @param name The name of the entity.
+     *
      * @return The entity, or null if it does not exist.
      */
     public Entity getNode(String name) {
@@ -175,6 +189,7 @@ public class Scene {
      * with the same object (same class and same names).
      *
      * @param entity The entity to add.
+     *
      * @return False if the object already exists.
      */
     public boolean addToIndex(Entity entity) {
@@ -244,8 +259,8 @@ public class Scene {
                 }
             }
         }
-        if(!ok) {
-            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + findArchetype(entity).getName() +")"));
+        if (!ok) {
+            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + findArchetype(entity).getName() + ")"));
         }
         return ok;
     }
@@ -336,125 +351,25 @@ public class Scene {
             }
     }
 
+    /**
+     * Initializes the archetypes map with an entry for each model object.
+     */
     protected void initializeArchetypes() {
-        if (this.engine != null) {
-            this.archetypes = new HashMap<>();
-
-            // SceneGraphNode
-            addArchetype(SceneGraphNode.class.getName(), Base.class, Flags.class, Body.class, GraphNode.class, Octant.class);
-
-            // Universe
-            addArchetype(ROOT_NAME, Base.class, Body.class, GraphNode.class, GraphRoot.class);
-
-            // Celestial
-            addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class,
-                    Coordinates.class, Rotation.class, Text.class, SolidAngle.class);
-
-            // ModelBody
-            addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class, AffineTransformations.class);
-
-            // Planet
-            addArchetype(Planet.class.getName(), ModelBody.class.getName(), Atmosphere.class, Cloud.class);
-
-            // Particle
-            addArchetype(Particle.class.getName(), CelestialBody.class.getName(), ProperMotion.class, RenderType.class, ParticleExtra.class);
-
-            // Star
-            addArchetype(Star.class.getName(), Particle.class.getName(), Hip.class, Distance.class);
-
-            // Satellite
-            addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);
-
-            // HeliotropicSatellite
-            addArchetype(HeliotropicSatellite.class.getName(), Satellite.class.getName(), Attitude.class);
-
-            // GenericSpacecraft
-            addArchetype(GenericSpacecraft.class.getName(), Satellite.class.getName(), RenderFlags.class);
-
-            // Spacecraft
-            addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
-
-            // StarCluster
-            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class);
-
-            // Billboard
-            addArchetype(Billboard.class.getName(), ModelBody.class.getName(), Fade.class);
-
-            // VertsObject
-            addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);
-
-            // Polyline
-            addArchetype(Polyline.class.getName(), VertsObject.class.getName(), Arrow.class);
-
-            // Orbit
-            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class);
-
-            // HeliotropicOrbit
-            addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), Heliotropic.class);
-
-            // FadeNode
-            addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);
-
-            // BackgroundModel
-            addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
-
-            // SphericalGrid
-            addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(), GridUV.class);
-
-            // RecursiveGrid
-            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, RenderType.class);
-
-            // BillboardGroup
-            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
-
-            // Text2D
-            addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class);
-
-            // Axes
-            addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, RefSysTransform.class);
-
-            // Loc
-            addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class);
-
-            // Area
-            addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class, AuxVec.class);
-
-            // ParticleGroup
-            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class);
-
-            // StarGroup
-            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class);
-
-            // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class);
-
-            // ConstellationBoundaries
-            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
-
-            // CosmicRuler
-            addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class);
-
-        } else {
-            logger.error("World is null, can't initialize archetypes.");
-        }
+        this.archetypes = (new ArchetypeInitializer(engine)).initializeArchetypes();
     }
 
-    private void addArchetype(String archetypeName, String parentArchetypeName, Class<? extends Component>... classes) {
-        Archetype parent = null;
-        if (parentArchetypeName != null && this.archetypes.containsKey(parentArchetypeName)) {
-            parent = this.archetypes.get(parentArchetypeName);
-        }
-        this.archetypes.put(archetypeName, new Archetype(engine, parent, archetypeName, classes));
-    }
-
-    private void addArchetype(String archetypeName, Class<? extends Component>... classes) {
-        addArchetype(archetypeName, null, classes);
+    /**
+     * Initializes the attributes map.
+     */
+    private void initializeAttributes() {
+        this.attributeMap = (new AttributeInitializer(engine)).initializeAttributes();
     }
 
     /**
      * Find a matching archetype given an entity.
      *
      * @param entity The entity.
+     *
      * @return The matching archetype if it exists, or null if it does not.
      */
     private Archetype findArchetype(Entity entity) {
@@ -467,115 +382,4 @@ public class Scene {
         return null;
     }
 
-    private void initializeAttributes() {
-        if (this.engine != null) {
-            this.attributeMap = new HashMap<>();
-
-            // Base
-            putAll(Base.class, "id", "name", "names", "opacity", "ct");
-
-            // Body
-            putAll(Body.class, "position", "size", "color", "labelcolor");
-
-            // GraphNode
-            putAll(GraphNode.class, "parent");
-
-            // Coordinates
-            putAll(Coordinates.class, "coordinates");
-
-            // Rotation
-            putAll(Rotation.class, "rotation");
-
-            // Celestial
-            putAll(Celestial.class, "wikiname", "colorbv");
-
-            // Magnitude
-            putAll(Magnitude.class, "appmag", "absmag");
-
-            // SolidAngleThresholds
-            putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
-
-            // Text
-            putAll(Text.class, "labelFactor", "labelMax", "textScale");
-
-            // ModelScaffolding
-            putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locthoverfactor", "shadowvalues");
-
-            // Model
-            putAll(Model.class, "model");
-
-            // Atmosphere
-            putAll(Atmosphere.class, "atmosphere");
-
-            // Cloud
-            putAll(Cloud.class, "cloud");
-
-            // RenderFlags
-            putAll(RenderFlags.class, "renderquad");
-
-            // Machine
-            putAll(MotorEngine.class, "machines");
-
-            // Trajectory
-            putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "trail", "newmethod");
-
-            // RefSysTransform
-            putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues");
-
-            // AffineTransformations
-            putAll(AffineTransformations.class, "transformations");
-
-            // Fade
-            putAll(Fade.class, "fadein", "fadeout", "fade", "fadepc", "positionobjectname");
-
-            // DatasetDescription
-            putAll(DatasetDescription.class, "catalogInfo", "cataloginfo");
-
-            // Label
-            putAll(Label.class, "label", "label2d", "labelposition");
-
-            // RenderType
-            putAll(RenderType.class, "rendergroup");
-
-            // BillboardDataset
-            putAll(BillboardSet.class, "data:BillboardGroup");
-
-            // Title
-            putAll(Title.class, "scale:Text2D", "lines:Text2D", "align:Text2D");
-
-            // Axis
-            putAll(Axis.class, "axesColors");
-
-            // LocationMark
-            putAll(LocationMark.class, "location", "distFactor");
-
-            // Constel
-            putAll(Constel.class, "ids");
-
-            // Boundaries
-            putAll(Boundaries.class, "boundaries");
-
-            // ParticleSet
-            putAll(ParticleSet.class, "provider:ParticleGroup", "datafile", "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits");
-
-            // StarSet
-            putAll(StarSet.class, "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup");
-
-            // Attitude
-            putAll(Attitude.class, "provider:HeliotropicSatellite", "attitudeLocation");
-        } else {
-            logger.error("World is null, can't initialize attributes.");
-        }
-    }
-
-    private void putAll(Class<? extends Component> clazz, String... attributes) {
-        for (String attribute : attributes) {
-            if (attributeMap.containsKey(attribute)) {
-                logger.warn("Attribute already defined: " + attribute);
-                throw new RuntimeException("Attribute already defined: " + attribute);
-            } else {
-                attributeMap.put(attribute, clazz);
-            }
-        }
-    }
 }
