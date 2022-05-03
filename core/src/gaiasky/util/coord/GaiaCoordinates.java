@@ -15,7 +15,7 @@ import gaiasky.util.math.Vector3d;
 import java.time.Instant;
 
 /**
- * Gaia orbit coordinates.
+ * Provides coordiantes for the Gaia object.
  * @deprecated Use {@link HeliotropicOrbitCoordinates} instead.
  */
 @Deprecated
