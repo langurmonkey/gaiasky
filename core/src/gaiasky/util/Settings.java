@@ -57,6 +57,7 @@ public class Settings {
         return assetsPath(relativeAssetsLoc).toString();
     }
 
+    // Static settings
     public static String APPLICATION_NAME = "Gaia Sky";
     public static String APPLICATION_NAME_TITLE = "G a i a   S k y";
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
@@ -71,6 +72,7 @@ public class Settings {
     public static final String AUTHOR_EMAIL = "tsagrista@ari.uni-heidelberg.de";
     public static final String AUTHOR_AFFILIATION = "Universität Heidelberg, Zentrum für Astronomie, Astronomisches Rechen-Institut";
     public static final String AUTHOR_AFFILIATION_PLAIN = "Universitaet Heidelberg, Zentrum fuer Astronomie, Astronomisches Rechen-Institut";
+    public static final String LICENSE_URL = "https://opensource.org/licenses/MPL-2.0";
 
     // The settings instance
     public static Settings settings;

@@ -356,7 +356,7 @@ public class GaiaSkyDesktop implements IObserver {
                     }
                 } else {
                     logger.error(I18n.msg("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
-                    showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash.exception.2", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                 }
             } else {
                 logger.error(I18n.msg("error.java", REQUIRED_JAVA_VERSION));
@@ -364,11 +364,15 @@ public class GaiaSkyDesktop implements IObserver {
             }
         } catch (Exception e) {
             logger.error(e);
-            showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash.exception", e, Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+            showDialogOGL(e, I18n.msg("error.crash.title"), I18n.msg("error.crash.exception.2", SysUtils.getCrashReportsDir()));
         }
     }
 
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg) {
+        configureWindowSize(cfg, 1f, 1f);
+    }
+
+    private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg, float widthFactor, float heightFactor) {
         int w = Settings.settings.graphics.getScreenWidth();
         int h = Settings.settings.graphics.getScreenHeight();
         if (!SysUtils.isMac()) {
@@ -411,6 +415,14 @@ public class GaiaSkyDesktop implements IObserver {
             Settings.settings.graphics.resolution[0] = w;
             Settings.settings.graphics.resolution[1] = h;
         }
+
+        // Apply factors
+        Settings.settings.graphics.resolution[0] = (int) (Settings.settings.graphics.resolution[0] * widthFactor);
+        Settings.settings.graphics.resolution[1] = (int) (Settings.settings.graphics.resolution[1] * heightFactor);
+        w = (int) (w * widthFactor);
+        h = (int) (h * heightFactor);
+
+        // Set to config
         if (cfg != null)
             cfg.setWindowedMode(w, h);
     }
@@ -431,7 +443,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
-        configureWindowSize(cfg);
+        configureWindowSize(cfg, 0.6f, 0.85f);
         cfg.setResizable(false);
         cfg.setTitle(title);
 
