@@ -743,9 +743,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         final Task logAttributes = new Task() {
             @Override
             public void run() {
-                logger.info("Total number of attributes registered: " + Attribute.getNumAttributes());
+                logger.info(I18n.msg("notif.shader.attributes.total", Attribute.getNumAttributes()));
                 if (settings.program.debugInfo) {
-                    logger.debug("Registered attributes:");
+                    logger.debug(I18n.msg("notif.shader.attributes.registered"));
                     Array<String> attributes = Attribute.getTypes();
                     for (int i = 0; i < attributes.size; i++) {
                         logger.debug(i + ": " + attributes.get(i));
