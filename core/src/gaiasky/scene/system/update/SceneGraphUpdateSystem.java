@@ -1,12 +1,16 @@
 package gaiasky.scene.system.update;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
@@ -18,13 +22,23 @@ import net.jafama.FastMath;
  * component. Generally, this should be a single entity unless
  * we have more than one scene graph.
  */
-public class SceneGraphUpdateSystem extends IteratingSystem {
+public class SceneGraphUpdateSystem extends EntitySystem {
+    private static Log logger = Logger.getLogger(SceneGraphUpdateSystem.class);
 
     private ICamera camera;
     private final ITimeFrameProvider time;
+    private Family family;
+    private Entity root;
+    private ImmutableArray<Entity> entities;
 
+
+    /**
+     * Instantiates a system that will iterate over the entities described by the Family.
+     * @param family The family of entities iterated over in this System. In this case, it should be just one ({@link GraphRoot}.
+     */
     public SceneGraphUpdateSystem(Family family, int priority, ITimeFrameProvider time) {
-        super(family, priority);
+        super(priority);
+        this.family = family;
         this.time = time;
     }
 
@@ -34,7 +48,41 @@ public class SceneGraphUpdateSystem extends IteratingSystem {
        }
     }
 
+
     @Override
+    public void addedToEngine (Engine engine) {
+        entities = engine.getEntitiesFor(family);
+        if(entities.size() > 1) {
+            logger.error("The scene graph update system should only update one entity, the root.");
+        }
+    }
+
+    @Override
+    public void removedFromEngine (Engine engine) {
+        entities = null;
+    }
+
+    @Override
+    public void update (float deltaTime) {
+        for (int i = 0; i < entities.size(); ++i) {
+            processEntity(entities.get(i), deltaTime);
+        }
+    }
+
+    /**
+     * @return set of entities processed by the system
+     */
+    public ImmutableArray<Entity> getEntities () {
+        return entities;
+    }
+
+    /**
+     * @return the Family used when the system was created
+     */
+    public Family getFamily () {
+        return family;
+    }
+
     protected void processEntity(Entity entity, float deltaTime) {
         // This runs the root node
         GraphNode root = Mapper.graph.get(entity);

@@ -178,7 +178,7 @@ public class Scene {
      */
     public void prepareUpdateSystems() {
         if (engine != null) {
-            SceneGraphUpdateSystem sceneGraphUpdateSystem = new SceneGraphUpdateSystem(Family.all(GraphNode.class).get(), 0, GaiaSky.instance.time);
+            SceneGraphUpdateSystem sceneGraphUpdateSystem = new SceneGraphUpdateSystem(Family.all(GraphRoot.class).get(), 0, GaiaSky.instance.time);
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
 
             // Remove all remaining systems
