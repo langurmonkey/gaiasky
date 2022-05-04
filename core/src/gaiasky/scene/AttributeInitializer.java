@@ -25,7 +25,7 @@ public class AttributeInitializer {
             putAll(Base.class, "id", "name", "names", "opacity", "ct");
 
             // Body
-            putAll(Body.class, "position", "size", "color", "labelcolor");
+            putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "color", "labelcolor");
 
             // GraphNode
             putAll(GraphNode.class, "parent");
@@ -85,7 +85,7 @@ public class AttributeInitializer {
             putAll(Label.class, "label", "label2d", "labelposition");
 
             // RenderType
-            putAll(RenderType.class, "rendergroup");
+            putAll(RenderType.class, "rendergroup", "billboardRenderGroup:Particle");
 
             // BillboardDataset
             putAll(BillboardSet.class, "data:BillboardGroup");
@@ -113,6 +113,9 @@ public class AttributeInitializer {
 
             // Attitude
             putAll(Attitude.class, "provider:HeliotropicSatellite", "attitudeLocation");
+
+            // ParticleExtra
+            putAll(ParticleExtra.class, "primitiveRenderScale");
 
             return attributeMap;
         } else {

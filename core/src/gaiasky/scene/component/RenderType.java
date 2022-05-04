@@ -9,4 +9,8 @@ public class RenderType implements Component {
     public void setRendergroup(String rg) {
         this.renderGroup = RenderGroup.valueOf(rg);
     }
+
+    public void setBillboardRenderGroup(String rg) {
+        this.renderGroup = RenderGroup.valueOf(rg);
+    }
 }

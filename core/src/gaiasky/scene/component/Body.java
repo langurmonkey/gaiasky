@@ -46,12 +46,24 @@ public class Body implements Component {
     public float[] labelcolor = Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
 
 
+    public void setPos(double[] pos) {
+        setPosition(pos);
+    }
+
     public void setPosition(double[] pos) {
         this.pos.set(pos[0], pos[1], pos[2]);
     }
 
+    public void setPosKm(double[] pos) {
+        setPositionKm(pos);
+    }
+
     public void setPositionKm(double[] pos) {
         this.pos.set(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
+    }
+
+    public void setPosPc(double[] pos) {
+        setPositionPc(pos);
     }
 
     public void setPositionPc(double[] pos) {
