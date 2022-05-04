@@ -980,11 +980,6 @@ public class Settings {
                 return theme.contains("night");
             }
 
-            @JsonIgnore
-            public boolean isHiDPITheme() {
-                return scale > 1.5;
-            }
-
             @JsonProperty("distanceUnits")
             public void setDistanceUnits(String distanceUnits) {
                 if (distanceUnits == null || distanceUnits.isEmpty()) {

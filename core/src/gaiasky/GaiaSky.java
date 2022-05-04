@@ -744,7 +744,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             @Override
             public void run() {
                 logger.info("Total number of attributes registered: " + Attribute.getNumAttributes());
-                if (Settings.settings.program.debugInfo) {
+                if (settings.program.debugInfo) {
                     logger.debug("Registered attributes:");
                     Array<String> attributes = Attribute.getTypes();
                     for (int i = 0; i < attributes.size; i++) {

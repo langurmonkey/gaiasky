@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
@@ -37,7 +38,17 @@ public class ErrorDialog implements ApplicationListener {
 
     @Override
     public void create() {
-        ui = new Stage();
+        final float pad10 = 10f;
+        final float pad30 = 30f;
+
+        ScreenViewport svp = new ScreenViewport();
+        System.out.println(Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight());
+        int w = Gdx.graphics.getWidth();
+        float upp = w > 1000 ? 1f : 1.6f;
+        svp.setUnitsPerPixel(upp);
+        svp.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+
+        ui = new Stage(svp);
         FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         if (!fh.exists()) {
             // Default to dark-green
@@ -72,18 +83,18 @@ public class ErrorDialog implements ApplicationListener {
         long lines = TextUtils.countLines(stackStr);
         OwnTextArea stackTraceTextArea = new OwnTextArea(stackStr, skin, "default");
         stackTraceTextArea.setPrefRows(15);
-        stackTraceTextArea.setWidth(800);
-        stackTraceTextArea.setHeight(lines * 35);
+        stackTraceTextArea.setWidth(800f);
+        stackTraceTextArea.setHeight(lines * 35f);
 
         OwnScrollPane stackTraceScroll = new OwnScrollPane(stackTraceTextArea, skin, "minimalist");
-        stackTraceScroll.setWidth(820);
-        stackTraceScroll.setHeight(400);
+        stackTraceScroll.setWidth(820f);
+        stackTraceScroll.setHeight(400f);
         stackTraceScroll.setFadeScrollBars(false);
         OwnLabel stackTraceLabel = new OwnLabel(I18n.msg("error.crash.stacktrace"), skin, "header-s");
 
         // Close button
         Button b = new OwnTextButton(I18n.msg("gui.close"), skin, "default");
-        b.setWidth(400);
+        b.setWidth(400f);
         b.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
                 Gdx.app.postRunnable(() -> {
@@ -94,20 +105,20 @@ public class ErrorDialog implements ApplicationListener {
             }
             return true;
         });
-        b.pad(10);
+        b.pad(pad10);
 
         // Add to table
-        t.add(title).left().padBottom(10).row();
-        t.add(subtitle).left().padBottom(30).row();
+        t.add(title).left().padBottom(pad10).row();
+        t.add(subtitle).left().padBottom(pad30).row();
 
-        t.add(urlLabel).left().padBottom(10).row();
-        t.add(url).left().padBottom(30).row();
+        t.add(urlLabel).left().padBottom(pad10).row();
+        t.add(url).left().padBottom(pad30).row();
 
-        t.add(applicationMessageLabel).left().padBottom(10).row();
-        t.add(applicationMessage).left().padBottom(30).row();
+        t.add(applicationMessageLabel).left().padBottom(pad10).row();
+        t.add(applicationMessage).left().padBottom(pad30).row();
 
-        t.add(stackTraceLabel).left().padBottom(10).row();
-        t.add(stackTraceScroll).left().padBottom(80).row();
+        t.add(stackTraceLabel).left().padBottom(pad10).row();
+        t.add(stackTraceScroll).left().padBottom(80f).row();
 
         t.add(b).center().row();
 
