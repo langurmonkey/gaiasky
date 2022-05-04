@@ -64,6 +64,9 @@ public class ArchetypeInitializer {
             // Billboard
             addArchetype(Billboard.class.getName(), ModelBody.class.getName(), Fade.class);
 
+            // BillboardGalaxy
+            addArchetype(BillboardGalaxy.class.getName(), Billboard.class.getName());
+
             // VertsObject
             addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);
 
@@ -117,6 +120,10 @@ public class ArchetypeInitializer {
 
             // CosmicRuler
             addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class);
+
+            // GenericCatalog
+            addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());
+
 
             return archetypes;
         } else {

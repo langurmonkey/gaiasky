@@ -25,7 +25,7 @@ public class AttributeInitializer {
             putAll(Base.class, "id", "name", "names", "opacity", "ct");
 
             // Body
-            putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "color", "labelcolor");
+            putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "color", "labelcolor");
 
             // GraphNode
             putAll(GraphNode.class, "parent");

@@ -82,6 +82,10 @@ public class Body implements Component {
         this.size = (float) (size * Constants.KM_TO_U);
     }
 
+    public void setSizepc(Double sizePc) {
+        setSizePc(sizePc);
+    }
+
     public void setSizePc(Double sizePc) {
         this.size = (float) (size * Constants.PC_TO_U);
     }
