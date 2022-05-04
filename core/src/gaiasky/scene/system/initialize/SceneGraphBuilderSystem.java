@@ -9,28 +9,27 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.Vector3b;
 
 import java.util.Map;
 
 /**
  * Builds the scene graph once all nodes are in the index.
  */
-public class SceneGraphBuilderSystem implements EntityInitializer {
+public class SceneGraphBuilderSystem extends InitSystem {
 
     /** The index. **/
     private Map<String, Entity> index;
 
-    public SceneGraphBuilderSystem(final Map<String, Entity> index) {
+    public SceneGraphBuilderSystem(final Map<String, Entity> index, Family family, int priority) {
+        super(false, family, priority);
         this.index = index;
     }
 
     @Override
     public void initializeEntity(Entity entity) {
         GraphNode graph = Mapper.graph.get(entity);
-        if (graph.localTransform == null) {
-            graph.localTransform = new Matrix4();
-        }
-        if (graph.parentName != null) {
+        if (graph.parentName != null)  {
             Entity parent = getNode(graph.parentName);
             if(parent != null) {
                 addChild(parent, entity, true);

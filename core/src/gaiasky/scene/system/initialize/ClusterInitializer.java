@@ -1,6 +1,7 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -30,7 +31,11 @@ import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 /**
  * Initializes star cluster entities.
  */
-public class ClusterInitializer implements EntityInitializer {
+public class ClusterInitializer extends InitSystem {
+
+    public ClusterInitializer(boolean setUp, Family family, int priority) {
+        super(setUp, family, priority);
+    }
 
     @Override
     public void initializeEntity(Entity entity) {

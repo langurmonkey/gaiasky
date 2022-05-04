@@ -21,7 +21,6 @@ import gaiasky.util.math.Vector3d;
 import java.time.Instant;
 
 public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
-    PointCloudData data;
 
     public HeliotropicOrbitCoordinates() {
         super();
@@ -36,13 +35,10 @@ public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
         }
         if (params[1] instanceof CelestialBody) {
             orbit.setBody((CelestialBody) params[1]);
-            data = orbit.getPointCloud();
         } else if (params[1] instanceof Entity) {
             Trajectory trajectory = Mapper.trajectory.get(entity);
-            Verts verts = Mapper.verts.get(entity);
             if(trajectory != null) {
                 trajectory.body = (Entity) params[1];
-                data = verts.pointCloudData;
             }
         }
     }
@@ -59,7 +55,7 @@ public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
 
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
-        boolean inRange = data.loadPoint(out, date);
+        boolean inRange = getData().loadPoint(out, date);
         // Rotate by solar longitude, and convert to equatorial.
         Vector3d outd = new Vector3d();
         out.put(outd);

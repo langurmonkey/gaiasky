@@ -5,6 +5,7 @@
 
 package gaiasky.data.util;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
@@ -68,6 +69,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         public String name;
         public OrbitComponent orbitalParamaters;
         public Orbit orbit;
+        public Entity entity;
 
         public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass) {
             this.providerClass = providerClass;

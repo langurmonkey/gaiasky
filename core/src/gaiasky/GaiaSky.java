@@ -655,6 +655,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Set up entities
         scene.setUpEntities();
+        // Prepare scene for update
+        scene.prepareUpdateSystems();
 
         // First time, set assets
         final Array<SceneGraphNode> nodes = sceneGraph.getNodes();

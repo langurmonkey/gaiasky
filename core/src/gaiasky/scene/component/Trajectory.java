@@ -2,17 +2,15 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.Method;
+import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
@@ -20,7 +18,9 @@ import gaiasky.util.math.Vector3d;
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);
 
-    public enum OrientationModel {
+    public static OrbitRefresher orbitRefresher;
+
+    public enum OrbitOrientationModel {
         DEFAULT,
         EXTRASOLAR_SYSTEM
     }
@@ -45,7 +45,7 @@ public class Trajectory implements Component {
     // Current orbit completion -- current delta from t0
     public double coord;
     // The orientation model
-    public OrientationModel model = OrientationModel.DEFAULT;
+    public OrbitOrientationModel model = OrbitOrientationModel.DEFAULT;
 
     public boolean isInOrbitalElementsGroup = false;
 
@@ -86,7 +86,7 @@ public class Trajectory implements Component {
     public void setModel(String model) {
         model = model.toUpperCase().trim();
         try {
-            this.model = OrientationModel.valueOf(model);
+            this.model = OrbitOrientationModel.valueOf(model);
         } catch (IllegalArgumentException e) {
             logger.error(I18n.msg("notif.error", e.getLocalizedMessage()));
         }
@@ -130,5 +130,11 @@ public class Trajectory implements Component {
 
     public void setOrbittrail(Boolean trail) {
         this.orbitTrail = trail;
+    }
+
+    public void setBody(Entity entity, double radius) {
+        this.body = entity;
+        this.distUp = (float) Math.max(radius * 200, 500 * Constants.KM_TO_U);
+        this.distDown = (float) Math.max(radius * 20, 50 * Constants.KM_TO_U);
     }
 }

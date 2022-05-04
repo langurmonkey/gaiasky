@@ -1,6 +1,7 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -29,7 +30,11 @@ import gaiasky.util.math.Vector3d;
  * HeliotropicSatellite, GenericSpacecraft, Spacecraft, Billboard and
  * BillboardGalaxy.
  */
-public class ModelInitializer implements EntityInitializer {
+public class ModelInitializer extends InitSystem {
+
+    public ModelInitializer(boolean setUp, Family family, int priority) {
+        super(setUp, family, priority);
+    }
 
     @Override
     public void initializeEntity(Entity entity) {
@@ -58,7 +63,7 @@ public class ModelInitializer implements EntityInitializer {
 
         // First init spacecraft if needed
         if (isSpacecraft) {
-            initializeSpacecraft(base, body, model, scaffolding, graph, engine);
+            initializeSpacecraft(base, body, model, scaffolding, engine);
         }
 
         // Initialize model body
@@ -87,9 +92,8 @@ public class ModelInitializer implements EntityInitializer {
 
     }
 
-    private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, GraphNode graph, MotorEngine engine) {
+    private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
         base.ct = new ComponentTypes(ComponentType.Satellites);
-        graph.localTransform = new Matrix4();
         engine.rotationMatrix = new Matrix4();
 
         // position attributes
@@ -123,7 +127,6 @@ public class ModelInitializer implements EntityInitializer {
 
     private void initializeModel(Base base, Body body, Model model, SolidAngle sa, Text text, ModelScaffolding scaffolding, GraphNode graph) {
         // Default values
-        graph.localTransform = new Matrix4();
         graph.orientation = new Matrix4d();
 
         sa.thresholdPoint = Math.toRadians(0.30);

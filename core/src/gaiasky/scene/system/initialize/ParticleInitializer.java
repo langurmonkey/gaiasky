@@ -1,6 +1,7 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,9 +32,13 @@ import java.util.TreeMap;
 /**
  * Initializes the old Particle and Star objects.
  */
-public class ParticleInitializer implements EntityInitializer {
+public class ParticleInitializer extends InitSystem {
 
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
+
+    public ParticleInitializer(boolean setUp, Family family, int priority) {
+        super(setUp, family, priority);
+    }
 
     @Override
     public void initializeEntity(Entity entity) {

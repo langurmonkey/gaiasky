@@ -6,7 +6,12 @@
 package gaiasky.util.coord;
 
 import com.badlogic.ashley.core.Entity;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Body;
+import gaiasky.scene.component.Trajectory;
 import gaiasky.scenegraph.*;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -20,19 +25,19 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected static final Log logger = Logger.getLogger(AbstractOrbitCoordinates.class);
     // Holds all instances
     protected static final List<AbstractOrbitCoordinates> instances = new ArrayList<>();
-    
+
     protected String orbitname;
     protected Vector3d center;
     protected Orbit orbit;
     protected Entity entity;
     protected double scaling = 1d;
 
-    public AbstractOrbitCoordinates(){
+    public AbstractOrbitCoordinates() {
         super();
         instances.add(this);
     }
 
-    public static List<AbstractOrbitCoordinates> getInstances(){
+    public static List<AbstractOrbitCoordinates> getInstances() {
         return instances;
     }
 
@@ -42,14 +47,19 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
             logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
         } else {
             if (orbitname != null && !orbitname.isEmpty()) {
-                if(params[0] instanceof SceneGraph) {
+                if (params[0] instanceof SceneGraph) {
                     SceneGraphNode sgn = ((ISceneGraph) params[0]).getNode(orbitname);
                     orbit = (Orbit) sgn;
-                } else if(params[0] instanceof Scene) {
+                } else if (params[0] instanceof Scene) {
                     entity = ((Scene) params[0]).getNode(orbitname);
                 }
-                if (params[1] instanceof CelestialBody)
+                if (params[1] instanceof CelestialBody) {
                     orbit.setBody((CelestialBody) params[1]);
+                } else if (params[1] instanceof Entity) {
+                    Trajectory trajectory = Mapper.trajectory.get(entity);
+                    Body body = Mapper.body.get(entity);
+                    trajectory.setBody(entity, body.size / 2);
+                }
             }
         }
     }
@@ -63,7 +73,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         return orbit;
     }
 
-    public void setScaling(double scaling){
+    public void setScaling(double scaling) {
         this.scaling = scaling;
     }
 
@@ -80,11 +90,20 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         setCenterkm(center);
     }
 
-    public void setCenterkm(double[] center){
+    public void setCenterkm(double[] center) {
         this.center = new Vector3d(center[0] * Constants.KM_TO_U, center[1] * Constants.KM_TO_U, center[2] * Constants.KM_TO_U);
     }
 
-    public void setCenterpc(double[] center){
+    public void setCenterpc(double[] center) {
         this.center = new Vector3d(center[0] * Constants.PC_TO_U, center[1] * Constants.PC_TO_U, center[2] * Constants.PC_TO_U);
+    }
+
+    protected PointCloudData getData() {
+        if (orbit != null) {
+            return orbit.getPointCloud();
+        } else if (entity != null) {
+            return Mapper.verts.get(entity).pointCloudData;
+        }
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 
@@ -58,4 +59,5 @@ public class GraphNode implements Component {
     public void setParent(String parentName) {
         this.parentName = parentName;
     }
+
 }

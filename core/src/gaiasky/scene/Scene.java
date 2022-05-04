@@ -1,8 +1,11 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.systems.IteratingSystem;
+import gaiasky.GaiaSky;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.initialize.*;
+import gaiasky.scene.system.update.SceneGraphUpdateSystem;
 import gaiasky.scene.view.PositionEntity;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -61,7 +64,6 @@ public class Scene {
         Base base = root.getComponent(Base.class);
         base.setName(ROOT_NAME);
         engine.addEntity(root);
-
     }
 
     /**
@@ -119,16 +121,17 @@ public class Scene {
         if (engine != null) {
             // Prepare systems
             int priority = 0;
-            EntitySystem baseInit = new InitSystem(new BaseInitializer(this), setUp, Family.all(Base.class).get(), priority++);
-            EntitySystem particleInit = new InitSystem(new ParticleInitializer(), setUp, Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
-            EntitySystem modelInit = new InitSystem(new ModelInitializer(), setUp, Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
-            EntitySystem particleSetInit = new InitSystem(new ParticleSetInitializer(), setUp, Family.one(ParticleSet.class, StarSet.class).get(), priority++);
-            EntitySystem locInit = new InitSystem(new LocInitializer(), setUp, Family.all(LocationMark.class).get(), priority++);
-            EntitySystem billboardInit = new InitSystem(new BillboardSetInitializer(), setUp, Family.all(BillboardSet.class).get(), priority++);
-            EntitySystem axesInit = new InitSystem(new AxesInitializer(), setUp, Family.all(Axis.class, RefSysTransform.class).get(), priority++);
+            EntitySystem baseInit = new BaseInitializer(this, setUp, Family.all(Base.class, GraphNode.class).get(), priority++);
+            EntitySystem particleSetInit = new ParticleSetInitializer(setUp, Family.one(ParticleSet.class, StarSet.class).get(), priority++);
+            EntitySystem particleInit = new ParticleInitializer(setUp, Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
+            EntitySystem trajectoryInit = new TrajectoryInitializer(setUp, Family.all(Trajectory.class, Verts.class).get(), priority++);
+            EntitySystem modelInit = new ModelInitializer(setUp, Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
+            EntitySystem locInit = new LocInitializer(setUp, Family.all(LocationMark.class).get(), priority++);
+            EntitySystem billboardInit = new BillboardSetInitializer(setUp, Family.all(BillboardSet.class).get(), priority++);
+            EntitySystem axesInit = new AxesInitializer(setUp, Family.all(Axis.class, RefSysTransform.class).get(), priority++);
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, modelInit, locInit, billboardInit, axesInit);
+            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardInit, axesInit);
         }
     }
 
@@ -145,7 +148,7 @@ public class Scene {
             hipMap = new HashMap<>(151250);
 
             // Prepare system
-            EntitySystem indexSystem = new InitSystem(new IndexInitializer(this), Family.all(Base.class).get(), 0);
+            EntitySystem indexSystem = new IndexInitializer(this, Family.all(Base.class).get(), 0);
 
             // Run once
             runOnce(indexSystem);
@@ -158,21 +161,37 @@ public class Scene {
      */
     public void buildSceneGraph() {
         if (engine != null) {
-
             // Prepare system
-            EntitySystem sceneGraphBuilderSystem = new InitSystem(new SceneGraphBuilderSystem(this.index), Family.all(GraphNode.class).get(), 0);
+            EntitySystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(this.index, Family.all(GraphNode.class).get(), 0);
 
             // Run once
             runOnce(sceneGraphBuilderSystem);
 
             GraphNode rootGraph = Mapper.graph.get(getNode("Universe"));
             logger.info("Initialized " + (rootGraph.numChildren + 1) + " into the scene graph.");
+        }
+    }
 
+    /**
+     * Prepares the engine to start running update cycles. This method
+     * initializes the engine with all the necessary update systems.
+     */
+    public void prepareUpdateSystems() {
+        if (engine != null) {
+            SceneGraphUpdateSystem sceneGraphUpdateSystem = new SceneGraphUpdateSystem(Family.all(GraphNode.class).get(), 0, GaiaSky.instance.time);
+            sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
+
+            // Remove all remaining systems
+            engine.removeAllSystems();
+
+            // Add first updater: scene graph update system
+            engine.addSystem(sceneGraphUpdateSystem);
         }
     }
 
     /**
      * Updates the scene. This causes an update to the engine.
+     *
      * @param time The time frame provider object.
      */
     public void update(ITimeFrameProvider time) {

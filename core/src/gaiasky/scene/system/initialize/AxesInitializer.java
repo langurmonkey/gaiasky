@@ -1,6 +1,7 @@
 package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -14,7 +15,12 @@ import gaiasky.util.math.Matrix4d;
 /**
  * Initializes axes objects.
  */
-public class AxesInitializer implements EntityInitializer {
+public class AxesInitializer extends InitSystem {
+
+    public AxesInitializer(boolean setUp, Family family, int priority) {
+        super(setUp, family, priority);
+    }
+
     @Override
     public void initializeEntity(Entity entity) {
     }

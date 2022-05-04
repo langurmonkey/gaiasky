@@ -17,7 +17,11 @@ import java.nio.file.Path;
 /**
  * Initializes systems which contain a {@link gaiasky.util.CatalogInfo} object.
  */
-public class CatalogInfoInitializationSystem implements EntityInitializer {
+public class CatalogInfoInitializationSystem extends InitSystem {
+
+    public CatalogInfoInitializationSystem(boolean setUp, Family family, int priority) {
+        super(setUp, family, priority);
+    }
 
     @Override
     public void initializeEntity(Entity entity) {

@@ -6,6 +6,9 @@
 package gaiasky.util.coord;
 
 import gaiasky.data.util.PointCloudData;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Trajectory;
+import gaiasky.scene.component.Verts;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
@@ -30,8 +33,23 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         } else {
             super.doneLoading(params);
             transf = new Matrix4d();
-            orbitalParams = orbit.oc;
-            data = orbit.getPointCloud();
+            if (orbit != null) {
+                orbitalParams = orbit.oc;
+                data = orbit.getPointCloud();
+            } else if (entity != null) {
+                Trajectory trajectory = Mapper.trajectory.get(entity);
+                Verts verts = Mapper.verts.get(entity);
+                if (trajectory == null) {
+                    throw new RuntimeException("Trajectory component does not exist for orbit object: " + Mapper.base.get(entity).getName());
+                }
+                if (verts == null) {
+                    throw new RuntimeException("Verts component does not exist for orbit object: " + Mapper.base.get(entity).getName());
+                }
+                orbitalParams = trajectory.oc;
+                data = verts.pointCloudData;
+            } else {
+                throw new RuntimeException("This " + this.getClass().getSimpleName() + " object does have neither an orbit nor an entity object.");
+            }
         }
     }
 
@@ -69,14 +87,17 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         aux.nor().scl(percent * len);
         out.add(aux);
 
-        if (orbit.transformFunction == null && orbit.parent.orientation != null) {
-            transf.set(orbit.parent.orientation);
-        } else if (orbit.transformFunction != null) {
-            transf.set(orbit.transformFunction);
+        Matrix4d transformFunction = getTransformFunction();
+        Matrix4d parentOrientation = getParentOrientation();
+
+        if (transformFunction == null && parentOrientation != null) {
+            transf.set(parentOrientation);
+        } else if (transformFunction != null) {
+            transf.set(transformFunction);
         } else {
             transf.idt();
         }
-        if (!orbit.newMethod) {
+        if (!isNewMethod()) {
             transf.rotate(0, 1, 0, orbitalParams.argofpericenter);
             transf.rotate(0, 0, 1, orbitalParams.i);
             transf.rotate(0, 1, 0, orbitalParams.ascendingnode);
@@ -87,9 +108,37 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         out.mul(transf).scl(scaling);
 
         // Move to center if needed
-        if(center != null && !center.isZero())
+        if (center != null && !center.isZero())
             out.add(center);
         return out;
+    }
+
+    protected boolean isNewMethod() {
+        if(orbit != null) {
+            return orbit.newMethod;
+        } else if(entity != null){
+            return Mapper.trajectory.get(entity).newMethod;
+        }
+        return false;
+    }
+
+    protected Matrix4d getTransformFunction() {
+        if (orbit != null) {
+            return orbit.transformFunction;
+        } else if (entity != null) {
+            return Mapper.transform.get(entity).matrix;
+        }
+        return null;
+    }
+
+    protected Matrix4d getParentOrientation() {
+        if (orbit != null) {
+            return orbit.parent.orientation;
+        } else if (entity != null) {
+            return Mapper.graph.get(Mapper.graph.get(entity).parent).orientation;
+        }
+        return null;
+
     }
 
 }

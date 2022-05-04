@@ -26,11 +26,6 @@ public class MoonAACoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public void doneLoading(Object... params) {
-        super.doneLoading(params);
-    }
-
-    @Override
     public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         if (!Constants.withinVSOPTime(date.toEpochMilli()))
             return null;

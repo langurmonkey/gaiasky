@@ -6,10 +6,8 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
-public class InitSystem extends IteratingSystem {
-    private Log logger;
-
-    private EntityInitializer entityInitializer;
+public abstract class InitSystem extends IteratingSystem implements EntityInitializer {
+    protected Log logger;
 
     private enum InitializerMode {
         /** The initialization stage happens at the beginning, right after the entity has been created. **/
@@ -20,16 +18,15 @@ public class InitSystem extends IteratingSystem {
 
     private InitializerMode mode;
 
-    public InitSystem(EntityInitializer initializer, boolean setUp, Family family, int priority) {
+    public InitSystem(boolean setUp, Family family, int priority) {
         super(family, priority);
-        this.entityInitializer = initializer;
         this.mode = setUp ? InitializerMode.SETUP : InitializerMode.INIT;
-        this.logger = Logger.getLogger(initializer != null ? initializer.getClass() : getClass());
+        this.logger = Logger.getLogger(getClass());
     }
 
-    public InitSystem(EntityInitializer initializer, Family family, int priority) {
+    public InitSystem(Family family, int priority) {
         // Initialize by default
-        this(initializer, false, family, priority);
+        this(false, family, priority);
     }
 
     public void setModeInit() {
@@ -42,13 +39,14 @@ public class InitSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        if (entityInitializer != null) {
-            switch (mode) {
-            case INIT -> entityInitializer.initializeEntity(entity);
-            case SETUP -> entityInitializer.setUpEntity(entity);
-            }
-        } else {
-            logger.warn("Can't initialize: initializer is null");
+        switch (mode) {
+        case INIT -> initializeEntity(entity);
+        case SETUP -> setUpEntity(entity);
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
     }
 }
