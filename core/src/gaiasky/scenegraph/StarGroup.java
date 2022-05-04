@@ -835,7 +835,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void dispose() {
         this.disposed = true;
-        GaiaSky.instance.sceneGraph.remove(this, true);
+        if(GaiaSky.instance.sceneGraph != null) {
+            GaiaSky.instance.sceneGraph.remove(this, true);
+        }
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Data to be gc'd

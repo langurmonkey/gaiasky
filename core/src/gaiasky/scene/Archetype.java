@@ -63,28 +63,47 @@ public class Archetype {
         }
     }
 
+    public int numComponents() {
+        int n = 0;
+        Archetype current = this;
+
+        while (current != null) {
+            n += current.components.size();
+            current = current.parent;
+        }
+        return n;
+    }
+
+    public boolean hasComponent(Component component) {
+        Archetype current = this;
+
+        while (current != null) {
+            for (Class<? extends Component> componentClass : current.components) {
+                if (component.getClass().equals(componentClass)) {
+                    return true;
+                }
+            }
+            current = current.parent;
+        }
+
+        return false;
+
+    }
+
     /**
      * Checks whether the given entity matches this archetype.
      *
      * @param entity The entity.
-     *
      * @return True if the entity is of this archetype (has the same components), false otherwise.
      */
     public boolean matches(Entity entity) {
         ImmutableArray<Component> entityComponents = entity.getComponents();
-        if (entityComponents.size() != components.size()) {
+        if (entityComponents.size() != numComponents()) {
             return false;
         }
 
         for (Component component : entityComponents) {
-            boolean found = false;
-            for (Class<? extends Component> componentClass : components) {
-                if (component.getClass().equals(componentClass)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
+            if (!hasComponent(component)) {
                 return false;
             }
         }
