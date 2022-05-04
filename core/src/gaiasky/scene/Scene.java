@@ -8,6 +8,7 @@ import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
 import java.util.*;
@@ -103,21 +104,32 @@ public class Scene {
      * initial entity initialization.
      */
     public void initializeEntities() {
+        initializeEntities(false);
+    }
+
+    /**
+     * Runs the set up initialization stage for all entities. This happens when all
+     * asset loading has finished.
+     */
+    public void setUpEntities() {
+        initializeEntities(true);
+    }
+
+    private void initializeEntities(boolean setUp) {
         if (engine != null) {
             // Prepare systems
             int priority = 0;
-            EntitySystem baseInit = new InitSystem(new BaseInitializer(this), Family.all(Base.class).get(), priority++);
-            EntitySystem particleInit = new InitSystem(new ParticleInitializer(), Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
-            EntitySystem modelInit = new InitSystem(new ModelInitializer(), Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
-            EntitySystem particleSetInit = new InitSystem(new ParticleSetInitializer(), Family.one(ParticleSet.class, StarSet.class).get(), priority++);
-            EntitySystem locInit = new InitSystem(new LocInitializer(), Family.all(LocationMark.class).get(), priority++);
-            EntitySystem billboardInit = new InitSystem(new BillboardSetInitializer(), Family.all(BillboardSet.class).get(), priority++);
-            EntitySystem axesInit = new InitSystem(new AxesInitializer(), Family.all(Axis.class, RefSysTransform.class).get(), priority++);
+            EntitySystem baseInit = new InitSystem(new BaseInitializer(this), setUp, Family.all(Base.class).get(), priority++);
+            EntitySystem particleInit = new InitSystem(new ParticleInitializer(), setUp, Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get(), priority++);
+            EntitySystem modelInit = new InitSystem(new ModelInitializer(), setUp, Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), priority++);
+            EntitySystem particleSetInit = new InitSystem(new ParticleSetInitializer(), setUp, Family.one(ParticleSet.class, StarSet.class).get(), priority++);
+            EntitySystem locInit = new InitSystem(new LocInitializer(), setUp, Family.all(LocationMark.class).get(), priority++);
+            EntitySystem billboardInit = new InitSystem(new BillboardSetInitializer(), setUp, Family.all(BillboardSet.class).get(), priority++);
+            EntitySystem axesInit = new InitSystem(new AxesInitializer(), setUp, Family.all(Axis.class, RefSysTransform.class).get(), priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit, modelInit, locInit, billboardInit, axesInit);
         }
-
     }
 
     /**
@@ -160,11 +172,11 @@ public class Scene {
     }
 
     /**
-     * Runs the set up initialization stage for all entities. This happens when all
-     * asset loading has finished.
+     * Updates the scene. This causes an update to the engine.
+     * @param time The time frame provider object.
      */
-    public void setUpEntities() {
-
+    public void update(ITimeFrameProvider time) {
+        engine.update((float) time.getDt());
     }
 
     /**

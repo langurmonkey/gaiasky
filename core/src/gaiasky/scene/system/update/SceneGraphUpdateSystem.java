@@ -55,7 +55,7 @@ public class SceneGraphUpdateSystem extends IteratingSystem {
         graph.translation.set(parentTransform);
 
         // Update local position here
-        if(time.getHdiff() != 0 && coordinates != null) {
+        if(time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {
             // Load this object's equatorial cartesian coordinates into pos
             coordinates.timeOverflow = coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), body.pos) == null;
         }

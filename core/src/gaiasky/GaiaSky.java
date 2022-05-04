@@ -611,7 +611,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         postProcessor.doneLoading(assetManager);
 
 
-
         /*
          * GET SCENE GRAPH
          */
@@ -620,6 +619,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } else {
             throw new RuntimeException("Error loading scene graph from data load string: " + sceneGraphName + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
         }
+
 
         /*
          * GET SCENE
@@ -636,7 +636,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         updateProcess = () -> {
             // Process ECS
-            scene.engine.update((float) time.getDt());
+            scene.update(time);
 
             sceneGraph.update(time, cameraManager);
             // Swap proximity buffers
@@ -652,6 +652,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         AbstractRenderer.initialize(sceneGraph);
         sgr.doneLoading(assetManager);
         sgr.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
+
+        // Set up entities
+        scene.setUpEntities();
 
         // First time, set assets
         final Array<SceneGraphNode> nodes = sceneGraph.getNodes();
