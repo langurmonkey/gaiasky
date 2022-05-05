@@ -6,8 +6,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Axis;
-import gaiasky.scene.component.RefSysTransform;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;

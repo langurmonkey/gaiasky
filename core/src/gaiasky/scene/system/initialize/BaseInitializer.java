@@ -3,14 +3,10 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.Coordinates;
-import gaiasky.scene.component.GraphNode;
 import gaiasky.util.math.Vector3b;
 
 /**

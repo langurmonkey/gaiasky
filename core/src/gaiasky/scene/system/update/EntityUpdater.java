@@ -15,8 +15,9 @@ public interface EntityUpdater {
 
     /**
      * Updates the entity.
-     * @param entity The entity to update.
-     * @param time The global time frame provider object.
+     *
+     * @param entity    The entity to update.
+     * @param deltaTime The delta time since last frame.
      */
-    void updateEntity(Entity entity, ITimeFrameProvider time);
+    void updateEntity(Entity entity, float deltaTime);
 }

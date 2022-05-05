@@ -45,5 +45,7 @@ public class Mapper {
     public static final ComponentMapper<Trajectory> trajectory = ComponentMapper.getFor(Trajectory.class);
     public static final ComponentMapper<Verts> verts = ComponentMapper.getFor(Verts.class);
     public static final ComponentMapper<OrbitElementsSet> orbitElementsSet = ComponentMapper.getFor(OrbitElementsSet.class);
+    public static final ComponentMapper<ParentOrientation> parentOrientation = ComponentMapper.getFor(ParentOrientation.class);
+    public static final ComponentMapper<Raymarching> raymarching = ComponentMapper.getFor(Raymarching.class);
 
 }

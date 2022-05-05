@@ -124,6 +124,9 @@ public class ArchetypeInitializer {
             // GenericCatalog
             addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());
 
+            // Invisible
+            addArchetype(Invisible.class.getName(), CelestialBody.class.getName(), Raymarching.class);
+
 
             return archetypes;
         } else {

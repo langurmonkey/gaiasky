@@ -81,8 +81,8 @@ public class ParticleSetInitializer extends InitSystem {
             setLabelPosition(entity);
 
             if (createCatalogInfo && Mapper.datasetDescription.has(entity)) {
-                Base base = Mapper.base.get(entity);
-                DatasetDescription desc = Mapper.datasetDescription.get(entity);
+                Base base = entity.getComponent(Base.class);
+                DatasetDescription desc = entity.getComponent(DatasetDescription.class);
                 // Create catalog info and broadcast
                 CatalogInfo ci = new CatalogInfo(base.names[0], base.names[0], null, CatalogInfoSource.INTERNAL, 1f, entity);
                 ci.nParticles = set.pointData != null ? set.pointData.size() : -1;
@@ -169,7 +169,7 @@ public class ParticleSetInitializer extends InitSystem {
                 label.labelPosition = new Vector3b(body.pos);
             }
         } else {
-            Base base = Mapper.base.get(entity);
+            Base base = entity.getComponent(Base.class);
             logger.warn("Particle set entity does not have label or body (or both): " + base.getName());
         }
     }

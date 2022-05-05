@@ -2,12 +2,8 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.LocationMark;
 import gaiasky.util.Constants;
 
 /**

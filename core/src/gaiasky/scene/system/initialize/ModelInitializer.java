@@ -18,7 +18,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.SpacecraftRadio;
 import gaiasky.scenegraph.MachineDefinition;
-import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
@@ -94,15 +93,15 @@ public class ModelInitializer extends InitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-        var body = entity.getComponent(Body.class);
-        var model = entity.getComponent(Model.class);
-        var graph = entity.getComponent(GraphNode.class);
-        var atmosphere = entity.getComponent(Atmosphere.class);
-        var cloud = entity.getComponent(Cloud.class);
-        var attitude = entity.getComponent(Attitude.class);
-        var parentOrientation = entity.getComponent(ParentOrientation.class);
-        var engine = entity.getComponent(MotorEngine.class);
-        var fade = entity.getComponent(Fade.class);
+        var body = Mapper.body.get(entity);
+        var graph = Mapper.graph.get(entity);
+        var model = Mapper.model.get(entity);
+        var atmosphere = Mapper.atmosphere.get(entity);
+        var cloud = Mapper.cloud.get(entity);
+        var attitude = Mapper.attitude.get(entity);
+        var parentOrientation = Mapper.parentOrientation.get(entity);
+        var engine = Mapper.engine.get(entity);
+        var fade = Mapper.fade.get(entity);
 
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {

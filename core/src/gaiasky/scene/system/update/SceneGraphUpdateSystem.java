@@ -83,7 +83,7 @@ public class SceneGraphUpdateSystem extends EntitySystem {
 
     protected void processEntity(Entity entity, float deltaTime) {
         // This runs the root node
-        GraphNode root = Mapper.graph.get(entity);
+        GraphNode root = entity.getComponent(GraphNode.class);
 
         synchronized (camera) {
            root.translation.set(camera.getInversePos());

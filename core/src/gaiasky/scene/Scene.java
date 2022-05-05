@@ -1,13 +1,13 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.SceneGraphUpdateSystem;
 import gaiasky.scene.view.PositionEntity;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.Position;
+import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
@@ -129,9 +129,11 @@ public class Scene {
             EntitySystem locInit = new LocInitializer(setUp, Family.all(LocationMark.class).get(), priority++);
             EntitySystem billboardInit = new BillboardSetInitializer(setUp, Family.all(BillboardSet.class).get(), priority++);
             EntitySystem axesInit = new AxesInitializer(setUp, Family.all(Axis.class, RefSysTransform.class).get(), priority++);
+            EntitySystem raymarchingInit = new InvisibleInitializer(setUp, Family.all(Raymarching.class).get(), priority++);
+            EntitySystem catalogInfoInit = new CatalogInfoInitializationSystem(setUp, Family.all(DatasetDescription.class).get(), priority++);
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardInit, axesInit);
+            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardInit, axesInit, raymarchingInit, catalogInfoInit);
         }
     }
 

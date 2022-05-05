@@ -2,14 +2,10 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.Vector3b;
 
 import java.util.Map;
 
@@ -28,7 +24,7 @@ public class SceneGraphBuilderSystem extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        var graph = Mapper.graph.get(entity);
+        var graph = entity.getComponent(GraphNode.class);
         if (graph.parentName != null)  {
             var parent = getNode(graph.parentName);
             if(parent != null) {

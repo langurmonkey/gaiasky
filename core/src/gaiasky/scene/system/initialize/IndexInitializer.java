@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.component.Octant;
 
 /**
  * Initializes the name and id indices.
