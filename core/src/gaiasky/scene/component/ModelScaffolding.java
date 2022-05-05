@@ -19,10 +19,10 @@ public class ModelScaffolding implements Component {
     public float sizeScaleFactor = 1f;
 
     /** Fade opacity, special to model bodies **/
-    protected float fadeOpacity;
+    public float fadeOpacity;
 
     /** Shadow map properties **/
-    private ShadowMapImpl shadowMap;
+    public ShadowMapImpl shadowMap;
 
     /** State flag; whether to render the shadow (number of times left) **/
     public int shadow;

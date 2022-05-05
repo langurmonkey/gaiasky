@@ -7,9 +7,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.Model;
+import gaiasky.scene.component.*;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ITransform;
@@ -49,6 +47,7 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
         Body body = Mapper.body.get(entity);
         Model model = Mapper.model.get(entity);
         GraphNode graph = Mapper.graph.get(entity);
+        ModelScaffolding scaffolding = Mapper.modelScaffolding.get(entity);
 
         // Update light with global position
         if (model.model != null && body.distToCamera <= LIGHT_X1) {
@@ -76,33 +75,36 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
                 }
             }
         }
-        updateLocalTransform();
+        updateLocalTransform(entity, body, graph, scaffolding);
     }
 
-    protected void updateLocalTransform() {
-        setToLocalTransform(sizeScaleFactor, localTransform, true);
+    protected void updateLocalTransform(Entity entity, Body body, GraphNode graph, ModelScaffolding scaffolding) {
+        setToLocalTransform(entity, body, graph, scaffolding.sizeScaleFactor, graph.localTransform, true);
     }
 
-    public void setToLocalTransform(float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
-        setToLocalTransform(size, sizeFactor, localTransform, forceUpdate);
+    public void setToLocalTransform(Entity entity, Body body, GraphNode graph, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
+        setToLocalTransform(entity, graph, body.size, sizeFactor, localTransform, forceUpdate);
     }
 
-    public void setToLocalTransform(float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
+    public void setToLocalTransform(Entity entity, GraphNode graph, float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
-            if (rc != null) {
-                translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
-                orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
+            var rotation = Mapper.rotation.get(entity);
+            var scaffolding = Mapper.modelScaffolding.get(entity);
+            if (rotation.rc != null) {
+                graph.translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rotation.rc.ascendingNode).rotate(0, 0, 1, (float) (rotation.rc.inclination + rotation.rc.axialTilt)).rotate(0, 1, 0, (float) rotation.rc.angle);
+                graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rotation.rc.ascendingNode).rotate(0, 0, 1, (float) (rotation.rc.inclination + rotation.rc.axialTilt));
             } else {
-                translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(refPlaneTransform));
-                orientation.idt().mul(Coordinates.getTransformD(refPlaneTransform));
+                graph.translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
+                graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform));
             }
         } else {
-            localTransform.set(this.localTransform);
+            localTransform.set(graph.localTransform);
         }
 
         // Apply transformations
-        if (transformations != null)
-            for (ITransform tc : transformations)
+        AffineTransformations affine = Mapper.affine.get(entity);
+        if (affine != null && affine.transformations != null)
+            for (ITransform tc : affine.transformations)
                 tc.apply(localTransform);
     }
 }
