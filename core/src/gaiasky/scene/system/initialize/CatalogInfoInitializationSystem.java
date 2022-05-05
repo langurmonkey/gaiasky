@@ -25,7 +25,7 @@ public class CatalogInfoInitializationSystem extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        DatasetDescription dataset = Mapper.datasetDescription.get(entity);
+        var dataset = Mapper.datasetDescription.get(entity);
         initializeCatalogInfo(dataset);
 
     }

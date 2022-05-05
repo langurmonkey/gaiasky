@@ -27,8 +27,8 @@ public class AxesInitializer extends InitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-        Axis axis = Mapper.axis.get(entity);
-        RefSysTransform transform = Mapper.transform.get(entity);
+        var axis = Mapper.axis.get(entity);
+        var transform = Mapper.transform.get(entity);
 
         if (transform.transformName != null) {
             Class<Coordinates> c = Coordinates.class;

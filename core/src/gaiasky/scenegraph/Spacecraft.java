@@ -182,9 +182,6 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        if (mc != null) {
-            mc.doneLoading(manager, localTransform, null);
-        }
 
         // Broadcast me
         EventManager.publish(Event.SPACECRAFT_LOADED, this, this);

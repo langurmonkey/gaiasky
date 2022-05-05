@@ -33,8 +33,8 @@ public class ParticleSetInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        ParticleSet particleSet = Mapper.particleSet.get(entity);
-        StarSet starSet = Mapper.starSet.get(entity);
+        var particleSet = Mapper.particleSet.get(entity);
+        var starSet = Mapper.starSet.get(entity);
 
         // Initialize particle set
         if (starSet == null) {

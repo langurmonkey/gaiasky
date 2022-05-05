@@ -16,7 +16,7 @@ public class BillboardSetInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        BillboardSet billboard = Mapper.billboardSet.get(entity);
+        var billboard = Mapper.billboardSet.get(entity);
         reloadData(billboard);
     }
 
@@ -27,7 +27,7 @@ public class BillboardSetInitializer extends InitSystem {
 
     private boolean reloadData(BillboardSet billboard) {
         try {
-            PointDataProvider provider = new PointDataProvider();
+            var provider = new PointDataProvider();
             boolean reload = false;
             for (BillboardDataset dataset : billboard.datasets) {
                 boolean reloadNeeded = dataset.initialize(provider, reload);

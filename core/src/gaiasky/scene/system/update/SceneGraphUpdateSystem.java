@@ -28,7 +28,6 @@ public class SceneGraphUpdateSystem extends EntitySystem {
     private ICamera camera;
     private final ITimeFrameProvider time;
     private Family family;
-    private Entity root;
     private ImmutableArray<Entity> entities;
 
 
@@ -47,7 +46,6 @@ public class SceneGraphUpdateSystem extends EntitySystem {
            this.camera = camera;
        }
     }
-
 
     @Override
     public void addedToEngine (Engine engine) {

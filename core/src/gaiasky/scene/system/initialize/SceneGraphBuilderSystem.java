@@ -28,9 +28,9 @@ public class SceneGraphBuilderSystem extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        GraphNode graph = Mapper.graph.get(entity);
+        var graph = Mapper.graph.get(entity);
         if (graph.parentName != null)  {
-            Entity parent = getNode(graph.parentName);
+            var parent = getNode(graph.parentName);
             if(parent != null) {
                 addChild(parent, entity, true);
             } else {
@@ -53,8 +53,8 @@ public class SceneGraphBuilderSystem extends InitSystem {
      * @param updateAncestorCount Whether to update the ancestors number of children.
      */
     public final void addChild(Entity parent, Entity child, boolean updateAncestorCount) {
-        GraphNode graph = Mapper.graph.get(child);
-        GraphNode parentGraph = Mapper.graph.get(parent);
+        var graph = Mapper.graph.get(child);
+        var parentGraph = Mapper.graph.get(parent);
         if (parentGraph.children == null) {
             parentGraph.children = new Array<>(false, parentGraph.parent == null ? 100 : 1);
         }
@@ -64,9 +64,9 @@ public class SceneGraphBuilderSystem extends InitSystem {
 
         if (updateAncestorCount) {
             // Update num children in ancestors
-            Entity ancestor = parentGraph.parent;
+            var ancestor = parentGraph.parent;
             while (ancestor != null) {
-                GraphNode ancestorGraph = Mapper.graph.get(ancestor);
+                var ancestorGraph = Mapper.graph.get(ancestor);
                 ancestorGraph.numChildren++;
                 ancestor = ancestorGraph.parent;
             }

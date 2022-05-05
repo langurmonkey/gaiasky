@@ -39,9 +39,9 @@ public class ClusterInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        Base base = Mapper.base.get(entity);
-        Body body = Mapper.body.get(entity);
-        Cluster cluster = Mapper.cluster.get(entity);
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var cluster = Mapper.cluster.get(entity);
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units
@@ -55,10 +55,9 @@ public class ClusterInitializer extends InitSystem {
     }
 
     private void initModel(Entity entity) {
-        Base base = Mapper.base.get(entity);
-        Body body = Mapper.body.get(entity);
-        Model model = Mapper.model.get(entity);
-        Cluster cluster = Mapper.cluster.get(entity);
+        var body = Mapper.body.get(entity);
+        var model = Mapper.model.get(entity);
+        var cluster = Mapper.cluster.get(entity);
 
         if (cluster.clusterTex == null) {
             cluster.clusterTex = new Texture(Settings.settings.data.dataFileHandle("data/tex/base/cluster-tex.png"), true);

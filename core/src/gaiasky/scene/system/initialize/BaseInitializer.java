@@ -27,8 +27,8 @@ public class BaseInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        Base base = Mapper.base.get(entity);
-        GraphNode graph = Mapper.graph.get(entity);
+        var base = Mapper.base.get(entity);
+        var graph = Mapper.graph.get(entity);
 
         // Initialize component type, if entity does not have one.
         if (base.ct == null) {
@@ -46,7 +46,7 @@ public class BaseInitializer extends InitSystem {
     @Override
     public void setUpEntity(Entity entity) {
         if (Mapper.coordinates.has(entity)) {
-            Coordinates coord = Mapper.coordinates.get(entity);
+            var coord = Mapper.coordinates.get(entity);
             if (coord.coordinates != null)
                 coord.coordinates.doneLoading(scene, entity);
         }

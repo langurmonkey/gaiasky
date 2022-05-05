@@ -2,9 +2,10 @@ package gaiasky.test;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
-import gaiasky.scene.component.Arrow;
+import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
+import gaiasky.scene.component.SingleMatrix;
 import gaiasky.scene.system.ParallelSystem;
 
 import java.lang.management.ManagementFactory;
@@ -20,8 +21,9 @@ import java.util.logging.SimpleFormatter;
 /**
  * Tests the speed of {@link gaiasky.scene.system.ParallelSystem} and compares it to
  * {@link com.badlogic.ashley.systems.IteratingSystem}, for multiple numbers of entities.
+ * TODO Use JMH.
  */
-public class ParallelSystemTest {
+public class ParallelSystemBenchmark {
 
     /** Number of rounds for each test. **/
     private static int ROUNDS = 10;
@@ -38,7 +40,7 @@ public class ParallelSystemTest {
     private static int[] SIZES = new int[] { 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000 };
 
     public static void main(String[] args) {
-        (new ParallelSystemTest()).test();
+        (new ParallelSystemBenchmark()).test();
     }
 
     /**
@@ -78,7 +80,7 @@ public class ParallelSystemTest {
     protected Logger log;
     private DecimalFormat df;
 
-    public ParallelSystemTest() {
+    public ParallelSystemBenchmark() {
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%4$-2s] %5$s %n");
         log = Logger.getLogger(getClass().getSimpleName());
         log.setLevel(Level.INFO);
@@ -108,6 +110,9 @@ public class ParallelSystemTest {
             for (int j = 0; j < 200_000_000; j++) {
                 value += Math.cos(rand.nextDouble()) * Math.log10(j);
             }
+            SingleMatrix m = entity.getComponent(SingleMatrix.class);
+            m.matrix.idt().rotate(3, 1, 0, 32).scl(23).det();
+
             base.id = (long) (value);
         };
 
@@ -124,7 +129,8 @@ public class ParallelSystemTest {
             for (int i = 0; i < nEntities; i++) {
                 Entity entity = new Entity();
                 entity.add(new Base());
-                entity.add(new Arrow());
+                entity.add(new SingleMatrix());
+                entity.getComponent(SingleMatrix.class).matrix = new Matrix4();
 
                 engine.addEntity(entity);
             }

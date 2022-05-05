@@ -38,10 +38,10 @@ public class TrajectoryInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        Base base = Mapper.base.get(entity);
-        Body body = Mapper.body.get(entity);
-        Trajectory trajectory = Mapper.trajectory.get(entity);
-        Verts verts = Mapper.verts.get(entity);
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var trajectory = Mapper.trajectory.get(entity);
+        var verts = Mapper.verts.get(entity);
 
         if (!trajectory.onlyBody)
             try {
@@ -73,12 +73,12 @@ public class TrajectoryInitializer extends InitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-        Base base = Mapper.base.get(entity);
-        Body body = Mapper.body.get(entity);
-        GraphNode graph = Mapper.graph.get(entity);
-        RefSysTransform transform = Mapper.transform.get(entity);
-        Trajectory trajectory = Mapper.trajectory.get(entity);
-        Verts verts = Mapper.verts.get(entity);
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var graph = Mapper.graph.get(entity);
+        var transform = Mapper.transform.get(entity);
+        var trajectory = Mapper.trajectory.get(entity);
+        var verts = Mapper.verts.get(entity);
 
         trajectory.alpha = body.cc[3];
         initOrbitMetadata(body, trajectory, verts);

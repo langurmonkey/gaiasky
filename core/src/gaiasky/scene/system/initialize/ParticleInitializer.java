@@ -42,17 +42,17 @@ public class ParticleInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        Base base = Mapper.base.get(entity);
-        Body body = Mapper.body.get(entity);
-        Celestial celestial = Mapper.celestial.get(entity);
-        Magnitude mag = Mapper.magnitude.get(entity);
-        ProperMotion pm = Mapper.pm.get(entity);
-        ParticleExtra extra = Mapper.extra.get(entity);
-        SolidAngle sa = Mapper.sa.get(entity);
-        Text text = Mapper.text.get(entity);
-        RenderType render = Mapper.render.get(entity);
-        Hip hip = Mapper.hip.get(entity);
-        Distance dist = Mapper.distance.get(entity);
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var celestial = Mapper.celestial.get(entity);
+        var mag = Mapper.magnitude.get(entity);
+        var pm = Mapper.pm.get(entity);
+        var extra = Mapper.extra.get(entity);
+        var sa = Mapper.sa.get(entity);
+        var text = Mapper.text.get(entity);
+        var render = Mapper.render.get(entity);
+        var hip = Mapper.hip.get(entity);
+        var dist = Mapper.distance.get(entity);
 
 
         if (hip != null) {
@@ -66,7 +66,7 @@ public class ParticleInitializer extends InitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-        Hip hip = Mapper.hip.get(entity);
+        var hip = Mapper.hip.get(entity);
         if(hip != null) {
 
         }

@@ -12,7 +12,7 @@ public class Attitude implements Component {
     // Attitude
     public String provider;
     public String attitudeLocation;
-    private IAttitudeServer attitudeServer;
+    public IAttitudeServer attitudeServer;
     public IAttitude attitude;
 
     public Vector3d unrotatedPos;

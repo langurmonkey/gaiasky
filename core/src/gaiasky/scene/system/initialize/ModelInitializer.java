@@ -2,17 +2,23 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.data.AssetBean;
 import gaiasky.data.attitude.IAttitudeServer;
 import gaiasky.data.util.AttitudeLoader.AttitudeLoaderParameters;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.entity.SpacecraftRadio;
 import gaiasky.scenegraph.MachineDefinition;
+import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
@@ -21,6 +27,8 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
@@ -38,23 +46,20 @@ public class ModelInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        Base base = Mapper.base.get(entity);
-        Body body = Mapper.body.get(entity);
-        GraphNode graph = Mapper.graph.get(entity);
-        Celestial celestial = Mapper.celestial.get(entity);
-        Model model = Mapper.model.get(entity);
-        ModelScaffolding scaffolding = Mapper.modelScaffolding.get(entity);
-        SolidAngle sa = Mapper.sa.get(entity);
-        Text text = Mapper.text.get(entity);
-
-        Atmosphere atmosphere = Mapper.atmosphere.get(entity);
-        Cloud cloud = Mapper.cloud.get(entity);
-
-        Attitude attitude = Mapper.attitude.get(entity);
-
-        MotorEngine engine = Mapper.engine.get(entity);
-
-        Fade fade = Mapper.fade.get(entity);
+        // Component retrieval
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var graph = Mapper.graph.get(entity);
+        var celestial = Mapper.celestial.get(entity);
+        var model = Mapper.model.get(entity);
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+        var sa = Mapper.sa.get(entity);
+        var text = Mapper.text.get(entity);
+        var atmosphere = Mapper.atmosphere.get(entity);
+        var cloud = Mapper.cloud.get(entity);
+        var attitude = Mapper.attitude.get(entity);
+        var engine = Mapper.engine.get(entity);
+        var fade = Mapper.fade.get(entity);
 
         boolean isPlanet = atmosphere != null || cloud != null;
         boolean isSatellite = attitude != null;
@@ -70,7 +75,7 @@ public class ModelInitializer extends InitSystem {
         initializeModel(base, body, model, sa, text, scaffolding, graph);
 
         // Init billboard
-        if(isBillboard) {
+        if (isBillboard) {
             initializeBillboard(sa, text);
         }
 
@@ -89,7 +94,58 @@ public class ModelInitializer extends InitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
+        var body = entity.getComponent(Body.class);
+        var model = entity.getComponent(Model.class);
+        var graph = entity.getComponent(GraphNode.class);
+        var atmosphere = entity.getComponent(Atmosphere.class);
+        var cloud = entity.getComponent(Cloud.class);
+        var attitude = entity.getComponent(Attitude.class);
+        var parentOrientation = entity.getComponent(ParentOrientation.class);
+        var engine = entity.getComponent(MotorEngine.class);
+        var fade = entity.getComponent(Fade.class);
 
+        AssetManager manager = AssetBean.manager();
+        if (model != null && model.model != null) {
+            // All models
+            model.model.doneLoading(manager, graph.localTransform, body.cc);
+        }
+        if (atmosphere != null || cloud != null) {
+            // Planets
+            initializeAtmosphere(manager, atmosphere.atmosphere, model.model, body.size);
+            initializeClouds(manager, cloud.cloud);
+        }
+        if (parentOrientation != null) {
+            // Satellites
+            if (parentOrientation.parentOrientation) {
+                parentOrientation.parentrc = graph.parent.getComponent(Rotation.class).rc;
+            }
+            parentOrientation.orientationf = new Matrix4();
+        }
+        if (attitude != null) {
+            // Heliotropic satellites
+            if (attitude.attitudeLocation != null && manager.isLoaded(attitude.attitudeLocation)) {
+                attitude.attitudeServer = manager.get(attitude.attitudeLocation);
+            }
+        }
+        if (engine != null) {
+            // Spacecraft
+            // Broadcast me
+            // TODO activate
+            //EventManager.publish(Event.SPACECRAFT_LOADED, this, this);
+
+            EventManager.instance.subscribe(new SpacecraftRadio(entity), Event.CAMERA_MODE_CMD, Event.SPACECRAFT_STABILISE_CMD, Event.SPACECRAFT_STOP_CMD, Event.SPACECRAFT_THRUST_DECREASE_CMD, Event.SPACECRAFT_THRUST_INCREASE_CMD, Event.SPACECRAFT_THRUST_SET_CMD, Event.SPACECRAFT_MACHINE_SELECTION_CMD);
+        }
+        if (fade != null) {
+            // Billboards -- add depth test attribute, set to false
+            if (model.model != null && model.model.instance != null) {
+                // Disable depth test
+                Array<gaiasky.util.gdx.shader.Material> mats = model.model.instance.materials;
+                for (Material mat : mats) {
+                    mat.set(new DepthTestAttribute(false));
+                }
+            }
+
+        }
     }
 
     private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
@@ -149,7 +205,7 @@ public class ModelInitializer extends InitSystem {
         }
     }
 
-    private void initializeBillboard(SolidAngle sa, Text text){
+    private void initializeBillboard(SolidAngle sa, Text text) {
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = 0.002;
         sa.thresholdPoint = thPoint / 1e9;
@@ -221,6 +277,19 @@ public class ModelInitializer extends InitSystem {
             if (!model.model.isModelLoading() && !model.model.isModelInitialised()) {
                 model.model.initialize(null);
             }
+        }
+    }
+
+    private void initializeAtmosphere(AssetManager manager, AtmosphereComponent atmosphereComponent, ModelComponent modelComponent, float size) {
+        if (atmosphereComponent != null) {
+            // Initialize atmosphere model
+            atmosphereComponent.doneLoading(modelComponent.instance.materials.first(), size);
+        }
+    }
+
+    private void initializeClouds(AssetManager manager, CloudComponent cloudComponent) {
+        if (cloudComponent != null) {
+            cloudComponent.doneLoading(manager);
         }
     }
 }

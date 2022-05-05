@@ -25,7 +25,7 @@ public class IndexInitializer extends InitSystem {
 
         // Unwrap octree objects
         if (Mapper.octant.has(entity)) {
-            Octant octant = Mapper.octant.get(entity);
+            var octant = Mapper.octant.get(entity);
             // TODO add all children to index
             //for (SceneGraphNode ownode : ow.children) {
             //    addToIndex(ownode);

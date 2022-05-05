@@ -21,8 +21,8 @@ public class LocInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        Body body = Mapper.body.get(entity);
-        LocationMark loc = Mapper.loc.get(entity);
+        var body = Mapper.body.get(entity);
+        var loc = Mapper.loc.get(entity);
 
         body.cc = new float[] { 1f, 1f, 1f, 1f };
         loc.location3d = new Vector3();

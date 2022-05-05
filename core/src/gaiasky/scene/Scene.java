@@ -178,8 +178,11 @@ public class Scene {
      */
     public void prepareUpdateSystems() {
         if (engine != null) {
+            // Scene graph update system needs to run first
             SceneGraphUpdateSystem sceneGraphUpdateSystem = new SceneGraphUpdateSystem(Family.all(GraphRoot.class).get(), 0, GaiaSky.instance.time);
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
+
+            // All other systems could run in parallel
 
             // Remove all remaining systems
             engine.removeAllSystems();
