@@ -31,7 +31,8 @@ public class CatalogInfoInitializationSystem extends InitSystem {
     private void initializeCatalogInfo(DatasetDescription dataset) {
         if (dataset.catalogInfo != null) {
             // Insert
-            EventManager.publish(Event.CATALOG_ADD, this, dataset.catalogInfo, false);
+            // TODO activate
+            //EventManager.publish(Event.CATALOG_ADD, this, dataset.catalogInfo, false);
         }
     }
 }
