@@ -1,4 +1,4 @@
-package gaiasky.render;
+package gaiasky.render.api;
 
 import gaiasky.scenegraph.particle.BillboardDataset;
 

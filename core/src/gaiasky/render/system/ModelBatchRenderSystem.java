@@ -8,9 +8,9 @@ package gaiasky.render.system;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.IModelRenderable;
-import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.api.IModelRenderable;
+import gaiasky.render.api.IRenderable;
+import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
 

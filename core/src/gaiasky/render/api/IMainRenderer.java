@@ -3,10 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.api;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.ICamera;
 

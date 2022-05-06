@@ -6,7 +6,7 @@
 package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.util.math.Vector3d;
 
 /**

@@ -9,7 +9,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.IFadeObject;
+import gaiasky.render.api.IFadeObject;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.CatalogInfo;

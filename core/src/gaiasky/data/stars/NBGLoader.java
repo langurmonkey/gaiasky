@@ -9,7 +9,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.ISceneGraphLoader;
 import gaiasky.data.JsonLoader;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.BillboardGalaxy;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.Particle;
@@ -18,15 +18,12 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import org.apfloat.Apfloat;
 
 import java.io.*;
-import java.util.Arrays;
 
 /**
  * Loads the NBG catalog in csv format.

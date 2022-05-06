@@ -25,7 +25,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.render.IPostProcessor.RenderType;
+import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.gdx.contrib.utils.ItemsManager;

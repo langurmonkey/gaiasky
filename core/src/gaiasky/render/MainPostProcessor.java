@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
+import gaiasky.render.api.IPostProcessor;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;

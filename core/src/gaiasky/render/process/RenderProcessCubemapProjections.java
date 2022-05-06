@@ -3,14 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.process;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
@@ -24,12 +25,12 @@ import java.util.Set;
  * the cube map (front, back, up, down, right, left) with a 90 degree fov each
  * and applies a cube map projection (spherical, cylindrical, hammer, fisheye)
  */
-public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver {
+public class RenderProcessCubemapProjections extends RenderProcessCubemap implements IRenderProcess, IObserver {
 
     private final CubemapProjections cubemapEffect;
     private final Copy copy;
 
-    public SGRCubemapProjections() {
+    public RenderProcessCubemapProjections() {
         super();
 
         cubemapEffect = new CubemapProjections(0, 0);
@@ -80,7 +81,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         // This renders the cubemap to [x|y|z][pos|neg]fb
         super.renderCubemapSides(sgr, camera, t, rw, rh, ppb);
 

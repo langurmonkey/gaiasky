@@ -19,9 +19,9 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -30,7 +30,6 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.*;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.IAttribute;
@@ -41,8 +40,6 @@ import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 /**

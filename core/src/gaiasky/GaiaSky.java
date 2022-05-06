@@ -33,8 +33,10 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.*;
 import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.IPostProcessor.PostProcessBean;
-import gaiasky.render.IPostProcessor.RenderType;
+import gaiasky.render.api.IMainRenderer;
+import gaiasky.render.api.IPostProcessor;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.Scene;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager;
@@ -49,7 +51,6 @@ import gaiasky.script.ScriptingServer;
 import gaiasky.util.Logger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -1066,7 +1067,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public FrameBuffer getBackRenderBuffer() {
-        return sgr.getCurrentSGR().getResultBuffer();
+        return sgr.getRenderProcess().getResultBuffer();
     }
 
     /**

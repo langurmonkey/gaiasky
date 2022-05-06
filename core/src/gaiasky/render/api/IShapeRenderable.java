@@ -3,9 +3,10 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.api;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.camera.ICamera;
 
 public interface IShapeRenderable extends IRenderable {

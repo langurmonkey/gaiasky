@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.process;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -11,21 +11,22 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 
 /**
  * Abstract implementation with some useful methods for all SGRs.
  */
-public class SGRAbstract {
+public class RenderProcessAbstract {
 
     protected FrameBuffer resultBuffer;
     protected RenderingContext rc;
     /** Viewport to use in normal mode **/
     protected Viewport extendViewport;
 
-    public SGRAbstract() {
+    public RenderProcessAbstract() {
         // Render context
         rc = new RenderingContext();
         // Viewport

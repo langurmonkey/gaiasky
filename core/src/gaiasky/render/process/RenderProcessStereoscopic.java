@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.process;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -19,7 +19,8 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -40,7 +41,7 @@ import java.util.Set;
  * each eye, and then blends them together on screen with the necessary
  * processing depending on the 3D regime (anaglyph 3D, 3DTV, cross-eye, VR)
  */
-public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
+public class RenderProcessStereoscopic extends RenderProcessAbstract implements IRenderProcess, IObserver {
 
     private static final double EYE_ANGLE_DEG = 1.5;
 
@@ -64,7 +65,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     private final Vector3d aux4d;
     private final Vector3d aux5d;
 
-    public SGRStereoscopic(final SpriteBatch spriteBatch) {
+    public RenderProcessStereoscopic(final SpriteBatch spriteBatch) {
         super();
         // INIT VIEWPORT
         stretchViewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -102,7 +103,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean moveCam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
 
         PerspectiveCamera cam = camera.getCamera();

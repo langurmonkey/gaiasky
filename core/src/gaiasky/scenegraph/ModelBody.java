@@ -15,7 +15,7 @@ import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.ShadowMapImpl;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;

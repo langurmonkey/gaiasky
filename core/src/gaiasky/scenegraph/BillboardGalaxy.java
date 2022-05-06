@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.MaterialComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -17,7 +17,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.HashMap;
 import java.util.Map;

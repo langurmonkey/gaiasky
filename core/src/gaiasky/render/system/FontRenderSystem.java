@@ -7,10 +7,10 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.I3DTextRenderable;
-import gaiasky.render.IAnnotationsRenderable;
-import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.api.I3DTextRenderable;
+import gaiasky.render.api.IAnnotationsRenderable;
+import gaiasky.render.api.IRenderable;
+import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;

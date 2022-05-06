@@ -7,9 +7,9 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.render.IRenderable;
+import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**

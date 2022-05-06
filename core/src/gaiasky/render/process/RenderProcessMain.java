@@ -3,24 +3,25 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.process;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * Normal SGR, takes care of the regular to-screen rendering with no strange
  * modes (stereoscopic, planetarium, cubemap) active
  */
-public class SGR extends SGRAbstract implements ISGR {
+public class RenderProcessMain extends RenderProcessAbstract implements IRenderProcess {
 
-    SGR() {
+    public RenderProcessMain() {
         super();
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean postProcess = postProcessCapture(ppb, fb, rw, rh);
 
         // Viewport

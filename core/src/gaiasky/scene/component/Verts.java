@@ -2,7 +2,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
 
 public class Verts implements Component {
     public boolean blend = true, depth = true, additive = true;

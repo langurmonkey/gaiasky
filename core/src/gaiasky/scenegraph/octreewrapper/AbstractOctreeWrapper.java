@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gaiasky.render.SceneGraphRenderer.RenderGroup.LINE;
+import static gaiasky.render.RenderGroup.LINE;
 
 /**
  * Abstract Octree wrapper with the common parts of the regular Octree wrapper

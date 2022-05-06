@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.render.IRenderable;
+import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;

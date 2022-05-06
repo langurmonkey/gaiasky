@@ -1,4 +1,4 @@
-package gaiasky.render;
+package gaiasky.render.process;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
@@ -18,7 +18,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.*;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.ISceneRenderer;
+import gaiasky.render.RenderGroup;
+import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -43,8 +46,8 @@ import java.util.Map;
  * Renders to OpenVR. Renders basically two scenes, one for each eye, using the
  * OpenVR context.
  */
-public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
-    private static final Log logger = Logger.getLogger(SGROpenVR.class);
+public class RenderProcessOpenVR extends RenderProcessAbstract implements IRenderProcess, IObserver {
+    private static final Log logger = Logger.getLogger(RenderProcessOpenVR.class);
 
     private final VRContext vrContext;
 
@@ -78,7 +81,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
     private Vector2 lastSize;
 
-    public SGROpenVR(final VRContext vrContext, final SpriteBatch spriteBatch) {
+    public RenderProcessOpenVR(final VRContext vrContext, final SpriteBatch spriteBatch) {
         super();
         // VR Context
         this.vrContext = vrContext;
@@ -180,7 +183,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         if (vrContext != null) {
             rc.ppb = null;
             try {
@@ -195,7 +198,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 // Length from headset to controller
                 auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
                 if (controller.instance != null) {
-                    controller.addToRenderLists(SceneGraphRenderer.RenderGroup.MODEL_PIX);
+                    controller.addToRenderLists(RenderGroup.MODEL_PIX);
                 }
             }
 
@@ -204,7 +207,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             // Camera to left
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFb());
+            sgr.renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
             boolean postProcess = postProcessCapture(ppb, fbLeft, rw, rh);
 
@@ -232,7 +235,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             // Camera to right
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFb());
+            sgr.renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
             postProcess = postProcessCapture(ppb, fbRight, rw, rh);
 

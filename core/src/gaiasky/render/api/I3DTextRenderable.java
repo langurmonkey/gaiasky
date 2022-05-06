@@ -3,8 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.api;
 
+import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;

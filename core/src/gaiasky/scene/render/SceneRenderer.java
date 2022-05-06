@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.scene.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -21,6 +21,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderable;
@@ -56,8 +57,8 @@ import static gaiasky.render.RenderGroup.*;
 /**
  * Initializes the render infrastructure renders the scene using different render systems.
  */
-public class SceneGraphRenderer extends AbstractRenderer implements ISceneRenderer, IObserver {
-    private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
+public class SceneRenderer extends AbstractRenderer implements ISceneRenderer, IObserver {
+    private static final Log logger = Logger.getLogger(SceneRenderer.class);
 
     /**
      * Contains the flags representing each type's visibility
@@ -124,7 +125,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
 
     private RenderAssets renderAssets;
 
-    public SceneGraphRenderer(final VRContext vrContext, final GlobalResources globalResources) {
+    public SceneRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
         this.vrContext = vrContext;
         this.globalResources = globalResources;

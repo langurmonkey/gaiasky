@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.process;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -15,7 +15,8 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
@@ -28,7 +29,7 @@ import java.util.Map;
  * Scene graph renderer that renders six scenes in the six cartesian
  * directions (front, back, right, left, up, down) to a cubemap.
  */
-public abstract class SGRCubemap extends SGRAbstract {
+public abstract class RenderProcessCubemap extends RenderProcessAbstract {
 
     protected Vector3 aux1, aux2, aux3, dirBak, upBak, dirUpCrs;
     protected StretchViewport stretchViewport;
@@ -47,7 +48,7 @@ public abstract class SGRCubemap extends SGRAbstract {
     // Flags
     protected boolean zPosFlag, zNegFlag, xPosFlag, xNegFlag, yPosFlag, yNegFlag;
 
-    protected SGRCubemap() {
+    protected RenderProcessCubemap() {
         super();
         aux1 = new Vector3();
         aux3 = new Vector3();
@@ -69,7 +70,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         frameBufferCubeMap = new HashMap<>();
     }
 
-    protected void renderCubemapSides(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, PostProcessBean ppb) {
+    protected void renderCubemapSides(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, PostProcessBean ppb) {
         PerspectiveCamera cam = camera.getCamera();
 
         // Backup fov, direction and up
@@ -180,11 +181,11 @@ public abstract class SGRCubemap extends SGRAbstract {
         EventManager.publish(Event.FOV_CHANGED_CMD, this, fovBak);
     }
 
-    protected void renderFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+    protected void renderFace(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         renderRegularFace90(fb, camera, sgr, ppb, rw, rh, wh, t);
     }
 
-    protected void renderRegularFace45(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+    protected void renderRegularFace45(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
 
         // -----------------
         // |       |       |
@@ -260,7 +261,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         cam.update();
     }
 
-    private void renderFacePart(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+    private void renderFacePart(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         sgr.renderGlowPass(camera, null);
 
         boolean postProcess = postProcessCapture(ppb, fb, wh, wh);
@@ -269,7 +270,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         postProcessRender(ppb, fb, postProcess, camera, rw, rh);
     }
 
-    protected void renderRegularFace90(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+    protected void renderRegularFace90(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         sgr.renderGlowPass(camera, null);
 
         boolean postProcess = postProcessCapture(ppb, fb, wh, wh);

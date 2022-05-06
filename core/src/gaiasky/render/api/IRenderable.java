@@ -3,7 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render;
+package gaiasky.render.api;
+
+import gaiasky.render.ComponentTypes;
 
 /**
  * A top-level renderable interface that all renderable objects must extend

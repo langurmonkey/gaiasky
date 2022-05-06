@@ -21,7 +21,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.*;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
+import gaiasky.render.api.ILineRenderable;
+import gaiasky.render.api.IModelRenderable;
+import gaiasky.render.api.IQuadRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager;
@@ -32,7 +35,6 @@ import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
@@ -53,8 +55,6 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 /**

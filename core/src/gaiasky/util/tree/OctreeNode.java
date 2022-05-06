@@ -12,7 +12,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.ILineRenderable;
+import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;

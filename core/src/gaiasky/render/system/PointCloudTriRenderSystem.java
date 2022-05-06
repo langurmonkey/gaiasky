@@ -6,7 +6,7 @@
 package gaiasky.render.system;
 
 import gaiasky.event.IObserver;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.RenderGroup;
 import gaiasky.util.Pair;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
