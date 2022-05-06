@@ -6,21 +6,18 @@
 package gaiasky.render;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Bits;
-import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -34,23 +31,13 @@ import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.Settings.PointCloudMode;
-import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.IntRenderableSorter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
-import gaiasky.util.gdx.contrib.utils.ShaderLoader;
-import gaiasky.util.gdx.g2d.BitmapFont;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.loader.BitmapFontLoader.BitmapFontParameter;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.gdx.shader.loader.AtmosphereShaderProviderLoader.AtmosphereShaderProviderParameter;
-import gaiasky.util.gdx.shader.loader.GroundShaderProviderLoader.GroundShaderProviderParameter;
-import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader.RelativisticShaderProviderParameter;
-import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader;
-import gaiasky.util.gdx.shader.provider.*;
-import gaiasky.util.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParameter;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
@@ -59,7 +46,6 @@ import gaiasky.vr.openvr.VRContext;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
-import java.nio.IntBuffer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -69,6 +55,7 @@ import static gaiasky.render.SceneGraphRenderer.RenderGroup.*;
  * Initializes the render infrastructure renders the scene using different render systems.
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
+    private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
 
     /**
      * Describes to which render group this node belongs at a particular time
@@ -258,7 +245,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     }
 
-    private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
 
     /**
      * Contains the flags representing each type's visibility
@@ -272,10 +258,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * Alpha values for each type.
      **/
     public float[] alphas;
-
-    private ExtShaderProgram[] lineShaders;
-    private ExtShaderProgram[] lineQuadShaders;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /**
      * Render lists for all render groups.
@@ -311,8 +293,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     // Light glow pre-render
     private FrameBuffer glowFb;
-    private IntModelBatch mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingOpaqueTessellation, mbPixelLightingDepthTessellation;
-    private ExtSpriteBatch spriteBatch, fontBatch;
     private LightPositionUpdater lpu;
 
     private Vector3 aux1;
@@ -329,100 +309,27 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private AtomicBoolean rendering;
 
+    private RenderAssets renderAssets;
+
     public SceneGraphRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
         this.vrContext = vrContext;
         this.globalResources = globalResources;
         this.rendering = new AtomicBoolean(false);
+        this.renderAssets = new RenderAssets(globalResources);
     }
 
-    private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager, String vertexShader, String fragmentShader, String[] names, String[] prepend) {
-        @SuppressWarnings("unchecked") AssetDescriptor<ExtShaderProgram>[] result = new AssetDescriptor[prepend.length];
-
-        int i = 0;
-        for (String prep : prepend) {
-            ShaderProgramParameter spp = new ShaderProgramParameter();
-            spp.prependVertexCode = prep;
-            spp.prependFragmentCode = prep;
-            spp.vertexFile = vertexShader;
-            spp.fragmentFile = fragmentShader;
-            manager.load(names[i], ExtShaderProgram.class, spp);
-            AssetDescriptor<ExtShaderProgram> desc = new AssetDescriptor<>(names[i], ExtShaderProgram.class, spp);
-            result[i] = desc;
-
-            i++;
-        }
-
-        return result;
-    }
 
     @Override
     public void initialize(AssetManager manager) {
-        ShaderLoader.Pedantic = false;
-        ExtShaderProgram.pedantic = false;
-
-        /* DATA LOAD */
-        String[] defines = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
-        String[] names = GlobalResources.combinations(new String[] { "SSR", "Velbuff", "Rel", "Grav" });
-        // Color mapping in shaders
-        String[] definesCmap = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n" });
-        String[] namesCmap = GlobalResources.combinations(new String[] { "SSR", "Velbuff", "Rel", "Grav", "Colmap" });
-
-        // Add shaders to load (no providers)
-        starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
-        spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", TextUtils.concatAll("sprite", names), defines);
-        billboardGroupDesc = loadShader(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl", TextUtils.concatAll("billboard.group", names), defines);
-        pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", TextUtils.concatAll("point.cpu", names), defines);
-        lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
-        lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", TextUtils.concatAll("line.quad", names), defines);
-        lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("line.gpu", names), defines);
-        galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
-        particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
-        orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
-
-        // Initialize point cloud shaders - depends on point cloud mode
-        final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
-        particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffix + ".vertex.glsl", "shader/particle.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
-        starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
-        variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
-        // Regular stars
-        starPointDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.point", names), defines);
-
-        // Add shaders to load (with providers)
-        manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
-        manager.load("per-vertex-lighting-additive", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.additive.fragment.glsl"));
-        manager.load("per-vertex-diffuse", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.diffuse.fragment.glsl"));
-        manager.load("per-vertex-lighting-grid", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.grid.fragment.glsl"));
-        manager.load("per-vertex-lighting-recgrid", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.gridrec.fragment.glsl"));
-        manager.load("per-vertex-lighting-starsurface", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
-        manager.load("per-vertex-lighting-beam", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/beam.fragment.glsl"));
-        manager.load("per-vertex-lighting-thruster", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/thruster.fragment.glsl"));
-
-        manager.load("per-pixel-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/normal.fragment.glsl"));
-        manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl", "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
-        manager.load("per-pixel-lighting-dust", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/dust.fragment.glsl"));
-        manager.load("per-pixel-lighting-depth", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/depth.fragment.glsl"));
-        manager.load("per-pixel-lighting-depth-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.depth.control.glsl", "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.depth.fragment.glsl"));
-        manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
-        manager.load("per-pixel-lighting-opaque-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl", "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
-
-        manager.load("skybox", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/skybox.vertex.glsl", "shader/skybox.fragment.glsl"));
-        manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));
-        manager.load("cloud", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/cloud.vertex.glsl", "shader/cloud.fragment.glsl"));
-        manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
-
-        // Add fonts to load
-        BitmapFontParameter bfp = new BitmapFontParameter();
-        bfp.magFilter = TextureFilter.Linear;
-        bfp.minFilter = TextureFilter.Linear;
-        manager.load("skins/fonts/main-font.fnt", BitmapFont.class, bfp);
-        manager.load("skins/fonts/font2d.fnt", BitmapFont.class, bfp);
-        manager.load("skins/fonts/font-titles.fnt", BitmapFont.class, bfp);
+        // Initialize the render assets.
+        renderAssets.initialize(manager);
 
         stars = new Array<>();
 
         renderSystems = new Array<>();
 
+        // Initialize the runnables.
         noDepthTestR = (renderSystem, renderList, camera) -> {
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(false);
@@ -467,179 +374,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    private ExtShaderProgram[] fetchShaderProgram(final AssetManager manager, final AssetDescriptor<ExtShaderProgram>[] descriptors, final String... names) {
-        int n = descriptors.length;
-        ExtShaderProgram[] shaders = new ExtShaderProgram[n];
-
-        for (int i = 0; i < n; i++) {
-            shaders[i] = manager.get(descriptors[i]);
-            if (!shaders[i].isCompiled()) {
-                logger.error(names[i] + " shader compilation failed:\n" + shaders[i].getLog());
-            }
-        }
-        return shaders;
-    }
-
     public void doneLoading(final AssetManager manager) {
-        IntBuffer intBuffer = BufferUtils.newIntBuffer(16);
-        Gdx.gl20.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer);
-        int maxTexSize = intBuffer.get();
-        logger.info("Max texture size: " + maxTexSize + "^2 pixels");
+        // Prepare render assets
+        renderAssets.doneLoading(manager);
 
-        String[] names = GlobalResources.combinations(new String[] { " (ssr)", " (vel)", " (rel)", " (grav)" });
-
-        /*
-          STAR BILLBOARD SHADER
-         */
-        ExtShaderProgram[] starBillboardShaders = fetchShaderProgram(manager, starBillboardDesc, TextUtils.concatAll("star.billboard", names));
-
-        /*
-         * GALAXY SHADER
-         */
-        ExtShaderProgram[] galShaders = fetchShaderProgram(manager, galDesc, TextUtils.concatAll("gal", names));
-
-        /*
-         * FONT SHADER
-         */
-        ExtShaderProgram distanceFieldFontShader = manager.get("shader/font.vertex.glsl");
-        if (!distanceFieldFontShader.isCompiled()) {
-            logger.error("Distance field font shader compilation failed:\n" + distanceFieldFontShader.getLog());
-        }
-
-        /*
-         * SPRITE SHADER
-         */
-        ExtShaderProgram[] spriteShaders = fetchShaderProgram(manager, spriteDesc, TextUtils.concatAll("sprite", names));
-
-        /*
-         * POINT CPU
-         */
-        ExtShaderProgram[] pointShaders = fetchShaderProgram(manager, pointDesc, TextUtils.concatAll("point.cpu", names));
-
-        /*
-         * LINE CPU
-         */
-        lineShaders = fetchShaderProgram(manager, lineDesc, TextUtils.concatAll("line.cpu", names));
-
-        /*
-         * LINE QUAD
-         */
-        lineQuadShaders = fetchShaderProgram(manager, lineQuadDesc, TextUtils.concatAll("line.quad", names));
-
-        /*
-         * LINE GPU
-         */
-        ExtShaderProgram[] lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, TextUtils.concatAll("line.gpu", names));
-
-        /*
-         * BILLBOARD GROUP
-         */
-        ExtShaderProgram[] billboardGroupShaders = fetchShaderProgram(manager, billboardGroupDesc, TextUtils.concatAll("billboard.group", names));
-
-        /*
-         * PARTICLE EFFECT - default and relativistic
-         */
-        ExtShaderProgram[] particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, TextUtils.concatAll("particle.effect", names));
-
-        /*
-         * PARTICLE GROUP (TRI) - default and relativistic
-         */
-        ExtShaderProgram[] particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, TextUtils.concatAll("particle.group", names));
-
-        /*
-         * STAR GROUP (TRI) - default and relativistic
-         */
-        ExtShaderProgram[] starGroupShaders = fetchShaderProgram(manager, starGroupDesc, TextUtils.concatAll("star.group", names));
-
-        /*
-         * VARIABLE GROUP - default and relativistic
-         */
-        ExtShaderProgram[] variableGroupShaders = fetchShaderProgram(manager, variableGroupDesc, TextUtils.concatAll("variable.group", names));
-
-        /*
-         * STAR POINT
-         */
-        ExtShaderProgram[] starPointShaders = fetchShaderProgram(manager, starPointDesc, TextUtils.concatAll("star.point", names));
-
-        /*
-         * ORBITAL ELEMENTS PARTICLES - default and relativistic
-         */
-        ExtShaderProgram[] orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
-
+        // Initialize render lists
         RenderGroup[] renderGroups = values();
         renderLists = new Array<>(false, renderGroups.length);
         for (int i = 0; i < renderGroups.length; i++) {
             renderLists.add(new Array<>(false, 20));
         }
-
-        // Per-vertex lighting shaders
-        IntShaderProvider perVertexLighting = manager.get("per-vertex-lighting");
-        IntShaderProvider perVertexLightingAdditive = manager.get("per-vertex-lighting-additive");
-        IntShaderProvider perVertexDiffuse = manager.get("per-vertex-diffuse");
-        IntShaderProvider perVertexLightingGrid = manager.get("per-vertex-lighting-grid");
-        IntShaderProvider perVertexLightingRecGrid = manager.get("per-vertex-lighting-recgrid");
-        IntShaderProvider perVertexLightingStarSurface = manager.get("per-vertex-lighting-starsurface");
-        IntShaderProvider perVertexLightingBeam = manager.get("per-vertex-lighting-beam");
-        IntShaderProvider perVertexLightingThruster = manager.get("per-vertex-lighting-thruster");
-
-        // Per-pixel lighting shaders
-        IntShaderProvider perPixelLighting = manager.get("per-pixel-lighting");
-        TessellationShaderProvider perPixelLightingTessellation = manager.get("per-pixel-lighting-tessellation");
-        IntShaderProvider perPixelLightingDust = manager.get("per-pixel-lighting-dust");
-        IntShaderProvider perPixelLightingDepth = manager.get("per-pixel-lighting-depth");
-        IntShaderProvider perPixelLightingDepthTessellation = manager.get("per-pixel-lighting-depth-tessellation");
-        IntShaderProvider perPixelLightingOpaque = manager.get("per-pixel-lighting-opaque");
-        TessellationShaderProvider perPixelLightingOpaqueTessellation = manager.get("per-pixel-lighting-opaque-tessellation");
-
-        // Others
-        IntShaderProvider skybox = manager.get("skybox");
-        IntShaderProvider atmosphere = manager.get("atmosphere");
-        IntShaderProvider cloud = manager.get("cloud");
-
-        // Create empty sorter
-        IntRenderableSorter noSorter = (camera, renderables) -> {
-            // Does nothing
-        };
-
-        // Create model batches
-        IntModelBatch mbVertexLighting = new IntModelBatch(perVertexLighting, noSorter);
-        IntModelBatch mbVertexLightingAdditive = new IntModelBatch(perVertexLightingAdditive, noSorter);
-        IntModelBatch mbVertexDiffuse = new IntModelBatch(perVertexDiffuse, noSorter);
-        IntModelBatch mbVertexLightingStarSurface = new IntModelBatch(perVertexLightingStarSurface, noSorter);
-        IntModelBatch mbVertexLightingBeam = new IntModelBatch(perVertexLightingBeam, noSorter);
-        IntModelBatch mbVertexLightingThruster = new IntModelBatch(perVertexLightingThruster, noSorter);
-        IntModelBatch mbVertexLightingGrid = new IntModelBatch(perVertexLightingGrid, noSorter);
-        IntModelBatch mbVertexLightingRecGrid = new IntModelBatch(perVertexLightingRecGrid, noSorter);
-
-        IntModelBatch mbPixelLighting = new IntModelBatch(perPixelLighting, noSorter);
-        IntModelBatch mbPixelLightingDust = new IntModelBatch(perPixelLightingDust, noSorter);
-        mbPixelLightingDepth = new IntModelBatch(perPixelLightingDepth, noSorter);
-        mbPixelLightingOpaque = new IntModelBatch(perPixelLightingOpaque, noSorter);
-        IntModelBatch mbPixelLightingTessellation = new IntModelBatch(perPixelLightingTessellation, noSorter);
-        mbPixelLightingOpaqueTessellation = new IntModelBatch(perPixelLightingOpaqueTessellation, noSorter);
-        mbPixelLightingDepthTessellation = new IntModelBatch(perPixelLightingDepthTessellation, noSorter);
-
-        IntModelBatch mbSkybox = new IntModelBatch(skybox, noSorter);
-        IntModelBatch mbAtmosphere = new IntModelBatch(atmosphere, noSorter);
-        IntModelBatch mbCloud = new IntModelBatch(cloud, noSorter);
-
-        // Fonts - all of these are distance field fonts
-        BitmapFont font3d = manager.get("skins/fonts/main-font.fnt");
-        BitmapFont font2d = manager.get("skins/fonts/font2d.fnt");
-        font2d.getData().setScale(0.5f);
-        BitmapFont fontTitles = manager.get("skins/fonts/font-titles.fnt");
-
-        // Sprites
-        spriteBatch = globalResources.getExtSpriteBatch();
-        spriteBatch.enableBlending();
-
-        // Font batch - additive, no depth writes
-        // Two model batches, for front (models), back and atmospheres
-        fontBatch = new ExtSpriteBatch(2000, distanceFieldFontShader);
-        fontBatch.enableBlending();
-        fontBatch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE);
-
-        ComponentType[] comps = ComponentType.values();
 
         // Set reference
         visible = new ComponentTypes();
@@ -652,6 +396,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Invisible are always visible :_D
         visible.set(ComponentType.Invisible.ordinal());
 
+        ComponentType[] comps = ComponentType.values();
         times = new long[comps.length];
         alphas = new float[comps.length];
         for (int i = 0; i < comps.length; i++) {
@@ -671,143 +416,141 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         sgr = null;
 
         /*
-         *
-         * ======= INITIALIZE RENDER COMPONENTS =======
-         *
+         * ======= INITIALIZE RENDER SYSTEMS =======
          */
 
         final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
 
         // POINTS
-        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
+        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // SKYBOX - (MW panorama, CMWB)
-        AbstractRenderSystem skyboxProc = new ModelBatchRenderSystem(SKYBOX, alphas, mbSkybox);
+        AbstractRenderSystem skyboxProc = new ModelBatchRenderSystem(SKYBOX, alphas, renderAssets.mbSkybox);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
-        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_BG, alphas, mbVertexDiffuse);
+        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_BG, alphas, renderAssets.mbVertexDiffuse);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
-        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(MODEL_VERT_GRID, alphas, mbVertexLightingGrid);
+        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
         modelGridsProc.addPostRunnables(clearDepthR);
         // RECURSIVE GRID
-        AbstractRenderSystem modelRecGridProc = new ModelBatchRenderSystem(MODEL_VERT_RECGRID, alphas, mbVertexLightingRecGrid);
+        AbstractRenderSystem modelRecGridProc = new ModelBatchRenderSystem(MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
         modelRecGridProc.addPreRunnables(regularBlendR, depthTestR);
 
         // ANNOTATIONS - (grids)
-        AbstractRenderSystem annotationsProc = new FontRenderSystem(FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
+        AbstractRenderSystem annotationsProc = new FontRenderSystem(FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(BILLBOARD_STAR, alphas, starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars.ordinal());
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);
 
         // BILLBOARD GALAXIES
-        AbstractRenderSystem billboardGalaxiesProc = new BillboardStarRenderSystem(BILLBOARD_GAL, alphas, galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies.ordinal());
+        AbstractRenderSystem billboardGalaxiesProc = new BillboardStarRenderSystem(BILLBOARD_GAL, alphas, renderAssets.galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies.ordinal());
         billboardGalaxiesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // BILLBOARD SPRITES
-        AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(BILLBOARD_SPRITE, alphas, spriteShaders, ComponentType.Clusters.ordinal());
+        AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, ComponentType.Clusters.ordinal());
         billboardSpritesProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
 
         // LINES CPU
         AbstractRenderSystem lineProc = getLineRenderSystem();
 
         // LINES GPU
-        AbstractRenderSystem lineGpuProc = new VertGPURenderSystem<>(LINE_GPU, alphas, lineGpuShaders, true);
+        AbstractRenderSystem lineGpuProc = new VertGPURenderSystem<>(LINE_GPU, alphas, renderAssets.lineGpuShaders, true);
         lineGpuProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // POINTS CPU
-        AbstractRenderSystem pointProc = new PointRenderSystem(POINT, alphas, pointShaders);
+        AbstractRenderSystem pointProc = new PointRenderSystem(POINT, alphas, renderAssets.pointShaders);
 
         // POINTS GPU
-        AbstractRenderSystem pointGpuProc = new VertGPURenderSystem<>(POINT_GPU, alphas, lineGpuShaders, false);
+        AbstractRenderSystem pointGpuProc = new VertGPURenderSystem<>(POINT_GPU, alphas, renderAssets.lineGpuShaders, false);
         pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODELS DUST AND MESH
-        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(MODEL_PIX_DUST, alphas, mbPixelLightingDust);
-        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive);
+        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
         // MODEL PER-PIXEL-LIGHTING EARLY
-        AbstractRenderSystem modelPerPixelLightingEarly = new ModelBatchRenderSystem(MODEL_PIX_EARLY, alphas, mbPixelLighting);
+        AbstractRenderSystem modelPerPixelLightingEarly = new ModelBatchRenderSystem(MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
         // MODEL PER-VERTEX-LIGHTING EARLY
-        AbstractRenderSystem modelPerVertexLightingEarly = new ModelBatchRenderSystem(MODEL_VERT_EARLY, alphas, mbVertexLighting);
+        AbstractRenderSystem modelPerVertexLightingEarly = new ModelBatchRenderSystem(MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
 
         // MODEL DIFFUSE
-        AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(MODEL_DIFFUSE, alphas, mbVertexDiffuse);
+        AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
 
         // MODEL PER-PIXEL-LIGHTING
-        AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(MODEL_PIX, alphas, mbPixelLighting);
+        AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(MODEL_PIX, alphas, renderAssets.mbPixelLighting);
 
         // MODEL PER-PIXEL-LIGHTING-TESSELLATION
-        AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchTessellationRenderSystem(MODEL_PIX_TESS, alphas, mbPixelLightingTessellation);
+        AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchTessellationRenderSystem(MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
         modelPerPixelLightingTess.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL BEAM
-        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(MODEL_VERT_BEAM, alphas, mbVertexLightingBeam);
+        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
 
         // MODEL THRUSTER
-        AbstractRenderSystem modelThrusterProc = new ModelBatchRenderSystem(MODEL_VERT_THRUSTER, alphas, mbVertexLightingThruster);
+        AbstractRenderSystem modelThrusterProc = new ModelBatchRenderSystem(MODEL_VERT_THRUSTER, alphas, renderAssets.mbVertexLightingThruster);
 
         // GALAXY
-        BillboardGroupRenderSystem billboardGroupRenderSystem = new BillboardGroupRenderSystem(BILLBOARD_GROUP, alphas, billboardGroupShaders);
+        BillboardGroupRenderSystem billboardGroupRenderSystem = new BillboardGroupRenderSystem(BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
 
         // PARTICLE EFFECTS
-        AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderSystem(null, alphas, particleEffectShaders);
+        AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderSystem(null, alphas, renderAssets.particleEffectShaders);
         particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         particleEffectsProc.addPostRunnables(regularBlendR);
 
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = switch (pcm) {
-            case TRIANGLES -> new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
-            case TRIANGLES_INSTANCED -> new ParticleGroupInstRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
-            case POINTS -> new ParticleGroupPointRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
+            case TRIANGLES -> new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case TRIANGLES_INSTANCED -> new ParticleGroupInstRenderSystem(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case POINTS -> new ParticleGroupPointRenderSystem(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
         };
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP
         AbstractRenderSystem starGroupProc = switch (pcm) {
-            case TRIANGLES -> new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders);
-            case TRIANGLES_INSTANCED -> new StarGroupInstRenderSystem(STAR_GROUP, alphas, starGroupShaders);
-            case POINTS -> new StarGroupPointRenderSystem(STAR_GROUP, alphas, starGroupShaders);
+            case TRIANGLES -> new StarGroupRenderSystem(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES_INSTANCED -> new StarGroupInstRenderSystem(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case POINTS -> new StarGroupPointRenderSystem(STAR_GROUP, alphas, renderAssets.starGroupShaders);
         };
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // VARIABLE GROUP
         AbstractRenderSystem variableGroupProc = switch (pcm) {
-            case TRIANGLES -> new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
-            case TRIANGLES_INSTANCED -> new VariableGroupInstRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
-            case POINTS -> new VariableGroupPointRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
+            case TRIANGLES -> new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case TRIANGLES_INSTANCED -> new VariableGroupInstRenderSystem(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case POINTS -> new VariableGroupPointRenderSystem(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
         };
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // ORBITAL ELEMENTS PARTICLES
-        AbstractRenderSystem orbitElemParticlesProc = new OrbitalElementsParticlesRenderSystem(ORBITAL_ELEMENTS_PARTICLE, alphas, orbitElemShaders);
+        AbstractRenderSystem orbitElemParticlesProc = new OrbitalElementsParticlesRenderSystem(ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
         orbitElemParticlesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         orbitElemParticlesProc.addPostRunnables(regularBlendR, depthWritesR);
         // ORBITAL ELEMENTS GROUP
-        AbstractRenderSystem orbitElemGroupProc = new OrbitalElementsGroupRenderSystem(ORBITAL_ELEMENTS_GROUP, alphas, orbitElemShaders);
+        AbstractRenderSystem orbitElemGroupProc = new OrbitalElementsGroupRenderSystem(ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
         orbitElemGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         orbitElemGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // MODEL STARS
-        AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(MODEL_VERT_STAR, alphas, mbVertexLightingStarSurface);
+        AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
 
         // LABELS
-        AbstractRenderSystem labelsProc = new FontRenderSystem(FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
+        AbstractRenderSystem labelsProc = new FontRenderSystem(FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
 
         // BILLBOARD SSO
-        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
+        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders, "data/tex/base/sso.png", -1);
         billboardSSOProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
 
         // MODEL ATMOSPHERE
-        AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(MODEL_ATM, alphas, mbAtmosphere) {
+        AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
             @Override
             public float getAlpha(IRenderable s) {
                 return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
@@ -820,7 +563,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         };
 
         // MODEL CLOUDS
-        AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(MODEL_CLOUD, alphas, mbCloud);
+        AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(MODEL_CLOUD, alphas, renderAssets.mbCloud);
 
         // SHAPES
         AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas, globalResources.getSpriteShader());
@@ -975,25 +718,25 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             billboardStarsProc.render(stars, camera, 0, null);
 
             // Render models
-            mbPixelLightingOpaque.begin(camera.getCamera());
+            renderAssets.mbPixelLightingOpaque.begin(camera.getCamera());
             for (IRenderable model : models) {
                 if (model instanceof ModelBody) {
                     ModelBody mb = (ModelBody) model;
-                    mb.render(mbPixelLightingOpaque, RenderGroup.MODEL_PIX, 1, 0, false);
+                    mb.render(renderAssets.mbPixelLightingOpaque, RenderGroup.MODEL_PIX, 1, 0, false);
                 }
             }
-            mbPixelLightingOpaque.end();
+            renderAssets.mbPixelLightingOpaque.end();
 
             // Render tessellated models
             if (modelsTess.size > 0) {
-                mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
+                renderAssets.mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
                 for (IRenderable model : modelsTess) {
                     if (model instanceof ModelBody) {
                         ModelBody mb = (ModelBody) model;
-                        mb.render(mbPixelLightingOpaqueTessellation, RenderGroup.MODEL_PIX, 1, 0, false);
+                        mb.render(renderAssets.mbPixelLightingOpaqueTessellation, RenderGroup.MODEL_PIX, 1, 0, false);
                     }
                 }
-                mbPixelLightingOpaqueTessellation.end();
+                renderAssets.mbPixelLightingOpaqueTessellation.end();
             }
             //}
 
@@ -1064,9 +807,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // No tessellation
-            mbPixelLightingDepth.begin(cameraLight);
-            candidate.render(mbPixelLightingDepth, 1, 0, null, RenderGroup.MODEL_PIX);
-            mbPixelLightingDepth.end();
+            renderAssets.mbPixelLightingDepth.begin(cameraLight);
+            candidate.render(renderAssets.mbPixelLightingDepth, 1, 0, null, RenderGroup.MODEL_PIX);
+            renderAssets.mbPixelLightingDepth.end();
 
             // Save frame buffer and combined matrix
             candidate.shadow = shadowNRender;
@@ -1134,9 +877,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // Tessellation
-                mbPixelLightingDepthTessellation.begin(cameraLight);
-                candidate.render(mbPixelLightingDepthTessellation, 1, 0, rc, RenderGroup.MODEL_PIX);
-                mbPixelLightingDepthTessellation.end();
+                renderAssets.mbPixelLightingDepthTessellation.begin(cameraLight);
+                candidate.render(renderAssets.mbPixelLightingDepthTessellation, 1, 0, rc, RenderGroup.MODEL_PIX);
+                renderAssets.mbPixelLightingDepthTessellation.end();
 
                 // Save frame buffer and combined matrix
                 candidate.shadow = shadowNRender;
@@ -1583,11 +1326,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem sys;
         if (Settings.settings.scene.renderer.isNormalLineRenderer()) {
             // Normal
-            sys = new LineRenderSystem(LINE, alphas, lineShaders);
+            sys = new LineRenderSystem(LINE, alphas, renderAssets.lineShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         } else {
             // Quad
-            sys = new LineQuadRenderSystem(LINE, alphas, lineQuadShaders);
+            sys = new LineQuadRenderSystem(LINE, alphas, renderAssets.lineQuadShaders);
             sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
         return sys;

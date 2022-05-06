@@ -100,6 +100,13 @@ public class IntModelBatch implements Disposable {
 
 	/** Construct a ModelBatch
 	 * @param shaderProvider The {@link IntShaderProvider} to use, will be disposed when this ModelBatch is disposed.
+	 **/
+	public IntModelBatch(final IntShaderProvider shaderProvider) {
+		this(null, shaderProvider, null);
+	}
+
+	/** Construct a ModelBatch
+	 * @param shaderProvider The {@link IntShaderProvider} to use, will be disposed when this ModelBatch is disposed.
 	 * @param sorter The {@link IntRenderableSorter} to use. */
 	public IntModelBatch(final IntShaderProvider shaderProvider, final IntRenderableSorter sorter) {
 		this(null, shaderProvider, sorter);

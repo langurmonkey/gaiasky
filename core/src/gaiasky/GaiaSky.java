@@ -118,11 +118,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private Runnable updateRenderProcess;
 
     /**
-     * This thread updates the scene graph object.
-     */
-    private ServiceThread updateScenegraphThread;
-
-    /**
      * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
      * present or SteamVR is not installed.
      */
@@ -636,15 +631,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         updateProcess = () -> {
             // Process ECS
-            scene.update(time);
+            scene.update(time, cameraManager);
 
+            // Update scene graph
             sceneGraph.update(time, cameraManager);
             // Swap proximity buffers
             cameraManager.swapBuffers();
         };
-        //updateScenegraphThread = new ServiceThread("scenegraph-updater");
-        //updateScenegraphThread.setDaemon(true);
-        //updateScenegraphThread.start();
 
         /*
          * SCENE GRAPH RENDERER
@@ -912,11 +905,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Stop
         if (running != null) {
             running.set(false);
-        }
-
-        // Stop thread
-        if (updateScenegraphThread != null) {
-            updateScenegraphThread.stopDaemon();
         }
 
         // Revert back-buffer resolution
@@ -1278,9 +1266,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Update scene graph in a thread (sync for now).
         updateProcess.run();
-        // Use service thread
-        //updateScenegraphThread.offerTask(updateProcess);
-        //updateScenegraphThread.waitCurrentTask();
 
     }
 

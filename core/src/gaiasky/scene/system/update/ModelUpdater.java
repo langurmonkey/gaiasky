@@ -8,13 +8,15 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.*;
+import gaiasky.scene.component.AffineTransformations;
+import gaiasky.scene.component.Body;
+import gaiasky.scene.component.GraphNode;
+import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ITransform;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
-import gaiasky.util.Nature;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -59,13 +61,12 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
 
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
-
-        Body body = Mapper.body.get(entity);
-        Model model = Mapper.model.get(entity);
-        GraphNode graph = Mapper.graph.get(entity);
-        ModelScaffolding scaffolding = Mapper.modelScaffolding.get(entity);
-        Atmosphere atmosphere = Mapper.atmosphere.get(entity);
-        Cloud cloud = Mapper.cloud.get(entity);
+        var body = Mapper.body.get(entity);
+        var model = Mapper.model.get(entity);
+        var graph = Mapper.graph.get(entity);
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+        var atmosphere = Mapper.atmosphere.get(entity);
+        var cloud = Mapper.cloud.get(entity);
 
         // Update light with global position
         if (model.model != null && body.distToCamera <= LIGHT_X1) {
@@ -126,7 +127,7 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
                 graph.translation.getMatrix(localTransform).scl(size).rotate(QF);
             } else if (hasAttitude) {
                 // Satellites have attitude
-                Attitude attitude = Mapper.attitude.get(entity);
+                var attitude = Mapper.attitude.get(entity);
 
                 // Update attitude for current time if needed
                 if (time.getHdiff() != 0) {
@@ -159,7 +160,6 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
                 MD4.putIn(localTransform);
             } else if (rotation.rc != null && time.getHdiff() != 0) {
                 // Planets and moons have rotation components
-                rotation.rc.update(time);
                 graph.translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rotation.rc.ascendingNode).rotate(0, 0, 1, (float) (rotation.rc.inclination + rotation.rc.axialTilt)).rotate(0, 1, 0, (float) rotation.rc.angle);
                 graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rotation.rc.ascendingNode).rotate(0, 0, 1, (float) (rotation.rc.inclination + rotation.rc.axialTilt));
             } else {
@@ -170,13 +170,6 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
         } else {
             // Nothing whatsoever
             localTransform.set(graph.localTransform);
-        }
-
-        // Compute spherical coordinates
-        if (time.getHdiff() != 0) {
-            Vector3d aux3 = D31;
-            Coordinates.cartesianToSpherical(body.pos, aux3);
-            body.posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
         }
 
         // Apply transformations
