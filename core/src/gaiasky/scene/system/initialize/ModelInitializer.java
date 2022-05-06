@@ -78,14 +78,15 @@ public class ModelInitializer extends InitSystem {
             initializeBillboard(sa, text);
         }
 
+        if (isSatellite) {
+            initializeSatellite(attitude);
+        }
+
         if (isPlanet) {
             // Initialize planet
             initializePlanet(base, body, scaffolding, atmosphere, cloud);
             setColor2Data(body, celestial, 0.6f);
 
-            if (isSatellite) {
-                initializeSatellite(attitude);
-            }
         } else {
             setColor2Data(body, celestial, 0.1f);
         }
@@ -234,6 +235,7 @@ public class ModelInitializer extends InitSystem {
     }
 
     public void initializeSatellite(Attitude attitude) {
+        attitude.nonRotatedPos = new Vector3d();
         if (attitude.attitudeLocation != null && !attitude.attitudeLocation.isBlank()) {
             AssetBean.manager().load(attitude.attitudeLocation, IAttitudeServer.class, new AttitudeLoaderParameters(attitude.provider));
         }

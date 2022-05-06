@@ -50,7 +50,7 @@ public class ArchetypeInitializer {
             addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);
 
             // HeliotropicSatellite
-            addArchetype(HeliotropicSatellite.class.getName(), Satellite.class.getName(), Attitude.class);
+            addArchetype(HeliotropicSatellite.class.getName(), Satellite.class.getName(), Attitude.class, TagHeliotropic.class);
 
             // GenericSpacecraft
             addArchetype(GenericSpacecraft.class.getName(), Satellite.class.getName(), RenderFlags.class);
@@ -62,7 +62,7 @@ public class ArchetypeInitializer {
             addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class);
 
             // Billboard
-            addArchetype(Billboard.class.getName(), ModelBody.class.getName(), Fade.class);
+            addArchetype(Billboard.class.getName(), ModelBody.class.getName(), TagQuaternionOrientation.class, Fade.class);
 
             // BillboardGalaxy
             addArchetype(BillboardGalaxy.class.getName(), Billboard.class.getName());
@@ -104,7 +104,7 @@ public class ArchetypeInitializer {
             addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class);
 
             // Area
-            addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class, AuxVec.class);
+            addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class);
 
             // ParticleGroup
             addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class);

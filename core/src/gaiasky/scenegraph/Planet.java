@@ -124,11 +124,11 @@ public class Planet extends ModelBody implements ILineRenderable {
         if (time.getHdiff() == 0) {
             return;
         }
-        Vector3d aux3 = D31.get();
         // Load this object's equatorial cartesian coordinates into pos
         coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
-        // Convert to cartesian coordinates and put them in aux3 vector
+        // Convert to spherical coordinates and put them in aux3 vector
+        Vector3d aux3 = D31.get();
         Coordinates.cartesianToSpherical(pos, aux3);
         posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
         // Update angle

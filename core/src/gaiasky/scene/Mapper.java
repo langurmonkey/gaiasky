@@ -7,6 +7,7 @@ import gaiasky.scene.component.*;
  * Centralized repository of component mappers.
  */
 public class Mapper {
+    // Data components
     public static final ComponentMapper<Base> base = ComponentMapper.getFor(Base.class);
     public static final ComponentMapper<Id> id = ComponentMapper.getFor(Id.class);
     public static final ComponentMapper<Hip> hip = ComponentMapper.getFor(Hip.class);
@@ -47,5 +48,9 @@ public class Mapper {
     public static final ComponentMapper<OrbitElementsSet> orbitElementsSet = ComponentMapper.getFor(OrbitElementsSet.class);
     public static final ComponentMapper<ParentOrientation> parentOrientation = ComponentMapper.getFor(ParentOrientation.class);
     public static final ComponentMapper<Raymarching> raymarching = ComponentMapper.getFor(Raymarching.class);
+
+    // Tags
+    public static final ComponentMapper<TagQuaternionOrientation> tagQuatOrientation = ComponentMapper.getFor(TagQuaternionOrientation.class);
+    public static final ComponentMapper<TagHeliotropic> tagHeliotropic = ComponentMapper.getFor(TagHeliotropic.class);
 
 }

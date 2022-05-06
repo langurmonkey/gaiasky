@@ -56,11 +56,6 @@ public class BillboardGalaxy extends Billboard {
     }
 
     @Override
-    public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-        super.updateLocalValues(time, camera);
-    }
-
-    @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
             double thPoint = (TH_ANGLE_POINT_M * camera.getFovFactor()) / sizeScaleFactor;

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import gaiasky.GaiaSky;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.initialize.*;
+import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scene.system.update.SceneGraphUpdateSystem;
 import gaiasky.scene.view.PositionEntity;
 import gaiasky.scenegraph.Position;
@@ -185,12 +186,14 @@ public class Scene {
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
 
             // All other systems could run in parallel
+            ModelUpdater modelUpdateSystem = new ModelUpdater(Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get(), 1);
 
             // Remove all remaining systems
             engine.removeAllSystems();
 
             // Add first updater: scene graph update system
             engine.addSystem(sceneGraphUpdateSystem);
+            engine.addSystem(modelUpdateSystem);
         }
     }
 
