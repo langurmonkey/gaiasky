@@ -8,6 +8,7 @@ package gaiasky.data.orbit;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.data.OrbitRefresher;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.gui.ConsoleLogger;
@@ -27,7 +28,8 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
- * Samples an orbit for a particular Body.
+ * Samples an orbit for a particular Body. This guy is typically
+ * used to load orbit data by the {@link OrbitRefresher} daemon.
  */
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private static boolean writeData = false;

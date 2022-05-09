@@ -21,6 +21,9 @@ import gaiasky.util.concurrent.ServiceThread;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
+/**
+ * Refreshes sampled orbit data from the underlying data provider algorithms.
+ */
 public class OrbitRefresher implements IObserver {
     private static final Log logger = Logger.getLogger(OrbitRefresher.class);
 
@@ -29,7 +32,6 @@ public class OrbitRefresher implements IObserver {
     // Maximum number of pages to send to load every batch.
     protected static final int MAX_LOAD_CHUNK = 5;
 
-    private static OrbitRefresher instance;
     private final Queue<OrbitDataLoaderParameter> toLoadQueue;
     private final OrbitUpdaterThread daemon;
     private final boolean loadingPaused = false;
@@ -37,10 +39,9 @@ public class OrbitRefresher implements IObserver {
     public OrbitRefresher() {
         super();
         toLoadQueue = new ArrayBlockingQueue<>(LOAD_QUEUE_MAX_SIZE);
-        OrbitRefresher.instance = this;
 
         // Start daemon
-        daemon = new OrbitUpdaterThread();
+        daemon = new OrbitUpdaterThread(this);
         daemon.setDaemon(true);
         daemon.setName("gaiasky-worker-orbitupdate");
         daemon.setPriority(Thread.MIN_PRIORITY);
@@ -54,19 +55,7 @@ public class OrbitRefresher implements IObserver {
             toLoadQueue.remove(param);
             toLoadQueue.add(param);
             param.orbit.refreshing = true;
-            flushLoadQueue();
-        }
-
-    }
-
-    /**
-     * Tells the loader to start loading the octants in the queue.
-     */
-    public void flushLoadQueue() {
-        if (!daemon.isAwake() && !toLoadQueue.isEmpty() && !loadingPaused) {
-            synchronized (daemon.getThreadLock()) {
-                daemon.getThreadLock().notifyAll();
-            }
+            daemon.wakeUp();
         }
     }
 
@@ -82,20 +71,21 @@ public class OrbitRefresher implements IObserver {
      */
     protected static class OrbitUpdaterThread extends ServiceThread {
         private final OrbitSamplerDataProvider provider;
-
+        private final OrbitRefresher orbitRefresher;
         private final Array<OrbitDataLoaderParameter> toLoad;
 
-        public OrbitUpdaterThread() {
+        public OrbitUpdaterThread(final OrbitRefresher orbitRefresher) {
             super();
+            this.orbitRefresher = orbitRefresher;
             this.toLoad = new Array<>();
             this.provider = new OrbitSamplerDataProvider();
             this.task = () -> {
                 /* ----------- PROCESS REQUESTS ----------- */
-                while (!instance.toLoadQueue.isEmpty()) {
+                while (!orbitRefresher.toLoadQueue.isEmpty()) {
                     toLoad.clear();
                     int i = 0;
-                    while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
-                        OrbitDataLoaderParameter param = instance.toLoadQueue.poll();
+                    while (orbitRefresher.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
+                        OrbitDataLoaderParameter param = orbitRefresher.toLoadQueue.poll();
                         toLoad.add(param);
                         i++;
                     }

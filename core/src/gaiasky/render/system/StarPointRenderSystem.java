@@ -117,7 +117,6 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
             ensureTempVertsSize(renderables.size * curr.vertexSize);
             renderables.forEach(r -> {
-                // 2 FPS gain
                 CelestialBody cb = (CelestialBody) r;
                 float[] col = cb.cc;
 

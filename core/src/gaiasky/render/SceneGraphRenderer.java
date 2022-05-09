@@ -235,7 +235,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
 
         final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
 
-        // POINTS
+        // SINGLE STAR POINTS
         AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
 

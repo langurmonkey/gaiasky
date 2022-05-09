@@ -99,7 +99,6 @@ public class ServiceThread extends Thread {
 
     @Override
     public void run() {
-
         while (this.running.get()) {
             synchronized (this.threadLock) {
                 if (task != null) {
