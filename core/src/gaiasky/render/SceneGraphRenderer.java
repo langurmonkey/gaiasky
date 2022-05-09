@@ -23,6 +23,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
+import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.process.*;
@@ -56,7 +57,7 @@ import static gaiasky.render.RenderGroup.*;
 /**
  * Initializes the render infrastructure renders the scene using different render systems.
  */
-public class SceneGraphRenderer extends AbstractRenderer implements ISceneRenderer, IObserver {
+public class SceneGraphRenderer implements ISceneRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
 
     /**
@@ -86,11 +87,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
     /**
      * The particular current scene graph renderer
      **/
-    private IRenderProcess sgr;
+    private IRenderMode renderMode;
     /**
      * Renderers vector, with 0 = normal, 1 = stereoscopic, 2 = FOV, 3 = cubemap
      **/
-    private IRenderProcess[] sgrList;
+    private IRenderMode[] sgrList;
     // Indexes
     private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENVR_IDX = 4;
 
@@ -220,13 +221,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
         /*
          * INITIALIZE SGRs
          */
-        sgrList = new IRenderProcess[5];
-        sgrList[SGR_DEFAULT_IDX] = new RenderProcessMain();
-        sgrList[SGR_STEREO_IDX] = new RenderProcessStereoscopic(globalResources.getSpriteBatch());
-        sgrList[SGR_FOV_IDX] = new RenderProcessFov();
-        sgrList[SGR_CUBEMAP_IDX] = new RenderProcessCubemapProjections();
-        sgrList[SGR_OPENVR_IDX] = new RenderProcessOpenVR(vrContext, globalResources.getSpriteBatchVR());
-        sgr = null;
+        sgrList = new IRenderMode[5];
+        sgrList[SGR_DEFAULT_IDX] = new RenderModeMain();
+        sgrList[SGR_STEREO_IDX] = new RenderModeStereoscopic(globalResources.getSpriteBatch());
+        sgrList[SGR_FOV_IDX] = new RenderModeFov();
+        sgrList[SGR_CUBEMAP_IDX] = new RenderModeCubemapProjections();
+        sgrList[SGR_OPENVR_IDX] = new RenderModeOpenVR(vrContext, globalResources.getSpriteBatchVR());
+        renderMode = null;
 
         /*
          * ======= INITIALIZE RENDER SYSTEMS =======
@@ -474,19 +475,19 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
     private void initSGR(ICamera camera) {
         if (Settings.settings.runtime.openVr) {
             // Using Steam OpenVR renderer
-            sgr = sgrList[SGR_OPENVR_IDX];
+            renderMode = sgrList[SGR_OPENVR_IDX];
         } else if (camera.getNCameras() > 1) {
             // FOV mode
-            sgr = sgrList[SGR_FOV_IDX];
+            renderMode = sgrList[SGR_FOV_IDX];
         } else if (Settings.settings.program.modeStereo.active) {
             // Stereoscopic mode
-            sgr = sgrList[SGR_STEREO_IDX];
+            renderMode = sgrList[SGR_STEREO_IDX];
         } else if (Settings.settings.program.modeCubemap.active) {
             // 360 mode: cube map -> equirectangular map
-            sgr = sgrList[SGR_CUBEMAP_IDX];
+            renderMode = sgrList[SGR_CUBEMAP_IDX];
         } else {
             // Default mode
-            sgr = sgrList[SGR_DEFAULT_IDX];
+            renderMode = sgrList[SGR_DEFAULT_IDX];
         }
     }
 
@@ -513,7 +514,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
 
             // VR controllers
             if (Settings.settings.runtime.openVr) {
-                RenderProcessOpenVR sgrVR = (RenderProcessOpenVR) sgrList[SGR_OPENVR_IDX];
+                RenderModeOpenVR sgrVR = (RenderModeOpenVR) sgrList[SGR_OPENVR_IDX];
                 if (vrContext != null) {
                     for (VRDeviceModel m : sgrVR.controllerObjects) {
                         if (!models.contains(m, true))
@@ -748,7 +749,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
 
     public void render(final ICamera camera, final double t, final int rw, final int rh, final int tw, final int th, final FrameBuffer fb, final PostProcessBean ppb) {
         if (rendering.get()) {
-            if (sgr == null)
+            if (renderMode == null)
                 initSGR(camera);
 
             // Shadow maps are the same for all
@@ -759,13 +760,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
                 renderGlowPass(camera, glowFb);
             }
 
-            sgr.render(this, camera, t, rw, rh, tw, th, fb, ppb);
+            renderMode.render(this, camera, t, rw, rh, tw, th, fb, ppb);
         }
     }
 
     @Override
-    public IRenderProcess getRenderProcess() {
-        return sgr;
+    public IRenderMode getRenderProcess() {
+        return renderMode;
     }
 
     @Override
@@ -960,38 +961,38 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
         case STEREOSCOPIC_CMD:
             boolean stereo = (Boolean) data[0];
             if (stereo)
-                sgr = sgrList[SGR_STEREO_IDX];
+                renderMode = sgrList[SGR_STEREO_IDX];
             else {
                 if (Settings.settings.runtime.openVr)
-                    sgr = sgrList[SGR_OPENVR_IDX];
+                    renderMode = sgrList[SGR_OPENVR_IDX];
                 else
-                    sgr = sgrList[SGR_DEFAULT_IDX];
+                    renderMode = sgrList[SGR_DEFAULT_IDX];
             }
             break;
         case CUBEMAP_CMD:
             boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openVr;
             if (cubemap) {
-                sgr = sgrList[SGR_CUBEMAP_IDX];
+                renderMode = sgrList[SGR_CUBEMAP_IDX];
             } else {
                 if (Settings.settings.runtime.openVr)
-                    sgr = sgrList[SGR_OPENVR_IDX];
+                    renderMode = sgrList[SGR_OPENVR_IDX];
                 else
-                    sgr = sgrList[SGR_DEFAULT_IDX];
+                    renderMode = sgrList[SGR_DEFAULT_IDX];
             }
             break;
         case CAMERA_MODE_CMD:
             CameraMode cm = (CameraMode) data[0];
             if (cm.isGaiaFov())
-                sgr = sgrList[SGR_FOV_IDX];
+                renderMode = sgrList[SGR_FOV_IDX];
             else {
                 if (Settings.settings.runtime.openVr)
-                    sgr = sgrList[SGR_OPENVR_IDX];
+                    renderMode = sgrList[SGR_OPENVR_IDX];
                 else if (Settings.settings.program.modeStereo.active)
-                    sgr = sgrList[SGR_STEREO_IDX];
+                    renderMode = sgrList[SGR_STEREO_IDX];
                 else if (Settings.settings.program.modeCubemap.active)
-                    sgr = sgrList[SGR_CUBEMAP_IDX];
+                    renderMode = sgrList[SGR_CUBEMAP_IDX];
                 else
-                    sgr = sgrList[SGR_DEFAULT_IDX];
+                    renderMode = sgrList[SGR_DEFAULT_IDX];
 
             }
             break;
@@ -1040,7 +1041,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
         if (resizeRenderSys)
             resizeRenderSystems(w, h, rw, rh);
 
-        for (IRenderProcess sgr : sgrList) {
+        for (IRenderMode sgr : sgrList) {
             sgr.resize(w, h);
         }
     }
@@ -1062,7 +1063,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements ISceneRender
 
         // Dispose SGRs
         if (sgrList != null) {
-            for (IRenderProcess sgr : sgrList) {
+            for (IRenderMode sgr : sgrList) {
                 if (sgr != null)
                     sgr.dispose();
             }

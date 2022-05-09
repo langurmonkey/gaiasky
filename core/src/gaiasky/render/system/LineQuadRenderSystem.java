@@ -64,7 +64,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        doublePool = new DPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
+        doublePool = new DoubleArrayPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
         provisionalLines = new Array<>();
         provLines = new Array<>();
         sorter = new LineArraySorter(12);
@@ -358,11 +358,14 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         provLines.clear();
     }
 
-    protected class DPool extends Pool<double[]> {
+    /**
+     * Pools arrays of double-precision floating point numbers.
+     */
+    protected class DoubleArrayPool extends Pool<double[]> {
 
         private final int poolSize;
 
-        public DPool(int initialCapacity, int max, int poolSize) {
+        public DoubleArrayPool(int initialCapacity, int max, int poolSize) {
             super(initialCapacity, max);
             this.poolSize = poolSize;
         }

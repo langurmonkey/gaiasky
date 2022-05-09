@@ -30,7 +30,7 @@ import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.interafce.*;
+import gaiasky.gui.*;
 import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IMainRenderer;
@@ -38,12 +38,13 @@ import gaiasky.render.api.IPostProcessor;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.Scene;
+import gaiasky.scene.render.SceneRenderer;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.screenshot.ScreenshotsManager;
+import gaiasky.util.screenshot.ScreenshotsManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
 import gaiasky.script.IScriptingInterface;
@@ -150,9 +151,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     private final String sceneGraphName = "SceneGraphData";
     private final String sceneName = "SceneData";
-    public Scene scene;
     public ISceneGraph sceneGraph;
     public SceneGraphRenderer sgr;
+
+
+    public Scene scene;
+    public SceneRenderer sceneRenderer;
+
     private IPostProcessor postProcessor;
 
     /**
@@ -465,6 +470,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr = new SceneGraphRenderer(vrContext, globalResources);
         sgr.initialize(assetManager);
 
+        // Scene renderer
+        sceneRenderer = new SceneRenderer(vrContext, globalResources);
+        sceneRenderer.initialize(assetManager);
+
         // Initialise scripting gateway server
         if (!noScripting)
             ScriptingServer.initialize();
@@ -631,26 +640,32 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          * SCENE GRAPH UPDATER
          */
         updateProcess = () -> {
-            // Process ECS
+            // Update scene.
             scene.update(time, cameraManager);
 
-            // Update scene graph
+            // Update scene graph.
             sceneGraph.update(time, cameraManager);
-            // Swap proximity buffers
+
+            // Swap proximity buffers.
             cameraManager.swapBuffers();
         };
 
         /*
          * SCENE GRAPH RENDERER
          */
-        AbstractRenderer.initialize(sceneGraph);
         sgr.doneLoading(assetManager);
         sgr.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
+
+        /*
+         * SCENE RENDERER
+         */
+        sceneRenderer.doneLoading(assetManager);
+        sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
 
         // Set up entities
         scene.setUpEntities();
         // Prepare scene for update
-        scene.prepareUpdateSystems();
+        scene.prepareUpdateSystems(sceneRenderer.renderListsFront());
 
         // First time, set assets
         final Array<SceneGraphNode> nodes = sceneGraph.getNodes();
@@ -658,8 +673,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             sgn.doneLoading(assetManager);
         }
 
-        // Initialise input multiplexer to handle various input processors
-        // The input multiplexer
+        // Initialize input multiplexer to handle various input processors.
         guiRegistry = new GuiRegistry(this.globalResources.getSkin(), this.sceneGraph, this.catalogManager);
         inputMultiplexer = new InputMultiplexer();
         guiRegistry.setInputMultiplexer(inputMultiplexer);

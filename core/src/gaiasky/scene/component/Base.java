@@ -146,6 +146,14 @@ public class Base implements Component {
         }
     }
 
+    public String getLocalizedName() {
+        if (localizedNameIndex >= 0 && names.length > localizedNameIndex) {
+            return names[localizedNameIndex];
+        } else {
+            return getName();
+        }
+    }
+
     public void updateLocalizedName() {
         if (names != null && names.length > 0) {
             String base = names[0].toLowerCase(Locale.ROOT).replace(' ', '_');

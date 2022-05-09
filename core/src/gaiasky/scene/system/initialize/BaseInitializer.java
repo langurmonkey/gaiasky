@@ -25,6 +25,7 @@ public class BaseInitializer extends InitSystem {
     public void initializeEntity(Entity entity) {
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
+        var render = Mapper.render.get(entity);
 
         // Initialize component type, if entity does not have one.
         if (base.ct == null) {
@@ -35,6 +36,11 @@ public class BaseInitializer extends InitSystem {
         if (graph != null) {
             graph.localTransform = new Matrix4();
             graph.translation = new Vector3b();
+        }
+
+        // Render reference.
+        if (render != null) {
+            render.entity = entity;
         }
 
     }

@@ -25,7 +25,7 @@ public class ArchetypeInitializer {
 
         if (this.engine != null) {
             // SceneGraphNode
-            addArchetype(SceneGraphNode.class.getName(), Base.class, Body.class, GraphNode.class, Octant.class);
+            addArchetype(SceneGraphNode.class.getName(), Base.class, Body.class, GraphNode.class, Octant.class, Render.class);
 
             // Universe
             addArchetype(Scene.ROOT_NAME, Base.class, Body.class, GraphNode.class, GraphRoot.class);

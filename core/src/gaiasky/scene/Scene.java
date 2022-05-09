@@ -1,8 +1,11 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.*;
+import gaiasky.scene.render.extract.ParticleExtractor;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scene.system.update.SceneGraphUpdateSystem;
@@ -183,23 +186,31 @@ public class Scene {
      * Prepares the engine to start running update cycles. This method
      * initializes the engine with all the necessary update systems.
      */
-    public void prepareUpdateSystems() {
+    public void prepareUpdateSystems(Array<Array<IRenderable>> renderLists) {
         if (engine != null) {
             int priority = 0;
-            // Scene graph update system needs to run first
+            // Scene graph update system needs to run first.
             SceneGraphUpdateSystem sceneGraphUpdateSystem = new SceneGraphUpdateSystem(families.roots, priority++, GaiaSky.instance.time);
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
 
-            // All other systems could in principle run in parallel
+            // Regular update systems.
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models,  priority++);
+
+            // Extract systems.
+            ParticleExtractor particleExtractSystem = new ParticleExtractor(families.particles, priority++);
+            particleExtractSystem.setRenderLists(renderLists);
 
             // Remove all remaining systems
             engine.removeAllSystems();
 
             // 1. First updater: scene graph update system
             engine.addSystem(sceneGraphUpdateSystem);
-            // 2. Update models
+
+            // 2. Update
             engine.addSystem(modelUpdateSystem);
+
+            // 3. Extract
+            engine.addSystem(particleExtractSystem);
         }
     }
 

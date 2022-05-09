@@ -3,7 +3,6 @@ package gaiasky.render.api;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.process.IRenderProcess;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
@@ -48,7 +47,7 @@ public interface ISceneRenderer {
      * Gets the current render process.
      * @return
      */
-    IRenderProcess getRenderProcess();
+    IRenderMode getRenderProcess();
 
     /**
      * Returns the post-processing glow frame buffer.

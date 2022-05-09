@@ -12,4 +12,7 @@ public class ProperMotion implements Component {
      * MuAlpha [mas/yr], Mudelta [mas/yr], radvel [km/s]
      **/
     public Vector3 pmSph;
+
+    /** This flag is up if pm is not null, and it is not zero **/
+    public boolean hasPm;
 }

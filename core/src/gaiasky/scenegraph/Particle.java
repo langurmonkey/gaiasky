@@ -83,7 +83,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             fovFactor = 1f;
         }
         Settings settings = Settings.settings;
-        thpointTimesFovfactor = (float) settings.scene.star.threshold.point * fovFactor;
+        thpointTimesFovfactor = (float) settings.scene.star.threshold.point;
         thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
         thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
         float pSize = settings.scene.star.pointSize < 0 ? 8 : settings.scene.star.pointSize;

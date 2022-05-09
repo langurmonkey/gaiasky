@@ -50,7 +50,7 @@ public class ParticleInitializer extends InitSystem {
         var extra = Mapper.extra.get(entity);
         var sa = Mapper.sa.get(entity);
         var text = Mapper.text.get(entity);
-        var render = Mapper.render.get(entity);
+        var render = Mapper.renderType.get(entity);
         var hip = Mapper.hip.get(entity);
         var dist = Mapper.distance.get(entity);
 
@@ -74,8 +74,13 @@ public class ParticleInitializer extends InitSystem {
     }
 
     private void baseInitialization(ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
-        pm.pm = new Vector3();
-        pm.pmSph = new Vector3();
+        if(pm.pm == null) {
+            pm.pm = new Vector3();
+            pm.pmSph = new Vector3();
+            pm.hasPm = false;
+        } else {
+            pm.hasPm = pm.pm.len2() != 0;
+        }
 
         // Defaults
         sa.thresholdNone = Settings.settings.scene.star.threshold.none;
