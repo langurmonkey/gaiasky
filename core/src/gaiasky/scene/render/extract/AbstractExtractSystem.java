@@ -41,7 +41,10 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         try {
-            renderLists.get(rg.ordinal()).add(renderable);
+            Array<IRenderable> renderList = renderLists.get(rg.ordinal());
+            synchronized (renderList) {
+                renderList.add(renderable);
+            }
             return true;
         } catch (Exception e) {
             return false;
