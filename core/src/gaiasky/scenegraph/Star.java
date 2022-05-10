@@ -152,7 +152,7 @@ public class Star extends Particle {
 
         // Calculate size - This contains arbitrary boundary values to make
         // things nice on the render side
-        size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / DISC_FACTOR);
+        size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / Constants.PARTICLE_DISC_FACTOR);
         computedSize = 0;
     }
 

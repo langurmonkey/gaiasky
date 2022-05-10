@@ -5,8 +5,10 @@
 
 package gaiasky.render.system;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.scene.Mapper;
 import gaiasky.util.SysUtils;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.IRenderable;
@@ -93,6 +95,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      */
     public float getAlpha(IRenderable renderable) {
         return getAlpha(renderable.getComponentType());
+    }
+
+    public float getAlpha(Entity entity) {
+        return getAlpha(Mapper.base.get(entity).ct);
     }
 
     public float getAlpha(ComponentTypes ct) {
@@ -199,7 +205,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         return programs[num];
     }
 
-    public void dispose(){
+    public void dispose() {
         preRunnables.clear();
         preRunnables = null;
         postRunnables.clear();

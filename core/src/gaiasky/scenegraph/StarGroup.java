@@ -24,7 +24,7 @@ import gaiasky.render.*;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IModelRenderable;
-import gaiasky.render.api.IQuadRenderable;
+import gaiasky.render.api.IBillboardRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager;
@@ -61,7 +61,7 @@ import java.util.*;
  * A particle group which additionally to the xyz position, supports color and
  * magnitude. id x y z pmx pmy pmz appmag absmag col size additional
  */
-public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFocus, IQuadRenderable, IModelRenderable, IObserver {
+public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFocus, IBillboardRenderable, IModelRenderable, IObserver {
 
     /** Model used to represent the star **/
     private ModelComponent mc;

@@ -15,7 +15,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.*;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.api.IModelRenderable;
-import gaiasky.render.api.IQuadRenderable;
+import gaiasky.render.api.IBillboardRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -37,7 +37,7 @@ import net.jafama.FastMath;
 /**
  * Represents any celestial body.
  */
-public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
+public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IBillboardRenderable, IModelRenderable, IFocus {
 
     /**
      * radius/distance limit for rendering at all. If angle is smaller than this

@@ -30,6 +30,7 @@ import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.process.*;
 import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
+import gaiasky.scene.render.draw.BillboardRendering;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
@@ -234,7 +235,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
          */
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardRenderSystem(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
+        billboardStarsProc = new BillboardRendering(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);

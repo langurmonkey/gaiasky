@@ -2,6 +2,7 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,6 +10,10 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
@@ -32,12 +37,13 @@ import java.util.TreeMap;
 /**
  * Initializes the old Particle and Star objects.
  */
-public class ParticleInitializer extends InitSystem {
+public class ParticleInitializer extends InitSystem implements IObserver {
 
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
 
     public ParticleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
+        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD);
     }
 
     @Override
@@ -54,7 +60,6 @@ public class ParticleInitializer extends InitSystem {
         var hip = Mapper.hip.get(entity);
         var dist = Mapper.distance.get(entity);
 
-
         if (hip != null) {
             // Initialize star
             initializeStar(base, body, celestial, mag, pm, extra, sa, text, render, dist);
@@ -67,14 +72,14 @@ public class ParticleInitializer extends InitSystem {
     @Override
     public void setUpEntity(Entity entity) {
         var hip = Mapper.hip.get(entity);
-        if(hip != null) {
+        if (hip != null) {
 
         }
 
     }
 
     private void baseInitialization(ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
-        if(pm.pm == null) {
+        if (pm.pm == null) {
             pm.pm = new Vector3();
             pm.pmSph = new Vector3();
             pm.hasPm = false;
@@ -91,8 +96,11 @@ public class ParticleInitializer extends InitSystem {
         text.labelFactor = 1.3e-1f;
         text.labelMax = 0.01f;
 
-        extra.primitiveRenderScale = 1;
         render.renderGroup = RenderGroup.BILLBOARD_STAR;
+
+        extra.primitiveRenderScale = 1;
+        float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
+        extra.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
 
         sa.thresholdFactor = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
     }
@@ -183,5 +191,21 @@ public class ParticleInitializer extends InitSystem {
         if (Settings.settings.runtime.relativisticAberration)
             m.model.rec.setUpRelativisticEffectsMaterial(m.model.instance.materials);
         m.model.setModelInitialized(true);
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        GaiaSky.postRunnable(() -> {
+            ImmutableArray<Entity> entities = getEntities();
+            switch (event) {
+            case STAR_POINT_SIZE_CMD:
+                for (Entity entity : entities) {
+                    Mapper.extra.get(entity).innerRad = (float) ((0.004f * Constants.PARTICLE_DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f);
+                }
+                break;
+            default:
+                break;
+            }
+        });
     }
 }

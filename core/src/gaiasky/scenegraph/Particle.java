@@ -41,8 +41,6 @@ import java.util.Random;
  */
 public class Particle extends CelestialBody implements IStarFocus, ILineRenderable {
 
-    protected static final float DISC_FACTOR = 1.5f;
-
     private static final Random rnd = new Random();
 
     protected static float thpointTimesFovfactor;
@@ -63,12 +61,11 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             switch (event) {
             case FOV_CHANGE_NOTIFICATION:
                 fovFactor = (Float) data[1];
-                thpointTimesFovfactor = (float) Settings.settings.scene.star.threshold.point;
-                thupOverFovfactor = (float) Constants.THRESHOLD_UP;
-                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN;
+                thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
+                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
                 break;
             case STAR_POINT_SIZE_CMD:
-                innerRad = (0.004f * DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f;
+                innerRad = (float) ((0.004f * Constants.PARTICLE_DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f);
                 break;
             default:
                 break;
@@ -87,7 +84,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
         thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
         float pSize = settings.scene.star.pointSize < 0 ? 8 : settings.scene.star.pointSize;
-        innerRad = (0.004f * DISC_FACTOR + pSize * 0.008f) * 1.5f;
+        innerRad = (float) ((0.004f * Constants.PARTICLE_DISC_FACTOR + pSize * 0.008f) * 1.5f);
         paramUpdater = new ParamUpdater();
     }
 
@@ -273,8 +270,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
                 child.update(time, translation, camera, opacity);
             }
         }
-
-        innerRad = 0.01f * DISC_FACTOR + settings.scene.star.pointSize * 0.005f;
     }
 
     @Override

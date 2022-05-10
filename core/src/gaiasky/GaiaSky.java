@@ -154,7 +154,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public ISceneGraph sceneGraph;
     public SceneGraphRenderer sgr;
 
-
     public Scene scene;
     public SceneRenderer sceneRenderer;
 
@@ -788,6 +787,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Initialized
         EventManager.publish(Event.INITIALIZED_INFO, this);
         sgr.setRendering(true);
+        sceneRenderer.setRendering(true);
         initialized = true;
     }
 
@@ -800,6 +800,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Update whole scene graph
         sceneGraph.update(time, cameraManager);
         sgr.swapRenderLists();
+        sceneRenderer.swapRenderLists();
         time.update(0);
         settings.runtime.timeOn = timeOnBak;
         OctreeNode.LOAD_ACTIVE = true;
@@ -968,12 +969,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         ScriptingServer.dispose();
 
         // Renderer
-        if (sgr != null)
+        if (sgr != null) {
             sgr.dispose();
+        }
+
+        if (sceneRenderer != null) {
+            sceneRenderer.dispose();
+        }
 
         // Post processor
-        if (postProcessor != null)
+        if (postProcessor != null) {
             postProcessor.dispose();
+        }
 
         // Dispose music manager
         MusicManager.dispose();
@@ -1049,6 +1056,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
         // Clean lists
         sgr.swapRenderLists();
+        sceneRenderer.swapRenderLists();
         // Number of frames
         frames++;
 
@@ -1290,6 +1298,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public void renderSgr(final ICamera camera, final double t, final int width, final int height, final int tw, final int th, final FrameBuffer frameBuffer, final PostProcessBean ppb) {
         sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
+        sceneRenderer.render(camera, t, width, height, tw, th, frameBuffer, ppb);
     }
 
     private long lastResizeTime = Long.MAX_VALUE;
@@ -1463,7 +1472,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Load scene graph
             if (sceneGraph == null) {
-                if(settings.data.dataFiles == null) {
+                if (settings.data.dataFiles == null) {
                     throw new RuntimeException("Please set the data::dataFiles property in your configuration file, as it is null!");
                 }
                 final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];

@@ -22,7 +22,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.api.IModelRenderable;
-import gaiasky.render.api.IQuadRenderable;
+import gaiasky.render.api.IBillboardRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -48,7 +48,7 @@ import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion, IModelRenderable, I3DTextRenderable, IQuadRenderable {
+public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion, IModelRenderable, I3DTextRenderable, IBillboardRenderable {
 
     private static final double TH_ANGLE = Math.toRadians(0.5);
     private static final double TH_ANGLE_OVERLAP = Math.toRadians(0.7);

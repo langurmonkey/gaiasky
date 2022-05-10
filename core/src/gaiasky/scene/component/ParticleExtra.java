@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Component;
  */
 public class ParticleExtra implements Component {
 
+    public double innerRad;
     public double computedSize;
     public double radius;
     public double primitiveRenderScale;

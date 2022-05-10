@@ -9,15 +9,19 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-public interface IQuadRenderable extends IRenderable {
+/**
+ * Implemented by all objects that can be rendered by a camera-oriented
+ * quad, otherwise called a billboard.
+ */
+public interface IBillboardRenderable extends IRenderable {
 
     /**
-     * Renders the renderable as a quad using the star shader.
+     * Renders the billboard object using {@link gaiasky.render.system.BillboardRenderSystem}.
      *
-     * @param shader The shader program
-     * @param alpha  Opacity value
-     * @param mesh   The mesh
-     * @param camera The camera
+     * @param shader The shader program.
+     * @param alpha  The alpha value.
+     * @param mesh   The mesh.
+     * @param camera The camera.
      */
     void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera);
 }

@@ -1,6 +1,8 @@
-package gaiasky.render.system;
+package gaiasky.scene.render.draw;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -13,9 +15,14 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
-import gaiasky.render.api.IBillboardRenderable;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.system.AbstractRenderSystem;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Body;
+import gaiasky.scene.component.ParticleExtra;
+import gaiasky.scene.component.Render;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -26,16 +33,27 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
  * it is expected that the provided shader program does the rendering procedurally, or
  * the object itself binds its own texture.
  */
-public class BillboardRenderSystem extends AbstractRenderSystem implements IObserver {
+public class BillboardRendering extends AbstractRenderSystem implements IObserver {
 
     private IntMesh mesh;
     private Texture billboardTexture;
     private final ComponentType componentType;
 
-    public BillboardRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
+    private final Vector3 F31;
+
+    // Render metadata
+    protected float thpointTimesFovfactor;
+    protected float thupOverFovfactor;
+    protected float thdownOverFovfactor;
+    protected float fovFactor;
+
+    public BillboardRendering(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
         super(rg, alphas, programs);
         this.componentType = componentType;
         init(texturePath, w, h, starTextureListener);
+
+        this.F31 = new Vector3();
+        initRenderAttributes();
     }
 
     /**
@@ -48,8 +66,20 @@ public class BillboardRenderSystem extends AbstractRenderSystem implements IObse
      * @param componentType       The component type.
      * @param starTextureListener Whether to listen for star texture setting changes.
      */
-    public BillboardRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
+    public BillboardRendering(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
         this(rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
+    }
+
+    private void initRenderAttributes() {
+        if (GaiaSky.instance != null) {
+            fovFactor = GaiaSky.instance.getCameraManager().getFovFactor();
+        } else {
+            fovFactor = 1f;
+        }
+        Settings settings = Settings.settings;
+        thpointTimesFovfactor = (float) settings.scene.star.threshold.point;
+        thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
+        thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
     }
 
     private void init(String tex0, float w, float h, boolean starTextureListener) {
@@ -153,18 +183,68 @@ public class BillboardRenderSystem extends AbstractRenderSystem implements IObse
 
             // Render each sprite
             renderables.forEach(r -> {
-                IBillboardRenderable s = (IBillboardRenderable) r;
-                s.render(shaderProgram, getAlpha(s), mesh, camera);
+                Render render = (Render) r;
+                Entity entity = render.entity;
+                render(entity, shaderProgram,  mesh, camera);
             });
             shaderProgram.end();
         }
 
     }
 
+    /**
+     * Billboard quad render, for planets and stars.
+     */
+    public void render(Entity entity, ExtShaderProgram shader, IntMesh mesh, ICamera camera) {
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var graph = Mapper.graph.get(entity);
+        var sa = Mapper.sa.get(entity);
+        var celestial = Mapper.celestial.get(entity);
+        var extra = Mapper.extra.get(entity);
+        float alpha = getAlpha(base.ct);
+
+        float size = (float) (getFuzzyRenderSize(body, extra) * extra.primitiveRenderScale);
+        shader.setUniformf("u_pos", graph.translation.put(F31));
+        shader.setUniformf("u_size", size);
+
+        shader.setUniformf("u_color", celestial.ccPale[0], celestial.ccPale[1], celestial.ccPale[2], alpha * base.opacity);
+        shader.setUniformf("u_inner_rad", (float) extra.innerRad);
+        shader.setUniformf("u_distance", (float) body.distToCamera);
+        shader.setUniformf("u_apparent_angle", (float) body.viewAngleApparent);
+        shader.setUniformf("u_thpoint", (float) sa.thresholdPoint * camera.getFovFactor());
+
+        // Whether light scattering is enabled or not
+        shader.setUniformi("u_lightScattering", (Mapper.hip.has(entity) && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
+
+        shader.setUniformf("u_radius", (float) extra.radius);
+
+        // Render the mesh
+        mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
+    }
+
+    public float getFuzzyRenderSize(Body body, ParticleExtra extra) {
+        extra.computedSize = body.size;
+        if (body.viewAngle > thdownOverFovfactor) {
+            double dist = body.distToCamera;
+            if (body.viewAngle > thupOverFovfactor) {
+                dist = (float) extra.radius / Constants.THRESHOLD_UP;
+            }
+            extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
+        }
+
+        extra.computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
+        return (float) (extra.computedSize / Constants.DISTANCE_SCALE_FACTOR);
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.BILLBOARD_TEXTURE_IDX_CMD) {
             GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        } else if (event == Event.FOV_CHANGE_NOTIFICATION) {
+            fovFactor = (Float) data[1];
+            thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
+            thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
         }
     }
 }
