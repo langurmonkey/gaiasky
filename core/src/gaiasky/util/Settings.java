@@ -448,7 +448,7 @@ public class Settings {
             public ThresholdSettings threshold;
 
             public StarSettings() {
-                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD, Event.STAR_MIN_OPACITY_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.STAR_TEXTURE_IDX_CMD);
+                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD, Event.STAR_MIN_OPACITY_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
             }
 
             @JsonIgnore
@@ -537,7 +537,7 @@ public class Settings {
                     group.numLabel = (int) data[0];
                     group.numVelocityVector = (int) data[0];
                     break;
-                case STAR_TEXTURE_IDX_CMD:
+                case BILLBOARD_TEXTURE_IDX_CMD:
                     textureIndex = (int) data[0];
                     break;
                 case STAR_BRIGHTNESS_CMD:

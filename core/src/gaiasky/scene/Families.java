@@ -18,7 +18,8 @@ public class Families {
             billboardSets,
             axes,
             raymarchings,
-            catalogInfos;
+            catalogInfos,
+            orbitalElementSets;
 
     public Families() {
         roots = Family.all(GraphRoot.class).get();
@@ -32,6 +33,7 @@ public class Families {
         axes = Family.all(Axis.class, RefSysTransform.class).get();
         raymarchings = Family.all(Raymarching.class).get();
         catalogInfos = Family.all(DatasetDescription.class).get();
+        orbitalElementSets = Family.all(OrbitElementsSet.class).get();
     }
 
 }

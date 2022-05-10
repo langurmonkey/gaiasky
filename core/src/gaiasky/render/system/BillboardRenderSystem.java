@@ -1,8 +1,3 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
@@ -16,39 +11,48 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IQuadRenderable;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-public class BillboardStarRenderSystem extends AbstractRenderSystem implements IObserver {
+/**
+ * Renders a billboard, optionally with a global texture. If a texture is not provided,
+ * it is expected that the provided shader program does the rendering procedurally, or
+ * the object itself binds its own texture.
+ */
+public class BillboardRenderSystem extends AbstractRenderSystem implements IObserver {
 
     private IntMesh mesh;
-    private Texture texture0;
-    private final int ctIndex;
+    private Texture billboardTexture;
+    private final ComponentType componentType;
 
-    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String tex0, int ctIndex, float w, float h) {
+    public BillboardRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
         super(rg, alphas, programs);
-        this.ctIndex = ctIndex;
-        init(tex0, w, h);
+        this.componentType = componentType;
+        init(texturePath, w, h, starTextureListener);
     }
 
     /**
      * Creates a new billboard quad render component.
      *
-     * @param rg             The render group.
-     * @param alphas         The alphas list.
-     * @param shaderPrograms The shader programs to render the quad with.
+     * @param rg                  The render group.
+     * @param alphas              The alphas list.
+     * @param shaderPrograms      The shader programs to render the quad with.
+     * @param texturePath         The path to the texture to use for the billboards.
+     * @param componentType       The component type.
+     * @param starTextureListener Whether to listen for star texture setting changes.
      */
-    public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String tex0, int ctIndex) {
-        this(rg, alphas, shaderPrograms, tex0, ctIndex, 2, 2);
+    public BillboardRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
+        this(rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
     }
 
-    private void init(String tex0, float w, float h) {
+    private void init(String tex0, float w, float h, boolean starTextureListener) {
         setStarTexture(tex0);
 
         // Init comparator
@@ -74,12 +78,16 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
 
         aux = new Vector3();
 
-        EventManager.instance.subscribe(this, Event.STAR_TEXTURE_IDX_CMD);
+        if (starTextureListener) {
+            EventManager.instance.subscribe(this, Event.BILLBOARD_TEXTURE_IDX_CMD);
+        }
     }
 
-    public void setStarTexture(String tex0) {
-        texture0 = new Texture(Settings.settings.data.dataFileHandle(tex0), true);
-        texture0.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+    public void setStarTexture(String texturePath) {
+        if (texturePath != null) {
+            billboardTexture = new Texture(Settings.settings.data.dataFileHandle(texturePath), true);
+            billboardTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        }
     }
 
     private void fillVertices(float[] vertices, float w, float h) {
@@ -124,27 +132,26 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
+        if ((componentType == null || alphas[componentType.ordinal()] != 0)) {
             renderables.sort(comp);
 
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 
-            if (texture0 != null) {
-                texture0.bind(0);
+            if (billboardTexture != null) {
+                billboardTexture.bind(0);
                 shaderProgram.setUniformi("u_texture0", 0);
             }
 
-            // General uniforms
+            // Global uniforms
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+            shaderProgram.setUniformf("u_time", (float) t);
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
-            // Global uniforms
-            shaderProgram.setUniformf("u_time", (float) t);
-
+            // Render each sprite
             renderables.forEach(r -> {
                 IQuadRenderable s = (IQuadRenderable) r;
                 s.render(shaderProgram, getAlpha(s), mesh, camera);
@@ -156,7 +163,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event == Event.STAR_TEXTURE_IDX_CMD) {
+        if (event == Event.BILLBOARD_TEXTURE_IDX_CMD) {
             GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
         }
     }

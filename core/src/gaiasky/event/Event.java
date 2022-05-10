@@ -5,6 +5,7 @@
 
 package gaiasky.event;
 
+import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.OrbitalElementsGroup;
 import gaiasky.scenegraph.VertsObject;
 
@@ -1187,14 +1188,14 @@ public enum Event {
     STAR_GROUP_NEAREST_CMD,
 
     /**
-     * Set the flag to render stars as billboards or not
+     * Set the flag to render stars as billboards or not.
      */
     STAR_GROUP_BILLBOARD_CMD,
 
     /**
-     * Set the texture index for stars
+     * Set the global texture index for billboards rendered in {@link RenderGroup#BILLBOARD_STAR}.
      */
-    STAR_TEXTURE_IDX_CMD,
+    BILLBOARD_TEXTURE_IDX_CMD,
 
     /**
      * Stereoscopic vision, side by side rendering. Contains the state boolean.

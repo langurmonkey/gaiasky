@@ -949,7 +949,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarTextureIndex(int index) {
         if (checkNum(index, 1, 4, "index")) {
-            EventManager.publish(Event.STAR_TEXTURE_IDX_CMD, this, index);
+            EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, index);
         }
     }
 

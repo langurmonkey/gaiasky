@@ -54,5 +54,7 @@ public class Mapper {
     // Tags
     public static final ComponentMapper<TagQuaternionOrientation> tagQuatOrientation = ComponentMapper.getFor(TagQuaternionOrientation.class);
     public static final ComponentMapper<TagHeliotropic> tagHeliotropic = ComponentMapper.getFor(TagHeliotropic.class);
+    public static final ComponentMapper<TagSet> tagSet = ComponentMapper.getFor(TagSet.class);
+    public static final ComponentMapper<TagSetElement> tagSetElement = ComponentMapper.getFor(TagSetElement.class);
 
 }

@@ -135,8 +135,10 @@ public class SceneGraphUpdateSystem extends EntitySystem {
         body.viewAngle = FastMath.atan(body.size / body.distToCamera);
         body.viewAngleApparent = body.viewAngle / camera.getFovFactor();
 
-        // Go down a level
-        if (graph.children != null) {
+        // Only update non-set elements
+        boolean isSet = Mapper.tagSet.has(entity);
+        if (!isSet && graph.children != null) {
+            // Go down a level
             for (int i = 0; i < graph.children.size; i++) {
                 Entity child = graph.children.get(i);
                 // Update

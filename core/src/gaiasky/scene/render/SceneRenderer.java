@@ -234,7 +234,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
          */
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardRenderSystem(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);

@@ -49,7 +49,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
-        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.STAR_TEXTURE_IDX_CMD, Event.STAR_POINT_UPDATE_FLAG);
+        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.STAR_POINT_UPDATE_FLAG);
         this.ct = ct;
         this.alphaSizeBrRc = new float[4];
         initializing = true;
@@ -195,7 +195,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
-        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
         case STAR_POINT_UPDATE_FLAG -> pointUpdateFlag = (Boolean) data[0];
         default ->{}
         }

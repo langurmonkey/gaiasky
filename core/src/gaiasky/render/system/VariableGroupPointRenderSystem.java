@@ -58,7 +58,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -283,7 +283,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
             clearMeshData(offset);
             inGpu.remove(renderable);
         }
-        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
         default -> {
         }
         }

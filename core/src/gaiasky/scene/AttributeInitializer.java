@@ -67,7 +67,7 @@ public class AttributeInitializer {
             putAll(MotorEngine.class, "machines");
 
             // Trajectory
-            putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "trail", "newmethod");
+            putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "trail", "orbittrail", "newmethod", "onlybody");
 
             // RefSysTransform
             putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues");

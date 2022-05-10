@@ -107,7 +107,7 @@ public class ArchetypeInitializer {
             addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class);
 
             // ParticleGroup
-            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class);
+            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagSet.class);
 
             // StarGroup
             addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class);
@@ -123,6 +123,9 @@ public class ArchetypeInitializer {
 
             // GenericCatalog
             addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());
+
+            // OrbitalElementsGroup
+            addArchetype(OrbitalElementsGroup.class.getName(), GenericCatalog.class.getName(), OrbitElementsSet.class, TagSet.class);
 
             // Invisible
             addArchetype(Invisible.class.getName(), CelestialBody.class.getName(), Raymarching.class);

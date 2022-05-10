@@ -28,10 +28,24 @@ public class TextUtils {
         return pre + in + post;
     }
 
+    /**
+     * Breaks the character sequence with new line characters '\n' so that the lines have
+     * approximately <code>breakChars</code> characters.
+     * @param in The character sequence.
+     * @param breakChars The number of characters per line.
+     * @return The string, broken into lines.
+     */
     public static String breakCharacters(CharSequence in, int breakChars) {
         return breakCharacters(in.toString(), breakChars);
     }
 
+    /**
+     * Breaks the string with new line characters '\n' so that the lines have
+     * approximately <code>breakChars</code> characters.
+     * @param in The string.
+     * @param breakChars The number of characters per line.
+     * @return The string, broken into lines.
+     */
     public static String breakCharacters(String in, int breakChars) {
         // Warp text if breakChars <= 0
         if (breakChars > 0) {
