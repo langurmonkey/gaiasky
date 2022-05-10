@@ -53,7 +53,7 @@ public class ErrorDialog implements ApplicationListener {
         // Title
         OwnLabel title = new OwnLabel(I18n.msg("error.crash.title"), skin, "header-large");
         // Subtitle
-        OwnLabel subtitle = new OwnLabel(I18n.msg("notif.error", cause.getLocalizedMessage()), skin, "ui-21");
+        OwnLabel subtitle = new OwnLabel(I18n.msg("notif.error", TextUtils.breakCharacters(cause.getLocalizedMessage(), 30)), skin, "ui-21");
         // Notification
         OwnLabel urlLabel = new OwnLabel(I18n.msg("error.crash.exception.1"), skin, "header-s");
         Link url = new Link(Settings.REPO_ISSUES, skin, Settings.REPO_ISSUES);
