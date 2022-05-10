@@ -277,7 +277,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    private void initSGR(ICamera camera) {
+    private void initRenderMode(ICamera camera) {
         if (Settings.settings.runtime.openVr) {
             // Using Steam OpenVR renderer
             renderMode = sgrList[SGR_OPENVR_IDX];
@@ -555,7 +555,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     public void render(final ICamera camera, final double t, final int rw, final int rh, final int tw, final int th, final FrameBuffer fb, final PostProcessBean ppb) {
         if (rendering.get()) {
             if (renderMode == null)
-                initSGR(camera);
+                initRenderMode(camera);
 
             // Shadow maps are the same for all
             renderShadowMap(camera);
