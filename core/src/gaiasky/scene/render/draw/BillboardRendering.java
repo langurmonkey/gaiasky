@@ -183,8 +183,7 @@ public class BillboardRendering extends AbstractRenderSystem implements IObserve
 
             // Render each sprite
             renderables.forEach(r -> {
-                Render render = (Render) r;
-                Entity entity = render.entity;
+                Entity entity = ((Render) r).entity;
                 render(entity, shaderProgram,  mesh, camera);
             });
             shaderProgram.end();

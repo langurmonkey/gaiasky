@@ -31,6 +31,7 @@ import gaiasky.render.process.*;
 import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scene.render.draw.BillboardRendering;
+import gaiasky.scene.render.draw.SinglePointRendering;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
@@ -234,6 +235,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
          * ======= INITIALIZE RENDER SYSTEMS =======
          */
 
+        // SINGLE STAR POINTS
+        AbstractRenderSystem singlePointProc = new SinglePointRendering(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
+        singlePointProc.addPreRunnables(additiveBlendR, noDepthTestR);
+
+
         // BILLBOARD STARS
         billboardStarsProc = new BillboardRendering(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
@@ -242,6 +248,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
 
         // Add render systems
+        addRenderSystem(singlePointProc);
         addRenderSystem(billboardStarsProc);
 
         // INIT GL STATE

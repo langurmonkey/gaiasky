@@ -32,19 +32,19 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     // Offset and count per renderable, if needed
     private Map<IRenderable, Integer> offsets, counts;
 
-    protected static class MeshData {
+    public static class MeshData {
 
-        protected IntMesh mesh;
+        public IntMesh mesh;
 
-        protected int colorOffset;
+        public int colorOffset;
 
-        protected int vertexIdx;
+        public int vertexIdx;
         // Size of each vertex in number of entries in array. Multiply by array type
         // size to get vertex size in bytes.
-        protected int vertexSize;
+        public int vertexSize;
+
         // Vertex array, this usually is just a reference to an external temp array
         protected float[] vertices;
-
         protected int instanceIdx;
         protected int instanceSize;
         protected float[] instance;

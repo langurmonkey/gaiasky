@@ -21,6 +21,9 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
+/**
+ * Renders symbolic objects (usually part of the UI) as points.
+ */
 public class PointRenderSystem extends ImmediateModeRenderSystem {
     protected static final Log logger = Logger.getLogger(PointRenderSystem.class);
 
