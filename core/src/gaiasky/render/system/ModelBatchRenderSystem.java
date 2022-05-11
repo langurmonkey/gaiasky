@@ -19,16 +19,7 @@ import gaiasky.util.gdx.IntModelBatch;
  */
 public class ModelBatchRenderSystem extends AbstractRenderSystem {
 
-    public enum ModelRenderType {
-        NORMAL,
-        ATMOSPHERE,
-        CLOUD
-    }
-
-    protected ComponentTypes ctAtm, ctClouds;
-
     protected IntModelBatch batch;
-    protected ModelRenderType type;
 
     /**
      * Creates a new model batch render component.
@@ -40,9 +31,6 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
     public ModelBatchRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch) {
         super(rg, alphas, null);
         this.batch = batch;
-
-        this.ctAtm = new ComponentTypes(ComponentType.Atmospheres);
-        this.ctClouds = new ComponentTypes(ComponentType.Clouds);
     }
 
     @Override

@@ -165,19 +165,17 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
                 MD4.putIn(localTransform);
             } else if (rotation.rc != null) {
                 // Planets and moons have rotation components
-                if (time.getHdiff() != 0) {
-                    RotationComponent rc = rotation.rc;
-                    graph.translation.getMatrix(localTransform)
-                            .scl(size * sizeFactor)
-                            .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
-                            .rotate(0, 1, 0, (float) rc.ascendingNode)
-                            .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt))
-                            .rotate(0, 1, 0, (float) rc.angle);
-                    graph.orientation.idt()
-                            .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
-                            .rotate(0, 1, 0, (float) rc.ascendingNode)
-                            .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
-                }
+                RotationComponent rc = rotation.rc;
+                graph.translation.getMatrix(localTransform)
+                        .scl(size * sizeFactor)
+                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
+                        .rotate(0, 1, 0, (float) rc.ascendingNode)
+                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt))
+                        .rotate(0, 1, 0, (float) rc.angle);
+                graph.orientation.idt()
+                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
+                        .rotate(0, 1, 0, (float) rc.ascendingNode)
+                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
             } else {
                 // The rest of bodies are just sitting there, in their reference system
                 graph.translation.getMatrix(localTransform)

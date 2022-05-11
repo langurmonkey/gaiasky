@@ -34,10 +34,7 @@ import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.EntityUtils;
-import gaiasky.scene.render.draw.BillboardRenderer;
-import gaiasky.scene.render.draw.ModelRenderer;
-import gaiasky.scene.render.draw.ModelRenderer.ModelRenderObject;
-import gaiasky.scene.render.draw.SinglePointRenderer;
+import gaiasky.scene.render.draw.*;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
@@ -122,7 +119,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     public Map<Entity, Matrix4> smCombinedMap;
 
     /** Contains the code to render models. **/
-    private ModelRenderObject shadowModelRenderer;
+    private ModelEntityRender shadowModelRenderer;
 
     // Light glow pre-render
     private FrameBuffer glowFb;
@@ -150,7 +147,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.globalResources = globalResources;
         this.rendering = new AtomicBoolean(false);
         this.renderAssets = new RenderAssets(globalResources);
-        this.shadowModelRenderer = new ModelRenderObject();
+        this.shadowModelRenderer = new ModelEntityRender();
     }
 
     @Override
@@ -289,6 +286,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL PER-PIXEL-LIGHTING
         AbstractRenderSystem modelPerPixelLighting = new ModelRenderer(MODEL_PIX, alphas, renderAssets.mbPixelLighting);
 
+        // MODEL PER-PIXEL-LIGHTING-TESSELLATION
+        AbstractRenderSystem modelPerPixelLightingTess = new TessellationRenderer(MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
+        modelPerPixelLightingTess.addPreRunnables(regularBlendR, depthTestR);
+
         // MODEL BEAM
         AbstractRenderSystem modelBeamProc = new ModelRenderer(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
 
@@ -333,9 +334,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Billboard stars
         addRenderSystem(billboardStarsProc);
 
+        // Diffuse meshes
+        addRenderSystem(modelMeshDiffuse);
+
         // Generic per-pixel lighting models
         addRenderSystem(modelPerPixelLighting);
-        //addRenderSystem(modelPerPixelLightingTess);
+        addRenderSystem(modelPerPixelLightingTess);
         addRenderSystem(modelBeamProc);
 
         // Special models
