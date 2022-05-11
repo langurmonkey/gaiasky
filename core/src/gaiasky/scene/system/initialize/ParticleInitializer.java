@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
+import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -19,9 +20,11 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Environment;
@@ -30,6 +33,7 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+import gaiasky.util.math.Vector3b;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,10 +43,15 @@ import java.util.TreeMap;
  */
 public class ParticleInitializer extends InitSystem implements IObserver {
 
+    private Vector3b B31;
+
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
 
     public ParticleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
+
+        this.B31 = new Vector3b();
+
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD);
     }
 
@@ -71,9 +80,22 @@ public class ParticleInitializer extends InitSystem implements IObserver {
 
     @Override
     public void setUpEntity(Entity entity) {
-        var hip = Mapper.hip.get(entity);
-        if (hip != null) {
+        // Set up stars
+        if (Mapper.hip.has(entity)) {
+            var model = Mapper.model.get(entity);
+            initModel(AssetBean.manager(), model);
 
+            var mag = Mapper.magnitude.get(entity);
+            var coordinates = Mapper.coordinates.get(entity);
+            if (!Float.isFinite(mag.absmag)) {
+                double distPc;
+                if (coordinates.coordinates != null) {
+                    distPc = coordinates.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31).lend() * Constants.U_TO_PC;
+                } else {
+                    distPc = EntityUtils.getAbsolutePosition(entity, B31).lend() * Constants.U_TO_PC;
+                }
+                mag.absmag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, mag.appmag);
+            }
         }
 
     }
@@ -161,7 +183,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         celestial.ccPale = new float[] { Math.min(1, body.cc[0] + plus), Math.min(1, body.cc[1] + plus), Math.min(1, body.cc[2] + plus) };
     }
 
-    private void initModel(final AssetManager manager, final Model m) {
+    private void initModel(final AssetManager manager, final Model model) {
         Texture tex = manager.get(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
         Texture lut = manager.get(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
         tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -172,7 +194,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         params.put("flip", false);
 
         Pair<IntModel, Map<String, gaiasky.util.gdx.shader.Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
-        IntModel model = pair.getFirst();
+        IntModel intModel = pair.getFirst();
         Material mat = pair.getSecond().get("base");
         mat.clear();
         mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
@@ -181,16 +203,16 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         mat.set(new ColorAttribute(ColorAttribute.Specular));
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
         Matrix4 modelTransform = new Matrix4();
-        m.model = new ModelComponent(false);
-        m.model.initialize(null);
-        m.model.env = new Environment();
-        m.model.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        m.model.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
-        m.model.instance = new IntModelInstance(model, modelTransform);
+        model.model = new ModelComponent(false);
+        model.model.initialize(null);
+        model.model.env = new Environment();
+        model.model.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
+        model.model.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
+        model.model.instance = new IntModelInstance(intModel, modelTransform);
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)
-            m.model.rec.setUpRelativisticEffectsMaterial(m.model.instance.materials);
-        m.model.setModelInitialized(true);
+            model.model.rec.setUpRelativisticEffectsMaterial(model.model.instance.materials);
+        model.model.setModelInitialized(true);
     }
 
     @Override

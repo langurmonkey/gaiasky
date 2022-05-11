@@ -5,6 +5,7 @@
 
 package gaiasky.scene.render;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
@@ -30,8 +31,13 @@ import gaiasky.render.api.ISceneRenderer;
 import gaiasky.render.process.*;
 import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
-import gaiasky.scene.render.draw.BillboardRendering;
-import gaiasky.scene.render.draw.SinglePointRendering;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Render;
+import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.render.draw.BillboardRenderer;
+import gaiasky.scene.render.draw.ModelRenderer;
+import gaiasky.scene.render.draw.ModelRenderer.ModelRenderObject;
+import gaiasky.scene.render.draw.SinglePointRenderer;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
@@ -99,13 +105,24 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
-    private List<ModelBody> shadowCandidates, shadowCandidatesTess;
+
+    /** Contains the candidates for regular and tessellated shadow maps. **/
+    private List<Entity> shadowCandidates, shadowCandidatesTess;
+
     // Dimension 1: number of shadows, dimension 2: number of lights
     public FrameBuffer[][] shadowMapFb;
+
     // Dimension 1: number of shadows, dimension 2: number of lights
     private Matrix4[][] shadowMapCombined;
-    public Map<ModelBody, Texture> smTexMap;
-    public Map<ModelBody, Matrix4> smCombinedMap;
+
+    /** Map containing the shadow map for each model body. **/
+    public Map<Entity, Texture> smTexMap;
+
+    /** Map containing the combined matrix for each model body. **/
+    public Map<Entity, Matrix4> smCombinedMap;
+
+    /** Contains the code to render models. **/
+    private ModelRenderObject shadowModelRenderer;
 
     // Light glow pre-render
     private FrameBuffer glowFb;
@@ -133,8 +150,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.globalResources = globalResources;
         this.rendering = new AtomicBoolean(false);
         this.renderAssets = new RenderAssets(globalResources);
+        this.shadowModelRenderer = new ModelRenderObject();
     }
-
 
     @Override
     public void initialize(AssetManager manager) {
@@ -236,20 +253,99 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
          */
 
         // SINGLE STAR POINTS
-        AbstractRenderSystem singlePointProc = new SinglePointRendering(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
+        AbstractRenderSystem singlePointProc = new SinglePointRenderer(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
         singlePointProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
+        // SKYBOX - (MW panorama, CMWB)
+        AbstractRenderSystem skyboxProc = new ModelRenderer(SKYBOX, alphas, renderAssets.mbSkybox);
+
+        // MODEL BACKGROUND - (MW panorama, CMWB)
+        AbstractRenderSystem modelBackgroundProc = new ModelRenderer(MODEL_BG, alphas, renderAssets.mbVertexDiffuse);
+
+        // MODEL GRID - (Ecl, Eq, Gal grids)
+        AbstractRenderSystem modelGridsProc = new ModelRenderer(MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
+        modelGridsProc.addPostRunnables(clearDepthR);
+        // RECURSIVE GRID
+        AbstractRenderSystem modelRecGridProc = new ModelRenderer(MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
+        modelRecGridProc.addPreRunnables(regularBlendR, depthTestR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardRendering(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
+        billboardStarsProc = new BillboardRenderer(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);
 
+        // MODELS DUST AND MESH
+        AbstractRenderSystem modelMeshOpaqueProc = new ModelRenderer(MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelRenderer(MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
+        // MODEL PER-PIXEL-LIGHTING EARLY
+        AbstractRenderSystem modelPerPixelLightingEarly = new ModelRenderer(MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
+        // MODEL PER-VERTEX-LIGHTING EARLY
+        AbstractRenderSystem modelPerVertexLightingEarly = new ModelRenderer(MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
 
-        // Add render systems
+        // MODEL DIFFUSE
+        AbstractRenderSystem modelMeshDiffuse = new ModelRenderer(MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
+
+        // MODEL PER-PIXEL-LIGHTING
+        AbstractRenderSystem modelPerPixelLighting = new ModelRenderer(MODEL_PIX, alphas, renderAssets.mbPixelLighting);
+
+        // MODEL BEAM
+        AbstractRenderSystem modelBeamProc = new ModelRenderer(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
+
+        // MODEL STARS
+        AbstractRenderSystem modelStarsProc = new ModelRenderer(MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
+
+        // BILLBOARD SSO
+        AbstractRenderSystem billboardSSOProc = new BillboardRenderer(BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders, "data/tex/base/sso.png", null, false);
+        billboardSSOProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
+
+        // MODEL ATMOSPHERE
+        AbstractRenderSystem modelAtmProc = new ModelRenderer(MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
+            @Override
+            public float getAlpha(IRenderable s) {
+                return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
+            }
+
+            @Override
+            protected boolean mustRender() {
+                return alphas[ComponentType.Atmospheres.ordinal()] * alphas[ComponentType.Planets.ordinal()] > 0;
+            }
+        };
+
+        // MODEL CLOUDS
+        AbstractRenderSystem modelCloudProc = new ModelRenderer(MODEL_CLOUD, alphas, renderAssets.mbCloud);
+
+
+        /* ===============================
+         * ADD RENDER SYSTEMS TO PROCESSOR
+         * =============================== */
+
+        // Background stuff
+        addRenderSystem(modelBackgroundProc);
+        addRenderSystem(modelGridsProc);
         addRenderSystem(singlePointProc);
+
+        // Opaque meshes
+        addRenderSystem(modelMeshOpaqueProc);
+        addRenderSystem(modelPerPixelLightingEarly);
+        addRenderSystem(modelPerVertexLightingEarly);
+
+        // Billboard stars
         addRenderSystem(billboardStarsProc);
+
+        // Generic per-pixel lighting models
+        addRenderSystem(modelPerPixelLighting);
+        //addRenderSystem(modelPerPixelLightingTess);
+        addRenderSystem(modelBeamProc);
+
+        // Special models
+        addRenderSystem(modelStarsProc);
+        addRenderSystem(modelAtmProc);
+        addRenderSystem(modelCloudProc);
+
+        // Additive meshes
+        addRenderSystem(modelMeshAdditiveProc);
+
 
         // INIT GL STATE
         GL30.glClampColor(GL30.GL_CLAMP_READ_COLOR, GL30.GL_FALSE);
@@ -267,6 +363,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     public Array<Array<IRenderable>> renderListsFront() {
         return renderLists;
     }
+
     public Array<Array<IRenderable>> renderListsBack() {
         return renderLists;
     }
@@ -370,16 +467,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     }
 
-    private void addCandidates(Array<IRenderable> models, List<ModelBody> candidates) {
+    private void addCandidates(Array<IRenderable> models, List<Entity> candidates) {
         if (candidates != null) {
             candidates.clear();
             int num = 0;
             for (int i = 0; i < models.size; i++) {
-                if (models.get(i) instanceof ModelBody) {
-                    ModelBody mr = (ModelBody) models.get(i);
-                    if (mr.isShadow()) {
-                        candidates.add(num, mr);
-                        mr.shadow = 0;
+                Render render = (Render) models.get(i);
+                var scaffolding = Mapper.modelScaffolding.get(render.entity);
+                if (scaffolding != null) {
+                    if (scaffolding.isShadow()) {
+                        candidates.add(num, render.entity);
+                        scaffolding.shadow = 0;
                         num++;
                         if (num == Settings.settings.scene.renderer.shadow.number)
                             break;
@@ -389,23 +487,26 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    private void renderShadowMapCandidates(List<ModelBody> candidates, int shadowNRender, ICamera camera) {
+    private void renderShadowMapCandidates(List<Entity> candidates, int shadowNRender, ICamera camera) {
         int i = 0;
         int j = 0;
         // Normal bodies
-        for (ModelBody candidate : candidates) {
+        for (Entity candidate : candidates) {
+            var body = Mapper.body.get(candidate);
+            var model = Mapper.model.get(candidate);
+            var scaffolding = Mapper.modelScaffolding.get(candidate);
 
-            Vector3 camDir = aux1.set(candidate.mc.directional(0).direction);
+            Vector3 camDir = aux1.set(model.model.directional(0).direction);
             // Direction is that of the light
             cameraLight.direction.set(camDir);
 
-            double radius = candidate.getRadius();
+            double radius = (body.size / 2.0) * scaffolding.sizeScaleFactor;
             // Distance from camera to object, radius * sv[0]
-            double distance = radius * candidate.shadowMapValues[0];
+            double distance = radius * scaffolding.shadowMapValues[0];
             // Position, factor of radius
-            candidate.getAbsolutePosition(aux1b);
-            aux1b.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
-            aux1b.put(cameraLight.position);
+            Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
+            objPos.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
+            objPos.put(cameraLight.position);
             // Up is perpendicular to dir
             if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
                 aux1.set(1, 0, 0);
@@ -414,9 +515,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             cameraLight.up.set(cameraLight.direction).crs(aux1);
 
             // Near is sv[1]*radius before the object
-            cameraLight.near = (float) (distance - radius * candidate.shadowMapValues[1]);
+            cameraLight.near = (float) (distance - radius * scaffolding.shadowMapValues[1]);
             // Far is sv[2]*radius after the object
-            cameraLight.far = (float) (distance + radius * candidate.shadowMapValues[2]);
+            cameraLight.far = (float) (distance + radius * scaffolding.shadowMapValues[2]);
 
             // Update cam
             cameraLight.update(false);
@@ -427,11 +528,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             // No tessellation
             renderAssets.mbPixelLightingDepth.begin(cameraLight);
-            candidate.render(renderAssets.mbPixelLightingDepth, 1, 0, null, RenderGroup.MODEL_PIX);
+            shadowModelRenderer.render(candidate, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, true);
             renderAssets.mbPixelLightingDepth.end();
 
             // Save frame buffer and combined matrix
-            candidate.shadow = shadowNRender;
+            scaffolding.shadow = shadowNRender;
             shadowMapCombined[i][j].set(cameraLight.combined);
             smCombinedMap.put(candidate, shadowMapCombined[i][j]);
             smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
@@ -441,37 +542,41 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    private void renderShadowMapCandidatesTess(Array<ModelBody> candidates, int shadowNRender, ICamera camera, RenderingContext rc) {
+    private void renderShadowMapCandidatesTess(Array<Entity> candidates, int shadowNRender, ICamera camera, RenderingContext rc) {
         int i = 0;
         int j = 0;
         // Normal bodies
-        for (ModelBody candidate : candidates) {
-            double radius = candidate.getRadius();
-            // Only render when camera very close to surface
-            if (candidate.distToCamera < radius * 1.1) {
-                candidate.shadow = shadowNRender;
+        for (Entity candidate : candidates) {
+            var body = Mapper.body.get(candidate);
+            var model = Mapper.model.get(candidate);
+            var scaffolding = Mapper.modelScaffolding.get(candidate);
 
-                Vector3 shadowCameraDir = aux1.set(candidate.mc.directional(0).direction);
+            double radius = (body.size / 2.0) * scaffolding.sizeScaleFactor;
+            // Only render when camera very close to surface
+            if (body.distToCamera < radius * 1.1) {
+                scaffolding.shadow = shadowNRender;
+
+                Vector3 shadowCameraDir = aux1.set(model.model.directional(0).direction);
 
                 // Shadow camera direction is that of the light
                 cameraLight.direction.set(shadowCameraDir);
 
-                Vector3 shadowCamDir = aux1.set(candidate.mc.directional(0).direction);
+                Vector3 shadowCamDir = aux1.set(model.model.directional(0).direction);
                 // Direction is that of the light
                 cameraLight.direction.set(shadowCamDir);
 
                 // Distance from camera to object, radius * sv[0]
-                float distance = (float) (radius * candidate.shadowMapValues[0] * 0.01);
+                float distance = (float) (radius * scaffolding.shadowMapValues[0] * 0.01);
                 // Position, factor of radius
-                Vector3b objPos = candidate.getAbsolutePosition(aux1b);
+                Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
                 Vector3b camPos = camera.getPos();
                 Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
                 boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos.put(aux1d), radius);
                 if (intersect) {
                     // Use height
-                    camDir.nor().scl(candidate.distToCamera - radius);
+                    camDir.nor().scl(body.distToCamera - radius);
                 }
-                Vector3d objCam = aux2d.set(camPos).sub(objPos).nor().scl(-(candidate.distToCamera - radius)).add(camDir);
+                Vector3d objCam = aux2d.set(camPos).sub(objPos).nor().scl(-(body.distToCamera - radius)).add(camDir);
 
                 objCam.add(shadowCamDir.nor().scl(-distance));
                 objCam.put(cameraLight.position);
@@ -497,11 +602,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
                 // Tessellation
                 renderAssets.mbPixelLightingDepthTessellation.begin(cameraLight);
-                candidate.render(renderAssets.mbPixelLightingDepthTessellation, 1, 0, rc, RenderGroup.MODEL_PIX);
+                shadowModelRenderer.render(candidate, renderAssets.mbPixelLightingDepthTessellation, camera, 1, 0, rc, RenderGroup.MODEL_PIX, true);
                 renderAssets.mbPixelLightingDepthTessellation.end();
 
                 // Save frame buffer and combined matrix
-                candidate.shadow = shadowNRender;
+                scaffolding.shadow = shadowNRender;
                 shadowMapCombined[i][j].set(cameraLight.combined);
                 smCombinedMap.put(candidate, shadowMapCombined[i][j]);
                 smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
@@ -509,10 +614,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 shadowMapFb[i][j].end();
                 i++;
             } else {
-                candidate.shadow = -1;
+                scaffolding.shadow = -1;
             }
         }
-
     }
 
     private void renderShadowMap(ICamera camera) {

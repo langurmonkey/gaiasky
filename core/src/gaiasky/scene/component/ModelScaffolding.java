@@ -46,6 +46,15 @@ public class ModelScaffolding implements Component {
     public List<String> randomize;
 
     /**
+     * Whether shadows should be rendered for this object
+     *
+     * @return Whether shadows should be rendered for this object
+     */
+    public boolean isShadow() {
+        return shadowMapValues != null;
+    }
+
+    /**
      * Sets the shadow mapping values for this object
      *
      * @param shadowMapValues The values

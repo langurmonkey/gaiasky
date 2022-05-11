@@ -102,7 +102,9 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
     public FrameBuffer[][] shadowMapFb;
     // Dimension 1: number of shadows, dimension 2: number of lights
     private Matrix4[][] shadowMapCombined;
+    /** Map containing the shadow map for each model body. **/
     public Map<ModelBody, Texture> smTexMap;
+    /** Map containing the combined matrix for each model body. **/
     public Map<ModelBody, Matrix4> smCombinedMap;
 
     // Light glow pre-render
@@ -236,8 +238,8 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
 
         // SINGLE STAR POINTS
-        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
-        pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
+        AbstractRenderSystem singlePointProc = new StarPointRenderSystem(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
+        singlePointProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // SKYBOX - (MW panorama, CMWB)
         AbstractRenderSystem skyboxProc = new ModelBatchRenderSystem(SKYBOX, alphas, renderAssets.mbSkybox);
@@ -305,9 +307,6 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
 
         // MODEL BEAM
         AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
-
-        // MODEL THRUSTER
-        AbstractRenderSystem modelThrusterProc = new ModelBatchRenderSystem(MODEL_VERT_THRUSTER, alphas, renderAssets.mbVertexLightingThruster);
 
         // GALAXY
         BillboardGroupRenderSystem billboardGroupRenderSystem = new BillboardGroupRenderSystem(BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
@@ -383,11 +382,16 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas, globalResources.getSpriteShader());
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
-        // Add components to set
+
+        /* ===============================
+         * ADD RENDER SYSTEMS TO PROCESSOR
+         * =============================== */
+
+        // Background stuff
         addRenderSystem(skyboxProc);
         addRenderSystem(modelBackgroundProc);
         addRenderSystem(modelGridsProc);
-        addRenderSystem(pixelStarProc);
+        addRenderSystem(singlePointProc);
         addRenderSystem(annotationsProc);
 
         // Opaque meshes
@@ -411,11 +415,10 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         // Diffuse meshes
         addRenderSystem(modelMeshDiffuse);
 
-        // Models
+        // Generic per-pixel lighting models
         addRenderSystem(modelPerPixelLighting);
         addRenderSystem(modelPerPixelLightingTess);
         addRenderSystem(modelBeamProc);
-        addRenderSystem(modelThrusterProc);
 
         // Labels
         addRenderSystem(labelsProc);
@@ -436,10 +439,11 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         // Billboards SSO
         addRenderSystem(billboardSSOProc);
 
-        // Models
+        // Special models
         addRenderSystem(modelStarsProc);
         addRenderSystem(modelAtmProc);
         addRenderSystem(modelCloudProc);
+
         addRenderSystem(shapeProc);
         addRenderSystem(particleEffectsProc);
 

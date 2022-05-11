@@ -15,6 +15,7 @@ import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ITransform;
+import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.camera.Proximity;
@@ -124,7 +125,9 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
             if (Mapper.tagQuatOrientation.has(entity)) {
                 // Billboards use quaternion orientation
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
-                graph.translation.getMatrix(localTransform).scl(size).rotate(QF);
+                graph.translation.getMatrix(localTransform)
+                        .scl(size)
+                        .rotate(QF);
             } else if (hasAttitude) {
                 // Satellites have attitude
                 var attitude = Mapper.attitude.get(entity);
@@ -134,7 +137,9 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
                     attitude.nonRotatedPos.set(body.pos);
                     // Undo rotation if heliotropic
                     if (Mapper.tagHeliotropic.has(entity)) {
-                        attitude.nonRotatedPos.mul(Coordinates.eqToEcl()).rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
+                        attitude.nonRotatedPos
+                                .mul(Coordinates.eqToEcl())
+                                .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
                     }
                     // Update attitude
                     if (attitude.attitudeServer != null) {
@@ -158,14 +163,28 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
 
                 MD4.set(localTransform).mul(graph.orientation);
                 MD4.putIn(localTransform);
-            } else if (rotation.rc != null && time.getHdiff() != 0) {
+            } else if (rotation.rc != null) {
                 // Planets and moons have rotation components
-                graph.translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rotation.rc.ascendingNode).rotate(0, 0, 1, (float) (rotation.rc.inclination + rotation.rc.axialTilt)).rotate(0, 1, 0, (float) rotation.rc.angle);
-                graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rotation.rc.ascendingNode).rotate(0, 0, 1, (float) (rotation.rc.inclination + rotation.rc.axialTilt));
+                if (time.getHdiff() != 0) {
+                    RotationComponent rc = rotation.rc;
+                    graph.translation.getMatrix(localTransform)
+                            .scl(size * sizeFactor)
+                            .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
+                            .rotate(0, 1, 0, (float) rc.ascendingNode)
+                            .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt))
+                            .rotate(0, 1, 0, (float) rc.angle);
+                    graph.orientation.idt()
+                            .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
+                            .rotate(0, 1, 0, (float) rc.ascendingNode)
+                            .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
+                }
             } else {
                 // The rest of bodies are just sitting there, in their reference system
-                graph.translation.getMatrix(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
-                graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform));
+                graph.translation.getMatrix(localTransform)
+                        .scl(size * sizeFactor)
+                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
+                graph.orientation.idt()
+                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform));
             }
         } else {
             // Nothing whatsoever

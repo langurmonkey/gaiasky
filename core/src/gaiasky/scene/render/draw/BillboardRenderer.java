@@ -21,6 +21,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.ParticleExtra;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.component.SolidAngle;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -29,11 +30,11 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Renders a billboard, optionally with a global texture. If a texture is not provided,
+ * Renders billboards (camera-oriented quads), optionally with a global texture. If a texture is not provided,
  * it is expected that the provided shader program does the rendering procedurally, or
  * the object itself binds its own texture.
  */
-public class BillboardRendering extends AbstractRenderSystem implements IObserver {
+public class BillboardRenderer extends AbstractRenderSystem implements IObserver {
 
     private IntMesh mesh;
     private Texture billboardTexture;
@@ -47,7 +48,7 @@ public class BillboardRendering extends AbstractRenderSystem implements IObserve
     protected float thdownOverFovfactor;
     protected float fovFactor;
 
-    public BillboardRendering(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
+    public BillboardRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
         super(rg, alphas, programs);
         this.componentType = componentType;
         init(texturePath, w, h, starTextureListener);
@@ -66,7 +67,7 @@ public class BillboardRendering extends AbstractRenderSystem implements IObserve
      * @param componentType       The component type.
      * @param starTextureListener Whether to listen for star texture setting changes.
      */
-    public BillboardRendering(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
+    public BillboardRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
         this(rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
     }
 
@@ -184,7 +185,7 @@ public class BillboardRendering extends AbstractRenderSystem implements IObserve
             // Render each sprite
             renderables.forEach(r -> {
                 Entity entity = ((Render) r).entity;
-                render(entity, shaderProgram,  mesh, camera);
+                render(entity, shaderProgram, mesh, camera);
             });
             shaderProgram.end();
         }
@@ -201,11 +202,23 @@ public class BillboardRendering extends AbstractRenderSystem implements IObserve
         var sa = Mapper.sa.get(entity);
         var celestial = Mapper.celestial.get(entity);
         var extra = Mapper.extra.get(entity);
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+        boolean isModel = Mapper.model.has(entity);
+        boolean isStar = Mapper.hip.has(entity);
         float alpha = getAlpha(base.ct);
 
-        float size = (float) (getFuzzyRenderSize(body, extra) * extra.primitiveRenderScale);
-        shader.setUniformf("u_pos", graph.translation.put(F31));
-        shader.setUniformf("u_size", size);
+        float fuzzySize = getFuzzyRenderSize(camera, body, sa, extra);
+        float radius = (float) (extra != null ?  extra.radius : (body.size / 2d) * scaffolding.sizeScaleFactor);
+
+        Vector3 billboardPosition = graph.translation.put(F31);
+        if (isModel) {
+            // Get it a tad closer to the camera to prevent occlusion with orbit.
+            // Only for models.
+            float l = billboardPosition.len();
+            billboardPosition.nor().scl(l * 0.99f);
+        }
+        shader.setUniformf("u_pos", billboardPosition);
+        shader.setUniformf("u_size", fuzzySize);
 
         shader.setUniformf("u_color", celestial.ccPale[0], celestial.ccPale[1], celestial.ccPale[2], alpha * base.opacity);
         shader.setUniformf("u_inner_rad", (float) extra.innerRad);
@@ -214,26 +227,37 @@ public class BillboardRendering extends AbstractRenderSystem implements IObserve
         shader.setUniformf("u_thpoint", (float) sa.thresholdPoint * camera.getFovFactor());
 
         // Whether light scattering is enabled or not
-        shader.setUniformi("u_lightScattering", (Mapper.hip.has(entity) && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
+        shader.setUniformi("u_lightScattering", (isStar && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
 
-        shader.setUniformf("u_radius", (float) extra.radius);
+        shader.setUniformf("u_radius", radius);
 
         // Render the mesh
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
 
-    public float getFuzzyRenderSize(Body body, ParticleExtra extra) {
-        extra.computedSize = body.size;
-        if (body.viewAngle > thdownOverFovfactor) {
-            double dist = body.distToCamera;
-            if (body.viewAngle > thupOverFovfactor) {
-                dist = (float) extra.radius / Constants.THRESHOLD_UP;
+    public float getFuzzyRenderSize(ICamera camera, Body body, SolidAngle sa, ParticleExtra extra) {
+        if (extra != null) {
+            // Stars, particles
+            extra.computedSize = body.size;
+            if (body.viewAngle > thdownOverFovfactor) {
+                double dist = body.distToCamera;
+                if (body.viewAngle > thupOverFovfactor) {
+                    dist = (float) extra.radius / Constants.THRESHOLD_UP;
+                }
+                extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
             }
-            extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
-        }
 
-        extra.computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
-        return (float) (extra.computedSize / Constants.DISTANCE_SCALE_FACTOR);
+            extra.computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
+            return (float) ((extra.computedSize / Constants.DISTANCE_SCALE_FACTOR) * extra.primitiveRenderScale);
+        } else {
+            // Models
+            float thAngleQuad = (float) sa.thresholdQuad * camera.getFovFactor();
+            double size = 0f;
+            if (body.viewAngle >= sa.thresholdPoint * camera.getFovFactor()) {
+                size = Math.tan(thAngleQuad) * body.distToCamera * 2f;
+            }
+            return (float) size;
+        }
     }
 
     @Override

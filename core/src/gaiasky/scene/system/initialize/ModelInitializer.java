@@ -104,6 +104,9 @@ public class ModelInitializer extends InitSystem {
         var engine = Mapper.engine.get(entity);
         var fade = Mapper.fade.get(entity);
 
+        // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
+        body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
+
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {
             // All models

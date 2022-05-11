@@ -21,7 +21,6 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
-import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -39,8 +38,8 @@ import org.lwjgl.opengl.GL30;
  * represented using point primitives into a mesh and renders them with
  * a single draw call.
  */
-public class SinglePointRendering extends ImmediateModeRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(SinglePointRendering.class);
+public class SinglePointRenderer extends ImmediateModeRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(SinglePointRenderer.class);
 
     private final double BRIGHTNESS_FACTOR = 10;
 
@@ -56,7 +55,7 @@ public class SinglePointRendering extends ImmediateModeRenderSystem implements I
 
     private boolean pointUpdateFlag = true;
 
-    public SinglePointRendering(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
+    public SinglePointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
         EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.STAR_POINT_UPDATE_FLAG);
         this.ct = ct;

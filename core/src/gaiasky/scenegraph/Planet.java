@@ -159,7 +159,6 @@ public class Planet extends ModelBody implements ILineRenderable {
                 }
             }
             // Regular planet, render model normally
-            compalpha = alpha;
             prepareShadowEnvironment();
             mc.update(alpha * opacity);
             modelBatch.render(mc.instance, mc.env);

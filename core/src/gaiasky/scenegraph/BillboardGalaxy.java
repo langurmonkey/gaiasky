@@ -73,8 +73,6 @@ public class BillboardGalaxy extends Billboard {
 
     @Override
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
-        compalpha = alpha;
-
         float size = (float) (getFuzzyRenderSize(camera) / Constants.DISTANCE_SCALE_FACTOR);
 
         Vector3 aux = F31.get();

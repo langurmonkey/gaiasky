@@ -15,7 +15,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
 
 /**
- * Renders with a given model batch.
+ * Renders simple models using a batch.
  */
 public class ModelBatchRenderSystem extends AbstractRenderSystem {
 

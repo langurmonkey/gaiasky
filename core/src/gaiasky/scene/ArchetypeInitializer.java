@@ -44,7 +44,7 @@ public class ArchetypeInitializer {
             addArchetype(Particle.class.getName(), CelestialBody.class.getName(), ProperMotion.class, RenderType.class, ParticleExtra.class);
 
             // Star
-            addArchetype(Star.class.getName(), Particle.class.getName(), Hip.class, Distance.class);
+            addArchetype(Star.class.getName(), Particle.class.getName(), Hip.class, Distance.class, Model.class);
 
             // Satellite
             addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);

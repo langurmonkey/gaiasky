@@ -5,10 +5,16 @@
 
 package gaiasky.scenegraph.component;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Body;
+import gaiasky.scene.component.GraphNode;
+import gaiasky.scene.component.ModelScaffolding;
+import gaiasky.scene.component.Rotation;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Bits;
@@ -29,6 +35,8 @@ import gaiasky.util.math.Vector3d;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
+
+import static gaiasky.scene.Mapper.body;
 
 public class AtmosphereComponent extends NamedComponent {
 
@@ -67,7 +75,7 @@ public class AtmosphereComponent extends NamedComponent {
         setUpAtmosphericScatteringMaterial(planetMat);
 
         Material atmMat;
-        if(mc.instance == null) {
+        if (mc.instance == null) {
             Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
             IntModel atmosphereModel = pair.getFirst();
             atmMat = pair.getSecond().get("base");
@@ -146,18 +154,60 @@ public class AtmosphereComponent extends NamedComponent {
     }
 
     /**
-     * Updates the atmospheric scattering shader parameters
+     * Updates the atmospheric scattering shader parameters.
      *
-     * @param mat    The material to update.
-     * @param alpha  The opacity value.
-     * @param ground Whether it is the ground shader or the atmosphere.
-     * @param planet The planet itself, holder of this atmosphere
+     * @param mat      The material to update.
+     * @param alpha    The opacity value.
+     * @param ground   Whether it is the ground shader or the atmosphere.
+     * @param planet   The planet itself, holder of this atmosphere.
+     * @param vrOffset The VR offset vector.
      */
     public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vrOffset) {
-        Vector3b transform = planet.translation;
-        RotationComponent rc = planet.rc;
-        SceneGraphNode sol = planet.parent;
-        transform.put(aux3);
+        updateAtmosphericScatteringParams(mat, alpha, ground, planet.translation, planet.rc, planet.inverseRefPlaneTransform, planet.parent.translation, vrOffset);
+    }
+
+    /**
+     * Updates the atmospheric scattering shader parameters.
+     *
+     * @param mat         The material to update.
+     * @param alpha       The opacity value.
+     * @param ground      Whether it is the ground shader or the atmosphere.
+     * @param graph       The graph node component.
+     * @param rotation    The rotation component.
+     * @param scaffolding The model scaffolding component.
+     * @param vrOffset    The VR offset vector.
+     */
+    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, GraphNode graph, Rotation rotation, ModelScaffolding scaffolding, Vector3d vrOffset) {
+        Vector3b parentTranslation = null;
+        Entity parent = graph.parent;
+        if (parent != null) {
+            parentTranslation = Mapper.graph.get(parent).translation;
+        }
+        updateAtmosphericScatteringParams(mat, alpha, ground, graph.translation, rotation.rc, scaffolding.inverseRefPlaneTransform, parentTranslation, vrOffset);
+    }
+
+    /**
+     * Updates the atmospheric scattering shader parameters.
+     *
+     * @param mat               The material to update.
+     * @param alpha             The opacity value.
+     * @param ground            Whether it is the ground shader or the atmosphere.
+     * @param translation       The translation vector.
+     * @param rc                The rotation component.
+     * @param parentTranslation The parent translation vector.
+     * @param vrOffset          The VR offset vector.
+     */
+    public void updateAtmosphericScatteringParams(
+            Material mat,
+            float alpha,
+            boolean ground,
+            Vector3b translation,
+            RotationComponent rc,
+            String inverseRefPlaneTransform,
+            Vector3b parentTranslation,
+            Vector3d vrOffset) {
+
+        translation.put(aux3);
         if (vrOffset != null) {
             aux1.set(vrOffset).scl(1 / Constants.M_TO_U);
             aux3.sub(aux1);
@@ -194,7 +244,7 @@ public class AtmosphereComponent extends NamedComponent {
         // Planet position
         if (ground) {
             // Camera position must be corrected using the rotation angle of the planet
-            aux3.mul(Coordinates.getTransformD(planet.inverseRefPlaneTransform)).rotate(rc.ascendingNode, 0, 1, 0).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
+            aux3.mul(Coordinates.getTransformD(inverseRefPlaneTransform)).rotate(rc.ascendingNode, 0, 1, 0).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
         }
         ((Vector3Attribute) mat.get(Vector3Attribute.PlanetPos)).value.set(aux3.put(aux));
         // CameraPos = -PlanetPos
@@ -203,10 +253,13 @@ public class AtmosphereComponent extends NamedComponent {
         ((Vector3Attribute) mat.get(Vector3Attribute.CameraPos)).value.set(aux3.put(aux));
 
         // Light position respect the earth: LightPos = SunPos - EarthPos
-        aux3.add(sol.translation).nor();
+        if (parentTranslation != null) {
+            aux3.add(parentTranslation);
+        }
+        aux3.nor();
         if (ground) {
             // Camera position must be corrected using the rotation angle of the planet
-            aux3.mul(Coordinates.getTransformD(planet.inverseRefPlaneTransform)).rotate(rc.ascendingNode, 0, 1, 0).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
+            aux3.mul(Coordinates.getTransformD(inverseRefPlaneTransform)).rotate(rc.ascendingNode, 0, 1, 0).rotate(-rc.inclination - rc.axialTilt, 0, 0, 1).rotate(-rc.angle, 0, 1, 0);
         }
         ((Vector3Attribute) mat.get(Vector3Attribute.LightPos)).value.set(aux3.put(aux));
 
@@ -290,7 +343,6 @@ public class AtmosphereComponent extends NamedComponent {
         setParams(createModelParameters(600L, 1.0, true));
     }
 
-
     public void copyFrom(AtmosphereComponent other) {
         this.params = other.params;
         this.size = other.size;
@@ -302,7 +354,7 @@ public class AtmosphereComponent extends NamedComponent {
         this.fogColor = new Vector3(other.fogColor);
     }
 
-    public void print(Log log){
+    public void print(Log log) {
         log.debug("Size: " + size);
         log.debug("Wavelengths: " + Arrays.toString(wavelengths));
         log.debug("eSun: " + m_eSun);

@@ -232,7 +232,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         } else if (type != null) {
             // We actually need to create the model
             Bits attributes = Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates);
-            if(params.containsKey("attributes")) {
+            if (params.containsKey("attributes")) {
                 attributes = Bits.indexes(((Long) params.get("attributes")).intValue());
             }
             Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, attributes, GL20.GL_TRIANGLES);
@@ -251,27 +251,42 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void load(Matrix4 localTransform) {
-        AssetManager mgr = AssetBean.manager();
-        mgr.update();
-        if (mgr.isLoaded(Settings.settings.data.dataFile(modelFile))) {
-            this.doneLoading(mgr, localTransform, null);
+        if (manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
+            this.doneLoading(manager, localTransform, null);
             this.modelLoading = false;
             this.modelInitialised = true;
         }
     }
 
-    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
+    public void update(boolean relativistic, Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
         touch(localTransform);
         if (instance != null) {
+            ICamera cam = GaiaSky.instance.getICamera();
             setVROffset(GaiaSky.instance.getCameraManager().naturalCamera);
             setTransparency(alpha, blendSrc, blendDst);
-            updateRelativisticEffects(GaiaSky.instance.getICamera());
-            updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
+            if (relativistic) {
+                updateRelativisticEffects(cam);
+            } else {
+                updateRelativisticEffects(cam);
+            }
+            updateVelocityBufferUniforms(cam);
         }
     }
 
+    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
+        update(true, localTransform, alpha, blendSrc, blendDst);
+    }
+
+    public void update(boolean relativistic, Matrix4 localTransform, float alpha) {
+        update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
     public void update(Matrix4 localTransform, float alpha) {
-        update(localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        update(true, localTransform, alpha);
+    }
+
+    public void update(float alpha, boolean relativistic) {
+        update(relativistic, null, alpha);
     }
 
     public void update(float alpha) {
@@ -602,7 +617,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 }
             });
         } else if (event == Event.SSR_CMD) {
-            if(instance != null && instance.materials != null) {
+            if (instance != null && instance.materials != null) {
                 // Update cubemap
                 boolean active = (Boolean) data[0];
                 if (active) {

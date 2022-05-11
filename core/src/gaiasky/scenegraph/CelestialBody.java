@@ -76,9 +76,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     /** Holds information about the rotation of the body **/
     public RotationComponent rc;
 
-    /** Component alpha mirror **/
-    public float compalpha;
-
     public float labelFactor;
     public float labelMax;
     public float textScale = -1;
@@ -104,8 +101,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
      */
     @Override
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
-        compalpha = alpha;
-
         float size = getFuzzyRenderSize(camera) * primitiveRenderScale;
         shader.setUniformf("u_pos", translation.put(F31.get()));
         shader.setUniformf("u_size", size);
@@ -217,13 +212,22 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     /**
-     * Sets the size of this entity in kilometers
+     * Sets the radius of this entity in kilometers.
      *
-     * @param size The size in km
+     * @param radiusKm The size in km.
+     */
+    public void setRadiusKm(Double radiusKm) {
+        // Size gives us the radius, and we want the diameter
+        this.size = (float) (radiusKm * 2 * Constants.KM_TO_U);
+    }
+
+    /**
+     * Sets the size of this entity in kilometers.
+     *
+     * @param size The size in km.
      */
     public void setSize(Double size) {
-        // Size gives us the radius, and we want the diameter
-        this.size = (float) (size * 2 * Constants.KM_TO_U);
+        setRadiusKm(size);
     }
 
     public void setColorbv(Double colorbv) {

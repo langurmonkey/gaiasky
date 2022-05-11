@@ -79,7 +79,7 @@ public class Body implements Component {
     }
 
     public void setSizeKm(Double sizeKm) {
-        this.size = (float) (size * Constants.KM_TO_U);
+        this.size = (float) (sizeKm * Constants.KM_TO_U);
     }
 
     public void setSizepc(Double sizePc) {
@@ -87,15 +87,28 @@ public class Body implements Component {
     }
 
     public void setSizePc(Double sizePc) {
-        this.size = (float) (size * Constants.PC_TO_U);
+        this.size = (float) (sizePc * Constants.PC_TO_U);
     }
 
     public void setSizeM(Double sizeM) {
-        this.size = (float) (size * Constants.M_TO_U);
+        this.size = (float) (sizeM * Constants.M_TO_U);
     }
 
     public void setSizeAU(Double sizeAU) {
-        this.size = (float) (size * Constants.AU_TO_U);
+        this.size = (float) (sizeAU * Constants.AU_TO_U);
+    }
+
+    public void setRadius(Double radius) {
+        setSize(radius * 2.0);
+    }
+    public void setRadiusKm(Double radiusKm) {
+        setRadius(radiusKm * Constants.KM_TO_U);
+    }
+    public void setDiameter(Double diameter) {
+        setSize(diameter);
+    }
+    public void setDiameterKm(Double diameterKm) {
+        setDiameter(diameterKm * Constants.KM_TO_U);
     }
 
     /**
