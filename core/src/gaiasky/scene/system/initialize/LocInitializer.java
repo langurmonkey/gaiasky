@@ -20,7 +20,7 @@ public class LocInitializer extends InitSystem {
         var body = Mapper.body.get(entity);
         var loc = Mapper.loc.get(entity);
 
-        body.cc = new float[] { 1f, 1f, 1f, 1f };
+        body.color = new float[] { 1f, 1f, 1f, 1f };
         loc.location3d = new Vector3();
         loc.sizeKm = (float) (body.size * Constants.U_TO_KM);
 

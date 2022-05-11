@@ -9,28 +9,28 @@ public class Fade implements Component {
     /**
      * Fade in low and high limits
      */
-    private Vector2d fadeIn;
+    public Vector2d fadeIn;
 
     /**
      * Fade out low and high limits
      */
-    private Vector2d fadeOut;
+    public Vector2d fadeOut;
 
     /**
      * The current distance at each cycle, in internal units
      */
-    protected double currentDistance;
+    public double currentDistance;
 
     /**
      * If set, the fade distance is the distance between the current fade node and this object.
      * Otherwise, it is the length of the current object's position.
      */
-    protected Entity position;
+    public Entity positionObject;
 
     /**
      * The name of the position object
      */
-    private String positionObjectName;
+    public String positionObjectName;
 
     /**
      * Is the node already in the scene graph?

@@ -110,7 +110,7 @@ public class ModelInitializer extends InitSystem {
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {
             // All models
-            model.model.doneLoading(manager, graph.localTransform, body.cc);
+            model.model.doneLoading(manager, graph.localTransform, body.color);
         }
         if (atmosphere != null || cloud != null) {
             // Planets
@@ -257,7 +257,7 @@ public class ModelInitializer extends InitSystem {
     }
 
     protected void setColor2Data(final Body body, final Celestial celestial, final float plus) {
-        celestial.ccPale = new float[] { Math.min(1, body.cc[0] + plus), Math.min(1, body.cc[1] + plus), Math.min(1, body.cc[2] + plus) };
+        celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
     }
 
     /**

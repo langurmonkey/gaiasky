@@ -8,6 +8,7 @@ package gaiasky.util;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.OrbitalElementsGroup;
@@ -66,7 +67,7 @@ public class CatalogInfo {
     public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, Entity entity) {
         this(name, description, source, type, hlSizeFactor, (FadeNode) null);
         this.entity = entity;
-        if(Mapper.datasetDescription.has(entity)) {
+        if (Mapper.datasetDescription.has(entity)) {
             Mapper.datasetDescription.get(entity).setCatalogInfo(this);
         }
     }
@@ -182,6 +183,20 @@ public class CatalogInfo {
      */
     public boolean hasParticleAttributes() {
         return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper;
+    }
+
+    /**
+     * Gets the component type of the model object linked to this catalog.
+     *
+     * @return The component type.
+     */
+    public ComponentTypes getCt() {
+        if (object != null) {
+            return object.ct;
+        } else if (entity != null) {
+            return Mapper.base.get(entity).ct;
+        }
+        return null;
     }
 
 }

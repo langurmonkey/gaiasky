@@ -1,9 +1,13 @@
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
+import gaiasky.util.Settings;
+import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 
 /**
@@ -33,4 +37,5 @@ public class EntityUtils {
             return out;
         }
     }
+
 }

@@ -264,6 +264,6 @@ public class Focus implements Component, IFocus {
 
     @Override
     public float[] getColor() {
-        return body.cc;
+        return body.color;
     }
 }

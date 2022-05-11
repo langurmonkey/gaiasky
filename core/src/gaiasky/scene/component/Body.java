@@ -42,8 +42,8 @@ public class Body implements Component {
     /**
      * Base RGB color
      */
-    public float[] cc;
-    public float[] labelcolor = Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
+    public float[] color;
+    public float[] labelColor = Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
 
 
     public void setPos(double[] pos) {
@@ -117,7 +117,7 @@ public class Body implements Component {
      * @param color The color.
      */
     public void setColor(double[] color) {
-        this.cc = GlobalResources.toFloatArray(color);
+        this.color = GlobalResources.toFloatArray(color);
     }
 
     /**
@@ -126,7 +126,7 @@ public class Body implements Component {
      * @param color The color.
      */
     public void setColor(float[] color) {
-        this.cc = color;
+        this.color = color;
     }
     
     /**
@@ -134,8 +134,13 @@ public class Body implements Component {
      *
      * @param color The label color.
      */
+    public void setLabelColor(double[] color) {
+        this.labelColor = GlobalResources.toFloatArray(color);
+    }
+
+    @Deprecated
     public void setLabelcolor(double[] color) {
-        this.labelcolor = GlobalResources.toFloatArray(color);
+        setLabelColor(color);
     }
 
     /**
@@ -143,7 +148,12 @@ public class Body implements Component {
      *
      * @param color The label color.
      */
+    public void setLabelColor(float[] color) {
+        this.labelColor = color;
+    }
+
+    @Deprecated
     public void setLabelcolor(float[] color) {
-        this.labelcolor = color;
+        setLabelColor(color);
     }
 }

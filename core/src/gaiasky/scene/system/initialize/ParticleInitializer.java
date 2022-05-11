@@ -173,14 +173,14 @@ public class ParticleInitializer extends InitSystem implements IObserver {
      * Sets the RGB color.
      */
     private void setRGB(Body body, Celestial celestial) {
-        if (body.cc == null)
-            body.cc = ColorUtils.BVtoRGB(celestial.colorbv);
+        if (body.color == null)
+            body.color = ColorUtils.BVtoRGB(celestial.colorbv);
         setColor2Data(body, celestial);
     }
 
     private void setColor2Data(Body body, Celestial celestial) {
         final float plus = .1f;
-        celestial.ccPale = new float[] { Math.min(1, body.cc[0] + plus), Math.min(1, body.cc[1] + plus), Math.min(1, body.cc[2] + plus) };
+        celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
     }
 
     private void initModel(final AssetManager manager, final Model model) {

@@ -57,7 +57,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
      * If set, the fade distance is the distance between the current fade node and this object.
      * Otherwise, it is the length of the current object's position.
      */
-    protected SceneGraphNode position;
+    protected SceneGraphNode positionObject;
 
     /**
      * The name of the position object
@@ -140,19 +140,18 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if (positionObjectName != null) {
-            this.position = GaiaSky.instance.sceneGraph.getNode(positionObjectName);
+            this.positionObject = GaiaSky.instance.sceneGraph.getNode(positionObjectName);
         }
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
         translation.set(parentTransform);
-        Vector3d aux = D31.get();
 
-        if (this.position == null) {
-            this.currentDistance = aux.set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();
+        if (this.positionObject == null) {
+            this.currentDistance = D31.get().set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();
         } else {
-            this.currentDistance = this.position.distToCamera;
+            this.currentDistance = this.positionObject.distToCamera;
         }
 
         // Update with translation/rotation/etc
@@ -171,7 +170,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
-        this.distToCamera = this.position == null ? pos.dst(camera.getPos(), B31.get()).doubleValue() : this.position.distToCamera;
+        this.distToCamera = this.positionObject == null ? pos.dst(camera.getPos(), B31.get()).doubleValue() : this.positionObject.distToCamera;
 
         // Opacity
         updateOpacity();

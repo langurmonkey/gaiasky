@@ -3,6 +3,10 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import gaiasky.scene.component.*;
+import gaiasky.scene.component.tag.TagBackgroundModel;
+import gaiasky.scene.component.tag.TagHeliotropic;
+import gaiasky.scene.component.tag.TagQuaternionOrientation;
+import gaiasky.scene.component.tag.TagSet;
 import gaiasky.scenegraph.*;
 
 import java.util.HashMap;
@@ -83,7 +87,7 @@ public class ArchetypeInitializer {
             addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);
 
             // BackgroundModel
-            addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
+            addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
 
             // SphericalGrid
             addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(), GridUV.class);

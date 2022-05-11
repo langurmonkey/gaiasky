@@ -5,9 +5,12 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.*;
+import gaiasky.scene.render.extract.BackgroundExtractor;
 import gaiasky.scene.render.extract.ModelExtractor;
 import gaiasky.scene.render.extract.ParticleExtractor;
 import gaiasky.scene.system.initialize.*;
+import gaiasky.scene.system.update.BackgroundUpdater;
+import gaiasky.scene.system.update.FadeUpdater;
 import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scene.system.update.SceneGraphUpdateSystem;
 import gaiasky.scene.view.PositionEntity;
@@ -139,10 +142,13 @@ public class Scene {
             EntitySystem billboardSetInit = new BillboardSetInitializer(setUp, families.billboardSets, priority++);
             EntitySystem axesInit = new AxesInitializer(setUp, families.axes, priority++);
             EntitySystem raymarchingInit = new InvisibleInitializer(setUp, families.raymarchings, priority++);
-            EntitySystem catalogInfoInit = new CatalogInfoInitializationSystem(setUp, families.catalogInfos, priority++);
+            EntitySystem fadeInit = new FadeNodeInitializer(setUp, families.fadeNodes, priority++);
+            EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
+            EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
+
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardSetInit, axesInit, raymarchingInit, catalogInfoInit);
+            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardSetInit, axesInit, raymarchingInit, fadeInit, datasetDescInit, backgroundInit);
         }
     }
 
@@ -195,13 +201,17 @@ public class Scene {
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
 
             // Regular update systems.
+            FadeUpdater fadeUpdateSystem = new FadeUpdater(families.fadeNodes, priority++);
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models,  priority++);
+            BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
 
             // Extract systems.
             ParticleExtractor particleExtractor = new ParticleExtractor(families.particles, priority++);
             particleExtractor.setRenderLists(renderLists);
             ModelExtractor modelExtractor = new ModelExtractor(families.models, priority++);
             modelExtractor.setRenderLists(renderLists);
+            BackgroundExtractor backgroundExtractor = new BackgroundExtractor(families.backgroundModels, priority++);
+            backgroundExtractor.setRenderLists(renderLists);
 
             // Remove all remaining systems
             engine.removeAllSystems();
@@ -210,11 +220,14 @@ public class Scene {
             engine.addSystem(sceneGraphUpdateSystem);
 
             // 2. Update
+            engine.addSystem(fadeUpdateSystem);
             engine.addSystem(modelUpdateSystem);
+            engine.addSystem(backgroundUpdateSystem);
 
             // 3. Extract
             engine.addSystem(particleExtractor);
             engine.addSystem(modelExtractor);
+            engine.addSystem(backgroundExtractor);
         }
     }
 

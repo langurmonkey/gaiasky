@@ -7,6 +7,7 @@ import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.util.Settings;
 
 /**
@@ -24,12 +25,9 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
     }
 
     protected boolean shouldRender(Base base) {
-        return GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && (base.visible || msSinceStateChange(base) < Settings.settings.scene.fadeMs);
+        return GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && (base.visible || base.msSinceStateChange() < Settings.settings.scene.fadeMs);
     }
 
-    protected long msSinceStateChange(Base base) {
-        return (long) (GaiaSky.instance.getT() * 1000f) - base.lastStateChangeTimeMs;
-    }
 
     /**
      * Adds the given renderable to the given render group list.

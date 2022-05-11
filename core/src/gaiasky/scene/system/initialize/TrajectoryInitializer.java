@@ -60,8 +60,8 @@ public class TrajectoryInitializer extends InitSystem {
             }
 
         // Initialize default colors if needed
-        if (body.cc == null) {
-            body.cc = new float[] { 0.8f, 0.8f, 0.8f, 1f };
+        if (body.color == null) {
+            body.color = new float[] { 0.8f, 0.8f, 0.8f, 1f };
         }
         if (trajectory.pointColor == null) {
             trajectory.pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
@@ -80,7 +80,7 @@ public class TrajectoryInitializer extends InitSystem {
         var trajectory = Mapper.trajectory.get(entity);
         var verts = Mapper.verts.get(entity);
 
-        trajectory.alpha = body.cc[3];
+        trajectory.alpha = body.color[3];
         initOrbitMetadata(body, trajectory, verts);
         verts.primitiveSize = 1.1f;
 

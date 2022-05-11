@@ -220,7 +220,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
         shader.setUniformf("u_pos", billboardPosition);
         shader.setUniformf("u_size", fuzzySize);
 
-        shader.setUniformf("u_color", celestial.ccPale[0], celestial.ccPale[1], celestial.ccPale[2], alpha * base.opacity);
+        shader.setUniformf("u_color", celestial.colorPale[0], celestial.colorPale[1], celestial.colorPale[2], alpha * base.opacity);
         shader.setUniformf("u_inner_rad", (float) extra.innerRad);
         shader.setUniformf("u_distance", (float) body.distToCamera);
         shader.setUniformf("u_apparent_angle", (float) body.viewAngleApparent);

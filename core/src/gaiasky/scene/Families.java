@@ -2,6 +2,7 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.component.*;
+import gaiasky.scene.component.tag.TagBackgroundModel;
 
 /**
  * A simple utility object that collects the most-used families.
@@ -19,7 +20,10 @@ public class Families {
             axes,
             raymarchings,
             catalogInfos,
-            orbitalElementSets;
+            orbitalElementSets,
+            fadeNodes,
+            backgroundModels,
+            sphericalGrids;
 
     public Families() {
         roots = Family.all(GraphRoot.class).get();
@@ -34,6 +38,9 @@ public class Families {
         raymarchings = Family.all(Raymarching.class).get();
         catalogInfos = Family.all(DatasetDescription.class).get();
         orbitalElementSets = Family.all(OrbitElementsSet.class).get();
+        fadeNodes = Family.all(Fade.class).get();
+        backgroundModels = Family.all(TagBackgroundModel.class).get();
+        sphericalGrids = Family.all(GridUV.class).get();
     }
 
 }

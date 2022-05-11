@@ -1,4 +1,4 @@
-package gaiasky.scene.component;
+package gaiasky.scene.component.tag;
 
 import com.badlogic.ashley.core.Component;
 

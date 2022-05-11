@@ -194,7 +194,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }
         int cap = 25;
-        String types = ci.type.toString() + " / " + ci.object.ct.toString();
+        String types = ci.type.toString() + " / " + ci.getCt();
         OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin);
         typesLabel.addListener(new OwnTextTooltip(types, skin));
         t.add(typesLabel).colspan(2).left().row();

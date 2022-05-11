@@ -60,7 +60,7 @@ public class ClusterInitializer extends InitSystem {
             cluster.clusterTex.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear);
         }
         if (cluster.model == null) {
-            Material mat = new Material(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE), new ColorAttribute(ColorAttribute.Diffuse, body.cc[0], body.cc[1], body.cc[2], body.cc[3]));
+            Material mat = new Material(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE), new ColorAttribute(ColorAttribute.Diffuse, body.color[0], body.color[1], body.color[2], body.color[3]));
             IntModelBuilder modelBuilder = ModelCache.cache.mb;
             modelBuilder.begin();
             // create part

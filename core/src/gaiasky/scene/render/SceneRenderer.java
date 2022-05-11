@@ -322,6 +322,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
          * =============================== */
 
         // Background stuff
+        addRenderSystem(skyboxProc);
         addRenderSystem(modelBackgroundProc);
         addRenderSystem(modelGridsProc);
         addRenderSystem(singlePointProc);

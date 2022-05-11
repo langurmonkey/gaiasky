@@ -1,9 +1,12 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.MathUtilsd;
 
 import java.util.Locale;
 
@@ -185,5 +188,33 @@ public class Base implements Component {
                 this.ct.set(ComponentType.valueOf(s).ordinal());
             }
         }
+    }
+
+    /**
+     * Computes the elapsed number of milliseconds since the last visibility state change
+     * for the given base component.
+     * @return The elapsed time [ms] since the last visibility state change.
+     */
+    public long msSinceStateChange() {
+        return (long) (GaiaSky.instance.getT() * 1000f) - lastStateChangeTimeMs;
+    }
+
+    /**
+     * Gets the visibility opacity factor for this base component.
+     * @return The visibility opacity factor.
+     */
+    public float getVisibilityOpacityFactor() {
+        long msSinceStateChange = msSinceStateChange();
+
+        // Fast track
+        if (msSinceStateChange > Settings.settings.scene.fadeMs)
+            return visible ? 1 : 0;
+
+        // Fading
+        float opacity = MathUtilsd.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
+        if (!visible) {
+            opacity = 1 - opacity;
+        }
+        return opacity;
     }
 }

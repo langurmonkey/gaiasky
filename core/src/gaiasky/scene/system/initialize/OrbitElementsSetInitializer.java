@@ -1,10 +1,9 @@
 package gaiasky.scene.system.initialize;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.TagSetElement;
+import gaiasky.scene.component.tag.TagSetElement;
 
 /**
  * This system initializes orbital element set objects. The most important action

@@ -128,7 +128,7 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
                 var base = Mapper.base.get(entity);
                 var body = Mapper.body.get(entity);
                 var pm = Mapper.pm.get(entity);
-                float[] col = body.cc;
+                float[] col = body.color;
 
                 // COLOR
                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], base.opacity);

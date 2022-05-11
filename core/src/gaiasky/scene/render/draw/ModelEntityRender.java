@@ -51,7 +51,7 @@ public class ModelEntityRender {
         } else {
             boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
             // Generic model
-            renderGenericModel(model, scaffolding, batch, alpha, relativistic, shadowEnvironment);
+            renderGenericModel(entity, model, scaffolding, batch, alpha, relativistic, shadowEnvironment);
         }
     }
 
@@ -65,13 +65,24 @@ public class ModelEntityRender {
      * @param relativistic      Whether to apply relativistic effects.
      * @param shadowEnvironment Whether to prepare the shadow environment.
      */
-    private void renderGenericModel(Model model, ModelScaffolding scaffolding, IntModelBatch batch, float alpha, boolean relativistic, boolean shadowEnvironment) {
-        if (model.model.isModelInitialised()) {
-            if (shadowEnvironment) {
+    private void renderGenericModel(Entity entity, Model model, ModelScaffolding scaffolding, IntModelBatch batch, float alpha, boolean relativistic, boolean shadowEnvironment) {
+        ModelComponent mc = model.model;
+        if (mc.isModelInitialised()) {
+            if (scaffolding != null && shadowEnvironment) {
                 prepareShadowEnvironment(model, scaffolding);
             }
-            model.model.update(alpha * scaffolding.fadeOpacity, relativistic);
-            batch.render(model.model.instance, model.model.env);
+
+            float alphaFactor;
+            if (scaffolding != null) {
+                alphaFactor = scaffolding.fadeOpacity;
+            } else {
+                var body = Mapper.body.get(entity);
+                var base = Mapper.base.get(entity);
+                alphaFactor = body.color[3] * base.opacity;
+            }
+
+            mc.update(alpha * alphaFactor, relativistic);
+            batch.render(mc.instance, mc.env);
         }
     }
 

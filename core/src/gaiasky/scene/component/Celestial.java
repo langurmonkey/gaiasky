@@ -1,7 +1,6 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import org.lwjgl.system.CallbackI.V;
 
 public class Celestial implements Component {
     /** Threshold over fov factor **/
@@ -11,9 +10,10 @@ public class Celestial implements Component {
     public String wikiname;
 
     /** Color for billboard rendering **/
-    public float[] ccBillboard;
+    public float[] colorBillboard;
+
     /** Red, green and blue colors and their revamped cousins **/
-    public float[] ccPale;
+    public float[] colorPale;
 
     /** B-V color index **/
     public float colorbv;
