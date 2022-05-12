@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaiasky.GaiaSky;
 import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
@@ -13,10 +12,7 @@ import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.Trajectory.OrbitOrientationModel;
-import gaiasky.scene.entity.EntityUtils;
-import gaiasky.util.math.Intersectord;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3b;
+import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.util.math.Vector3d;
 
 /**
@@ -24,16 +20,14 @@ import gaiasky.util.math.Vector3d;
  */
 public class TrajectoryInitializer extends InitSystem {
 
-    private Vector3b B31, B32;
-    private Vector3d D31, D32, D33;
+    /**
+     * The trajectory utils instance.
+     */
+    private final TrajectoryUtils utils;
 
     public TrajectoryInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
-        B31 = new Vector3b();
-        B32 = new Vector3b();
-        D31 = new Vector3d();
-        D32 = new Vector3d();
-        D33 = new Vector3d();
+        utils = new TrajectoryUtils();
     }
 
     @Override
@@ -121,34 +115,8 @@ public class TrajectoryInitializer extends InitSystem {
 
     private void initializeTransformMatrix(Trajectory trajectory, GraphNode graph, RefSysTransform transform) {
         if (trajectory.model == OrbitOrientationModel.EXTRASOLAR_SYSTEM && transform.matrix == null && graph.parent != null) {
-            computeExtrasolarSystemTransformMatrix(graph, transform);
+            utils.computeExtrasolarSystemTransformMatrix(graph, transform);
         }
-    }
-
-    private void computeExtrasolarSystemTransformMatrix(GraphNode graph, RefSysTransform transform) {
-        Entity parent = graph.parent;
-        Coordinates coord = Mapper.coordinates.get(parent);
-        // Compute new transform function from the orbit's parent position
-        Vector3b barycenter = B31;
-        if (coord != null && coord.coordinates != null) {
-            coord.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), barycenter);
-        } else {
-            EntityUtils.getAbsolutePosition(parent, barycenter);
-        }
-
-        // Up
-        Vector3b y = B32.set(barycenter).scl(1).nor();
-        Vector3d yd = y.put(D31);
-        // Towards north - intersect y with plane
-        Vector3d zd = D32;
-        Intersectord.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0, 0, 0), new Vector3d(0, 1, 0), zd);
-        zd.sub(barycenter).nor();
-        //zd.set(yd).crs(0, 1, 0).nor();
-
-        // Orthogonal to ZY, right-hand system
-        Vector3d xd = D33.set(yd).crs(zd);
-
-        transform.matrix = Matrix4d.changeOfBasis(zd, yd, xd);
     }
 
 }

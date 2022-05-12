@@ -1,8 +1,14 @@
 package gaiasky.scene;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import gaiasky.scenegraph.Star;
+import gaiasky.scene.component.*;
+import gaiasky.scene.component.tag.TagBackgroundModel;
+import gaiasky.scene.component.tag.TagHeliotropic;
+import gaiasky.scene.component.tag.TagQuaternionOrientation;
+import gaiasky.scene.component.tag.TagSet;
+import gaiasky.scenegraph.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -11,6 +17,9 @@ import java.util.Map;
  * A container for data and logic concerning {@link Archetype}s.
  */
 public class Archetypes {
+
+    /** The engine reference. **/
+    private Engine engine;
 
     /** Archetypes map, links old scene graph model objects to artemis archetypes. **/
     protected Map<String, Archetype> archetypes;
@@ -25,7 +34,8 @@ public class Archetypes {
      * Initializes the archetypes map with an entry for each model object.
      */
     public void initialize(Engine engine) {
-        this.archetypes = (new ArchetypeInitializer(engine)).initializeArchetypes();
+        this.engine = engine;
+        this.archetypes = initializeArchetypes();
     }
 
     public boolean contains(String key) {
@@ -69,5 +79,132 @@ public class Archetypes {
             }
         }
         return null;
+    }
+
+    public Map<String, Archetype> initializeArchetypes() {
+        if (engine != null) {
+            // SceneGraphNode
+            addArchetype(SceneGraphNode.class.getName(), Base.class, Body.class, GraphNode.class, Octant.class, Render.class);
+
+            // Universe
+            addArchetype(Scene.ROOT_NAME, Base.class, Body.class, GraphNode.class, GraphRoot.class);
+
+            // Celestial
+            addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class,
+                    Coordinates.class, Rotation.class, Text.class, SolidAngle.class);
+
+            // ModelBody
+            addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class, AffineTransformations.class);
+
+            // Planet
+            addArchetype(Planet.class.getName(), ModelBody.class.getName(), Atmosphere.class, Cloud.class);
+
+            // Particle
+            addArchetype(Particle.class.getName(), CelestialBody.class.getName(), ProperMotion.class, RenderType.class, ParticleExtra.class);
+
+            // Star
+            addArchetype(Star.class.getName(), Particle.class.getName(), Hip.class, Distance.class, Model.class);
+
+            // Satellite
+            addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);
+
+            // HeliotropicSatellite
+            addArchetype(HeliotropicSatellite.class.getName(), Satellite.class.getName(), Attitude.class, TagHeliotropic.class);
+
+            // GenericSpacecraft
+            addArchetype(GenericSpacecraft.class.getName(), Satellite.class.getName(), RenderFlags.class);
+
+            // Spacecraft
+            addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
+
+            // StarCluster
+            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class);
+
+            // Billboard
+            addArchetype(Billboard.class.getName(), ModelBody.class.getName(), TagQuaternionOrientation.class, Fade.class);
+
+            // BillboardGalaxy
+            addArchetype(BillboardGalaxy.class.getName(), Billboard.class.getName());
+
+            // VertsObject
+            addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);
+
+            // Polyline
+            addArchetype(Polyline.class.getName(), VertsObject.class.getName(), Arrow.class);
+
+            // Orbit
+            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class);
+
+            // HeliotropicOrbit
+            addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), Heliotropic.class);
+
+            // FadeNode
+            addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);
+
+            // BackgroundModel
+            addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
+
+            // SphericalGrid
+            addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(), GridUV.class);
+
+            // RecursiveGrid
+            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, RenderType.class);
+
+            // BillboardGroup
+            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
+
+            // Text2D
+            addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class);
+
+            // Axes
+            addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, RefSysTransform.class);
+
+            // Loc
+            addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class);
+
+            // Area
+            addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class);
+
+            // ParticleGroup
+            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagSet.class);
+
+            // StarGroup
+            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class);
+
+            // Constellation
+            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class);
+
+            // ConstellationBoundaries
+            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
+
+            // CosmicRuler
+            addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class);
+
+            // GenericCatalog
+            addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());
+
+            // OrbitalElementsGroup
+            addArchetype(OrbitalElementsGroup.class.getName(), GenericCatalog.class.getName(), OrbitElementsSet.class, TagSet.class);
+
+            // Invisible
+            addArchetype(Invisible.class.getName(), CelestialBody.class.getName(), Raymarching.class);
+
+
+            return archetypes;
+        } else {
+            throw new RuntimeException("Can't create archetypes: the engine is null!");
+        }
+    }
+
+    private void addArchetype(String archetypeName, String parentArchetypeName, Class<? extends Component>... classes) {
+        Archetype parent = null;
+        if (parentArchetypeName != null && this.archetypes.containsKey(parentArchetypeName)) {
+            parent = this.archetypes.get(parentArchetypeName);
+        }
+        this.archetypes.put(archetypeName, new Archetype(engine, parent, archetypeName, classes));
+    }
+
+    private void addArchetype(String archetypeName, Class<? extends Component>... classes) {
+        addArchetype(archetypeName, null, classes);
     }
 }
