@@ -15,7 +15,6 @@ import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-import org.lwjgl.system.CallbackI.V;
 
 public abstract class Satellite extends ModelBody {
 

@@ -221,13 +221,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
-        /*
+        /**
             TODO
             This is a pretty brutal patch for macOS. For some obscure reason,
             the sucker will welcome you with a nice cozy blank screen if
             the activation of the light glow effect is
             not delayed. No time to get to the bottom of this.
-         */
+         **/
         if (SysUtils.isMac() && Settings.settings.postprocess.lightGlow) {
             Task enableLG = new Task() {
                 @Override
@@ -303,9 +303,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             PFMData data;
             if (warpFile != null) {
                 // Load from file
-                // TODO remove the .replace() once the next Libgdx version is released
-                // Check that AssetDescriptor#L41 does not contain a replace anymore (libgdx 791a6bf5)
-                data = manager.get(warpFile.toString().replace('\\', '/'));
+                data = manager.get(warpFile.toString());
             } else {
                 // Generate identity
                 data = PFMReader.constructPFMData(50, 50, val -> val);
@@ -313,9 +311,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             GeometryWarp geometryWarp;
             if (blendFile != null) {
                 // Set up blend texture
-                // TODO remove the .replace() once the next Libgdx version is released
-                // Check that AssetDescriptor#L41 does not contain a replace anymore (libgdx 791a6bf5)
-                Texture blendTex = manager.get(blendFile.toString().replace('\\', '/'));
+                Texture blendTex = manager.get(blendFile.toString());
                 geometryWarp = new GeometryWarp(data, blendTex);
             } else {
                 // No blend

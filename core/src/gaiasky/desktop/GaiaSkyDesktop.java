@@ -10,6 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -310,7 +311,7 @@ public class GaiaSkyDesktop implements IObserver {
         } else {
             cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
         }
-        cfg.useOpenGL3(true, DEFAULT_OPENGL_MAJOR, DEFAULT_OPENGL_MINOR);
+        cfg.setOpenGLEmulation(GLEmulation.GL30, DEFAULT_OPENGL_MAJOR, DEFAULT_OPENGL_MINOR);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
         // Headless mode
@@ -436,7 +437,7 @@ public class GaiaSkyDesktop implements IObserver {
         logger.info(I18n.msg("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
         Settings.settings.scene.renderer.elevation.type = ElevationType.NONE;
         Settings.settings.program.safeMode = true;
-        cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
+        cfg.setOpenGLEmulation(GLEmulation.GL30, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
     private void showDialogOGL(final Exception ex, final String title, final String message) {

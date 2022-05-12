@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.Logger.Log;
@@ -60,9 +61,7 @@ public class SlaveManager {
         if (projectionActive()) {
             instance.loadAssets(manager);
             // Mute cursor
-            // TODO uncomment when libgdx 1.10.1 is released
-            //Gdx.graphics.setSystemCursor(SystemCursor.None);
-            GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            Gdx.graphics.setSystemCursor(SystemCursor.None);
         }
     }
 

@@ -487,17 +487,6 @@ public class VRContext implements Disposable {
             int button = 0;
 
             switch (event.eventType()) {
-            case VR.EVREventType_VREvent_DualAnalog_Move:
-            case VR.EVREventType_VREvent_DualAnalog_Press:
-            case VR.EVREventType_VREvent_DualAnalog_Touch:
-            case VR.EVREventType_VREvent_DualAnalog_Unpress:
-            case VR.EVREventType_VREvent_DualAnalog_Untouch:
-            case VR.EVREventType_VREvent_DualAnalog_Cancel:
-            case VR.EVREventType_VREvent_DualAnalog_ModeSwitch1:
-            case VR.EVREventType_VREvent_DualAnalog_ModeSwitch2:
-                for (VRDeviceListener l : listeners)
-                    l.event(event.eventType());
-                break;
             case VR.EVREventType_VREvent_TrackedDeviceActivated:
                 createDevice(index);
                 for (VRDeviceListener l : listeners) {
