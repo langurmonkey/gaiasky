@@ -135,6 +135,7 @@ public class GSKeys {
     public static final int PAGE_DOWN = Keys.PAGE_DOWN;
     public static final int PICTSYMBOLS = Keys.PICTSYMBOLS;
     public static final int SWITCH_CHARSET = Keys.SWITCH_CHARSET;
+    public static final int CAPS_LOCK = Keys.CAPS_LOCK;
 
     public static final int NUMPAD_0 = Keys.NUMPAD_0;
     public static final int NUMPAD_1 = Keys.NUMPAD_1;
