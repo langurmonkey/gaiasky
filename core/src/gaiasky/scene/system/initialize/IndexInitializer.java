@@ -2,6 +2,7 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 
@@ -10,17 +11,18 @@ import gaiasky.scene.Scene;
  */
 public class IndexInitializer extends InitSystem {
 
-    private Scene scene;
+    /** The index reference. **/
+    private Index index;
 
-    public IndexInitializer(Scene scene, Family family, int priority) {
+    public IndexInitializer(Index index, Family family, int priority) {
         super(false, family, priority);
-        this.scene = scene;
+        this.index = index;
     }
 
     @Override
     public void initializeEntity(Entity entity) {
         // Add entity to index
-        scene.addToIndex(entity);
+        index.addToIndex(entity);
 
         // Unwrap octree objects
         if (Mapper.octant.has(entity)) {
@@ -32,7 +34,7 @@ public class IndexInitializer extends InitSystem {
         }
 
         // Add entity to HIP map, for constellations
-        scene.addToHipMap(entity);
+        index.addToHipMap(entity);
 
     }
 

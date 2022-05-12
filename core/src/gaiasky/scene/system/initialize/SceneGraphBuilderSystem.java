@@ -3,6 +3,7 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.util.i18n.I18n;
@@ -14,10 +15,10 @@ import java.util.Map;
  */
 public class SceneGraphBuilderSystem extends InitSystem {
 
-    /** The index. **/
-    private Map<String, Entity> index;
+    /** The index reference. **/
+    private Index index;
 
-    public SceneGraphBuilderSystem(final Map<String, Entity> index, Family family, int priority) {
+    public SceneGraphBuilderSystem(final Index index, Family family, int priority) {
         super(false, family, priority);
         this.index = index;
     }
@@ -26,7 +27,7 @@ public class SceneGraphBuilderSystem extends InitSystem {
     public void initializeEntity(Entity entity) {
         var graph = entity.getComponent(GraphNode.class);
         if (graph.parentName != null)  {
-            var parent = getNode(graph.parentName);
+            var parent = index.getNode(graph.parentName);
             if(parent != null) {
                 addChild(parent, entity, true);
             } else {
@@ -67,10 +68,5 @@ public class SceneGraphBuilderSystem extends InitSystem {
                 ancestor = ancestorGraph.parent;
             }
         }
-    }
-
-    public Entity getNode(String name) {
-        name = name.toLowerCase().strip();
-        return index.get(name);
     }
 }

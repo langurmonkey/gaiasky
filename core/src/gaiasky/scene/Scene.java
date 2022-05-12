@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.*;
+import gaiasky.scene.render.extract.AbstractExtractSystem;
 import gaiasky.scene.render.extract.BackgroundExtractor;
 import gaiasky.scene.render.extract.ModelExtractor;
 import gaiasky.scene.render.extract.ParticleExtractor;
@@ -13,16 +14,12 @@ import gaiasky.scene.system.update.BackgroundUpdater;
 import gaiasky.scene.system.update.FadeUpdater;
 import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scene.system.update.SceneGraphUpdateSystem;
-import gaiasky.scene.view.PositionEntity;
-import gaiasky.scenegraph.Position;
-import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
-import gaiasky.util.i18n.I18n;
 import gaiasky.util.time.ITimeFrameProvider;
-import gaiasky.util.tree.IPosition;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -34,30 +31,26 @@ public class Scene {
 
     public static final String ROOT_NAME = "Universe";
 
-    /** The engine, containing all entities, components and systems **/
+    /** The engine, containing all entities, components and systems. **/
     public Engine engine;
 
-    /** Quick lookup map. Name to node. **/
-    protected Map<String, Entity> index;
-    /**
-     * Map from integer to position with all Hipparcos stars, for the
-     * constellations
-     **/
-    protected Map<Integer, IPosition> hipMap;
-    // Archetypes map, links old scene graph model objects to artemis archetypes
+    /** The index of names to entities. **/
+    private Index index;
 
-    protected Families families;
-    protected Map<String, Archetype> archetypes;
+    /** Repository for families, which are component set definitions. **/
+    private Families families;
 
-    // Maps old attributes to components
-    protected Map<String, Class<? extends Component>> attributeMap;
+    /** Archetypes map, links old scene graph model objects to artemis archetypes. **/
+    private Archetypes archetypes;
 
-    public Map<String, Archetype> archetypes() {
-        return archetypes;
+    /** Access to the index. **/
+    public Index index() {
+        return index;
     }
 
-    public Map<String, Class<? extends Component>> attributeMap() {
-        return attributeMap;
+    /** Access to the archetypes. **/
+    public Archetypes archetypes() {
+        return archetypes;
     }
 
     public Scene() {
@@ -66,9 +59,12 @@ public class Scene {
     public void initialize() {
         engine = new PooledEngine();
 
+        // Initialize families.
         families = new Families();
-        initializeArchetypes();
-        initializeAttributes();
+
+        // Initialize archetypes.
+        archetypes = new Archetypes();
+        archetypes.initialize(engine);
 
         // Add root element
         Archetype rootArchetype = archetypes.get(ROOT_NAME);
@@ -142,7 +138,7 @@ public class Scene {
             EntitySystem billboardSetInit = new BillboardSetInitializer(setUp, families.billboardSets, priority++);
             EntitySystem axesInit = new AxesInitializer(setUp, families.axes, priority++);
             EntitySystem raymarchingInit = new InvisibleInitializer(setUp, families.raymarchings, priority++);
-            EntitySystem fadeInit = new FadeNodeInitializer(setUp, families.fadeNodes, priority++);
+            EntitySystem fadeInit = new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++);
             EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
 
@@ -158,14 +154,12 @@ public class Scene {
     public void initializeIndex() {
         if (engine != null) {
             int numEntities = engine.getEntities().size();
-            // String-to-node map. The number of objects is a first approximation, as
-            // some nodes actually contain multiple objects.
-            index = new HashMap<>((int) (numEntities * 1.25));
-            // HIP map with 121k * 1.25
-            hipMap = new HashMap<>(151250);
+
+            index = new Index(archetypes);
+            index.initialize(numEntities);
 
             // Prepare system
-            EntitySystem indexSystem = new IndexInitializer(this, Family.all(Base.class).get(), 0);
+            EntitySystem indexSystem = new IndexInitializer(index, Family.all(Base.class).get(), 0);
 
             // Run once
             runOnce(indexSystem);
@@ -179,12 +173,12 @@ public class Scene {
     public void buildSceneGraph() {
         if (engine != null) {
             // Prepare system
-            EntitySystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(this.index, families.graphNodes, 0);
+            EntitySystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(index, families.graphNodes, 0);
 
             // Run once
             runOnce(sceneGraphBuilderSystem);
 
-            GraphNode rootGraph = Mapper.graph.get(getNode("Universe"));
+            GraphNode rootGraph = Mapper.graph.get(index.getNode("Universe"));
             logger.info("Initialized " + (rootGraph.numChildren + 1) + " into the scene graph.");
         }
     }
@@ -206,12 +200,9 @@ public class Scene {
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
 
             // Extract systems.
-            ParticleExtractor particleExtractor = new ParticleExtractor(families.particles, priority++);
-            particleExtractor.setRenderLists(renderLists);
-            ModelExtractor modelExtractor = new ModelExtractor(families.models, priority++);
-            modelExtractor.setRenderLists(renderLists);
-            BackgroundExtractor backgroundExtractor = new BackgroundExtractor(families.backgroundModels, priority++);
-            backgroundExtractor.setRenderLists(renderLists);
+            AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, renderLists);
+            AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, renderLists);
+            AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, renderLists);
 
             // Remove all remaining systems
             engine.removeAllSystems();
@@ -232,6 +223,31 @@ public class Scene {
     }
 
     /**
+     * Creates a new extractor system with the given class, family and priority.
+     * @param extractorClass The extractor class. Must extends {@link AbstractExtractSystem}.
+     * @param family The family.
+     * @param priority The priority of the system (lower means the system gets executed before).
+     * @param renderLists The render lists.
+     * @return The new system instance.
+     */
+    private AbstractExtractSystem newExtractor(Class<? extends AbstractExtractSystem> extractorClass, Family family, int priority, Array<Array<IRenderable>> renderLists) {
+        try {
+            Constructor c = extractorClass.getDeclaredConstructor(Family.class, int.class);
+            AbstractExtractSystem system = (AbstractExtractSystem) c.newInstance(family, priority);
+            system.setRenderLists(renderLists);
+            return system;
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Updates the scene. This causes an update to the engine.
      *
      * @param time   The time frame provider object.
@@ -239,136 +255,6 @@ public class Scene {
      */
     public void update(ITimeFrameProvider time, ICamera camera) {
         engine.update((float) time.getDt());
-    }
-
-    /**
-     * Returns the entity identified with the given name, or null if
-     * it is not found.
-     *
-     * @param name The name of the entity.
-     *
-     * @return The entity, or null if it does not exist.
-     */
-    public Entity getNode(String name) {
-        synchronized (index) {
-            name = name.toLowerCase().strip();
-            Entity entity = index.get(name);
-            return entity;
-        }
-    }
-
-    /**
-     * Adds the given node to the index. Returns false if it was not added due to a naming conflict (name already exists)
-     * with the same object (same class and same names).
-     *
-     * @param entity The entity to add.
-     *
-     * @return False if the object already exists.
-     */
-    public boolean addToIndex(Entity entity) {
-        boolean ok = true;
-        Base base;
-        if ((base = Mapper.base.get(entity)) != null) {
-            synchronized (index) {
-                if (base.names != null) {
-                    if (mustAddToIndex(entity)) {
-                        for (String name : base.names) {
-                            String nameLowerCase = name.toLowerCase().trim();
-                            if (!index.containsKey(nameLowerCase)) {
-                                index.put(nameLowerCase, entity);
-                            } else if (!nameLowerCase.isEmpty()) {
-                                Entity conflict = index.get(nameLowerCase);
-                                Base conflictBase = Mapper.base.get(conflict);
-                                Archetype entityArchetype = findArchetype(entity);
-                                Archetype conflictArchetype = findArchetype(conflict);
-                                logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName().toLowerCase() + ")", conflictBase.getName() + " (" + conflictArchetype.getName().toLowerCase() + ")"));
-                                String[] names1 = base.names;
-                                String[] names2 = conflictBase.names;
-                                boolean same = names1.length == names2.length;
-                                if (same) {
-                                    for (int i = 0; i < names1.length; i++) {
-                                        same = same && names1[i].equals(names2[i]);
-                                    }
-                                }
-                                if (same) {
-                                    same = entityArchetype == conflictArchetype;
-                                }
-                                ok = !same;
-                            }
-                        }
-
-                        // Id
-                        Id id = Mapper.id.get(entity);
-                        if (id != null && id.id > 0) {
-                            String idString = String.valueOf(id.id);
-                            index.put(idString, entity);
-                        }
-                    }
-
-                    // Special cases
-
-                    // HIP stars add "HIP + hipID"
-                    Archetype starArchetype = archetypes.get(Star.class.getName());
-                    if (starArchetype.matches(entity)) {
-                        // Hip
-                        Hip hip = Mapper.hip.get(entity);
-                        if (hip.hip > 0) {
-                            String hipid = "hip " + hip.hip;
-                            index.put(hipid, entity);
-                        }
-                    }
-
-                    // Particle sets add names of each particle
-                    ParticleSet particleSet = Mapper.particleSet.get(entity);
-                    if (particleSet != null) {
-                        if (particleSet.index != null) {
-                            Set<String> keys = particleSet.index.keySet();
-                            for (String key : keys) {
-                                index.put(key, entity);
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
-        if (!ok) {
-            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + findArchetype(entity).getName() + ")"));
-        }
-        return ok;
-    }
-
-    public void addToHipMap(Entity entity) {
-        if (Mapper.octant.has(entity)) {
-            // TODO add octree stars to hip map
-        } else {
-            synchronized (hipMap) {
-                Archetype starArchetype = archetypes.get(Star.class.getName());
-                if (starArchetype.matches(entity)) {
-                    Hip hip = Mapper.hip.get(entity);
-                    if (hip.hip > 0) {
-                        if (hipMap.containsKey(hip.hip)) {
-                            logger.debug(I18n.msg("error.id.hip.duplicate", hip.hip));
-                        } else {
-                            hipMap.put(hip.hip, new PositionEntity(entity));
-                        }
-                    }
-                } else if (Mapper.starSet.has(entity)) {
-                    StarSet starSet = Mapper.starSet.get(entity);
-                    List<IParticleRecord> stars = starSet.data();
-                    for (IParticleRecord pb : stars) {
-                        if (pb.hip() > 0) {
-                            hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(), pb.pmx(), pb.pmy(), pb.pmz()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean mustAddToIndex(Entity entity) {
-        // All entities except the ones who have perimeter, location mark and particle or star set
-        return entity.getComponent(Perimeter.class) == null && entity.getComponent(LocationMark.class) == null && entity.getComponent(ParticleSet.class) == null && entity.getComponent(StarSet.class) == null;
     }
 
     /**
@@ -422,37 +308,6 @@ public class Scene {
             } else {
                 engine.removeSystem(system);
             }
-    }
-
-    /**
-     * Initializes the archetypes map with an entry for each model object.
-     */
-    protected void initializeArchetypes() {
-        this.archetypes = (new ArchetypeInitializer(engine)).initializeArchetypes();
-    }
-
-    /**
-     * Initializes the attributes map.
-     */
-    private void initializeAttributes() {
-        this.attributeMap = (new AttributeInitializer(engine)).initializeAttributes();
-    }
-
-    /**
-     * Find a matching archetype given an entity.
-     *
-     * @param entity The entity.
-     *
-     * @return The matching archetype if it exists, or null if it does not.
-     */
-    private Archetype findArchetype(Entity entity) {
-        Collection<Archetype> archetypes = this.archetypes.values();
-        for (Archetype archetype : archetypes) {
-            if (archetype.matches(entity)) {
-                return archetype;
-            }
-        }
-        return null;
     }
 
 }

@@ -31,7 +31,7 @@ public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
         if (params[0] instanceof SceneGraph) {
             orbit = (HeliotropicOrbit) ((ISceneGraph) params[0]).getNode(orbitname);
         } else if (params[0] instanceof Scene) {
-            entity = ((Scene) params[0]).getNode(orbitname);
+            entity = ((Scene) params[0]).index().getNode(orbitname);
         }
         if (params[1] instanceof CelestialBody) {
             orbit.setBody((CelestialBody) params[1]);

@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Archetype;
+import gaiasky.scene.AttributeMap;
 import gaiasky.scene.component.Base;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
@@ -34,6 +35,18 @@ public class NewJsonLoader extends AbstractSceneLoader {
     private static final String COMPONENTS_PACKAGE = "gaiasky.scenegraph.component.";
     // Params to skip in the normal processing
     private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
+
+
+    /** Maps old attributes to components. **/
+    private AttributeMap attributeMap;
+
+    /**
+     * Creates a new instance.
+     */
+    public NewJsonLoader() {
+        this.attributeMap = new AttributeMap();
+        this.attributeMap.initialize();
+    }
 
     @FunctionalInterface
     interface Function6<One, Two, Three, Four> {
@@ -63,7 +76,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                         clazzName = clazzName.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
                         @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
-                        if (!scene.archetypes().containsKey(clazzName)) {
+                        if (!scene.archetypes().contains(clazzName)) {
                             // Do not know what to do
                             if (!loggedArchetypes.contains(clazzName)) {
                                 logger.warn("Skipping " + clazz.getSimpleName() + ": no suitable archetype found.");
@@ -179,7 +192,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
         processJson(json, (valueClass, value, attribute) -> {
             String key = findAttribute(attribute.name, className);
             if (key != null) {
-                Class<? extends Component> componentClass = scene.attributeMap().get(key);
+                Class<? extends Component> componentClass = attributeMap.get(key);
                 Component comp = entity.getComponent(componentClass);
 
                 if (!set(comp, attribute.name, value)) {
@@ -197,9 +210,9 @@ public class NewJsonLoader extends AbstractSceneLoader {
 
     public String findAttribute(String attributeName, String className){
         String mixedKey = attributeName + ":" + className;
-        if(scene.attributeMap().containsKey(mixedKey)) {
+        if(attributeMap.containsKey(mixedKey)) {
             return mixedKey;
-        } else if(scene.attributeMap().containsKey(attributeName)) {
+        } else if(attributeMap.containsKey(attributeName)) {
             return attributeName;
         }
         return null;

@@ -7,6 +7,7 @@ package gaiasky.util.coord;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Base;
@@ -51,7 +52,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
                     SceneGraphNode sgn = ((ISceneGraph) params[0]).getNode(orbitname);
                     orbit = (Orbit) sgn;
                 } else if (params[0] instanceof Scene) {
-                    entity = ((Scene) params[0]).getNode(orbitname);
+                    entity = ((Scene) params[0]).index().getNode(orbitname);
                 }
                 if (params[1] instanceof CelestialBody) {
                     orbit.setBody((CelestialBody) params[1]);

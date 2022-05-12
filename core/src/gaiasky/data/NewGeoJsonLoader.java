@@ -49,7 +49,7 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
     private void loadJsonObject(JsonValue json) {
         Class clazz = Area.class;
         String className = clazz.getName();
-        if (!scene.archetypes().containsKey(className)) {
+        if (!scene.archetypes().contains(className)) {
             // Do not know what to do
             if (!loggedArchetypes.contains(className)) {
                 logger.warn("Skipping " + clazz.getSimpleName() + ": no suitable archetype found.");
