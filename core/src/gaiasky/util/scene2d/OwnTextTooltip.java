@@ -29,7 +29,7 @@ import gaiasky.util.TextUtils;
 /** A tooltip that shows a label.
  * @author Nathan Sweet */
 public class OwnTextTooltip extends Tooltip<Label> {
-    private final Label label;
+    private final OwnLabel label;
 
     public OwnTextTooltip(String text, Skin skin, int breakSpaces) {
         this(text, TooltipManager.getInstance(), skin.get(TextTooltipStyle.class), breakSpaces);
@@ -61,13 +61,13 @@ public class OwnTextTooltip extends Tooltip<Label> {
         // Warp text if breakSpaces <= 0
         text = TextUtils.breakSpaces(text, breakSpaces);
 
-        label = new Label(text, style.label);
-        label.setWrap(true);
+        label = new OwnLabel(text, style.label);
 
         getContainer().setActor(label);
+        getContainer().pack();
         getContainer().width(new Value() {
             public float get(Actor context) {
-                return Math.min(manager.maxWidth, getContainer().getActor().getGlyphLayout().width);
+                return Math.min(manager.maxWidth, label.getGlyphLayout().width);
             }
         });
 
