@@ -33,7 +33,8 @@ public class Trajectory implements Component {
     public Entity body;
     public Vector3d prev, curr;
     public double alpha;
-    public Matrix4d localTransformD, auxMat;
+    public Matrix4d localTransformD = new Matrix4d();
+    public Matrix4d auxMat;
     public String provider;
     public Double multiplier = 1.0d;
     public Class<? extends IOrbitDataProvider> providerClass;

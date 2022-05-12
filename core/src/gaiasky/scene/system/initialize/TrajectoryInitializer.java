@@ -13,6 +13,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.Trajectory.OrbitOrientationModel;
 import gaiasky.scene.entity.TrajectoryUtils;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
 /**
