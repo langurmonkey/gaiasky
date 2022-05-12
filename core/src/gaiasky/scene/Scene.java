@@ -10,10 +10,7 @@ import gaiasky.scene.render.extract.BackgroundExtractor;
 import gaiasky.scene.render.extract.ModelExtractor;
 import gaiasky.scene.render.extract.ParticleExtractor;
 import gaiasky.scene.system.initialize.*;
-import gaiasky.scene.system.update.BackgroundUpdater;
-import gaiasky.scene.system.update.FadeUpdater;
-import gaiasky.scene.system.update.ModelUpdater;
-import gaiasky.scene.system.update.SceneGraphUpdateSystem;
+import gaiasky.scene.system.update.*;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -197,6 +194,7 @@ public class Scene {
             // Regular update systems.
             FadeUpdater fadeUpdateSystem = new FadeUpdater(families.fadeNodes, priority++);
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models,  priority++);
+            TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
 
             // Extract systems.
@@ -210,12 +208,13 @@ public class Scene {
             // 1. First updater: scene graph update system
             engine.addSystem(sceneGraphUpdateSystem);
 
-            // 2. Update
+            // 2. Update --- these can run in parallel
             engine.addSystem(fadeUpdateSystem);
             engine.addSystem(modelUpdateSystem);
+            engine.addSystem(trajectoryUpdateSystem);
             engine.addSystem(backgroundUpdateSystem);
 
-            // 3. Extract
+            // 3. Extract --- these can also run in parallel
             engine.addSystem(particleExtractor);
             engine.addSystem(modelExtractor);
             engine.addSystem(backgroundExtractor);

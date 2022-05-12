@@ -11,6 +11,7 @@ import gaiasky.scene.component.tag.TagSet;
 import gaiasky.scenegraph.*;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -83,6 +84,8 @@ public class Archetypes {
 
     public Map<String, Archetype> initializeArchetypes() {
         if (engine != null) {
+            this.archetypes = new HashMap<>();
+
             // SceneGraphNode
             addArchetype(SceneGraphNode.class.getName(), Base.class, Body.class, GraphNode.class, Octant.class, Render.class);
 
