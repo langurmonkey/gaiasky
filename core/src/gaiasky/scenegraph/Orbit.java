@@ -249,11 +249,11 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         }
 
         if (!onlyBody)
-            updateLocalTransform();
+            updateLocalTransform(time.getTime());
 
     }
 
-    protected void updateLocalTransform() {
+    protected void updateLocalTransform(Instant date) {
         translation.getMatrix(localTransformD);
         if (newMethod) {
             if (transformFunction != null) {
