@@ -38,4 +38,13 @@ public class EntityUtils {
         }
     }
 
+    /**
+     * Checks whether the given entity has a {@link gaiasky.scene.component.Coordinates} component,
+     * and the current time is out of range.
+     * @return Whether the entity is in time overflow.
+     */
+    public static boolean isCoordinatesTimeOverflow(Entity entity) {
+        return Mapper.coordinates.has(entity) && Mapper.coordinates.get(entity).timeOverflow;
+    }
+
 }

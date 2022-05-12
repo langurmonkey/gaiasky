@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagBackgroundModel;
-import gaiasky.scene.component.tag.TagHeliotropic;
 import gaiasky.scene.component.tag.TagQuaternionOrientation;
 import gaiasky.scene.component.tag.TagSet;
 import gaiasky.scenegraph.*;
@@ -112,7 +111,7 @@ public class Archetypes {
             addArchetype(Satellite.class.getName(), ModelBody.class.getName(), ParentOrientation.class);
 
             // HeliotropicSatellite
-            addArchetype(HeliotropicSatellite.class.getName(), Satellite.class.getName(), Attitude.class, TagHeliotropic.class);
+            addArchetype(HeliotropicSatellite.class.getName(), Satellite.class.getName(), Attitude.class, gaiasky.scene.component.tag.TagHeliotropic.class);
 
             // GenericSpacecraft
             addArchetype(GenericSpacecraft.class.getName(), Satellite.class.getName(), RenderFlags.class);
@@ -139,7 +138,7 @@ public class Archetypes {
             addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class);
 
             // HeliotropicOrbit
-            addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), Heliotropic.class);
+            addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), TagHeliotropic.class);
 
             // FadeNode
             addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);

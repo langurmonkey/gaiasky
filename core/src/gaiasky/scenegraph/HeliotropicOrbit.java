@@ -24,6 +24,7 @@ public class HeliotropicOrbit extends Orbit {
      * necessary. Override if your model contains more than just the position
      * and size.
      */
+    @Override
     protected void updateLocalTransform(Instant date) {
         double sunLongitude = AstroUtils.getSunLongitude(date);
         translation.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);

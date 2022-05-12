@@ -23,24 +23,23 @@ public class ModelExtractor extends AbstractExtractSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
-        var model = Mapper.model.get(entity);
-        var coord = Mapper.coordinates.get(entity);
-        var graph = Mapper.graph.get(entity);
-        var sa = Mapper.sa.get(entity);
-        var scaffolding = Mapper.modelScaffolding.get(entity);
-        var atmosphere = Mapper.atmosphere.get(entity);
-        var cloud = Mapper.cloud.get(entity);
-        var render = Mapper.render.get(entity);
-
-        addToRenderLists(GaiaSky.instance.cameraManager, base, body, coord, graph, sa, model, scaffolding, render, atmosphere, cloud);
-
+        addToRenderLists(entity, camera);
     }
 
-    protected void addToRenderLists(ICamera camera, Base base, Body body, Coordinates coord, GraphNode graph, SolidAngle sa, Model model, ModelScaffolding scaffolding, Render render, Atmosphere atmosphere, Cloud cloud) {
+    protected void addToRenderLists(Entity entity, ICamera camera) {
+        var base = Mapper.base.get(entity);
+        var graph = Mapper.graph.get(entity);
+        var coord = Mapper.coordinates.get(entity);
         Coordinates parentCoord = Mapper.coordinates.get(graph.parent);
+
         if (shouldRender(base) && isValidPosition(coord) && isValidPosition(parentCoord)) {
+            var body = Mapper.body.get(entity);
+            var model = Mapper.model.get(entity);
+            var sa = Mapper.sa.get(entity);
+            var scaffolding = Mapper.modelScaffolding.get(entity);
+            var atmosphere = Mapper.atmosphere.get(entity);
+            var cloud = Mapper.cloud.get(entity);
+            var render = Mapper.render.get(entity);
             // TODO restore
             // camera.checkClosestBody(this);
             double thPoint = (sa.thresholdPoint * camera.getFovFactor()) / scaffolding.sizeScaleFactor;

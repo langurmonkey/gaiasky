@@ -2,9 +2,12 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import gaiasky.GaiaSky;
 import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
@@ -14,6 +17,9 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
+
+import java.time.Instant;
+import java.util.Date;
 
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);
@@ -137,5 +143,37 @@ public class Trajectory implements Component {
         this.body = entity;
         this.distUp = (float) Math.max(radius * 200, 500 * Constants.KM_TO_U);
         this.distDown = (float) Math.max(radius * 20, 50 * Constants.KM_TO_U);
+    }
+
+    /**
+     * TODO move this function to a system or another more suitable location.
+     * Queues a trajectory refresh task with the refresher for this trajectory.
+     *
+     * @param verts The verts object containing the data.
+     * @param force Whether to force the refresh.
+     */
+    public void refreshOrbit(Verts verts, boolean force) {
+        if ((force && params != null) || (mustRefresh && !EntityUtils.isCoordinatesTimeOverflow(body))) {
+            Instant currentTime = GaiaSky.instance.time.getTime();
+            long currentMs = currentTime.toEpochMilli();
+            if (verts.pointCloudData == null || currentMs < orbitStartMs || currentMs > orbitEndMs) {
+                // Schedule for refresh
+                // Work out sample initial date
+                Date iniTime;
+                if (GaiaSky.instance.time.getWarpFactor() < 0) {
+                    // From (now - period) forward (reverse)
+                    iniTime = Date.from(Instant.from(currentTime).minusMillis((long) (oc.period * 80000000L)));
+                } else {
+                    // From now forward
+                    iniTime = Date.from(currentTime);
+                }
+                params.setIni(iniTime);
+
+                // Add to queue
+                if (!refreshing) {
+                    orbitRefresher.queue(params);
+                }
+            }
+        }
     }
 }

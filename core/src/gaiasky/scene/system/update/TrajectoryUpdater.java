@@ -12,6 +12,8 @@ import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Trajectory.OrbitOrientationModel;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -57,11 +59,28 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
             trajectory.coord = ((double) nowt0 / (double) t1t0) % 1d;
         }
 
-        if (!trajectory.onlyBody)
-            updateLocalTransform(graph, trajectory, transform);
+        if (!trajectory.onlyBody) {
+            if(Mapper.tagHeliotropic.has(entity)) {
+                // Heliotropic orbit
+                updateLocalTransformHeliotropic(GaiaSky.instance.time.getTime(), graph, trajectory, transform);
+            } else {
+                // Regular orbit
+                updateLocalTransformRegular(graph, trajectory, transform);
+            }
+        }
     }
 
-    protected void updateLocalTransform(GraphNode graph, Trajectory trajectory, RefSysTransform transform) {
+    protected void updateLocalTransformHeliotropic(Instant date, GraphNode graph, Trajectory trajectory, RefSysTransform transform) {
+        Matrix4 localTransform = graph.localTransform;
+        Matrix4d localTransformD = trajectory.localTransformD;
+
+        double sunLongitude = AstroUtils.getSunLongitude(date);
+        graph.translation.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);
+
+        localTransformD.putIn(localTransform);
+    }
+
+    protected void updateLocalTransformRegular(GraphNode graph, Trajectory trajectory, RefSysTransform transform) {
         Matrix4 localTransform = graph.localTransform;
         Matrix4d localTransformD = trajectory.localTransformD;
         Matrix4d transformFunction = transform.matrix;

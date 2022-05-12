@@ -5,10 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.*;
-import gaiasky.scene.render.extract.AbstractExtractSystem;
-import gaiasky.scene.render.extract.BackgroundExtractor;
-import gaiasky.scene.render.extract.ModelExtractor;
-import gaiasky.scene.render.extract.ParticleExtractor;
+import gaiasky.scene.render.extract.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scenegraph.camera.ICamera;
@@ -200,6 +197,7 @@ public class Scene {
             // Extract systems.
             AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, renderLists);
             AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, renderLists);
+            AbstractExtractSystem trajectoryExtractor = newExtractor(TrajectoryExtractor.class, families.orbits, priority++, renderLists);
             AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, renderLists);
 
             // Remove all remaining systems
@@ -217,6 +215,7 @@ public class Scene {
             // 3. Extract --- these can also run in parallel
             engine.addSystem(particleExtractor);
             engine.addSystem(modelExtractor);
+            engine.addSystem(trajectoryExtractor);
             engine.addSystem(backgroundExtractor);
         }
     }

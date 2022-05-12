@@ -8,16 +8,20 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 
 /**
  * Contains some utils common to all extract systems.
  */
 public abstract class AbstractExtractSystem extends IteratingSystem {
+
+    protected final ICamera camera;
     protected Array<Array<IRenderable>> renderLists;
 
     public AbstractExtractSystem(Family family, int priority) {
         super(family, priority);
+        this.camera = GaiaSky.instance.cameraManager;;
     }
 
     public void setRenderLists(Array<Array<IRenderable>> renderLists) {

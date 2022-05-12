@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -239,7 +240,7 @@ public class Focus implements Component, IFocus {
 
     @Override
     public boolean isCoordinatesTimeOverflow() {
-        return Mapper.coordinates.has(entity) ? Mapper.coordinates.get(entity).timeOverflow : false;
+        return EntityUtils.isCoordinatesTimeOverflow(entity);
     }
 
     @Override

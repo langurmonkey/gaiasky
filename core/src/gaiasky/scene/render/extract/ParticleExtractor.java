@@ -16,6 +16,7 @@ import gaiasky.util.Settings;
  */
 public class ParticleExtractor extends AbstractExtractSystem {
 
+
     public ParticleExtractor(Family family, int priority) {
         super(family, priority);
     }
@@ -23,17 +24,19 @@ public class ParticleExtractor extends AbstractExtractSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
-        var render = Mapper.render.get(entity);
-        var renderType = Mapper.renderType.get(entity);
-        var hip = Mapper.hip.get(entity);
-        addToRenderLists(GaiaSky.instance.cameraManager, entity, base, body, render, renderType, hip);
+        addToRenderLists(entity, camera);
     }
 
-    private void addToRenderLists(ICamera camera, Entity entity, Base base, Body body, Render render, RenderType renderType, Hip hip) {
+    private void addToRenderLists(Entity entity, ICamera camera) {
+        var base = Mapper.base.get(entity);
         //camera.checkClosestParticle(this);
+
         if (this.shouldRender(base)) {
+            var body = Mapper.body.get(entity);
+            var render = Mapper.render.get(entity);
+            var renderType = Mapper.renderType.get(entity);
+            var hip = Mapper.hip.get(entity);
+
             addToRender(render, RenderGroup.POINT_STAR);
 
             if (hip == null) {

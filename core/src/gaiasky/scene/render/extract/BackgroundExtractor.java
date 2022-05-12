@@ -15,10 +15,15 @@ public class BackgroundExtractor extends AbstractExtractSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        addToRenderLists(entity);
+    }
+
+    private void addToRenderLists(Entity entity) {
         var base = Mapper.base.get(entity);
-        var render = Mapper.render.get(entity);
 
         if (shouldRender(base)) {
+            var render = Mapper.render.get(entity);
+
             if(Mapper.grid.has(entity)) {
                 // UV grid
                 addToRender(render, RenderGroup.MODEL_VERT_GRID);

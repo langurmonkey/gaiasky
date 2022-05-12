@@ -248,8 +248,9 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             this.coord = ((double) nowt0 / (double) t1t0) % 1d;
         }
 
-        if (!onlyBody)
-            updateLocalTransform(time.getTime());
+        if (!onlyBody) {
+            updateLocalTransform(GaiaSky.instance.time.getTime());
+        }
 
     }
 
