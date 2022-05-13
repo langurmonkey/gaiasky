@@ -7,6 +7,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
@@ -29,8 +30,11 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
      */
     protected static final float SHADER_MODEL_OVERLAP_FACTOR = 20f;
 
+    private final TrajectoryUtils utils;
+
     public TrajectoryExtractor(Family family, int priority) {
         super(family, priority);
+        this.utils = new TrajectoryUtils();
     }
 
     @Override
@@ -62,26 +66,29 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
 
                     RenderGroup rg = Settings.settings.scene.renderer.isQuadLineRenderer() ? RenderGroup.LINE : RenderGroup.LINE_GPU;
 
-                    if (body == null) {
+                    if (trajectory.body == null) {
                         // There is no body, always render
                         addToRender(render, rg);
                         added = true;
-                    } else if (body.distToCamera > trajectory.distDown) {
-                        // Body, disappear slowly
-                        if (body.distToCamera < trajectory.distUp)
-                            trajectory.alpha *= MathUtilsd.lint(body.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
-                        addToRender(render, rg);
-                        added = true;
+                    } else {
+                        var bodyBody = Mapper.body.get(trajectory.body);
+                        if (bodyBody.distToCamera > trajectory.distDown) {
+                            // Body, disappear slowly
+                            if (bodyBody.distToCamera < trajectory.distUp)
+                                trajectory.alpha *= MathUtilsd.lint(bodyBody.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
+                            addToRender(render, rg);
+                            added = true;
+                        }
                     }
                 }
 
                 var verts = Mapper.verts.get(entity);
                 if (verts.pointCloudData == null || added) {
-                    trajectory.refreshOrbit(verts, false);
+                    utils.refreshOrbit(trajectory, verts, false);
                 }
             }
             // Orbital elements renderer
-            if (body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
+            if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
                 addToRender(render, RenderGroup.ORBITAL_ELEMENTS_PARTICLE);
             }
             if (base.forceLabel) {

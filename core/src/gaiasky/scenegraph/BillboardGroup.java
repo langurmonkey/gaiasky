@@ -210,7 +210,7 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
      */
     protected void updateLocalTransform() {
         // Scale + Rotate + Tilt + Translate
-        translation.getMatrix(localTransform).scl(size);
+        translation.setToTranslation(localTransform).scl(size);
         localTransform.mul(coordinateSystem);
     }
 

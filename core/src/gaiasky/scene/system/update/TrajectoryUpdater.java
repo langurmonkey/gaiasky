@@ -71,24 +71,21 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
     }
 
     protected void updateLocalTransformHeliotropic(Instant date, GraphNode graph, Trajectory trajectory, RefSysTransform transform) {
-        Matrix4 localTransform = graph.localTransform;
         Matrix4d localTransformD = trajectory.localTransformD;
 
         double sunLongitude = AstroUtils.getSunLongitude(date);
-        graph.translation.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);
+        graph.translation.setToTranslation(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);
 
-        localTransformD.putIn(localTransform);
+        localTransformD.putIn(graph.localTransform);
     }
 
     protected void updateLocalTransformRegular(GraphNode graph, Trajectory trajectory, RefSysTransform transform) {
-        Matrix4 localTransform = graph.localTransform;
-        Matrix4d localTransformD = trajectory.localTransformD;
-        Matrix4d transformFunction = transform.matrix;
-        OrbitComponent oc = trajectory.oc;
+        var localTransformD = trajectory.localTransformD;
+        var transformFunction = transform.matrix;
 
         var parentGraph = Mapper.graph.get(graph.parent);
 
-        graph.translation.getMatrix(localTransformD);
+        graph.translation.setToTranslation(localTransformD);
         if (trajectory.newMethod) {
             if (transformFunction != null) {
                 localTransformD.mul(transformFunction);
@@ -99,6 +96,8 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
                 localTransformD.rotate(0, 1, 0, 90);
             }
         } else {
+            OrbitComponent oc = trajectory.oc;
+
             if (transformFunction == null && parentGraph.orientation != null)
                 localTransformD.mul(parentGraph.orientation);
             if (transformFunction != null)
@@ -108,6 +107,6 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
             localTransformD.rotate(0, 0, 1, oc.i);
             localTransformD.rotate(0, 1, 0, oc.ascendingnode);
         }
-        localTransformD.putIn(localTransform);
+        localTransformD.putIn(graph.localTransform);
     }
 }

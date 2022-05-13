@@ -160,7 +160,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
     }
 
     public void update(Vector3b transform) {
-        transform.getMatrix(localTransform).scl(size);
+        transform.setToTranslation(localTransform).scl(size);
     }
 
     public void initMaterial() {

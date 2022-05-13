@@ -53,7 +53,7 @@ public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-        translation.getMatrix(localTransform);
+        translation.setToTranslation(localTransform);
     }
 
     /**

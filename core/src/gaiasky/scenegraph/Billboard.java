@@ -91,7 +91,7 @@ public class Billboard extends ModelBody {
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
             DecalUtils.setBillboardRotation(q, pos.put(D32.get()).nor(), new Vector3d(0, 1, 0));
 
-            translation.getMatrix(localTransform).scl(size).rotate(q);
+            translation.setToTranslation(localTransform).scl(size).rotate(q);
         } else {
             localTransform.set(this.localTransform);
         }

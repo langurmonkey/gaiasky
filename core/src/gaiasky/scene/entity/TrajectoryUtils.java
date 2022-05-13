@@ -2,19 +2,36 @@ package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
+import gaiasky.data.OrbitRefresher;
+import gaiasky.data.orbit.OrbitFileDataProvider;
+import gaiasky.data.orbit.OrbitalParametersProvider;
+import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Coordinates;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.RefSysTransform;
+import gaiasky.scene.component.*;
+import gaiasky.scene.system.initialize.TrajectoryInitializer;
+import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
+import java.time.Instant;
+import java.util.Date;
+
 /**
  * Contains methods that act on trajectory entities.
  */
 public class TrajectoryUtils {
+
+    /** The trajectory refresher daemon. **/
+    public static OrbitRefresher orbitRefresher;
+
+    /** Initialize the trajectory refresher daemon. **/
+    public static void initRefresher() {
+        if (orbitRefresher == null) {
+            orbitRefresher = new OrbitRefresher("gaiasky-worker-trajectoryupdate");
+        }
+    }
 
     private Vector3b B31, B32;
     private Vector3d D31, D32, D33;
@@ -25,6 +42,32 @@ public class TrajectoryUtils {
         D31 = new Vector3d();
         D32 = new Vector3d();
         D33 = new Vector3d();
+    }
+
+    public void initOrbitMetadata(Body body, Trajectory trajectory, Verts verts) {
+        PointCloudData pointCloudData = verts.pointCloudData;
+        if (pointCloudData != null) {
+            trajectory.orbitStartMs = pointCloudData.getDate(0).toEpochMilli();
+            trajectory.orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
+            if (!trajectory.onlyBody) {
+                int last = pointCloudData.getNumPoints() - 1;
+                Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
+                body.size = (float) v.len() * 5;
+            }
+        }
+        trajectory.mustRefresh = trajectory.providerClass != null
+                && trajectory.providerClass.equals(OrbitFileDataProvider.class)
+                && trajectory.body != null
+                // body instanceof Planet
+                && Mapper.atmosphere.has(trajectory.body)
+                && trajectory.oc.period > 0;
+        trajectory.orbitTrail = trajectory.orbitTrail | trajectory.mustRefresh | (trajectory.providerClass != null && trajectory.providerClass.equals(OrbitalParametersProvider.class));
+    }
+
+    public void initializeTransformMatrix(Trajectory trajectory, GraphNode graph, RefSysTransform transform) {
+        if (trajectory.model == Trajectory.OrbitOrientationModel.EXTRASOLAR_SYSTEM && transform.matrix == null && graph.parent != null) {
+            computeExtrasolarSystemTransformMatrix(graph, transform);
+        }
     }
 
     public void computeExtrasolarSystemTransformMatrix(GraphNode graph, RefSysTransform transform) {
@@ -51,5 +94,36 @@ public class TrajectoryUtils {
         Vector3d xd = D33.set(yd).crs(zd);
 
         transform.matrix = Matrix4d.changeOfBasis(zd, yd, xd);
+    }
+
+    /**
+     * Queues a trajectory refresh task with the refresher for this trajectory.
+     *
+     * @param verts The verts object containing the data.
+     * @param force Whether to force the refresh.
+     */
+    public void refreshOrbit(Trajectory trajectory, Verts verts, boolean force) {
+        if ((force && trajectory.params != null) || (trajectory.mustRefresh && !EntityUtils.isCoordinatesTimeOverflow(trajectory.body))) {
+            Instant currentTime = GaiaSky.instance.time.getTime();
+            long currentMs = currentTime.toEpochMilli();
+            if (verts.pointCloudData == null || currentMs < trajectory.orbitStartMs || currentMs > trajectory.orbitEndMs) {
+                // Schedule for refresh
+                // Work out sample initial date
+                Date iniTime;
+                if (GaiaSky.instance.time.getWarpFactor() < 0) {
+                    // From (now - period) forward (reverse)
+                    iniTime = Date.from(Instant.from(currentTime).minusMillis((long) (trajectory.oc.period * 80000000L)));
+                } else {
+                    // From now forward
+                    iniTime = Date.from(currentTime);
+                }
+                trajectory.params.setIni(iniTime);
+
+                // Add to queue
+                if (!trajectory.refreshing) {
+                    orbitRefresher.queue(trajectory.params);
+                }
+            }
+        }
     }
 }

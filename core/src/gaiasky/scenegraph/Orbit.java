@@ -18,7 +18,7 @@ import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
-import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -54,7 +54,7 @@ import java.util.Date;
 public class Orbit extends Polyline implements I3DTextRenderable {
     private static final Log logger = Logger.getLogger(Orbit.class);
 
-    private static OrbitRefresher orbitRefresher;
+    public static OrbitRefresher orbitRefresher;
 
     public enum OrientationModel {
         DEFAULT,
@@ -115,7 +115,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
      * Whether to show the orbit as a trail or not
      */
     private boolean orbitTrail;
-    private OrbitDataLoaderParameter params;
+    private OrbitDataLoaderParameters params;
 
     /**
      * Point color
@@ -148,7 +148,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                 IOrbitDataProvider provider;
                 try {
                     provider = ClassReflection.newInstance(providerClass);
-                    provider.load(oc.source, new OrbitDataLoaderParameter(names[0], providerClass, oc, multiplier, 100), newMethod);
+                    provider.load(oc.source, new OrbitDataLoaderParameters(names[0], providerClass, oc, multiplier, 100), newMethod);
                     pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);
@@ -175,7 +175,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         primitiveSize = 1.1f;
 
         if (body != null) {
-            params = new OrbitDataLoaderParameter(body.names[0], null, oc.period, 500);
+            params = new OrbitDataLoaderParameters(body.names[0], null, oc.period, 500);
             params.orbit = this;
         }
 
@@ -228,7 +228,11 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                 this.size = (float) v.len() * 5;
             }
         }
-        mustRefresh = providerClass != null && providerClass.equals(OrbitFileDataProvider.class) && body != null && body instanceof Planet && oc.period > 0;
+        mustRefresh = providerClass != null
+                && providerClass.equals(OrbitFileDataProvider.class)
+                && body != null
+                && body instanceof Planet
+                && oc.period > 0;
         orbitTrail = orbitTrail | mustRefresh | (providerClass != null && providerClass.equals(OrbitalParametersProvider.class));
     }
 
@@ -255,7 +259,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     }
 
     protected void updateLocalTransform(Instant date) {
-        translation.getMatrix(localTransformD);
+        translation.setToTranslation(localTransformD);
         if (newMethod) {
             if (transformFunction != null) {
                 localTransformD.mul(transformFunction);

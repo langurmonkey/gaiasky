@@ -7,7 +7,7 @@ package gaiasky.data.orbit;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -20,7 +20,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
     PointCloudData data;
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter) {
+    public void load(String file, OrbitDataLoaderParameters parameter) {
         FileDataLoaderEclipticJulianTime odl = new FileDataLoaderEclipticJulianTime();
         try {
             FileHandle f = Settings.settings.data.dataFileHandle(file);
@@ -32,7 +32,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter, boolean newMethod) {
+    public void load(String file, OrbitDataLoaderParameters parameter, boolean newMethod) {
         load(file, parameter);
     }
 

@@ -176,7 +176,7 @@ public abstract class ModelBody extends CelestialBody {
     public void setToLocalTransform(float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
             if (rc != null) {
-                translation.getMatrix(localTransform)
+                translation.setToTranslation(localTransform)
                         .scl(size * sizeFactor)
                         .mul(Coordinates.getTransformF(refPlaneTransform))
                         .rotate(0, 1, 0, (float) rc.ascendingNode)
@@ -187,7 +187,7 @@ public abstract class ModelBody extends CelestialBody {
                         .rotate(0, 1, 0, (float) rc.ascendingNode)
                         .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
             } else {
-                translation.getMatrix(localTransform)
+                translation.setToTranslation(localTransform)
                         .scl(size * sizeFactor)
                         .mul(Coordinates.getTransformF(refPlaneTransform));
                 orientation.idt()

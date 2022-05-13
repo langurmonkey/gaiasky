@@ -185,7 +185,7 @@ public class Scene {
         if (engine != null) {
             int priority = 0;
             // Scene graph update system needs to run first.
-            SceneGraphUpdateSystem sceneGraphUpdateSystem = new SceneGraphUpdateSystem(families.roots, priority++, GaiaSky.instance.time);
+            GraphUpdater sceneGraphUpdateSystem = new GraphUpdater(families.roots, priority++, GaiaSky.instance.time);
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
 
             // Regular update systems.

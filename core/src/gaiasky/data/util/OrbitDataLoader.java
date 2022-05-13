@@ -22,9 +22,9 @@ import gaiasky.util.Logger;
 import java.util.Date;
 
 /**
- * Abstract data loader to rule them all.
+ * An orbit data loader to rule them all.
  */
-public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, OrbitDataLoader.OrbitDataLoaderParameter> {
+public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, OrbitDataLoader.OrbitDataLoaderParameters> {
 
     PointCloudData data;
 
@@ -34,31 +34,30 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
 
     @Override
     @SuppressWarnings("rawtypes")
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, OrbitDataLoaderParameter parameter) {
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, OrbitDataLoaderParameters parameters) {
         return null;
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, OrbitDataLoaderParameter parameter) {
+    public void loadAsync(AssetManager manager, String fileName, FileHandle file, OrbitDataLoaderParameters parameters) {
         IOrbitDataProvider provider;
         try {
-            provider = ClassReflection.newInstance(parameter.providerClass);
-            provider.load(fileName, parameter);
+            provider = ClassReflection.newInstance(parameters.providerClass);
+            provider.load(fileName, parameters);
             data = provider.getData();
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
-
     }
 
     /**
      * 
      */
-    public PointCloudData loadSync(AssetManager manager, String fileName, FileHandle file, OrbitDataLoaderParameter parameter) {
+    public PointCloudData loadSync(AssetManager manager, String fileName, FileHandle file, OrbitDataLoaderParameters parameter) {
         return data;
     }
 
-    static public class OrbitDataLoaderParameter extends AssetLoaderParameters<PointCloudData> {
+    static public class OrbitDataLoaderParameters extends AssetLoaderParameters<PointCloudData> {
 
         Class<? extends IOrbitDataProvider> providerClass;
         public Date ini;
@@ -71,25 +70,25 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         public Orbit orbit;
         public Entity entity;
 
-        public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass) {
+        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass) {
             this.providerClass = providerClass;
         }
 
-        public OrbitDataLoaderParameter(String name, Class<? extends IOrbitDataProvider> providerClass, double orbitalPeriod, int numSamples) {
+        public OrbitDataLoaderParameters(String name, Class<? extends IOrbitDataProvider> providerClass, double orbitalPeriod, int numSamples) {
             this(providerClass);
             this.name = name;
             this.orbitalPeriod = orbitalPeriod;
             this.numSamples = numSamples;
         }
 
-        public OrbitDataLoaderParameter(String name, Class<? extends IOrbitDataProvider> providerClass, OrbitComponent orbitalParameters, double multiplier) {
+        public OrbitDataLoaderParameters(String name, Class<? extends IOrbitDataProvider> providerClass, OrbitComponent orbitalParameters, double multiplier) {
             this(providerClass);
             this.name = name;
             this.orbitalParamaters = orbitalParameters;
             this.multiplier = multiplier;
         }
 
-        public OrbitDataLoaderParameter(String name, Class<? extends IOrbitDataProvider> providerClass, OrbitComponent orbitalParameters, double multiplier, int numSamples) {
+        public OrbitDataLoaderParameters(String name, Class<? extends IOrbitDataProvider> providerClass, OrbitComponent orbitalParameters, double multiplier, int numSamples) {
             this(providerClass);
             this.name = name;
             this.orbitalParamaters = orbitalParameters;
@@ -97,7 +96,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
             this.numSamples = numSamples;
         }
 
-        public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod, int numSamples) {
+        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod, int numSamples) {
             this(providerClass);
             this.name = name;
             this.ini = ini;
@@ -106,7 +105,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
             this.numSamples = numSamples;
         }
 
-        public OrbitDataLoaderParameter(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod) {
+        public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass, String name, Date ini, boolean forward, double orbitalPeriod) {
             this(providerClass, name, ini, forward, orbitalPeriod, -1);
         }
 

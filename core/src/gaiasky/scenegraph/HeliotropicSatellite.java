@@ -80,7 +80,7 @@ public class HeliotropicSatellite extends Satellite {
 
     public void setToLocalTransform(float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         if (sizeFactor != 1 || forceUpdate) {
-            translation.getMatrix(localTransform).scl(size * sizeFactor);
+            translation.setToTranslation(localTransform).scl(size * sizeFactor);
             if (attitude != null) {
                 quaterniond = attitude.getQuaternion();
                 quaternion.set((float) quaterniond.x, (float) quaterniond.y, (float) quaterniond.z, (float) quaterniond.w);

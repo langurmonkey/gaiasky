@@ -28,7 +28,7 @@ import net.jafama.FastMath;
 
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).
- * Slower but higher quality.
+ * Slower than using GL_LINES primitive, but higher quality.
  */
 public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     protected static final Log logger = Logger.getLogger(LineQuadstripRenderer.class);

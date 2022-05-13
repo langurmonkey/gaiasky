@@ -6,7 +6,7 @@
 package gaiasky.data.orbit;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -20,7 +20,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
     PointCloudData data;
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter) {
+    public void load(String file, OrbitDataLoaderParameters parameter) {
         if(file != null) {
             FileDataLoader odl = new FileDataLoader();
             try {
@@ -42,7 +42,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter, boolean newMethod) {
+    public void load(String file, OrbitDataLoaderParameters parameter, boolean newMethod) {
         load(file, parameter);
     }
 

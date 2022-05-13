@@ -5,7 +5,7 @@
 
 package gaiasky.data.orbit;
 
-import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -29,12 +29,12 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter) {
+    public void load(String file, OrbitDataLoaderParameters parameter) {
         load(file, parameter, false);
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter, boolean newMethod) {
+    public void load(String file, OrbitDataLoaderParameters parameter, boolean newMethod) {
         if (newMethod) {
             OrbitComponent params = parameter.orbitalParamaters;
             Vector3d out = new Vector3d();
@@ -80,7 +80,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
         }
     }
 
-    public void loadOld(String file, OrbitDataLoaderParameter parameter) {
+    public void loadOld(String file, OrbitDataLoaderParameters parameter) {
         OrbitComponent params = parameter.orbitalParamaters;
         try {
             // Parameters of the ellipse

@@ -125,7 +125,7 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
             if (Mapper.tagQuatOrientation.has(entity)) {
                 // Billboards use quaternion orientation
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
-                graph.translation.getMatrix(localTransform)
+                graph.translation.setToTranslation(localTransform)
                         .scl(size)
                         .rotate(QF);
             } else if (hasAttitude) {
@@ -147,7 +147,7 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
                     }
                 }
 
-                graph.translation.getMatrix(localTransform).scl(size * sizeFactor);
+                graph.translation.setToTranslation(localTransform).scl(size * sizeFactor);
                 if (attitude.attitude != null) {
                     QD = attitude.attitude.getQuaternion();
                     QF.set((float) QD.x, (float) QD.y, (float) QD.z, (float) QD.w);
@@ -166,7 +166,7 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
             } else if (rotation.rc != null) {
                 // Planets and moons have rotation components
                 RotationComponent rc = rotation.rc;
-                graph.translation.getMatrix(localTransform)
+                graph.translation.setToTranslation(localTransform)
                         .scl(size * sizeFactor)
                         .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
                         .rotate(0, 1, 0, (float) rc.ascendingNode)
@@ -178,7 +178,7 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
                         .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
             } else {
                 // The rest of bodies are just sitting there, in their reference system
-                graph.translation.getMatrix(localTransform)
+                graph.translation.setToTranslation(localTransform)
                         .scl(size * sizeFactor)
                         .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
                 graph.orientation.idt()

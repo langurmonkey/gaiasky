@@ -27,7 +27,7 @@ public class HeliotropicOrbit extends Orbit {
     @Override
     protected void updateLocalTransform(Instant date) {
         double sunLongitude = AstroUtils.getSunLongitude(date);
-        translation.getMatrix(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);
+        translation.setToTranslation(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);
 
         localTransformD.putIn(localTransform);
     }

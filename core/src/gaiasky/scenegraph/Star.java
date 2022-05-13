@@ -239,7 +239,7 @@ public class Star extends Particle {
         ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
         mc.update(alpha * opacity);
         // Local transform
-        translation.getMatrix(mc.instance.transform).scl((float) (getRadius() * 2d));
+        translation.setToTranslation(mc.instance.transform).scl((float) (getRadius() * 2d));
         modelBatch.render(mc.instance, mc.env);
     }
 

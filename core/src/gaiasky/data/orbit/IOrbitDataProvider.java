@@ -5,7 +5,7 @@
 
 package gaiasky.data.orbit;
 
-import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 
 public interface IOrbitDataProvider {
@@ -16,7 +16,7 @@ public interface IOrbitDataProvider {
      * @param file The file path
      * @param source The parameters
      */
-    void load(String file, OrbitDataLoaderParameter source);
+    void load(String file, OrbitDataLoaderParameters source);
 
     /**
      * Loads the orbit data into the OrbitData object in the internal
@@ -25,7 +25,7 @@ public interface IOrbitDataProvider {
      * @param source The parameters
      * @param newMethod Use new method (for orbital elements only)
      */
-    void load(String file, OrbitDataLoaderParameter source, boolean newMethod);
+    void load(String file, OrbitDataLoaderParameters source, boolean newMethod);
 
     PointCloudData getData();
 

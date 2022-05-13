@@ -25,8 +25,8 @@ import net.jafama.FastMath;
  * component. Generally, this should be a single entity unless
  * we have more than one scene graph.
  */
-public class SceneGraphUpdateSystem extends EntitySystem {
-    private static Log logger = Logger.getLogger(SceneGraphUpdateSystem.class);
+public class GraphUpdater extends EntitySystem {
+    private static Log logger = Logger.getLogger(GraphUpdater.class);
 
     private ICamera camera;
     private final ITimeFrameProvider time;
@@ -39,7 +39,7 @@ public class SceneGraphUpdateSystem extends EntitySystem {
      *
      * @param family The family of entities iterated over in this System. In this case, it should be just one ({@link GraphRoot}.
      */
-    public SceneGraphUpdateSystem(Family family, int priority, ITimeFrameProvider time) {
+    public GraphUpdater(Family family, int priority, ITimeFrameProvider time) {
         super(priority);
         this.family = family;
         this.time = time;

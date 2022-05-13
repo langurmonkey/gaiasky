@@ -9,7 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.OrbitRefresher;
-import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameter;
+import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.gui.ConsoleLogger;
 import gaiasky.util.Logger;
@@ -62,7 +62,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             for (int i = 0; i < bodies.length; i++) {
                 String b = bodies[i];
                 double period = periods[i];
-                OrbitDataLoaderParameter param = new OrbitDataLoaderParameter(me.getClass(), b, now, true, period, 500);
+                OrbitDataLoaderParameters param = new OrbitDataLoaderParameters(me.getClass(), b, now, true, period, 500);
                 me.load(null, param);
 
             }
@@ -80,7 +80,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private final Vector3b ecl = new Vector3b();
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter) {
+    public void load(String file, OrbitDataLoaderParameters parameter) {
         // Sample using VSOP
         // If num samples is not defined, we use 300 samples per year of period
 
@@ -143,7 +143,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter, boolean newMethod) {
+    public void load(String file, OrbitDataLoaderParameters parameter, boolean newMethod) {
         load(file, parameter);
     }
 

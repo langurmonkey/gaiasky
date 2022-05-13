@@ -186,6 +186,7 @@ public class Vector3b implements Serializable {
     public Vector3 tov3() {
         return new Vector3(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
+
     public Vector3 tov3(Vector3 out) {
         return out.set(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
@@ -197,6 +198,7 @@ public class Vector3b implements Serializable {
     public Vector3d tov3d() {
         return new Vector3d(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
+
     public Vector3d tov3d(Vector3d out) {
         return out.set(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
@@ -445,6 +447,7 @@ public class Vector3b implements Serializable {
     public double lend() {
         return len(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
+
     public float lenf() {
         return this.len().floatValue();
     }
@@ -492,6 +495,7 @@ public class Vector3b implements Serializable {
 
     /**
      * Faster version of {@link Vector3b#dst(Vector3b)}, using an auxiliary vector.
+     *
      * @param vec The vector to compute the distance to.
      * @param aux The auxiliary vector.
      * @return The distance between the two points.
@@ -509,6 +513,7 @@ public class Vector3b implements Serializable {
 
     /**
      * Faster version of {@link Vector3b#dst(Vector3d)}, using an auxiliary vector.
+     *
      * @param vec The vector to compute the distance to.
      * @param aux The auxiliary vector.
      * @return The distance between the two points.
@@ -537,6 +542,7 @@ public class Vector3b implements Serializable {
     public double dst2d(Vector3b vec) {
         return this.dst2(vec).doubleValue();
     }
+
     public double dst2d(Vector3d vec) {
         return this.dst2d(vec.x, vec.y, vec.z);
     }
@@ -581,6 +587,7 @@ public class Vector3b implements Serializable {
         var vz = new Apfloat(vec.z, prec);
         return this.x.multiply(vx).add(this.y.multiply(vy)).add(this.z.multiply(vz)).doubleValue();
     }
+
     public double dotd(final Vector3b vec) {
         return this.dot(vec).doubleValue();
     }
@@ -614,6 +621,7 @@ public class Vector3b implements Serializable {
     public Vector3b crs(final Vector3b vec) {
         return this.set(this.y.multiply(vec.z).subtract(this.z.multiply(vec.y)), this.z.multiply(vec.x).subtract(this.x.multiply(vec.z)), this.x.multiply(vec.y).subtract(this.y.multiply(vec.x)));
     }
+
     public Vector3b crs(final Vector3d vec) {
         var vx = new Apfloat(vec.x, prec);
         var vy = new Apfloat(vec.y, prec);
@@ -671,9 +679,7 @@ public class Vector3b implements Serializable {
         var m9 = new Apfloat(matrix[9], prec);
         var m10 = new Apfloat(matrix[10], prec);
         var m11 = new Apfloat(matrix[11], prec);
-        return set(x.multiply(m0).add(y.multiply(m3)).add(z.multiply(m6)).add(m9),
-                x.multiply(m1).add(y.multiply(m4)).add(z.multiply(m7)).add(m10),
-                x.multiply(m2).add(y.multiply(m5)).add(z.multiply(m8)).add(m11));
+        return set(x.multiply(m0).add(y.multiply(m3)).add(z.multiply(m6)).add(m9), x.multiply(m1).add(y.multiply(m4)).add(z.multiply(m7)).add(m10), x.multiply(m2).add(y.multiply(m5)).add(z.multiply(m8)).add(m11));
     }
 
     /**
@@ -697,10 +703,7 @@ public class Vector3b implements Serializable {
         var m21 = new Apfloat(mat[Matrix4d.M21], prec);
         var m22 = new Apfloat(mat[Matrix4d.M22], prec);
         var m23 = new Apfloat(mat[Matrix4d.M23], prec);
-        return this.set(
-                x.multiply(m00).add(y.multiply(m01)).add(z.multiply(m02)).add(m03),
-                x.multiply(m10).add(y.multiply(m11)).add(z.multiply(m12)).add(m13),
-                x.multiply(m20).add(y.multiply(m21)).add(z.multiply(m22)).add(m23));
+        return this.set(x.multiply(m00).add(y.multiply(m01)).add(z.multiply(m02)).add(m03), x.multiply(m10).add(y.multiply(m11)).add(z.multiply(m12)).add(m13), x.multiply(m20).add(y.multiply(m21)).add(z.multiply(m22)).add(m23));
     }
 
     /**
@@ -728,24 +731,24 @@ public class Vector3b implements Serializable {
         return this.mul(tmpMat);
     }
 
+    /**
+     * Sets the given matrix to a translation matrix using this vector.
+     *
+     * @param matrix The matrix to set as a translation matrix.
+     * @return The matrix aux, for chaining.
+     */
+    public Matrix4 setToTranslation(Matrix4 matrix) {
+        return matrix.idt().translate(x.floatValue(), y.floatValue(), z.floatValue());
+    }
 
     /**
-     * Sets the matrix aux to a translation matrix using this vector
+     * Sets the given matrix to a translation matrix using this vector.
      *
-     * @param aux
-     * @return The matrix aux
+     * @param matrix The matrix to set as a translation matrix.
+     * @return The matrix aux, for chaining.
      */
-    public Matrix4 getMatrix(Matrix4 aux) {
-        return aux.idt().translate(x.floatValue(), y.floatValue(), z.floatValue());
-    }
-    /**
-     * Sets the matrix aux to a translation matrix using this vector
-     *
-     * @param aux
-     * @return The matrix aux
-     */
-    public Matrix4d getMatrix(Matrix4d aux) {
-        return aux.idt().translate(x.doubleValue(), y.doubleValue(), z.doubleValue());
+    public Matrix4d setToTranslation(Matrix4d matrix) {
+        return matrix.idt().translate(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
 
     public boolean isUnit() {
@@ -871,6 +874,7 @@ public class Vector3b implements Serializable {
     public double anglePrecise(Vector3b v) {
         return MathUtilsd.radiansToDegrees * Math.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
     }
+
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3d v) {
         return MathUtilsd.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));

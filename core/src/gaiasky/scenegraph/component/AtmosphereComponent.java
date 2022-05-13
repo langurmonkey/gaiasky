@@ -11,12 +11,10 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scene.component.Rotation;
 import gaiasky.scenegraph.Planet;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger.Log;
@@ -35,8 +33,6 @@ import gaiasky.util.math.Vector3d;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
-
-import static gaiasky.scene.Mapper.body;
 
 public class AtmosphereComponent extends NamedComponent {
 
@@ -91,7 +87,7 @@ public class AtmosphereComponent extends NamedComponent {
     }
 
     public void update(Vector3b transform) {
-        transform.getMatrix(localTransform).scl(size);
+        transform.setToTranslation(localTransform).scl(size);
     }
 
     /**

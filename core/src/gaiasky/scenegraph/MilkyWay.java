@@ -213,7 +213,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IStat
      */
     protected void updateLocalTransform() {
         // Scale + Rotate + Tilt + Translate
-        translation.getMatrix(localTransform).scl(size);
+        translation.setToTranslation(localTransform).scl(size);
         localTransform.mul(coordinateSystem);
     }
 
