@@ -87,7 +87,6 @@ public class Polyline extends VertsObject implements ILineRenderable {
 
             }
         }
-
     }
 
     @Override

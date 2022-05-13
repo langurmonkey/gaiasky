@@ -2,7 +2,7 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
-import gaiasky.scene.view.PositionEntity;
+import gaiasky.scene.view.PositionView;
 import gaiasky.scenegraph.Position;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -166,7 +166,7 @@ public class Index {
                         if (hipMap.containsKey(hip.hip)) {
                             logger.debug(I18n.msg("error.id.hip.duplicate", hip.hip));
                         } else {
-                            hipMap.put(hip.hip, new PositionEntity(entity));
+                            hipMap.put(hip.hip, new PositionView(entity));
                         }
                     }
                 } else if (Mapper.starSet.has(entity)) {

@@ -9,15 +9,26 @@ import gaiasky.util.tree.IPosition;
 
 /**
  * A view which exposes position and velocity properties of an entity.
+ * Can be reused
  */
-public class PositionEntity implements IPosition {
+public class PositionView extends AbstractView implements IPosition {
 
+    /** The body component. **/
     private Body body;
 
-    public PositionEntity(Entity entity) {
-        if(!Mapper.body.has(entity)){
-            throw new RuntimeException("The given entity does not have a Body component: Can't be a PositionEntity");
+    public PositionView(Entity entity) {
+        super(entity);
+    }
+
+    @Override
+    protected void entityCheck(Entity entity) {
+        if (!Mapper.body.has(entity)) {
+            throw new RuntimeException("The given entity does not have a " + Body.class.getSimpleName() + " component: Can't be a " + PositionView.class.getSimpleName() + ".");
         }
+    }
+
+    @Override
+    protected void entityChanged() {
         this.body = Mapper.body.get(entity);
     }
 

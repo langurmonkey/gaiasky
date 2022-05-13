@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
@@ -141,6 +142,11 @@ public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
     @Override
     public SceneGraphNode getParent() {
         return parent;
+    }
+
+    @Override
+    public Entity getParentEntity() {
+        return null;
     }
 
     @Override
