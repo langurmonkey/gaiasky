@@ -1,11 +1,14 @@
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
+import gaiasky.scene.component.Verts;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
@@ -41,10 +44,43 @@ public class EntityUtils {
     /**
      * Checks whether the given entity has a {@link gaiasky.scene.component.Coordinates} component,
      * and the current time is out of range.
+     *
      * @return Whether the entity is in time overflow.
      */
     public static boolean isCoordinatesTimeOverflow(Entity entity) {
         return Mapper.coordinates.has(entity) && Mapper.coordinates.get(entity).timeOverflow;
+    }
+
+    /**
+     * Prepares the blending OpenGL state given a {@link Verts} component.
+     *
+     * @param verts The verts component.
+     */
+    public static void blend(Verts verts) {
+        if (verts.blend) {
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+            if (verts.additive) {
+                Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+            } else {
+                Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            }
+        } else {
+            Gdx.gl20.glDisable(GL20.GL_BLEND);
+        }
+    }
+
+    /**
+     * Prepares the depth test OpenGL state given an {@link Verts} component.
+     *
+     * @param verts The verts component.
+     */
+    public static void depth(Verts verts) {
+        Gdx.gl20.glDepthMask(verts.depth);
+        if (verts.depth) {
+            Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
+        } else {
+            Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
+        }
     }
 
 }

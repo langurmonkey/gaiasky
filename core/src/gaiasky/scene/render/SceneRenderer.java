@@ -272,6 +272,28 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);
 
+        // BILLBOARD GALAXIES
+        AbstractRenderSystem billboardGalaxiesProc = new BillboardRenderer(BILLBOARD_GAL, alphas, renderAssets.galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies, false);
+        billboardGalaxiesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+
+        // BILLBOARD SPRITES
+        AbstractRenderSystem billboardSpritesProc = new BillboardRenderer(BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null, ComponentType.Clusters, false);
+        billboardSpritesProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
+
+        // LINES CPU
+        AbstractRenderSystem lineProc = getLineRenderSystem();
+
+        // LINES GPU
+        AbstractRenderSystem lineGpuProc = new PrimitiveVertexRenderSystem<>(LINE_GPU, alphas, renderAssets.lineGpuShaders, true);
+        lineGpuProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+
+        // POINTS CPU
+        AbstractRenderSystem pointProc = new PointPrimitiveRenderSystem(POINT, alphas, renderAssets.pointShaders);
+
+        // POINTS GPU
+        AbstractRenderSystem pointGpuProc = new PrimitiveVertexRenderSystem<>(POINT_GPU, alphas, renderAssets.lineGpuShaders, false);
+        pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
+
         // MODELS DUST AND MESH
         AbstractRenderSystem modelMeshOpaqueProc = new ModelRenderer(MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
         AbstractRenderSystem modelMeshAdditiveProc = new ModelRenderer(MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
@@ -342,6 +364,18 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelPerPixelLighting);
         addRenderSystem(modelPerPixelLightingTess);
         addRenderSystem(modelBeamProc);
+
+        // Galaxy & nebulae billboards, recursive grid
+        addRenderSystem(billboardSpritesProc);
+        addRenderSystem(billboardGalaxiesProc);
+
+        // Primitives
+        addRenderSystem(pointProc);
+        addRenderSystem(pointGpuProc);
+
+        // Lines
+        addRenderSystem(lineProc);
+        addRenderSystem(lineGpuProc);
 
         // Special models
         addRenderSystem(modelStarsProc);
@@ -1055,11 +1089,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem sys;
         if (Settings.settings.scene.renderer.isNormalLineRenderer()) {
             // Normal
-            sys = new LineRenderSystem(LINE, alphas, renderAssets.lineShaders);
+            sys = new LinePrimitiveRenderer(LINE, alphas, renderAssets.lineShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         } else {
             // Quad
-            sys = new LineQuadRenderSystem(LINE, alphas, renderAssets.lineQuadShaders);
+            sys = new LineQuadstripRenderer(LINE, alphas, renderAssets.lineQuadShaders);
             sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
         return sys;

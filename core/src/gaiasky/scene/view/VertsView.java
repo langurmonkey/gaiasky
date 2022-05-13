@@ -11,6 +11,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.IGPUVertsRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scenegraph.SceneGraphNode;
 
 /**
@@ -101,26 +102,12 @@ public class VertsView extends AbstractView implements IGPUVertsRenderable {
 
     @Override
     public void blend() {
-        if (verts.blend) {
-            Gdx.gl20.glEnable(GL20.GL_BLEND);
-            if(verts.additive){
-                Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-            }else {
-                Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            }
-        } else {
-            Gdx.gl20.glDisable(GL20.GL_BLEND);
-        }
+        EntityUtils.blend(verts);
     }
 
     @Override
     public void depth() {
-        Gdx.gl20.glDepthMask(verts.depth);
-        if (verts.depth) {
-            Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
-        } else {
-            Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
-        }
+        EntityUtils.depth(verts);
     }
 
     @Override

@@ -3,33 +3,40 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render.system;
+package gaiasky.scene.render.draw;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IPointRenderable;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.RenderGroup;
+import gaiasky.render.system.ImmediateModeRenderSystem;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Render;
+import gaiasky.scene.view.PointView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL30;
 
 /**
  * Renders symbolic objects (usually part of the UI) as points.
  */
-public class PointRenderSystem extends ImmediateModeRenderSystem {
-    protected static final Log logger = Logger.getLogger(PointRenderSystem.class);
+public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
+    protected static final Log logger = Logger.getLogger(PointPrimitiveRenderSystem.class);
 
-    protected int glType;
+    private final PointView pointView;
+    private int glType;
     private int sizeOffset;
-
+    private Vector3d D31 = new Vector3d();
 
     @Override
     protected void initShaderProgram() {
@@ -37,9 +44,10 @@ public class PointRenderSystem extends ImmediateModeRenderSystem {
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
-    public PointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public PointPrimitiveRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders, -1);
-        glType = GL20.GL_POINTS;
+        this.pointView = new PointView();
+        this.glType = GL20.GL_POINTS;
     }
 
     @Override
@@ -92,11 +100,12 @@ public class PointRenderSystem extends ImmediateModeRenderSystem {
         addEffectsUniforms(shaderProgram, camera);
 
         renderables.forEach(r -> {
-            IPointRenderable renderable = (IPointRenderable) r;
-            renderable.render(this, camera, getAlpha(renderable));
+            Render render = (Render) r;
+            pointView.setEntity(render.entity);
+            render(render.entity, pointView, getAlpha(render.entity));
 
-            renderable.blend();
-            renderable.depth();
+            pointView.blend();
+            pointView.depth();
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshd = meshes.get(md);
@@ -112,6 +121,23 @@ public class PointRenderSystem extends ImmediateModeRenderSystem {
         meshIdx = 1;
         curr = meshes.get(0);
 
+    }
+
+    private void render(Entity entity, PointView pointView, float alpha){
+        // Render points CPU
+        var body = Mapper.body.get(entity);
+        var verts = Mapper.verts.get(entity);
+        var graph = Mapper.graph.get(entity);
+
+        var pointCloudData = verts.pointCloudData;
+        var cc = body.color;
+
+        Vector3d v = D31;
+        for (int i = 0; i < pointCloudData.getNumPoints(); i++) {
+            pointCloudData.loadPoint(v, i);
+            v.add(graph.translation);
+            addPoint(pointView, (float) v.x, (float) v.y, (float) v.z, verts.primitiveSize, cc[0], cc[1], cc[2], alpha * cc[3]);
+        }
     }
 
     public void addPoint(IPointRenderable pr, double x, double y, double z, float pointSize, float r, float g, float b, float a) {
