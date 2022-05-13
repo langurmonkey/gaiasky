@@ -2,7 +2,6 @@ package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.render.ComponentTypes;
-import gaiasky.render.api.IPointRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
@@ -28,12 +27,8 @@ public class RenderView extends AbstractView implements IRenderable {
 
     @Override
     protected void entityCheck(Entity entity) {
-        if (!Mapper.base.has(entity)) {
-            throw new RuntimeException("The given entity does not have a " + Base.class.getSimpleName() + " component: Can't be a " + RenderView.class.getSimpleName() + ".");
-        }
-        if (!Mapper.body.has(entity)) {
-            throw new RuntimeException("The given entity does not have a " + Body.class.getSimpleName() + " component: Can't be a " + RenderView.class.getSimpleName() + ".");
-        }
+        check(entity, Mapper.base, Base.class);
+        check(entity, Mapper.body, Body.class);
     }
 
     @Override

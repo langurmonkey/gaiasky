@@ -41,9 +41,10 @@ public class VertsView extends AbstractView implements IGPUVertsRenderable {
 
     @Override
     protected void entityCheck(Entity entity) {
-        if (!Mapper.verts.has(entity)) {
-            throw new RuntimeException("The given entity does not have a " + Verts.class.getSimpleName() + " component: Can't be a " + VertsView.class.getSimpleName() + ".");
-        }
+        check(entity, Mapper.base, Base.class);
+        check(entity, Mapper.body, Body.class);
+        check(entity, Mapper.verts, Verts.class);
+        check(entity, Mapper.graph, GraphNode.class);
     }
 
     @Override

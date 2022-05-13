@@ -36,9 +36,9 @@ public class LineView extends AbstractView implements ILineRenderable {
 
     @Override
     protected void entityCheck(Entity entity) {
-        if (!Mapper.verts.has(entity)) {
-            throw new RuntimeException("The given entity does not have a " + Verts.class.getSimpleName() + " component: Can't be a " + LineView.class.getSimpleName() + ".");
-        }
+        check(entity, Mapper.base, Base.class);
+        check(entity, Mapper.body, Body.class);
+        check(entity, Mapper.verts, Verts.class);
     }
 
     @Override

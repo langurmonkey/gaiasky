@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import gaiasky.render.api.IPointRenderable;
 import gaiasky.render.system.PointRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scenegraph.camera.ICamera;
@@ -31,9 +33,7 @@ public class PointView extends RenderView implements IPointRenderable {
     @Override
     protected void entityCheck(Entity entity) {
         super.entityCheck(entity);
-        if (!Mapper.verts.has(entity)) {
-            throw new RuntimeException("The given entity does not have a " + Verts.class.getSimpleName() + " component: Can't be a " + VertsView.class.getSimpleName() + ".");
-        }
+        check(entity, Mapper.verts, Verts.class);
     }
 
     @Override
