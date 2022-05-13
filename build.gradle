@@ -24,6 +24,9 @@ allprojects {
         appName = "GaiaSky"
         gdxVersion = "1.11.0"
         gdxcontrollersVersion = "2.2.1"
+        // The latest jamepad (2.0.20.0) does not work with M1
+        // Using 2.0.14.2
+        jamepadVersion = '2.0.14.2'
         lwjglVersion = "3.3.1"
         jcommanderVersion = "1.81"
         slf4jVersion = "1.7.+"
@@ -125,6 +128,12 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+        // The latest jamepad (2.0.20.0) does not work with M1
+        // Using 2.0.14.2
+        api("com.badlogicgames.jamepad:jamepad:$jamepadVersion") {
+            exclude group: 'com.badlogicgames.gdx', module: 'gdx-jnigen-loader'
+        }
 
         // gdx-controllers:2.+ bases up on SDL 2.0.12
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
