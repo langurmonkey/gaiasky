@@ -57,6 +57,9 @@ public class SysUtils {
     private static final boolean unix;
     private static final boolean solaris;
 
+    private static final String ARCH;
+    private static final boolean aarch64;
+
     static {
         OS = System.getProperty("os.name").toLowerCase();
         linux = OS.contains("linux");
@@ -64,6 +67,9 @@ public class SysUtils {
         windows = OS.contains("win");
         unix = OS.contains("unix");
         solaris = OS.contains("sunos");
+
+        ARCH = System.getProperty("os.arch");
+        aarch64 = ARCH.contains("aarch64");
     }
 
     public static String getXdgDesktop() {
@@ -133,6 +139,10 @@ public class SysUtils {
 
     public static boolean isMac() {
         return mac;
+    }
+
+    public static boolean isM1Mac() {
+        return isMac() && aarch64;
     }
 
     public static boolean isUnix() {
