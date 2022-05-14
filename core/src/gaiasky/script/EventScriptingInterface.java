@@ -19,6 +19,7 @@ import gaiasky.data.cluster.StarClusterLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
+import gaiasky.scene.render.extract.TrajectoryExtractor;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -969,6 +970,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setOrbitSolidAngleThreshold(float angleDeg) {
         if (checkNum(angleDeg, 0.0f, 180f, "solid-angle")) {
             Orbit.setSolidAngleThreshold(angleDeg);
+            TrajectoryExtractor.setSolidAngleThreshold(angleDeg);
         }
     }
 

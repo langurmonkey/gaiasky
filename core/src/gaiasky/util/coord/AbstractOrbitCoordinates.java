@@ -57,9 +57,10 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
                 if (params[1] instanceof CelestialBody) {
                     orbit.setBody((CelestialBody) params[1]);
                 } else if (params[1] instanceof Entity) {
-                    Trajectory trajectory = Mapper.trajectory.get(entity);
-                    Body body = Mapper.body.get(entity);
-                    trajectory.setBody(entity, body.size / 2);
+                    var trajectory = Mapper.trajectory.get(entity);
+                    var orbitObject = (Entity) params[1];
+                    var body = Mapper.body.get(orbitObject);
+                    trajectory.setBody(orbitObject, body.size / 2);
                 }
             }
         }

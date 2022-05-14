@@ -65,6 +65,9 @@ public class ModelInitializer extends InitSystem {
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
 
+        // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
+        body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
+
         // First init spacecraft if needed
         if (isSpacecraft) {
             initializeSpacecraft(base, body, model, scaffolding, engine);
@@ -103,9 +106,6 @@ public class ModelInitializer extends InitSystem {
         var parentOrientation = Mapper.parentOrientation.get(entity);
         var engine = Mapper.engine.get(entity);
         var fade = Mapper.fade.get(entity);
-
-        // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
-        body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
 
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {

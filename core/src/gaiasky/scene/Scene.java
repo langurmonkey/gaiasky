@@ -126,8 +126,8 @@ public class Scene {
             EntitySystem baseInit = new BaseInitializer(this, setUp,families.graphNodes, priority++);
             EntitySystem particleSetInit = new ParticleSetInitializer(setUp, families.particleSets, priority++);
             EntitySystem particleInit = new ParticleInitializer(setUp, families.particles, priority++);
-            EntitySystem trajectoryInit = new TrajectoryInitializer(setUp, families.orbits, priority++);
             EntitySystem modelInit = new ModelInitializer(setUp, families.models, priority++);
+            EntitySystem trajectoryInit = new TrajectoryInitializer(setUp, families.orbits, priority++);
             EntitySystem locInit = new LocInitializer(setUp, families.locations, priority++);
             EntitySystem billboardSetInit = new BillboardSetInitializer(setUp, families.billboardSets, priority++);
             EntitySystem axesInit = new AxesInitializer(setUp, families.axes, priority++);
