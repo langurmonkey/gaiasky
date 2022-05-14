@@ -1292,7 +1292,7 @@ return true;</property>
     </styles>
   </installerGui>
   <mediaSets>
-    <windows name="Windows 64" id="25" installDir="${compiler:sys.fullName}">
+    <windows name="Windows x64" id="25" installDir="${compiler:sys.fullName}">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>
@@ -1311,17 +1311,17 @@ return true;</property>
       </exclude>
       <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" usePack200="false" overrideJdkRelease="true" />
     </windows>
-    <macos name="macOS Single Bundle" id="221" launcherId="573">
+    <macosArchive name="macOS Archive" id="966" includeAllDownloadableComponents="false" architecture="universal" launcherId="573">
       <exclude>
-        <entry location="rest-static" />
-        <entry location="AppRun" />
-        <entry location="gaiasky-appimage.desktop" />
         <entry location="gaiasky.6.gz" />
+        <entry location="gaiasky-appimage.desktop" />
+        <entry location="AppRun" />
         <entry location="gaiasky.cmd" />
         <entry location="gaiasky.desktop" />
+        <entry location="rest-static" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" usePack200="false" overrideJdkRelease="true" />
-    </macos>
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" overrideJdkRelease="true" />
+    </macosArchive>
     <unixInstaller name="Unix Installer" id="28" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
         <launcher id="573" />
