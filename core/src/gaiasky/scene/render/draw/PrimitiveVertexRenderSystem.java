@@ -5,7 +5,6 @@
 
 package gaiasky.scene.render.draw;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -23,12 +22,10 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.VertsView;
-import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
@@ -182,6 +179,8 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
 
             shaderProgram.begin();
 
+            var trajectory = Mapper.trajectory.get(render.entity);
+
             // Regular.
             if (isLine())
                 Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * Settings.settings.scene.lineWidth);
@@ -191,8 +190,8 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
-            shaderProgram.setUniformf("u_coordPos", renderable instanceof Orbit ? (float) ((Orbit) renderable).coord : 1f);
-            shaderProgram.setUniformf("u_period", renderable instanceof Orbit && ((Orbit) renderable).oc != null ? (float) ((Orbit) renderable).oc.period : 0f);
+            shaderProgram.setUniformf("u_coordPos", trajectory != null ? (float) trajectory.coord : 1f);
+            shaderProgram.setUniformf("u_period", trajectory != null && trajectory.oc != null ? (float) trajectory.oc.period : 0f);
             if (renderable.getParent() != null) {
                 Vector3d urp = renderable.getParent().getUnrotatedPos();
                 if (urp != null)

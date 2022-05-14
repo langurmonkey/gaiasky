@@ -45,7 +45,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     @Override
     public void doneLoading(Object... params) {
         if (params.length == 0) {
-            logger.error(new RuntimeException("OrbitLintCoordinates need the scene graph"));
+            logger.error(new RuntimeException("No parameters found, can't initialize coordinates from orbit: " + orbitname));
         } else {
             if (orbitname != null && !orbitname.isEmpty()) {
                 if (params[0] instanceof SceneGraph) {

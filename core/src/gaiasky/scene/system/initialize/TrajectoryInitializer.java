@@ -10,10 +10,12 @@ import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.util.math.Vector3d;
+import org.lwjgl.opengl.GL20;
 
 /**
  * Initializes entities with a {@link Trajectory} component.
@@ -38,7 +40,7 @@ public class TrajectoryInitializer extends InitSystem {
         var trajectory = Mapper.trajectory.get(entity);
         var verts = Mapper.verts.get(entity);
 
-        if (!trajectory.onlyBody)
+        if (!trajectory.onlyBody) {
             try {
                 trajectory.providerClass = (Class<? extends IOrbitDataProvider>) ClassReflection.forName(trajectory.provider);
                 // Orbit data
@@ -53,6 +55,10 @@ public class TrajectoryInitializer extends InitSystem {
             } catch (ReflectionException e) {
                 logger.error(e);
             }
+        }
+        // All trajectories have the same primitive and render group.
+        verts.glPrimitive = GL20.GL_LINE_STRIP;
+        verts.renderGroup = RenderGroup.LINE_GPU;
 
         // Initialize default colors if needed
         if (body.color == null) {
@@ -65,7 +71,6 @@ public class TrajectoryInitializer extends InitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
-        var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var transform = Mapper.transform.get(entity);

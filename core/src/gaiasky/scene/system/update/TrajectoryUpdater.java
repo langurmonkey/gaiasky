@@ -45,10 +45,11 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
         var trajectory = Mapper.trajectory.get(entity);
         var verts = Mapper.verts.get(entity);
 
-        if (trajectory.model == OrbitOrientationModel.EXTRASOLAR_SYSTEM)
+        if (trajectory.model == OrbitOrientationModel.EXTRASOLAR_SYSTEM) {
             utils.computeExtrasolarSystemTransformMatrix(graph, transform);
+        }
 
-        // Completion
+        // Compute position percentage in the trajectory.
         if (verts.pointCloudData != null) {
             long now = time.getTime().toEpochMilli();
             long t0 = verts.pointCloudData.time.get(0).toEpochMilli();
@@ -61,10 +62,10 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
 
         if (!trajectory.onlyBody) {
             if(Mapper.tagHeliotropic.has(entity)) {
-                // Heliotropic orbit
+                // Heliotropic orbit.
                 updateLocalTransformHeliotropic(GaiaSky.instance.time.getTime(), graph, trajectory, transform);
             } else {
-                // Regular orbit
+                // Regular orbit.
                 updateLocalTransformRegular(graph, trajectory, transform);
             }
         }
@@ -74,7 +75,9 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
         Matrix4d localTransformD = trajectory.localTransformD;
 
         double sunLongitude = AstroUtils.getSunLongitude(date);
-        graph.translation.setToTranslation(localTransformD).mul(Coordinates.eclToEq()).rotate(0, 1, 0, sunLongitude + 180);
+        graph.translation.setToTranslation(localTransformD)
+                .mul(Coordinates.eclToEq())
+                .rotate(0, 1, 0, sunLongitude + 180);
 
         localTransformD.putIn(graph.localTransform);
     }
@@ -88,12 +91,12 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
         graph.translation.setToTranslation(localTransformD);
         if (trajectory.newMethod) {
             if (transformFunction != null) {
-                localTransformD.mul(transformFunction);
-                localTransformD.rotate(0, 1, 0, 90);
+                localTransformD.mul(transformFunction)
+                        .rotate(0, 1, 0, 90);
             }
             if (parentGraph.orientation != null) {
-                localTransformD.mul(parentGraph.orientation);
-                localTransformD.rotate(0, 1, 0, 90);
+                localTransformD.mul(parentGraph.orientation)
+                        .rotate(0, 1, 0, 90);
             }
         } else {
             OrbitComponent oc = trajectory.oc;
@@ -103,9 +106,9 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
             if (transformFunction != null)
                 localTransformD.mul(transformFunction);
 
-            localTransformD.rotate(0, 1, 0, oc.argofpericenter);
-            localTransformD.rotate(0, 0, 1, oc.i);
-            localTransformD.rotate(0, 1, 0, oc.ascendingnode);
+            localTransformD.rotate(0, 1, 0, oc.argofpericenter)
+                    .rotate(0, 0, 1, oc.i)
+                    .rotate(0, 1, 0, oc.ascendingnode);
         }
         localTransformD.putIn(graph.localTransform);
     }
