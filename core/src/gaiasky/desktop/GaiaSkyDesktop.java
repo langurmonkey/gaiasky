@@ -78,7 +78,7 @@ public class GaiaSkyDesktop implements IObserver {
     private static final String MIN_GLSL = MIN_GLSL_MAJOR + "." + MIN_GLSL_MINOR;
 
     /**
-     * Program arguments
+     * Program CLI arguments.
      */
     private static class CLIArgs {
         @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
@@ -112,21 +112,21 @@ public class GaiaSkyDesktop implements IObserver {
      * Formats the regular usage so that it removes the left padding characters.
      * This is necessary so that help2man recognizes the OPTIONS block.
      *
-     * @param jc The JCommander object
+     * @param jc The JCommander object.
      */
     private static void printUsage(JCommander jc) {
         jc.usage();
     }
 
     /**
-     * UTF-8 output stream printer
+     * UTF-8 output stream printer.
      **/
     private static PrintStream out;
 
     /**
-     * Main method
+     * Main method.
      *
-     * @param args Arguments
+     * @param args CLI arguments (see {@link CLIArgs}).
      */
     public static void main(final String[] args) {
         Thread.currentThread().setName("gaiasky-main-thread");
@@ -148,18 +148,18 @@ public class GaiaSkyDesktop implements IObserver {
         }
 
         try {
-            // Check java version
+            // Check java version.
             javaVersionCheck();
 
-            // Experimental features
+            // Experimental features.
             experimentalCheck();
 
-            // Set properties file from arguments to VM params if needed
+            // Set properties file from arguments to VM params if needed.
             if (cliArgs.propertiesFile != null && !cliArgs.propertiesFile.isEmpty()) {
                 System.setProperty("properties.file", cliArgs.propertiesFile);
             }
 
-            // Set assets location to VM params if needed
+            // Set assets location to VM params if needed.
             if (cliArgs.assetsLocation != null && !cliArgs.assetsLocation.isEmpty()) {
                 System.setProperty("assets.location", cliArgs.assetsLocation);
             }
@@ -172,28 +172,28 @@ public class GaiaSkyDesktop implements IObserver {
 
             Gdx.files = new Lwjgl3Files();
 
-            // Init Gaia Sky directories
+            // Init Gaia Sky directories.
             SysUtils.mkdirs();
 
-            // Init properties file
+            // Init properties file.
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
                 initConfigFile(cliArgs.vr);
             }
 
-            // Init global configuration
+            // Init global configuration.
             SettingsManager.initialize(cliArgs.vr);
 
-            // Initialize i18n (only for global config logging)
+            // Initialize i18n (only for global config logging).
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"), Gdx.files.internal("i18n/objects"));
 
-            // Safe mode
-            if (cliArgs.safeMode && !Settings.settings.program.safeMode) {
+            // Safe mode active if specified in CLI arg, or in config. Force safe mode for M1 macOS.
+            if (SysUtils.isM1Mac() || (cliArgs.safeMode && !Settings.settings.program.safeMode)) {
                 Settings.settings.program.safeMode = true;
                 Settings.settings.program.safeModeFlag = true;
             }
 
-            // Reinitialize with user-defined locale
+            // Reinitialize with user-defined locale.
             I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
 
             // -v or --version
@@ -222,35 +222,35 @@ public class GaiaSkyDesktop implements IObserver {
 
             ConsoleLogger consoleLogger = new ConsoleLogger();
 
-            // REST API server
+            // REST API server.
             REST_ENABLED = Settings.settings.program.net.restPort >= 0 && checkRestDependenciesInClasspath();
             if (REST_ENABLED) {
                 RESTServer.initialize(Settings.settings.program.net.restPort);
             }
 
-            // Slave manager
+            // Slave manager.
             SlaveManager.initialize();
 
-            // Full screen command
+            // Full screen command.
             ScreenModeCmd.initialize();
 
-            // Init cam recorder
+            // Init cam recorder.
             CamRecorder.initialize();
 
-            // Init music manager
+            // Init music manager.
             MusicManager.initialize(Paths.get(Settings.ASSETS_LOC, "music"), SysUtils.getDefaultMusicDir());
 
-            // Key mappings
+            // Key mappings.
             KeyBindings.initialize();
 
-            // Math
+            // Math.
             MathManager.initialize();
 
             consoleLogger.dispose();
 
             gaiaSkyDesktop.init();
 
-            // Write session log
+            // Write session log.
             CrashReporter.writeLastSessionLog(logger);
         } catch (Exception e) {
             CrashReporter.reportCrash(e, logger);
@@ -276,7 +276,7 @@ public class GaiaSkyDesktop implements IObserver {
         if (!cliArgs.vr) {
             if (s.graphics.fullScreen.active) {
                 int[] fullScreenResolution = s.graphics.fullScreen.resolution;
-                // Full screen mode
+                // Full screen mode.
                 DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
                 DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
@@ -286,7 +286,7 @@ public class GaiaSkyDesktop implements IObserver {
                     }
                 }
                 if (myMode == null) {
-                    // Fall back to windowed
+                    // Fall back to windowed.
                     logger.warn(I18n.msg("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
                     cfg.setWindowedMode(s.graphics.getScreenWidth(), s.graphics.getScreenHeight());
                     cfg.setResizable(s.graphics.resizable);
@@ -294,15 +294,15 @@ public class GaiaSkyDesktop implements IObserver {
                     cfg.setFullscreenMode(myMode);
                 }
             } else {
-                // Windowed mode
+                // Windowed mode.
                 configureWindowSize(cfg);
                 cfg.setResizable(s.graphics.resizable);
             }
             cfg.useVsync(s.graphics.vsync);
         } else {
-            // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
+            // Note that we disable VSync! The VRContext manages vsync with respect to the HMD.
             cfg.useVsync(false);
-            // Always windowed, actual render sent to headset
+            // Always windowed, actual render sent to headset.
             configureWindowSize(cfg);
             cfg.setResizable(true);
         }
@@ -312,18 +312,18 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
         }
         cfg.setOpenGLEmulation(GLEmulation.GL30, DEFAULT_OPENGL_MAJOR, DEFAULT_OPENGL_MINOR);
-        // Disable logical DPI modes (macOS, Windows)
+        // Disable logical DPI modes (macOS, Windows).
         cfg.setHdpiMode(HdpiMode.Pixels);
-        // Headless mode
+        // Headless mode.
         cfg.setInitialVisible(!cliArgs.headless);
-        // OpenGL debug
+        // OpenGL debug.
         if (cliArgs.debugGpu) {
             cfg.enableGLDebugOutput(true, System.out);
         }
-        // Color, Depth, stencil buffers, MSAA
+        // Color, Depth, stencil buffers, MSAA.
         cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
 
-        // Launch app
+        // Launch app.
         try {
             if (s.program.safeMode) {
                 setSafeMode(cfg);
@@ -377,7 +377,7 @@ public class GaiaSkyDesktop implements IObserver {
         int w = Settings.settings.graphics.getScreenWidth();
         int h = Settings.settings.graphics.getScreenHeight();
         if (!SysUtils.isMac()) {
-            // Graphics device method
+            // Graphics device method.
             if (w <= 0 || h <= 0) {
                 try {
                     GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -391,7 +391,7 @@ public class GaiaSkyDesktop implements IObserver {
                     logger.debug(he);
                 }
             }
-            // Toolkit method
+            // Toolkit method.
             if (w <= 0 || h <= 0) {
                 try {
                     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -400,7 +400,7 @@ public class GaiaSkyDesktop implements IObserver {
                     Settings.settings.graphics.resolution[0] = w;
                     Settings.settings.graphics.resolution[1] = h;
                 } catch (Exception e) {
-                    // Default
+                    // Default.
                     w = 1600;
                     h = 900;
                     Settings.settings.graphics.resolution[0] = w;
@@ -410,20 +410,20 @@ public class GaiaSkyDesktop implements IObserver {
                 }
             }
         } else {
-            // macOS is retarded and only likes headless mode, using default
+            // macOS is retarded and only likes headless mode, using default.
             w = 1600;
             h = 900;
             Settings.settings.graphics.resolution[0] = w;
             Settings.settings.graphics.resolution[1] = h;
         }
 
-        // Apply factors
+        // Apply factors.
         Settings.settings.graphics.resolution[0] = (int) (Settings.settings.graphics.resolution[0] * widthFactor);
         Settings.settings.graphics.resolution[1] = (int) (Settings.settings.graphics.resolution[1] * heightFactor);
         w = (int) (w * widthFactor);
         h = (int) (h * heightFactor);
 
-        // Set to config
+        // Set to config.
         if (cfg != null)
             cfg.setWindowedMode(w, h);
     }
