@@ -116,34 +116,29 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
     }
 
     public void setToLocalTransform(Entity entity, Body body, GraphNode graph, float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
-        boolean hasAttitude = Mapper.attitude.has(entity);
-        // Update translation, orientation and local transform
+        // Update translation, orientation and local transform.
         ITimeFrameProvider time = GaiaSky.instance.time;
         if (sizeFactor != 1 || forceUpdate) {
             var rotation = Mapper.rotation.get(entity);
             var scaffolding = Mapper.modelScaffolding.get(entity);
             if (Mapper.tagQuatOrientation.has(entity)) {
-                // Billboards use quaternion orientation
+                // Billboards use quaternion orientation.
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
-                graph.translation.setToTranslation(localTransform)
-                        .scl(size)
-                        .rotate(QF);
-            } else if (hasAttitude) {
-                // Satellites have attitude
+                graph.translation.setToTranslation(localTransform).scl(size).rotate(QF);
+            } else if (Mapper.attitude.has(entity)) {
+                // Satellites have attitude.
                 var attitude = Mapper.attitude.get(entity);
 
-                // Update attitude for current time if needed
+                // Update attitude for current time if needed.
                 if (time.getHdiff() != 0) {
-                    attitude.nonRotatedPos.set(body.pos);
-                    // Undo rotation if heliotropic
                     if (Mapper.tagHeliotropic.has(entity)) {
-                        attitude.nonRotatedPos
-                                .mul(Coordinates.eqToEcl())
-                                .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
-                    }
-                    // Update attitude
-                    if (attitude.attitudeServer != null) {
-                        attitude.attitude = attitude.attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli()));
+                        attitude.nonRotatedPos.set(body.pos);
+                        // Undo rotation.
+                        attitude.nonRotatedPos.mul(Coordinates.eqToEcl()).rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
+                        // Update attitude from server if needed.
+                        if (attitude.attitudeServer != null) {
+                            attitude.attitude = attitude.attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli()));
+                        }
                     }
                 }
 
@@ -166,23 +161,12 @@ public class ModelUpdater extends IteratingSystem implements EntityUpdater {
             } else if (rotation.rc != null) {
                 // Planets and moons have rotation components
                 RotationComponent rc = rotation.rc;
-                graph.translation.setToTranslation(localTransform)
-                        .scl(size * sizeFactor)
-                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform))
-                        .rotate(0, 1, 0, (float) rc.ascendingNode)
-                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt))
-                        .rotate(0, 1, 0, (float) rc.angle);
-                graph.orientation.idt()
-                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform))
-                        .rotate(0, 1, 0, (float) rc.ascendingNode)
-                        .rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
+                graph.translation.setToTranslation(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt)).rotate(0, 1, 0, (float) rc.angle);
+                graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform)).rotate(0, 1, 0, (float) rc.ascendingNode).rotate(0, 0, 1, (float) (rc.inclination + rc.axialTilt));
             } else {
                 // The rest of bodies are just sitting there, in their reference system
-                graph.translation.setToTranslation(localTransform)
-                        .scl(size * sizeFactor)
-                        .mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
-                graph.orientation.idt()
-                        .mul(Coordinates.getTransformD(scaffolding.refPlaneTransform));
+                graph.translation.setToTranslation(localTransform).scl(size * sizeFactor).mul(Coordinates.getTransformF(scaffolding.refPlaneTransform));
+                graph.orientation.idt().mul(Coordinates.getTransformD(scaffolding.refPlaneTransform));
             }
         } else {
             // Nothing whatsoever

@@ -66,7 +66,8 @@ public class HeliotropicSatellite extends Satellite {
         if (time.getHdiff() != 0 || force) {
             unrotatedPos.set(pos);
             // Undo rotation
-            unrotatedPos.mul(Coordinates.eqToEcl()).rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
+            unrotatedPos.mul(Coordinates.eqToEcl())
+                    .rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
             if (attitudeServer != null) {
                 attitude = attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli()));
             }
