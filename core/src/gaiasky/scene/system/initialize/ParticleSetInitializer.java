@@ -2,18 +2,21 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
+import gaiasky.data.AssetBean;
 import gaiasky.data.group.IParticleGroupDataProvider;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scenegraph.ParticleSetUpdaterTask;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.CatalogInfo;
+import gaiasky.scenegraph.particle.VariableRecord;
+import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
-import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3b;
 
 import java.nio.file.Files;
@@ -27,8 +30,11 @@ import java.util.List;
 public class ParticleSetInitializer extends InitSystem {
     private static final Log logger = Logger.getLogger(ParticleSetInitializer.class);
 
+    private final ParticleUtils utils;
+
     public ParticleSetInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
+        this.utils = new ParticleUtils();
     }
 
     @Override
@@ -46,6 +52,15 @@ public class ParticleSetInitializer extends InitSystem {
 
     @Override
     public void setUpEntity(Entity entity) {
+        var starSet = Mapper.starSet.get(entity);
+
+        if(starSet != null) {
+            // Is it a catalog of variable stars?
+            starSet.variableStars = starSet.pointData.size() > 0 && starSet.pointData.get(0) instanceof VariableRecord;
+            initSortingData(entity, starSet);
+            // Load model in main thread
+            GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), Mapper.model.get(entity)));
+        }
 
     }
 
@@ -67,6 +82,7 @@ public class ParticleSetInitializer extends InitSystem {
                 set.factor = 1d;
 
             set.lastSortTime = -1;
+            set.isStars = false;
 
             if (dataLoad) {
                 Class<?> clazz = Class.forName(set.provider);
@@ -110,6 +126,8 @@ public class ParticleSetInitializer extends InitSystem {
         try {
             if (set.factor == null)
                 set.factor = 1d;
+
+            set.isStars = true;
 
             Class<?> clazz = Class.forName(set.provider);
             IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
@@ -176,5 +194,27 @@ public class ParticleSetInitializer extends InitSystem {
 
     private double len(double x, double y, double z) {
         return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    private void initSortingData(Entity entity, StarSet starSet) {
+        var pointData = starSet.pointData;
+        var indices1 = starSet.indices1;
+        var indices2 = starSet.indices2;
+
+        // Metadata
+        starSet.metadata = new double[pointData.size()];
+
+        // Initialise indices list with natural order
+        indices1 = new Integer[pointData.size()];
+        indices2 = new Integer[pointData.size()];
+        for (int i = 0; i < pointData.size(); i++) {
+            indices1[i] = i;
+            indices2[i] = i;
+        }
+        starSet.active = indices1;
+        starSet.background = indices2;
+
+        // Initialize updater task
+        starSet.updaterTask = new ParticleSetUpdaterTask(entity);
     }
 }

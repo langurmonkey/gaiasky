@@ -124,6 +124,7 @@ public class Scene {
             // Prepare systems
             int priority = 0;
             EntitySystem baseInit = new BaseInitializer(this, setUp,families.graphNodes, priority++);
+            EntitySystem fadeInit = new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++);
             EntitySystem particleSetInit = new ParticleSetInitializer(setUp, families.particleSets, priority++);
             EntitySystem particleInit = new ParticleInitializer(setUp, families.particles, priority++);
             EntitySystem modelInit = new ModelInitializer(setUp, families.models, priority++);
@@ -132,7 +133,6 @@ public class Scene {
             EntitySystem billboardSetInit = new BillboardSetInitializer(setUp, families.billboardSets, priority++);
             EntitySystem axesInit = new AxesInitializer(setUp, families.axes, priority++);
             EntitySystem raymarchingInit = new InvisibleInitializer(setUp, families.raymarchings, priority++);
-            EntitySystem fadeInit = new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++);
             EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
 

@@ -1,10 +1,18 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.GaiaSky;
+import gaiasky.scenegraph.ParticleSetUpdaterTask;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
+import gaiasky.scenegraph.particle.PointParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
+import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 
 import java.util.*;
@@ -17,6 +25,9 @@ public class ParticleSet implements Component {
      * List that contains the point data. It contains only [x y z]
      */
     public List<IParticleRecord> pointData;
+
+    /** Flag indicating whether the particle set holds stars or particles. **/
+    public boolean isStars;
 
     /**
      * Fully qualified name of data provider class
@@ -62,7 +73,6 @@ public class ParticleSet implements Component {
      */
     public Double factor = null;
 
-
     /**
      * Mapping colors
      */
@@ -86,9 +96,33 @@ public class ParticleSet implements Component {
     public static Vector3d geomCentre;
 
     /**
-     * Reference to the current focus
+     * Reference to the current focus.
      */
     public IParticleRecord focus;
+    /**
+     * Index of the particle acting as focus. Negative if we have no focus here.
+     */
+    public int focusIndex;
+
+    /**
+     * Candidate to focus.
+     */
+    public int candidateFocusIndex;
+
+    /**
+     * Position of the current focus
+     */
+    public Vector3d focusPosition;
+
+    /**
+     * Position in equatorial coordinates of the current focus in radians
+     */
+    public Vector2d focusPositionSph;
+
+    /**
+     * FOCUS_MODE attributes
+     */
+    public double focusDistToCamera, focusViewAngle, focusViewAngleApparent, focusSize;
 
     /**
      * Proximity particles
@@ -101,15 +135,11 @@ public class ParticleSet implements Component {
     // Name index
     public Map<String, Integer> index;
 
-    // Minimum amount of time [ms] between two update calls
-    public static final double UPDATE_INTERVAL_MS = 1500;
-    public static final double UPDATE_INTERVAL_MS_2 = UPDATE_INTERVAL_MS * 2;
-
     // Metadata, for sorting - holds distances from each particle to the camera, squared
     public double[] metadata;
 
     // Comparator
-    private  Comparator<Integer> comp;
+    private Comparator<Integer> comp;
 
     // Indices list buffer 1
     public Integer[] indices1;
@@ -127,13 +157,12 @@ public class ParticleSet implements Component {
     public volatile boolean updating = false;
 
     // Updater task
-    public ParticleGroup.UpdaterTask updaterTask;
+    public ParticleSetUpdaterTask updaterTask;
 
-    // Camera dx threshold
-    public static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
     // Last sort position
     public Vector3d lastSortCameraPos, cPosD;
 
+    private final Vector3d D31 = new Vector3d();
 
     /**
      * Returns the list of particles.
@@ -195,7 +224,6 @@ public class ParticleSet implements Component {
         this.providerParams = params;
     }
 
-
     public void setFactor(Double factor) {
         this.factor = factor * Constants.DISTANCE_SCALE_FACTOR;
     }
@@ -214,4 +242,79 @@ public class ParticleSet implements Component {
         this.particleSizeLimits = sizeLimits;
     }
 
+    public IParticleRecord get(int index) {
+        return pointData.get(index);
+    }
+
+    // FOCUS_MODE size
+    public double getSize() {
+        return focusSize;
+    }
+
+    /**
+     * Returns the size of the particle at index i
+     *
+     * @param i The index
+     *
+     * @return The size
+     */
+    public double getSize(int i) {
+        return pointData.get(i).size();
+    }
+
+    /**
+     * Default size if not in data, 1e5 km
+     *
+     * @return The size
+     */
+    public double getFocusSize() {
+        return isStars ? focus.size() : 1e5 * Constants.KM_TO_U;
+    }
+
+    // Radius in stars is different!
+    public double getRadius() {
+        return isStars ? getSize() * Constants.STAR_SIZE_FACTOR : getSize() / 2.0;
+    }
+
+    // Radius in stars is different!
+    public double getRadius(int i) {
+        return isStars ? getSize(i) * Constants.STAR_SIZE_FACTOR : getRadius();
+    }
+
+    /**
+     * Updates the parameters of the focus, if the focus is active in this group
+     *
+     * @param camera The current camera
+     */
+    public void updateFocus(ICamera camera) {
+        Vector3d aux = D31.set(focusPosition);
+        focusDistToCamera = aux.sub(camera.getPos()).len();
+        focusSize = getFocusSize();
+        focusViewAngle = (float) ((getRadius() / focusDistToCamera) / camera.getFovFactor());
+        focusViewAngleApparent = focusViewAngle * Settings.settings.scene.star.brightness;
+    }
+
+    private void updateFocusDataPos() {
+        if (focusIndex < 0) {
+            focus = null;
+        } else {
+            focus = pointData.get(focusIndex);
+            focusPosition.set(focus.x(), focus.y(), focus.z());
+            Vector3d posSph = Coordinates.cartesianToSpherical(focusPosition, D31);
+            focusPositionSph.set((float) (MathUtilsd.radDeg * posSph.x), (float) (MathUtilsd.radDeg * posSph.y));
+            updateFocus(GaiaSky.instance.getICamera());
+        }
+    }
+
+    public void setFocusIndex(int index) {
+        if (index >= 0 && index < pointData.size()) {
+            candidateFocusIndex = index;
+            makeFocus();
+        }
+    }
+
+    public void makeFocus() {
+        focusIndex = candidateFocusIndex;
+        updateFocusDataPos();
+    }
 }

@@ -3,12 +3,6 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
@@ -21,28 +15,18 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
-import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.gdx.shader.Environment;
-import gaiasky.util.gdx.shader.Material;
-import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
-import gaiasky.util.gdx.shader.attribute.ColorAttribute;
-import gaiasky.util.gdx.shader.attribute.FloatAttribute;
-import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.Vector3b;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Initializes the old Particle and Star objects.
  */
 public class ParticleInitializer extends InitSystem implements IObserver {
 
+    private final ParticleUtils utils;
     private Vector3b B31;
 
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
@@ -50,6 +34,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
     public ParticleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
 
+        this.utils = new ParticleUtils();
         this.B31 = new Vector3b();
 
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD);
@@ -83,7 +68,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         // Set up stars
         if (Mapper.hip.has(entity)) {
             var model = Mapper.model.get(entity);
-            initModel(AssetBean.manager(), model);
+            utils.initModel(AssetBean.manager(), model);
 
             var mag = Mapper.magnitude.get(entity);
             var coordinates = Mapper.coordinates.get(entity);
@@ -181,38 +166,6 @@ public class ParticleInitializer extends InitSystem implements IObserver {
     private void setColor2Data(Body body, Celestial celestial) {
         final float plus = .1f;
         celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
-    }
-
-    private void initModel(final AssetManager manager, final Model model) {
-        Texture tex = manager.get(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
-        Texture lut = manager.get(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
-        tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        Map<String, Object> params = new TreeMap<>();
-        params.put("quality", 120L);
-        params.put("diameter", 1d);
-        params.put("flip", false);
-
-        Pair<IntModel, Map<String, gaiasky.util.gdx.shader.Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
-        IntModel intModel = pair.getFirst();
-        Material mat = pair.getSecond().get("base");
-        mat.clear();
-        mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
-        mat.set(new TextureAttribute(TextureAttribute.Normal, lut));
-        // Only to activate view vector (camera position)
-        mat.set(new ColorAttribute(ColorAttribute.Specular));
-        mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
-        Matrix4 modelTransform = new Matrix4();
-        model.model = new ModelComponent(false);
-        model.model.initialize(null);
-        model.model.env = new Environment();
-        model.model.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        model.model.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
-        model.model.instance = new IntModelInstance(intModel, modelTransform);
-        // Relativistic effects
-        if (Settings.settings.runtime.relativisticAberration)
-            model.model.rec.setUpRelativisticEffectsMaterial(model.model.instance.materials);
-        model.model.setModelInitialized(true);
     }
 
     @Override

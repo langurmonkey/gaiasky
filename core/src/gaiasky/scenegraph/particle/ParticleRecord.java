@@ -13,7 +13,6 @@ import net.jafama.FastMath;
 
 public class ParticleRecord implements IParticleRecord {
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
-    protected static TLV3 aux3f1 = new TLV3();
     public static final int STAR_SIZE_D = 3;
     public static final int STAR_SIZE_F = 11;
 

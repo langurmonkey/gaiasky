@@ -192,7 +192,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected volatile boolean updating = false;
 
     // Updater task
-    protected UpdaterTask updaterTask;
+    protected ParticleSetUpdaterTask updaterTask;
 
     // Camera dx threshold
     protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
@@ -207,22 +207,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         public int compare(Integer i1, Integer i2) {
             return Double.compare(metadata[i1], metadata[i2]);
         }
-    }
-
-    // Updates the group
-    public static class UpdaterTask implements Runnable {
-
-        private final ParticleGroup pg;
-
-        public UpdaterTask(ParticleGroup pg) {
-            this.pg = pg;
-        }
-
-        @Override
-        public void run() {
-            pg.updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
-        }
-
     }
 
     public ParticleGroup() {
@@ -330,7 +314,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         background = indices2;
 
         // Initialize updater task
-        updaterTask = new UpdaterTask(this);
+        updaterTask = new ParticleSetUpdaterTask(this);
     }
 
     /**
