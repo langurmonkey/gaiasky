@@ -67,7 +67,7 @@ public class ModelEntityRender {
      */
     private void renderGenericModel(Entity entity, Model model, ModelScaffolding scaffolding, IntModelBatch batch, float alpha, boolean relativistic, boolean shadowEnvironment) {
         ModelComponent mc = model.model;
-        if (mc.isModelInitialised()) {
+        if (mc != null && mc.isModelInitialised()) {
             if (scaffolding != null && shadowEnvironment) {
                 prepareShadowEnvironment(model, scaffolding);
             }

@@ -18,6 +18,7 @@ import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,8 +45,10 @@ public class ParticleSetInitializer extends InitSystem {
 
         // Initialize particle set
         if (starSet == null) {
+            initializeCommon(particleSet);
             initializeParticleSet(entity, particleSet);
         } else {
+            initializeCommon(starSet);
             initializeStarSet(entity, starSet);
         }
     }
@@ -54,7 +57,7 @@ public class ParticleSetInitializer extends InitSystem {
     public void setUpEntity(Entity entity) {
         var starSet = Mapper.starSet.get(entity);
 
-        if(starSet != null) {
+        if (starSet != null) {
             // Is it a catalog of variable stars?
             starSet.variableStars = starSet.pointData.size() > 0 && starSet.pointData.get(0) instanceof VariableRecord;
             initSortingData(entity, starSet);
@@ -64,24 +67,29 @@ public class ParticleSetInitializer extends InitSystem {
 
     }
 
+    private void initializeCommon(ParticleSet set) {
+        if (set.factor == null)
+            set.factor = 1d;
+        set.lastSortTime = -1;
+        set.cPosD = new Vector3d();
+        set.lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    }
+
     private void initializeParticleSet(Entity entity, ParticleSet set) {
         initializeParticleSet(entity, set, true, true);
     }
 
     /**
      * Initializes a particle set. It loads the data from the provider
-     * @param entity The entity.
-     * @param set The particle set.
-     * @param dataLoad Whether to load the data.
+     *
+     * @param entity            The entity.
+     * @param set               The particle set.
+     * @param dataLoad          Whether to load the data.
      * @param createCatalogInfo Whether to initialize the catalog info.
      */
     private void initializeParticleSet(Entity entity, ParticleSet set, boolean dataLoad, boolean createCatalogInfo) {
         // Load data
         try {
-            if (set.factor == null)
-                set.factor = 1d;
-
-            set.lastSortTime = -1;
             set.isStars = false;
 
             if (dataLoad) {
@@ -118,15 +126,13 @@ public class ParticleSetInitializer extends InitSystem {
     /**
      * Initializes a star set. Loads the data from the provider and computes mean and
      * label positions.
+     *
      * @param entity The entity.
-     * @param set The star set.
+     * @param set    The star set.
      */
     public void initializeStarSet(Entity entity, StarSet set) {
         // Load data
         try {
-            if (set.factor == null)
-                set.factor = 1d;
-
             set.isStars = true;
 
             Class<?> clazz = Class.forName(set.provider);
@@ -198,23 +204,21 @@ public class ParticleSetInitializer extends InitSystem {
 
     private void initSortingData(Entity entity, StarSet starSet) {
         var pointData = starSet.pointData;
-        var indices1 = starSet.indices1;
-        var indices2 = starSet.indices2;
 
         // Metadata
         starSet.metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order
-        indices1 = new Integer[pointData.size()];
-        indices2 = new Integer[pointData.size()];
+        starSet.indices1 = new Integer[pointData.size()];
+        starSet.indices2 = new Integer[pointData.size()];
         for (int i = 0; i < pointData.size(); i++) {
-            indices1[i] = i;
-            indices2[i] = i;
+            starSet.indices1[i] = i;
+            starSet.indices2[i] = i;
         }
-        starSet.active = indices1;
-        starSet.background = indices2;
+        starSet.active = starSet.indices1;
+        starSet.background = starSet.indices2;
 
         // Initialize updater task
-        starSet.updaterTask = new ParticleSetUpdaterTask(entity);
+        starSet.updaterTask = new ParticleSetUpdaterTask(entity, starSet);
     }
 }

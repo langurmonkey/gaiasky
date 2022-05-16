@@ -172,7 +172,7 @@ public class Archetypes {
             addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagSet.class);
 
             // StarGroup
-            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class);
+            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class);
 
             // Constellation
             addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class);

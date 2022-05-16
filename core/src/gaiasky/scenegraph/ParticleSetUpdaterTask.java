@@ -69,9 +69,9 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         this.comp = null;
     }
 
-    public ParticleSetUpdaterTask(Entity entity) {
+    public ParticleSetUpdaterTask(Entity entity, ParticleSet particleSet) {
         this.entity = entity;
-        this.particleSet = Mapper.particleSet.get(entity);
+        this.particleSet = particleSet;
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
         this.comp = new ParticleGroupComparator(this.particleSet);
