@@ -91,12 +91,14 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
         graph.translation.setToTranslation(localTransformD);
         if (trajectory.newMethod) {
             if (transformFunction != null) {
-                localTransformD.mul(transformFunction)
-                        .rotate(0, 1, 0, 90);
+                localTransformD.mul(transformFunction);
             }
             if (parentGraph.orientation != null) {
-                localTransformD.mul(parentGraph.orientation)
-                        .rotate(0, 1, 0, 90);
+                localTransformD.mul(parentGraph.orientation);
+
+            }
+            if(trajectory.model.isExtrasolar()) {
+               localTransformD.rotate(0, 1, 0, 90);
             }
         } else {
             OrbitComponent oc = trajectory.oc;

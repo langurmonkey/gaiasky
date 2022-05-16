@@ -30,9 +30,9 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Matrix4d;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,7 +43,7 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
     protected static final Log logger = Logger.getLogger(OrbitalElementsGroupRenderSystem.class);
 
     private final Vector3 aux1;
-    private final Matrix4 maux;
+    private final Matrix4 aux, refSysTransformF;
     private int posOffset;
     private int uvOffset;
     private int elems01Offset;
@@ -54,7 +54,8 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
     public OrbitalElementsGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         aux1 = new Vector3();
-        maux = new Matrix4();
+        aux = new Matrix4();
+        refSysTransformF = new Matrix4();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
@@ -172,7 +173,14 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                 float curRt1 = (float) curRt;
                 float curRt2 = (float) (curRt - (double) curRt1);
                 shaderProgram.setUniformf("u_t", curRt1, curRt2);
-                shaderProgram.setUniformMatrix("u_eclToEq", maux.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEclipticF()));
+                Matrix4d refSysTransform = oeg.children.size > 0 ? ((Orbit) oeg.children.get(0)).transformFunction : null;
+                if(((Orbit) oeg.children.get(0)).model.isExtrasolar()) {
+                    refSysTransform.putIn(aux).inv();
+                    refSysTransformF.setToRotation(0,1,0,-90).mul(aux);
+                } else {
+                    refSysTransform.putIn(refSysTransformF).inv();
+                }
+                shaderProgram.setUniformMatrix("u_eclToEq", refSysTransformF);
 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);

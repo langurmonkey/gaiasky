@@ -26,7 +26,15 @@ public class Trajectory implements Component {
 
     public enum OrbitOrientationModel {
         DEFAULT,
-        EXTRASOLAR_SYSTEM
+        EXTRASOLAR_SYSTEM;
+
+        public boolean isDefault() {
+            return this.equals(DEFAULT);
+        }
+
+        public boolean isExtrasolar() {
+            return this.equals(EXTRASOLAR_SYSTEM);
+        }
     }
 
     /**

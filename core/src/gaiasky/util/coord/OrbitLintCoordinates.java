@@ -102,7 +102,11 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             transf.rotate(0, 0, 1, orbitalParams.i);
             transf.rotate(0, 1, 0, orbitalParams.ascendingnode);
         } else {
-            transf.rotate(0, 1, 0, 90);
+            if (orbit != null && orbit.model.isExtrasolar()) {
+                transf.rotate(0, 1, 0, 90);
+            } else if(entity != null && Mapper.trajectory.get(entity).model.isExtrasolar()) {
+                transf.rotate(0, 1, 0, 90);
+            }
         }
 
         out.mul(transf).scl(scaling);
