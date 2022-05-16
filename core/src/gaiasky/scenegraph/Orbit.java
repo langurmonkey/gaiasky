@@ -56,9 +56,17 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     private static OrbitRefresher orbitRefresher;
 
-    private static enum OrientationModel {
+    public enum OrientationModel {
         DEFAULT,
-        EXTRASOLAR_SYSTEM
+        EXTRASOLAR_SYSTEM;
+
+        public boolean isDefault() {
+            return this.equals(DEFAULT);
+        }
+
+        public boolean isExtrasolar() {
+            return this.equals(EXTRASOLAR_SYSTEM);
+        }
     }
 
     private static void initRefresher() {
@@ -258,10 +266,11 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         if (newMethod) {
             if (transformFunction != null) {
                 localTransformD.mul(transformFunction);
-                localTransformD.rotate(0, 1, 0, 90);
             }
             if (parent.getOrientation() != null) {
                 localTransformD.mul(parent.getOrientation());
+            }
+            if (model.isExtrasolar()) {
                 localTransformD.rotate(0, 1, 0, 90);
             }
         } else {
@@ -360,8 +369,12 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         oc.loadDataPoint(out, GaiaSky.instance.time.getTime());
 
         if (transformFunction != null) {
-            auxMat.set(transformFunction).rotate(0, 1, 0, 90);
-            out.mul(auxMat);
+            if(model.isExtrasolar()) {
+                auxMat.set(transformFunction).rotate(0, 1, 0, 90);
+                out.mul(auxMat);
+            } else {
+                out.mul(transformFunction);
+            }
         }
 
         return out;

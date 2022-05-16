@@ -80,7 +80,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             transf.rotate(0, 1, 0, orbitalParams.argofpericenter);
             transf.rotate(0, 0, 1, orbitalParams.i);
             transf.rotate(0, 1, 0, orbitalParams.ascendingnode);
-        } else {
+        } else if (orbit.model.isExtrasolar()) {
             transf.rotate(0, 1, 0, 90);
         }
 
