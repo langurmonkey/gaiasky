@@ -18,6 +18,9 @@ public class Celestial implements Component {
     /** B-V color index **/
     public float colorbv;
 
+    /** Inner radius for billboard rendering **/
+    public double innerRad;
+
     public void setColorbv(Double colorbv) {
         this.colorbv = colorbv.floatValue();
     }

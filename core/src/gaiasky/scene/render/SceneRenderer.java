@@ -377,6 +377,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(lineProc);
         addRenderSystem(lineGpuProc);
 
+        // Billboards SSO
+        addRenderSystem(billboardSSOProc);
+
         // Special models
         addRenderSystem(modelStarsProc);
         addRenderSystem(modelAtmProc);

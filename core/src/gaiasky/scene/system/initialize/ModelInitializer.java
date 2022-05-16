@@ -74,7 +74,7 @@ public class ModelInitializer extends InitSystem {
         }
 
         // Initialize model body
-        initializeModel(base, body, model, sa, text, scaffolding, graph);
+        initializeModel(base, body, model, celestial, sa, text, scaffolding, graph);
 
         // Init billboard
         if (isBillboard) {
@@ -87,7 +87,7 @@ public class ModelInitializer extends InitSystem {
 
         if (isPlanet) {
             // Initialize planet
-            initializePlanet(base, body, scaffolding, atmosphere, cloud);
+            initializePlanet(base, body, scaffolding, sa, text, atmosphere, cloud);
             setColor2Data(body, celestial, 0.6f);
 
         } else {
@@ -184,8 +184,9 @@ public class ModelInitializer extends InitSystem {
         setToMachine(engine.machines[engine.currentMachine], false, body, model, scaffolding, engine);
     }
 
-    private void initializeModel(Base base, Body body, Model model, SolidAngle sa, Text text, ModelScaffolding scaffolding, GraphNode graph) {
+    private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Text text, ModelScaffolding scaffolding, GraphNode graph) {
         // Default values
+        celestial.innerRad = 0.2f;
         graph.orientation = new Matrix4d();
 
         sa.thresholdPoint = Math.toRadians(0.30);
@@ -212,12 +213,18 @@ public class ModelInitializer extends InitSystem {
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = 0.002;
         sa.thresholdPoint = thPoint / 1e9;
-        sa.thresholdQuad = thPoint / 8;
+        sa.thresholdQuad = thPoint / 8.0;
 
         text.labelFactor = 1e1f;
     }
 
-    private void initializePlanet(Base base, Body body, ModelScaffolding scaffolding, Atmosphere atmosphere, Cloud cloud) {
+    private void initializePlanet(Base base, Body body, ModelScaffolding scaffolding, SolidAngle sa, Text text, Atmosphere atmosphere, Cloud cloud) {
+        double thPoint = sa.thresholdPoint;
+        sa.thresholdNone = thPoint / 1e6;
+        sa.thresholdPoint = thPoint / 3e4;
+        sa.thresholdQuad = thPoint / 2.0;
+        text.labelFactor = (float) (1.5e1 * Constants.DISTANCE_SCALE_FACTOR);
+
         if (isRandomizeCloud(scaffolding)) {
             // Ignore current cloud component (if any) and create a random one
             cloud.cloud = new CloudComponent();

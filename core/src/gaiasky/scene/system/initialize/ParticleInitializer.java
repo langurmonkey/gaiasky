@@ -100,7 +100,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
 
     }
 
-    private void baseInitialization(ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
+    private void baseInitialization(ProperMotion pm, ParticleExtra extra, Celestial celestial, SolidAngle sa, Text text, RenderType render) {
         if (pm.pm == null) {
             pm.pm = new Vector3();
             pm.pmSph = new Vector3();
@@ -122,13 +122,13 @@ public class ParticleInitializer extends InitSystem implements IObserver {
 
         extra.primitiveRenderScale = 1;
         float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
-        extra.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
+        celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
 
         sa.thresholdFactor = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
     }
 
     private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
-        baseInitialization(pm, extra, sa, text, render);
+        baseInitialization(pm, extra, celestial, sa, text, render);
 
         // Actual initialization
         setDerivedAttributes(body, celestial, mag, extra, false);
@@ -142,7 +142,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
     }
 
     private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render, Distance dist) {
-        baseInitialization(pm, extra, sa, text, render);
+        baseInitialization(pm, extra, celestial, sa, text, render);
 
         setDerivedAttributes(body, celestial, mag, extra, true);
 
@@ -222,7 +222,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
             switch (event) {
             case STAR_POINT_SIZE_CMD:
                 for (Entity entity : entities) {
-                    Mapper.extra.get(entity).innerRad = (float) ((0.004f * Constants.PARTICLE_DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f);
+                    Mapper.celestial.get(entity).innerRad = (float) ((0.004f * Constants.PARTICLE_DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f);
                 }
                 break;
             default:

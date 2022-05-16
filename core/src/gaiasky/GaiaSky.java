@@ -796,11 +796,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         OctreeNode.LOAD_ACTIVE = false;
         boolean timeOnBak = settings.runtime.timeOn;
         settings.runtime.timeOn = true;
-        time.update(1e-5);
+        // Set non-zero time
+        time.update(1e-7);
         // Update whole scene graph
         sceneGraph.update(time, cameraManager);
+        scene.update(time, cameraManager);
+        // Clear render lists
         sgr.swapRenderLists();
         sceneRenderer.swapRenderLists();
+        // Time back to zero
         time.update(0);
         settings.runtime.timeOn = timeOnBak;
         OctreeNode.LOAD_ACTIVE = true;
