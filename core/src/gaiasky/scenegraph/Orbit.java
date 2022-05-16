@@ -194,7 +194,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         }
 
         // Up
-        Vector3b y = B32.get().set(barycenter).scl(1).nor();
+        Vector3b y = B32.get().set(barycenter).nor();
         Vector3d yd = y.put(D31.get());
         // Towards north - intersect y with plane
         Vector3d zd = D32.get();
@@ -224,7 +224,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
             if (!onlyBody) {
                 int last = pointCloudData.getNumPoints() - 1;
-                Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
+                Vector3d v = D31.get().set(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
                 this.size = (float) v.len() * 5;
             }
         }
@@ -255,7 +255,11 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         if (!onlyBody) {
             updateLocalTransform(GaiaSky.instance.time.getTime());
         }
+    }
 
+    @Override
+    public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
+        // EMPTY
     }
 
     protected void updateLocalTransform(Instant date) {

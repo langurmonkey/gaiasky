@@ -88,7 +88,7 @@ public class GraphUpdater extends EntitySystem {
 
     protected void processEntity(Entity entity, float deltaTime) {
         // This runs the root node
-        GraphNode root = entity.getComponent(GraphNode.class);
+        var root = entity.getComponent(GraphNode.class);
 
         synchronized (camera) {
             root.translation.set(camera.getInversePos());
@@ -117,8 +117,9 @@ public class GraphUpdater extends EntitySystem {
                 rotation.rc.update(time);
         }
 
-        // Update translation
-        graph.translation.set(parentTransform).add(body.pos);
+        graph.translation.set(parentTransform);
+        // updateLocalValues() method -> can usually run in later systems
+        graph.translation.add(body.pos);
 
         // Update opacity
         base.opacity = opacity * getVisibilityOpacityFactor(base);

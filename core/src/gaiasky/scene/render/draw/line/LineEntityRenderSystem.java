@@ -30,6 +30,7 @@ public class LineEntityRenderSystem {
         final var entity = render.entity;
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
+        var graph = Mapper.graph.get(entity);
         var trajectory = Mapper.trajectory.get(entity);
         var verts = Mapper.verts.get(entity);
         if (!trajectory.onlyBody) {
@@ -42,7 +43,7 @@ public class LineEntityRenderSystem {
             alpha *= trajectory.alpha * base.opacity;
 
             Vector3d parentPos;
-            parentPos = Mapper.attitude.has(entity) ? Mapper.attitude.get(entity).nonRotatedPos : null;
+            parentPos = Mapper.attitude.has(graph.parent) ? Mapper.attitude.get(graph.parent).nonRotatedPos : null;
             int last = parentPos != null ? 2 : 1;
 
             float dAlpha = 0f;

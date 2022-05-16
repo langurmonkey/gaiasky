@@ -51,8 +51,8 @@ public class TrajectoryUtils {
             trajectory.orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
             if (!trajectory.onlyBody) {
                 int last = pointCloudData.getNumPoints() - 1;
-                Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
-                body.size = (float) v.len() * 5;
+                D31.set(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
+                body.size = (float) D31.len() * 5;
             }
         }
         trajectory.mustRefresh = trajectory.providerClass != null
@@ -82,7 +82,7 @@ public class TrajectoryUtils {
         }
 
         // Up
-        Vector3b y = B32.set(barycenter).scl(1).nor();
+        Vector3b y = B32.set(barycenter).nor();
         Vector3d yd = y.put(D31);
         // Towards north - intersect y with plane
         Vector3d zd = D32;

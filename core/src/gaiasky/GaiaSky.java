@@ -1297,7 +1297,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public void renderSgr(final ICamera camera, final double t, final int width, final int height, final int tw, final int th, final FrameBuffer frameBuffer, final PostProcessBean ppb) {
-        //sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
+        sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
         sceneRenderer.render(camera, t, width, height, tw, th, frameBuffer, ppb);
     }
 

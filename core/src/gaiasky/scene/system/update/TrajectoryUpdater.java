@@ -63,7 +63,7 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
         if (!trajectory.onlyBody) {
             if(Mapper.tagHeliotropic.has(entity)) {
                 // Heliotropic orbit.
-                updateLocalTransformHeliotropic(GaiaSky.instance.time.getTime(), graph, trajectory, transform);
+                updateLocalTransformHeliotropic(GaiaSky.instance.time.getTime(), graph, trajectory);
             } else {
                 // Regular orbit.
                 updateLocalTransformRegular(graph, trajectory, transform);
@@ -71,7 +71,7 @@ public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater 
         }
     }
 
-    protected void updateLocalTransformHeliotropic(Instant date, GraphNode graph, Trajectory trajectory, RefSysTransform transform) {
+    protected void updateLocalTransformHeliotropic(Instant date, GraphNode graph, Trajectory trajectory) {
         Matrix4d localTransformD = trajectory.localTransformD;
 
         double sunLongitude = AstroUtils.getSunLongitude(date);
