@@ -91,7 +91,7 @@ public class HeliotropicSatellite extends Satellite {
 
             // Update orientation
             orientation.idt().rotate(quaterniond);
-            if(attitude != null) {
+            if (attitude != null) {
                 orientation.rotate(0, 0, 1, 180);
             }
 
@@ -109,6 +109,9 @@ public class HeliotropicSatellite extends Satellite {
     }
 
     public Quaterniond getOrientationQuaternion() {
+        if (attitude == null) {
+            return null;
+        }
         return attitude.getQuaternion();
     }
 
