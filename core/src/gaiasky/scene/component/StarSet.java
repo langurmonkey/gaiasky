@@ -53,7 +53,7 @@ public class StarSet extends ParticleSet {
         this.focusViewAngleApparent = this.focusViewAngle * Settings.settings.scene.star.brightness;
     }
 
-    protected Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d out, double deltaYears) {
+    public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d out, double deltaYears) {
         Vector3d pm = D32.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
         Vector3d dest = D33.set(pb.x(), pb.y(), pb.z());
         if (campos != null && !campos.hasNaN())

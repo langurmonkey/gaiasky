@@ -347,6 +347,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem orbitElemParticlesProc = new OrbitalElementsParticlesRenderSystem(ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
         orbitElemParticlesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         orbitElemParticlesProc.addPostRunnables(regularBlendR, depthWritesR);
+
         // ORBITAL ELEMENTS GROUP
         AbstractRenderSystem orbitElemGroupProc = new OrbitalElementsGroupRenderSystem(ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
         orbitElemGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -402,7 +403,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         // Milky way
         addRenderSystem(billboardGroupRenderSystem);
 
-        // Billboards
+        // Billboard stars
         addRenderSystem(billboardStarsProc);
 
         // Stars, particles

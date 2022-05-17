@@ -49,7 +49,7 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         protected int instanceSize;
         protected float[] instance;
 
-        protected int indexIdx;
+        public int indexIdx;
         protected int indexVert;
         protected int[] indices;
         public int numVertices;

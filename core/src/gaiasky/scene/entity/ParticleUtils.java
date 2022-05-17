@@ -1,18 +1,23 @@
 package gaiasky.scene.entity;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
-import gaiasky.scene.component.DatasetDescription;
-import gaiasky.scene.component.Model;
-import gaiasky.scene.component.ParticleSet;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.*;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
@@ -36,6 +41,48 @@ public class ParticleUtils {
     private final Vector3d D31 = new Vector3d();
 
     public ParticleUtils() {
+    }
+
+    public float highlightedSizeFactor(Highlight highlight, DatasetDescription datasetDesc) {
+        return (highlight.highlighted && datasetDesc.catalogInfo != null) ? datasetDesc.catalogInfo.hlSizeFactor : getPointscaling(highlight);
+    }
+
+    public float getPointscaling(Highlight highlight) {
+        //var graph = Mapper.graph.get(entity);
+
+        // TODO octree
+        //if(graph.parent instanceof OctreeWrapper) {
+        //    return ((OctreeWrapper) parent).getPointscaling() * pointscaling;
+        //}
+        return highlight.pointscaling;
+    }
+
+    public double getVariableSizeScaling(final StarSet set, final int idx) {
+        IParticleRecord ipr = set.pointData.get(idx);
+        if (ipr instanceof VariableRecord) {
+            VariableRecord vr = (VariableRecord) ipr;
+            double[] times = vr.variTimes;
+            float[] sizes = vr.variMags;
+            int n = vr.nVari;
+
+            // Days since epoch
+            double t = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
+            double t0 = times[0];
+            double t1 = times[n - 1];
+            double period = t1 - t0;
+            t = t % period;
+            for (int i = 0; i < n - 1; i++) {
+                double x0 = times[i] - t0;
+                double x1 = times[i + 1] - t0;
+                if (t >= x0 && t <= x1) {
+                    return MathUtilsd.lint(t, x0, x1, sizes[i], sizes[i + 1]) / vr.size();
+                }
+            }
+        }
+        return 1;
+    }
+    public float getColor(int index, ParticleSet set, Highlight highlight) {
+        return highlight.highlighted ? Color.toFloatBits(highlight.hlc[0], highlight.hlc[1], highlight.hlc[2], highlight.hlc[3]) : set.pointData.get(index).col();
     }
 
     /**

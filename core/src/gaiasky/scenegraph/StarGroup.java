@@ -103,6 +103,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void initialize() {
         initialize(true);
     }
+
     public void initialize(boolean createCatalogInfo) {
         // Load data
         try {
@@ -285,7 +286,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
             }
             if (GaiaSky.instance.sgr.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
-                //addToRender(this, RenderGroup.LINE);
                 addToRender(this, RenderGroup.LINE);
             }
             if (renderText()) {
@@ -324,7 +324,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
-    Color c = new Color();
+    private final Color c = new Color();
 
     private void renderCloseupStar(int idx, float fovFactor, Vector3d cPosD, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, double thUpOverFovFactor, double thDownOverFovFactor, float alpha) {
         if (filter(idx) && isVisible(idx)) {
@@ -835,7 +835,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void dispose() {
         this.disposed = true;
-        if(GaiaSky.instance.sceneGraph != null) {
+        if (GaiaSky.instance.sceneGraph != null) {
             GaiaSky.instance.sceneGraph.remove(this, true);
         }
         // Unsubscribe from all events
@@ -851,7 +851,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public float getColor(int index) {
-        return highlighted ? Color.toFloatBits(hlc[0], hlc[1], hlc[2], hlc[3]) : (float) pointData.get(index).col();
+        return highlighted ? Color.toFloatBits(hlc[0], hlc[1], hlc[2], hlc[3]) : pointData.get(index).col();
     }
 
     /**

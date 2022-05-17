@@ -197,25 +197,27 @@ public class Scene {
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
 
             // Extract systems.
+            AbstractExtractSystem particleSetExtractor = newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, renderLists);
             AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, renderLists);
             AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, renderLists);
             AbstractExtractSystem trajectoryExtractor = newExtractor(TrajectoryExtractor.class, families.orbits, priority++, renderLists);
             AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, renderLists);
 
-            // Remove all remaining systems
+            // Remove all remaining systems.
             engine.removeAllSystems();
 
-            // 1. First updater: scene graph update system
+            // 1. First updater: scene graph update system.
             engine.addSystem(sceneGraphUpdateSystem);
 
-            // 2. Update --- these can run in parallel
+            // 2. Update --- these can run in parallel.
             engine.addSystem(fadeUpdateSystem);
             engine.addSystem(particleSetUpdateSystem);
             engine.addSystem(modelUpdateSystem);
             engine.addSystem(trajectoryUpdateSystem);
             engine.addSystem(backgroundUpdateSystem);
 
-            // 3. Extract --- these can also run in parallel
+            // 3. Extract --- these can also run in parallel.
+            engine.addSystem(particleSetExtractor);
             engine.addSystem(particleExtractor);
             engine.addSystem(modelExtractor);
             engine.addSystem(trajectoryExtractor);

@@ -24,4 +24,32 @@ public class Highlight implements Component {
     public double hlcmmax;
     // Point size scaling
     public float pointscaling = 1;
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public boolean isHlplain() {
+        return hlplain;
+    }
+
+    public int getHlcmi() {
+        return hlcmi;
+    }
+
+    public IAttribute getHlcma() {
+        return hlcma;
+    }
+
+    public double getHlcmmin() {
+        return hlcmmin;
+    }
+
+    public double getHlcmmax() {
+        return hlcmmax;
+    }
+
+    public boolean isHlAllVisible() {
+        return hlallvisible;
+    }
 }

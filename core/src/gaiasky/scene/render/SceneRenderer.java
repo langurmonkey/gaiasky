@@ -45,6 +45,7 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
@@ -248,6 +249,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         /*
          * ======= INITIALIZE RENDER SYSTEMS =======
          */
+        final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
 
         // SINGLE STAR POINTS
         AbstractRenderSystem singlePointProc = new SinglePointRenderer(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
@@ -315,6 +317,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL BEAM
         AbstractRenderSystem modelBeamProc = new ModelRenderer(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
 
+        // STAR GROUP
+        AbstractRenderSystem starGroupProc = switch (pcm) {
+           // case TRIANGLES -> new StarSetRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+           // case TRIANGLES_INSTANCED -> new StarGroupInstRenderSystem(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+           // case POINTS -> new StarGroupPointRenderSystem(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            default -> new StarSetRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+        };
+        starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
+
         // MODEL STARS
         AbstractRenderSystem modelStarsProc = new ModelRenderer(MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
 
@@ -356,6 +368,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // Billboard stars
         addRenderSystem(billboardStarsProc);
+
+        // Star and particle sets
+        addRenderSystem(starGroupProc);
 
         // Diffuse meshes
         addRenderSystem(modelMeshDiffuse);

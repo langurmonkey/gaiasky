@@ -152,8 +152,9 @@ public class Constants {
     }
 
 
-    /** Threshold radius/distance where star size remains constant. **/
+    /** Threshold down, for radius/distance where star size remains constant. **/
     public static final double THRESHOLD_DOWN = 5e-7;
+    /** Threshold up, for radius/distance where star size remains constant. **/
     public static final double THRESHOLD_UP = 1e-2;
 
     /** Disc factor for single particles and stars. **/

@@ -26,6 +26,7 @@ public class Mapper {
     public static final ComponentMapper<AffineTransformations> affine = ComponentMapper.getFor(AffineTransformations.class);
     public static final ComponentMapper<Octant> octant = ComponentMapper.getFor(Octant.class);
     public static final ComponentMapper<Fade> fade = ComponentMapper.getFor(Fade.class);
+    public static final ComponentMapper<Highlight> highlight = ComponentMapper.getFor(Highlight.class);
     public static final ComponentMapper<Rotation> rotation = ComponentMapper.getFor(Rotation.class);
     public static final ComponentMapper<DatasetDescription> datasetDescription = ComponentMapper.getFor(DatasetDescription.class);
     public static final ComponentMapper<ParticleSet> particleSet = ComponentMapper.getFor(ParticleSet.class);
