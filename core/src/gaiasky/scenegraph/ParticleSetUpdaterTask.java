@@ -134,24 +134,10 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             IParticleRecord d = particleSet.pointData.get(i);
             // Pos
             Vector3d x = D31.set(d.x(), d.y(), d.z());
-            particleSet.metadata[i] = filter(i) ? camPos.dst2d(x) : Double.MAX_VALUE;
+            particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? camPos.dst2d(x) : Double.MAX_VALUE;
         }
     }
 
-    /**
-     * Evaluates the filter of this dataset (if any) for the given particle index
-     *
-     * @param index The index to filter
-     *
-     * @return The result of the filter evaluation, true if the particle passed the filtering, false otherwise
-     */
-    public boolean filter(int index) {
-        final CatalogInfo catalogInfo = datasetDescription.catalogInfo;
-        if (catalogInfo != null && catalogInfo.filter != null) {
-            return catalogInfo.filter.evaluate(particleSet.get(index));
-        }
-        return true;
-    }
 
     // Minimum amount of time [ms] between two update calls
     protected static final double UPDATE_INTERVAL_MS = 1500;

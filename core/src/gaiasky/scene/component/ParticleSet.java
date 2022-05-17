@@ -162,7 +162,7 @@ public class ParticleSet implements Component {
     // Last sort position
     public Vector3d lastSortCameraPos, cPosD;
 
-    private final Vector3d D31 = new Vector3d();
+    protected final Vector3d D31 = new Vector3d();
 
     /**
      * Returns the list of particles.
@@ -316,5 +316,16 @@ public class ParticleSet implements Component {
     public void makeFocus() {
         focusIndex = candidateFocusIndex;
         updateFocusDataPos();
+    }
+
+    /**
+     * Checks whether the particle with the given index is visible
+     *
+     * @param index The index of the particle
+     *
+     * @return The visibility of the particle
+     */
+    public boolean isVisible(int index) {
+        return visibilityArray != null && visibilityArray[index] != (byte) 0;
     }
 }

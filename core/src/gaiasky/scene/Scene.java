@@ -12,6 +12,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import javax.servlet.http.Part;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -190,6 +191,7 @@ public class Scene {
 
             // Regular update systems.
             FadeUpdater fadeUpdateSystem = new FadeUpdater(families.fadeNodes, priority++);
+            ParticleSetUpdater particleSetUpdateSystem = new ParticleSetUpdater(families.particleSets, priority++);
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models,  priority++);
             TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
@@ -208,6 +210,7 @@ public class Scene {
 
             // 2. Update --- these can run in parallel
             engine.addSystem(fadeUpdateSystem);
+            engine.addSystem(particleSetUpdateSystem);
             engine.addSystem(modelUpdateSystem);
             engine.addSystem(trajectoryUpdateSystem);
             engine.addSystem(backgroundUpdateSystem);

@@ -17,6 +17,7 @@ import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.camera.Proximity;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -73,6 +74,7 @@ public class ParticleSetInitializer extends InitSystem {
         set.lastSortTime = -1;
         set.cPosD = new Vector3d();
         set.lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        set.proximity = new Proximity(Constants.N_DIR_LIGHTS);
     }
 
     private void initializeParticleSet(Entity entity, ParticleSet set) {

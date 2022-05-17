@@ -7,14 +7,12 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
+import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.Model;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.Bits;
-import gaiasky.util.ModelCache;
-import gaiasky.util.Pair;
-import gaiasky.util.Settings;
+import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
@@ -40,7 +38,20 @@ public class ParticleUtils {
     public ParticleUtils() {
     }
 
-
+    /**
+     * Evaluates the filter of this dataset (if any) for the given particle index
+     *
+     * @param index The index to filter
+     *
+     * @return The result of the filter evaluation, true if the particle passed the filtering, false otherwise
+     */
+    public boolean filter(int index, ParticleSet particleSet, DatasetDescription datasetDescription) {
+        final CatalogInfo catalogInfo = datasetDescription.catalogInfo;
+        if (catalogInfo != null && catalogInfo.filter != null) {
+            return catalogInfo.filter.evaluate(particleSet.get(index));
+        }
+        return true;
+    }
 
     public void updateFocusDataPos(ParticleSet particleSet) {
         if (particleSet.focusIndex < 0) {
