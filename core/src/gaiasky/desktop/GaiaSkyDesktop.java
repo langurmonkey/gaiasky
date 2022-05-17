@@ -5,6 +5,7 @@
 
 package gaiasky.desktop;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -18,6 +19,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
+import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -220,6 +222,9 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
 
+            // Set log level
+            Logger.level = cliArgs.debug ? LoggerLevel.DEBUG : LoggerLevel.INFO;
+            // Create logger
             ConsoleLogger consoleLogger = new ConsoleLogger();
 
             // REST API server.
@@ -278,10 +283,19 @@ public class GaiaSkyDesktop implements IObserver {
                 int[] fullScreenResolution = s.graphics.fullScreen.resolution;
                 // Full screen mode.
                 DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
+                if (cliArgs.debug) {
+                    logger.debug("Full screen resolution in config file: " + fullScreenResolution[0] + "x" + fullScreenResolution[1]);
+                    logger.debug("Supported full screen modes:");
+                    int modeIndex = 1;
+                    for (DisplayMode displayMode : modes) {
+                        logger.debug("  " + modeIndex++ + ". " + displayMode.toString());
+                    }
+                }
                 DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
                     if (mode.height == fullScreenResolution[1] && mode.width == fullScreenResolution[0]) {
                         myMode = mode;
+                        logger.debug("Using full screen mode: " + myMode);
                         break;
                     }
                 }
