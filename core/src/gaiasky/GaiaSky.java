@@ -344,7 +344,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void create() {
         startTime = TimeUtils.millis();
-        // Log level
+        // Set log level
         Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
         Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
 
