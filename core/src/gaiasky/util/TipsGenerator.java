@@ -100,6 +100,9 @@ public class TipsGenerator {
         g.clear();
 
         for (String part : tip) {
+            if (part == null) {
+                continue;
+            }
             boolean def = true;
             String style = "main-title-s";
             String text = part;
@@ -121,8 +124,8 @@ public class TipsGenerator {
                 int n = keys.length;
                 for (int i = 0; i < n; i++) {
                     String t = keys[i];
-                    if(I18n.hasMessage("key." + keys[i])){
-                       t = I18n.msg("key." + keys[i]);
+                    if (I18n.hasMessage("key." + keys[i])) {
+                        t = I18n.msg("key." + keys[i]);
                     }
                     OwnTextButton button = new OwnTextButton(t, skin, style);
                     button.pad(pad2, pad5, pad2, pad5);
