@@ -44,7 +44,10 @@ public class ScreenModeCmd implements IObserver {
                 // Find best mode
                 DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
-                    if (mode.height == Settings.settings.graphics.fullScreen.resolution[1] && mode.width == Settings.settings.graphics.fullScreen.resolution[0]) {
+                    if (mode.height == Settings.settings.graphics.fullScreen.resolution[1]
+                            && mode.width == Settings.settings.graphics.fullScreen.resolution[0]
+                            && mode.refreshRate == Settings.settings.graphics.fullScreen.refreshRate
+                            && mode.bitsPerPixel == Settings.settings.graphics.fullScreen.bitDepth) {
                         myMode = mode;
                         break;
                     }

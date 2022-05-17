@@ -281,6 +281,8 @@ public class Settings {
         public static class FullscreenSettings {
             public boolean active;
             public int[] resolution;
+            public int bitDepth;
+            public int refreshRate;
         }
 
         @JsonIgnore
