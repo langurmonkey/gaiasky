@@ -60,10 +60,10 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 32,
+      "version": 33,
       "mingsversion": 30200,
-      "size": 79920724,
-      "nobjects": 53,
+      "size": 79920119,
+      "nobjects": 55,
       "check": "data-main.json",
       "data": [
         "asteroids.json",
@@ -117,11 +117,11 @@
         "tex/cubemap/earth-cloud-low",
         "tex/cubemap/earth-cloud-med"
       ],
-      "sha256": "e601cbd20211dc9f6447ddc496b3aa84b3f228b25e047305bd1573e9b7dfa3e5",
-      "description": "Required data pack.\nFor Gaia Sky 3.2.0-RC14 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC14+.\n- Move constellations and constellation boundaries to JSON format.\n- General JSON cleanup.\n- Move attitude data location, integrate Gaia object as a heliotropic satellite.\n- Move cosmic ruler to JSON format.\n- Use heliotropic orbit coordinates for Gaia object.",
+      "sha256": "1301ee1bfba0b7ef3c11df0f815cf5e3a33defd085b9b8a1e98be6a56900d835",
+      "description": "Required data pack.\nFor Gaia Sky 3.2.0-RC16 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC16+.\n- Fix typo in the 'Mikly' Way title.\n- Add Oort cloud and solar neighborhood titles.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v032_20220425/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v033_20220517/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
