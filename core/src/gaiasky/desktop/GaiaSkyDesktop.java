@@ -14,6 +14,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration.GLEmulation;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -292,13 +293,40 @@ public class GaiaSkyDesktop implements IObserver {
                     }
                 }
                 DisplayMode myMode = null;
+
+                // Find out modes with the same resolution.
+                Array<DisplayMode> fittingModes = new Array<>();
                 for (DisplayMode mode : modes) {
                     if (mode.height == fullScreenResolution[1] && mode.width == fullScreenResolution[0]) {
-                        myMode = mode;
-                        logger.debug("Using full screen mode: " + myMode);
-                        break;
+                        fittingModes.add(mode);
                     }
                 }
+                if(fittingModes.size == 1) {
+                    // Only one available, use it.
+                    myMode = fittingModes.get(0);
+                } else if (fittingModes.size > 1) {
+                    // Check if bit depth and refresh rate are set.
+                    for(DisplayMode fittingMode : fittingModes) {
+                        if(myMode == null) {
+                            myMode = fittingMode;
+                        } else {
+                            if(s.graphics.fullScreen.bitDepth > 0
+                                    && fittingMode.bitsPerPixel == s.graphics.fullScreen.bitDepth
+                                    && s.graphics.fullScreen.refreshRate > 0
+                                    && fittingMode.refreshRate == s.graphics.fullScreen.refreshRate) {
+                                myMode = fittingMode;
+                                break;
+                            } else {
+                                if(fittingMode.refreshRate > myMode.refreshRate) {
+                                    myMode = fittingMode;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                logger.debug("Using full screen mode: " + myMode);
+
                 if (myMode == null) {
                     // Fall back to windowed.
                     logger.warn(I18n.msg("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
@@ -306,6 +334,10 @@ public class GaiaSkyDesktop implements IObserver {
                     cfg.setResizable(s.graphics.resizable);
                 } else {
                     cfg.setFullscreenMode(myMode);
+                    s.graphics.fullScreen.resolution[0] = myMode.width;
+                    s.graphics.fullScreen.resolution[1] = myMode.height;
+                    s.graphics.fullScreen.bitDepth = myMode.bitsPerPixel;
+                    s.graphics.fullScreen.refreshRate = myMode.refreshRate;
                 }
             } else {
                 // Windowed mode.

@@ -202,13 +202,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         DisplayMode selectedMode = null;
         for (DisplayMode dm : modes) {
-            if (dm.width == settings.graphics.fullScreen.resolution[0] && dm.height == settings.graphics.fullScreen.resolution[1]) {
+            if (dm.width == settings.graphics.fullScreen.resolution[0]
+                    && dm.height == settings.graphics.fullScreen.resolution[1]
+                    && dm.bitsPerPixel == settings.graphics.fullScreen.bitDepth
+                    && dm.refreshRate == settings.graphics.fullScreen.refreshRate) {
                 selectedMode = dm;
                 break;
             }
         }
-        if (selectedMode != null)
+        if (selectedMode != null) {
             fullScreenResolutions.setSelected(selectedMode);
+        }
 
         // Get current resolution
         Table windowedResolutions = new Table(skin);
@@ -2052,14 +2056,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add all properties to settings.instance
 
         final boolean reloadFullScreenMode = fullScreen.isChecked() != settings.graphics.fullScreen.active;
-        final boolean reloadScreenMode = reloadFullScreenMode || (settings.graphics.fullScreen.active && (settings.graphics.fullScreen.resolution[0] != fullScreenResolutions.getSelected().width || settings.graphics.fullScreen.resolution[1] != fullScreenResolutions.getSelected().height)) || (!settings.graphics.fullScreen.active && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
+        final var selected = fullScreenResolutions.getSelected();
+        final boolean reloadScreenMode = reloadFullScreenMode
+                || (settings.graphics.fullScreen.active
+                    && (settings.graphics.fullScreen.resolution[0] != selected.width
+                        || settings.graphics.fullScreen.resolution[1] != selected.height
+                        || settings.graphics.fullScreen.refreshRate != selected.refreshRate
+                        || settings.graphics.fullScreen.bitDepth != selected.bitsPerPixel))
+                || (!settings.graphics.fullScreen.active
+                        && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
         boolean reloadRenderSystem = false;
 
         settings.graphics.fullScreen.active = fullScreen.isChecked();
 
         // Full screen options
-        settings.graphics.fullScreen.resolution[0] = fullScreenResolutions.getSelected().width;
-        settings.graphics.fullScreen.resolution[1] = fullScreenResolutions.getSelected().height;
+        settings.graphics.fullScreen.resolution[0] = selected.width;
+        settings.graphics.fullScreen.resolution[1] = selected.height;
+        settings.graphics.fullScreen.bitDepth = selected.bitsPerPixel;
+        settings.graphics.fullScreen.refreshRate = selected.refreshRate;
 
         // Windowed options
         settings.graphics.resolution[0] = Integer.parseInt(widthField.getText());
