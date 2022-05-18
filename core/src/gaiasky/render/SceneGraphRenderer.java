@@ -380,7 +380,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(MODEL_CLOUD, alphas, renderAssets.mbCloud);
 
         // SHAPES
-        AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas, globalResources.getSpriteShader());
+        AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas, globalResources.getShapeShader());
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
 
