@@ -95,6 +95,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
+    /** Renderer index. 0 for old, 1 for new, 2 for all. **/
+    public int ri = 2;
+
     /**
      * Singleton instance.
      **/
@@ -1301,8 +1304,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public void renderSgr(final ICamera camera, final double t, final int width, final int height, final int tw, final int th, final FrameBuffer frameBuffer, final PostProcessBean ppb) {
-        sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
-        sceneRenderer.render(camera, t, width, height, tw, th, frameBuffer, ppb);
+        if (ri != 1) {
+            sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
+        }
+        if (ri != 0) {
+            sceneRenderer.render(camera, t, width, height, tw, th, frameBuffer, ppb);
+        }
     }
 
     private long lastResizeTime = Long.MAX_VALUE;

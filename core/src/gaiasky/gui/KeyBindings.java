@@ -105,6 +105,7 @@ public class KeyBindings {
      * Finds an action given its name
      *
      * @param name The name
+     *
      * @return The action if it exists
      */
     public ProgramAction findAction(String name) {
@@ -120,6 +121,7 @@ public class KeyBindings {
      * Gets the keys that trigger the action identified by the given name
      *
      * @param actionId The action ID
+     *
      * @return The keys
      */
     public TreeSet<Integer> getKeys(String actionId) {
@@ -134,6 +136,7 @@ public class KeyBindings {
         }
         return null;
     }
+
     public String getStringKeys(String actionId) {
         return getStringKeys(actionId, "+");
     }
@@ -459,6 +462,21 @@ public class KeyBindings {
                 }
             }
 
+            // Special mapping to switch the renderer at runtime.
+            // TODO remove this when old OOP is removed
+            ProgramAction switchRenderer = new ProgramAction("switch-renderer", () -> {
+                GaiaSky.instance.ri = (GaiaSky.instance.ri + 1) % 2;
+                String msg = switch (GaiaSky.instance.ri) {
+                    case 0 -> "old renderer";
+                    case 1 -> "new renderer";
+                    case 2 -> "both renderers";
+                    default -> "undefined renderer!!#!#";
+                };
+                logger.info("Switched to " + msg);
+            }
+            );
+            addMapping(switchRenderer, new int[] { GSKeys.EQUALS });
+
         } catch (Exception e) {
             logger.error(e, I18n.msg("notif.kbd.mappings.error", customMappings));
         }
@@ -484,20 +502,14 @@ public class KeyBindings {
     /**
      * A simple program action. It can optionally contain a condition which must
      * evaluate to true for the action to be run.
-     *
- 
      */
     public static class ProgramAction implements Runnable, Comparable<ProgramAction> {
         final String actionId;
         final String actionName;
-        /**
-         * Action to run
-         **/
+        /** Action to run. **/
         private final Runnable action;
 
-        /**
-         * Condition that must be met
-         **/
+        /** Condition that must be met. **/
         private final BooleanRunnable[] conditions;
 
         ProgramAction(String actionId, Runnable action, BooleanRunnable... conditions) {
@@ -521,8 +533,9 @@ public class KeyBindings {
 
         @Override
         public void run() {
-            if (evaluateConditions())
+            if (evaluateConditions()) {
                 action.run();
+            }
         }
 
         /**
