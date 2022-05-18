@@ -1,5 +1,6 @@
 package gaiasky.scene.system.initialize;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -8,6 +9,8 @@ import gaiasky.util.Logger.Log;
 
 public abstract class InitSystem extends IteratingSystem implements EntityInitializer {
     protected Log logger;
+
+    protected Engine engineBackup;
 
     private enum InitializerMode {
         /** The initialization stage happens at the beginning, right after the entity has been created. **/
@@ -48,5 +51,11 @@ public abstract class InitSystem extends IteratingSystem implements EntityInitia
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public void addedToEngine(Engine engine) {
+        super.addedToEngine(engine);
+        this.engineBackup = engine;
     }
 }

@@ -63,10 +63,10 @@ public class ParticleSet implements Component {
     public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) };
 
     /**
-     * This flag indicates whether the mean position is already given by the
-     * JSON injector
-     */
-    public boolean fixedMeanPosition = false;
+     * Temporary storage for the mean position of this particle set, if it is given externally.
+     * If this is set, the mean position is not computed from the positions of all the particles automatically.
+     **/
+    public Vector3d meanPosition;
 
     /**
      * Factor to apply to the data points, usually to normalise distances
@@ -234,6 +234,30 @@ public class ParticleSet implements Component {
             }
         }
         return index;
+    }
+
+    public void setPosition(double[] pos) {
+        this.meanPosition = new Vector3d(pos[0], pos[1], pos[2]);
+    }
+
+    public void setPosKm(double[] pos) {
+        setPositionKm(pos);
+    }
+
+    public void setPositionKm(double[] pos) {
+        this.meanPosition = new Vector3d(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
+    }
+
+    public void setPosPc(double[] pos) {
+        setPositionPc(pos);
+    }
+
+    public void setPositionPc(double[] pos) {
+        this.meanPosition = new Vector3d(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
+    }
+
+    public void setPosition(int[] pos) {
+        setPosition(new double[] { pos[0], pos[1], pos[2] });
     }
 
     public void setDatafile(String datafile) {

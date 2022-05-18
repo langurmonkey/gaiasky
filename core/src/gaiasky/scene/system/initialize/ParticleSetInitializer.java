@@ -175,9 +175,10 @@ public class ParticleSetInitializer extends InitSystem {
     }
 
     public void computeMeanPosition(Entity entity, ParticleSet set) {
-        if (!set.fixedMeanPosition && Mapper.body.has(entity)) {
-            Body body = Mapper.body.get(entity);
-            body.pos = new Vector3b();
+        var body = Mapper.body.get(entity);
+        if(set.meanPosition != null) {
+            body.pos.set(set.meanPosition);
+        } else {
             // Mean position
             for (IParticleRecord point : set.data()) {
                 body.pos.add(point.x(), point.y(), point.z());

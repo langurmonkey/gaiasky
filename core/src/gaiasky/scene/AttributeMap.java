@@ -123,7 +123,7 @@ public class AttributeMap {
         putAll(Boundaries.class, "boundaries");
 
         // ParticleSet
-        putAll(ParticleSet.class, "provider:ParticleGroup", "datafile", "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits");
+        putAll(ParticleSet.class, "provider:ParticleGroup", "position:ParticleGroup", "datafile", "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits");
 
         // StarSet
         putAll(StarSet.class, "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup");

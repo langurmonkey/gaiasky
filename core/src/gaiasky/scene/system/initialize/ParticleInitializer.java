@@ -171,15 +171,18 @@ public class ParticleInitializer extends InitSystem implements IObserver {
     @Override
     public void notify(Event event, Object source, Object... data) {
         GaiaSky.postRunnable(() -> {
-            ImmutableArray<Entity> entities = getEntities();
-            switch (event) {
-            case STAR_POINT_SIZE_CMD:
-                for (Entity entity : entities) {
-                    Mapper.celestial.get(entity).innerRad = (float) ((0.004f * Constants.PARTICLE_DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f);
+            // First, get all current entities for the family
+            if (this.engineBackup != null) {
+                ImmutableArray<Entity> entities = this.engineBackup.getEntitiesFor(getFamily());
+                switch (event) {
+                case STAR_POINT_SIZE_CMD:
+                    for (Entity entity : entities) {
+                        Mapper.celestial.get(entity).innerRad = (float) ((0.004f * Constants.PARTICLE_DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f);
+                    }
+                    break;
+                default:
+                    break;
                 }
-                break;
-            default:
-                break;
             }
         });
     }
