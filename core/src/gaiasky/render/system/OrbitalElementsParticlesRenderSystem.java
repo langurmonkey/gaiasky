@@ -30,6 +30,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Matrix4d;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,7 +41,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
     protected static final Log logger = Logger.getLogger(OrbitalElementsParticlesRenderSystem.class);
 
     private final Vector3 aux1;
-    private final Matrix4 maux;
+    private final Matrix4 maux, refSysTransformF;
     private int posOffset;
     private int uvOffset;
     private int elems01Offset;
@@ -53,6 +54,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
+        refSysTransformF = new Matrix4();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
@@ -163,7 +165,16 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
                 float curRt1 = (float) curRt;
                 float curRt2 = (float) (curRt - (double) curRt1);
                 shaderProgram.setUniformf("u_t", curRt1, curRt2);
-                shaderProgram.setUniformMatrix("u_eclToEq", maux.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEclipticF()));
+
+                // Reference system transform
+                Matrix4d refSysTransform = first.transformFunction != null ? first.transformFunction : null;
+                if(first.model.isExtrasolar()) {
+                    refSysTransform.putIn(maux).inv();
+                    refSysTransformF.setToRotation(0,1,0,-90).mul(maux);
+                } else {
+                    refSysTransform.putIn(refSysTransformF).inv();
+                }
+                shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);

@@ -76,7 +76,7 @@ public class BillboardRenderSystem extends AbstractRenderSystem implements IObse
         int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
         mesh.setIndices(indices);
 
-        aux = new Vector3();
+        auxf = new Vector3();
 
         if (starTextureListener) {
             EventManager.instance.subscribe(this, Event.BILLBOARD_TEXTURE_IDX_CMD);

@@ -173,6 +173,8 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                 float curRt1 = (float) curRt;
                 float curRt2 = (float) (curRt - (double) curRt1);
                 shaderProgram.setUniformf("u_t", curRt1, curRt2);
+
+                // Reference system transform
                 Matrix4d refSysTransform = oeg.children.size > 0 ? ((Orbit) oeg.children.get(0)).transformFunction : null;
                 if(((Orbit) oeg.children.get(0)).model.isExtrasolar()) {
                     refSysTransform.putIn(aux).inv();
@@ -180,7 +182,7 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                 } else {
                     refSysTransform.putIn(refSysTransformF).inv();
                 }
-                shaderProgram.setUniformMatrix("u_eclToEq", refSysTransformF);
+                shaderProgram.setUniformMatrix("u_refSysTransform", refSysTransformF);
 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);

@@ -8,7 +8,7 @@ uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform float u_alpha;
 uniform float u_sizeFactor;
-uniform mat4 u_eclToEq;
+uniform mat4 u_refSysTransform;
 uniform vec2 u_sizeLimits;
 // Current julian date, in days, emulates a double in vec2
 uniform vec2 u_t;
@@ -108,7 +108,7 @@ vec4 keplerToCartesian() {
 
 void main() {
     // Compute position for current time from orbital elements
-    vec4 pos4 = keplerToCartesian() * u_eclToEq;
+    vec4 pos4 = keplerToCartesian() * u_refSysTransform;
     vec3 pos = pos4.xyz - u_camPos;
 
     // Distance to point

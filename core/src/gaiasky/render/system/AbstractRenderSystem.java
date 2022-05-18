@@ -6,6 +6,7 @@
 package gaiasky.render.system;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
@@ -31,7 +32,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;
     public RenderingContext rc;
-    protected Vector3 aux;
+
+    protected Vector3 auxf;
     protected Vector3d auxd;
 
     private final Settings settings;
@@ -46,7 +48,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         this.group = rg;
         this.alphas = alphas;
         this.programs = programs;
-        this.aux = new Vector3();
+        this.auxf = new Vector3();
         this.auxd = new Vector3d();
         this.preRunnables = new Array<>(false, 1);
         this.postRunnables = new Array<>(false, 1);
@@ -164,10 +166,10 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     /**
-     * Uniforms needed to compute the logarithmic depth buffer. They never change, so only add if not present
+     * Uniforms needed to compute the logarithmic depth buffer. They never change, so only add if not present.
      *
-     * @param shaderProgram The program
-     * @param camera        The camera
+     * @param shaderProgram The program.
+     * @param camera        The camera.
      */
     protected void addDepthBufferUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         if (!depthBufferFlag) {
@@ -186,8 +188,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         // Velocity buffer
         if (settings.postprocess.motionBlur) {
-            shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux));
-            shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux));
+            shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(auxf));
+            shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(auxf));
             shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
         }
     }
