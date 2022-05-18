@@ -96,7 +96,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /** Renderer index. 0 for old, 1 for new, 2 for all. **/
-    public int ri = 2;
+    public int ri = 0;
 
     /**
      * Singleton instance.

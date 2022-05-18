@@ -18,6 +18,7 @@ import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.Proximity;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -152,6 +153,15 @@ public class ParticleSetInitializer extends InitSystem {
 
         computeMeanPosition(entity, set);
         setLabelPosition(entity);
+
+        // Default epochs, if not set
+        if (set.epochJd <= 0) {
+            set.epochJd = AstroUtils.JD_J2015_5;
+        }
+
+        if (set.variabilityEpochJd <= 0) {
+            set.variabilityEpochJd = AstroUtils.JD_J2010;
+        }
     }
 
     public void computeMinMeanMaxDistances(Entity entity, ParticleSet set) {
@@ -176,7 +186,7 @@ public class ParticleSetInitializer extends InitSystem {
 
     public void computeMeanPosition(Entity entity, ParticleSet set) {
         var body = Mapper.body.get(entity);
-        if(set.meanPosition != null) {
+        if (set.meanPosition != null) {
             body.pos.set(set.meanPosition);
         } else {
             // Mean position

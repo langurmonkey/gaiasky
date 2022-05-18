@@ -101,7 +101,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
      */
     @Override
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
-        float size = getFuzzyRenderSize(camera) * primitiveRenderScale;
+        final float size = getFuzzyRenderSize(camera) * primitiveRenderScale;
         shader.setUniformf("u_pos", translation.put(F31.get()));
         shader.setUniformf("u_size", size);
 

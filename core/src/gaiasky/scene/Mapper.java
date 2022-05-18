@@ -2,10 +2,7 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import gaiasky.scene.component.*;
-import gaiasky.scene.component.tag.TagHeliotropic;
-import gaiasky.scene.component.tag.TagQuaternionOrientation;
-import gaiasky.scene.component.tag.TagSet;
-import gaiasky.scene.component.tag.TagSetElement;
+import gaiasky.scene.component.tag.*;
 
 /**
  * Centralized repository of component mappers.
@@ -62,5 +59,6 @@ public class Mapper {
     public static final ComponentMapper<TagHeliotropic> tagHeliotropic = ComponentMapper.getFor(TagHeliotropic.class);
     public static final ComponentMapper<TagSet> tagSet = ComponentMapper.getFor(TagSet.class);
     public static final ComponentMapper<TagSetElement> tagSetElement = ComponentMapper.getFor(TagSetElement.class);
+    public static final ComponentMapper<TagBillboardGalaxy> tagBillboardGalaxy = ComponentMapper.getFor(TagBillboardGalaxy.class);
 
 }

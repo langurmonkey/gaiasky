@@ -40,7 +40,6 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     private Texture billboardTexture;
     private final ComponentType componentType;
 
-
     // Render metadata
     protected float thpointTimesFovfactor;
     protected float thupOverFovfactor;
@@ -197,7 +196,6 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             });
             shaderProgram.end();
         }
-
     }
 
     /**
@@ -208,42 +206,34 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var celestial = Mapper.celestial.get(entity);
+
         float alpha = getAlpha(base.ct);
 
-        if (celestial != null) {
-            var sa = Mapper.sa.get(entity);
-            var extra = Mapper.extra.get(entity);
+        if (Mapper.tagBillboardGalaxy.has(entity)) {
+            /*
+             *  BILLBOARD GALAXIES
+             */
             var scaffolding = Mapper.modelScaffolding.get(entity);
-            boolean isModel = Mapper.model.has(entity);
-            boolean isStar = Mapper.hip.has(entity);
+            float size = (float) (getRenderSizeBillboard(camera, body, scaffolding) / Constants.DISTANCE_SCALE_FACTOR);
 
-            float fuzzySize = getRenderSizeCelestial(camera, body, sa, extra);
-            float radius = (float) (extra != null ? extra.radius : (body.size / 2d) * scaffolding.sizeScaleFactor);
+            Vector3 aux = F31;
+            shader.setUniformf("u_pos", graph.translation.put(aux));
+            shader.setUniformf("u_size", size);
 
-            Vector3 billboardPosition = graph.translation.put(F31);
-            if (isModel) {
-                // Get it a tad closer to the camera to prevent occlusion with orbit.
-                // Only for models.
-                float l = billboardPosition.len();
-                billboardPosition.nor().scl(l * 0.99f);
-            }
-            shader.setUniformf("u_pos", billboardPosition);
-            shader.setUniformf("u_size", fuzzySize);
-
-            shader.setUniformf("u_color", celestial.colorPale[0], celestial.colorPale[1], celestial.colorPale[2], alpha * base.opacity);
-            shader.setUniformf("u_inner_rad", (float) celestial.innerRad);
+            shader.setUniformf("u_color", celestial.colorPale[0], celestial.colorPale[1], celestial.colorPale[2], alpha);
+            shader.setUniformf("u_alpha", alpha * base.opacity);
             shader.setUniformf("u_distance", (float) body.distToCamera);
             shader.setUniformf("u_apparent_angle", (float) body.viewAngleApparent);
-            shader.setUniformf("u_thpoint", (float) sa.thresholdPoint * camera.getFovFactor());
+            shader.setUniformf("u_time", (float) GaiaSky.instance.getT() / 5f);
 
-            // Whether light scattering is enabled or not
-            shader.setUniformi("u_lightScattering", (isStar && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
+            shader.setUniformf("u_radius", size);
 
-            shader.setUniformf("u_radius", radius);
-
-            // Render the mesh
+            // Render mesh
             mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
         } else if (Mapper.starSet.has(entity)) {
+            /*
+             *  STARS IN SETS
+             */
             var set = Mapper.starSet.get(entity);
             var desc = Mapper.datasetDescription.get(entity);
             var highlight = Mapper.highlight.get(entity);
@@ -272,10 +262,57 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             if (set.focus != null && !focusRendered) {
                 renderCloseupStar(set, highlight, desc, set.focusIndex, fovFactor, set.cPosD, shader, mesh, thPointTimesFovFactor, thUpOverFovFactor, thDownOverFovFactor, alpha);
             }
+        } else if (celestial != null) {
+            /*
+             *  REGULAR STARS, PLANETS, SATELLITES, BILLBOARDS and SSOs
+             */
+            var sa = Mapper.sa.get(entity);
+            var extra = Mapper.extra.get(entity);
+            var scaffolding = Mapper.modelScaffolding.get(entity);
+            boolean isModel = Mapper.model.has(entity);
+            boolean isStar = Mapper.hip.has(entity);
+
+            final float fuzzySize = getRenderSizeCelestial(camera, entity, body, sa, scaffolding, extra);
+            final float radius = (float) (extra != null ? extra.radius : (body.size / 2d) * scaffolding.sizeScaleFactor);
+
+            Vector3 billboardPosition = graph.translation.put(F31);
+            if (isModel) {
+                // Bring it a tad closer to the camera to prevent occlusion with orbit.
+                // Only for models.
+                float len = billboardPosition.len();
+                billboardPosition.nor().scl(len * 0.99f);
+            }
+            shader.setUniformf("u_pos", billboardPosition);
+            shader.setUniformf("u_size", fuzzySize);
+
+            // Models use the regular color
+            float[] color = Mapper.model.has(entity) ? body.color : celestial.colorPale;
+
+            // Alpha channel:
+            // - particles: alpha * opacity
+            // - models:    alpha * (1 - fadeOpacity)
+            float a = scaffolding != null ? alpha * (1f - scaffolding.fadeOpacity) : alpha * base.opacity;
+            shader.setUniformf("u_color", color[0], color[1], color[2], a);
+            shader.setUniformf("u_inner_rad", (float) celestial.innerRad);
+            shader.setUniformf("u_distance", (float) body.distToCamera);
+            shader.setUniformf("u_apparent_angle", (float) body.viewAngleApparent);
+            shader.setUniformf("u_thpoint", (float) sa.thresholdPoint * camera.getFovFactor());
+
+            // Whether light scattering is enabled or not
+            shader.setUniformi("u_lightScattering", (isStar && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);
+
+            shader.setUniformf("u_radius", radius);
+
+            // Render the mesh
+            mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
         }
     }
 
-    public float getRenderSizeCelestial(ICamera camera, Body body, SolidAngle sa, ParticleExtra extra) {
+    public float getRenderSizeBillboard(ICamera camera, Body body, ModelScaffolding scaffolding) {
+        return body.size * Settings.settings.scene.star.brightness * scaffolding.billboardSizeFactor;
+    }
+
+    public float getRenderSizeCelestial(ICamera camera, Entity entity, Body body, SolidAngle sa, ModelScaffolding scaffolding, ParticleExtra extra) {
         if (extra != null) {
             // Stars, particles
             extra.computedSize = body.size;
@@ -289,18 +326,22 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
             extra.computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
             return (float) ((extra.computedSize / Constants.DISTANCE_SCALE_FACTOR) * extra.primitiveRenderScale);
+        } else if(Mapper.fade.has(entity)) {
+            // Regular billboards
+            return getRenderSizeBillboard(camera, body, scaffolding);
         } else {
             // Models
             float thAngleQuad = (float) sa.thresholdQuad * camera.getFovFactor();
             double size = 0f;
             if (body.viewAngle >= sa.thresholdPoint * camera.getFovFactor()) {
-                size = Math.tan(thAngleQuad) * body.distToCamera * 2f;
+                size = Math.tan(thAngleQuad) * body.distToCamera * scaffolding.billboardSizeFactor;
             }
             return (float) size;
         }
     }
 
     private final Color c = new Color();
+
     private void renderCloseupStar(StarSet set, Highlight highlight, DatasetDescription desc, int idx, float fovFactor, Vector3d cPosD, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, double thUpOverFovFactor, double thDownOverFovFactor, float alpha) {
         if (utils.filter(idx, set, desc) && set.isVisible(idx)) {
             IParticleRecord star = set.pointData.get(idx);

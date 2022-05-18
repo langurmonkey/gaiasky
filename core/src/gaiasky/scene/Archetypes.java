@@ -4,10 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
-import gaiasky.scene.component.tag.TagBackgroundModel;
-import gaiasky.scene.component.tag.TagHeliotropic;
-import gaiasky.scene.component.tag.TagQuaternionOrientation;
-import gaiasky.scene.component.tag.TagSet;
+import gaiasky.scene.component.tag.*;
 import gaiasky.scenegraph.*;
 
 import java.util.Collection;
@@ -127,7 +124,7 @@ public class Archetypes {
             addArchetype(Billboard.class.getName(), ModelBody.class.getName(), TagQuaternionOrientation.class, Fade.class);
 
             // BillboardGalaxy
-            addArchetype(BillboardGalaxy.class.getName(), Billboard.class.getName());
+            addArchetype(BillboardGalaxy.class.getName(), Billboard.class.getName(), TagBillboardGalaxy.class);
 
             // VertsObject
             addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);

@@ -126,7 +126,7 @@ public class AttributeMap {
         putAll(ParticleSet.class, "provider:ParticleGroup", "position:ParticleGroup", "datafile", "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits");
 
         // StarSet
-        putAll(StarSet.class, "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup");
+        putAll(StarSet.class, "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup", "epoch:StarGroup", "variabilityEpoch:StarGroup");
 
         // Attitude
         putAll(Attitude.class, "provider:HeliotropicSatellite", "attitudeLocation");

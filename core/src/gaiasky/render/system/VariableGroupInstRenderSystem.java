@@ -205,7 +205,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
-                    curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), starGroup.getVariabilityepoch());
+                    curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), starGroup.getVariabilityEpoch());
                     shaderProgram.setUniformf("u_s", (float) curRt);
 
                     try {

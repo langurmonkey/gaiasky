@@ -81,7 +81,7 @@ public class Billboard extends ModelBody {
     }
 
     /**
-     * Sets the local transform of this satellite
+     * Sets the local transform.
      */
     public void setToLocalTransform(Matrix4 localTransform, boolean forceUpdate) {
         if (forceUpdate) {
@@ -145,10 +145,7 @@ public class Billboard extends ModelBody {
     }
 
     public float getFuzzyRenderSize(ICamera camera) {
-        float computedSize = this.size;
-        computedSize *= Settings.settings.scene.star.brightness * .6e-3;
-
-        return computedSize;
+        return this.size * Settings.settings.scene.star.brightness * .6e-3f;
     }
 
     public void setHidden(String hidden) {

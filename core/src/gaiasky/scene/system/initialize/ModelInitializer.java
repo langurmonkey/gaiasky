@@ -16,6 +16,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.SpacecraftRadio;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Planet;
@@ -78,20 +79,19 @@ public class ModelInitializer extends InitSystem {
 
         // Init billboard
         if (isBillboard) {
-            initializeBillboard(sa, text);
+            initializeBillboard(scaffolding, sa, text);
         }
 
         if (isSatellite) {
-            initializeSatellite(attitude);
+            initializeSatellite(attitude, scaffolding, sa, text);
         }
 
         if (isPlanet) {
             // Initialize planet
             initializePlanet(base, body, scaffolding, sa, text, atmosphere, cloud);
-            setColor2Data(body, celestial, 0.6f);
-
+            EntityUtils.setColor2Data(body, celestial, 0.6f);
         } else {
-            setColor2Data(body, celestial, 0.1f);
+            EntityUtils.setColor2Data(body, celestial, 0.1f);
         }
     }
 
@@ -189,6 +189,7 @@ public class ModelInitializer extends InitSystem {
         celestial.innerRad = 0.2f;
         graph.orientation = new Matrix4d();
 
+        scaffolding.billboardSizeFactor = 2f;
         sa.thresholdPoint = Math.toRadians(0.30);
         sa.thresholdFactor = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
 
@@ -209,13 +210,14 @@ public class ModelInitializer extends InitSystem {
         }
     }
 
-    private void initializeBillboard(SolidAngle sa, Text text) {
+    private void initializeBillboard(ModelScaffolding scaffolding, SolidAngle sa, Text text) {
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = 0.002;
         sa.thresholdPoint = thPoint / 1e9;
         sa.thresholdQuad = thPoint / 8.0;
 
         text.labelFactor = 1e1f;
+        scaffolding.billboardSizeFactor = 0.6e-3f;
     }
 
     private void initializePlanet(Base base, Body body, ModelScaffolding scaffolding, SolidAngle sa, Text text, Atmosphere atmosphere, Cloud cloud) {
@@ -244,7 +246,15 @@ public class ModelInitializer extends InitSystem {
         }
     }
 
-    public void initializeSatellite(Attitude attitude) {
+    public void initializeSatellite(Attitude attitude, ModelScaffolding scaffolding, SolidAngle sa, Text text) {
+        double thPoint = sa.thresholdPoint;
+        sa.thresholdNone = thPoint / 1e18;
+        sa.thresholdPoint = thPoint / 3.3e10;
+        sa.thresholdQuad = thPoint / 8.0;
+        text.labelFactor = (float) (0.5e1 * Constants.DISTANCE_SCALE_FACTOR);
+        text.labelMax = text.labelMax * 2f;
+
+        scaffolding.billboardSizeFactor = 10f;
         attitude.nonRotatedPos = new Vector3d();
         if (attitude.attitudeLocation != null && !attitude.attitudeLocation.isBlank()) {
             AssetBean.manager().load(attitude.attitudeLocation, IAttitudeServer.class, new AttitudeLoaderParameters(attitude.provider));
@@ -261,10 +271,6 @@ public class ModelInitializer extends InitSystem {
 
     protected boolean isRandomizeCloud(ModelScaffolding scaffolding) {
         return scaffolding.randomize != null && scaffolding.randomize.contains("cloud");
-    }
-
-    protected void setColor2Data(final Body body, final Celestial celestial, final float plus) {
-        celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
     }
 
     /**

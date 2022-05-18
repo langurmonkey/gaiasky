@@ -599,7 +599,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             int n = vr.nVari;
 
             // Days since epoch
-            double t = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), this.getVariabilityepoch());
+            double t = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), this.getVariabilityEpoch());
             double t0 = times[0];
             double t1 = times[n - 1];
             double period = t1 - t0;
@@ -819,7 +819,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      *
      * @param epochJd The light curve epoch in julian days (days since January 1, 4713 BCE)
      */
-    public void setVariabilityepoch(Double epochJd) {
+    public void setVariabilityEpoch(Double epochJd) {
         this.variabilityEpochJd = epochJd;
     }
 
@@ -828,7 +828,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      *
      * @return The light curve epoch in julian days
      */
-    public Double getVariabilityepoch() {
+    public Double getVariabilityEpoch() {
         return this.variabilityEpochJd;
     }
 

@@ -3,6 +3,7 @@ package gaiasky.scene.component;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Settings;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
@@ -10,16 +11,17 @@ import java.util.Set;
 
 public class StarSet extends ParticleSet {
     /**
-     * Epoch for positions/proper motions in julian days
+     * Epoch for positions/proper motions in julian days.
      **/
     public double epochJd;
 
     /**
-     * Epoch for the times in the light curves in julian days
+     * Epoch for the times in the light curves in julian days.
      */
     public double variabilityEpochJd;
+
     /**
-     * Current computed epoch time
+     * Current computed epoch time.
      **/
     public double currDeltaYears = 0;
 
@@ -28,9 +30,10 @@ public class StarSet extends ParticleSet {
     /** Does this contain variable stars? **/
     public boolean variableStars = false;
 
-    /** Stars for which forceLabel is enabled **/
+    /** Stars for which forceLabel is enabled. **/
     public Set<Integer> forceLabelStars;
-    /** Stars with special label colors **/
+
+    /** Stars with special label colors. **/
     public Map<Integer, float[]> labelColors;
 
     private final Vector3d D32 = new Vector3d();
@@ -62,5 +65,41 @@ public class StarSet extends ParticleSet {
             dest.add(pm);
 
         return out.set(dest);
+    }
+
+    /**
+     * Sets the epoch to use for the stars in this set.
+     *
+     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE).
+     */
+    public void setEpoch(Double epochJd) {
+        setEpochJd(epochJd);
+    }
+
+    /**
+     * Sets the epoch to use for the stars in this set.
+     *
+     * @param epochJd The epoch in julian days (days since January 1, 4713 BCE).
+     */
+    public void setEpochJd(Double epochJd) {
+        this.epochJd = epochJd;
+    }
+
+    /**
+     * Sets the light curve epoch to use for the stars in this group.
+     *
+     * @param epochJd The light curve epoch in julian days (days since January 1, 4713 BCE).
+     */
+    public void setVariabilityEpoch(Double epochJd) {
+        setVariabilityEpochJd(epochJd);
+    }
+
+    /**
+     * Sets the light curve epoch to use for the stars in this group.
+     *
+     * @param epochJd The light curve epoch in julian days (days since January 1, 4713 BCE).
+     */
+    public void setVariabilityEpochJd(Double epochJd) {
+        this.variabilityEpochJd = epochJd;
     }
 }

@@ -45,6 +45,9 @@ public class ModelScaffolding implements Component {
     /** The components to randomize---possible values are ["model", "cloud", "atmosphere"] **/
     public List<String> randomize;
 
+    /** The factor to apply to the size when rendered as billboard. **/
+    public float billboardSizeFactor;
+
     /**
      * Whether shadows should be rendered for this object
      *

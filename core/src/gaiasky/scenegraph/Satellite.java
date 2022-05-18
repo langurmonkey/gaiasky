@@ -29,7 +29,7 @@ public abstract class Satellite extends ModelBody {
         double thPoint = this.thresholdPoint;
         this.thresholdNone = thPoint / 1e18;
         this.thresholdPoint = thPoint / 3.3e10;
-        this.thresholdQuad = thPoint / 8;
+        this.thresholdQuad = thPoint / 8.0;
 
         this.labelFactor = 0.5e1f;
         this.labelMax = this.labelMax * 2;

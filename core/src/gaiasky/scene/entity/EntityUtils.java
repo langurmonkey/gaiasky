@@ -5,10 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.Verts;
+import gaiasky.scene.component.*;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
@@ -81,6 +78,17 @@ public class EntityUtils {
         } else {
             Gdx.gl20.glDisable(GL20.GL_DEPTH_TEST);
         }
+    }
+
+    /**
+     * Sets the pale color of this body.
+     *
+     * @param body      The body component.
+     * @param celestial The celestial component.
+     * @param plus      The addition.
+     */
+    public static void setColor2Data(final Body body, final Celestial celestial, final float plus) {
+        celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
     }
 
 }
