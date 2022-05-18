@@ -85,6 +85,10 @@ public class ParticleUtils {
         return highlight.highlighted ? Color.toFloatBits(highlight.hlc[0], highlight.hlc[1], highlight.hlc[2], highlight.hlc[3]) : set.pointData.get(index).col();
     }
 
+    public float[] getColor(Body body, Highlight highlight) {
+        return highlight.highlighted ? highlight.hlc : body.color;
+    }
+
     /**
      * Evaluates the filter of this dataset (if any) for the given particle index
      *

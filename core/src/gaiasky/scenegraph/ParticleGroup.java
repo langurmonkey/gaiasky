@@ -899,7 +899,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public float[] getColor() {
         return highlighted ? hlc : cc;
-
     }
 
     public float highlightedSizeFactor() {

@@ -317,12 +317,20 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL BEAM
         AbstractRenderSystem modelBeamProc = new ModelRenderer(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
 
+        // PARTICLE GROUP
+        AbstractRenderSystem particleGroupProc = switch (pcm) {
+            case TRIANGLES -> new ParticleSetRenderer(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case TRIANGLES_INSTANCED -> new ParticleSetInstancedRenderer(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case POINTS -> new ParticleSetPointRenderer(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+        };
+        particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
+
         // STAR GROUP
         AbstractRenderSystem starGroupProc = switch (pcm) {
-           // case TRIANGLES -> new StarSetRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
-           // case TRIANGLES_INSTANCED -> new StarGroupInstRenderSystem(STAR_GROUP, alphas, renderAssets.starGroupShaders);
-           // case POINTS -> new StarGroupPointRenderSystem(STAR_GROUP, alphas, renderAssets.starGroupShaders);
-            default -> new StarSetRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES -> new StarSetRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES_INSTANCED -> new StarSetInstancedRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case POINTS -> new StarSetPointRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
         };
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
@@ -370,6 +378,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(billboardStarsProc);
 
         // Star and particle sets
+        addRenderSystem(particleGroupProc);
         addRenderSystem(starGroupProc);
 
         // Diffuse meshes
@@ -402,7 +411,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // Additive meshes
         addRenderSystem(modelMeshAdditiveProc);
-
 
         // INIT GL STATE
         GL30.glClampColor(GL30.GL_CLAMP_READ_COLOR, GL30.GL_FALSE);

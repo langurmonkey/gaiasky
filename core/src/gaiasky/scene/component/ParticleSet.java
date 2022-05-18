@@ -164,6 +164,26 @@ public class ParticleSet implements Component {
 
     protected final Vector3d D31 = new Vector3d();
 
+    public float[] getColorMin() {
+        return ccMin;
+    }
+
+    public float[] getColorMax() {
+        return ccMax;
+    }
+
+    public double getMeanDistance() {
+        return meanDistance;
+    }
+
+    public double getMinDistance() {
+        return minDistance;
+    }
+
+    public double getMaxDistance() {
+        return maxDistance;
+    }
+
     /**
      * Returns the list of particles.
      */

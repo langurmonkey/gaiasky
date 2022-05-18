@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render.system;
+package gaiasky.scene.render.draw;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -15,8 +15,11 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.api.IRenderable;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Render;
+import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -33,19 +36,22 @@ import java.util.Random;
 /**
  * Renders particle groups using regular arrays via billboards with geometry (quads as two triangles).
  */
-public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(ParticleGroupRenderSystem.class);
+public class ParticleSetRenderer extends PointCloudQuadRenderer implements IObserver {
+    protected static final Log logger = Logger.getLogger(ParticleSetRenderer.class);
 
     private final Vector3 aux1;
     private int posOffset, sizeOffset, particlePosOffset, uvOffset;
     private final Random rand;
     private final Colormap cmap;
+    private final ParticleUtils utils;
 
-    public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public ParticleSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
+        cmap = new Colormap();
+        utils = new ParticleUtils();
+
         rand = new Random(123);
         aux1 = new Vector3();
-        cmap = new Colormap();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_PARTICLE_GROUP);
     }
 
@@ -78,29 +84,37 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
 
     @Override
     protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
-        final ParticleGroup particleGroup = (ParticleGroup) renderable;
-        synchronized (particleGroup) {
-            if (!particleGroup.disposed) {
-                boolean hlCmap = particleGroup.isHighlighted() && !particleGroup.isHlplain();
-                if (!inGpu(particleGroup)) {
-                    int n = particleGroup.size();
+        final var render = (Render) renderable;
+        synchronized (render) {
+            var base = Mapper.base.get(render.entity);
+            var body = Mapper.body.get(render.entity);
+            var set = Mapper.particleSet.get(render.entity);
+            var hl = Mapper.highlight.get(render.entity);
+            var desc = Mapper.datasetDescription.get(render.entity);
+
+            float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+
+            if (!set.disposed) {
+                boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+                if (!inGpu(render)) {
+                    int n = set.pointData.size();
                     int offset = addMeshData(n * 4, n * 6);
-                    setOffset(particleGroup, offset);
+                    setOffset(render, offset);
                     curr = meshes.get(offset);
                     ensureTempVertsSize(n * 4 * curr.vertexSize);
                     ensureTempIndicesSize(n * 6);
 
-                    float[] c = particleGroup.getColor();
-                    float[] colorMin = particleGroup.getColorMin();
-                    float[] colorMax = particleGroup.getColorMax();
-                    double minDistance = particleGroup.getMinDistance();
-                    double maxDistance = particleGroup.getMaxDistance();
+                    float[] c = utils.getColor(body, hl);
+                    float[] colorMin = set.getColorMin();
+                    float[] colorMax = set.getColorMax();
+                    double minDistance = set.getMinDistance();
+                    double maxDistance = set.getMaxDistance();
 
                     int numVerticesAdded = 0;
                     int numParticlesAdded = 0;
                     for (int i = 0; i < n; i++) {
-                        if (particleGroup.filter(i) && particleGroup.isVisible(i)) {
-                            IParticleRecord particle = particleGroup.get(i);
+                        if (utils.filter(i, set, desc) && set.isVisible(i)) {
+                            IParticleRecord particle = set.get(i);
                             double[] p = particle.rawDoubleData();
                             // 4 vertices per particle
                             for (int vert = 0; vert < 4; vert++) {
@@ -113,10 +127,10 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                                 tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
                                 // COLOR
-                                if (particleGroup.isHighlighted()) {
+                                if (hl.isHighlighted()) {
                                     if (hlCmap) {
                                         // Color map
-                                        double[] color = cmap.colormap(particleGroup.getHlcmi(), particleGroup.getHlcma().get(particle), particleGroup.getHlcmmin(), particleGroup.getHlcmmax());
+                                        double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                                     } else {
                                         // Plain
@@ -130,16 +144,16 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                                         interpolateColor(colorMin, colorMax, c, fac);
                                     }
                                     float r = 0, g = 0, b = 0;
-                                    if (particleGroup.colorNoise != 0) {
-                                        r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                                        g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                                        b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                                    if (set.colorNoise != 0) {
+                                        r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                        g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                        b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
                                     }
                                     tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
                                 }
 
                                 // SIZE
-                                tempVerts[curr.vertexIdx + sizeOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
+                                tempVerts[curr.vertexIdx + sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * hlSizeFactor;
 
                                 // PARTICLE POSITION
                                 tempVerts[curr.vertexIdx + particlePosOffset] = (float) p[0];
@@ -156,25 +170,25 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                         }
                     }
                     int count = numVerticesAdded * curr.vertexSize;
-                    setCount(particleGroup, count);
+                    setCount(render, count);
                     curr.mesh.setVertices(tempVerts, 0, count);
                     curr.mesh.setIndices(tempIndices, 0, numParticlesAdded * 6);
 
-                    setInGpu(particleGroup, true);
+                    setInGpu(render, true);
                 }
 
                 /*
                  * RENDER
                  */
-                curr = meshes.get(getOffset(particleGroup));
+                curr = meshes.get(getOffset(render));
                 if (curr != null) {
-                    float meanDist = (float) (particleGroup.getMeanDistance());
+                    float meanDist = (float) (set.getMeanDistance());
 
                     double s = .3e-4f;
-                    shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
-                    shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] * particleGroup.highlightedSizeFactor()), (float) (particleGroup.particleSizeLimits[1] * particleGroup.highlightedSizeFactor()));
+                    shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
+                    shaderProgram.setUniformf("u_falloff", set.profileDecay);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * hlSizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * hlSizeFactor), (float) (set.particleSizeLimits[1] * hlSizeFactor));
 
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);

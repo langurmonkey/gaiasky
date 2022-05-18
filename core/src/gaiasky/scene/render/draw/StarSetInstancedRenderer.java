@@ -18,10 +18,11 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.system.InstancedRenderSystem;
+import gaiasky.render.system.StarGroupTriComponent;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
-import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -36,50 +37,62 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Renders star sets using regular arrays via billboards with geometry (quads as two triangles).
+ * Renders star sets using instancing via billboards with geometry (quads as two triangles).
  */
-public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver {
-    protected static final Log logger = Logger.getLogger(StarSetRenderer.class);
+public class StarSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(StarSetInstancedRenderer.class);
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset, uvOffset, starPosOffset;
+    private int sizeOffset, pmOffset, starPosOffset;
     private final Colormap cmap;
 
+    private StarSetQuadComponent triComponent;
     private final ParticleUtils utils;
 
-    private StarSetQuadComponent triComponent;
-
-    public StarSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public StarSetInstancedRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        this.aux1 = new Vector3();
-        this.utils = new ParticleUtils();
-        this.cmap = new Colormap();
-        this.triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
+        utils = new ParticleUtils();
+        cmap = new Colormap();
+
+        aux1 = new Vector3();
+        triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
-    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
+    @Override
+    protected void addAttributesDivisor0(Array<VertexAttribute> attributes) {
+        // Vertex position and texture coordinates are global
         attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
+    }
+
+    @Override
+    protected void addAttributesDivisor1(Array<VertexAttribute> attributes) {
+        // Color, object position, proper motion and size are per instance
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
         attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
     }
 
-    protected void offsets(MeshData curr) {
-        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
-        pmOffset = curr.mesh.getVertexAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getVertexAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
-        starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
+    @Override
+    protected void offsets0(MeshData curr) {
+        // Not needed
+    }
+
+    @Override
+    protected void offsets1(MeshData curr) {
+        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
+        pmOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
+        sizeOffset = curr.mesh.getInstancedAttribute(OwnUsage.Size) != null ? curr.mesh.getInstancedAttribute(OwnUsage.Size).offset / 4 : 0;
+        starPosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
     @Override
     protected void initShaderProgram() {
-        triComponent = new StarSetQuadComponent();
-        triComponent.initShaderProgram(getShaderProgram());
+        this.triComponent = new StarSetQuadComponent();
+        this.triComponent.initShaderProgram(getShaderProgram());
     }
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
@@ -109,74 +122,60 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
         synchronized (render) {
             if (!set.disposed) {
                 boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+                int n = set.pointData.size();
                 if (!inGpu(render)) {
-                    int n = set.pointData.size();
-                    int offset = addMeshData(n * 4, n * 6);
+                    int offset = addMeshData(6, n);
                     setOffset(render, offset);
-                    // Get mesh, reset indices
                     curr = meshes.get(offset);
-                    ensureTempVertsSize(n * 4 * curr.vertexSize);
-                    ensureTempIndicesSize(n * 6);
-                    int numVerticesAdded = 0;
+                    ensureInstanceAttribsSize(n * curr.instanceSize);
                     int numStarsAdded = 0;
 
                     for (int i = 0; i < n; i++) {
                         if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                            IParticleRecord particle = set.pointData.get(i);
+                            IParticleRecord particle = set.get(i);
                             if (!Double.isFinite(particle.size())) {
                                 logger.debug("Star " + particle.id() + " has a non-finite size");
                                 continue;
                             }
-                            // 4 vertices per star
-                            for (int vert = 0; vert < 4; vert++) {
-                                // Vertex POSITION
-                                tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
-                                tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
 
-                                // UV coordinates
-                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
-
-                                // COLOR
-                                if (hlCmap) {
-                                    // Color map
-                                    double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                } else {
-                                    // Plain
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
-                                }
-
-                                // SIZE
-                                if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
-                                } else {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
-                                }
-
-                                // PROPER MOTION [u/yr]
-                                tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
-
-                                // STAR POSITION [u]
-                                tempVerts[curr.vertexIdx + starPosOffset] = (float) particle.x();
-                                tempVerts[curr.vertexIdx + starPosOffset + 1] = (float) particle.y();
-                                tempVerts[curr.vertexIdx + starPosOffset + 2] = (float) particle.z();
-
-                                curr.vertexIdx += curr.vertexSize;
-                                curr.numVertices++;
-                                numVerticesAdded++;
+                            // COLOR
+                            if (hlCmap) {
+                                // Color map
+                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                            } else {
+                                // Plain
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
                             }
-                            // Indices
-                            quadIndices(curr);
+
+                            // SIZE
+                            if (hl.isHlAllVisible() && hl.isHighlighted()) {
+                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
+                            } else {
+                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                            }
+
+                            // PROPER MOTION [u/yr]
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 1] = (float) particle.pmy();
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 2] = (float) particle.pmz();
+
+                            // STAR POSITION [u]
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset] = (float) particle.x();
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 1] = (float) particle.y();
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 2] = (float) particle.z();
+
+                            curr.instanceIdx += curr.instanceSize;
+                            curr.numVertices++;
                             numStarsAdded++;
                         }
                     }
-                    int count = numVerticesAdded * curr.vertexSize;
+                    // Global (divisor=0) vertices (position, uv)
+                    curr.mesh.setVertices(tempVerts, 0, 24);
+                    // Per instance (divisor=1) vertices
+                    int count = numStarsAdded * curr.instanceSize;
                     setCount(render, count);
-                    curr.mesh.setVertices(tempVerts, 0, count);
-                    curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
+                    curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
                     setInGpu(render, true);
                 }
@@ -202,7 +201,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
                     try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
                     } catch (IllegalArgumentException e) {
                         logger.error(e, "Render exception");
                     }

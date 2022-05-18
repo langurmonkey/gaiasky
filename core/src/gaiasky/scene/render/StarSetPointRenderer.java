@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render.system;
+package gaiasky.scene.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
@@ -14,9 +14,12 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
-import gaiasky.scenegraph.StarGroup;
+import gaiasky.render.api.IRenderable;
+import gaiasky.render.system.ImmediateModeRenderSystem;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Render;
+import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -32,8 +35,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(StarGroupPointRenderSystem.class);
+public class StarSetPointRenderer extends ImmediateModeRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(StarSetPointRenderer.class);
 
     private final double BRIGHTNESS_FACTOR;
 
@@ -44,15 +47,19 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
     private final float[] opacityLimitsHl;
     private final Colormap cmap;
 
+    private final ParticleUtils utils;
+
     private Texture starTex;
 
-    public StarGroupPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public StarSetPointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
-        this.alphaSizeBrRc = new float[4];
-        this.opacityLimitsHl = new float[] { 2, 4 };
-        this.aux1 = new Vector3();
+        utils = new ParticleUtils();
         cmap = new Colormap();
+
+        alphaSizeBrRc = new float[4];
+        opacityLimitsHl = new float[] { 2, 4 };
+        aux1 = new Vector3();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
 
         EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
@@ -132,20 +139,27 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
             alphaSizeBrRc[3] = rc.scaleFactor;
 
             renderables.forEach(r -> {
-                final StarGroup starGroup = (StarGroup) r;
-                synchronized (starGroup) {
-                    if (!starGroup.disposed) {
-                        boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                        if (!inGpu(starGroup)) {
-                            int n = starGroup.size();
+                final Render render = (Render) r;
+                var base = Mapper.base.get(render.entity);
+                var set = Mapper.starSet.get(render.entity);
+                var hl = Mapper.highlight.get(render.entity);
+                var desc = Mapper.datasetDescription.get(render.entity);
+
+                float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+
+                synchronized (render) {
+                    if (!set.disposed) {
+                        boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+                        if (!inGpu(render)) {
+                            int n = set.pointData.size();
                             int offset = addMeshData(n);
-                            setOffset(starGroup, offset);
+                            setOffset(render, offset);
                             curr = meshes.get(offset);
                             ensureTempVertsSize(n * curr.vertexSize);
                             int numAdded = 0;
                             for (int i = 0; i < n; i++) {
-                                if (starGroup.filter(i) && starGroup.isVisible(i)) {
-                                    IParticleRecord particle = starGroup.data().get(i);
+                                if (utils.filter(i, set, desc) && set.isVisible(i)) {
+                                    IParticleRecord particle = set.get(i);
                                     if (!Double.isFinite(particle.size())) {
                                         logger.debug("Star " + particle.id() + " has a non-finite size");
                                         continue;
@@ -153,18 +167,18 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                                     // COLOR
                                     if (hlCmap) {
                                         // Color map
-                                        double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(particle), starGroup.getHlcmmin(), starGroup.getHlcmmax());
+                                        double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                                     } else {
                                         // Plain
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                        tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
                                     }
 
                                     // SIZE
-                                    if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                                    if (hl.isHlAllVisible() && hl.isHighlighted()) {
+                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
                                     } else {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
                                     }
 
                                     // POSITION [u]
@@ -184,29 +198,29 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                             int count = numAdded * curr.vertexSize;
                             curr.mesh.setVertices(tempVerts, 0, count);
 
-                            setInGpu(starGroup, true);
+                            setInGpu(render, true);
 
                         }
 
                         /*
                          * RENDER
                          */
-                        curr = meshes.get(getOffset(starGroup));
+                        curr = meshes.get(getOffset(render));
                         if (curr != null) {
                             if (starTex != null) {
                                 starTex.bind(0);
                                 shaderProgram.setUniformi("u_starTex", 0);
                             }
 
-                            shaderProgram.setUniform2fv("u_opacityLimits", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? opacityLimitsHl : opacityLimits, 0, 2);
+                            shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && desc.catalogInfo.hlAllVisible ? opacityLimitsHl : opacityLimits, 0, 2);
 
-                            alphaSizeBrRc[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
+                            alphaSizeBrRc[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
+                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * hlSizeFactor) / camera.getFovFactor();
                             shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
                             // Days since epoch
                             // Emulate double with floats, for compatibility
-                            double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch());
+                            double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
                             float curRt2 = (float) (curRt - (double) ((float) curRt));
                             shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 

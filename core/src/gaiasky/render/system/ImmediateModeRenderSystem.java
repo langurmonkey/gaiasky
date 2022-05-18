@@ -45,9 +45,9 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
         // Vertex array, this usually is just a reference to an external temp array
         public float[] vertices;
-        protected int instanceIdx;
-        protected int instanceSize;
-        protected float[] instance;
+        public int instanceIdx;
+        public int instanceSize;
+        public float[] instance;
 
         public int indexIdx;
         protected int indexVert;
