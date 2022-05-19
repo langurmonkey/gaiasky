@@ -101,7 +101,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         shapeRenderer.setProjectionMatrix(shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
 
         // Lines
-        shapeRenderer.setColor(1f, 1f, 1f, 0.7f * opacity * alpha);
+        shapeRenderer.setColor(1f, 1f, 1f, opacity * alpha);
         shapeRenderer.line(x0top, ytop, x1top, ytop);
         shapeRenderer.line(x0bottom, ybottom, x1bottom, ybottom);
 
