@@ -422,8 +422,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             double dist = textPosition2(camera, pos);
             shader.setUniformf("u_viewAngle", 2f);
             shader.setUniformf("u_viewAnglePow", 1f);
-            shader.setUniformf("u_thOverFactor", 1f);
-            shader.setUniformf("u_thOverFactorScl", 1f);
+            shader.setUniformf("u_thLabel", 1f);
 
             double size = dist * camera.getFovFactor() * .5e-3f;
             float scale = textScale() * camera.getFovFactor();

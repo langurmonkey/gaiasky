@@ -434,8 +434,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private void renderDistanceLabel(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera, double dist, String text) {
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1);
-        shader.setUniformf("u_thOverFactor", 1);
-        shader.setUniformf("u_thOverFactorScl", 1);
+        shader.setUniformf("u_thLabel", 1);
 
         IFocus focus = camera.getFocus();
         Vector3b v = B31.get().setZero();

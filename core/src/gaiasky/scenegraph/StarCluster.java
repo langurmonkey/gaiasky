@@ -282,8 +282,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) this.viewAngle * 500f);
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thOverFactor", 1f);
-        shader.setUniformf("u_thOverFactorScl", 1f);
+        shader.setUniformf("u_thLabel", 1f);
 
         render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
     }

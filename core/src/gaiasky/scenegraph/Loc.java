@@ -137,8 +137,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) (viewAngleApparent * ((ModelBody) parent).locVaMultiplier * Constants.U_TO_KM));
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thOverFactor", forceLabel ? 1f : ((ModelBody) parent).locThOverFactor / (float) Constants.DISTANCE_SCALE_FACTOR);
-        shader.setUniformf("u_thOverFactorScl", 1f);
+        shader.setUniformf("u_thLabel", forceLabel ? 1f : ((ModelBody) parent).locThresholdLabel / (float) Constants.DISTANCE_SCALE_FACTOR);
         render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
     }
 

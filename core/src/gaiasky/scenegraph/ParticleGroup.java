@@ -595,13 +595,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thOverFactor", 1f);
-        shader.setUniformf("u_thOverFactorScl", 1f);
+        shader.setUniformf("u_thLabel", 1f);
         render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, pos.len(), textScale() * 2f * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
 
         // Particle labels
         if (active != null) {
-            float thOverFactor = 1e-15f;
+            float thresholdLabel = 1e-15f;
             for (int i = 0; i < Math.min(50, pointData.size()); i++) {
                 IParticleRecord pb = pointData.get(active[i]);
                 if (pb.names() != null) {
@@ -613,8 +612,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
                     shader.setUniformf("u_viewAngle", viewAngle);
                     shader.setUniformf("u_viewAnglePow", 1f);
-                    shader.setUniformf("u_thOverFactor", thOverFactor);
-                    shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
+                    shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
                     float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;

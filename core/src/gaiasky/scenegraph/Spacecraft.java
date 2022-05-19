@@ -164,7 +164,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
         qf = new Quaternion();
 
-        this.labelFactor = 0;
     }
 
     public void initialize() {
@@ -174,8 +173,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         // Initialize model
         super.initialize();
 
-        // Load thruster
-        //GaiaSky.instance.manager.load(GlobalConf.data.dataFile("tex/base/thruster.png"), Texture.class);
+        this.labelFactor = 0;
     }
 
     @Override

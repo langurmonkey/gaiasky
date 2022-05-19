@@ -125,18 +125,11 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.parentName = ROOT_NAME;
 
         // Defaults
-        this.thresholdNone = Settings.settings.scene.star.threshold.none;
-        this.thresholdPoint = Settings.settings.scene.star.threshold.point;
-        this.thresholdQuad = Settings.settings.scene.star.threshold.quad;
-
-        this.textScale = 0.2f;
-        this.labelFactor = 1.3e-1f;
-        this.labelMax = 0.01f;
 
         this.primitiveRenderScale = 1;
         this.billboardRenderGroup = RenderGroup.BILLBOARD_STAR;
 
-        this.TH_OVER_FACTOR = (float) (thresholdPoint / Settings.settings.scene.label.number);
+        this.thresholdLabel = (float) (thresholdPoint / Settings.settings.scene.label.number);
     }
 
     public Particle(double thNone, double thPoint, double thQuad, float textScale, float labelFactor, float labelMax, float primitiveRenderScale, RenderGroup bbRenderGroup) {
@@ -156,7 +149,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.primitiveRenderScale = primitiveRenderScale;
         this.billboardRenderGroup = bbRenderGroup;
 
-        this.TH_OVER_FACTOR = (float) (thresholdPoint / Settings.settings.scene.label.number);
+        this.thresholdLabel = (float) (thresholdPoint / Settings.settings.scene.label.number);
     }
 
     public Particle(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, double thNone, double thPoint, double thQuad, float textScale, float labelFactor, float labelMax, float primitiveRenderScale, RenderGroup bbRenderGroup) {
@@ -222,12 +215,21 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public void initialize() {
-        this.TH_OVER_FACTOR = (float) (thresholdPoint / Settings.settings.scene.label.number);
         setDerivedAttributes();
         ct = new ComponentTypes(ComponentType.Galaxies);
         // Relation between our star size and actual star size (normalized for
         // the Sun, 695700 Km of radius
         radius = size * Constants.STAR_SIZE_FACTOR;
+
+        // Thresholds
+        this.thresholdNone = Settings.settings.scene.star.threshold.none;
+        this.thresholdPoint = Settings.settings.scene.star.threshold.point;
+        this.thresholdQuad = Settings.settings.scene.star.threshold.quad;
+        this.thresholdLabel = thresholdPoint / Settings.settings.scene.label.number;
+
+        this.textScale = 0.2f;
+        this.labelFactor = 1.3e-1f;
+        this.labelMax = 0.01f;
     }
 
     protected void setDerivedAttributes() {
@@ -343,7 +345,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public boolean renderText() {
-        return computedSize > 0 && GaiaSky.instance.isOn(ComponentType.Labels) && viewAngleApparent >= (TH_OVER_FACTOR / GaiaSky.instance.cameraManager.getFovFactor());
+        return computedSize > 0 && GaiaSky.instance.isOn(ComponentType.Labels) && viewAngleApparent >= (thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
     }
 
     @Override

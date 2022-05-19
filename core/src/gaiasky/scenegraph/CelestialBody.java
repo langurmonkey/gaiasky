@@ -37,24 +37,28 @@ import net.jafama.FastMath;
 public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
 
     /**
-     * radius/distance limit for rendering at all. If angle is smaller than this
+     * Minimum solid angle for rendering at all. If angle is smaller than this
      * quantity, no rendering happens.
      */
     public double thresholdNone;
 
     /**
-     * radius/distance limit for rendering as shader. If angle is any bigger, we
+     * Minimum solid angle limit for rendering as a quad. If angle is any bigger, we
      * render as a model.
      */
     public double thresholdQuad;
 
     /**
-     * radius/distance limit for rendering as point. If angle is any bigger, we
+     * Minimum solid angle for rendering as a point. If angle is any bigger, we
      * render with shader.
      */
     public  double thresholdPoint;
 
-    public float TH_OVER_FACTOR;
+    /** Minimum solid angle for rendering the lable of this object. */
+    public double thresholdLabel;
+
+    /** Factor to apply to labels. **/
+    public float labelFactor;
 
     /** NAME FOR WIKIPEDIA **/
     public String wikiname;
@@ -76,7 +80,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     /** Component alpha mirror **/
     public float compalpha;
 
-    public float labelFactor;
     public float labelMax;
     public float textScale = -1;
 
@@ -148,8 +151,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
             textPosition(camera, pos);
             shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) viewAngleApparent);
             shader.setUniformf("u_viewAnglePow", forceLabel ? 1f : getViewAnglePow());
-            shader.setUniformf("u_thOverFactor", forceLabel ? 1f : getThOverFactor(camera));
-            shader.setUniformf("u_thOverFactorScl", forceLabel ? 1f : getThOverFactorScl());
+            shader.setUniformf("u_thLabel", forceLabel ? 1f : (float) thresholdLabel);
 
             render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
         }
@@ -157,14 +159,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     protected float getViewAnglePow() {
         return 1f;
-    }
-
-    protected float getThOverFactorScl() {
-        return 1f;
-    }
-
-    protected float getThOverFactor(ICamera camera) {
-        return TH_OVER_FACTOR / camera.getFovFactor();
     }
 
     protected void setColor2Data() {
@@ -250,7 +244,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     @Override
     public boolean renderText() {
-        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && (forceLabel || FastMath.pow(viewAngleApparent, getViewAnglePow()) >= (TH_OVER_FACTOR * getThOverFactorScl()));
+        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && (forceLabel || FastMath.pow(viewAngleApparent, getViewAnglePow()) >= thresholdLabel);
     }
 
     @Override

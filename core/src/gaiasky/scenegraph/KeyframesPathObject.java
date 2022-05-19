@@ -621,8 +621,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         float distToCam = (float) D32.get().set(kf.pos).add(camera.getInversePos()).len();
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1);
-        shader.setUniformf("u_thOverFactor", 1);
-        shader.setUniformf("u_thOverFactorScl", 1);
+        shader.setUniformf("u_thLabel", 1);
         shader.setUniform4fv("u_color", textColour(kf), 0, 4);
 
         render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, getText(kf), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor() * distToCam, this.forceLabel);

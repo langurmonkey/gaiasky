@@ -50,13 +50,7 @@ public class ImageUtils {
                 imageFormat = ImageFormats.PNG;
             }
 
-            final Map<String, Object> params = new HashMap<>();
-            params.put(ImagingConstants.PARAM_KEY_FORMAT, imageFormat);
-            params.put(PngConstants.PARAM_KEY_PNG_FORCE_TRUE_COLOR, true);
-
-            Imaging.writeImage(rgb, file, imageFormat, params);
-            final ImageInfo ii = Imaging.getImageInfo(file);
-            ColorType ct = ii.getColorType();
+            Imaging.writeImage(rgb, file, imageFormat);
             return true;
         } else {
             return false;

@@ -220,8 +220,7 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thOverFactor", 1f);
-        shader.setUniformf("u_thOverFactorScl", 1f);
+        shader.setUniformf("u_thLabel", 1f);
         render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale(), textSize() * camera.getFovFactor(), this.forceLabel);
     }
 
