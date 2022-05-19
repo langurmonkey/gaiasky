@@ -109,7 +109,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
 
-        sa.thresholdFactor = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
+        sa.thresholdLabel = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
     }
 
     private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {

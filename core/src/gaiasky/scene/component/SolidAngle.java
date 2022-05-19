@@ -21,8 +21,6 @@ public class SolidAngle implements Component {
      */
     public  double thresholdPoint;
 
-    /**
-     * The old TH_OVER_FACTOR value.
-     */
-    public double thresholdFactor;
+    /** Minimum solid angle for rendering the lable of this object. */
+    public double thresholdLabel;
 }

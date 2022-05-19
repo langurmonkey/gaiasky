@@ -191,9 +191,11 @@ public class ModelInitializer extends InitSystem {
 
         scaffolding.billboardSizeFactor = 2f;
         sa.thresholdPoint = Math.toRadians(0.30);
-        sa.thresholdFactor = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
+        sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number)
+                * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
 
         text.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
+        text.labelFactor = 1;
 
         if (isRandomizeModel(scaffolding)) {
             // Ignore current model component (if any) and create a random one
@@ -251,6 +253,7 @@ public class ModelInitializer extends InitSystem {
         sa.thresholdNone = thPoint / 1e18;
         sa.thresholdPoint = thPoint / 3.3e10;
         sa.thresholdQuad = thPoint / 8.0;
+        sa.thresholdLabel = (Math.toRadians(1e-7) / Settings.settings.scene.label.number);
         text.labelFactor = (float) (0.5e1 * Constants.DISTANCE_SCALE_FACTOR);
         text.labelMax = text.labelMax * 2f;
 
