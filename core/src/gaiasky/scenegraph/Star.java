@@ -144,6 +144,16 @@ public class Star extends Particle {
         setDerivedAttributes();
         radius = size * Constants.STAR_SIZE_FACTOR;
         modelDistance = 172.4643429 * radius;
+
+        // Thresholds
+        this.thresholdNone = Settings.settings.scene.star.threshold.none;
+        this.thresholdPoint = Settings.settings.scene.star.threshold.point;
+        this.thresholdQuad = Settings.settings.scene.star.threshold.quad;
+        this.thresholdLabel = thresholdPoint / Settings.settings.scene.label.number;
+
+        this.textScale = 0.2f;
+        this.labelFactor = 1.3e-1f;
+        this.labelMax = 0.01f;
     }
 
     protected void setDerivedAttributes() {

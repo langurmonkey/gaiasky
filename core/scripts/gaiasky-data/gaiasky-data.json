@@ -117,9 +117,9 @@
         "tex/cubemap/earth-cloud-low",
         "tex/cubemap/earth-cloud-med"
       ],
-      "sha256": "1301ee1bfba0b7ef3c11df0f815cf5e3a33defd085b9b8a1e98be6a56900d835",
+      "sha256": "070884e7062d5a6d015ebb1f228d94a64b6473801acf836dc4f6bd8ac2b21e2a",
       "description": "Required data pack.\nFor Gaia Sky 3.2.0-RC16 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC16+.\n- Fix typo in the 'Mikly' Way title.\n- Add Oort cloud and solar neighborhood titles.",
+      "releasenotes": "- WARN: The milky way and the constellations in this pack will only work with 3.2.0-RC16+.\n- Fix typo in the 'Mikly' Way title.\n- Add Oort cloud and solar neighborhood titles.\n- Adjust location settings for Earth, Moon and Gaia.",
       "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v033_20220517/basedata.tar.gz"
     },

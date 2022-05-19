@@ -51,10 +51,11 @@ public abstract class ModelBody extends CelestialBody {
     /** TRANSFORMATIONS - are applied each cycle **/
     public ITransform[] transformations;
 
-    /** Multiplier for Loc view angle **/
-    public float locVaMultiplier = 1f;
-    /** ThOverFactor for Locs **/
-    public float locThOverFactor = 1f;
+    /** Multiplier for Loc view angle. **/
+    public float locVaMultiplier = 2.8f;
+
+    /** thresholdLabel for children locations. **/
+    public float locThresholdLabel = 1000f;
 
     /** Size factor, which can be set to scale model objects up or down **/
     public float sizeScaleFactor = 1f;
@@ -90,11 +91,6 @@ public abstract class ModelBody extends CelestialBody {
         super();
         this.localTransform = new Matrix4();
         this.orientation = new Matrix4d();
-
-        this.thresholdPoint = Math.toRadians(0.30);
-        this.TH_OVER_FACTOR = (float) (this.thresholdPoint / Settings.settings.scene.label.number);
-
-        this.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
     }
 
     public void initialize() {
@@ -112,6 +108,13 @@ public abstract class ModelBody extends CelestialBody {
             mc.initialize(this.getName());
         }
         setColor2Data();
+
+        // Thresholds
+        this.thresholdPoint = Math.toRadians(0.30);
+        this.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number)
+                                * (ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
+        this.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
+        this.labelFactor = 1;
     }
 
     @Override
@@ -320,14 +323,6 @@ public abstract class ModelBody extends CelestialBody {
         return 1.0f;
     }
 
-    protected float getThOverFactorScl() {
-        return ct.get(ComponentType.Moons.ordinal()) ? 2500f : 25f;
-    }
-
-    protected float getThOverFactor(ICamera camera) {
-        return TH_OVER_FACTOR;
-    }
-
     @Override
     public float textScale() {
         return Math.max(1f, labelSizeConcrete()) * 2e-1f;
@@ -338,11 +333,17 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     public void setLocvamultiplier(Double val) {
+        setLocViewAngleMultiplier(val);
+    }
+    public void setLocViewAngleMultiplier(Double val) {
         this.locVaMultiplier = val.floatValue();
     }
 
     public void setLocthoverfactor(Double val) {
-        this.locThOverFactor = val.floatValue();
+        setLocThresholdLabel(val);
+    }
+    public void setLocThresholdLabel(Double val) {
+        this.locThresholdLabel = val.floatValue();
     }
 
     public void setTransformations(Object[] transformations) {

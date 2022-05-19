@@ -7,8 +7,7 @@ in vec2 a_texCoord0;
 uniform mat4 u_projTrans;
 uniform float u_viewAngle;
 uniform float u_viewAnglePow;
-uniform float u_thOverFactor;
-uniform float u_thOverFactorScl;
+uniform float u_thLabel;
 uniform float u_componentAlpha;
 uniform vec4 u_color;
 uniform vec3 u_pos;
@@ -19,8 +18,7 @@ out float v_opacity;
 
 void main()
 {
-   float thOverFac = u_thOverFactor * u_thOverFactorScl;
-   v_opacity = clamp((pow(u_viewAngle, u_viewAnglePow) - thOverFac) / thOverFac, 0.0, 0.95) * u_componentAlpha;
+   v_opacity = clamp((pow(u_viewAngle, u_viewAnglePow) - u_thLabel) / u_thLabel, 0.0, 0.95) * u_componentAlpha;
    v_color = u_color;
    v_texCoords = a_texCoord0;
    

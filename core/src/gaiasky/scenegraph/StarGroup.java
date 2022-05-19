@@ -535,7 +535,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        float thOverFactor = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
+        float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
 
         Vector3d starPosition = D31.get();
         int n = Math.min(pointData.size(), Settings.settings.scene.star.group.numLabel);
@@ -554,15 +554,15 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         } else {
             for (int i = 0; i < n; i++) {
                 int idx = active[i];
-                renderStarLabel(idx, starPosition, thOverFactor, batch, shader, sys, rc, camera);
+                renderStarLabel(idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
             }
             for (Integer i : forceLabelStars) {
-                renderStarLabel(i, starPosition, thOverFactor, batch, shader, sys, rc, camera);
+                renderStarLabel(i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
             }
         }
     }
 
-    private void renderStarLabel(int idx, Vector3d starPosition, float thOverFactor, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    private void renderStarLabel(int idx, Vector3d starPosition, float thresholdLabel, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         boolean forceLabel = forceLabelStars.contains(idx);
         IParticleRecord star = pointData.get(idx);
         starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
@@ -574,13 +574,12 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
         float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
 
-        if (forceLabel || viewAngle >= thOverFactor && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
+        if (forceLabel || viewAngle >= thresholdLabel && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
             textPosition(camera, starPosition, distToCamera, radius);
 
             shader.setUniformf("u_viewAngle", viewAngle);
             shader.setUniformf("u_viewAnglePow", 1f);
-            shader.setUniformf("u_thOverFactor", thOverFactor);
-            shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
+            shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
             // Override object color
             shader.setUniform4fv("u_color", textColour(star.names()[0]), 0, 4);
             double textSize = FastMath.tanh(viewAngle) * distToCamera * 1e5d;

@@ -159,7 +159,6 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
 
         qf = new Quaternion();
 
-        this.labelFactor = 0;
     }
 
     public void initialize() {
@@ -173,6 +172,8 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
 
         // Initialize model
         super.initialize();
+
+        this.labelFactor = 0;
     }
 
     @Override

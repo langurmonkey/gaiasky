@@ -32,11 +32,16 @@ public class Billboard extends ModelBody {
         super();
         q = new Quaternion();
 
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+
         double thPoint = this.thresholdPoint;
         this.thresholdNone = 0.002;
         this.thresholdPoint = thPoint / 1e9;
         this.thresholdQuad = thPoint / 8;
-
         this.labelFactor = 1e1f;
     }
 
@@ -132,10 +137,6 @@ public class Billboard extends ModelBody {
     }
 
     protected float getViewAnglePow() {
-        return 1f;
-    }
-
-    protected float getThOverFactorScl() {
         return 1f;
     }
 

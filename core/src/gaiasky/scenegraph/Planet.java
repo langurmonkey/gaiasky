@@ -43,12 +43,6 @@ public class Planet extends ModelBody implements ILineRenderable {
     public Planet() {
         super();
 
-        double thPoint = this.thresholdPoint;
-        this.thresholdNone = thPoint / 1e6;
-        this.thresholdPoint = thPoint / 3e4;
-        this.thresholdQuad = thPoint / 2;
-
-        this.labelFactor = (float) (1.5e1 * Constants.DISTANCE_SCALE_FACTOR);
     }
 
     @Override
@@ -71,6 +65,12 @@ public class Planet extends ModelBody implements ILineRenderable {
         if (clc != null) {
             clc.initialize(this.getName(), false);
         }
+
+        double thPoint = this.thresholdPoint;
+        this.thresholdNone = thPoint / 1e6;
+        this.thresholdPoint = thPoint / 3e4;
+        this.thresholdQuad = thPoint / 2;
+        this.labelFactor = (float) (1.5e1 * Constants.DISTANCE_SCALE_FACTOR);
     }
 
     protected void setColor2Data() {
@@ -141,7 +141,6 @@ public class Planet extends ModelBody implements ILineRenderable {
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
-
         if (group == RenderGroup.MODEL_ATM) {
             // Atmosphere
             renderAtmosphere(modelBatch, GaiaSky.instance.sgr.alphas[ComponentType.Atmospheres.ordinal()], rc);

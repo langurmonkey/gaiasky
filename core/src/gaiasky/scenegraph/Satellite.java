@@ -27,9 +27,17 @@ public abstract class Satellite extends ModelBody {
         super();
 
         double thPoint = this.thresholdPoint;
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+
+        double thPoint = this.thresholdPoint;
         this.thresholdNone = thPoint / 1e18;
         this.thresholdPoint = thPoint / 3.3e10;
         this.thresholdQuad = thPoint / 8.0;
+        this.thresholdLabel = (Math.toRadians(1e-7) / Settings.settings.scene.label.number);
 
         this.labelFactor = 0.5e1f;
         this.labelMax = this.labelMax * 2;
@@ -65,7 +73,7 @@ public abstract class Satellite extends ModelBody {
             Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
 
-            if(rc != null)
+            if (rc != null)
                 rc.update(time);
         }
     }
@@ -87,7 +95,6 @@ public abstract class Satellite extends ModelBody {
     public boolean renderText() {
         return !hidden && super.renderText();
     }
-
 
     protected float getViewAnglePow() {
         return 1f;

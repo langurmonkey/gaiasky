@@ -57,7 +57,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     protected void setParentOpacity() {
         if (this.opacity > 0 && this.parent instanceof Text2D) {
-            // If our parent is a text2d, we update its opacity
+            // If our parent is a Text2D, we update its opacity
             Text2D parent = (Text2D) this.parent;
             parent.opacity *= (1 - this.opacity);
             parent.setParentOpacity();
@@ -114,8 +114,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         shader.setUniformf("u_viewAngle", (float) viewAngleApparent);
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thOverFactor", 1f);
-        shader.setUniformf("u_thOverFactorScl", 1f);
+        shader.setUniformf("u_thLabel", 1f);
 
         // Resize batch
         batch.setProjectionMatrix(batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
