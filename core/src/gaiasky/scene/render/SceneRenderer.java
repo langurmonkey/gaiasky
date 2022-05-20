@@ -264,9 +264,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL GRID - (Ecl, Eq, Gal grids)
         AbstractRenderSystem modelGridsProc = new ModelRenderer(MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
         modelGridsProc.addPostRunnables(clearDepthR);
+
         // RECURSIVE GRID
         AbstractRenderSystem modelRecGridProc = new ModelRenderer(MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
         modelRecGridProc.addPreRunnables(regularBlendR, depthTestR);
+
+        // ANNOTATIONS - (grids)
+        AbstractRenderSystem annotationsProc = new TextRenderer(FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
+        annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
+        annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
         billboardStarsProc = new BillboardRenderer(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
@@ -338,6 +344,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL STARS
         AbstractRenderSystem modelStarsProc = new ModelRenderer(MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
 
+        // LABELS
+        AbstractRenderSystem labelsProc = new TextRenderer(FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
+
         // BILLBOARD SSO
         AbstractRenderSystem billboardSSOProc = new BillboardRenderer(BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders, "data/tex/base/sso.png", null, false);
         billboardSSOProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
@@ -368,6 +377,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelBackgroundProc);
         addRenderSystem(modelGridsProc);
         addRenderSystem(singlePointProc);
+        addRenderSystem(annotationsProc);
 
         // Opaque meshes
         addRenderSystem(modelMeshOpaqueProc);
@@ -388,6 +398,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelPerPixelLighting);
         addRenderSystem(modelPerPixelLightingTess);
         addRenderSystem(modelBeamProc);
+
+        // Labels
+        addRenderSystem(labelsProc);
 
         // Galaxy & nebulae billboards, recursive grid
         addRenderSystem(billboardSpritesProc);

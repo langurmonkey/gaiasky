@@ -23,7 +23,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 public class Billboard extends ModelBody {
 
-    protected boolean hidden = false;
     protected double[] fade;
 
     protected Quaternion q;
@@ -122,11 +121,6 @@ public class Billboard extends ModelBody {
     }
 
     @Override
-    public boolean renderText() {
-        return !hidden && super.renderText();
-    }
-
-    @Override
     public float getTextOpacity() {
         return Math.min(getOpacity(), fadeOpacity);
     }
@@ -148,14 +142,6 @@ public class Billboard extends ModelBody {
 
     public float getFuzzyRenderSize(ICamera camera) {
         return this.size * Settings.settings.scene.star.brightness * .6e-3f;
-    }
-
-    public void setHidden(String hidden) {
-        try {
-            this.hidden = Boolean.parseBoolean(hidden);
-        } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e);
-        }
     }
 
     /**

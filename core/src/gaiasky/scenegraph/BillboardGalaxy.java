@@ -32,28 +32,6 @@ public class BillboardGalaxy extends Billboard {
        super();
     }
 
-    public BillboardGalaxy(String[] names, double alphaDeg, double deltaDeg, double distPc, double sizePc, String tex) {
-        super();
-        setNames(names);
-        setColor(new double[] { 1, 1, 1, 1 });
-        setSizepc(sizePc);
-        setCt("Galaxies");
-        setParent("NBG");
-        StaticCoordinates sc = new StaticCoordinates();
-        sc.setEquatorial(new double[] { alphaDeg, deltaDeg, distPc });
-        setCoordinates(sc);
-        ModelComponent mc = new ModelComponent(true);
-        mc.setType("twofacedbillboard");
-        mc.setStaticlight(1.0);
-        Map<String, Object> params = new HashMap<>();
-        params.put("diameter", 1.0);
-        mc.setParams(params);
-        MaterialComponent mtc = new MaterialComponent();
-        mtc.setDiffuse(tex);
-        mc.setMaterial(mtc);
-        setModel(mc);
-    }
-
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {

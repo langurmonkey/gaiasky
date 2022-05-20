@@ -8,15 +8,12 @@ package gaiasky.scene.render.draw;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
-import gaiasky.render.api.I3DTextRenderable;
-import gaiasky.render.api.IAnnotationsRenderable;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.system.AbstractRenderSystem;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Label;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.render.draw.text.GridAnnotationsRenderSystem;
-import gaiasky.scene.render.draw.text.LabelRenderSystem;
+import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
@@ -24,21 +21,22 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
  * Renders text (labels, annotations, titles, etc.) in two and three dimensional space.
+ * TODO - extend AbstractRenderSystem instead of FontRenderSystem
  */
-public class TextRenderer extends AbstractRenderSystem {
+public class TextRenderer extends FontRenderSystem {
 
     private final ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
 
     private final GridAnnotationsRenderSystem girdRenderer;
-    private final LabelRenderSystem labelRenderer;
 
+    private final LabelView view;
     public TextRenderer(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
 
         this.girdRenderer = new GridAnnotationsRenderSystem();
-        this.labelRenderer = new LabelRenderSystem();
+        this.view = new LabelView();
     }
 
     public TextRenderer(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
@@ -70,23 +68,23 @@ public class TextRenderer extends AbstractRenderSystem {
     }
 
     private void renderFont3D(Array<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float alpha) {
-
         renderables.forEach(r -> {
             Render render = (Render) r;
             var entity = render.entity;
+            view.setEntity(entity);
 
             var body = Mapper.body.get(entity);
 
             // Label color
             program.setUniform4fv("u_color", body.labelColor, 0, 4);
             // Component alpha
-            program.setUniformf("u_componentAlpha", getAlpha(entity) * (!labelRenderer.isLabel(entity) ? 1 : alpha));
+            program.setUniformf("u_componentAlpha", getAlpha(entity) * (!view.isLabel() ? 1 : alpha));
             // Font opacity multiplier, take into account element opacity
-            program.setUniformf("u_opacity", 0.75f * labelRenderer.getTextOpacity(entity));
+            program.setUniformf("u_opacity", 0.75f * view.getTextOpacity());
             // z-far and k
             addDepthBufferUniforms(program, camera);
 
-            labelRenderer.render(entity, batch, program, this, rc, camera);
+            view.render(batch, program, this, rc, camera);
         });
     }
 

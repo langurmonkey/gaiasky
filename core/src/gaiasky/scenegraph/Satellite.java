@@ -19,7 +19,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 public abstract class Satellite extends ModelBody {
 
     protected boolean parentOrientation = false;
-    protected boolean hidden = false;
     protected Matrix4 orientationf;
     protected RotationComponent parentrc;
 
@@ -91,11 +90,6 @@ public abstract class Satellite extends ModelBody {
 
     }
 
-    @Override
-    public boolean renderText() {
-        return !hidden && super.renderText();
-    }
-
     protected float getViewAnglePow() {
         return 1f;
     }
@@ -116,14 +110,6 @@ public abstract class Satellite extends ModelBody {
     public void setParentorientation(String parentorientation) {
         try {
             this.parentOrientation = Boolean.parseBoolean(parentorientation);
-        } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e);
-        }
-    }
-
-    public void setHidden(String hidden) {
-        try {
-            this.hidden = Boolean.parseBoolean(hidden);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }

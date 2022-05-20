@@ -18,8 +18,12 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
-    private final ExtSpriteBatch batch;
+    private ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
+
+    protected FontRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+        super(rg, alphas, programs);
+    }
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(rg, alphas, new ExtShaderProgram[] { program });

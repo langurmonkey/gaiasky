@@ -13,12 +13,11 @@ import gaiasky.scene.component.Body;
 public class RenderView extends AbstractView implements IRenderable {
 
     /** The base component. **/
-    private Base base;
+    protected Base base;
     /** The body component. **/
-    private Body body;
+    protected Body body;
 
-    public RenderView(){
-
+    public RenderView() {
     }
 
     public RenderView(Entity entity) {

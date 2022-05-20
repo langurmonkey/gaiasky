@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
@@ -99,7 +100,9 @@ public class ModelExtractor extends AbstractExtractSystem {
 
     private boolean renderText(Base base, Body body, SolidAngle sa) {
         double thOverFactor = sa.thresholdPoint / Settings.settings.scene.label.number;
-        return base.names != null && GaiaSky.instance.isOn(ComponentTypes.ComponentType.Labels) && (base.forceLabel || FastMath.pow(body.viewAngleApparent, getViewAnglePow()) >= (thOverFactor * getThOverFactorScl(base)));
+        return base.names != null
+                && GaiaSky.instance.isOn(ComponentTypes.ComponentType.Labels)
+                && (base.forceLabel || FastMath.pow(body.viewAngleApparent, getViewAnglePow()) >= (thOverFactor * getThOverFactorScl(base)));
     }
 
     private float getThOverFactorScl(Base base) {
