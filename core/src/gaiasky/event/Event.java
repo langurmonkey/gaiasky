@@ -343,11 +343,6 @@ public enum Event {
 
 
     /**
-     * Mark star points for update, contains the value of the flag in [0].
-     */
-    STAR_POINT_UPDATE_FLAG,
-
-    /**
      * Dispose all resources, app is shutting down.
      **/
     DISPOSE,
@@ -695,11 +690,6 @@ public enum Event {
      * Pauses background data loading thread, if any.
      **/
     PAUSE_BACKGROUND_LOADING,
-    /**
-     * Issues the command to update the pixel render system. Contains no
-     * parameters.
-     **/
-    PIXEL_RENDERER_UPDATE,
 
     /**
      * Sets the aperture angle [deg] of the planetarium in cubemap mode.

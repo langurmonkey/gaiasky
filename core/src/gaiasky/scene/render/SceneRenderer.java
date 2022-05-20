@@ -417,7 +417,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         GL30.glClampColor(GL30.GL_CLAMP_VERTEX_COLOR, GL30.GL_FALSE);
         GL30.glClampColor(GL30.GL_CLAMP_FRAGMENT_COLOR, GL30.GL_FALSE);
 
-        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.PIXEL_RENDERER_UPDATE, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_SCATTERING_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_SCATTERING_CMD);
 
     }
 
@@ -922,12 +922,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                 }
             }
-            break;
-        case PIXEL_RENDERER_UPDATE:
-            GaiaSky.postRunnable(() -> {
-                EventManager.publish(Event.STAR_POINT_UPDATE_FLAG, this, true);
-                // updatePixelRenderSystem();
-            });
             break;
         case LINE_RENDERER_UPDATE:
             GaiaSky.postRunnable(this::updateLineRenderSystem);

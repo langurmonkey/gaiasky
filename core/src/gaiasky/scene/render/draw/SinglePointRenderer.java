@@ -57,7 +57,7 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
 
     public SinglePointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
-        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.STAR_POINT_UPDATE_FLAG);
+        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
         this.ct = ct;
         this.alphaSizeBrRc = new float[4];
         initializing = true;
@@ -93,10 +93,12 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
         aux = new Vector3();
 
         // Init renderer
-        int nVertices = 30;
-
         VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, nVertices, 0, attribs);
+        createNewMesh(50, new VertexAttributes(attribs));
+    }
+
+    private void createNewMesh(int numVertices, VertexAttributes attributes){
+        curr.mesh = new IntMesh(false, numVertices, 0, attributes);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
@@ -117,12 +119,24 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
         return array;
     }
 
+    public void ensureMeshSize(int desiredNumVertices) {
+        VertexAttributes attributes = curr.mesh.getVertexAttributes();
+        if(curr.mesh.getMaxVertices() < desiredNumVertices) {
+            int newNumVertices = (int) (desiredNumVertices * 1.2);
+            logger.info("Buffer capacity too small (" + curr.mesh.getMaxVertices() + " v " + desiredNumVertices +"), growing to " + newNumVertices);
+            // Dispose old and create new mesh.
+            curr.mesh.dispose();
+            createNewMesh(newNumVertices, attributes);
+        }
+    }
+
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (pointUpdateFlag) {
             curr.clear();
 
             ensureTempVertsSize(renderables.size * curr.vertexSize);
+            ensureMeshSize(renderables.size);
             renderables.forEach(r -> {
                 Entity entity = ((Render) r).entity;
                 var base = Mapper.base.get(entity);
@@ -206,7 +220,6 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
         case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
-        case STAR_POINT_UPDATE_FLAG -> pointUpdateFlag = (Boolean) data[0];
         default -> {
         }
         }
