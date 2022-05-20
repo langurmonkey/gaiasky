@@ -20,6 +20,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
@@ -110,6 +111,21 @@ public abstract class AbstractOctreeWrapper extends FadeNode {
         parenthood.remove(child);
     }
 
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        this.opacity = opacity;
+        translation.set(parentTransform);
+        Vector3d aux = D31.get();
+
+        if (this.position == null) {
+            this.currentDistance = aux.set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();
+        } else {
+            this.currentDistance = this.position.distToCamera;
+        }
+
+        // Update with translation/rotation/etc
+        updateLocal(time, camera);
+    }
+
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
 
@@ -120,7 +136,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode {
 
                 // Compute observed octants and fill roulette list
                 OctreeNode.nOctantsObserved = 0;
-                OctreeNode.nObjectsObserved = 0;
 
                 root.update(translation, camera, roulette, opacity);
 
@@ -133,9 +148,10 @@ public abstract class AbstractOctreeWrapper extends FadeNode {
                 // is implemented in the subclass.
                 updateOctreeObjects(time, translation, camera);
 
+                // Render the octree with lines.
                 addToRenderLists(camera, root);
 
-                // Reset mask
+                // Reset roulette.
                 roulette.clear();
 
                 // Update focus, just in case
