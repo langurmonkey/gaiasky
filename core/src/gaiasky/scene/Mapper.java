@@ -42,6 +42,7 @@ public class Mapper {
     public static final ComponentMapper<MotorEngine> engine = ComponentMapper.getFor(MotorEngine.class);
     public static final ComponentMapper<RenderType> renderType = ComponentMapper.getFor(RenderType.class);
     public static final ComponentMapper<LocationMark> loc = ComponentMapper.getFor(LocationMark.class);
+    public static final ComponentMapper<Title> title = ComponentMapper.getFor(Title.class);
     public static final ComponentMapper<BillboardSet> billboardSet = ComponentMapper.getFor(BillboardSet.class);
     public static final ComponentMapper<Axis> axis = ComponentMapper.getFor(Axis.class);
     public static final ComponentMapper<Cluster> cluster = ComponentMapper.getFor(Cluster.class);

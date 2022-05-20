@@ -189,6 +189,7 @@ public class DecalUtils {
         float scaley = font.getData().scaleY;
         aux1.set(batch.getProjectionMatrix());
 
+
         batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h());
         font.getData().setScale(scale);
 
