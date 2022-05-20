@@ -803,7 +803,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         goTo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Go to keyframe
-                EventManager.publish(Event.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+                EventManager.publish(Event.CAMERA_MODE_CMD, goTo, CameraManager.CameraMode.FREE_MODE);
                 GaiaSky.postRunnable(() -> {
                     EventManager.publish(Event.CAMERA_POS_CMD, goTo, (Object) kf.pos.values());
                     EventManager.publish(Event.CAMERA_DIR_CMD, goTo, (Object) kf.dir.values());

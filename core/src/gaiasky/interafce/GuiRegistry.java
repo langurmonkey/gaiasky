@@ -18,6 +18,8 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.data.SceneGraphJsonLoader;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.SceneGraphRenderer;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -519,6 +521,10 @@ public class GuiRegistry implements IObserver {
                 }
                 if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
                     keyframesWindow.show(ui, 0, 0);
+                if (!GaiaSky.instance.isOn(ComponentType.Others)) {
+                    // Notify that the user needs to enable 'others'
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.keyframe.ct"), 10f);
+                }
                 break;
             case UI_THEME_RELOAD_INFO:
                 if (keyframesWindow != null) {
