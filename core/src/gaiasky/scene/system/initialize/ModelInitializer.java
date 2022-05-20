@@ -213,10 +213,11 @@ public class ModelInitializer extends InitSystem {
     }
 
     private void initializeBillboard(ModelScaffolding scaffolding, SolidAngle sa, Text text) {
-        double thPoint = sa.thresholdPoint;
+        double baseThreshold = Math.toRadians(0.30);
         sa.thresholdNone = 0.002;
-        sa.thresholdPoint = thPoint / 1e9;
-        sa.thresholdQuad = thPoint / 8.0;
+        sa.thresholdPoint = baseThreshold / 1e9;
+        sa.thresholdQuad = baseThreshold / 8.0;
+        sa.thresholdLabel = Math.toRadians(0.2);
 
         text.labelFactor = 1e1f;
         scaffolding.billboardSizeFactor = 0.6e-3f;

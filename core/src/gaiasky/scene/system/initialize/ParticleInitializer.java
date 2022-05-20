@@ -98,18 +98,17 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         sa.thresholdNone = Settings.settings.scene.star.threshold.none;
         sa.thresholdPoint = Settings.settings.scene.star.threshold.point;
         sa.thresholdQuad = Settings.settings.scene.star.threshold.quad;
+        sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
 
         text.textScale = 0.2f;
         text.labelFactor = 1.3e-1f;
-        text.labelMax = 0.01f;
+        text.labelMax = 0.005f;
 
         render.renderGroup = RenderGroup.BILLBOARD_STAR;
 
         extra.primitiveRenderScale = 1;
         float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
-
-        sa.thresholdLabel = (float) (sa.thresholdPoint / Settings.settings.scene.label.number);
     }
 
     private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
@@ -141,6 +140,11 @@ public class ParticleInitializer extends InitSystem implements IObserver {
     }
 
     private void setDerivedAttributes(Body body, Celestial celestial, Magnitude mag, ParticleExtra extra, boolean isStar) {
+        if (!Float.isFinite(mag.absmag)) {
+            // Default
+            mag.absmag = isStar ? 15.0f : -5.0f;
+        }
+
         double flux = Math.pow(10, -mag.absmag / 2.5f);
         setRGB(body, celestial);
 
