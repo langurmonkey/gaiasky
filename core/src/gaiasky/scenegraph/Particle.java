@@ -222,14 +222,18 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.thresholdNone = Settings.settings.scene.star.threshold.none;
         this.thresholdPoint = Settings.settings.scene.star.threshold.point;
         this.thresholdQuad = Settings.settings.scene.star.threshold.quad;
-        this.thresholdLabel = thresholdPoint / Settings.settings.scene.label.number;
+        this.thresholdLabel = thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
 
-        this.textScale = 0.2f;
+        this.textScale = 0.1f;
         this.labelFactor = 1.3e-1f;
-        this.labelMax = 0.01f;
+        this.labelMax = 0.005f;
     }
 
     protected void setDerivedAttributes() {
+        if(!Float.isFinite(absmag)) {
+            // Default
+            absmag = -5.0f;
+        }
         double flux = Math.pow(10, -absmag / 2.5f);
         setRGB(colorbv);
 
@@ -283,7 +287,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
             addToRender(this, RenderGroup.POINT_STAR);
             if (!(camera.getCurrent() instanceof FovCamera)) {
-
                 addToRender(this, billboardRenderGroup);
 
                 if (viewAngleApparent >= thpointTimesFovfactor / Settings.settings.scene.properMotion.number && this.hasPm) {

@@ -38,10 +38,11 @@ public class Billboard extends ModelBody {
     public void initialize() {
         super.initialize();
 
-        double thPoint = this.thresholdPoint;
+        double baseThreshold = Math.toRadians(0.30);
         this.thresholdNone = 0.002;
-        this.thresholdPoint = thPoint / 1e9;
-        this.thresholdQuad = thPoint / 8;
+        this.thresholdPoint = baseThreshold / 1e9;
+        this.thresholdQuad = baseThreshold / 8;
+        this.thresholdLabel = Math.toRadians(0.2);
         this.labelFactor = 1e1f;
     }
 
