@@ -126,7 +126,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode {
 
                 if (OctreeNode.nObjectsObserved != lastNumberObjects) {
                     // Need to update the points in renderer
-                    EventManager.publish(Event.STAR_POINT_UPDATE_FLAG, this, true);
                     lastNumberObjects = OctreeNode.nObjectsObserved;
                 }
 

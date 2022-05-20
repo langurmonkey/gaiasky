@@ -537,7 +537,6 @@ public class OctreeNode implements ILineRenderable {
 
             double alpha = 1;
             if (Settings.settings.scene.octree.fade && viewAngle < th1) {
-                EventManager.publish(Event.STAR_POINT_UPDATE_FLAG, this, true);
                 alpha = MathUtilsd.clamp(MathUtilsd.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
             }
             this.opacity *= alpha;

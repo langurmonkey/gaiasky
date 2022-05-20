@@ -56,7 +56,7 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
         }
         if (meshes.get(index) == null) {
             if (index > 0)
-                logger.info("Capacity too small, creating new meshdata: " + curr.capacity);
+                logger.info("Capacity too small, creating new buffer: " + curr.capacity);
             curr = new MeshData();
             meshes.set(index, curr);
 
