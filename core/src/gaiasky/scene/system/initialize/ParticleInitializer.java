@@ -98,11 +98,6 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         sa.thresholdNone = Settings.settings.scene.star.threshold.none;
         sa.thresholdPoint = Settings.settings.scene.star.threshold.point;
         sa.thresholdQuad = Settings.settings.scene.star.threshold.quad;
-        sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
-
-        text.textScale = 0.2f;
-        text.labelFactor = 1.3e-1f;
-        text.labelMax = 0.005f;
 
         render.renderGroup = RenderGroup.BILLBOARD_STAR;
 
@@ -113,6 +108,11 @@ public class ParticleInitializer extends InitSystem implements IObserver {
 
     private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
         baseInitialization(pm, extra, celestial, sa, text, render);
+
+        sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
+        text.textScale = 0.1f;
+        text.labelFactor = 1.3e-1f;
+        text.labelMax = 0.005f;
 
         // Actual initialization
         setDerivedAttributes(body, celestial, mag, extra, false);
@@ -127,6 +127,11 @@ public class ParticleInitializer extends InitSystem implements IObserver {
 
     private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render, Distance dist) {
         baseInitialization(pm, extra, celestial, sa, text, render);
+
+        sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;
+        text.textScale = 0.2f;
+        text.labelFactor = 1.3e-1f;
+        text.labelMax = 0.01f;
 
         setDerivedAttributes(body, celestial, mag, extra, true);
 

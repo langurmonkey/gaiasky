@@ -133,8 +133,15 @@ public class GraphUpdater extends EntitySystem {
 
         // Update supporting attributes
         body.distToCamera = graph.translation.lend();
-        body.viewAngle = FastMath.atan(body.size / body.distToCamera);
-        body.viewAngleApparent = body.viewAngle / camera.getFovFactor();
+        if(Mapper.extra.has(entity)) {
+            // Particles have a special algorithm for the solid angles.
+            body.viewAngle = (Mapper.extra.get(entity).radius / body.distToCamera);
+            body.viewAngleApparent = body.viewAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
+        } else {
+            // Regular objects.
+            body.viewAngle = FastMath.atan(body.size / body.distToCamera);
+            body.viewAngleApparent = body.viewAngle / camera.getFovFactor();
+        }
 
         // Only update non-set elements
         boolean isSet = Mapper.tagSet.has(entity);

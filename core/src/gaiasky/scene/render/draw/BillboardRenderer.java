@@ -269,8 +269,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             var sa = Mapper.sa.get(entity);
             var extra = Mapper.extra.get(entity);
             var scaffolding = Mapper.modelScaffolding.get(entity);
-            boolean isModel = Mapper.model.has(entity);
             boolean isStar = Mapper.hip.has(entity);
+            boolean isModel = !isStar && Mapper.model.has(entity);
 
             final float fuzzySize = getRenderSizeCelestial(camera, entity, body, sa, scaffolding, extra);
             final float radius = (float) (extra != null ? extra.radius : (body.size / 2d) * scaffolding.sizeScaleFactor);
@@ -286,7 +286,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             shader.setUniformf("u_size", fuzzySize);
 
             // Models use the regular color
-            float[] color = Mapper.model.has(entity) ? body.color : celestial.colorPale;
+            float[] color = isModel ? body.color : celestial.colorPale;
 
             // Alpha channel:
             // - particles: alpha * opacity

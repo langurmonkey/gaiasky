@@ -10,6 +10,7 @@ import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
+import gaiasky.scene.component.ParticleExtra;
 import gaiasky.scene.component.SolidAngle;
 import gaiasky.scene.component.Text;
 import gaiasky.scene.render.draw.TextRenderer;
@@ -38,6 +39,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private GraphNode graph;
     private SolidAngle sa;
     private Text text;
+    private ParticleExtra extra;
 
     @Override
     protected void entityCheck(Entity entity) {
@@ -51,6 +53,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.graph = Mapper.graph.get(entity);
         this.sa = Mapper.sa.get(entity);
         this.text = Mapper.text.get(entity);
+        this.extra = Mapper.extra.get(entity);
     }
 
     @Override
@@ -81,7 +84,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public double getRadius() {
-        return body.size / 2.0;
+        return extra == null ? body.size / 2.0 : extra.radius;
     }
 
     @Override

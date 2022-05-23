@@ -293,18 +293,10 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
                     addToRender(this, RenderGroup.LINE);
                 }
             }
-            if (renderText() && camera.isVisible(this)) {
+            if (renderText()) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
         }
-    }
-
-    protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        if (shouldRender()) {
-            GaiaSky.instance.sgr.renderListsFront().get(rg.ordinal()).add(renderable);
-            return true;
-        }
-        return false;
     }
 
     /**
