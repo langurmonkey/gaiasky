@@ -19,6 +19,8 @@ import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.Environment;
+import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsd;
 
 /**
@@ -46,11 +48,14 @@ public class ModelEntityRender {
         var model = Mapper.model.get(entity);
         var scaffolding = Mapper.modelScaffolding.get(entity);
         if (Mapper.atmosphere.has(entity)) {
-            // Planet
+            // Planet.
             renderPlanet(entity, model, scaffolding, batch, alpha, t, rc, renderGroup);
+        }else if(Mapper.extra.has(entity)) {
+            // Single particle/star.
+            renderParticleStarModel(entity, model, batch, alpha, t);
         } else {
             boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
-            // Generic model
+            // Generic model.
             renderGenericModel(entity, model, scaffolding, batch, alpha, relativistic, shadowEnvironment);
         }
     }
@@ -84,6 +89,25 @@ public class ModelEntityRender {
             mc.update(alpha * alphaFactor, relativistic);
             batch.render(mc.instance, mc.env);
         }
+    }
+
+    private void renderParticleStarModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t) {
+        var body = Mapper.body.get(entity);
+        var base = Mapper.base.get(entity);
+        var graph = Mapper.graph.get(entity);
+        var extra = Mapper.extra.get(entity);
+        var dist = Mapper.distance.get(entity);
+
+        ModelComponent mc = model.model;
+        var cc = body.color;
+
+        float opacity = (float) MathUtilsd.lint(body.distToCamera, dist.distance / 50f, dist.distance, 1f, 0f);
+        ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(cc[0], cc[1], cc[2], 1f);
+        ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
+        mc.update(alpha * opacity);
+        // Local transform
+        graph.translation.setToTranslation(mc.instance.transform).scl((float) (extra.radius * 2d));
+        batch.render(mc.instance, mc.env);
     }
 
     /**

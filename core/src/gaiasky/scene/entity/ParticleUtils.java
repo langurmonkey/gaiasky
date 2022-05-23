@@ -147,16 +147,15 @@ public class ParticleUtils {
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
         Matrix4 modelTransform = new Matrix4();
 
-        var mc = model.model;
-        mc = new ModelComponent(false);
-        mc.initialize(null);
-        mc.env = new Environment();
-        mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        mc.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
-        mc.instance = new IntModelInstance(intModel, modelTransform);
+        model.model = new ModelComponent(false);
+        model.model.initialize(null);
+        model.model.env = new Environment();
+        model.model.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
+        model.model.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
+        model.model.instance = new IntModelInstance(intModel, modelTransform);
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)
-            mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
-        mc.setModelInitialized(true);
+            model.model.rec.setUpRelativisticEffectsMaterial(model.model.instance.materials);
+        model.model.setModelInitialized(true);
     }
 }
