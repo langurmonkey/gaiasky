@@ -10,12 +10,13 @@ import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.ParticleExtra;
 import gaiasky.scene.component.SolidAngle;
+import gaiasky.scene.component.StarSet;
 import gaiasky.scene.component.Text;
 import gaiasky.scene.render.draw.TextRenderer;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
@@ -39,7 +40,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private GraphNode graph;
     private SolidAngle sa;
     private Text text;
-    private ParticleExtra extra;
+
+    public LabelView() {
+    }
 
     @Override
     protected void entityCheck(Entity entity) {
@@ -53,7 +56,6 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.graph = Mapper.graph.get(entity);
         this.sa = Mapper.sa.get(entity);
         this.text = Mapper.text.get(entity);
-        this.extra = Mapper.extra.get(entity);
     }
 
     @Override
@@ -64,7 +66,11 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (Mapper.celestial.has(entity)) {
+            // Celestial: planets, single stars, etc.
             renderCelestial(batch, shader, sys, rc, camera);
+        } else if (set != null) {
+            // Star sets.
+            renderStarSet(batch, shader, sys, rc, camera);
         }
     }
 
@@ -83,6 +89,67 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         }
     }
 
+    public void renderStarSet(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
+
+        var pointData = set.pointData;
+        var active = set.active;
+
+        Vector3d starPosition = D31;
+        int n = Math.min(pointData.size(), Settings.settings.scene.star.group.numLabel);
+        if (camera.getCurrent() instanceof FovCamera) {
+            for (int i = 0; i < n; i++) {
+                IParticleRecord star = pointData.get(active[i]);
+                starPosition = set.fetchPosition(star, set.cPosD, starPosition, set.currDeltaYears);
+                double distToCamera = starPosition.len();
+                float radius = (float) set.getRadius(set.active[i]);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 6f);
+
+                if (camera.isVisible(viewAngle, starPosition, distToCamera)) {
+                    render2DLabel(batch, shader, rc,  ((TextRenderer) sys).font2d, camera, star.names()[0], starPosition);
+                }
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+                int idx = active[i];
+                renderStarLabel(idx, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+            }
+            for (Integer i : set.forceLabelStars) {
+                renderStarLabel(i, starPosition, thresholdLabel, batch, shader, sys, rc, camera);
+            }
+        }
+    }
+
+    /**
+     * Renders the label fora single star in a star group.
+     */
+    private void renderStarLabel(int idx, Vector3d starPosition, float thresholdLabel, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        boolean forceLabel = set.forceLabelStars.contains(idx);
+        IParticleRecord star = set.pointData.get(idx);
+        starPosition = set.fetchPosition(star, set.cPosD, starPosition, set.currDeltaYears);
+
+        double distToCamera = starPosition.len();
+        float radius = (float) set.getRadius(idx);
+        if (forceLabel) {
+            radius = Math.max(radius, 1e4f);
+        }
+        float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
+
+        if (forceLabel || viewAngle >= thresholdLabel && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
+            textPosition(camera, starPosition, body.distToCamera, radius);
+
+            shader.setUniformf("u_viewAngle", viewAngle);
+            shader.setUniformf("u_viewAnglePow", 1f);
+            shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
+            // Override object color
+            shader.setUniform4fv("u_color", textColour(star.names()[0]), 0, 4);
+            double textSize = FastMath.tanh(viewAngle) * distToCamera * 1e5d;
+            float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+            textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+            render3DLabel(batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, star.names()[0], starPosition, distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
+        }
+    }
+
     @Override
     public float textSize() {
         return (float) (text.labelMax * body.distToCamera * text.labelFactor);
@@ -90,14 +157,50 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public float textScale() {
-        return text.textScale >= 0 ? text.textScale : (float) FastMath.atan(text.labelMax) * text.labelFactor * 4e2f;
+        if (set == null) {
+            return text.textScale >= 0 ? text.textScale : (float) FastMath.atan(text.labelMax) * text.labelFactor * 4e2f;
+        } else {
+            return .5f / Settings.settings.scene.label.size;
+        }
     }
 
+    /**
+     * Text position for single objects (models, single stars, etc.).
+     *
+     * @param cam The camera.
+     * @param out The out parameter with the result.
+     */
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
         graph.translation.put(out);
         double len = out.len();
         out.clamp(0, len - getRadius()).scl(0.9f);
+
+        Vector3d aux = D32;
+        aux.set(cam.getUp());
+
+        aux.crs(out).nor();
+
+        float dist = -0.02f * cam.getFovFactor() * (float) out.len();
+
+        aux.add(cam.getUp()).nor().scl(dist);
+
+        out.add(aux);
+
+        GlobalResources.applyRelativisticAberration(out, cam);
+        RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
+    }
+
+    /**
+     * Text position for star sets.
+     *
+     * @param cam The camera.
+     * @param out The output vector to put the result.
+     * @param len The length.
+     * @param rad The radius.
+     */
+    private void textPosition(ICamera cam, Vector3d out, double len, double rad) {
+        out.clamp(0, len - rad);
 
         Vector3d aux = D32;
         aux.set(cam.getUp());

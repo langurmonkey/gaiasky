@@ -25,6 +25,8 @@ import gaiasky.util.math.Vector3d;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -103,7 +105,7 @@ public class ParticleSetInitializer extends InitSystem {
                 set.setData(provider.loadData(set.datafile, set.factor));
             }
 
-            computeMinMeanMaxDistances(entity, set);
+            computeMinMeanMaxDistances(set);
             computeMeanPosition(entity, set);
             setLabelPosition(entity);
 
@@ -162,9 +164,13 @@ public class ParticleSetInitializer extends InitSystem {
         if (set.variabilityEpochJd <= 0) {
             set.variabilityEpochJd = AstroUtils.JD_J2010;
         }
+
+        // Maps.
+        set.forceLabelStars = new HashSet<>();
+        set.labelColors = new HashMap<>();
     }
 
-    public void computeMinMeanMaxDistances(Entity entity, ParticleSet set) {
+    public void computeMinMeanMaxDistances(ParticleSet set) {
         set.meanDistance = 0;
         set.maxDistance = Double.MIN_VALUE;
         set.minDistance = Double.MAX_VALUE;
@@ -232,6 +238,6 @@ public class ParticleSetInitializer extends InitSystem {
         starSet.background = starSet.indices2;
 
         // Initialize updater task
-        starSet.updaterTask = new ParticleSetUpdaterTask(entity, starSet);
+        starSet.updaterTask = new ParticleSetUpdaterTask(entity, starSet, starSet);
     }
 }

@@ -1,9 +1,13 @@
 package gaiasky.scene.component;
 
+import gaiasky.GaiaSky;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
+import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
@@ -38,7 +42,6 @@ public class StarSet extends ParticleSet {
 
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D33 = new Vector3d();
-
 
     /**
      * Updates the parameters of the focus, if the focus is active in this group
@@ -102,4 +105,6 @@ public class StarSet extends ParticleSet {
     public void setVariabilityEpochJd(Double epochJd) {
         this.variabilityEpochJd = epochJd;
     }
+
+
 }

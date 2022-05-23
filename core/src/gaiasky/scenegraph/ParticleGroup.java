@@ -1314,9 +1314,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         int n = pointData.size();
         for (int i = 0; i < n; i++) {
             IParticleRecord d = pointData.get(i);
-            // Pos
-            Vector3d x = D31.get().set(d.x(), d.y(), d.z());
-            metadata[i] = filter(i) ? camPos.dst2d(x) : Double.MAX_VALUE;
+            metadata[i] = filter(i) ? camPos.dst2d(d.x(), d.y(), d.z()) : Double.MAX_VALUE;
         }
     }
 

@@ -9,11 +9,14 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.ParticleSet;
+import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
+import gaiasky.util.Nature;
+import gaiasky.util.Settings;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -35,21 +38,27 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     /** Reference to the particle set component. **/
     private final ParticleSet particleSet;
 
+    /** Reference to the star set component. **/
+    private final StarSet starSet;
+
     /** Reference to the dataset description component. **/
     private final DatasetDescription datasetDescription;
 
     private final ParticleUtils utils;
 
     private final Comparator<Integer> comp;
+
     private final Vector3d D31 = new Vector3d();
+    private final Vector3d D32 = new Vector3d();
+    private final Vector3d D34 = new Vector3d();
 
     /**
-     * User order in metadata arrays to compare indices
+     * User order in metadata arrays to compare indices in this particle set.
      */
-    private class ParticleGroupComparator implements Comparator<Integer> {
+    private class ParticleSetComparator implements Comparator<Integer> {
         private ParticleSet set;
 
-        public ParticleGroupComparator(ParticleSet set) {
+        public ParticleSetComparator(ParticleSet set) {
             this.set = set;
         }
 
@@ -64,17 +73,19 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
         this.entity = null;
         this.particleSet = null;
+        this.starSet = null;
         this.datasetDescription = null;
         this.utils = null;
         this.comp = null;
     }
 
-    public ParticleSetUpdaterTask(Entity entity, ParticleSet particleSet) {
+    public ParticleSetUpdaterTask(Entity entity, ParticleSet particleSet, StarSet starSet) {
         this.entity = entity;
         this.particleSet = particleSet;
+        this.starSet = starSet;
         this.datasetDescription = Mapper.datasetDescription.get(entity);
         this.utils = new ParticleUtils();
-        this.comp = new ParticleGroupComparator(this.particleSet);
+        this.comp = new ParticleSetComparator(this.particleSet);
 
         this.pg = null;
 
@@ -90,14 +101,14 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
     }
 
-    private void updateSorter(ITimeFrameProvider time, ICamera camera) {
-        var background = particleSet.background;
+    private long last = -1;
 
+    private void updateSorter(ITimeFrameProvider time, ICamera camera) {
         // Prepare metadata to sort
         updateMetadata(time, camera);
 
         // Sort background list of indices
-        Arrays.sort(background, comp);
+        Arrays.sort(particleSet.background, comp);
 
         // Synchronously with the render thread, update indices, lastSortTime and updating state
         GaiaSky.postRunnable(() -> {
@@ -108,15 +119,12 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     }
 
     private void swapBuffers() {
-        var indices1 = particleSet.indices1;
-        var indices2 = particleSet.indices2;
-
-        if (particleSet.active == indices1) {
-            particleSet.active = indices2;
-            particleSet.background = indices1;
+        if (particleSet.active == particleSet.indices1) {
+            particleSet.active = particleSet.indices2;
+            particleSet.background = particleSet.indices1;
         } else {
-            particleSet.active = indices1;
-            particleSet.background = indices2;
+            particleSet.active = particleSet.indices1;
+            particleSet.background = particleSet.indices2;
         }
     }
 
@@ -128,16 +136,33 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
      * @param camera The camera.
      */
     private void updateMetadata(ITimeFrameProvider time, ICamera camera) {
-        Vector3b camPos = camera.getPos();
-        int n = particleSet.pointData.size();
-        for (int i = 0; i < n; i++) {
-            IParticleRecord d = particleSet.pointData.get(i);
-            // Pos
-            Vector3d x = D31.set(d.x(), d.y(), d.z());
-            particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? camPos.dst2d(x) : Double.MAX_VALUE;
+        if(starSet != null) {
+            // Stars, propagate proper motion, weigh with size.
+            Vector3d camPos = camera.getPos().tov3d(D34);
+            double deltaYears = AstroUtils.getMsSince(time.getTime(), starSet.epochJd) * Nature.MS_TO_Y;
+            if (starSet.pointData != null) {
+                int n = starSet.pointData.size();
+                for (int i = 0; i < n; i++) {
+                    IParticleRecord d = starSet.pointData.get(i);
+
+                    // Pm
+                    Vector3d dx = D32.set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);
+                    // Pos
+                    Vector3d x = D31.set(d.x(), d.y(), d.z()).add(dx);
+
+                    starSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst(x)) / camera.getFovFactor()) * Settings.settings.scene.star.brightness) : Double.MAX_VALUE;
+                }
+            }
+        } else {
+            // Particles, only distance.
+            Vector3b camPos = camera.getPos();
+            int n = particleSet.pointData.size();
+            for (int i = 0; i < n; i++) {
+                IParticleRecord d = particleSet.pointData.get(i);
+                particleSet.metadata[i] = utils.filter(i, particleSet, datasetDescription) ? camPos.dst2d(d.x(), d.y(), d.z()) : Double.MAX_VALUE;
+            }
         }
     }
-
 
     // Minimum amount of time [ms] between two update calls
     protected static final double UPDATE_INTERVAL_MS = 1500;
@@ -165,7 +190,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 final Vector3b currentCameraPos = (Vector3b) data[0];
                 long t = TimeUtils.millis() - particleSet.lastSortTime;
                 if (!particleSet.updating && base.opacity > 0 && (t > UPDATE_INTERVAL_MS_2 || (particleSet.lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
-                    particleSet.updating = GaiaSky.instance.getExecutorService().execute(particleSet.updaterTask);
+                    particleSet.updating = GaiaSky.instance.getExecutorService().execute(this);
                 }
             }
             break;

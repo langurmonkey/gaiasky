@@ -11,6 +11,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.ShadowMapImpl;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
@@ -29,7 +30,10 @@ import gaiasky.util.math.MathUtilsd;
  */
 public class ModelEntityRender {
 
+    private final ParticleUtils utils;
+
     public ModelEntityRender() {
+        this.utils = new ParticleUtils();
     }
 
     /**
@@ -50,9 +54,12 @@ public class ModelEntityRender {
         if (Mapper.atmosphere.has(entity)) {
             // Planet.
             renderPlanet(entity, model, scaffolding, batch, alpha, t, rc, renderGroup);
-        }else if(Mapper.extra.has(entity)) {
+        } else if (Mapper.extra.has(entity)) {
             // Single particle/star.
             renderParticleStarModel(entity, model, batch, alpha, t);
+        } else if (Mapper.starSet.has(entity)) {
+            // Star set.
+            renderParticleStarSetModel(entity, model, batch, alpha, t);
         } else {
             boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
             // Generic model.
@@ -91,6 +98,50 @@ public class ModelEntityRender {
         }
     }
 
+    /**
+     * Renders the model of a single star or particle.
+     * @param entity The entity.
+     * @param model The model component.
+     * @param batch The model batch.
+     * @param alpha The model alpha.
+     * @param t The time.
+     */
+    private void renderParticleStarSetModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t) {
+        var set = Mapper.starSet.get(entity);
+
+        var mc = model.model;
+
+        if (mc != null && mc.isModelInitialised()) {
+            mc.touch();
+            float opacity = (float) MathUtilsd.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
+            if (alpha * opacity > 0) {
+                mc.setTransparency(alpha * opacity);
+                float[] col = set.proximity.updating[0].col;
+                ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
+                ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
+                // Local transform
+                double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
+                mc.instance.transform.idt()
+                        .translate(
+                        (float) set.proximity.updating[0].pos.x,
+                        (float) set.proximity.updating[0].pos.y,
+                        (float) set.proximity.updating[0].pos.z)
+                        .scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
+                mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
+                mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
+                batch.render(mc.instance, mc.env);
+            }
+        }
+    }
+
+    /**
+     * Renders the model of a single star or particle.
+     * @param entity The entity.
+     * @param model The model component.
+     * @param batch The model batch.
+     * @param alpha The model alpha.
+     * @param t The time.
+     */
     private void renderParticleStarModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t) {
         var body = Mapper.body.get(entity);
         var base = Mapper.base.get(entity);

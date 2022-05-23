@@ -135,7 +135,7 @@ public class ParticleSet implements Component {
     // Name index
     public Map<String, Integer> index;
 
-    // Metadata, for sorting - holds distances from each particle to the camera, squared
+    // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
 
     // Comparator

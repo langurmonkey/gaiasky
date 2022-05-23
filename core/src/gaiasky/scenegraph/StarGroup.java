@@ -93,9 +93,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public StarGroup() {
         super();
         this.lastSortTime = -1;
-        // Default epochs
+        // Default epochs.
         this.epochJd = AstroUtils.JD_J2015_5;
         this.variabilityEpochJd = AstroUtils.JD_J2010;
+        // Maps.
         this.forceLabelStars = new HashSet<>();
         this.labelColors = new HashMap<>();
     }
