@@ -6,6 +6,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
+import gaiasky.scene.component.ParticleExtra;
 
 /**
  * An entity view that implements the {@link IRenderable} methods.
@@ -16,6 +17,8 @@ public class RenderView extends AbstractView implements IRenderable {
     protected Base base;
     /** The body component. **/
     protected Body body;
+    /** Particle component, maybe. **/
+    protected ParticleExtra extra;
 
     public RenderView() {
     }
@@ -34,6 +37,7 @@ public class RenderView extends AbstractView implements IRenderable {
     protected void entityChanged() {
         this.base = Mapper.base.get(entity);
         this.body = Mapper.body.get(entity);
+        this.extra = Mapper.extra.get(entity);
     }
 
     @Override
@@ -51,4 +55,11 @@ public class RenderView extends AbstractView implements IRenderable {
         return base.opacity;
     }
 
+    public double getRadius() {
+        return extra == null ? body.size / 2.0 : extra.radius;
+    }
+
+    public float[] textColour() {
+        return body.labelColor;
+    }
 }

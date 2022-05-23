@@ -30,6 +30,8 @@ public class FocusView extends AbstractView implements IFocus {
     private Octant octant;
     /** The magnitude component. **/
     private Magnitude mag;
+    /** Particle component, maybe. **/
+    protected ParticleExtra extra;
 
     /** The particle set component, if any. **/
     private ParticleSet particleSet;
@@ -64,6 +66,7 @@ public class FocusView extends AbstractView implements IFocus {
         this.graph = Mapper.graph.get(entity);
         this.octant = Mapper.octant.get(entity);
         this.mag = Mapper.magnitude.get(entity);
+        this.extra = Mapper.extra.get(entity);
         this.particleSet = Mapper.particleSet.get(entity);
         this.starSet = Mapper.starSet.get(entity);
     }
@@ -205,7 +208,7 @@ public class FocusView extends AbstractView implements IFocus {
 
     @Override
     public double getRadius() {
-        return body.size / 2.0;
+        return extra != null ? extra.radius : body.size / 2.0;
     }
 
     @Override

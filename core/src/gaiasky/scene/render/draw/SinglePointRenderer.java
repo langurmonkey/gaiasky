@@ -21,6 +21,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.view.RenderView;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -51,17 +52,21 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
 
     private Texture starTex;
 
-    boolean initializing;
+    private final RenderView view;
 
-    private boolean pointUpdateFlag = true;
+    boolean initializing;
 
     public SinglePointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
-        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
+
+        this.view = new RenderView();
         this.ct = ct;
+
         this.alphaSizeBrRc = new float[4];
         initializing = true;
         setStarTexture(Settings.settings.scene.star.getStarTexture());
+
+        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -97,7 +102,7 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
         createNewMesh(50, new VertexAttributes(attribs));
     }
 
-    private void createNewMesh(int numVertices, VertexAttributes attributes){
+    private void createNewMesh(int numVertices, VertexAttributes attributes) {
         curr.mesh = new IntMesh(false, numVertices, 0, attributes);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
@@ -121,9 +126,9 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
 
     public void ensureMeshSize(int desiredNumVertices) {
         VertexAttributes attributes = curr.mesh.getVertexAttributes();
-        if(curr.mesh.getMaxVertices() < desiredNumVertices) {
+        if (curr.mesh.getMaxVertices() < desiredNumVertices) {
             int newNumVertices = (int) (desiredNumVertices * 1.2);
-            logger.info("Buffer capacity too small (" + curr.mesh.getMaxVertices() + " v " + desiredNumVertices +"), growing to " + newNumVertices);
+            logger.info("Buffer capacity too small (" + curr.mesh.getMaxVertices() + " v " + desiredNumVertices + "), growing to " + newNumVertices);
             // Dispose old and create new mesh.
             curr.mesh.dispose();
             createNewMesh(newNumVertices, attributes);
@@ -132,42 +137,40 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (pointUpdateFlag) {
-            curr.clear();
+        curr.clear();
 
-            ensureTempVertsSize(renderables.size * curr.vertexSize);
-            ensureMeshSize(renderables.size);
-            renderables.forEach(r -> {
-                Entity entity = ((Render) r).entity;
-                var base = Mapper.base.get(entity);
-                var body = Mapper.body.get(entity);
-                var pm = Mapper.pm.get(entity);
-                float[] col = body.color;
+        ensureTempVertsSize(renderables.size * curr.vertexSize);
+        ensureMeshSize(renderables.size);
+        renderables.forEach(r -> {
+            Entity entity = ((Render) r).entity;
+            view.setEntity(entity);
+            var base = Mapper.base.get(entity);
+            var body = Mapper.body.get(entity);
+            var pm = Mapper.pm.get(entity);
+            float[] col = body.color;
 
-                // COLOR
-                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], base.opacity);
+            // COLOR
+            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], base.opacity);
 
-                // SIZE
-                tempVerts[curr.vertexIdx + sizeOffset] = body.size / 2f;
+            // SIZE
+            tempVerts[curr.vertexIdx + sizeOffset] = (float) view.getRadius();
 
-                // POSITION
-                aux.set(body.pos.x.floatValue(), body.pos.y.floatValue(), body.pos.z.floatValue());
-                final int idx = curr.vertexIdx;
-                tempVerts[idx] = aux.x;
-                tempVerts[idx + 1] = aux.y;
-                tempVerts[idx + 2] = aux.z;
+            // POSITION
+            aux.set(body.pos.x.floatValue(), body.pos.y.floatValue(), body.pos.z.floatValue());
+            final int idx = curr.vertexIdx;
+            tempVerts[idx] = aux.x;
+            tempVerts[idx + 1] = aux.y;
+            tempVerts[idx + 2] = aux.z;
 
-                // PROPER MOTION
-                tempVerts[curr.vertexIdx + pmOffset] = pm != null ? pm.pm.x : 0;
-                tempVerts[curr.vertexIdx + pmOffset + 1] = pm != null ? pm.pm.y : 0;
-                tempVerts[curr.vertexIdx + pmOffset + 2] = pm != null ? pm.pm.z : 0;
+            // PROPER MOTION
+            tempVerts[curr.vertexIdx + pmOffset] = pm != null ? pm.pm.x : 0;
+            tempVerts[curr.vertexIdx + pmOffset + 1] = pm != null ? pm.pm.y : 0;
+            tempVerts[curr.vertexIdx + pmOffset + 2] = pm != null ? pm.pm.z : 0;
 
-                curr.vertexIdx += curr.vertexSize;
-            });
-            curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
-            // Put flag down
-            pointUpdateFlag = false;
-        }
+            curr.vertexIdx += curr.vertexSize;
+        });
+        curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
+
         ExtShaderProgram shaderProgram = getShaderProgram();
 
         shaderProgram.begin();

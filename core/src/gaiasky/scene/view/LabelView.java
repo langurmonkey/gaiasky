@@ -83,15 +83,6 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         }
     }
 
-    public double getRadius() {
-        return extra == null ? body.size / 2.0 : extra.radius;
-    }
-
-    @Override
-    public float[] textColour() {
-        return body.labelColor;
-    }
-
     @Override
     public float textSize() {
         return (float) (text.labelMax * body.distToCamera * text.labelFactor);
