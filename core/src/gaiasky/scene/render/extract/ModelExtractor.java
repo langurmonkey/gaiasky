@@ -102,7 +102,7 @@ public class ModelExtractor extends AbstractExtractSystem {
         double thOverFactor = sa.thresholdPoint / Settings.settings.scene.label.number;
         return base.names != null
                 && GaiaSky.instance.isOn(ComponentTypes.ComponentType.Labels)
-                && (base.forceLabel || FastMath.pow(body.viewAngleApparent, getViewAnglePow()) >= (thOverFactor * getThOverFactorScl(base)));
+                && (base.forceLabel || FastMath.pow(body.viewAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
     }
 
     private float getThOverFactorScl(Base base) {
