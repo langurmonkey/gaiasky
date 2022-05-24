@@ -136,7 +136,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
 
         if (forceLabel || viewAngle >= thresholdLabel && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
-            textPosition(camera, starPosition, body.distToCamera, radius);
+            textPosition(camera, starPosition, distToCamera, radius);
 
             shader.setUniformf("u_viewAngle", viewAngle);
             shader.setUniformf("u_viewAnglePow", 1f);
