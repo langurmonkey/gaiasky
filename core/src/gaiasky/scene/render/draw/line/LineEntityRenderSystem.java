@@ -2,11 +2,19 @@ package gaiasky.scene.render.draw.line;
 
 import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Render;
+import gaiasky.scene.component.*;
 import gaiasky.scene.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.view.LineView;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.util.Constants;
+import gaiasky.util.Nature;
+import gaiasky.util.Settings;
+import gaiasky.util.color.ColorUtils;
+import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -16,10 +24,19 @@ import java.time.Instant;
  */
 public class LineEntityRenderSystem {
 
-    /** The line view object, used to send into the
-     * {@link LinePrimitiveRenderer}.**/
+    /**
+     * The line view object, used to send into the
+     * {@link LinePrimitiveRenderer}.
+     **/
     private LineView lineView;
+
+    /** Auxiliary color array. **/
+    private final float[] rgba = new float[4];
+
     private Vector3d D31 = new Vector3d();
+    private Vector3d D32 = new Vector3d();
+    private Vector3d D33 = new Vector3d();
+    private Vector3d D34 = new Vector3d();
     protected Vector3d prev = new Vector3d(), curr = new Vector3d();
 
     public LineEntityRenderSystem() {
@@ -29,10 +46,21 @@ public class LineEntityRenderSystem {
     public void render(final Render render, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         final var entity = render.entity;
         var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
-        var graph = Mapper.graph.get(entity);
         var trajectory = Mapper.trajectory.get(entity);
-        var verts = Mapper.verts.get(entity);
+        var set = Mapper.starSet.get(render.entity);
+        if (trajectory != null) {
+            // Orbits.
+            var verts = Mapper.verts.get(entity);
+            var graph = Mapper.graph.get(entity);
+            var body = Mapper.body.get(entity);
+            renderTrajectory(render, base, body, graph, trajectory, verts, renderer, camera, alpha);
+        } else if(set != null) {
+            // Star sets.
+            renderStarSet(render, base, set, renderer, camera, alpha);
+        }
+    }
+
+    private void renderTrajectory(Render render, Base base, Body body, GraphNode graph, Trajectory trajectory, Verts verts, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         if (!trajectory.onlyBody) {
             var localTransformD = trajectory.localTransformD;
             var oc = trajectory.oc;
@@ -74,7 +102,7 @@ public class LineEntityRenderSystem {
                 }
             }
 
-            lineView.setEntity(entity);
+            lineView.setEntity(render.entity);
 
             // This is so that the shape renderer does not mess up the z-buffer
             int n = 0;
@@ -144,6 +172,129 @@ public class LineEntityRenderSystem {
                 }
             }
         }
+    }
+
+    /**
+     * Renders the proper motions of a star set.
+     */
+    public void renderStarSet(Render render, Base base, StarSet set, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        lineView.setEntity(render.entity);
+
+        alpha *= GaiaSky.instance.sgr.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
+        float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
+        int n = (int) getMaxProperMotionLines(set);
+        for (int i = n - 1; i >= 0; i--) {
+            IParticleRecord star = set.pointData.get(set.active[i]);
+            float radius = (float) (set.getSize(set.active[i]) * Constants.STAR_SIZE_FACTOR);
+            // Position
+            Vector3d lPos = set.fetchPosition(star, set.cPosD, D31, set.currDeltaYears);
+            // Proper motion
+            Vector3d pm = D32.set(star.pmx(), star.pmy(), star.pmz()).scl(set.currDeltaYears);
+            // Rest of attributes
+            float distToCamera = (float) lPos.len();
+            float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
+            if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
+                Vector3d p1 = D31.set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
+                Vector3d ppm = D32.set(star.pmx(), star.pmy(), star.pmz()).scl(Settings.settings.scene.properMotion.length);
+                double p1p2len = ppm.len();
+                Vector3d p2 = D33.set(ppm).add(p1);
+
+                // Maximum speed in km/s, to normalize
+                float maxSpeedKms = 100;
+                float r, g, b;
+                switch (Settings.settings.scene.properMotion.colorMode) {
+                case 0:
+                default:
+                    // DIRECTION
+                    // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
+                    ppm.nor();
+                    r = (float) (ppm.x + 1d) / 2f;
+                    g = (float) (ppm.y + 1d) / 2f;
+                    b = (float) (ppm.z + 1d) / 2f;
+                    break;
+                case 1:
+                    // LENGTH
+                    ppm.set(star.pmx(), star.pmy(), star.pmz());
+                    // Units/year to Km/s
+                    ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                    double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
+                    ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
+                    r = rgba[0];
+                    g = rgba[1];
+                    b = rgba[2];
+                    break;
+                case 2:
+                    // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
+                    if (star.radvel() != 0) {
+                        r = ColorUtils.gBlue[0] + 0.2f;
+                        g = ColorUtils.gBlue[1] + 0.4f;
+                        b = ColorUtils.gBlue[2] + 0.4f;
+                    } else {
+                        r = ColorUtils.gRed[0] + 0.4f;
+                        g = ColorUtils.gRed[1] + 0.2f;
+                        b = ColorUtils.gRed[2] + 0.2f;
+                    }
+                    break;
+                case 3:
+                    // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
+                    float rav = star.radvel();
+                    if (rav != 0) {
+                        // rv in [0:1]
+                        float rv = ((MathUtilsd.clamp(rav, -maxSpeedKms, maxSpeedKms) / maxSpeedKms) + 1) / 2;
+                        ColorUtils.colormap_blue_white_red(rv, rgba);
+                        r = rgba[0];
+                        g = rgba[1];
+                        b = rgba[2];
+                    } else {
+                        r = g = b = 1;
+                    }
+                    break;
+                case 4:
+                    // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
+                    if (ppm.len2() != 0) {
+                        ppm.set(star.pmx(), star.pmy(), star.pmz());
+                        // Units/year to Km/s
+                        ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                        Vector3d camStar = D34.set(p1);
+                        double pr = ppm.dot(camStar.nor());
+                        double projection = ((MathUtilsd.clamp(pr, -(double) maxSpeedKms, maxSpeedKms) / (double) maxSpeedKms) + 1) / 2;
+                        ColorUtils.colormap_blue_white_red((float) projection, rgba);
+                        r = rgba[0];
+                        g = rgba[1];
+                        b = rgba[2];
+                    } else {
+                        r = g = b = 1;
+                    }
+                    break;
+                case 5:
+                    // SINGLE COLOR
+                    r = ColorUtils.gBlue[0] + 0.2f;
+                    g = ColorUtils.gBlue[1] + 0.4f;
+                    b = ColorUtils.gBlue[2] + 0.4f;
+                    break;
+                }
+
+                // Clamp
+                r = MathUtilsd.clamp(r, 0, 1);
+                g = MathUtilsd.clamp(g, 0, 1);
+                b = MathUtilsd.clamp(b, 0, 1);
+
+                renderer.addLine(lineView, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
+                if (Settings.settings.scene.properMotion.arrowHeads) {
+                    // Add Arrow cap.
+                    Vector3d p3 = D32.set(ppm).nor().scl(p1p2len * .86).add(p1);
+                    p3.rotate(p2, 30);
+                    renderer.addLine(lineView, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
+                    p3.rotate(p2, -60);
+                    renderer.addLine(lineView, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
+                }
+
+            }
+        }
+    }
+
+    private long getMaxProperMotionLines(StarSet set) {
+        return Math.min(set.pointData.size(), Settings.settings.scene.star.group.numVelocityVector);
     }
 
     private int wrap(int idx, int n) {

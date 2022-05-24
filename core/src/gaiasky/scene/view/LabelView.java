@@ -121,7 +121,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     /**
-     * Renders the label fora single star in a star group.
+     * Renders the label for a single star in a star group.
      */
     private void renderStarLabel(int idx, Vector3d starPosition, float thresholdLabel, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         boolean forceLabel = set.forceLabelStars.contains(idx);

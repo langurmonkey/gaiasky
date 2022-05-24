@@ -1,6 +1,7 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.GL30;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
@@ -38,7 +39,6 @@ public class LineView extends AbstractView implements ILineRenderable {
     protected void entityCheck(Entity entity) {
         check(entity, Mapper.base, Base.class);
         check(entity, Mapper.body, Body.class);
-        check(entity, Mapper.verts, Verts.class);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class LineView extends AbstractView implements ILineRenderable {
 
     @Override
     public float getLineWidth() {
-        return verts.primitiveSize;
+        return verts != null ? verts.primitiveSize : 0.6f;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class LineView extends AbstractView implements ILineRenderable {
 
     @Override
     public int getGlPrimitive() {
-        return verts.glPrimitive;
+        return verts != null ? verts.glPrimitive : GL30.GL_LINES;
     }
 
     @Override
