@@ -38,6 +38,8 @@ public class Quaterniond implements Serializable {
     private static final Quaterniond tmp1 = new Quaterniond(0, 0, 0, 0);
     private static final Quaterniond tmp2 = new Quaterniond(0, 0, 0, 0);
 
+    private static final Matrix4d tmpMat = new Matrix4d();
+
     public double x;
     public double y;
     public double z;
@@ -497,17 +499,9 @@ public class Quaterniond implements Serializable {
         return setFromMatrix(false, matrix);
     }
 
-    //    /** Sets the Quaterniond from the given matrix, optionally removing any scaling. */
-    //    public Quaterniond setFromMatrix(boolean normalizeAxes, Matrix3 matrix) {
-    //	return setFromAxes(normalizeAxes, matrix.val[Matrix3.M00], matrix.val[Matrix3.M01], matrix.val[Matrix3.M02],
-    //		matrix.val[Matrix3.M10], matrix.val[Matrix3.M11], matrix.val[Matrix3.M12], matrix.val[Matrix3.M20],
-    //		matrix.val[Matrix3.M21], matrix.val[Matrix3.M22]);
-    //    }
-    //
-    //    /** Sets the Quaterniond from the given rotation matrix, which must not contain scaling. */
-    //    public Quaterniond setFromMatrix(Matrix3 matrix) {
-    //	return setFromMatrix(false, matrix);
-    //    }
+    public synchronized Quaterniond setFromBasis(Vector3d dir, Vector3d up) {
+        return tmpMat.setToLookAt(dir, up).getRotation(this, true);
+    }
 
     /** <p>
      * Sets the Quaterniond from the given x-, y- and z-axis which have to be orthonormal.

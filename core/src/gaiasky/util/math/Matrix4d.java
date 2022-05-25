@@ -1164,6 +1164,21 @@ public class Matrix4d implements Serializable {
         return position;
     }
 
+    /** Gets the rotation of this matrix.
+     * @param rotation The {@link Quaterniond} to receive the rotation
+     * @param normalizeAxes True to normalize the axes, necessary when the matrix might also include scaling.
+     * @return The provided {@link Quaterniond} for chaining. */
+    public Quaterniond getRotation (Quaterniond rotation, boolean normalizeAxes) {
+        return rotation.setFromMatrix(normalizeAxes, this);
+    }
+
+    /** Gets the rotation of this matrix.
+     * @param rotation The {@link Quaterniond} to receive the rotation
+     * @return The provided {@link Quaterniond} for chaining. */
+    public Quaterniond getRotation (Quaterniond rotation) {
+        return rotation.setFromMatrix(this);
+    }
+
     /** @return the squared scale factor on the X axis */
     public double getScaleXSquared() {
         return val[Matrix4d.M00] * val[Matrix4d.M00] + val[Matrix4d.M01] * val[Matrix4d.M01] + val[Matrix4d.M02] * val[Matrix4d.M02];

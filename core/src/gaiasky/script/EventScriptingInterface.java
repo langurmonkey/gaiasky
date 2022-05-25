@@ -1964,8 +1964,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Runnable end;
         final Object lock;
 
-        Vector3d aux;
+        final Vector3d D31, D32, D33;
 
+        /**
+         * A runnable that interpolates the camera state (position, direction, up) to the new given state
+         * in the specified number of seconds.
+         *
+         * @param cam     The camera to use.
+         * @param pos     The final position.
+         * @param dir     The final direction.
+         * @param up      The final up vector.
+         * @param seconds The number of seconds to complete the transition.
+         * @param end     An optional runnable that is executed when the transition has completed.
+         */
         public CameraTransitionRunnable(NaturalCamera cam, double[] pos, double[] dir, double[] up, double seconds, Runnable end) {
             this.cam = cam;
             this.targetPos = pos;
@@ -1977,13 +1988,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             this.end = end;
             this.lock = new Object();
 
-            // Set up interpolation
+            // Set up interpolation.
             posl = getPathd(cam.getPos().tov3d(aux3d3), pos);
             dirl = getPathd(cam.getDirection(), dir);
             upl = getPathd(cam.getUp(), up);
 
             // Aux
-            aux = new Vector3d();
+            D31 = new Vector3d();
+            D32 = new Vector3d();
+            D33 = new Vector3d();
         }
 
         private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
@@ -2000,9 +2013,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             double alpha = MathUtilsd.clamp(elapsed / seconds, 0.0, 0.99999999999999);
 
             // Set camera state
-            cam.setPos(posl.valueAt(aux, alpha));
-            cam.setDirection(dirl.valueAt(aux, alpha));
-            cam.setUp(upl.valueAt(aux, alpha));
+            cam.setPos(posl.valueAt(D31, alpha));
+            cam.setDirection(dirl.valueAt(D31, alpha).nor());
+            Vector3d up = upl.valueAt(D31, alpha);
+            Vector3d right = D32.set(cam.direction).crs(up);
+            cam.setUp(right.crs(cam.direction).nor());
 
             // Finish if needed
             if (elapsed >= seconds) {
@@ -2054,7 +2069,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
         NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
-        // Put in focus mode
+        // Put camera in free mode.
         em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
 
         // Set up final actions
