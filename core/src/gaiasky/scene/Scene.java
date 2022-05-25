@@ -206,11 +206,11 @@ public class Scene {
             // Remove all remaining systems.
             engine.removeAllSystems();
 
-            // 1. First updater: scene graph update system.
+            // 1. First updater: scene graph and fade update systems.
             engine.addSystem(sceneGraphUpdateSystem);
+            engine.addSystem(fadeUpdateSystem);
 
             // 2. Update --- these can run in parallel.
-            engine.addSystem(fadeUpdateSystem);
             engine.addSystem(particleSetUpdateSystem);
             engine.addSystem(modelUpdateSystem);
             engine.addSystem(trajectoryUpdateSystem);
