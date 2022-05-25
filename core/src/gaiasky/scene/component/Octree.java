@@ -6,6 +6,7 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +19,14 @@ public class Octree implements Component {
 
     /** The list with the currently observed objects. **/
     public List<IOctreeObject> roulette;
+
     /** Map with the parent for each node. **/
     public Map<Entity, OctreeNode> parenthood;
-    /** The number of objects added to render in the last frame **/
-    public int lastNumberObjects = 0;
+
     /** Is this just a copy? */
     public boolean copy = false;
 
+    /** Creates an empty octree. **/
     public Octree() {
         this.parenthood = new HashMap<>();
     }

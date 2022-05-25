@@ -2,15 +2,10 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
-import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.util.i18n.I18n;
-
-import java.util.Map;
 
 /**
  * Builds the scene graph once all nodes are in the index.

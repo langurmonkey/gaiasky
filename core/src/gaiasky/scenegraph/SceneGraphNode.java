@@ -19,7 +19,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -258,7 +258,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      */
     public final void add(IOctreeObject... children) {
         if (this.children == null) {
-            initChildren(this.parent == null || this instanceof AbstractOctreeWrapper ? 300000 : children.length * 5, this.parent == null ? 1000 : children.length);
+            initChildren(this.parent == null || this instanceof OctreeWrapper ? 300000 : children.length * 5, this.parent == null ? 1000 : children.length);
         }
         for (IOctreeObject child : children) {
             SceneGraphNode sgn = (SceneGraphNode) child;
@@ -275,7 +275,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      */
     public final void add(SceneGraphNode... children) {
         if (this.children == null) {
-            initChildren(this.parent == null || this instanceof AbstractOctreeWrapper ? 300000 : children.length * 5, this.parent == null ? 1000 : children.length);
+            initChildren(this.parent == null || this instanceof OctreeWrapper ? 300000 : children.length * 5, this.parent == null ? 1000 : children.length);
         }
         for (SceneGraphNode child : children) {
             this.children.add(child);

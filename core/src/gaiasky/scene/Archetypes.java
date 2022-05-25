@@ -6,7 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.*;
 import gaiasky.scenegraph.*;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -191,7 +191,7 @@ public class Archetypes {
             addArchetype(Invisible.class.getName(), CelestialBody.class.getName(), Raymarching.class);
 
             // AbstractOctreeWrapper
-            addArchetype(AbstractOctreeWrapper.class.getName(), SceneGraphNode.class.getName(), Fade.class, Octree.class, Octant.class, DatasetDescription.class);
+            addArchetype(OctreeWrapper.class.getName(), SceneGraphNode.class.getName(), Fade.class, Octree.class, Octant.class, DatasetDescription.class);
 
 
             return archetypes;

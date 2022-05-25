@@ -13,7 +13,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -140,7 +140,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     @Override
     public Array<? extends SceneGraphNode> loadData() {
-        AbstractOctreeWrapper octreeWrapper = loadOctreeData();
+        OctreeWrapper octreeWrapper = loadOctreeData();
 
         if (octreeWrapper != null) {
             // Initialize daemon loader thread.
@@ -194,7 +194,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     /**
      * Loads the nodes and the octree.
      */
-    protected abstract AbstractOctreeWrapper loadOctreeData();
+    protected abstract OctreeWrapper loadOctreeData();
 
     /**
      * Adds the octant to the load queue.
@@ -314,7 +314,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @throws IOException When any of the level's files fails to load.
      */
-    public void loadLod(final Integer lod, final AbstractOctreeWrapper octreeWrapper) throws IOException {
+    public void loadLod(final Integer lod, final OctreeWrapper octreeWrapper) throws IOException {
         loadOctant(octreeWrapper.root, octreeWrapper, lod);
     }
 
@@ -328,7 +328,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @throws IOException When the octant's file fails to load.
      */
-    public void loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, Integer level) throws IOException {
+    public void loadOctant(final OctreeNode octant, final OctreeWrapper octreeWrapper, Integer level) throws IOException {
         if (level >= 0) {
             loadOctant(octant, octreeWrapper, false);
             if (octant.children != null) {
@@ -351,7 +351,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @throws IOException When any of the octants' files fail to load.
      */
-    public int loadOctants(final Array<OctreeNode> octants, final AbstractOctreeWrapper octreeWrapper, final AtomicBoolean abort) throws IOException {
+    public int loadOctants(final Array<OctreeNode> octants, final OctreeWrapper octreeWrapper, final AtomicBoolean abort) throws IOException {
         int loaded = 0;
         if (octants.size > 0) {
             int i = 0;
@@ -377,7 +377,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     /**
      * Unloads the given octant.
      */
-    public void unloadOctant(OctreeNode octant, final AbstractOctreeWrapper octreeWrapper) {
+    public void unloadOctant(OctreeNode octant, final OctreeWrapper octreeWrapper) {
         List<IOctreeObject> objects = octant.objects;
         if (objects != null) {
             GaiaSky.postRunnable(() -> {
@@ -421,17 +421,17 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @throws IOException When the octant file could not be read.
      */
-    public abstract boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullInit) throws IOException;
+    public abstract boolean loadOctant(final OctreeNode octant, final OctreeWrapper octreeWrapper, boolean fullInit) throws IOException;
 
     /**
      * The daemon loader thread.
      */
     protected static class OctreeLoaderThread extends ServiceThread {
-        private final AbstractOctreeWrapper octreeWrapper;
+        private final OctreeWrapper octreeWrapper;
         private final Array<OctreeNode> toLoad;
         private final AtomicBoolean abort;
 
-        public OctreeLoaderThread(AbstractOctreeWrapper aow, StreamingOctreeLoader loader) {
+        public OctreeLoaderThread(OctreeWrapper aow, StreamingOctreeLoader loader) {
             super();
             this.octreeWrapper = aow;
             this.toLoad = new Array<>();

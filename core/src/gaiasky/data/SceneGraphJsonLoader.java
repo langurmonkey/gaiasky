@@ -17,13 +17,12 @@ import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -56,9 +55,9 @@ public class SceneGraphJsonLoader {
         boolean hasStarGroup = false;
         for (SceneGraphNode node : nodes) {
             node.initialize();
-            if (node instanceof AbstractOctreeWrapper) {
+            if (node instanceof OctreeWrapper) {
                 hasOctree = true;
-                AbstractOctreeWrapper aow = (AbstractOctreeWrapper) node;
+                OctreeWrapper aow = (OctreeWrapper) node;
                 if (aow.children != null)
                     for (SceneGraphNode n : aow.children) {
                         if (n instanceof StarGroup) {

@@ -5,8 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
-import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 

@@ -145,7 +145,8 @@ public class GraphUpdater extends EntitySystem {
 
         // Only update non-set elements
         boolean isSet = Mapper.tagSet.has(entity);
-        if (!isSet && graph.children != null) {
+        boolean isOctree = Mapper.octree.has(entity);
+        if (!isSet && !isOctree && graph.children != null) {
             // Go down a level
             for (int i = 0; i < graph.children.size; i++) {
                 Entity child = graph.children.get(i);

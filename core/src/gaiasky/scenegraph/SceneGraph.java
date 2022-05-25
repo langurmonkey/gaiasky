@@ -10,7 +10,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -80,8 +80,8 @@ public class SceneGraph implements ISceneGraph {
             addToIndex(node);
 
             // Unwrap octree objects
-            if (node instanceof AbstractOctreeWrapper) {
-                AbstractOctreeWrapper ow = (AbstractOctreeWrapper) node;
+            if (node instanceof OctreeWrapper) {
+                OctreeWrapper ow = (OctreeWrapper) node;
                 if (ow.children != null)
                     for (SceneGraphNode ownode : ow.children) {
                         addToIndex(ownode);
@@ -141,8 +141,8 @@ public class SceneGraph implements ISceneGraph {
     }
 
     private void addToHipMap(SceneGraphNode node) {
-        if (node instanceof AbstractOctreeWrapper) {
-            AbstractOctreeWrapper aow = (AbstractOctreeWrapper) node;
+        if (node instanceof OctreeWrapper) {
+            OctreeWrapper aow = (OctreeWrapper) node;
             Set<SceneGraphNode> set = aow.parenthood.keySet();
             for (SceneGraphNode ape : set)
                 addToHipMap(ape);
@@ -170,8 +170,8 @@ public class SceneGraph implements ISceneGraph {
     }
 
     private void removeFromHipMap(SceneGraphNode node) {
-        if (node instanceof AbstractOctreeWrapper) {
-            AbstractOctreeWrapper aow = (AbstractOctreeWrapper) node;
+        if (node instanceof OctreeWrapper) {
+            OctreeWrapper aow = (OctreeWrapper) node;
             Set<SceneGraphNode> set = aow.parenthood.keySet();
             for (SceneGraphNode ape : set)
                 removeFromHipMap(ape);

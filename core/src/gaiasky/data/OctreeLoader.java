@@ -10,24 +10,21 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
-import gaiasky.data.StreamingOctreeLoader.OctreeLoaderThread;
 import gaiasky.data.group.BinaryDataProvider;
 import gaiasky.data.octreegen.MetadataBinaryIO;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Archetype;
-import gaiasky.scene.Archetypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.component.tag.TagOctreeObject;
 import gaiasky.scene.entity.StarSetUtils;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scene.system.initialize.SceneGraphBuilderSystem;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
@@ -41,7 +38,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
-import uk.ac.starlink.util.DataSource;
 
 import java.io.IOException;
 import java.util.*;
@@ -208,7 +204,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
              * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default
              * parallel, so we never use OctreeWrapperConcurrent
              */
-            Archetype archetype = scene.archetypes().get(AbstractOctreeWrapper.class.getName());
+            Archetype archetype = scene.archetypes().get(OctreeWrapper.class.getName());
             Entity entity = archetype.createEntity();
 
             // Catalog info
@@ -218,6 +214,9 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
             ci.nParticles = params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
             EventManager.publish(Event.CATALOG_ADD, this, ci, false);
+
+            var octree = Mapper.octree.get(entity);
+            octree.roulette = new ArrayList<>(Math.min(10, (int) (rootOctant.numObjectsRec * 0.5)));
 
             var graph = Mapper.graph.get(entity);
             graph.parentName = Scene.ROOT_NAME;
@@ -271,6 +270,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
 
         List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
         Entity sg = utils.getDefaultStarSet("stargroup-%%SGID%%", data, fullInit ? setInitializer : null);
+        sg.add(new TagOctreeObject());
 
         var set = Mapper.starSet.get(sg);
         set.setEpoch(epoch);

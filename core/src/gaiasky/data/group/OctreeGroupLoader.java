@@ -12,7 +12,6 @@ import gaiasky.data.octreegen.MetadataBinaryIO;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
@@ -58,7 +57,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
     }
 
     @Override
-    protected AbstractOctreeWrapper loadOctreeData() {
+    protected OctreeWrapper loadOctreeData() {
         /*
          * LOAD METADATA
          */
@@ -75,7 +74,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
              * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default
              * parallel, so we never use OctreeWrapperConcurrent
              */
-            AbstractOctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);
+            OctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);
             octreeWrapper.setFadeout(new double[] { 8e3, 5e5 });
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
@@ -105,7 +104,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         }
     }
 
-    public boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, final boolean fullInit) {
+    public boolean loadOctant(final OctreeNode octant, final OctreeWrapper octreeWrapper, final boolean fullInit) {
         FileHandle octantFile = Settings.settings.data.dataFileHandle(particles + "particles_" + String.format("%06d", octant.pageId) + ".bin");
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
