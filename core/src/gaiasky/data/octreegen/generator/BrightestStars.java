@@ -98,7 +98,6 @@ public class BrightestStars implements IAggregationAlgorithm {
             sg.setData(data, false);
             octant.add(sg);
             sg.octant = octant;
-            sg.octantId = octant.pageId;
             return true;
         } else {
             // Extract sample
@@ -119,7 +118,6 @@ public class BrightestStars implements IAggregationAlgorithm {
                 sg.setData(data, false);
                 octant.add(sg);
                 sg.octant = octant;
-                sg.octantId = octant.pageId;
             }
             // It is leaf if we added all the stars
             return added == inputStars.size();

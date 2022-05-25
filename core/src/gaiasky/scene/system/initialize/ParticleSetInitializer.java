@@ -44,15 +44,16 @@ public class ParticleSetInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
+        var base = Mapper.base.get(entity);
         var particleSet = Mapper.particleSet.get(entity);
         var starSet = Mapper.starSet.get(entity);
 
         // Initialize particle set
         if (starSet == null) {
-            initializeCommon(particleSet);
+            initializeCommon(base, particleSet);
             initializeParticleSet(entity, particleSet);
         } else {
-            initializeCommon(starSet);
+            initializeCommon(base, starSet);
             initializeStarSet(entity, starSet);
         }
     }
@@ -71,7 +72,11 @@ public class ParticleSetInitializer extends InitSystem {
 
     }
 
-    private void initializeCommon(ParticleSet set) {
+    private void initializeCommon(Base base, ParticleSet set) {
+        if(base.id < 0) {
+            base.id = ParticleSet.idSeq++;
+        }
+
         if (set.factor == null)
             set.factor = 1d;
         set.lastSortTime = -1;

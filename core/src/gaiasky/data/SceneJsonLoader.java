@@ -27,7 +27,7 @@ import java.util.Map;
 public class SceneJsonLoader {
     private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
 
-    private static List<String> supportedLoaders = Arrays.asList("gaiasky.data.JsonLoader", "gaiasky.data.GeoJsonLoader");
+    private static List<String> supportedLoaders = Arrays.asList("gaiasky.data.JsonLoader", "gaiasky.data.GeoJsonLoader", "gaiasky.data.group.OctreeGroupLoader");
 
     public synchronized static void loadScene(FileHandle[] jsonFiles, Scene scene) throws FileNotFoundException, ReflectionException {
         logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
@@ -53,6 +53,7 @@ public class SceneJsonLoader {
         scene.buildSceneGraph();
 
     }
+
     public synchronized static void loadJsonFile(FileHandle jsonFile, Scene scene) throws ReflectionException, FileNotFoundException {
 
         JsonReader jsonReader = new JsonReader();
@@ -73,17 +74,19 @@ public class SceneJsonLoader {
             while (child != null) {
                 String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
-                if(!supportedLoaders.contains(clazzName)){
+                if (!supportedLoaders.contains(clazzName)) {
                     logger.info("Skipping " + clazzName + ": unsupported");
                     child = child.next;
                     continue;
                 }
 
-                // Update name
-                if(clazzName.equals("gaiasky.data.JsonLoader")) {
+                // Loader mappings.
+                if (clazzName.equals("gaiasky.data.JsonLoader")) {
                     clazzName = "gaiasky.data.NewJsonLoader";
                 } else if (clazzName.equals("gaiasky.data.GeoJsonLoader")) {
                     clazzName = "gaiasky.data.NewGeoJsonLoader";
+                } else if (clazzName.equals("gaiasky.data.group.OctreeGroupLoader")) {
+                    clazzName = "gaiasky.data.OctreeLoader";
                 }
 
                 @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);

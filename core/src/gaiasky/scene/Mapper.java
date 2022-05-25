@@ -21,6 +21,7 @@ public class Mapper {
     public static final ComponentMapper<Label> label = ComponentMapper.getFor(Label.class);
     public static final ComponentMapper<RefSysTransform> transform = ComponentMapper.getFor(RefSysTransform.class);
     public static final ComponentMapper<AffineTransformations> affine = ComponentMapper.getFor(AffineTransformations.class);
+    public static final ComponentMapper<Octree> octree = ComponentMapper.getFor(Octree.class);
     public static final ComponentMapper<Octant> octant = ComponentMapper.getFor(Octant.class);
     public static final ComponentMapper<Fade> fade = ComponentMapper.getFor(Fade.class);
     public static final ComponentMapper<Highlight> highlight = ComponentMapper.getFor(Highlight.class);

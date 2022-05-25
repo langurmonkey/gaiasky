@@ -36,6 +36,7 @@ public class Index {
 
     /**
      * Creates a new index with the given archetypes.
+     *
      * @param archetypes The archetypes.
      */
     public Index(Archetypes archetypes) {
@@ -185,5 +186,56 @@ public class Index {
     private boolean mustAddToIndex(Entity entity) {
         // All entities except the ones who have perimeter, location mark and particle or star set
         return entity.getComponent(Perimeter.class) == null && entity.getComponent(LocationMark.class) == null && entity.getComponent(ParticleSet.class) == null && entity.getComponent(StarSet.class) == null;
+    }
+
+    /** Removes the given key from the index. **/
+    public void remove(String key) {
+        index.remove(key);
+    }
+
+    /**
+     * Removes the given entity from the index.
+     *
+     * @param entity The entity to remove.
+     */
+    public synchronized void remove(Entity entity) {
+        var base = Mapper.base.get(entity);
+        if (base.names != null) {
+            for (String name : base.names) {
+                index.remove(name.toLowerCase().trim());
+            }
+
+            // Id
+            if (base.id > 0) {
+                String id = String.valueOf(base.id);
+                index.remove(id);
+            }
+
+            // HIP
+            if (Mapper.hip.has(entity)) {
+                var hip = Mapper.hip.get(entity);
+                hipMap.remove(hip.hip);
+            }
+
+            // Special cases
+            if (Mapper.particleSet.has(entity)) {
+                var set = Mapper.particleSet.get(entity);
+                removeFromIndex(set);
+            }
+            if (Mapper.starSet.has(entity)) {
+                var set = Mapper.starSet.get(entity);
+                removeFromIndex(set);
+            }
+        }
+    }
+
+    /** Removes the entities in the given particle set from this index. **/
+    public void removeFromIndex(ParticleSet set) {
+        if (set.index != null) {
+            Set<String> keys = set.index.keySet();
+            for (String key : keys) {
+                index.remove(key);
+            }
+        }
     }
 }

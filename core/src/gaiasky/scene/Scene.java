@@ -8,6 +8,7 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.render.extract.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.*;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -124,7 +125,7 @@ public class Scene {
         if (engine != null) {
             // Prepare systems
             int priority = 0;
-            EntitySystem baseInit = new BaseInitializer(this, setUp,families.graphNodes, priority++);
+            EntitySystem baseInit = new BaseInitializer(this, setUp, families.graphNodes, priority++);
             EntitySystem fadeInit = new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++);
             EntitySystem particleSetInit = new ParticleSetInitializer(setUp, families.particleSets, priority++);
             EntitySystem particleInit = new ParticleInitializer(setUp, families.particles, priority++);
@@ -136,7 +137,6 @@ public class Scene {
             EntitySystem raymarchingInit = new InvisibleInitializer(setUp, families.raymarchings, priority++);
             EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
-
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardSetInit, axesInit, raymarchingInit, fadeInit, datasetDescInit, backgroundInit);
@@ -192,7 +192,7 @@ public class Scene {
             // Regular update systems.
             FadeUpdater fadeUpdateSystem = new FadeUpdater(families.fadeNodes, priority++);
             ParticleSetUpdater particleSetUpdateSystem = new ParticleSetUpdater(families.particleSets, priority++);
-            ModelUpdater modelUpdateSystem = new ModelUpdater(families.models,  priority++);
+            ModelUpdater modelUpdateSystem = new ModelUpdater(families.models, priority++);
             TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
 
@@ -227,10 +227,12 @@ public class Scene {
 
     /**
      * Creates a new extractor system with the given class, family and priority.
+     *
      * @param extractorClass The extractor class. Must extends {@link AbstractExtractSystem}.
-     * @param family The family.
-     * @param priority The priority of the system (lower means the system gets executed before).
-     * @param renderLists The render lists.
+     * @param family         The family.
+     * @param priority       The priority of the system (lower means the system gets executed before).
+     * @param renderLists    The render lists.
+     *
      * @return The new system instance.
      */
     private AbstractExtractSystem newExtractor(Class<? extends AbstractExtractSystem> extractorClass, Family family, int priority, Array<Array<IRenderable>> renderLists) {
@@ -311,6 +313,25 @@ public class Scene {
             } else {
                 engine.removeSystem(system);
             }
+    }
+
+    /**
+     * Removes the given entity from the scene.
+     *
+     * @param entity          The entity.
+     * @param removeFromIndex Whether to remove it from the index too.
+     */
+    public void remove(Entity entity, boolean removeFromIndex) {
+        var graph = Mapper.graph.get(entity);
+        if (entity != null && graph.parent != null) {
+            var parentGraph = Mapper.graph.get(graph.parent);
+            parentGraph.removeChild(entity, true);
+        } else {
+            throw new RuntimeException("Given node is null");
+        }
+        if (removeFromIndex) {
+            index.remove(entity);
+        }
     }
 
 }

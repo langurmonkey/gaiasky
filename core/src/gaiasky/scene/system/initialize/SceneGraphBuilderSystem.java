@@ -6,6 +6,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.util.i18n.I18n;
 
 import java.util.Map;
@@ -53,7 +55,7 @@ public class SceneGraphBuilderSystem extends InitSystem {
         var graph = Mapper.graph.get(child);
         var parentGraph = Mapper.graph.get(parent);
         if (parentGraph.children == null) {
-            parentGraph.children = new Array<>(false, parentGraph.parent == null ? 100 : 1);
+            parentGraph.initChildren(parentGraph.parent == null ? 100 : 1);
         }
         parentGraph.children.add(child);
         graph.parent = parent;
@@ -68,5 +70,23 @@ public class SceneGraphBuilderSystem extends InitSystem {
                 ancestor = ancestorGraph.parent;
             }
         }
+    }
+
+    /**
+     * Adds the given {@link Entity} list as children to this node.
+     *
+     * @param children The children nodes to add.
+     */
+    public final void add(Entity parent, Entity... children) {
+        var parentGraph = Mapper.graph.get(parent);
+        if (parentGraph.children == null) {
+            parentGraph.initChildren(parentGraph.parent == null || Mapper.octree.has(parent) ? 300000 : children.length * 5);
+        }
+        for (Entity child : children) {
+            var graph = Mapper.graph.get(child);
+            parentGraph.children.add(child);
+            graph.parent = parent;
+        }
+        parentGraph.numChildren += children.length;
     }
 }

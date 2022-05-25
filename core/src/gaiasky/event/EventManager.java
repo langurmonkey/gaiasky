@@ -5,14 +5,13 @@
 
 package gaiasky.event;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.scene.entity.EntityRadio;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Event manager that allows for subscription of observers to events (identified
@@ -133,6 +132,30 @@ public class EventManager implements IObserver {
                 }
             }
         }
+    }
+
+    /**
+     * Removes all subscriptions of {@link gaiasky.scene.entity.EntityRadio} for the given entity.
+     * @param entity
+     */
+    public void removeRadioSubscriptions(Entity entity) {
+        synchronized (subscriptions) {
+            Set<Integer> km = subscriptions.keySet();
+            for (int key : km) {
+                Set<IObserver> set = subscriptions.get(key);
+                Iterator<IObserver> it = set.iterator();
+                while(it.hasNext()){
+                    IObserver obs = it.next();
+                    if(obs instanceof EntityRadio){
+                        EntityRadio radio = (EntityRadio) obs;
+                        if(radio.getEntity() == entity) {
+                            it.remove();
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     /**

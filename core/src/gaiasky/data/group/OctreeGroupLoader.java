@@ -117,10 +117,9 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
 
         synchronized (octant) {
             sg.octant = octant;
-            sg.octantId = octant.pageId;
-            // Add objects to octree wrapper node
+            // Add objects to octree wrapper node.
             octreeWrapper.add(sg, octant);
-            // Aux info
+            // Add to index and HIP map.
             if (GaiaSky.instance != null && GaiaSky.instance.sceneGraph != null)
                 GaiaSky.instance.sceneGraph.addNodeAuxiliaryInfo(sg);
 

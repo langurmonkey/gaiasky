@@ -65,6 +65,7 @@ public abstract class AbstractView {
 
     /**
      * Contains actions to take after a new entity has been set.
+     * This method is typically used to initialize the view components.
      */
     protected abstract void entityChanged();
 }

@@ -52,7 +52,6 @@ public class BrightestStarsSimple implements IAggregationAlgorithm {
             sg.setData(data, false);
             octant.add(sg);
             sg.octant = octant;
-            sg.octantId = octant.pageId;
         }
         return added == inputStars.size();
 

@@ -200,11 +200,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public boolean copy = false;
 
     /**
-     * The id of the octant it belongs to, if any
-     **/
-    public Long octantId;
-
-    /**
      * Its page
      **/
     public OctreeNode octant;

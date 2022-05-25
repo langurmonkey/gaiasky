@@ -2,7 +2,9 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.GaiaSky;
+import gaiasky.scene.Index;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
@@ -372,4 +374,5 @@ public class ParticleSet implements Component {
     public boolean isVisible(int index) {
         return visibilityArray != null && visibilityArray[index] != (byte) 0;
     }
+
 }

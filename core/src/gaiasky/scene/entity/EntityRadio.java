@@ -13,4 +13,8 @@ public abstract class EntityRadio implements IObserver {
     public EntityRadio(Entity entity) {
         this.entity = entity;
     }
+
+    public Entity getEntity() {
+        return entity;
+    }
 }

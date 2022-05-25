@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 
@@ -55,6 +56,7 @@ public class GraphNode implements Component {
 
     /**
      * Sets the name of the parent.
+     *
      * @param parentName The parent name.
      */
     public void setParent(String parentName) {
@@ -69,4 +71,31 @@ public class GraphNode implements Component {
         }
     }
 
+    public void initChildren(int size) {
+        children = new Array<>(false, size);
+    }
+
+    /**
+     * Removes the given child from this node, if it exists.
+     *
+     * @param child               The child node to remove.
+     * @param updateAncestorCount Whether to update the ancestors number of children.
+     */
+    public final void removeChild(Entity child, boolean updateAncestorCount) {
+        if (this.children.contains(child, true)) {
+            this.children.removeValue(child, true);
+            var childGraph = Mapper.graph.get(child);
+            childGraph.parent = null;
+            numChildren--;
+            if (updateAncestorCount) {
+                // Update num children in ancestors
+                Entity ancestor = this.parent;
+                while (ancestor != null) {
+                    var ancestorGraph = Mapper.graph.get(ancestor);
+                    ancestorGraph.numChildren--;
+                    ancestor = ancestorGraph.parent;
+                }
+            }
+        }
+    }
 }

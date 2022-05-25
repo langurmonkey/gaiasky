@@ -119,7 +119,6 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             sg.setData(list, false);
             node.add(sg);
             sg.octant = node;
-            sg.octantId = node.pageId;
         }
 
         root.updateCounts();
