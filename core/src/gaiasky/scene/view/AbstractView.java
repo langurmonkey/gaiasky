@@ -41,6 +41,11 @@ public abstract class AbstractView {
         entityChanged();
     }
 
+    /** Returns the current entity under this view. **/
+    public Entity getEntity() {
+       return this.entity;
+    }
+
     /**
      * Checks whether an entity has a component, and throws a {@link RuntimeException} if it does not.
      *

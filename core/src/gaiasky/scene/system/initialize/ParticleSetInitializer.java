@@ -73,7 +73,7 @@ public class ParticleSetInitializer extends InitSystem {
     }
 
     private void initializeCommon(Base base, ParticleSet set) {
-        if(base.id < 0) {
+        if (base.id < 0) {
             base.id = ParticleSet.idSeq++;
         }
 
@@ -145,13 +145,15 @@ public class ParticleSetInitializer extends InitSystem {
         try {
             set.isStars = true;
 
-            Class<?> clazz = Class.forName(set.provider);
-            IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
-            provider.setProviderParams(set.providerParams);
+            if (set.provider != null && set.pointData == null) {
+                Class<?> clazz = Class.forName(set.provider);
+                IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
+                provider.setProviderParams(set.providerParams);
 
-            // Set data, generate index
-            List<IParticleRecord> l = provider.loadData(set.datafile, set.factor);
-            set.setData(l);
+                // Set data, generate index
+                List<IParticleRecord> l = provider.loadData(set.datafile, set.factor);
+                set.setData(l);
+            }
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);

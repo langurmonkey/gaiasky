@@ -21,6 +21,10 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        extractEntity(entity);
+    }
+
+    public void extractEntity(Entity entity) {
         var base = Mapper.base.get(entity);
         if (shouldRender(base)) {
             var render = Mapper.render.get(entity);

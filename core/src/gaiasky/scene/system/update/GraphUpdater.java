@@ -25,7 +25,7 @@ import net.jafama.FastMath;
  * component. Generally, this should be a single entity unless
  * we have more than one scene graph.
  */
-public class GraphUpdater extends EntitySystem {
+public class GraphUpdater extends EntitySystem implements EntityUpdater {
     private static Log logger = Logger.getLogger(GraphUpdater.class);
 
     private ICamera camera;
@@ -87,6 +87,11 @@ public class GraphUpdater extends EntitySystem {
     }
 
     protected void processEntity(Entity entity, float deltaTime) {
+        updateEntity(entity, deltaTime);
+    }
+
+    @Override
+    public void updateEntity(Entity entity, float deltaTime) {
         // This runs the root node
         var root = entity.getComponent(GraphNode.class);
 
@@ -96,7 +101,7 @@ public class GraphUpdater extends EntitySystem {
         update(entity, time, null, 1);
     }
 
-    private void update(Entity entity, ITimeFrameProvider time, final Vector3b parentTransform, float opacity) {
+    public void update(Entity entity, ITimeFrameProvider time, final Vector3b parentTransform, float opacity) {
         var graph = Mapper.graph.get(entity);
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);

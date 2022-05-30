@@ -29,7 +29,7 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
     }
 
     protected boolean shouldRender(Base base) {
-        return GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && (base.visible || base.msSinceStateChange() < Settings.settings.scene.fadeMs);
+        return GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && base.isVisible();
     }
 
 

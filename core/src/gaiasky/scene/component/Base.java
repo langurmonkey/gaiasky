@@ -190,6 +190,10 @@ public class Base implements Component {
         }
     }
 
+    public boolean isVisible() {
+        return this.visible || msSinceStateChange() <= Settings.settings.scene.fadeMs;
+    }
+
     /**
      * Computes the elapsed number of milliseconds since the last visibility state change
      * for the given base component.

@@ -20,6 +20,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagOctreeObject;
 import gaiasky.scene.entity.StarSetUtils;
+import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scene.system.initialize.SceneGraphBuilderSystem;
 import gaiasky.scene.view.OctreeObjectView;
@@ -139,6 +140,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
 
     /** The scene graph builder. **/
     private SceneGraphBuilderSystem sceneGraphBuilder;
+    /** Base initializer object. **/
+    private BaseInitializer baseInitializer;
     /** Initializer object for star sets. **/
     private ParticleSetInitializer setInitializer;
 
@@ -181,6 +184,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
         utils = new StarSetUtils(scene);
         sceneGraphBuilder = new SceneGraphBuilderSystem(scene.index(), null, 0);
         setInitializer = new ParticleSetInitializer(true, null, 0);
+        baseInitializer = new BaseInitializer(scene, true, null, 0);
 
     }
 
@@ -269,7 +273,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
         var octree = Mapper.octree.get(octreeWrapper);
 
         List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
-        Entity sg = utils.getDefaultStarSet("stargroup-%%SGID%%", data, fullInit ? setInitializer : null);
+        Entity sg = utils.getDefaultStarSet("stargroup-%%SGID%%", data, baseInitializer, setInitializer, fullInit);
         sg.add(new TagOctreeObject());
 
         var set = Mapper.starSet.get(sg);
@@ -315,6 +319,9 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
     public void loadData() {
         Entity octreeWrapper = loadOctreeData();
         if (octreeWrapper != null) {
+            // Add to engine
+            scene.engine.addEntity(octreeWrapper);
+
             // Initialize daemon loader thread.
             daemon = new OctreeLoaderThread(octreeWrapper, this);
             daemon.setDaemon(true);
@@ -492,11 +499,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
      * @param octreeWrapper The octree wrapper.
      * @param level         The depth to load.
      *
-     * @throws IOException When the octant's file fails to load.
      */
-    public void loadOctant(final OctreeNode octant, final Entity octreeWrapper, Integer level) throws IOException {
+    public void loadOctant(final OctreeNode octant, final Entity octreeWrapper, Integer level) {
         if (level >= 0) {
-            loadOctant(octant, octreeWrapper, false);
+            loadOctant(octant, octreeWrapper, true);
             if (octant.children != null) {
                 for (OctreeNode child : octant.children) {
                     if (child != null && child.numObjectsRec > 0)
@@ -515,9 +521,8 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
      *
      * @return The actual number of loaded octants.
      *
-     * @throws IOException When any of the octants' files fail to load.
      */
-    public int loadOctants(final Array<OctreeNode> octants, final Entity octreeWrapper, final AtomicBoolean abort) throws IOException {
+    public int loadOctants(final Array<OctreeNode> octants, final Entity octreeWrapper, final AtomicBoolean abort) {
         int loaded = 0;
         if (octants.size > 0) {
             int i = 0;

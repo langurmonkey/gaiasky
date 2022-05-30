@@ -190,6 +190,7 @@ public class Scene {
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
 
             // Regular update systems.
+            OctreeUpdater octreeUpdateSystem = new OctreeUpdater(families.octrees, priority++);
             FadeUpdater fadeUpdateSystem = new FadeUpdater(families.fadeNodes, priority++);
             ParticleSetUpdater particleSetUpdateSystem = new ParticleSetUpdater(families.particleSets, priority++);
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models, priority++);
@@ -197,6 +198,7 @@ public class Scene {
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
 
             // Extract systems.
+            AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, renderLists);
             AbstractExtractSystem particleSetExtractor = newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, renderLists);
             AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, renderLists);
             AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, renderLists);
@@ -208,6 +210,7 @@ public class Scene {
 
             // 1. First updater: scene graph and fade update systems.
             engine.addSystem(sceneGraphUpdateSystem);
+            engine.addSystem(octreeUpdateSystem);
             engine.addSystem(fadeUpdateSystem);
 
             // 2. Update --- these can run in parallel.
@@ -217,6 +220,7 @@ public class Scene {
             engine.addSystem(backgroundUpdateSystem);
 
             // 3. Extract --- these can also run in parallel.
+            engine.addSystem(octreeExtractor);
             engine.addSystem(particleSetExtractor);
             engine.addSystem(particleExtractor);
             engine.addSystem(modelExtractor);

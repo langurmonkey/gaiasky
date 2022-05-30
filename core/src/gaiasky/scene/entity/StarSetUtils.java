@@ -11,12 +11,14 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
+import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.math.Vector3b;
 
 import java.util.List;
 
@@ -30,19 +32,21 @@ public class StarSetUtils {
 
     /** Constructs a star set utils with the given scene. **/
     public StarSetUtils(Scene scene) {
-       this.scene = scene;
+        this.scene = scene;
     }
 
     /**
      * Creates a default star set entity with some sane parameters, given the name and the data
      *
-     * @param name     The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group.
-     * @param data     The data of the star group.
-     * @param initializer  The initializer to use for the star set initialization, or null.
+     * @param name               The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group.
+     * @param data               The data of the star group.
+     * @param baseInitializer    The base initializer.
+     * @param starSetInitializer The initializer to use for the star set initialization.
+     * @param fullInit           Whether to run the <code>setUpEntity()</code> to fully initialize the star set.
      *
      * @return A new star group with sane parameters
      */
-    public Entity getDefaultStarSet(String name, List<IParticleRecord> data, ParticleSetInitializer initializer) {
+    public Entity getDefaultStarSet(String name, List<IParticleRecord> data, BaseInitializer baseInitializer, ParticleSetInitializer starSetInitializer, boolean fullInit) {
         Archetype archetype = scene.archetypes().get(StarGroup.class);
         Entity entity = archetype.createEntity();
 
@@ -65,8 +69,14 @@ public class StarSetUtils {
         var set = Mapper.starSet.get(entity);
         set.setData(data);
 
-        if (initializer != null) {
-            initializer.setUpEntity(entity);
+        // Initialize.
+        baseInitializer.initializeEntity(entity);
+        starSetInitializer.initializeEntity(entity);
+
+        // Set up.
+        if (fullInit) {
+            baseInitializer.setUpEntity(entity);
+            starSetInitializer.setUpEntity(entity);
         }
         return entity;
     }
