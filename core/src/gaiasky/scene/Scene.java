@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.*;
 import gaiasky.scene.render.extract.*;
 import gaiasky.scene.system.initialize.*;
@@ -182,7 +183,7 @@ public class Scene {
      * Prepares the engine to start running update cycles. This method
      * initializes the engine with all the necessary update systems.
      */
-    public void prepareUpdateSystems(Array<Array<IRenderable>> renderLists) {
+    public void prepareUpdateSystems(ISceneRenderer sceneRenderer) {
         if (engine != null) {
             int priority = 0;
             // Scene graph update system needs to run first.
@@ -198,12 +199,12 @@ public class Scene {
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
 
             // Extract systems.
-            AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, renderLists);
-            AbstractExtractSystem particleSetExtractor = newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, renderLists);
-            AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, renderLists);
-            AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, renderLists);
-            AbstractExtractSystem trajectoryExtractor = newExtractor(TrajectoryExtractor.class, families.orbits, priority++, renderLists);
-            AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, renderLists);
+            AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
+            AbstractExtractSystem particleSetExtractor = newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, sceneRenderer);
+            AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, sceneRenderer);
+            AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, sceneRenderer);
+            AbstractExtractSystem trajectoryExtractor = newExtractor(TrajectoryExtractor.class, families.orbits, priority++, sceneRenderer);
+            AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -235,15 +236,15 @@ public class Scene {
      * @param extractorClass The extractor class. Must extends {@link AbstractExtractSystem}.
      * @param family         The family.
      * @param priority       The priority of the system (lower means the system gets executed before).
-     * @param renderLists    The render lists.
+     * @param sceneRenderer  The scene renderer.
      *
      * @return The new system instance.
      */
-    private AbstractExtractSystem newExtractor(Class<? extends AbstractExtractSystem> extractorClass, Family family, int priority, Array<Array<IRenderable>> renderLists) {
+    private AbstractExtractSystem newExtractor(Class<? extends AbstractExtractSystem> extractorClass, Family family, int priority, ISceneRenderer sceneRenderer) {
         try {
             Constructor c = extractorClass.getDeclaredConstructor(Family.class, int.class);
             AbstractExtractSystem system = (AbstractExtractSystem) c.newInstance(family, priority);
-            system.setRenderLists(renderLists);
+            system.setRenderer(sceneRenderer);
             return system;
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);

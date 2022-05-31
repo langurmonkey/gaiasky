@@ -329,7 +329,7 @@ public class CameraManager implements ICamera, IObserver {
 
         // High speed?
         if (speed > (Settings.settings.runtime.openVr ? 5e6 : 5e5)) {
-            StreamingOctreeLoader.clearQueue();
+            EventManager.publish(Event.CLEAR_OCTANT_QUEUE, this);
         }
 
         // Post event with camera motion parameters

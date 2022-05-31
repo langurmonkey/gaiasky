@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Octree;
@@ -24,10 +25,11 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
     public OctreeUpdater(Family family, int priority) {
         super(family, priority);
 
-        graphUpdater = new GraphUpdater(null, 0, GaiaSky.instance.time);
-        fadeUpdater = new FadeUpdater(null, 0);
-        particleSetUpdater = new ParticleSetUpdater(null, 0);
-        particleSetExtractor = new ParticleSetExtractor(null, 0);
+        this.graphUpdater = new GraphUpdater(null, 0, GaiaSky.instance.time);
+        this.fadeUpdater = new FadeUpdater(null, 0);
+        this.particleSetUpdater = new ParticleSetUpdater(null, 0);
+        this.particleSetExtractor = new ParticleSetExtractor(null, 0);
+        particleSetExtractor.setRenderer(GaiaSky.instance.sceneRenderer);
     }
 
     @Override

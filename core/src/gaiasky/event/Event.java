@@ -835,6 +835,9 @@ public enum Event {
      **/
     RESUME_BACKGROUND_LOADING,
 
+    /** Clears the octant loading queues. **/
+    CLEAR_OCTANT_QUEUE,
+
     /**
      * Contains the new camera rotation speed.
      **/

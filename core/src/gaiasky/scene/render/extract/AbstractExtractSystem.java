@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scenegraph.camera.ICamera;
@@ -17,6 +18,7 @@ import gaiasky.util.Settings;
 public abstract class AbstractExtractSystem extends IteratingSystem {
 
     protected final ICamera camera;
+    protected ISceneRenderer renderer;
     protected Array<Array<IRenderable>> renderLists;
 
     public AbstractExtractSystem(Family family, int priority) {
@@ -24,8 +26,9 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
         this.camera = GaiaSky.instance.cameraManager;;
     }
 
-    public void setRenderLists(Array<Array<IRenderable>> renderLists) {
-        this.renderLists = renderLists;
+    public void setRenderer(ISceneRenderer renderer) {
+        this.renderer = renderer;
+        this.renderLists = renderer.renderListsFront();
     }
 
     protected boolean shouldRender(Base base) {
@@ -43,6 +46,7 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         try {
+            assert renderLists != null : "Render lists are not set in " + this.getClass().getSimpleName();
             Array<IRenderable> renderList = renderLists.get(rg.ordinal());
             synchronized (renderList) {
                 renderList.add(renderable);

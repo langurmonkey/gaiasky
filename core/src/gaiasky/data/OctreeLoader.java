@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Implements the loading and streaming of octree nodes from files. This version
  * loads star groups using {@link BinaryDataProvider}.
  */
-public class OctreeLoader extends AbstractSceneLoader implements IObserver {
+public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOctantLoader {
     private static final Log logger = Logger.getLogger(OctreeLoader.class);
 
     /**
@@ -72,7 +72,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
      **/
     protected static final int MAX_LOAD_CHUNK = 5;
 
-    /** This instance. **/
     public static OctreeLoader instance;
 
     /**
@@ -169,7 +168,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
         idxLoadedIds = 0;
         loadedIds = new long[maxLoadedIds];
 
-        EventManager.instance.subscribe(this, Event.DISPOSE, Event.PAUSE_BACKGROUND_LOADING, Event.RESUME_BACKGROUND_LOADING);
+        EventManager.instance.subscribe(this, Event.DISPOSE, Event.PAUSE_BACKGROUND_LOADING, Event.RESUME_BACKGROUND_LOADING, Event.CLEAR_OCTANT_QUEUE);
     }
 
     @Override
@@ -199,6 +198,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
         OctreeNode rootOctant = metadataReader.readMetadataMapped(metadata);
+        rootOctant.setOctantLoader(this, true);
 
         if (rootOctant != null) {
             logger.info(I18n.msg("notif.nodeloader", rootOctant.numNodesRec(), metadata));
@@ -221,6 +221,9 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
 
             var octree = Mapper.octree.get(entity);
             octree.roulette = new ArrayList<>(Math.min(10, (int) (rootOctant.numObjectsRec * 0.5)));
+
+            var base = Mapper.base.get(entity);
+            base.setName(name);
 
             var graph = Mapper.graph.get(entity);
             graph.parentName = Scene.ROOT_NAME;
@@ -325,7 +328,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
             // Initialize daemon loader thread.
             daemon = new OctreeLoaderThread(octreeWrapper, this);
             daemon.setDaemon(true);
-            daemon.setName("gaiasky-worker-octreeload");
+            daemon.setName("gaiasky-new-octreeload");
             daemon.setPriority(Thread.MIN_PRIORITY);
             daemon.start();
 
@@ -371,36 +374,36 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
     /**
      * Adds the octant to the load queue.
      */
-    public static void queue(OctreeNode octant) {
-        if (instance != null && instance.daemon != null) {
-            instance.addToQueue(octant);
+    public void queue(OctreeNode octant) {
+        if (daemon != null) {
+            addToQueue(octant);
         }
     }
 
     /**
      * Clears the current load queue.
      */
-    public static void clearQueue() {
-        if (instance != null && instance.daemon != null) {
-            if (TimeUtils.millis() - instance.lastQueueClearMs > MIN_QUEUE_CLEAR_MS) {
-                instance.emptyLoadQueue();
-                instance.lastQueueClearMs = TimeUtils.millis();
+    public void clearQueue() {
+        if (daemon != null) {
+            if (TimeUtils.millis() - lastQueueClearMs > MIN_QUEUE_CLEAR_MS) {
+                emptyLoadQueue();
+                lastQueueClearMs = TimeUtils.millis();
             }
-            instance.abortCurrentLoading();
+            abortCurrentLoading();
         }
     }
 
-    public static int getLoadQueueSize() {
-        if (instance != null && instance.daemon != null) {
-            return instance.toLoadQueue.size();
+    public int getLoadQueueSize() {
+        if (daemon != null) {
+            return toLoadQueue.size();
         } else {
             return -1;
         }
     }
 
-    public static int getNLoadedStars() {
-        if (instance != null && instance.daemon != null) {
-            return instance.nLoadedStars;
+    public int getNLoadedStars() {
+        if (daemon != null) {
+            return nLoadedStars;
         } else {
             return -1;
         }
@@ -409,9 +412,9 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
     /**
      * Moves the octant to the end of the unload queue.
      */
-    public static void touch(OctreeNode octant) {
-        if (instance != null && instance.daemon != null) {
-            instance.touchOctant(octant);
+    public void touch(OctreeNode octant) {
+        if (daemon != null) {
+            touchOctant(octant);
         }
     }
 
@@ -598,11 +601,11 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
 
             this.task = () -> {
                 /* ----------- PROCESS OCTANTS ----------- */
-                while (!instance.toLoadQueue.isEmpty()) {
+                while (!loader.toLoadQueue.isEmpty()) {
                     toLoad.clear();
                     int i = 0;
-                    while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
-                        OctreeNode octant = instance.toLoadQueue.poll();
+                    while (loader.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
+                        OctreeNode octant = loader.toLoadQueue.poll();
                         toLoad.add(octant);
                         i++;
                     }
@@ -663,6 +666,9 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver {
             loadingPaused = false;
             clearQueue();
             logger.info("Background data loading thread resumed");
+            break;
+        case CLEAR_OCTANT_QUEUE:
+            clearQueue();
             break;
         case DISPOSE:
             if (daemon != null) {

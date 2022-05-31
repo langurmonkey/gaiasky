@@ -7,6 +7,7 @@ package gaiasky.util.tree;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.data.IOctantLoader;
 import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -34,7 +35,7 @@ import java.util.*;
 public class OctreeNode implements ILineRenderable {
     public static int nOctantsObserved = 0;
     public static int nObjectsObserved = 0;
-    /** Max depth of the structure this node belongs to **/
+    /** Max depth of the structure this node belongs to. **/
     public static int maxDepth;
     /** Is dynamic loading active? **/
     public static boolean LOAD_ACTIVE;
@@ -47,45 +48,47 @@ public class OctreeNode implements ILineRenderable {
     private static final Vector3d auxD3 = new Vector3d();
     private static final Vector3d auxD4 = new Vector3d();
 
-    /** The load status of this node **/
+    /** The load status of this node. **/
     private LoadStatus status;
-    /** The unique page identifier **/
+    /** The unique page identifier. **/
     public long pageId;
-    /** Contains the bottom-left-front position of the octant **/
+    /** Contains the bottom-left-front position of the octant. **/
     public final Vector3d min;
-    /** Contains the top-right-back position of the octant **/
+    /** Contains the top-right-back position of the octant. **/
     public final Vector3d max;
-    /** The centre of this octant **/
+    /** The centre of this octant. **/
     public final Vector3d centre;
-    /** Octant size in x, y and z **/
+    /** Octant size in x, y and z. **/
     public final Vector3d size;
-    /** Contains the depth level **/
+    /** Contains the depth level. **/
     public final int depth;
-    /** Number of objects contained in this node and its descendants **/
+    /** Number of objects contained in this node and its descendants. **/
     public int numObjectsRec;
-    /** Number of objects contained in this node **/
+    /** Number of objects contained in this node. **/
     public int numObjects;
-    /** Number of children nodes of this node **/
+    /** Number of children nodes of this node. **/
     public int numChildren;
-    /** The parent, if any **/
+    /** The parent, if any. **/
     public OctreeNode parent;
-    /** Children nodes **/
+    /** Children nodes. **/
     public OctreeNode[] children = new OctreeNode[8];
-    /** List of objects **/
+    /** List of objects. **/
     public List<IOctreeObject> objects;
+    /** The object used to load new octants. **/
+    public IOctantLoader loader;
 
     private final double radius;
-    /** If observed, the view angle in radians of this octant **/
+    /** If observed, the view angle in radians of this octant. **/
     public double viewAngle;
-    /** The distance to the camera in units of the center of this octant **/
+    /** The distance to the camera in units of the center of this octant. **/
     public double distToCamera;
     /** Is this octant observed in this frame? **/
     public boolean observed;
-    /** The opacity of this node **/
+    /** The opacity of this node. **/
     public float opacity;
 
     /**
-     * Constructs an octree node
+     * Constructs an octree node.
      */
     private OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
         this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
@@ -99,7 +102,7 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Constructs an octree node
+     * Constructs an octree node.
      */
     public OctreeNode(long pageId, double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
         this.pageId = pageId;
@@ -114,7 +117,7 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Constructs an octree node
+     * Constructs an octree node.
      */
     public OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth, OctreeNode parent, int i) {
         this(x, y, z, hsx, hsy, hsz, depth);
@@ -148,7 +151,7 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Constructs an octree node.
      *
-     * @param pageid        The octant id
+     * @param pageid        The octant id.
      * @param x             The x coordinate of the center.
      * @param y             The y coordinate of the center.
      * @param z             The z coordinate of the center.
@@ -184,7 +187,7 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
-    /** Gets the index of this node in the parent's list **/
+    /** Gets the index of this node in the parent's list. **/
     protected int getParentIndex() {
         if (parent != null) {
             for (int i = 0; i < 8; i++) {
@@ -217,7 +220,7 @@ public class OctreeNode implements ILineRenderable {
     public void resolveChildren(Map<Long, Pair<OctreeNode, long[]>> map) {
         Pair<OctreeNode, long[]> me = map.get(pageId);
         if (me == null) {
-            throw new RuntimeException("OctreeNode with page ID " + pageId + " not found in map");
+            throw new RuntimeException("OctreeNode with page ID " + pageId + " not found in map.");
         }
 
         long[] childrenIds = me.getSecond();
@@ -351,9 +354,9 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Gets some per-level stats on the octree node
+     * Gets some per-level stats on the octree node.
      *
-     * @return A [DEPTH,2] matrix with number of octants [i,0] and objects [i,1] per level
+     * @return A [DEPTH,2] matrix with number of octants [i,0] and objects [i,1] per level.
      */
     public int[][] stats() {
         int[][] result = new int[getMaxDepth()][2];
@@ -373,7 +376,7 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Removes this octant from the octree
+     * Removes this octant from the octree.
      */
     public void remove() {
         if (this.parent != null)
@@ -381,7 +384,7 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Removes the child from this octant's descendants
+     * Removes the child from this octant's descendants.
      *
      * @param child The child node to remove.
      */
@@ -449,6 +452,7 @@ public class OctreeNode implements ILineRenderable {
      * Returns the deepest octant that contains the position.
      *
      * @param position The position.
+     *
      * @return The best octant.
      */
     public OctreeNode getBestOctant(Vector3d position) {
@@ -523,10 +527,12 @@ public class OctreeNode implements ILineRenderable {
              */
             if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE) {
                 // Add to load and go on
-                StreamingOctreeLoader.queue(this);
+                assert loader != null : "Octant loader is null!";
+                loader.queue(this);
             } else if (status == LoadStatus.LOADED) {
                 // Visited last!
-                StreamingOctreeLoader.touch(this);
+                assert loader != null : "Octant loader is null!";
+                loader.touch(this);
 
                 // Add objects
                 addObjectsTo(roulette);
@@ -575,6 +581,7 @@ public class OctreeNode implements ILineRenderable {
      * Second method, which uses a simplification.
      *
      * @param cam The camera
+     *
      * @return Whether the octant is observed
      */
     private boolean computeObserved(ICamera cam) {
@@ -586,6 +593,7 @@ public class OctreeNode implements ILineRenderable {
      * must be smaller than fov/2 plus a correction (approximates octants to spheres)
      *
      * @param cam The camera
+     *
      * @return Whether the octant is observed
      */
     private boolean computeObservedFast(ICamera cam) {
@@ -812,6 +820,7 @@ public class OctreeNode implements ILineRenderable {
      * Returns an integer hash code representing the given double value.
      *
      * @param value the value to be hashed
+     *
      * @return the hash code
      */
     public static long hash(double value) {
@@ -843,5 +852,33 @@ public class OctreeNode implements ILineRenderable {
     @Override
     public int getGlPrimitive() {
         return GL20.GL_LINE_STRIP;
+    }
+
+    /**
+     * Sets the octant loader to this node. Optionally, the loader can be set recursively to
+     * all children octree nodes of this node.
+     *
+     * @param loader    The loader to set.
+     * @param recursive Whether to set the loader recursively to the children nodes.
+     */
+    public void setOctantLoader(IOctantLoader loader, boolean recursive) {
+        this.loader = loader;
+        if (recursive && children != null) {
+            for (OctreeNode child : children) {
+                if (child != null) {
+                    child.setOctantLoader(loader, true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the octree loader to this node. It does <strong>not</strong> set the loader of
+     * children recursively.
+     *
+     * @param loader The loader to set.
+     */
+    public void setOctantLoader(IOctantLoader loader) {
+        setOctantLoader(loader, false);
     }
 }

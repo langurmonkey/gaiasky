@@ -52,7 +52,6 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
     private double epoch = AstroUtils.JD_J2015_5;
 
     public OctreeGroupLoader() {
-        instance = this;
         particleReader = new BinaryDataProvider();
     }
 
@@ -65,6 +64,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
         OctreeNode root = metadataReader.readMetadataMapped(metadata);
+        root.setOctantLoader(this, true);
 
         if (root != null) {
             logger.info(I18n.msg("notif.nodeloader", root.numNodesRec(), metadata));

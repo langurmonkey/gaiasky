@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
+import gaiasky.data.OctreeLoader;
 import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.attitude.IAttitudeServer;
 import gaiasky.data.util.*;
@@ -667,7 +668,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Set up entities
         scene.setUpEntities();
         // Prepare scene for update
-        scene.prepareUpdateSystems(sceneRenderer.renderListsFront());
+        scene.prepareUpdateSystems(sceneRenderer);
 
         // First time, set assets
         final Array<SceneGraphNode> nodes = sceneGraph.getNodes();
@@ -732,9 +733,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 // Memory
                 EventManager.publish(Event.DEBUG_RAM, this, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
                 // Observed objects
-                EventManager.publish(Event.DEBUG_OBJECTS, this, OctreeNode.nObjectsObserved, StreamingOctreeLoader.getNLoadedStars());
+                EventManager.publish(Event.DEBUG_OBJECTS, this, OctreeNode.nObjectsObserved, OctreeLoader.instance != null ? OctreeLoader.instance.getNLoadedStars() : -1);
                 // Observed octants
-                EventManager.publish(Event.DEBUG_QUEUE, this, OctreeNode.nOctantsObserved, StreamingOctreeLoader.getLoadQueueSize());
+                EventManager.publish(Event.DEBUG_QUEUE, this, OctreeNode.nOctantsObserved, OctreeLoader.instance != null ? OctreeLoader.instance.getLoadQueueSize() : -1);
                 // VRAM
                 EventManager.publish(Event.DEBUG_VRAM, this, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
                 // Threads
