@@ -107,6 +107,7 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
         var body = Mapper.body.get(entity);
         var coordinates = Mapper.coordinates.get(entity);
         var rotation = Mapper.rotation.get(entity);
+        var octant = Mapper.octant.get(entity);
 
         // Update local position here
         if (time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {

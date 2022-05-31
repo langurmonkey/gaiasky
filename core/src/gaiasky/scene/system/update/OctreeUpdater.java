@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.Scene;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Octree;
@@ -100,7 +99,9 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
         graphUpdater.setCamera(GaiaSky.instance.cameraManager);
         for (int i = 0; i < size; i++) {
             Entity entity = ((OctreeObjectView) octree.roulette.get(i)).getEntity();
-            graphUpdater.update(entity, time, graph.translation, base.opacity);
+            // Use octant opacity
+            var octant = Mapper.octant.get(entity);
+            graphUpdater.update(entity, time, graph.translation, base.opacity * octant.octant.opacity);
         }
     }
 

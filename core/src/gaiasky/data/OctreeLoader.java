@@ -224,6 +224,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
 
             var base = Mapper.base.get(entity);
             base.setName(name);
+            base.opacity = 1;
 
             var graph = Mapper.graph.get(entity);
             graph.parentName = Scene.ROOT_NAME;
