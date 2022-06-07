@@ -144,7 +144,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         this.epoch = AstroUtils.getJulianDate(epoch);
     }
 
-    public void setEpoch(Integer epoch) {
+    public void setEpoch(Long epoch) {
         this.epoch = AstroUtils.getJulianDate(epoch);
     }
 
