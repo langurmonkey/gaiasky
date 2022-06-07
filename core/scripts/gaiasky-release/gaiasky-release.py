@@ -21,7 +21,8 @@ def check_args(args=None):
     parser.add_argument('-u', '--undo', action='store_true', help='Undoes the changes to the build and script files. If this flag is not present, the default is to *do* a release.')
     parser.add_argument('-t', '--tag', type=str, help='Tag name for the new release. If this is not present, the tag is not created, the change log is not generated and the release is not packed.')
     parser.add_argument('-a', '--tag_annotation', type=str, help='Tag annotation for the new release.')
-    parser.add_argument('-p', '--def_file', type=str, help='JSON file with the action definitions.')
+    parser.add_argument('-d', '--def_file', type=str, help='JSON file with the action definitions.')
+    parser.add_argument('-p', '--kyestore_pwd', type=str, help='Keystore password for the windows binary.', required=True)
 
     return parser.parse_args(args)
 
