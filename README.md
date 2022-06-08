@@ -5,7 +5,7 @@
 <h2 align="center">An open source 3D universe simulator for desktop and VR with support for more than a billion objects</h2>
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
-[![Docs](https://img.shields.io/badge/docs-master-3245a9)](https://img.shields.io/badge/docs-latest-3245a9)
+[![Docs](https://img.shields.io/badge/docs-master-3245a9)](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
 [![Stats](https://img.shields.io/badge/stats-gaiasky-%234d7)](https://gaia.ari.uni-heidelberg.de/gaiasky/stats)
 
