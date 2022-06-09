@@ -1055,7 +1055,7 @@
         "J0805+4812-system.json"
       ],
       "sha256": "31c19a51bf7c82fbc96f05d1753837d4402bdec50f524456e3d3ee1ad18d8aff",
-      "file": "@mirror-url@systems/dr3/j0805-4812/v00_20220609/dr3-system-J0805+4812.tar.gz"
+      "file": "@mirror-url@systems/dr3/j0805-4812/v00_20220609/dr3-system-J0805-4812.tar.gz"
     },
     {
       "key": "dr3-ucac2-1151977-system",
@@ -1072,7 +1072,7 @@
         "catalog-UCAC2-1151977.json",
         "UCAC2-1151977-system.json"
       ],
-      "sha256": "31c19a51bf7c82fbc96f05d1753837d4402bdec50f524456e3d3ee1ad18d8aff",
+      "sha256": "4774cbf044eb725d073f650592cca9b8340bb1ba188f876ee84312115f802369",
       "file": "@mirror-url@systems/dr3/ucac2-1151977/v00_20220609/dr3-system-UCAC2-1151977.tar.gz"
     },
     {
