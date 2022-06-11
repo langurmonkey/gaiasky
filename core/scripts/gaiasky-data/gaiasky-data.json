@@ -973,7 +973,7 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A system with a star and a planet. The Gaia orbit corresponds to the M-dwarf's reflex motion due to the orbting planet, which is a gas giant. It was one of the earliest radial-velocity discovery. The system is less than 5 pc from the Sun.",
+      "description": "A system with a star and a planet. The Gaia orbit corresponds to the M-dwarf's reflex motion due to the orbiting planet, which is a gas giant. It was one of the earliest radial-velocity discovery. The system is less than 5 pc from the Sun.",
       "releasenotes" : "- First version of this system.",
       "size": 1540,
       "nobjects": 2,
