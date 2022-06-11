@@ -16,14 +16,14 @@ fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 # Copy to server
-scp $DIR/gaiasky-data.json tsagrista@mintaka:/dataB/gaiasky/files/repository/gaiasky-data/gaiasky-data_v$1.json
+rsync -avh $DIR/gaiasky-data.json tsagrista@andromeda:/gaiasky/files/repository/gaiasky-data/gaiasky-data_v$1.json
 
 
 # Generate and upload mini JSON if we can
 if type minify >/dev/null; then
     echo "Generating mini version"
     minify -o $DIR/gaiasky-data.min.json $DIR/gaiasky-data.json
-    scp $DIR/gaiasky-data.min.json tsagrista@mintaka:/dataB/gaiasky/files/repository/gaiasky-data/gaiasky-data_v$1.min.json
+    rsync -avh $DIR/gaiasky-data.min.json tsagrista@andromeda:/gaiasky/files/repository/gaiasky-data/gaiasky-data_v$1.min.json
     rm $DIR/gaiasky-data.min.json
 fi
 echo "Done"
