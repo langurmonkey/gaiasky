@@ -973,16 +973,16 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A system with a star and a planet, based on Gaia DR3 data.",
+      "description": "A system with a star and a planet. The Gaia orbit corresponds to the M-dwarf's reflex motion due to the orbting planet, which is a gas giant. It was one of the earliest radial-velocity discovery. The system is less than 5 pc from the Sun.",
       "releasenotes" : "- First version of this system.",
-      "size": 500,
+      "size": 1540,
       "nobjects": 2,
       "check": "catalog-Gl876.json",
       "data": [
         "catalog-Gl876.json",
         "Gl876-system.json"
       ],
-      "sha256": "47ff193860dbb56ca722c991deed742eb82172db931e2b6cb3116e87fc3b5e2e",
+      "sha256": "4a6d92591dbb3ca84ee3cc9a31a13b5a6f25b8394b7dcccc8211f13abf8e2915",
       "file": "@mirror-url@systems/dr3/gl876/v00_20220609/dr3-system-Gl876.tar.gz"
     },
     {
@@ -991,16 +991,16 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A small system with a star and a planet, based on Gaia DR3 data.",
+      "description": "A small system with a star and a planet. It is a candidate giant exoplanet around a K dwarf discovered by Gaia astrometry. The orbital period is about 850 days and the inferred planet mass is around 5 Jupiter masses.",
       "releasenotes" : "- First version of this system.",
-      "size": 500,
+      "size": 1534,
       "nobjects": 2,
       "check": "catalog-HD40503.json",
       "data": [
         "catalog-HD40503.json",
         "HD40503-system.json"
       ],
-      "sha256": "7b9f085ae3a955d5ac8fdc141ece367c097f45533b090a0b519ec325a8c29097",
+      "sha256": "5c50a16133f5d907f70481d56117e926b17ff571e705c0655879dc26eeb96b1c",
       "file": "@mirror-url@systems/dr3/hd40503/v00_20220609/dr3-system-HD40503.tar.gz"
     },
     {
@@ -1009,16 +1009,16 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A small system with a star and a planet, based on Gaia DR3 data.",
+      "description": "A system with a super-Jupiter orbiting a G-type star with a period of 1000 days. The planet was discovered using Gaia radial velocities, and Gaia determined the star's astrometric orbit.",
       "releasenotes" : "- First version of this system.",
-      "size": 500,
+      "size": 1517,
       "nobjects": 2,
       "check": "catalog-HD81040.json",
       "data": [
         "catalog-HD81040.json",
         "HD81040-system.json"
       ],
-      "sha256": "df065d65262d5f7e2c3fd01bec93cce2d70b9a83fe688345b7ea2f0896574f96",
+      "sha256": "8120602f4fd191043fdf4f5376a6c93fabd9b1fe55d39b314792dc3078c37e61",
       "file": "@mirror-url@systems/dr3/hd81040/v00_20220609/dr3-system-HD81040.tar.gz"
     },
     {
@@ -1027,16 +1027,16 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A small system with two stars, based on Gaia DR3 data.",
+      "description": "This star hosts the first substellar companion candidate around a solar-type star which was identified from radial velocities in 1989. The Gaia results show that the orbit is seen almost face-on and the companion is, therefore, a low-mass M dwarf.",
       "releasenotes" : "- First version of this system.",
-      "size": 500,
+      "size": 1320,
       "nobjects": 2,
       "check": "catalog-HD114762.json",
       "data": [
         "catalog-HD114762.json",
         "HD114762-system.json"
       ],
-      "sha256": "c12d20be2e4414159d72541c5d67cc6adcffa33ee16338af12b0f91337c2c09b",
+      "sha256": "6da1fb0016888cf501ec32c2a9ae48b366ab705c2d4b410fbc7dadc2831074e1",
       "file": "@mirror-url@systems/dr3/hd114762/v00_20220609/dr3-system-HD114762.tar.gz"
     },
     {
@@ -1045,16 +1045,16 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A small system with two brown dwarfs orbiting each other, based on Gaia DR3 data.",
+      "description": "This known system is composed of two brown dwarfs orbiting each other with spectral types L4 and T5. Gaia's orbit determination refers to the photocentre of the system, dominated by the brighter primary component.",
       "releasenotes" : "- First version of this system.",
-      "size": 500,
+      "size": 1264,
       "nobjects": 2,
       "check": "catalog-J0805+4812.json",
       "data": [
         "catalog-J0805+4812.json",
         "J0805+4812-system.json"
       ],
-      "sha256": "31c19a51bf7c82fbc96f05d1753837d4402bdec50f524456e3d3ee1ad18d8aff",
+      "sha256": "82f97b1529b2acb8be6fab9805d9bc69bb753d16df1d8c71c4c98c6b2934a582",
       "file": "@mirror-url@systems/dr3/j0805-4812/v00_20220609/dr3-system-J0805-4812.tar.gz"
     },
     {
@@ -1063,16 +1063,16 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A system with a cental star and an orbiting white dwarf, based on Gaia DR3 data.",
+      "description": "UCAC2 1151977 is a Sirius-like binary comprising a main sequence primary with a white dwarf companion. The white dwarf is considerably hotter than the primary star.",
       "releasenotes" : "- First version of this system.",
-      "size": 500,
+      "size": 1244,
       "nobjects": 2,
       "check": "catalog-UCAC2-1151977.json",
       "data": [
         "catalog-UCAC2-1151977.json",
         "UCAC2-1151977-system.json"
       ],
-      "sha256": "4774cbf044eb725d073f650592cca9b8340bb1ba188f876ee84312115f802369",
+      "sha256": "05fbfa14550d8d8f5f71cbf6b536ffa97ede46be081bee2d9a91dcacf629c8f9",
       "file": "@mirror-url@systems/dr3/ucac2-1151977/v00_20220609/dr3-system-UCAC2-1151977.tar.gz"
     },
     {
@@ -1081,16 +1081,16 @@
       "version": 0,
       "mingsversion": 30200,
       "type": "system",
-      "description": "A system with a white dwarf star and a planet orbiting around, based on Gaia DR3 data.",
+      "description": "A candidate giant exoplanet around a nearby white dwarf discovered by Gaia astrometry. The orbital period is about 33 days and the inferred planet mass is about 9 Jupiter masses. The white dwarf is located within 10 pc from the Sun.",
       "releasenotes" : "- First version of this system.",
-      "size": 500,
+      "size": 1522,
       "nobjects": 2,
       "check": "catalog-WD0141-675.json",
       "data": [
         "catalog-WD0141-675.json",
         "WD0141-675-system.json"
       ],
-      "sha256": "e916b3bdcc2cce1d2648745b58596ed51c66b262b5ccf7cff67e9d980478a452",
+      "sha256": "65d231795f84ee2b55f4e2c436e8ef4589633dd630727aca530935c173a1f7a9",
       "file": "@mirror-url@systems/dr3/wd0141-675/v00_20220609/dr3-system-WD0141-675.tar.gz"
     },
     {
