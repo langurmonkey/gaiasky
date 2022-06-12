@@ -235,7 +235,7 @@
       "mingsversion": 30200,
       "description": "Star catalog based on Gaia DR3. Contains the stars for which the RUWE (re-normalized unit weight error) is <= 1.4.",
       "releasenotes": "- Contains a selection of DR3 and all Hipparcos stars.\n- The cross-match table used is in the archive.\n- Distances are derived from parallaxes (d=1000/plx).\n- Parallaxes are using the corrected terms.\n- Extinction and reddening corrections are applied to magnitudes and colors.",
-      "link": "https://gea.esac.esa.int/archive/documentation/GDR2/Gaia_archive/chap_datamodel/sec_dm_main_tables/ssec_dm_ruwe.html",
+      "link": "http://www.rssd.esa.int/doc_fetch.php?id=3757412",
       "size": 61309496907,
       "nobjects": 957749159,
       "check": "catalog-dr3-ruwe.json",
