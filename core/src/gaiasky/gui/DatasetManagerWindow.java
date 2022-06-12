@@ -747,7 +747,7 @@ public class DatasetManagerWindow extends GenericDialog {
             Link link = null;
             if (dataset.link != null && !dataset.link.isBlank()) {
                 String linkStr = dataset.link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
-                link = new Link(linkStr, skin, dataset.link);
+                link = new Link(TextUtils.breakCharacters(linkStr, 100, true), skin, dataset.link);
             }
 
             Table infoTable = new Table(skin);
