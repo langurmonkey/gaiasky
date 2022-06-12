@@ -28,11 +28,40 @@ public class TextUtils {
         return pre + in + post;
     }
 
+    /**
+     * Breaks the character sequence with new line characters '\n' so that the lines have
+     * approximately <code>breakChars</code> characters.
+     *
+     * @param in         The character sequence.
+     * @param breakChars The number of characters per line.
+     * @return The string, broken into lines.
+     */
     public static String breakCharacters(CharSequence in, int breakChars) {
         return breakCharacters(in.toString(), breakChars);
     }
 
+    /**
+     * Breaks the string with new line characters '\n' so that the lines have
+     * approximately <code>breakChars</code> characters.
+     *
+     * @param in         The string.
+     * @param breakChars The number of characters per line.
+     * @return The string, broken into lines.
+     */
     public static String breakCharacters(String in, int breakChars) {
+        return breakCharacters(in, breakChars, false);
+    }
+
+    /**
+     * Breaks the string with new line characters '\n' so that the lines have
+     * approximately <code>breakChars</code> characters.
+     *
+     * @param in         The string.
+     * @param breakChars The number of characters per line.
+     * @param forceBreak Break the string even when there are not separator characters.
+     * @return The string, broken into lines.
+     */
+    public static String breakCharacters(String in, int breakChars, boolean forceBreak) {
         // Warp text if breakChars <= 0
         if (breakChars > 0) {
             java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
@@ -43,7 +72,7 @@ public class TextUtils {
                     chars = 0;
                 } else {
                     chars++;
-                    if (chars > breakChars && Character.isSpaceChar(c)) {
+                    if (chars > breakChars && (forceBreak || Character.isSpaceChar(c))) {
                         sb.setCharAt(i, '\n');
                         chars = 0;
                     }
@@ -134,7 +163,6 @@ public class TextUtils {
      * -> ModelTextureBump
      *
      * @param property The property displayName
-     *
      * @return The method name
      */
     public static String propertyToMethodName(String property) {
@@ -150,7 +178,6 @@ public class TextUtils {
      * Returns the given string with the first letter capitalised
      *
      * @param line The input string
-     *
      * @return The string with its first letter capitalised
      */
     public static String capitalise(String line) {
@@ -162,7 +189,6 @@ public class TextUtils {
      * others in lower case
      *
      * @param line The input string
-     *
      * @return The string with its first letter capitalised and the others in
      * lower case
      */
@@ -175,7 +201,6 @@ public class TextUtils {
      *
      * @param split The split
      * @param strs  The strings
-     *
      * @return The concatenation
      */
     public static String concatenate(String split, String... strs) {
@@ -197,7 +222,6 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
-     *
      * @return The concatenation
      */
     public static String concatenate(final String split, final Array<String> strings) {
@@ -217,7 +241,6 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
-     *
      * @return The concatenation
      */
     public static String concatenate(final String split, final java.util.List<String> strings) {
@@ -304,7 +327,6 @@ public class TextUtils {
      *
      * @param base     The base string
      * @param suffixes All the suffixes
-     *
      * @return The result
      */
     public static String[] concatAll(String base, String[] suffixes) {
@@ -338,7 +360,7 @@ public class TextUtils {
     }
 
     public static String ensureStartsWith(String base, String start) {
-        if(!base.startsWith(start))
+        if (!base.startsWith(start))
             return start + base;
         else
             return base;
@@ -563,8 +585,7 @@ public class TextUtils {
                 }
                 int value = 0;
                 try {
-                    value = Integer.parseInt(
-                            oldstr.substring(i, i + digits), 8);
+                    value = Integer.parseInt(oldstr.substring(i, i + digits), 8);
                 } catch (NumberFormatException nfe) {
                     die("invalid octal value for \\0 escape");
                 }
@@ -603,15 +624,8 @@ public class TextUtils {
                         break; /* for */
                     }
 
-                    if (!((ch >= '0' && ch <= '9')
-                            ||
-                            (ch >= 'a' && ch <= 'f')
-                            ||
-                            (ch >= 'A' && ch <= 'F')
-                    )
-                    ) {
-                        die(String.format(
-                                "illegal hex digit #%d '%c' in \\x", ch, ch));
+                    if (!((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))) {
+                        die(String.format("illegal hex digit #%d '%c' in \\x", ch, ch));
                     }
 
                 }
