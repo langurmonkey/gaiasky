@@ -44,7 +44,7 @@ public class MinimapWidget implements Disposable {
 
         OrthographicCamera ortho = new OrthographicCamera();
 
-        ShapeRenderer sr = new ShapeRenderer(100, shapeShader);
+        ShapeRenderer sr = new ShapeRenderer(200, shapeShader);
         sr.setAutoShapeType(true);
 
         SpriteBatch sb = new SpriteBatch(1000, spriteShader);
