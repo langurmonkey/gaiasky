@@ -48,7 +48,6 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
 
         ortho.setToOrtho(true, side, sideshort);
         sr.setProjectionMatrix(ortho.combined);
-        sb.setProjectionMatrix(ortho.combined);
         fb.begin();
         // Clear
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
