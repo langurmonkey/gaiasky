@@ -47,7 +47,7 @@ public class TrajectoryInitializer extends InitSystem {
                 IOrbitDataProvider provider;
                 try {
                     provider = ClassReflection.newInstance(trajectory.providerClass);
-                    provider.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, 100), trajectory.newMethod);
+                    provider.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, trajectory.numSamples), trajectory.newMethod);
                     verts.pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);

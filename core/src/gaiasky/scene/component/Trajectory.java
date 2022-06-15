@@ -67,6 +67,9 @@ public class Trajectory implements Component {
      */
     public boolean refreshing = false;
 
+    /** Number of samples for the orbit data provider. **/
+    public int numSamples = 100;
+
     public long orbitStartMs, orbitEndMs;
 
     /**
@@ -143,6 +146,10 @@ public class Trajectory implements Component {
 
     public void setOrbittrail(Boolean trail) {
         this.orbitTrail = trail;
+    }
+
+    public void setNumSamples(Long numSamples) {
+        this.numSamples = Math.toIntExact(numSamples);
     }
 
     public void setBody(Entity entity, double radius) {

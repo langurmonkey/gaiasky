@@ -113,6 +113,9 @@ public class Orbit extends Polyline implements I3DTextRenderable {
      */
     public boolean refreshing = false;
 
+    /** Number of samples for the orbit data provider. **/
+    public int numSamples = 100;
+
     private long orbitStartMs, orbitEndMs;
 
     /**
@@ -156,7 +159,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                 IOrbitDataProvider provider;
                 try {
                     provider = ClassReflection.newInstance(providerClass);
-                    provider.load(oc.source, new OrbitDataLoaderParameters(names[0], providerClass, oc, multiplier, 100), newMethod);
+                    provider.load(oc.source, new OrbitDataLoaderParameters(names[0], providerClass, oc, multiplier, numSamples), newMethod);
                     pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);
@@ -668,6 +671,10 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     public void setOrbittrail(Boolean trail) {
         this.orbitTrail = trail;
+    }
+
+    public void setNumSamples(Long numSamples) {
+        this.numSamples = Math.toIntExact(numSamples);
     }
 
     /**
