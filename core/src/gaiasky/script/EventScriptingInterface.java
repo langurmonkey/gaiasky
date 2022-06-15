@@ -1263,9 +1263,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 target = Math.toRadians(20d);
 
             long prevTime = TimeUtils.millis();
-            if (object.getViewAngleApparent() < target) {
+            if (object.getViewAngle() < target) {
                 // Add forward movement while distance > target distance
-                while (object.getViewAngleApparent() < target && (stop == null || !stop.get())) {
+                while (object.getViewAngle() < target && (stop == null || !stop.get())) {
                     // dt in ms
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
