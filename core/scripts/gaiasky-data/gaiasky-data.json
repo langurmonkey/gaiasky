@@ -927,6 +927,63 @@
       "file": "@mirror-url@meshes/dr2/isodensity/v01_20201217/mesh-dr2-isodensity.tar.gz"
     },
     {
+      "key" : "mesh-dr3-dust",
+      "name" : "Dust iso-surface mesh (DR3)",
+      "version" : 0,
+      "type": "mesh",
+      "description" : "30% dust density iso-surface based on DR3 data, produced by Kevin Jardine. Dust from 'Three-dimensional extinction maps: Inverting inter-calibrated extinction catalogues' by J.R. Vergely, R. Lallement and N.L.J. Cox, 2022. Dust extinction cubes provided by Rosine Lallement.",
+      "releasenotes" : "- Initial version of this dataset.",
+      "link": "https://gruze.org/posters_dr3/readme.pdf",
+      "size" : 8078371,
+      "nobjects" : 1,
+      "check": "catalog-mesh-dr3-dust.json",
+      "data": [
+        "catalog-mesh-dr3-dust.json",
+        "mesh-dr3-dust.json",
+        "meshes/dr3/dust"
+      ],
+      "sha256" : "d93d4af8e69a4b689c494fa58b672ed92040db6773e5ee7f06048971fcdf6360",
+      "file": "@mirror-url@meshes/dr3/dust/v00_20220614/mesh-dr3-dust.tar.gz"
+    },
+    {
+      "key" : "mesh-dr3-hii",
+      "name" : "HII regions (DR3)",
+      "version" : 0,
+      "type": "mesh",
+      "description" : "HII regions (clouds of partially ionized gas) based on DR3 data, produced by Kevin Jardine. The HII region positions were determined by known ionizing stars and clusters with sizes estimated using Douglas Finkbeiner's H-alpha Full Sky Map and distances taken from 'Estimating Distances from Parallaxes. V. Geometric and Photogeometric Distances to 1.47 Billion Stars in Gaia Early Data Release 3' by C.A.L. Bailer-Jones et.al. 2021.",
+      "link": "https://gruze.org/posters_dr3/readme.pdf",
+      "releasenotes" : "- Initial version of this dataset.",
+      "size" : 9336476,
+      "nobjects" : 1,
+      "check": "catalog-mesh-dr3-hii.json",
+      "data": [
+        "catalog-mesh-dr3-hii.json",
+        "mesh-dr3-hii.json",
+        "meshes/dr3/hii"
+      ],
+      "sha256" : "0b8242fb204ec098b46895227bd091738b1a47e84f1e8963d2d96cd7861d6c42",
+      "file": "@mirror-url@meshes/dr3/hii/v00_20220614/mesh-dr3-hii.tar.gz"
+    },
+    {
+      "key" : "mesh-dr3-star",
+      "name" : "Star density iso-surface mesh (DR3)",
+      "version" : 0,
+      "type": "mesh",
+      "description" : "35% star density iso-surfaces based on DR3 data, produced by Kevin Jardine. sosurface algorithm inspired by 'Cosmography of OB stars in the solar neighbourhood.' Astronomy & Astrophysics 584 (2015): A26 by H. Bouy and J. Alves. Hot star density and bar orientation from 'Gaia Data Release 3: Mapping the asymmetric disc of the Milky Way' by the Gaia Collaboration, R. Drimmel, et al. 2022. Data provided by Ronald Drimmel.",
+      "releasenotes" : "- Initial version of this dataset.",
+      "link": "https://gruze.org/posters_dr3/readme.pdf",
+      "size": 25168342,
+      "nobjects" : 1,
+      "check": "catalog-mesh-dr3-stars.json",
+      "data": [
+        "catalog-mesh-dr3-stars.json",
+        "mesh-dr3-stars.json",
+        "meshes/dr2/stars"
+      ],
+      "sha256" : "21f057716436fee23e3ab516146734665cfb5c396324886e29c02f56994637ad",
+      "file": "@mirror-url@meshes/dr3/stars/v00_20220614/mesh-dr3-stars.tar.gz"
+    },
+    {
       "key" : "spacecraft-jwst",
       "name": "James Webb Space Telescope",
       "type": "spacecraft",
