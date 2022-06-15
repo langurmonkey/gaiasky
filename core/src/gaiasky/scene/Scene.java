@@ -5,19 +5,18 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
-import gaiasky.scene.component.*;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.render.extract.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.*;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.time.ITimeFrameProvider;
 
-import javax.servlet.http.Part;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Set;
 
 /**
  * Represents a scene, contains and manages the engine. The engine contains
@@ -233,7 +232,7 @@ public class Scene {
     /**
      * Creates a new extractor system with the given class, family and priority.
      *
-     * @param extractorClass The extractor class. Must extends {@link AbstractExtractSystem}.
+     * @param extractorClass The extractor class. Must extend {@link AbstractExtractSystem}.
      * @param family         The family.
      * @param priority       The priority of the system (lower means the system gets executed before).
      * @param sceneRenderer  The scene renderer.
