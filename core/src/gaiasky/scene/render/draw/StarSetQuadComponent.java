@@ -2,13 +2,17 @@ package gaiasky.scene.render.draw;
 
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.GaiaSky;
+import gaiasky.scene.component.Fade;
+import gaiasky.scene.component.Highlight;
+import gaiasky.scene.component.StarSet;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class StarSetQuadComponent {
 
-    protected float[] alphaSizeBr, opacityLimits;
+    protected float[] alphaSizeBr, opacityLimits, opacityLimitsHlShowAll;
     protected float starPointSize, brightnessPower;
     protected int fovMode;
     protected Texture starTex;
@@ -22,6 +26,7 @@ public class StarSetQuadComponent {
     protected void initShaderProgram(ExtShaderProgram shaderProgram) {
         this.alphaSizeBr = new float[3];
         this.opacityLimits = new float[2];
+        this.opacityLimitsHlShowAll = new float[] { 0.95f, Settings.settings.scene.star.opacity[1] };
 
         updateStarBrightness(Settings.settings.scene.star.brightness);
         updateBrightnessPower(Settings.settings.scene.star.power);
@@ -39,7 +44,6 @@ public class StarSetQuadComponent {
     protected void starParameterUniforms(ExtShaderProgram shaderProgram) {
         shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
         shaderProgram.setUniformf("u_brightnessPower", brightnessPower);
-        shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);
     }
 
     protected void touchStarParameters(ExtShaderProgram shaderProgram) {
@@ -67,5 +71,15 @@ public class StarSetQuadComponent {
     protected void updateStarOpacityLimits(float min, float max) {
         opacityLimits[0] = min;
         opacityLimits[1] = max;
+    }
+
+    protected void setOpacityLimitsUniform(ExtShaderProgram shaderProgram, Highlight highlight) {
+        if (highlight.isHighlighted() && highlight.isHlAllVisible()) {
+            opacityLimitsHlShowAll[0] = 0.95f;
+            opacityLimitsHlShowAll[1] = Settings.settings.scene.star.opacity[1];
+            shaderProgram.setUniform2fv("u_opacityLimits", opacityLimitsHlShowAll, 0, 2);
+        } else {
+            shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);
+        }
     }
 }

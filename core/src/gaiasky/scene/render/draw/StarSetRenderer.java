@@ -148,11 +148,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                                 }
 
                                 // SIZE
-                                if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
-                                } else {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
-                                }
+                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
 
                                 // PROPER MOTION [u/yr]
                                 tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
@@ -201,6 +197,9 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
+                    // Opacity limits
+                    triComponent.setOpacityLimitsUniform(shaderProgram, hl);
+
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
                     } catch (IllegalArgumentException e) {
@@ -212,8 +211,8 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
             }
             if (state) {

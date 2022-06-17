@@ -149,11 +149,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                             }
 
                             // SIZE
-                            if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
-                            } else {
-                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
-                            }
+                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
 
                             // PROPER MOTION [u/yr]
                             tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
@@ -200,6 +196,9 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
+                    // Opacity limits
+                    triComponent.setOpacityLimitsUniform(shaderProgram, hl);
+
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
                     } catch (IllegalArgumentException e) {
@@ -211,8 +210,8 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
             }
             if (state) {
