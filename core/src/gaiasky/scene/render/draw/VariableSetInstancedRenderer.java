@@ -27,7 +27,7 @@ import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -37,19 +37,22 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Renders star sets using instancing via billboards with geometry (quads as two triangles).
+ * Renders variable star sets using instancing via billboards with geometry (quads as two triangles).
  */
-public class StarSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(StarSetInstancedRenderer.class);
+public class VariableSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(VariableSetInstancedRenderer.class);
+
+    // Maximum number of data points in the light curves
+    public static final int MAX_VARI = 20;
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset, starPosOffset;
+    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, starPosOffset;
     private final Colormap cmap;
 
     private StarSetQuadComponent triComponent;
     private final ParticleUtils utils;
 
-    public StarSetInstancedRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public VariableSetInstancedRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         utils = new ParticleUtils();
         cmap = new Colormap();
@@ -57,7 +60,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         aux1 = new Vector3();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     @Override
@@ -69,11 +72,22 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
     @Override
     protected void addAttributesDivisor1(Array<VertexAttribute> attributes) {
-        // Color, object position, proper motion and size are per instance
+        // Color, object position, proper motion and time series are per instance
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
         attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
-        attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
+        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
+
+        attributes.add(new VertexAttribute(OwnUsage.NumVariablePoints, 1, "a_nVari"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes, 4, "a_vmags1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 1, 4, "a_vmags2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 2, 4, "a_vmags3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 3, 4, "a_vmags4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 4, 4, "a_vmags5"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes, 4, "a_vtimes1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 1, 4, "a_vtimes2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 2, 4, "a_vtimes3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 3, 4, "a_vtimes4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 4, 4, "a_vtimes5"));
     }
 
     @Override
@@ -85,8 +99,10 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     protected void offsets1(MeshData curr) {
         curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
-        sizeOffset = curr.mesh.getInstancedAttribute(OwnUsage.Size) != null ? curr.mesh.getInstancedAttribute(OwnUsage.Size).offset / 4 : 0;
         starPosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
+        nVariOffset = curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
+        variMagsOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
+        variTimesOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
     }
 
     @Override
@@ -132,7 +148,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
 
                     for (int i = 0; i < n; i++) {
                         if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                            IParticleRecord particle = set.get(i);
+                            VariableRecord particle = (VariableRecord) set.get(i);
                             if (!Double.isFinite(particle.size())) {
                                 logger.debug("Star " + particle.id() + " has a non-finite size");
                                 continue;
@@ -148,8 +164,12 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                                 tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = utils.getColor(i, set, hl);
                             }
 
-                            // SIZE
-                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                            // VARIABLE STARS (magnitudes and times)
+                            tempInstanceAttribs[curr.instanceIdx + nVariOffset] = particle.nVari;
+                            for (int k = 0; k < particle.nVari; k++) {
+                                tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                tempInstanceAttribs[curr.instanceIdx + variTimesOffset + k] = (float) particle.variTime(k);
+                            }
 
                             // PROPER MOTION [u/yr]
                             tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
@@ -196,6 +216,9 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
+                    curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
+                    shaderProgram.setUniformf("u_s", (float) curRt);
+
                     // Opacity limits
                     triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
@@ -212,7 +235,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     protected void setInGpu(IRenderable renderable, boolean state) {
         if (inGpu != null) {
             if (inGpu.contains(renderable) && !state) {
-                EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
+                EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, renderable);
             }
             if (state) {
                 inGpu.add(renderable);
@@ -241,7 +264,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
             triComponent.updateStarPointSize((float) data[0]);
             triComponent.touchStarParameters(getShaderProgram());
         }
-        case GPU_DISPOSE_STAR_GROUP -> {
+        case GPU_DISPOSE_VARIABLE_GROUP -> {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);

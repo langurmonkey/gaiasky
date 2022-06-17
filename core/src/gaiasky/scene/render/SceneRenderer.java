@@ -341,6 +341,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
+        // VARIABLE GROUP
+        AbstractRenderSystem variableGroupProc = switch (pcm) {
+            case TRIANGLES -> new VariableSetRenderer(VARIABLE_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES_INSTANCED -> new VariableSetInstancedRenderer(VARIABLE_GROUP, alphas, renderAssets.starGroupShaders);
+            case POINTS -> new VariableSetPointRenderer(VARIABLE_GROUP, alphas, renderAssets.starGroupShaders);
+        };
+        variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
+
         // MODEL STARS
         AbstractRenderSystem modelStarsProc = new ModelRenderer(MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
 
@@ -390,6 +399,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Star and particle sets
         addRenderSystem(particleGroupProc);
         addRenderSystem(starGroupProc);
+        addRenderSystem(variableGroupProc);
 
         // Diffuse meshes
         addRenderSystem(modelMeshDiffuse);

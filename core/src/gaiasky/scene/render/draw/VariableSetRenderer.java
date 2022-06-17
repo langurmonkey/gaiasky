@@ -18,15 +18,16 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.render.system.PointCloudTriRenderSystem;
+import gaiasky.render.system.StarGroupTriComponent;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
-import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -36,44 +37,60 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Renders star sets using regular arrays via billboards with geometry (quads as two triangles).
+ * Renders variable star sets using regular arrays via billboards with geometry (quads as two triangles).
  */
-public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver {
-    protected static final Log logger = Logger.getLogger(StarSetRenderer.class);
+public class VariableSetRenderer extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(VariableSetRenderer.class);
+
+    // Maximum number of data points in the light curves
+    public static final int MAX_VARI = 20;
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset, uvOffset, starPosOffset;
+    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, uvOffset, starPosOffset;
     private final Colormap cmap;
-
     private final ParticleUtils utils;
 
     private StarSetQuadComponent triComponent;
 
-    public StarSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public VariableSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         this.aux1 = new Vector3();
         this.utils = new ParticleUtils();
-        this.cmap = new Colormap();
-        this.triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
+        cmap = new Colormap();
+        triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
         attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
+        attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
-        attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
-        attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
+
+        attributes.add(new VertexAttribute(OwnUsage.NumVariablePoints, 1, "a_nVari"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes, 4, "a_vmags1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 1, 4, "a_vmags2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 2, 4, "a_vmags3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 3, 4, "a_vmags4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 4, 4, "a_vmags5"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes, 4, "a_vtimes1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 1, 4, "a_vtimes2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 2, 4, "a_vtimes3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 3, 4, "a_vtimes4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 4, 4, "a_vtimes5"));
+
     }
 
     protected void offsets(MeshData curr) {
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getVertexAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
         starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
+        nVariOffset = curr.mesh.getVertexAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getVertexAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
+        variMagsOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
+        variTimesOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
     }
 
     @Override
@@ -113,7 +130,6 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                     int n = set.data().size();
                     int offset = addMeshData(n * 4, n * 6);
                     setOffset(render, offset);
-                    // Get mesh, reset indices
                     curr = meshes.get(offset);
                     ensureTempVertsSize(n * 4 * curr.vertexSize);
                     ensureTempIndicesSize(n * 6);
@@ -122,7 +138,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
 
                     for (int i = 0; i < n; i++) {
                         if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                            IParticleRecord particle = set.data().get(i);
+                            VariableRecord particle = (VariableRecord) set.data().get(i);
                             if (!Double.isFinite(particle.size())) {
                                 logger.debug("Star " + particle.id() + " has a non-finite size");
                                 continue;
@@ -147,8 +163,12 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                                     tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
                                 }
 
-                                // SIZE
-                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                // VARIABLE STARS (magnitudes and times)
+                                tempVerts[curr.vertexIdx + nVariOffset] = particle.nVari;
+                                for (int k = 0; k < particle.nVari; k++) {
+                                    tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                    tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) particle.variTime(k);
+                                }
 
                                 // PROPER MOTION [u/yr]
                                 tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
@@ -197,6 +217,9 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
+                    curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
+                    shaderProgram.setUniformf("u_s", (float) curRt);
+
                     // Opacity limits
                     triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
@@ -213,7 +236,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
     protected void setInGpu(IRenderable renderable, boolean state) {
         if (inGpu != null) {
             if (inGpu.contains(renderable) && !state) {
-                EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
+                EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, renderable);
             }
             if (state) {
                 inGpu.add(renderable);
@@ -242,7 +265,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
             triComponent.updateStarPointSize((float) data[0]);
             triComponent.touchStarParameters(getShaderProgram());
         }
-        case GPU_DISPOSE_STAR_GROUP -> {
+        case GPU_DISPOSE_VARIABLE_GROUP -> {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);

@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.scene.render;
+package gaiasky.scene.render.draw;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
@@ -20,10 +20,11 @@ import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -35,34 +36,35 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-public class StarSetPointRenderer extends ImmediateModeRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(StarSetPointRenderer.class);
+/**
+ * Renders variable star sets which have periodical light curve data using <code>GL_POINT</code> primitives.
+ */
+public class VariableSetPointRenderer extends ImmediateModeRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(VariableSetPointRenderer.class);
 
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset;
+    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset;
     private float[] opacityLimits;
     private final float[] alphaSizeBrRc;
     private final float[] opacityLimitsHl;
     private final Colormap cmap;
-
     private final ParticleUtils utils;
 
     private Texture starTex;
 
-    public StarSetPointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public VariableSetPointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
-        utils = new ParticleUtils();
+        this.alphaSizeBrRc = new float[4];
+        this.opacityLimitsHl = new float[] { 2, 4 };
+        this.aux1 = new Vector3();
         cmap = new Colormap();
-
-        alphaSizeBrRc = new float[4];
-        opacityLimitsHl = new float[] { 2, 4 };
-        aux1 = new Vector3();
+        utils = new ParticleUtils();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -107,7 +109,9 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        nVariOffset = curr.mesh.getVertexAttribute(Usage.BiNormal) != null ? curr.mesh.getVertexAttribute(Usage.BiNormal).offset / 4 : 0;
+        variMagsOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
+        variTimesOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
         return mdi;
     }
 
@@ -138,8 +142,8 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
             alphaSizeBrRc[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
             alphaSizeBrRc[3] = rc.scaleFactor;
 
-            renderables.forEach(r -> {
-                final Render render = (Render) r;
+            renderables.forEach(renderable -> {
+                final Render render = (Render) renderable;
                 var base = Mapper.base.get(render.entity);
                 var set = Mapper.starSet.get(render.entity);
                 var hl = Mapper.highlight.get(render.entity);
@@ -151,7 +155,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                     if (!set.disposed) {
                         boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
                         if (!inGpu(render)) {
-                            int n = set.pointData.size();
+                            int n = set.data().size();
                             int offset = addMeshData(n);
                             setOffset(render, offset);
                             curr = meshes.get(offset);
@@ -159,7 +163,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                             int numAdded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                                    IParticleRecord particle = set.get(i);
+                                    VariableRecord particle = (VariableRecord) set.get(i);
                                     if (!Double.isFinite(particle.size())) {
                                         logger.debug("Star " + particle.id() + " has a non-finite size");
                                         continue;
@@ -174,11 +178,15 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
                                     }
 
-                                    // SIZE
-                                    if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
-                                    } else {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                    // VARIABLE STARS (magnitudes and times)
+                                    tempVerts[curr.vertexIdx + nVariOffset] = particle.nVari;
+                                    for (int k = 0; k < particle.nVari; k++) {
+                                        if (hl.isHlAllVisible() && hl.isHighlighted()) {
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
+                                        } else {
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                        }
+                                        tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) particle.variTime(k);
                                     }
 
                                     // POSITION [u]
@@ -196,6 +204,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                                 }
                             }
                             int count = numAdded * curr.vertexSize;
+                            setCount(render, count);
                             curr.mesh.setVertices(tempVerts, 0, count);
 
                             setInGpu(render, true);
@@ -207,12 +216,13 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                          */
                         curr = meshes.get(getOffset(render));
                         if (curr != null) {
+
                             if (starTex != null) {
                                 starTex.bind(0);
                                 shaderProgram.setUniformi("u_starTex", 0);
                             }
 
-                            shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && desc.catalogInfo.hlAllVisible ? opacityLimitsHl : opacityLimits, 0, 2);
+                            shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && hl.isHlAllVisible() ? opacityLimitsHl : opacityLimits, 0, 2);
 
                             alphaSizeBrRc[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
                             alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * hlSizeFactor) / camera.getFovFactor();
@@ -223,6 +233,9 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                             double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
                             float curRt2 = (float) (curRt - (double) ((float) curRt));
                             shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
+
+                            curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.variabilityEpochJd);
+                            shaderProgram.setUniformf("u_s", (float) curRt);
 
                             try {
                                 curr.mesh.render(shaderProgram, GL20.GL_POINTS);
@@ -242,7 +255,17 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
+        attributes.add(new VertexAttribute(Usage.BiNormal, 1, "a_nVari"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes, 4, "a_vmags1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 1, 4, "a_vmags2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 2, 4, "a_vmags3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 3, 4, "a_vmags4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 4, 4, "a_vmags5"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes, 4, "a_vtimes1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 1, 4, "a_vtimes2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 2, 4, "a_vtimes3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 3, 4, "a_vtimes4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 4, 4, "a_vtimes5"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)
@@ -253,9 +276,13 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     protected void setInGpu(IRenderable renderable, boolean state) {
         if(inGpu != null) {
             if(inGpu.contains(renderable) && !state) {
-                EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
+                EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, renderable);
             }
-            super.setInGpu(renderable, state);
+            if (state) {
+                inGpu.add(renderable);
+            } else {
+                inGpu.remove(renderable);
+            }
         }
     }
 
@@ -263,7 +290,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
-        case GPU_DISPOSE_STAR_GROUP -> {
+        case GPU_DISPOSE_VARIABLE_GROUP -> {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);
