@@ -100,7 +100,7 @@ public class ImageRenderer {
         return pixmap;
     }
 
-    private static FileHandle getTarget(String absoluteLocation, String baseFileName, ImageFormat format) {
+    private synchronized static FileHandle getTarget(String absoluteLocation, String baseFileName, ImageFormat format) {
         FileHandle fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.toString().toLowerCase());
         while (fh.exists()) {
             fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.toString().toLowerCase());
@@ -108,7 +108,7 @@ public class ImageRenderer {
         return fh;
     }
 
-    private static String getNextSeqNumSuffix() {
+    private synchronized static String getNextSeqNumSuffix() {
         return "_" + intToString(sequenceNumber++, 5);
     }
 
@@ -124,11 +124,11 @@ public class ImageRenderer {
         return df.format(num);
     }
 
-    public static int getSequenceNumber(){
+    public synchronized static int getSequenceNumber(){
         return sequenceNumber;
     }
 
-    public static void resetSequenceNumber(){
+    public synchronized static void resetSequenceNumber(){
         sequenceNumber = 0;
     }
 }

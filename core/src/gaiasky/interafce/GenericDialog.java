@@ -286,7 +286,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
             setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
         }
         setKeyboardFocus();
+        showDialogHook(stage);
         return this;
+    }
+
+    protected void showDialogHook(Stage stage){
     }
 
     /**
