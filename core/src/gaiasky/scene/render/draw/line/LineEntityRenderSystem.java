@@ -83,7 +83,8 @@ public class LineEntityRenderSystem {
             Vector3d bodyPos = D31.setZero();
             if (orbitTrail) {
                 float top = alpha;
-                float bottom = 0f;
+                // For large periods, fade orbit to 0 a bit before.
+                float bottom = trajectory.params != null && trajectory.params.orbitalPeriod > 40000 ? -0.2f : -0.1f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = verts.pointCloudData.getWrapTimeMs(currentTime);
