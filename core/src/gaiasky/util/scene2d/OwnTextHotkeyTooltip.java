@@ -32,8 +32,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
  */
 public class OwnTextHotkeyTooltip extends Tooltip<Table> {
     private final Table table;
-    private final Label label;
-    private Label labelHotkey;
+    private final OwnLabel label;
+    private OwnLabel labelHotkey;
 
     public OwnTextHotkeyTooltip(String text, String hotkey, Skin skin, int breakSpaces) {
         this(text, hotkey, skin, TooltipManager.getInstance(), skin.get(TextTooltipStyle.class), breakSpaces);
@@ -65,16 +65,17 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
 
         table = new Table(skin);
 
-        label = new Label(text, skin);
+        label = new OwnLabel(text, skin);
 
         if (hotkey != null)
-            labelHotkey = new Label("[" + hotkey + "]", skin, "hotkey");
+            labelHotkey = new OwnLabel("[" + hotkey + "]", skin, "hotkey");
 
         table.add(label).padRight(labelHotkey != null ? 10f : 0f);
         if (labelHotkey != null)
             table.add(labelHotkey);
 
         getContainer().setActor(table);
+        getContainer().pack();
         getContainer().width(new Value() {
             public float get(Actor context) {
                 return Math.min(manager.maxWidth, label.getGlyphLayout().width + 10f + (labelHotkey != null ? labelHotkey.getGlyphLayout().width : 0f));
