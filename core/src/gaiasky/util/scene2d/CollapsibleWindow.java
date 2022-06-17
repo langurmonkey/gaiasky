@@ -38,8 +38,6 @@ import gaiasky.util.i18n.I18n;
 /**
  * A {@code CollapsableWindow} can be expanded/collapsed with a single click on
  * the title bar.
- *
- * @author Xoppa
  **/
 public class CollapsibleWindow extends OwnWindow {
     private boolean collapsed, collapsing = false, expanding = false;
@@ -51,9 +49,12 @@ public class CollapsibleWindow extends OwnWindow {
 
     private float maxWidth = -1f, maxHeight = -1f;
     /**
-     * Collapse speed in pixels per second
+     * Collapse speed in pixels per second.
      **/
     protected float collapseSpeed;
+
+    /** Whether the user can collapse the window by clicking on the menu bar. **/
+    private boolean collapsible = true;
 
     String expandIcon = "window-expand";
     String collapseIcon = "window-collapse";
@@ -76,7 +77,7 @@ public class CollapsibleWindow extends OwnWindow {
         initWindow(skin, collapseSpeed);
     }
 
-    private void initWindow(final Skin skin, final float collapseSpeed){
+    private void initWindow(final Skin skin, final float collapseSpeed) {
         this.me = this;
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
@@ -108,7 +109,6 @@ public class CollapsibleWindow extends OwnWindow {
                 }
                 super.touchUp(event, x, y, pointer, button);
             }
-
         });
 
         // Pad title cell
@@ -118,7 +118,7 @@ public class CollapsibleWindow extends OwnWindow {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();
                 // Click
-                if (type == Type.mouseMoved) {
+                if (collapsible && type == Type.mouseMoved) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Hand);
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
@@ -146,7 +146,9 @@ public class CollapsibleWindow extends OwnWindow {
             }
             return false;
         });
-        getTitleTable().addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.expandcollapse"), skin));
+        if (collapsible) {
+            getTitleTable().addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.expandcollapse"), skin));
+        }
     }
 
     protected void drawBackground(Batch batch, float parentAlpha, float x, float y) {
@@ -217,30 +219,49 @@ public class CollapsibleWindow extends OwnWindow {
     }
 
     public void collapse() {
-        if (collapsed || expanding || collapsing)
-            return;
-        else {
-            expandHeight = getHeight();
-            collapsing = true;
+        if (collapsible) {
+            if (collapsed || expanding || collapsing)
+                return;
+            else {
+                expandHeight = getHeight();
+                collapsing = true;
+            }
         }
     }
 
     public void collapseInstant() {
-        if (collapsed)
-            return;
-        expandHeight = getHeight();
-        setHeight(collapseHeight);
-        setY(getY() + expandHeight - collapseHeight);
-        collapsed = true;
-        if (getStage() != null)
-            getStage().setScrollFocus(null);
+        if (collapsible) {
+            if (collapsed)
+                return;
+            expandHeight = getHeight();
+            setHeight(collapseHeight);
+            setY(getY() + expandHeight - collapseHeight);
+            collapsed = true;
+            if (getStage() != null)
+                getStage().setScrollFocus(null);
+        }
     }
 
     public void toggleCollapsed() {
-        if (collapsed)
-            expand();
-        else
-            collapse();
+        if (collapsible) {
+            if (collapsed)
+                expand();
+            else
+                collapse();
+        }
+    }
+
+    public void setCollapsible(boolean collapsible) {
+        this.collapsible = collapsible;
+        if (collapsible) {
+            getTitleTable().addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.expandcollapse"), skin));
+        } else {
+            getTitleTable().clearListeners();
+        }
+    }
+
+    public boolean isCollapsible() {
+        return collapsible;
     }
 
     public boolean isCollapsed() {
@@ -307,6 +328,13 @@ public class CollapsibleWindow extends OwnWindow {
             return super.getMaxHeight();
         else
             return maxHeight;
+    }
+
+    @Override
+    public void setModal(boolean isModal) {
+        super.setModal(isModal);
+        // Only non-modal windows can be collapsed.
+        setCollapsible(!isModal);
     }
 
     @Override
