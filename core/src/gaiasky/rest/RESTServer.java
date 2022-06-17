@@ -64,7 +64,7 @@ import static spark.Spark.*;
  * The 'cmd_syntax' entry you get from the 'help' command (e.g. http://localhost:8080/api/help)
  * gives a summary of permitted commands and their return type. Details on the meaning of the
  * command and its parameters need to be found from the scripting API documentation:
- * https://langurmonkey.github.io/gaiasky/javadoc/gaiasky/script/IScriptingInterface.html
+ * https://gaia.ari.uni-heidelberg.de/gaiasky/docs/javadoc/latest/gaiasky/script/IScriptingInterface.html
  * <p>
  * To examine, what happens during an API call, set the default log level of SimpleLogger to
  * 'info' or lower (in core/build.gradle).
