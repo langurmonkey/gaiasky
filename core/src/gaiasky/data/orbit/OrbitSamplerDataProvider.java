@@ -83,17 +83,25 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         // If num samples is not defined, we use 300 samples per year of period
 
         // Prevent overlapping by rescaling the period
-        double period = parameter.orbitalPeriod * 0.99d;
+        double period = parameter.orbitalPeriod * 0.999d;
         int numSamples = parameter.numSamples > 0 ? parameter.numSamples : (int) (300.0 * period / 365.0);
         numSamples = Math.max(100, Math.min(2000, numSamples));
         data = new PointCloudData();
         String bodyDesc = parameter.name;
-        Instant d = Instant.ofEpochMilli(parameter.ini.getTime());
         double last = 0, accum = 0;
 
         // Milliseconds of this orbit in one revolution
         double orbitalMs = period * 86400000.0;
         double stepMs = orbitalMs / (double) numSamples;
+
+        Instant d;
+        if (period > 40000) {
+            // For long-period orbits, it is better to recompute more often because they can deviate significantly.
+            d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.8));
+        } else {
+            // Shorter period orbits don't deviate enough to be noticeable.
+            d = Instant.ofEpochMilli(parameter.ini.getTime());
+        }
 
         // Load orbit data
         for (int i = 0; i <= numSamples; i++) {
