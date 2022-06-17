@@ -64,7 +64,7 @@ public class Settings {
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
     public static final String DOCUMENTATION = "https://gaia.ari.uni-heidelberg.de/gaiasky/docs";
-    public static final String REPOSITORY = "https://gitlab.com/langurmonkey/gaiasky";
+    public static final String REPOSITORY = "https://gitlab.com/gaiasky/gaiasky";
     public static final String ICON_URL;
     public static final String REPO_ISSUES = REPOSITORY + "/issues";
     public static final String AUTHOR_NAME = "Toni Sagristà Sellés";

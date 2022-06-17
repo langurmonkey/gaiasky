@@ -3,32 +3,32 @@
   <id>gaiasky</id>
   <url type="homepage">https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/</url>
   <url type="help">https://gaia.ari.uni-heidelberg.de/gaiasky/docs</url>
-  <url type="bugtracker">https://gitlab.com/langurmonkey/gaiasky/-/issues</url>
-  
+  <url type="bugtracker">https://gitlab.com/gaiasky/gaiasky/-/issues</url>
+
   <name>Gaia Sky</name>
   <summary>3D universe simulator for desktop and VR with support for more than a billion objects</summary>
-  
+
   <metadata_license>CC-BY-SA-4.0</metadata_license>
   <project_license>MPL-2.0</project_license>
   <developer_name>ARI/Zentrum für Astronomie Heidelberg</developer_name>
   <launchable type="desktop-id">gaiasky</launchable>
-  
+
   <recommends>
     <control>pointing</control>
     <control>keyboard</control>
     <control>gamepad</control>
   </recommends>
-  
+
   <description>
     <p>
       Gaia Sky is a real-time, 3D, astronomy visualisation software for desktop and VR that runs on Linux, Windows and macOS. It is developed in the framework of ESA&apos;s Gaia mission to chart about 1 billion stars of our Galaxy in the Gaia group of the Astronomisches Rechen-Institut (ZAH, Universität Heidelberg). Explore the Solar System, the Milky Way or even the most distant galaxies of the Universe.
     </p>
   </description>
-  
-   <releases>
-      <release version="3.1.6" date="2021-09-22" urgency="high">
-        <url>https://gitlab.com/langurmonkey/gaiasky/blob/master/CHANGELOG.md</url>
-      </release>
+
+  <releases>
+    <release version="3.2.0" date="2022-06-07" urgency="high">
+      <url>https://gitlab.com/gaiasky/gaiasky/blob/master/CHANGELOG.md</url>
+    </release>
   </releases>
 
   <content_rating type="oars-1.1" />
