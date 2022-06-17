@@ -381,7 +381,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         oc.loadDataPoint(out, GaiaSky.instance.time.getTime());
 
         if (transformFunction != null) {
-            if(model.isExtrasolar()) {
+            if (model.isExtrasolar()) {
                 auxMat.set(transformFunction).rotate(0, 1, 0, 90);
                 out.mul(auxMat);
             } else {
@@ -465,7 +465,8 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             Vector3d bodyPos = D31.get().setZero();
             if (orbitTrail) {
                 float top = alpha;
-                float bottom = 0f;
+                // For large periods, fade orbit to 0 a bit before.
+                float bottom = params != null && params.orbitalPeriod > 40000 ? -0.2f : -0.1f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = pointCloudData.getWrapTimeMs(currentTime);
