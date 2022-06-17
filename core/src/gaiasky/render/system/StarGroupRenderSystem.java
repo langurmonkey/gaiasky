@@ -134,11 +134,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                                 }
 
                                 // SIZE
-                                if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
-                                } else {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                }
+                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
 
                                 // PROPER MOTION [u/yr]
                                 tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
@@ -187,6 +183,9 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
+                    // Opacity limits
+                    triComponent.setOpacityLimitsUniform(shaderProgram, starGroup);
+
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
                     } catch (IllegalArgumentException e) {
@@ -198,8 +197,8 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
             }
             if (state) {

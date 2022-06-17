@@ -41,7 +41,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
     private int sizeOffset, pmOffset;
     private float[] opacityLimits;
     private final float[] alphaSizeBrRc;
-    private final float[] opacityLimitsHl;
+    private final float[] opacityLimitsHlShowAll;
     private final Colormap cmap;
 
     private Texture starTex;
@@ -50,7 +50,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.alphaSizeBrRc = new float[4];
-        this.opacityLimitsHl = new float[] { 2, 4 };
+        this.opacityLimitsHlShowAll = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
@@ -198,7 +198,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                                 shaderProgram.setUniformi("u_starTex", 0);
                             }
 
-                            shaderProgram.setUniform2fv("u_opacityLimits", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? opacityLimitsHl : opacityLimits, 0, 2);
+                            shaderProgram.setUniform2fv("u_opacityLimits", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? opacityLimitsHlShowAll : opacityLimits, 0, 2);
 
                             alphaSizeBrRc[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
                             alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
