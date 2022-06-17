@@ -79,6 +79,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnTextField fadeTimeField, widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
+    private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
     private OwnLabel tessQualityLabel;
     private Cell<?> noticeHiResCell;
@@ -96,7 +97,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private boolean welcomeScreen = false;
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
-       this(stage,skin, globalResources, false);
+        this(stage, skin, globalResources, false);
     }
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources, final boolean welcomeScreen) {
@@ -1416,19 +1417,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel counterLabel = new OwnLabel(I18n.msg("gui.frameoutput.sequence"), skin);
         HorizontalGroup counterGroup = new HorizontalGroup();
         counterGroup.space(pad5);
-        OwnLabel counter = new OwnLabel(ImageRenderer.getSequenceNumber() + "", skin);
-        counter.setWidth(textWidth * 3f);
+        frameSequenceNumber = new OwnLabel(Integer.toString(ImageRenderer.getSequenceNumber()), skin);
+        frameSequenceNumber.setWidth(textWidth * 3f);
         OwnTextButton resetCounter = new OwnTextButton(I18n.msg("gui.frameoutput.sequence.reset"), skin);
         resetCounter.pad(pad10);
         resetCounter.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 ImageRenderer.resetSequenceNumber();
-                counter.setText("0");
+                frameSequenceNumber.setText("0");
             }
             return false;
         });
 
-        counterGroup.addActor(counter);
+        counterGroup.addActor(frameSequenceNumber);
 
         // LABELS
         labels.addAll(frameoutputLocationLabel, prefixLabel, fpsLabel, fomodeLabel, frameoutputSizeLabel);
@@ -1696,7 +1697,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentDataTable.add(highAccuracyPositionsLabel).left().padBottom(pad20);
         contentDataTable.add(highAccuracyPositions).left().padRight(pad20).padBottom(pad20);
         contentDataTable.add(highAccTooltip).left().padBottom(pad20).row();
-        if(!welcomeScreen) {
+        if (!welcomeScreen) {
             contentDataTable.add(titleData).left().colspan(3).padBottom(pad10).row();
             contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad5).row();
             contentDataTable.add(dataDownload).left().colspan(3);
@@ -2059,12 +2060,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final var selected = fullScreenResolutions.getSelected();
         final boolean reloadScreenMode = reloadFullScreenMode
                 || (settings.graphics.fullScreen.active
-                    && (settings.graphics.fullScreen.resolution[0] != selected.width
-                        || settings.graphics.fullScreen.resolution[1] != selected.height
-                        || settings.graphics.fullScreen.refreshRate != selected.refreshRate
-                        || settings.graphics.fullScreen.bitDepth != selected.bitsPerPixel))
+                && (settings.graphics.fullScreen.resolution[0] != selected.width
+                || settings.graphics.fullScreen.resolution[1] != selected.height
+                || settings.graphics.fullScreen.refreshRate != selected.refreshRate
+                || settings.graphics.fullScreen.bitDepth != selected.bitsPerPixel))
                 || (!settings.graphics.fullScreen.active
-                        && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
+                && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
         boolean reloadRenderSystem = false;
 
         settings.graphics.fullScreen.active = fullScreen.isChecked();
@@ -2353,9 +2354,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.SCENE_GRAPH_RELOAD_NAMES_CMD, this);
     }
 
-
     private void reloadUI(final GlobalResources globalResources) {
         EventManager.publish(Event.UI_RELOAD_CMD, this, globalResources);
+    }
+
+    @Override
+    protected void showDialogHook(Stage stage) {
+        if (frameSequenceNumber != null) {
+            frameSequenceNumber.setText(Integer.toString(ImageRenderer.getSequenceNumber()));
+        }
     }
 
     private void showRestartDialog(String text) {
