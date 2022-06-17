@@ -152,11 +152,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
                             // VARIABLE STARS (magnitudes and times)
                             tempInstanceAttribs[curr.instanceIdx + nVariOffset] = particle.nVari;
                             for (int k = 0; k < particle.nVari; k++) {
-                                if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                    tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
-                                } else {
-                                    tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                }
+                                tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                 tempInstanceAttribs[curr.instanceIdx + variTimesOffset + k] = (float) particle.variTime(k);
                             }
 
@@ -208,6 +204,9 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
                     curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), starGroup.getVariabilityepoch());
                     shaderProgram.setUniformf("u_s", (float) curRt);
 
+                    // Opacity limits
+                    triComponent.setOpacityLimitsUniform(shaderProgram, starGroup);
+
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
                     } catch (IllegalArgumentException e) {
@@ -219,8 +218,8 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, renderable);
             }
             if (state) {

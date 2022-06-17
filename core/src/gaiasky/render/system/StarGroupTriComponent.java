@@ -2,17 +2,17 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.GaiaSky;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class StarGroupTriComponent {
 
-    protected float[] alphaSizeBr, opacityLimits;
+    protected float[] alphaSizeBr, opacityLimits, opacityLimitsHlShowAll;
     protected float starPointSize, brightnessPower;
     protected int fovMode;
     protected Texture starTex;
-
 
     public void setStarTexture(String starTexture) {
         starTex = new Texture(Settings.settings.data.dataFileHandle(starTexture), true);
@@ -22,6 +22,7 @@ public class StarGroupTriComponent {
     protected void initShaderProgram(ExtShaderProgram shaderProgram) {
         this.alphaSizeBr = new float[3];
         this.opacityLimits = new float[2];
+        this.opacityLimitsHlShowAll = new float[] { 0.95f, Settings.settings.scene.star.opacity[1] };
 
         updateStarBrightness(Settings.settings.scene.star.brightness);
         updateBrightnessPower(Settings.settings.scene.star.power);
@@ -39,7 +40,6 @@ public class StarGroupTriComponent {
     protected void starParameterUniforms(ExtShaderProgram shaderProgram) {
         shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
         shaderProgram.setUniformf("u_brightnessPower", brightnessPower);
-        shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);
     }
 
     protected void touchStarParameters(ExtShaderProgram shaderProgram) {
@@ -50,6 +50,7 @@ public class StarGroupTriComponent {
             shaderProgram.end();
         });
     }
+
     protected void updateStarBrightness(float br) {
         // Remap brightness to [0,2]
         alphaSizeBr[2] = (br - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 4f;
@@ -67,5 +68,15 @@ public class StarGroupTriComponent {
     protected void updateStarOpacityLimits(float min, float max) {
         opacityLimits[0] = min;
         opacityLimits[1] = max;
+    }
+
+    protected void setOpacityLimitsUniform(ExtShaderProgram shaderProgram, StarGroup starGroup) {
+        if (starGroup.isHighlighted() && starGroup.isHlAllVisible()) {
+            opacityLimitsHlShowAll[0] = 0.95f;
+            opacityLimitsHlShowAll[1] = Settings.settings.scene.star.opacity[1];
+            shaderProgram.setUniform2fv("u_opacityLimits", opacityLimitsHlShowAll, 0, 2);
+        } else {
+            shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);
+        }
     }
 }

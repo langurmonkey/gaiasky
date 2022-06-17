@@ -134,11 +134,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                             }
 
                             // SIZE
-                            if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
-                            } else {
-                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                            }
+                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
 
                             // PROPER MOTION [u/yr]
                             tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
@@ -185,6 +181,9 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                     float curRt2 = (float) (curRt - (double) ((float) curRt));
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
+                    // Opacity limits
+                    triComponent.setOpacityLimitsUniform(shaderProgram, starGroup);
+
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
                     } catch (IllegalArgumentException e) {
@@ -196,8 +195,8 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
             }
             if (state) {
