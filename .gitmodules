@@ -1,3 +1,0 @@
-[submodule "docs"]
-	path = docs
-	url = git@gitlab.com:gaiasky/gaiasky-docs.git
