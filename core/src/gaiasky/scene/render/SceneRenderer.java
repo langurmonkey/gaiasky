@@ -343,9 +343,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // VARIABLE GROUP
         AbstractRenderSystem variableGroupProc = switch (pcm) {
-            case TRIANGLES -> new VariableSetRenderer(VARIABLE_GROUP, alphas, renderAssets.starGroupShaders);
-            case TRIANGLES_INSTANCED -> new VariableSetInstancedRenderer(VARIABLE_GROUP, alphas, renderAssets.starGroupShaders);
-            case POINTS -> new VariableSetPointRenderer(VARIABLE_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES -> new VariableSetRenderer(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case TRIANGLES_INSTANCED -> new VariableSetInstancedRenderer(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case POINTS -> new VariableSetPointRenderer(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
         };
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
