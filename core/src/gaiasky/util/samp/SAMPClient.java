@@ -12,7 +12,7 @@ import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.interafce.DatasetLoadDialog;
+import gaiasky.gui.DatasetLoadDialog;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;

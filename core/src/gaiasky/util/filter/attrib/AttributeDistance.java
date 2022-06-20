@@ -7,6 +7,7 @@ package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.i18n.I18n;
 
 public class AttributeDistance extends AttributeAbstract implements IAttribute {
     @Override
@@ -14,9 +15,9 @@ public class AttributeDistance extends AttributeAbstract implements IAttribute {
         return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
     }
     public String getUnit(){
-        return "pc";
+        return I18n.msg("gui.unit.pc");
     }
     public String toString(){
-        return "Distance from Sun";
+        return I18n.msg("gui.attrib.distsun");
     }
 }

@@ -17,7 +17,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.interafce.*;
+import gaiasky.gui.*;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.ICamera;

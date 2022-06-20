@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.util.SysUtils;
-import gaiasky.interafce.GenericDialog;
+import gaiasky.gui.GenericDialog;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;

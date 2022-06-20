@@ -24,7 +24,7 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import gaiasky.interafce.GSKeys;
+import gaiasky.gui.GSKeys;
 
 /**
  * Operating system related utils.

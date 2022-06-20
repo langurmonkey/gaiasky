@@ -33,7 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Scaling;
-import gaiasky.interafce.GSKeys;
+import gaiasky.gui.GSKeys;
 
 /**
  * MenuItem contains text or text with icon. Best icon size is 22px. MenuItem

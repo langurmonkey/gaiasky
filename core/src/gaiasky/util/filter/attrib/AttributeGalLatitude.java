@@ -6,6 +6,7 @@
 package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.util.i18n.I18n;
 
 public class AttributeGalLatitude extends AttributeAbstract implements IAttribute {
     @Override
@@ -13,9 +14,9 @@ public class AttributeGalLatitude extends AttributeAbstract implements IAttribut
         return bean.b();
     }
     public String getUnit(){
-        return "deg";
+        return I18n.msg("gui.unit.deg");
     }
     public String toString(){
-        return "Galactic latitude (b)";
+        return I18n.msg("gui.attrib.gallon");
     }
 }

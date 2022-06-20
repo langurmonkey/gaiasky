@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.desktop.GaiaSkyDesktop;
-import gaiasky.interafce.DatasetManagerWindow;
+import gaiasky.gui.DatasetManagerWindow;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;

@@ -5,7 +5,6 @@
 
 package gaiasky.desktop;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -25,8 +24,8 @@ import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.interafce.ConsoleLogger;
-import gaiasky.interafce.KeyBindings;
+import gaiasky.gui.ConsoleLogger;
+import gaiasky.gui.KeyBindings;
 import gaiasky.render.ScreenModeCmd;
 import gaiasky.rest.RESTServer;
 import gaiasky.util.*;
