@@ -175,7 +175,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
                     curr.mesh.setVertices(tempVerts, 0, 24);
                     // Per instance (divisor=1) vertices
                     int count = numStarsAdded * curr.instanceSize;
-                    setCount(starGroup, count);
+                    setCount(starGroup, numStarsAdded);
                     curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
                     setInGpu(starGroup, true);
@@ -208,7 +208,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
                     triComponent.setOpacityLimitsUniform(shaderProgram, starGroup);
 
                     try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
+                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, getCount(starGroup));
                     } catch (IllegalArgumentException e) {
                         logger.error(e, "Render exception");
                     }

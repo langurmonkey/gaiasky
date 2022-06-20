@@ -107,7 +107,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
         synchronized (starGroup) {
             if (!starGroup.disposed) {
                 boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                int n = starGroup.size();
+                final int n = starGroup.size();
                 if (!inGpu(starGroup)) {
                     int offset = addMeshData(6, n);
                     setOffset(starGroup, offset);
@@ -155,7 +155,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                     curr.mesh.setVertices(tempVerts, 0, 24);
                     // Per instance (divisor=1) vertices
                     int count = numStarsAdded * curr.instanceSize;
-                    setCount(starGroup, count);
+                    setCount(starGroup, numStarsAdded);
                     curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
                     setInGpu(starGroup, true);
@@ -185,7 +185,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                     triComponent.setOpacityLimitsUniform(shaderProgram, starGroup);
 
                     try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
+                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, getCount(starGroup));
                     } catch (IllegalArgumentException e) {
                         logger.error(e, "Render exception");
                     }
@@ -206,6 +206,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
             }
         }
     }
+
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
