@@ -120,15 +120,15 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(jupc);
-        font.draw(sb, I18n.msg("gui.minimap.jupiter"), jupf[0] - px(20), jupf[1] - px(10));
+        font.draw(sb, I18n.obj("jupiter"), jupf[0] - px(20), jupf[1] - px(10));
         font.setColor(satc);
-        font.draw(sb, I18n.msg("gui.minimap.saturn"), satf[0] - px(20), satf[1] + px(25));
+        font.draw(sb, I18n.obj("saturn"), satf[0] - px(20), satf[1] + px(25));
         font.setColor(urac);
-        font.draw(sb, I18n.msg("gui.minimap.uranus"), uraf[0] - px(20), uraf[1] - px(25));
+        font.draw(sb, I18n.obj("uranus"), uraf[0] - px(20), uraf[1] - px(25));
         font.setColor(nepc);
-        font.draw(sb, I18n.msg("gui.minimap.neptune"), nepf[0] - px(20), nepf[1] + px(40));
+        font.draw(sb, I18n.obj("neptune"), nepf[0] - px(20), nepf[1] + px(40));
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
+        font.draw(sb, I18n.obj("sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
 
         fb.end();
@@ -209,21 +209,21 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(textbc);
-        font.draw(sb, "5.4 AU", side2, u2Px(5.4 + 2.6, side2));
-        font.draw(sb, "9.2 AU", side2, u2Px(9.2 + 3, side2));
-        font.draw(sb, "20 AU", side2, u2Px(20 + 3, side2));
-        font.draw(sb, "30 AU", side2, u2Px(30 + 3, side2));
+        font.draw(sb, "5.4 " + I18n.msg("gui.unit.au"), side2, u2Px(5.4 + 2.6, side2));
+        font.draw(sb, "9.2 " + I18n.msg("gui.unit.au"), side2, u2Px(9.2 + 3, side2));
+        font.draw(sb, "20 " + I18n.msg("gui.unit.au"), side2, u2Px(20 + 3, side2));
+        font.draw(sb, "30 " + I18n.msg("gui.unit.au"), side2, u2Px(30 + 3, side2));
 
         font.setColor(jupc);
-        font.draw(sb, I18n.msg("gui.minimap.jupiter"), jupf[2] - px(20), jupf[3] - px(8));
+        font.draw(sb, I18n.obj("jupiter"), jupf[2] - px(20), jupf[3] - px(8));
         font.setColor(satc);
-        font.draw(sb, I18n.msg("gui.minimap.saturn"), satf[2] - px(20), satf[3] - px(8));
+        font.draw(sb, I18n.obj("saturn"), satf[2] - px(20), satf[3] - px(8));
         font.setColor(urac);
-        font.draw(sb, I18n.msg("gui.minimap.uranus"), uraf[2] - px(20), uraf[3] - px(8));
+        font.draw(sb, I18n.obj("uranus"), uraf[2] - px(20), uraf[3] - px(8));
         font.setColor(nepc);
-        font.draw(sb, I18n.msg("gui.minimap.neptune"), nepf[2] - px(20), nepf[3] - px(8));
+        font.draw(sb, I18n.obj("neptune"), nepf[2] - px(20), nepf[3] - px(8));
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(5), side2 - px(5));
+        font.draw(sb, I18n.obj("sun"), side2 + px(5), side2 - px(5));
 
         sb.end();
 

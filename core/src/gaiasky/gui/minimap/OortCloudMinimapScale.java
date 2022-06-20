@@ -83,9 +83,9 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(occ);
-        font.draw(sb, I18n.msg("gui.minimap.oort"),  side2 - px(60),  u2Px(-50000, sideshort2) + px(8));
+        font.draw(sb, I18n.obj("oort_cloud"),  side2 - px(60),  u2Px(-50000, sideshort2) + px(8));
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
+        font.draw(sb, I18n.obj("sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
 
         fb.end();
@@ -141,9 +141,9 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
         font.draw(sb, "100,000 AU", side2, u2Px(95000, side2));
 
         font.setColor(occ);
-        font.draw(sb, I18n.msg("gui.minimap.oort"),  side2 + px(15),  u2Px(-60000, side2) + px(8));
+        font.draw(sb, I18n.obj("oort_cloud"),  side2 + px(15),  u2Px(-60000, side2) + px(8));
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(5), side2 - px(5));
+        font.draw(sb, I18n.obj("sun"), side2 + px(5), side2 - px(5));
 
         sb.end();
 
@@ -153,6 +153,6 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
 
     @Override
     public String getName() {
-        return I18n.msg("gui.minimap.oort");
+        return I18n.obj("oort_cloud");
     }
 }

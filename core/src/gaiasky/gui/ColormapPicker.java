@@ -108,8 +108,9 @@ public class ColormapPicker extends ColorPickerAbstract {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return super.touchDown(event, x, y, pointer, button);
             }
+
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if(event.getButton() == Buttons.LEFT){
+                if (event.getButton() == Buttons.LEFT) {
                     // Launch color picker window
                     ColorPickerColormapDialog cpd = new ColorPickerColormapDialog(name, color, stage, skin);
                     cpd.setAcceptRunnable(() -> {
@@ -208,7 +209,7 @@ public class ColormapPicker extends ColorPickerAbstract {
     /** A color picker and colormap dialog **/
     private class ColorPickerColormapDialog extends GenericDialog {
         private CheckBox plainColor, colormap;
-        private final Map<String, Image> cmapImages;
+        private final Map<Integer, Image> cmapImages;
         private Image cmapImage;
         private Cell cmapImageCell;
         private float[] color;
@@ -239,7 +240,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             cmapImages = new HashMap<>();
             for (Pair<String, Integer> cmapDef : cmapList) {
                 Texture tex = new Texture(Gdx.files.internal("img/cmap/cmap_" + cmapDef.getFirst() + ".png"));
-                cmapImages.put(cmapDef.getFirst(), new Image(tex));
+                cmapImages.put(cmapDef.getSecond(), new Image(tex));
             }
 
             setAcceptText(I18n.msg("gui.ok"));
@@ -298,22 +299,22 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private void addColormapWidget(Table container) {
-            float sbwidth = 272f;
+            float sbWidth = 272f;
 
             // Color map
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.colormap"), skin)).left().padRight(pad10).padBottom(pad5).padTop(pad10 * 2);
             ComboBoxBean[] gqs = new ComboBoxBean[cmapList.size];
             for (Pair<String, Integer> cmapDef : cmapList) {
-                gqs[cmapDef.getSecond()] = new ComboBoxBean(cmapDef.getFirst(), cmapDef.getSecond());
+                gqs[cmapDef.getSecond()] = new ComboBoxBean(I18n.msg("gui.colormap." + cmapDef.getFirst()), cmapDef.getSecond());
             }
 
             OwnSelectBox<ComboBoxBean> cmap = new OwnSelectBox<>(skin);
             cmap.setItems(gqs);
-            cmap.setWidth(sbwidth);
+            cmap.setWidth(sbWidth);
             cmap.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     cmapIndex = cmap.getSelectedIndex();
-                    updateCmapImage(cmap.getSelected().name);
+                    updateCmapImage(cmap.getSelected().value);
                     return true;
                 }
                 return false;
@@ -323,7 +324,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Color map image
             cmapImageCell = container.add();
             cmapImageCell.colspan(3).center().padBottom(pad10 * 2).row();
-            updateCmapImage(cmap.getSelected().name);
+            updateCmapImage(cmap.getSelected().value);
 
             // Attribute
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.attribute"), skin)).left().padRight(pad10).padBottom(pad5);
@@ -365,7 +366,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             OwnSelectBox<AttributeComboBoxBean> attribs = new OwnSelectBox<>(skin);
             attribs.setItems(attrs);
-            attribs.setWidth(sbwidth);
+            attribs.setWidth(sbWidth);
             attribs.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     cmapAttrib = attribs.getSelected().attr;
@@ -376,11 +377,10 @@ public class ColormapPicker extends ColorPickerAbstract {
             });
             container.add(attribs).colspan(2).left().padBottom(pad5).row();
 
-
             // Min mapping value
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.min"), skin)).left().padRight(pad10).padBottom(pad5);
             minMap = new OwnTextField(Double.toString(getCmapMin(cmapAttrib, catalogInfo)), skin);
-            minMap.setWidth(sbwidth * 0.9f);
+            minMap.setWidth(sbWidth * 0.9f);
             minMap.addListener(event -> {
                 if (event instanceof ChangeEvent && minMap.isValid()) {
                     cmapMin = Parser.parseFloat(minMap.getText());
@@ -393,8 +393,8 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Reload
             OwnImageButton reloadCmap = new OwnImageButton(skin, "reload");
             reloadCmap.addListener(new OwnTextTooltip(I18n.msg("gui.colorpicker.minmax.reload"), skin, 3));
-            reloadCmap.addListener((event)->{
-                if(event instanceof ChangeEvent){
+            reloadCmap.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
                     recomputeAttributeMinMax(catalogInfo, cmapAttrib, true);
                     return true;
                 }
@@ -405,7 +405,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             // Max mapping value
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.max"), skin)).left().padRight(pad10).padBottom(pad5);
             maxMap = new OwnTextField(Double.toString(getCmapMax(cmapAttrib, catalogInfo)), skin);
-            maxMap.setWidth(sbwidth * 0.9f);
+            maxMap.setWidth(sbWidth * 0.9f);
             maxMap.addListener(event -> {
                 if (event instanceof ChangeEvent && maxMap.isValid()) {
                     cmapMax = Parser.parseFloat(maxMap.getText());
@@ -427,21 +427,21 @@ public class ColormapPicker extends ColorPickerAbstract {
 
         }
 
-        private void updateCmapImage(String cmap) {
-            cmapImage = cmapImages.get(cmap);
+        private void updateCmapImage(Integer colorMapIndex) {
+            cmapImage = cmapImages.get(colorMapIndex);
             cmapImageCell.clearActor();
             cmapImageCell.setActor(cmapImage);
             pack();
         }
 
         private double getCmapMin(IAttribute attrib, CatalogInfo ci) {
-            if(attrib != null && ci != null) {
+            if (attrib != null && ci != null) {
                 String key = key(ci, attrib);
                 if (!minMaxMap.containsKey(key))
                     return ci.hlCmapMin;
                 else
                     return minMaxMap.get(key)[0];
-            }else{
+            } else {
                 return 0;
             }
         }
@@ -463,7 +463,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             }
         }
 
-        private String key(CatalogInfo ci, IAttribute attrib){
+        private String key(CatalogInfo ci, IAttribute attrib) {
             return (ci != null ? ci.name + "-" : "") + (attrib != null ? attrib.toString() : "dummy");
         }
 
@@ -471,6 +471,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         private void recomputeAttributeMinMax(CatalogInfo ci, IAttribute attrib) {
             recomputeAttributeMinMax(ci, attrib, false);
         }
+
         private void recomputeAttributeMinMax(CatalogInfo ci, IAttribute attrib, boolean force) {
             String key = key(ci, attrib);
             if (!force && minMaxMap.containsKey(key)) {

@@ -14,9 +14,9 @@ public class AttributeDEC extends AttributeAbstract implements IAttribute {
         return bean.dec();
     }
     public String getUnit(){
-        return "deg";
+        return I18n.msg("gui.unit.deg");
     }
     public String toString(){
-        return "Declination (" + I18n.msg("gui.focusinfo.delta") + ")";
+        return I18n.msg("gui.attrib.dec") + " (" + I18n.msg("gui.focusinfo.delta") + ")";
     }
 }

@@ -19,23 +19,21 @@ import gaiasky.data.cluster.StarClusterLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
-import gaiasky.scene.render.extract.TrajectoryExtractor;
-import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.EventManager.TimeFrame;
 import gaiasky.event.IObserver;
-import gaiasky.gui.AddShapeDialog.Primitive;
-import gaiasky.gui.AddShapeDialog.Shape;
 import gaiasky.gui.ColormapPicker;
 import gaiasky.gui.IGui;
+import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
+import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.render.extract.TrajectoryExtractor;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
@@ -48,6 +46,7 @@ import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
+import gaiasky.util.screenshot.ImageRenderer;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import uk.ac.starlink.util.DataSource;
@@ -3104,6 +3103,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void addShapeAroundObject(String shapeName, String shape, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject) {
         if (checkString(shapeName, "shapeName") && checkStringEnum(shape, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
+            final var shapeLc = shape.toLowerCase();
             postRunnable(() -> {
                 IFocus object = getFocus(objectName);
                 float[] color = new float[] { r, g, b, a };
@@ -3114,11 +3114,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 } else {
                     shapeObj = new ShapeObject(new String[] { shapeName.trim() }, "Universe", object.getAbsolutePosition(objectName, new Vector3b()), objectName, showLabel, color);
                 }
+                shapeObj.setLabelcolor(new float[] { r, g, b, a });
                 shapeObj.ct = new ComponentTypes(ComponentType.Others.ordinal());
                 shapeObj.size = (float) (size * Constants.KM_TO_U);
                 Map<String, Object> params = new HashMap<>();
                 params.put("quality", 25L);
-                params.put("divisions", shape.equals("octahedronsphere") ? 3L : 15L);
+                params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 15L);
                 params.put("recursion", 3L);
                 params.put("diameter", 1.0);
                 params.put("width", 1.0);
@@ -3128,7 +3129,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 params.put("outerradius", 1.0);
                 params.put("sphere-in-ring", false);
                 params.put("flip", false);
-                shapeObj.setModel(shape, primitiveInt, params);
+                shapeObj.setModel(shapeLc, primitiveInt, params);
 
                 shapeObj.doneLoading(GaiaSky.instance.assetManager);
 

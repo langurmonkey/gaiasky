@@ -14,7 +14,7 @@ public class AttributeMualpha extends AttributeAbstract implements IAttribute {
         return bean.mualpha();
     }
     public String getUnit(){
-        return "mas/yr";
+        return I18n.msg("gui.unit.masyr");
     }
     public String toString(){
         return I18n.msg("gui.focusinfo.mualpha");

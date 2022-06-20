@@ -14,9 +14,9 @@ public class AttributeRA extends AttributeAbstract implements IAttribute {
         return bean.ra();
     }
     public String getUnit(){
-        return "deg";
+        return I18n.msg("gui.unit.deg");
     }
     public String toString(){
-        return "Right ascension (" + I18n.msg("gui.focusinfo.alpha") + ")";
+        return I18n.msg("gui.attrib.ra") + " (" + I18n.msg("gui.focusinfo.alpha") + ")";
     }
 }

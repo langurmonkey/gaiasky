@@ -10,8 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import gaiasky.gui.beans.DistanceUnitComboBoxBean;
+import gaiasky.gui.beans.DistanceUnitComboBoxBean.DistanceUnit;
+import gaiasky.gui.beans.PrimitiveComboBoxBean;
+import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
+import gaiasky.gui.beans.ShapeComboBoxBean;
+import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.util.Nature;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
@@ -24,9 +29,9 @@ public class AddShapeDialog extends GenericDialog {
     public OwnCheckBox track, showLabel;
     public OwnTextField name, size;
     public ColorPicker color;
-    public OwnSelectBox<Units> units;
-    public OwnSelectBox<Shape> shape;
-    public OwnSelectBox<Primitive> primitive;
+    public OwnSelectBox<DistanceUnitComboBoxBean> units;
+    public OwnSelectBox<ShapeComboBoxBean> shape;
+    public OwnSelectBox<PrimitiveComboBoxBean> primitive;
 
     private final IFocus object;
     private final String objectName;
@@ -60,7 +65,7 @@ public class AddShapeDialog extends GenericDialog {
         content.add(info).left().padBottom(pad15).row();
 
         // Name
-        addName(content, "1 AU from " + objectName);
+        addName(content, "1 " + I18n.msg("gui.unit.au") + " -> " + objectName);
 
         // Size
         FloatValidator val = new FloatValidator(0f, Float.MAX_VALUE);
@@ -72,10 +77,11 @@ public class AddShapeDialog extends GenericDialog {
             }
             return true;
         });
+        int i = 0;
         units = new OwnSelectBox<>(skin);
         units.setWidth(fieldWidth * 0.3f);
-        units.setItems(Units.values());
-        units.setSelected(Units.AU);
+        units.setItems(DistanceUnitComboBoxBean.defaultBeans());
+        units.setSelectedIndex(2);
         units.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 recomputeObjectName();
@@ -105,8 +111,8 @@ public class AddShapeDialog extends GenericDialog {
         // Shape
         shape = new OwnSelectBox<>(skin);
         shape.setWidth(fieldWidth);
-        shape.setItems(Shape.values());
-        shape.setSelected(Shape.SPHERE);
+        shape.setItems(ShapeComboBoxBean.defaultShapes());
+        shape.setSelectedIndex(0);
         content.add(new OwnLabel(I18n.msg("gui.shape.shape"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         content.add(shape).left().padBottom(pad10).row();
 
@@ -116,8 +122,8 @@ public class AddShapeDialog extends GenericDialog {
         // Primitive
         primitive = new OwnSelectBox<>(skin);
         primitive.setWidth(fieldWidth);
-        primitive.setItems(Primitive.values());
-        primitive.setSelected(Primitive.LINES);
+        primitive.setItems(PrimitiveComboBoxBean.defaultShapes());
+        primitive.setSelectedIndex(0);
         content.add(new OwnLabel(I18n.msg("gui.shape.primitive"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         content.add(primitive).left().padBottom(pad10).row();
 
@@ -150,8 +156,8 @@ public class AddShapeDialog extends GenericDialog {
         if (canRecomputeName) {
             String newName = size.getText()
                     + " "
-                    + units.getSelected().text()
-                    + " from "
+                    + units.getSelected().name
+                    + " -> "
                     + objectName;
             name.setText(newName);
             canRecomputeName = true;
@@ -171,42 +177,5 @@ public class AddShapeDialog extends GenericDialog {
     @Override
     public void dispose() {
 
-    }
-
-    public enum Shape {
-        SPHERE,
-        ICOSPHERE,
-        OCTAHEDRONSPHERE,
-        CYLINDER,
-        RING,
-        CONE
-    }
-
-    public enum Units {
-        M(1e-3, "metres"),
-        KM(1, "km"),
-        AU(Nature.AU_TO_KM, "AU"),
-        LY(Nature.LY_TO_KM, "light years"),
-        PC(Nature.PC_TO_KM, "pc");
-        private double toKm;
-        private String text;
-
-        Units(double toKm, String text) {
-            this.toKm = toKm;
-            this.text = text;
-        }
-
-        public String text() {
-            return text;
-        }
-
-        public double toKm(double value) {
-            return value * toKm;
-        }
-    }
-
-    public enum Primitive {
-        LINES,
-        TRIANGLES
     }
 }

@@ -136,10 +136,10 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 if (event instanceof ChangeEvent) {
                     AddShapeDialog dialog = new AddShapeDialog(I18n.msg("context.shape.new", candidateNameShort), candidate, candidateName, skin, getStage());
                     dialog.setAcceptRunnable(() -> {
-                        double size = dialog.units.getSelected().toKm(dialog.size.getDoubleValue(1)) * 2.0;
+                        double size = dialog.units.getSelected().unit.toKm(dialog.size.getDoubleValue(1)) * 2.0;
                         float[] color = dialog.color.getPickedColor();
-                        String shape = dialog.shape.getSelected().toString().toLowerCase(Locale.ROOT);
-                        String primitive = dialog.primitive.getSelected().toString();
+                        String shape = dialog.shape.getSelected().shape.toString();
+                        String primitive = dialog.primitive.getSelected().primitive.toString();
                         boolean showLabel = dialog.showLabel.isChecked();
                         boolean trackObj = dialog.track.isChecked();
                         GaiaSky.instance.scripting().addShapeAroundObject(dialog.name.getText().trim(), shape, primitive, size, candidateName, color[0], color[1], color[2], color[3], showLabel, trackObj);

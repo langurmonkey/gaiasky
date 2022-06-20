@@ -107,12 +107,12 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(7), sideshort2);
+        font.draw(sb, I18n.obj("sun"), side2 + px(7), sideshort2);
         font.setColor(textgc);
-        font.draw(sb, "To\nGalactic\nCenter", side - px(50), sideshort2 + px(15));
-        font.draw(sb, "To\nOuter\nGalaxy", 0, sideshort2 + px(15));
-        font.draw(sb, "Galactic\nNorth Pole", side2 - px(30), sideshort);
-        font.draw(sb, "Galactic\nSouth Pole", side2 - px(30), px(30));
+        font.draw(sb, I18n.msg("gui.minimap.togc"), side - px(50), sideshort2 + px(15));
+        font.draw(sb, I18n.msg("gui.minimap.tooutergalaxy"), 0, sideshort2 + px(15));
+        font.draw(sb, I18n.msg("gui.minimap.ngp"), side2 - px(30), sideshort);
+        font.draw(sb, I18n.msg("gui.minimap.sgp"), side2 - px(30), px(30));
         sb.end();
 
         fb.end();
@@ -158,11 +158,11 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(1, 1, 0, 1);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(10), side2 + px(10));
+        font.draw(sb, I18n.obj("sun"), side2 + px(10), side2 + px(10));
         font.setColor(textgc);
-        font.draw(sb, "Hyades", side2 + px(5), side2 - px(5));
-        font.draw(sb, "Pleiades", side2, side2 - px(20));
-        font.draw(sb, "Taurus", side2 - px(30), side2 - px(40));
+        font.draw(sb, I18n.obj("hyades"), side2 + px(5), side2 - px(5));
+        font.draw(sb, I18n.obj("pleiades"), side2, side2 - px(20));
+        font.draw(sb, I18n.obj("taurus"), side2 - px(30), side2 - px(40));
         font.draw(sb, "Near\nPerseus", side2 - px(70), side2 - px(50));
         font.draw(sb, "Far\nPerseus", side2 - px(50), side2 - px(85));
         font.draw(sb, "Orion", side2 + px(20), side2 - px(85));
@@ -177,14 +177,14 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
         font.draw(sb, "VEL OB2", side2 + px(65), side2 - px(15));
 
         font.setColor(textmc);
-        font.draw(sb, "0°", side2 - px(15), side - px(5));
-        font.draw(sb, "270°", side - px(30), side2 + px(5));
-        font.draw(sb, "180°", side2 + px(3), px(15));
-        font.draw(sb, "90°", px(5), side2 + px(5));
+        font.draw(sb, "0" + I18n.msg("gui.unit.deg"), side2 - px(15), side - px(5));
+        font.draw(sb, "270" + I18n.msg("gui.unit.deg"), side - px(30), side2 + px(5));
+        font.draw(sb, "180" + I18n.msg("gui.unit.deg"), side2 + px(3), px(15));
+        font.draw(sb, "90" + I18n.msg("gui.unit.deg"), px(5), side2 + px(5));
 
         font.setColor(textbc);
-        font.draw(sb, "250pc", side2 + px(15), side2 + side2 / 2f + px(10));
-        font.draw(sb, "500pc", side2 + px(25), side);
+        font.draw(sb, "250" + I18n.msg("gui.unit.pc"), side2 + px(15), side2 + side2 / 2f + px(10));
+        font.draw(sb, "500" + I18n.msg("gui.unit.pc"), side2 + px(25), side);
         sb.end();
 
         fb.end();

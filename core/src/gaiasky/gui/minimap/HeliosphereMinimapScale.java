@@ -83,7 +83,7 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
         font.setColor(intc);
         font.draw(sb, I18n.msg("gui.minimap.interstellar"), px(10),  px(90));
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
+        font.draw(sb, I18n.obj("sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
 
         fb.end();
@@ -127,8 +127,8 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(textbc);
-        font.draw(sb, "100 AU", side2, u2Px(200, side2));
-        font.draw(sb, "1000 AU", side2, u2Px(1000 + 3, side2));
+        font.draw(sb, "100 " + I18n.msg("gui.unit.au"), side2, u2Px(200, side2));
+        font.draw(sb, "1000 " + I18n.msg("gui.unit.au"), side2, u2Px(1000 + 3, side2));
 
         font.setColor(helc);
         font.draw(sb, I18n.msg("gui.minimap.heliosphere"),  side2 + px(15),  u2Px(0, side2) + px(8));
@@ -137,7 +137,7 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
         font.setColor(intc);
         font.draw(sb, I18n.msg("gui.minimap.interstellar"), px(60),  px(30));
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2 + px(5), side2 - px(5));
+        font.draw(sb, I18n.obj("sun"), side2 + px(5), side2 - px(5));
 
         sb.end();
 

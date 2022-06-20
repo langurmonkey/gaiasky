@@ -15,9 +15,9 @@ public class AttributeAbsmag extends AttributeAbstract implements IAttribute {
     }
 
     public String getUnit(){
-        return "mag";
+        return I18n.msg("gui.unit.mag");
     }
     public String toString(){
-        return I18n.msg("gui.focusinfo.absmag");
+        return I18n.msg("gui.attrib.absmag");
     }
 }

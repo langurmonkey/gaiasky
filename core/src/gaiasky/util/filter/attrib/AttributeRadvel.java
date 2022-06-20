@@ -14,9 +14,9 @@ public class AttributeRadvel extends AttributeAbstract implements IAttribute {
         return bean.radvel();
     }
     public String getUnit(){
-        return "km/s";
+        return I18n.msg("gui.unit.kms");
     }
     public String toString(){
-        return I18n.msg("gui.focusinfo.radvel");
+        return I18n.msg("gui.attrib.radvel");
     }
 }

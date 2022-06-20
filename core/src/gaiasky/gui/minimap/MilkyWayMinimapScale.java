@@ -34,7 +34,7 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
     }
 
     @Override
-    public void updateLocal(){
+    public void updateLocal() {
 
     }
 
@@ -117,14 +117,14 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), u2Px(-8000, side2), sideshort2 - px(8));
+        font.draw(sb, I18n.obj("sun"), u2Px(-8000, side2), sideshort2 - px(8));
         font.setColor(textbc);
         font.draw(sb, I18n.msg("gui.minimap.gc"), side2, sideshort2 - px(4));
         font.setColor(textmc);
-        font.draw(sb, "4Kpc", side2 + px(15), sideshort2 - px(10));
-        font.draw(sb, "8Kpc", side2 + px(50), sideshort2 + px(20));
-        font.draw(sb, "12Kpc", side2 + px(70), sideshort2 - px(30));
-        font.draw(sb, "16Kpc", side2 + px(90), sideshort2 + px(60));
+        font.draw(sb, "4" + I18n.msg("gui.unit.kpc"), side2 + px(15), sideshort2 - px(10));
+        font.draw(sb, "8" + I18n.msg("gui.unit.kpc"), side2 + px(50), sideshort2 + px(20));
+        font.draw(sb, "12" + I18n.msg("gui.unit.kpc"), side2 + px(70), sideshort2 - px(30));
+        font.draw(sb, "16" + I18n.msg("gui.unit.kpc"), side2 + px(90), sideshort2 + px(60));
         sb.end();
 
         fb.end();
@@ -174,22 +174,21 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         renderCameraTop(.1f);
         sr.end();
 
-
         // Fonts
         sb.begin();
         font.setColor(sunc);
-        font.draw(sb, I18n.msg("gui.minimap.sun"), side2, sunPos.y - px(8));
+        font.draw(sb, I18n.obj("sun"), side2, sunPos.y - px(8));
         font.setColor(0, 0, 0, 1);
         font.draw(sb, I18n.msg("gui.minimap.gc"), side2 + px(4), side2 - px(4));
         font.setColor(textmc);
         for (int i = 4000; i <= 16000; i += 4000) {
-            font.draw(sb, "" + (i / 1000) + "Kpc", side2 + px(4), (16000f + i) * side / 32000f - px(6));
+            font.draw(sb, "" + (i / 1000) + I18n.msg("gui.unit.kpc"), side2 + px(4), (16000f + i) * side / 32000f - px(6));
         }
 
-        font.draw(sb, "0°", side2 - px(15), side - px(5));
-        font.draw(sb, "270°", side - px(50), sunPos.y + px(15));
-        font.draw(sb, "180°", side2 - px(32), px(15));
-        font.draw(sb, "90°", px(18), sunPos.y + px(15));
+        font.draw(sb, "0" + I18n.msg("gui.unit.deg"), side2 - px(15), side - px(5));
+        font.draw(sb, "270" + I18n.msg("gui.unit.deg"), side - px(50), sunPos.y + px(15));
+        font.draw(sb, "180" + I18n.msg("gui.unit.deg"), side2 - px(32), px(15));
+        font.draw(sb, "90" + I18n.msg("gui.unit.deg"), px(18), sunPos.y + px(15));
         sb.end();
 
         fb.end();

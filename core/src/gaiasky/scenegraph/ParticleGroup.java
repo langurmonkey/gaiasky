@@ -829,11 +829,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return super.getName();
     }
 
-    // Particles and stars are not localized yet
-    public String getLocalizedName() {
-        return getName();
-    }
-
     public String[] getNames() {
         if (focus != null && focus.names() != null)
             return focus.names();

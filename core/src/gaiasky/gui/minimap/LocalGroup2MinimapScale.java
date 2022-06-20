@@ -179,14 +179,14 @@ public class LocalGroup2MinimapScale extends AbstractMinimapScale {
         }
 
         font.setColor(textmc);
-        font.draw(sb, "0°", side2 - px(15), side - px(5));
-        font.draw(sb, "270°", side - px(30), side2 + px(15));
-        font.draw(sb, "180°", side2 + px(3), px(15));
-        font.draw(sb, "90°", px(5), side2 + px(15));
+        font.draw(sb, "0" + I18n.msg("gui.unit.deg"), side2 - px(15), side - px(5));
+        font.draw(sb, "270" + I18n.msg("gui.unit.deg"), side - px(30), side2 + px(15));
+        font.draw(sb, "180" + I18n.msg("gui.unit.deg"), side2 + px(3), px(15));
+        font.draw(sb, "90°" + I18n.msg("gui.unit.deg"), px(5), side2 + px(15));
 
         font.setColor(textgc);
-        font.draw(sb, "12Mpc", side2 + px(15), side2 + side2 / 2f + px(10));
-        font.draw(sb, "25Mpc", side2 + px(25), side - px(15));
+        font.draw(sb, "12" + I18n.msg("gui.unit.mpc"), side2 + px(15), side2 + side2 / 2f + px(10));
+        font.draw(sb, "25" + I18n.msg("gui.unit.mpc"), side2 + px(25), side - px(15));
         sb.end();
 
         fb.end();
