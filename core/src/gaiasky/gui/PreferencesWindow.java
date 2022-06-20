@@ -2290,7 +2290,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Save configuration
         SettingsManager.instance.persistSettings(new File(System.getProperty("properties.file")));
-
         EventManager.publish(Event.PROPERTIES_WRITTEN, this);
 
         if (reloadScreenMode) {

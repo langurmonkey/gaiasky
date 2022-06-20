@@ -44,6 +44,7 @@ import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 import gaiasky.vr.openvr.VRStatus;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -455,6 +456,12 @@ public class WelcomeGui extends AbstractGui {
         this.localDatasets = DataDescriptorUtils.instance().buildLocalDatasets(null);
     }
 
+    private void savePreferences() {
+        // Save configuration
+        SettingsManager.instance.persistSettings(new File(System.getProperty("properties.file")));
+        EventManager.publish(Event.PROPERTIES_WRITTEN, this);
+    }
+
     private int numTotalDatasetsEnabled() {
         return this.localDatasets != null ? (int) this.localDatasets.datasets.stream()
                 .filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr))
@@ -571,6 +578,7 @@ public class WelcomeGui extends AbstractGui {
             ddw = new DatasetManagerWindow(ui, skin, dd);
             ddw.setAcceptRunnable(() -> {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
+                savePreferences();
                 reloadView();
             });
         } else {
