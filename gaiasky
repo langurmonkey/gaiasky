@@ -6,30 +6,33 @@
 
 print_usage() {
   echo "$0 launcher script"
-  echo "3D Universe simulation focused on Gaia"
+  echo "3D Universe simulation focused on Gaia."
   echo
   echo "Usage: $0 [OPTION]"
   echo
   echo "Options:"
-  echo " -v          Print version and exit"
-  echo " -h          Print help"
-  echo " -s          Skip welcome screen"
-  echo " -e          Create an extra window with the view of the scene and no UI"
-  echo " -n          Do not start the scripting server"
-  echo " -d          Start in debug mode"
-  echo " -g          Start OpenGL in debug mode"
+  echo " -v          Print version and exit."
+  echo " -h          Print help."
+  echo " -s          Skip welcome screen."
+  echo " -e          Create an extra window with the view of the scene and no UI."
+  echo " -n          Do not start the scripting server."
+  echo " -d          Start in debug mode."
+  echo " -g          Start OpenGL in debug mode."
+  echo " -p          Start Gaia Sky in VR mode."
 }
 
-while getopts 'hvsiend' flag; do
+while getopts 'hvsiendgp' flag; do
   case "${flag}" in
-    h) args="-h " ;;
-    v) args="-v " ;;
-    s) args="-s " ;;
-    e) args="-e " ;;
-    n) args="-n " ;;
-    d) args="-d " ;;
-    *) print_usage
-       exit 1 ;;
+    h)  args="-h " ;;
+    v)  args="-v " ;;
+    s)  args="-s " ;;
+    e)  args="-e " ;;
+    n)  args="-n " ;;
+    d)  args="-d " ;;
+    g)  args="-g " ;;
+    p)  args="-vr " ;;
+    *)  print_usage
+        exit 1 ;;
   esac
 done
 
