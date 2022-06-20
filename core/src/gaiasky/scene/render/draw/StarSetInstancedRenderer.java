@@ -170,7 +170,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     curr.mesh.setVertices(tempVerts, 0, 24);
                     // Per instance (divisor=1) vertices
                     int count = numStarsAdded * curr.instanceSize;
-                    setCount(render, count);
+                    setCount(render, numStarsAdded);
                     curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
                     setInGpu(render, true);
@@ -200,7 +200,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
                     try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
+                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, getCount(render));
                     } catch (IllegalArgumentException e) {
                         logger.error(e, "Render exception");
                     }
