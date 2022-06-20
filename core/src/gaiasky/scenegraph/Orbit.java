@@ -456,8 +456,8 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             Vector3d bodyPos = D31.get().setZero();
             if (orbitTrail) {
                 float top = alpha;
-                // For large periods, fade orbit to 0 a bit before.
-                float bottom = params != null && params.orbitalPeriod > 40000 ? -0.2f : -0.1f;
+                // For large periods, or moon orbits, fade orbit to 0 a bit before.
+                float bottom = params != null && (params.orbitalPeriod > 40000 || ct.isEnabled(ComponentType.Moons)) ? -0.2f : -0.1f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = pointCloudData.getWrapTimeMs(currentTime);
