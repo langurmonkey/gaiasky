@@ -80,7 +80,7 @@ public class Base implements Component {
         updateLocalizedName();
     }
 
-    public void setNames(String... names) {
+    public void setNames(String[] names) {
         this.names = names;
         updateLocalizedName();
     }

@@ -36,7 +36,6 @@ public class NewJsonLoader extends AbstractSceneLoader {
     // Params to skip in the normal processing
     private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
 
-
     /** Maps old attributes to components. **/
     private AttributeMap attributeMap;
 
@@ -52,7 +51,6 @@ public class NewJsonLoader extends AbstractSceneLoader {
     interface Function6<One, Two, Three, Four> {
         Four apply(One one, Two two, Three three);
     }
-
 
     @Override
     public void loadData() throws FileNotFoundException {
@@ -122,7 +120,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                 if (attribute.isValue()) {
                     valueClass = getValueClass(attribute);
                     value = getValue(attribute);
-                    if(value instanceof String) {
+                    if (value instanceof String) {
                         value = ((String) value).replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
                     }
                 } else if (attribute.isArray()) {
@@ -195,9 +193,13 @@ public class NewJsonLoader extends AbstractSceneLoader {
                 Class<? extends Component> componentClass = attributeMap.get(key);
                 Component comp = entity.getComponent(componentClass);
 
-                if (!set(comp, attribute.name, value)) {
-                    // Basic attribute set did not work, try out setter method
-                    return set(attribute, comp, value, valueClass, componentClass);
+                if (!set(attribute, comp, value, valueClass, componentClass)) {
+                    // Setter set did not work, try setting the attribute directly
+                    boolean succeed = set(comp, attribute.name, value);
+                    if (!succeed) {
+                        logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                    }
+                    return succeed;
                 }
                 return true;
             } else {
@@ -208,11 +210,11 @@ public class NewJsonLoader extends AbstractSceneLoader {
         logger.debug(I18n.msg("notif.loading", className + ": " + entity.getComponent(Base.class).names[0]));
     }
 
-    public String findAttribute(String attributeName, String className){
+    public String findAttribute(String attributeName, String className) {
         String mixedKey = attributeName + ":" + className;
-        if(attributeMap.containsKey(mixedKey)) {
+        if (attributeMap.containsKey(mixedKey)) {
             return mixedKey;
-        } else if(attributeMap.containsKey(attributeName)) {
+        } else if (attributeMap.containsKey(attributeName)) {
             return attributeName;
         }
         return null;
@@ -270,7 +272,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
 
     private boolean set(JsonValue attribute, Object instance, Object value, Class<?> valueClass, Class<?> instanceClass) {
         String methodName = "set" + TextUtils.propertyToMethodName(attribute.name);
-        Method m = searchMethod(methodName, valueClass, instanceClass);
+        Method m = searchMethod(methodName, valueClass, instanceClass, false);
         if (m != null) {
             try {
                 m.invoke(instance, value);
@@ -279,7 +281,6 @@ public class NewJsonLoader extends AbstractSceneLoader {
             }
             return true;
         } else {
-            logger.error("ERROR: No method " + methodName + "(" + valueClass.getName() + ") in class " + instanceClass + " or its superclass/interfaces.");
             return false;
         }
     }
@@ -288,12 +289,14 @@ public class NewJsonLoader extends AbstractSceneLoader {
      * Searches for the given method with the given class. If none is found, it looks for fitting methods
      * with the class' interfaces and superclasses recursively.
      *
-     * @param methodName    The method name.
-     * @param parameterType The parameter class type.
+     * @param methodName     The method name.
+     * @param parameterType  The parameter class type.
+     * @param source         The class of the source object.
+     * @param printException Whether to print an exception if no method is found.
      *
      * @return The method, if found. Null otherwise.
      */
-    private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source) {
+    private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source, boolean printException) {
         Method m = null;
         try {
             m = ClassReflection.getMethod(source, methodName, parameterType);
@@ -304,7 +307,9 @@ public class NewJsonLoader extends AbstractSceneLoader {
                     m = ClassReflection.getMethod(source, methodName, IBodyCoordinates.class);
                 }
             } catch (ReflectionException e1) {
-                logger.error(e1);
+                if (printException) {
+                    logger.error(e1);
+                }
             }
         }
         return m;
