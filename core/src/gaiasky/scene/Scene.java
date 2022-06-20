@@ -1,9 +1,7 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
