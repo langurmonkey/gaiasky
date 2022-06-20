@@ -3,6 +3,7 @@ package gaiasky.scene.render.draw.line;
 import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
@@ -54,7 +55,7 @@ public class LineEntityRenderSystem {
             var graph = Mapper.graph.get(entity);
             var body = Mapper.body.get(entity);
             renderTrajectory(render, base, body, graph, trajectory, verts, renderer, camera, alpha);
-        } else if(set != null) {
+        } else if (set != null) {
             // Star sets.
             renderStarSet(render, base, set, renderer, camera, alpha);
         }
@@ -84,7 +85,7 @@ public class LineEntityRenderSystem {
             if (orbitTrail) {
                 float top = alpha;
                 // For large periods, fade orbit to 0 a bit before.
-                float bottom = trajectory.params != null && trajectory.params.orbitalPeriod > 40000 ? -0.2f : -0.1f;
+                float bottom = trajectory.params != null && (trajectory.params.orbitalPeriod > 40000 || base.ct.isEnabled(ComponentType.Moons)) ? -0.2f : -0.1f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = verts.pointCloudData.getWrapTimeMs(currentTime);
