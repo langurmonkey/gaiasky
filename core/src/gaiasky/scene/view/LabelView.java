@@ -9,10 +9,7 @@ import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.SolidAngle;
-import gaiasky.scene.component.StarSet;
-import gaiasky.scene.component.Text;
+import gaiasky.scene.component.*;
 import gaiasky.scene.render.draw.TextRenderer;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -40,6 +37,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private GraphNode graph;
     private SolidAngle sa;
     private Text text;
+    private Cluster cluster;
 
     public LabelView() {
     }
@@ -56,6 +54,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.graph = Mapper.graph.get(entity);
         this.sa = Mapper.sa.get(entity);
         this.text = Mapper.text.get(entity);
+        this.cluster = Mapper.cluster.get(entity);
     }
 
     @Override
@@ -71,6 +70,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         } else if (set != null) {
             // Star sets.
             renderStarSet(batch, shader, sys, rc, camera);
+        } else if (cluster != null) {
+            // Clusters
+            renderCluster(batch, shader, sys, rc, camera);
         }
     }
 
@@ -87,6 +89,16 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
             render3DLabel(batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text(), pos, body.distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), getRadius(), base.forceLabel);
         }
+    }
+
+    public void renderCluster(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        Vector3d pos = D31;
+        textPosition(camera, pos);
+        shader.setUniformf("u_viewAngle", base.forceLabel ? 2f : (float) body.viewAngle * 500f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+
+        render3DLabel(batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text(), pos, body.distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), body.size / 2d, base.forceLabel);
     }
 
     public void renderStarSet(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
@@ -106,7 +118,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 6f);
 
                 if (camera.isVisible(viewAngle, starPosition, distToCamera)) {
-                    render2DLabel(batch, shader, rc,  ((TextRenderer) sys).font2d, camera, star.names()[0], starPosition);
+                    render2DLabel(batch, shader, rc, ((TextRenderer) sys).font2d, camera, star.names()[0], starPosition);
                 }
             }
         } else {

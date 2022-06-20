@@ -27,7 +27,7 @@ import java.util.Map;
 public class SceneJsonLoader {
     private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
 
-    private static List<String> supportedLoaders = Arrays.asList("gaiasky.data.JsonLoader", "gaiasky.data.GeoJsonLoader", "gaiasky.data.group.OctreeGroupLoader");
+    private static List<String> supportedLoaders = Arrays.asList("gaiasky.data.JsonLoader", "gaiasky.data.GeoJsonLoader", "gaiasky.data.group.OctreeGroupLoader", "gaiasky.data.cluster.StarClusterLoader");
 
     public synchronized static void loadScene(FileHandle[] jsonFiles, Scene scene) throws FileNotFoundException, ReflectionException {
         logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
@@ -87,6 +87,8 @@ public class SceneJsonLoader {
                     clazzName = "gaiasky.data.NewGeoJsonLoader";
                 } else if (clazzName.equals("gaiasky.data.group.OctreeGroupLoader")) {
                     clazzName = "gaiasky.data.OctreeLoader";
+                } else if(clazzName.equals("gaiasky.data.cluster.StarClusterLoader")) {
+                    clazzName = "gaiasky.data.NewStarClusterLoader";
                 }
 
                 @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);

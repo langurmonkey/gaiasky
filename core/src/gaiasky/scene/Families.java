@@ -25,6 +25,7 @@ public class Families {
             fadeNodes,
             backgroundModels,
             sphericalGrids,
+            clusters,
             octrees;
 
     public Families() {
@@ -43,6 +44,7 @@ public class Families {
         fadeNodes = Family.all(Fade.class).exclude(TagOctreeObject.class).get();
         backgroundModels = Family.all(TagBackgroundModel.class).get();
         sphericalGrids = Family.all(GridUV.class).get();
+        clusters = Family.all(Cluster.class).get();
         octrees = Family.all(Octree.class).get();
     }
 

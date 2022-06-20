@@ -107,7 +107,6 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
         var body = Mapper.body.get(entity);
         var coordinates = Mapper.coordinates.get(entity);
         var rotation = Mapper.rotation.get(entity);
-        var octant = Mapper.octant.get(entity);
 
         // Update local position here
         if (time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {
@@ -133,7 +132,7 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
         // Apply proper motion if needed
         if (Mapper.pm.has(entity)) {
             var pm = Mapper.pm.get(entity);
-            Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
+            Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
             graph.translation.add(pmv);
         }
 

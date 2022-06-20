@@ -119,7 +119,7 @@ public class Archetypes {
             addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
 
             // StarCluster
-            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class);
+            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class, Text.class);
 
             // Billboard
             addArchetype(Billboard.class.getName(), ModelBody.class.getName(), TagQuaternionOrientation.class, Fade.class);

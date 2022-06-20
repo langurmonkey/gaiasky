@@ -50,10 +50,10 @@ public class AstroUtils {
     public static final long J2000_MS;
 
     /**
-     * Get julian date from a double reference epoch
+     * Get julian date from a double reference epoch, as a Gregorian calendar year plus fraction.
      *
-     * @param refEpoch The reference epoch
-     * @return The julian date
+     * @param refEpoch The reference epoch as a Gregorian calendar year.
+     * @return The julian date.
      */
     public static double getJulianDate(double refEpoch) {
         int year = (int) refEpoch;

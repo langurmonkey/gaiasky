@@ -13,6 +13,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Bits;
+import gaiasky.util.Constants;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntMeshPartBuilder;
@@ -38,10 +39,15 @@ public class ClusterInitializer extends InitSystem {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var cluster = Mapper.cluster.get(entity);
+        var text = Mapper.text.get(entity);
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units
         body.size = (float) (Math.tan(Math.toRadians(cluster.raddeg)) * cluster.dist * 2);
+
+        text.textScale = 1;
+        text.labelMax = (float) (1e-4 / Constants.DISTANCE_SCALE_FACTOR);
+        text.labelFactor = 1;
 
     }
 

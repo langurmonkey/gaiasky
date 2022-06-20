@@ -135,9 +135,10 @@ public class Scene {
             EntitySystem raymarchingInit = new InvisibleInitializer(setUp, families.raymarchings, priority++);
             EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
+            EntitySystem clusterInit = new ClusterInitializer(setUp, families.clusters, priority++);
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardSetInit, axesInit, raymarchingInit, fadeInit, datasetDescInit, backgroundInit);
+            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardSetInit, axesInit, raymarchingInit, fadeInit, datasetDescInit, backgroundInit, clusterInit);
         }
     }
 
@@ -194,6 +195,7 @@ public class Scene {
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models, priority++);
             TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
+            ClusterUpdater clusterUpdateSystem = new ClusterUpdater(families.clusters, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -202,6 +204,7 @@ public class Scene {
             AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, sceneRenderer);
             AbstractExtractSystem trajectoryExtractor = newExtractor(TrajectoryExtractor.class, families.orbits, priority++, sceneRenderer);
             AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, sceneRenderer);
+            AbstractExtractSystem clusterExtractor = newExtractor(ClusterExtractor.class, families.clusters, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -216,6 +219,7 @@ public class Scene {
             engine.addSystem(modelUpdateSystem);
             engine.addSystem(trajectoryUpdateSystem);
             engine.addSystem(backgroundUpdateSystem);
+            engine.addSystem(clusterUpdateSystem);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -224,6 +228,7 @@ public class Scene {
             engine.addSystem(modelExtractor);
             engine.addSystem(trajectoryExtractor);
             engine.addSystem(backgroundExtractor);
+            engine.addSystem(clusterExtractor);
         }
     }
 
