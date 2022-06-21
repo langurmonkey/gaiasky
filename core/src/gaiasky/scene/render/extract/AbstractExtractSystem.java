@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
@@ -33,6 +34,10 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
 
     protected boolean shouldRender(Base base) {
         return GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && base.isVisible();
+    }
+
+    public boolean renderText() {
+        return GaiaSky.instance.isOn(ComponentType.Labels);
     }
 
 

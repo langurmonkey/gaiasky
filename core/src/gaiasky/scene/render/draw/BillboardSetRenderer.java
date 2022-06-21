@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.render.system;
+package gaiasky.scene.render.draw;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -19,11 +19,13 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.api.IBillboardDatasetProvider;
-import gaiasky.render.api.IFadeObject;
-import gaiasky.render.api.IRenderable;
-import gaiasky.render.api.IStatusObject;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.api.IRenderable;
+import gaiasky.render.system.PointCloudTriRenderSystem;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.component.BillboardSet;
+import gaiasky.scene.component.Render;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.BillboardDataset;
 import gaiasky.scenegraph.particle.BillboardDataset.ParticleType;
@@ -46,25 +48,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Renders billboard datasets by sending them to the GPU at once. Eligible objects
- * must implement {@link IRenderable}, {@link IStatusObject}, {@link IBillboardDatasetProvider} and
- * {@link IFadeObject}.
+ * Renders billboard sets.
  */
-public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(BillboardGroupRenderSystem.class);
+public class BillboardSetRenderer extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(BillboardSetRenderer.class);
 
     private static final String texFolder = "data/galaxy/sprites/";
 
     private final Vector3 aux3f1;
 
-    private Map<IBillboardDatasetProvider, MeshDataWrap[]> meshes;
-    private Map<IBillboardDatasetProvider, GpuData[]> gpus;
+    private Map<Render, MeshDataWrap[]> meshes;
+    private Map<Render, GpuData[]> gpus;
 
     private TextureArray ta;
 
     private ColorGenerator starColorGenerator, dustColorGenerator;
 
-    public BillboardGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
+    public BillboardSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
         super(rg, alphas, starShaders);
         aux3f1 = new Vector3();
 
@@ -117,7 +117,7 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
         ta.dispose();
     }
 
-    private void disposeMeshes(IBillboardDatasetProvider key) {
+    private void disposeMeshes(Render key) {
         if (meshes != null && meshes.containsKey(key)) {
             MeshDataWrap[] m = meshes.get(key);
             if (m != null && m.length > 0) {
@@ -133,8 +133,8 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
     }
 
     private void disposeMeshes() {
-        Set<IBillboardDatasetProvider> keys = meshes.keySet();
-        for (IBillboardDatasetProvider key : keys) {
+        Set<Render> keys = meshes.keySet();
+        for (Render key : keys) {
             disposeMeshes(key);
         }
     }
@@ -258,63 +258,68 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
     /**
      * Creates the GPU data objects for a given dataset provider and stores them.
      *
-     * @param datasetProvider The dataset provider object.
+     * @param render The render object.
+     * @param base   The base component.
+     * @param set    The billboard set component.
      */
-    private void convertDataToGpuFormat(IBillboardDatasetProvider datasetProvider) {
-        logger.info("Converting billboard data to VRAM format: " + datasetProvider);
-        BillboardDataset[] datasets = datasetProvider.getDatasets();
+    private void convertDataToGpuFormat(Render render, Base base, BillboardSet set) {
+        logger.info("Converting billboard data to VRAM format: " + base.getLocalizedName());
+        BillboardDataset[] datasets = set.datasets;
         GpuData[] g = new GpuData[datasets.length];
         for (int i = 0; i < g.length; i++) {
             g[i] = convertDataToGpu(datasets[i], getColorGenerator(datasets[i].type));
         }
-        gpus.put(datasetProvider, g);
+        gpus.put(render, g);
     }
 
     /**
      * Converts the GPU data objects for the given dataset provider to mesh data
      * objects and stores them.
      *
-     * @param datasetProvider The dataset provider object.
+     * @param render The render object.
+     * @param base   The base component.
      */
-    private void streamToGpu(IBillboardDatasetProvider datasetProvider) {
-        logger.info("Streaming billboard datasets to GPU: " + datasetProvider);
-        GpuData[] g = gpus.get(datasetProvider);
+    private void streamToGpu(Render render, Base base) {
+        logger.info("Streaming billboard datasets to GPU: " + base.getLocalizedName());
+        GpuData[] g = gpus.get(render);
         if (g != null) {
             MeshDataWrap[] m = new MeshDataWrap[g.length];
             for (int i = 0; i < g.length; i++) {
                 m[i] = toMeshData(g[i], m[i]);
             }
-            gpus.remove(datasetProvider);
-            meshes.put(datasetProvider, m);
+            gpus.remove(render);
+            meshes.put(render, m);
         }
     }
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         for (IRenderable renderable : renderables) {
-            IStatusObject statusObject = (IStatusObject) renderable;
-            IBillboardDatasetProvider datasetProvider = (IBillboardDatasetProvider) renderable;
-            IFadeObject fadeObject = (IFadeObject) renderable;
+            Render render = (Render) renderable;
+            var base = Mapper.base.get(render.entity);
+            var set = Mapper.billboardSet.get(render.entity);
 
-            switch (statusObject.getStatus()) {
+            switch (set.status) {
             case NOT_LOADED:
                 // PRELOAD
-                statusObject.setStatus(LoadStatus.LOADING);
+                set.setStatus(LoadStatus.LOADING);
                 Thread loader = new Thread(() -> {
-                    convertDataToGpuFormat(datasetProvider);
-                    statusObject.setStatus(LoadStatus.READY);
+                    convertDataToGpuFormat(render, base, set);
+                    set.setStatus(LoadStatus.READY);
                 });
                 loader.start();
                 break;
             case READY:
                 // TO GPU
-                streamToGpu(datasetProvider);
-                statusObject.setStatus(LoadStatus.LOADED);
+                streamToGpu(render, base);
+                set.setStatus(LoadStatus.LOADED);
                 break;
             case LOADED:
                 // RENDER
                 float alpha = getAlpha(renderable);
                 if (alpha > 0) {
+                    var fade = Mapper.fade.get(render.entity);
+
                     ExtShaderProgram shaderProgram = getShaderProgram();
 
                     shaderProgram.begin();
@@ -323,7 +328,7 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
                     shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha);
-                    shaderProgram.setUniformf("u_edges", (float) fadeObject.getFadeIn().y, (float) fadeObject.getFadeOut().y);
+                    shaderProgram.setUniformf("u_edges", (float) fade.fadeIn.y, (float) fade.fadeOut.y);
                     double pointScaleFactor = 1.8e7;
 
                     // Rel, grav, z-buffer
@@ -335,7 +340,7 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
                     Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
                     Gdx.gl20.glEnable(GL20.GL_BLEND);
 
-                    MeshDataWrap[] m = meshes.get(datasetProvider);
+                    MeshDataWrap[] m = meshes.get(render);
                     for (MeshDataWrap meshDataWrap : m) {
                         MeshData meshData = meshDataWrap.meshData;
                         BillboardDataset dataset = meshDataWrap.dataset;
@@ -343,8 +348,7 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
                         switch (dataset.blending) {
                         case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                         case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                        }
-                        ;
+                        };
                         // Depth mask
                         Gdx.gl20.glDepthMask(dataset.depthMask);
 
@@ -379,8 +383,8 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
-            if (source instanceof IBillboardDatasetProvider) {
-                disposeMeshes((IBillboardDatasetProvider) source);
+            if (source instanceof Render) {
+                disposeMeshes((Render) source);
             }
         }
     }

@@ -62,8 +62,4 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }
-
-    private boolean renderText() {
-        return GaiaSky.instance.isOn(ComponentType.Labels);
-    }
 }

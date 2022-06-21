@@ -197,6 +197,7 @@ public class Scene {
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
             ClusterUpdater clusterUpdateSystem = new ClusterUpdater(families.clusters, priority++);
             RaymarchingUpdater raymarchingUpdater = new RaymarchingUpdater(families.raymarchings, priority++);
+            BillboardSetUpdater billboardSetUpdater = new BillboardSetUpdater(families.billboardSets, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -206,6 +207,7 @@ public class Scene {
             AbstractExtractSystem trajectoryExtractor = newExtractor(TrajectoryExtractor.class, families.orbits, priority++, sceneRenderer);
             AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, sceneRenderer);
             AbstractExtractSystem clusterExtractor = newExtractor(ClusterExtractor.class, families.clusters, priority++, sceneRenderer);
+            AbstractExtractSystem billboardSetExtractor = newExtractor(BillboardSetExtractor.class, families.billboardSets, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -222,6 +224,7 @@ public class Scene {
             engine.addSystem(backgroundUpdateSystem);
             engine.addSystem(clusterUpdateSystem);
             engine.addSystem(raymarchingUpdater);
+            engine.addSystem(billboardSetUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -231,6 +234,7 @@ public class Scene {
             engine.addSystem(trajectoryExtractor);
             engine.addSystem(backgroundExtractor);
             engine.addSystem(clusterExtractor);
+            engine.addSystem(billboardSetExtractor);
         }
     }
 

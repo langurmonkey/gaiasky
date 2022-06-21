@@ -400,7 +400,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelPerPixelLightingEarly);
         addRenderSystem(modelPerVertexLightingEarly);
 
-        // Milky way
+        // Billboard groups
         addRenderSystem(billboardGroupRenderSystem);
 
         // Billboard stars

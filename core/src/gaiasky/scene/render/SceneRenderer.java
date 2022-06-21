@@ -323,6 +323,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL BEAM
         AbstractRenderSystem modelBeamProc = new ModelRenderer(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
 
+        // GALAXY
+        AbstractRenderSystem billboardSetProc = new BillboardSetRenderer(BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
+
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = switch (pcm) {
             case TRIANGLES -> new ParticleSetRenderer(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
@@ -392,6 +395,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelMeshOpaqueProc);
         addRenderSystem(modelPerPixelLightingEarly);
         addRenderSystem(modelPerVertexLightingEarly);
+
+        // Billboard groups
+        addRenderSystem(billboardSetProc);
 
         // Billboard stars
         addRenderSystem(billboardStarsProc);
