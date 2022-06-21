@@ -26,7 +26,7 @@
   </description>
 
   <releases>
-    <release version="3.2.0" date="2022-06-07" urgency="high">
+    <release version="3.2.1" date="2022-06-21" urgency="high">
       <url>https://gitlab.com/gaiasky/gaiasky/blob/master/CHANGELOG.md</url>
     </release>
   </releases>
