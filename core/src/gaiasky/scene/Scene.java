@@ -196,6 +196,7 @@ public class Scene {
             TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
             BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
             ClusterUpdater clusterUpdateSystem = new ClusterUpdater(families.clusters, priority++);
+            RaymarchingUpdater raymarchingUpdater = new RaymarchingUpdater(families.raymarchings, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -220,6 +221,7 @@ public class Scene {
             engine.addSystem(trajectoryUpdateSystem);
             engine.addSystem(backgroundUpdateSystem);
             engine.addSystem(clusterUpdateSystem);
+            engine.addSystem(raymarchingUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
