@@ -9,8 +9,8 @@ UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 GSDIR=`realpath $UTILSDIR/../../../`
 
 # Use regexp to only include full versions (e.g. exclude release candidates)
-git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 3.1.6..
-cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-315.md > $GSDIR/CHANGELOG.md
+git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 3.2.1..
+cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-320.md > $GSDIR/CHANGELOG.md
 rm $GSDIR/temp.md
 
 echo "Changelog generated to $GSDIR/CHANGELOG.md"
