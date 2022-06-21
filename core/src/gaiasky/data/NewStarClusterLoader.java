@@ -245,6 +245,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
         body.pos = pos;
         body.posSph = new Vector2d(posSph.x, posSph.y);
         body.setColor(new float[] { 0.93f, 0.93f, 0.3f, 1f });
+        body.setLabelColor(new float[] { 0.93f, 0.93f, 0.3f, 1f });
 
         var pm = Mapper.pm.get(entity);
         pm.pm = pmv.put(new Vector3());

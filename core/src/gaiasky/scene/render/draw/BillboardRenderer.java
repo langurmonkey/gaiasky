@@ -305,6 +305,25 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
             // Render the mesh
             mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
+        } else if(Mapper.cluster.has(entity)) {
+            /*
+             * STAR CLUSTERS
+             */
+            var cluster = Mapper.cluster.get(entity);
+            // Bind texture
+            if (cluster.clusterTex != null) {
+                cluster.clusterTex.bind(0);
+                shader.setUniformi("u_texture0", 0);
+            }
+
+            float fa = (1 - cluster.fadeAlpha) * 0.6f;
+
+            Vector3 aux = F31;
+            shader.setUniformf("u_pos", graph.translation.put(aux));
+            shader.setUniformf("u_size", body.size);
+            shader.setUniformf("u_color", body.color[0] * fa, body.color[1] * fa, body.color[2] * fa, body.color[3] * alpha * base.opacity * 6.5f);
+            // Sprite.render
+            mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
         }
     }
 

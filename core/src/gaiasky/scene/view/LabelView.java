@@ -169,10 +169,12 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public float textScale() {
-        if (set == null) {
-            return text.textScale >= 0 ? text.textScale : (float) FastMath.atan(text.labelMax) * text.labelFactor * 4e2f;
-        } else {
+        if (set != null) {
+            // Star sets
             return .5f / Settings.settings.scene.label.size;
+        } else {
+            // Rest
+            return text.textScale >= 0 ? text.textScale : (float) FastMath.atan(text.labelMax) * text.labelFactor * 4e2f;
         }
     }
 
@@ -193,7 +195,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
         aux.crs(out).nor();
 
-        float dist = -0.02f * cam.getFovFactor() * (float) out.len();
+        float dist = -0.015f * cam.getFovFactor() * (float) out.len();
 
         aux.add(cam.getUp()).nor().scl(dist);
 

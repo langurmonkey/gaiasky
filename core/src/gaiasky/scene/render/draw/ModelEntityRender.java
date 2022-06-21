@@ -60,6 +60,9 @@ public class ModelEntityRender {
         } else if (Mapper.starSet.has(entity)) {
             // Star set.
             renderParticleStarSetModel(entity, model, batch, alpha, t);
+        } else if (Mapper.cluster.has(entity)) {
+            // Cluster
+            renderStarClusterModel(entity, model, Mapper.cluster.get(entity), batch, alpha);
         } else {
             boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
             // Generic model.
@@ -96,6 +99,26 @@ public class ModelEntityRender {
             mc.update(alpha * alphaFactor, relativistic);
             batch.render(mc.instance, mc.env);
         }
+    }
+
+    /**
+     * Renders a star cluster entity as a model.
+     * @param entity The entity.
+     * @param model The model component.
+     * @param cluster The cluster component.
+     * @param modelBatch The model batch.
+     * @param alpha The model alpha.
+     */
+    private void renderStarClusterModel(Entity entity, Model model, Cluster cluster, IntModelBatch modelBatch, float alpha) {
+        ModelComponent mc = model.model;
+        var base = Mapper.base.get(entity);
+        var graph = Mapper.graph.get(entity);
+
+        mc.update(null, alpha * base.opacity * cluster.fadeAlpha, GL20.GL_ONE, GL20.GL_ONE);
+        // Depth reads, no depth writes
+        mc.setDepthTest(GL20.GL_LEQUAL, false);
+        mc.instance.transform.set(graph.localTransform);
+        modelBatch.render(mc.instance, mc.env);
     }
 
     /**

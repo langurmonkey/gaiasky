@@ -45,8 +45,8 @@ public class ClusterInitializer extends InitSystem {
         // Compute size from distance and radius, convert to units
         body.size = (float) (Math.tan(Math.toRadians(cluster.raddeg)) * cluster.dist * 2);
 
-        text.textScale = 1;
-        text.labelMax = (float) (1e-4 / Constants.DISTANCE_SCALE_FACTOR);
+        text.textScale = 0.2f;
+        text.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
         text.labelFactor = 1;
 
     }
