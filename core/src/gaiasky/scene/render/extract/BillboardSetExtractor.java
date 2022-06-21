@@ -14,7 +14,6 @@ public class BillboardSetExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
         var fade = Mapper.fade.get(entity);
 
         if (shouldRender(base) && (fade.fadeIn == null || fade.currentDistance > fade.fadeIn.x) && (fade.fadeOut == null || fade.currentDistance < fade.fadeOut.y)) {
