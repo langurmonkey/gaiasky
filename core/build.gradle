@@ -185,7 +185,7 @@ task manGen(type: Exec) {
 
 task genReleaseNotes(type: Exec) {
     println("generate-releasenotes $tag $distDir/releasenotes.txt")
-    workingDir "$baseDir/core/scripts/gaiasky-release/"
+    workingDir "$baseDir/core/scripts/release/"
     commandLine "generate-releasenotes", "$tag", "$distDir/releasenotes.txt"
 }
 

@@ -1,6 +1,32 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/gaiasky/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.2.0...HEAD)
+[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.2.1...HEAD)
+
+
+<a name="3.2.1"></a>
+## [3.2.1](https://gitlab.com/gaiasky/gaiasky/tree/3.2.0) (2022-06-21)
+[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.2.0...3.2.1)
+
+### Bug Fixes
+- translate strings of filters, shapes, datasets and minimap. Fixes [#403](https://gitlab.com/gaiasky/gaiasky/issues/403). [#403](https://gitlab.com/gaiasky/gaiasky/issues/403) 
+- filters crash with instanced star renderers. 
+- moon orbits are recomputed more often. 
+- modal windows made not collapsible by default. 
+- hotkey tooltip backgrounds. 
+- jump in Pluto's orbit due to deviation between full periods. 
+- highlight 'all visible' setting in quad-based star renderers. 
+- frame sequence number synchronized, value updated when opening preferences. 
+- typo in Jupiter English translation file, add meshes to data descriptor file. 
+- increase number of vertices of minimap shape renderer, fixes crash in heliosphere minimap. 
+- break link in dataset manager if too long. 
+
+### Build System
+- move namespace from 'gitlab.com/langurmonkey' to 'gitlab.com/gaiasky'. 
+- docs project no longer a submodule. 
+
+### Features
+- save configuration when closing dataset manager window. 
+- use view angle instead of view angle apparent for `goToObject()` API call. 
 
 
 <a name="3.2.0"></a>

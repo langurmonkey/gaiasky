@@ -3,7 +3,7 @@ style: github
 template: CHANGELOG.tpl.md
 info:
     title: Gaia Sky changelog
-    repository_url: https://gitlab.com/langurmonkey/gaiasky
+    repository_url: https://gitlab.com/gaiasky/gaiasky
 
 options:
 
