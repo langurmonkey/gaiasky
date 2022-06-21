@@ -33,6 +33,8 @@ public class I18nStatus {
         @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
         @Parameter(names = { "-s", "--show-untranslated" }, description = "Show untranslated keys for each language.", order = 1) private boolean showUntranslated = false;
         @Parameter(names = { "-u", "--show-unknown" }, description = "Show unknown keys for each language.", order = 2) private boolean showUnknown = false;
+        @Parameter(names = { "-f", "--file"}, description = "The name of the file to check, either 'gsbundle' or 'objects'.", order = 3) private String bundleFile = "gsbundle";
+
     }
 
     public static void main(String[] args) {
@@ -63,8 +65,8 @@ public class I18nStatus {
         DecimalFormat df = new DecimalFormat("0.0#");
 
         try {
-            PathMatcher globalMatcher = FileSystems.getDefault().getPathMatcher("glob:*.properties");
-            PathMatcher languageMatcher = FileSystems.getDefault().getPathMatcher("glob:*_*.properties");
+            PathMatcher globalMatcher = FileSystems.getDefault().getPathMatcher("glob:" + cliArgs.bundleFile + "*.properties");
+            PathMatcher languageMatcher = FileSystems.getDefault().getPathMatcher("glob:" + cliArgs.bundleFile + "*_*.properties");
 
             Path i18nDir = Path.of(ASSETS_LOC, "i18n");
             List<Path> candidatePaths = Files.list(i18nDir).collect(Collectors.toList());
@@ -75,10 +77,10 @@ public class I18nStatus {
                 if (globalMatcher.matches(fileName)) {
                     if (languageMatcher.matches(fileName)) {
                         languagePaths.add(p);
-                        logger.debug("Language file: " + fileName);
+                        logger.info("Language file: " + fileName);
                     } else {
                         main = p;
-                        logger.debug("Main file: " + fileName);
+                        logger.info("Main file: " + fileName);
                     }
                 }
             }
