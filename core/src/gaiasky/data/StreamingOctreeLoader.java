@@ -254,7 +254,6 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                 octant.setStatus(LoadStatus.NOT_LOADED);
             }
             toLoadQueue.clear();
-            //logger.info(I18n.txt("notif.loadingoctants.emtpied", n));
         }
     }
 
