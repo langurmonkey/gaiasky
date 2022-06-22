@@ -334,7 +334,9 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public boolean renderText() {
-        return computedSize > 0 && GaiaSky.instance.isOn(ComponentType.Labels) && viewAngleApparent >= (thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
+        return computedSize > 0 &&
+                GaiaSky.instance.isOn(ComponentType.Labels) &&
+                viewAngleApparent >= (thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
     }
 
     @Override

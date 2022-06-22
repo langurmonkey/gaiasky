@@ -103,7 +103,9 @@ public class ParticleInitializer extends InitSystem implements IObserver {
             render.renderGroup = RenderGroup.BILLBOARD_STAR;
         }
 
-        extra.primitiveRenderScale = 1;
+        if(extra.primitiveRenderScale <= 0) {
+            extra.primitiveRenderScale = 1;
+        }
         float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
     }

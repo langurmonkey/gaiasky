@@ -86,9 +86,8 @@ public class ParticleExtractor extends AbstractExtractSystem {
     }
 
     private boolean renderText(Body body, SolidAngle sa, ParticleExtra particleExtra) {
-        double thOverFactor = sa.thresholdPoint / Settings.settings.scene.label.number;
         return particleExtra.computedSize > 0 &&
                 GaiaSky.instance.isOn(ComponentType.Labels) &&
-                body.viewAngleApparent >= (thOverFactor / GaiaSky.instance.cameraManager.getFovFactor());
+                body.viewAngleApparent >= (sa.thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
     }
 }

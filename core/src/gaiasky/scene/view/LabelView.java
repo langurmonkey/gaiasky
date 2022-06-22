@@ -69,7 +69,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (Mapper.celestial.has(entity)) {
-            // Celestial: planets, single stars, etc.
+            // Celestial: planets, single stars, particles, etc.
             renderCelestial(batch, shader, sys, rc, camera);
         } else if (set != null) {
             // Star sets.

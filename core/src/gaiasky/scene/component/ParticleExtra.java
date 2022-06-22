@@ -10,4 +10,8 @@ public class ParticleExtra implements Component {
     public double computedSize;
     public double radius;
     public double primitiveRenderScale;
+
+    public void setPrimitiveRenderScale(Double primitiveRenderScale) {
+        this.primitiveRenderScale = primitiveRenderScale;
+    }
 }
