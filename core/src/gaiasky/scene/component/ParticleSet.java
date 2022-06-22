@@ -10,6 +10,7 @@ import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.scenegraph.particle.PointParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
@@ -275,11 +276,34 @@ public class ParticleSet implements Component {
     }
 
     public void setProfiledecay(Double profiledecay) {
-        this.profileDecay = profiledecay.floatValue();
+        setProfileDecay(profiledecay);
+    }
+
+    public void setProfileDecay(Double profileDecay) {
+        this.profileDecay = profileDecay.floatValue();
     }
 
     public void setColornoise(Double colorNoise) {
+        setColorNoise(colorNoise);
+    }
+    public void setColorNoise(Double colorNoise) {
         this.colorNoise = colorNoise.floatValue();
+    }
+
+    public void setColorMin(double[] colorMin) {
+        this.ccMin = GlobalResources.toFloatArray(colorMin);
+    }
+
+    public void setColorMin(float[] colorMin) {
+        this.ccMin = colorMin;
+    }
+
+    public void setColorMax(double[] colorMax) {
+        this.ccMax = GlobalResources.toFloatArray(colorMax);
+    }
+
+    public void setColorMax(float[] colorMax) {
+        this.ccMax = colorMax;
     }
 
     public void setParticlesizelimits(double[] sizeLimits) {

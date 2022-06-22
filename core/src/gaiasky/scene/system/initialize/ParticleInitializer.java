@@ -99,7 +99,9 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         sa.thresholdPoint = Settings.settings.scene.star.threshold.point;
         sa.thresholdQuad = Settings.settings.scene.star.threshold.quad;
 
-        render.renderGroup = RenderGroup.BILLBOARD_STAR;
+        if(render.renderGroup == null) {
+            render.renderGroup = RenderGroup.BILLBOARD_STAR;
+        }
 
         extra.primitiveRenderScale = 1;
         float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;

@@ -84,10 +84,10 @@ public class OrbitalElementsGroup extends GenericCatalog implements IRenderable,
         translation.set(parentTransform);
         Vector3d aux = D31.get();
 
-        if (this.positionObject == null) {
+        if (this.fadeObject == null) {
             this.currentDistance = aux.set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();
         } else {
-            this.currentDistance = this.positionObject.distToCamera;
+            this.currentDistance = this.fadeObject.distToCamera;
         }
 
         // Update with translation/rotation/etc

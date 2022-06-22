@@ -61,7 +61,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static final int SOURCE_VERSION = 30200;
+    public static final int SOURCE_VERSION = 30300;
     private static boolean REST_ENABLED = false;
     private static boolean JAVA_VERSION_FLAG = false;
 

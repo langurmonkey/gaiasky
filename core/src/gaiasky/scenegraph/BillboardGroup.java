@@ -317,6 +317,10 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
     }
 
     public void setFadein(double[] fadein) {
+        setFadeIn(fadein);
+    }
+
+    public void setFadeIn(double[] fadein) {
         fadeIn = new Vector2d(fadein[0] * Constants.PC_TO_U, fadein[1] * Constants.PC_TO_U);
     }
 
@@ -335,7 +339,14 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
     }
 
     public void setFadeout(double[] fadeout) {
+        setFadeOut(fadeout);
+    }
+
+    public void setFadeOut(double[] fadeout) {
         fadeOut = new Vector2d(fadeout[0] * Constants.PC_TO_U, fadeout[1] * Constants.PC_TO_U);
+    }
+
+    public void setFadePosition(double[] x) {
     }
 
     @Override

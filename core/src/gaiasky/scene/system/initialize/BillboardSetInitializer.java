@@ -42,9 +42,6 @@ public class BillboardSetInitializer extends InitSystem {
         var body = Mapper.body.get(entity);
         var text = Mapper.text.get(entity);
 
-        // TODO size is given here in KM, fix in data file
-        body.size = (float) (body.size * Constants.KM_TO_U);
-
         text.textScale = 3;
         text.labelMax = (float) (2e-3 / Constants.DISTANCE_SCALE_FACTOR);
         text.labelFactor = 1;

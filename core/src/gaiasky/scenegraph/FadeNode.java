@@ -57,12 +57,14 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
      * If set, the fade distance is the distance between the current fade node and this object.
      * Otherwise, it is the length of the current object's position.
      */
-    protected SceneGraphNode positionObject;
+    protected SceneGraphNode fadeObject;
 
     /**
      * The name of the position object
      */
-    private String positionObjectName;
+    private String fadeObjectName;
+
+    private Vector3d fadePosition;
 
     /**
      * Is the node already in the scene graph?
@@ -124,7 +126,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
             // Create catalog info and broadcast
             CatalogInfo ci = new CatalogInfo(name, desc, dataFile, CatalogInfoSource.INTERNAL, 1f, this);
             ci.nParticles = nParticles;
-            if(dataFile != null) {
+            if (dataFile != null) {
                 Path df = Path.of(Settings.settings.data.dataFile(dataFile));
                 ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
             } else {
@@ -136,11 +138,12 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
             EventManager.publish(Event.CATALOG_ADD, this, this.catalogInfo, false);
         }
     }
+
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        if (positionObjectName != null) {
-            this.positionObject = GaiaSky.instance.sceneGraph.getNode(positionObjectName);
+        if (fadeObjectName != null) {
+            this.fadeObject = GaiaSky.instance.sceneGraph.getNode(fadeObjectName);
         }
     }
 
@@ -148,10 +151,12 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         this.opacity = opacity;
         translation.set(parentTransform);
 
-        if (this.positionObject == null) {
-            this.currentDistance = D31.get().set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();
+        if (this.fadeObject != null) {
+            this.currentDistance = this.fadeObject.distToCamera;
+        }else if(this.fadePosition != null) {
+            this.currentDistance = D31.get().set(this.fadePosition).sub(camera.getPos()).len() * camera.getFovFactor();
         } else {
-            this.currentDistance = this.positionObject.distToCamera;
+            this.currentDistance = D31.get().set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();
         }
 
         // Update with translation/rotation/etc
@@ -170,7 +175,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
-        this.distToCamera = this.positionObject == null ? pos.dst(camera.getPos(), B31.get()).doubleValue() : this.positionObject.distToCamera;
+        this.distToCamera = this.fadeObject == null ? pos.dst(camera.getPos(), B31.get()).doubleValue() : this.fadeObject.distToCamera;
 
         // Opacity
         updateOpacity();
@@ -214,6 +219,10 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     }
 
     public void setFadein(double[] fadein) {
+        setFadeIn(fadein);
+    }
+
+    public void setFadeIn(double[] fadein) {
         if (fadein != null)
             fadeIn = new Vector2d(fadein[0] * Constants.PC_TO_U, fadein[1] * Constants.PC_TO_U);
         else
@@ -230,6 +239,10 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     }
 
     public void setFadeout(double[] fadeout) {
+        setFadeOut(fadeout);
+    }
+
+    public void setFadeOut(double[] fadeout) {
         if (fadeout != null)
             fadeOut = new Vector2d(fadeout[0] * Constants.PC_TO_U, fadeout[1] * Constants.PC_TO_U);
         else
@@ -255,8 +268,16 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
             this.labelPosition = new Vector3b(labelposition[0] * Constants.PC_TO_U, labelposition[1] * Constants.PC_TO_U, labelposition[2] * Constants.PC_TO_U);
     }
 
-    public void setPositionobjectname(String po) {
-        this.positionObjectName = po;
+    public void setPositionobjectname(String name) {
+        setFadeObjectName(name);
+    }
+
+    public void setFadeObjectName(String name) {
+        this.fadeObjectName = name;
+    }
+
+    public void setFadePosition(double[] position) {
+        this.fadePosition = new Vector3d(position);
     }
 
     public void setCatalogInfoBare(CatalogInfo info) {
@@ -367,7 +388,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     }
 
     public float getPointscaling() {
-        if(parent instanceof OctreeWrapper) {
+        if (parent instanceof OctreeWrapper) {
             return ((OctreeWrapper) parent).getPointscaling() * pointscaling;
         }
         return pointscaling;
