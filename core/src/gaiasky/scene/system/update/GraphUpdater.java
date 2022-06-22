@@ -33,6 +33,7 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
     private Family family;
     private ImmutableArray<Entity> entities;
     private Vector3d D31;
+    private Vector3b B31;
 
     /**
      * Instantiates a system that will iterate over the entities described by the Family.
@@ -44,6 +45,7 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
         this.family = family;
         this.time = time;
         this.D31 = new Vector3d();
+        this.B31 = new Vector3b();
     }
 
     public void setCamera(ICamera camera) {
@@ -107,6 +109,7 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
         var body = Mapper.body.get(entity);
         var coordinates = Mapper.coordinates.get(entity);
         var rotation = Mapper.rotation.get(entity);
+        var fade = Mapper.fade.get(entity);
 
         // Update local position here
         if (time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {
@@ -127,7 +130,14 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
         graph.translation.add(body.pos);
 
         // Update opacity
-        base.opacity = opacity * getVisibilityOpacityFactor(base);
+        if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
+            base.opacity = opacity;
+            updateFadeDistance(body, fade);
+            updateFadeOpacity(base, fade);
+        } else {
+            base.opacity = opacity;
+        }
+        base.opacity *= base.getVisibilityOpacityFactor();
 
         // Apply proper motion if needed
         if (Mapper.pm.has(entity)) {
@@ -138,7 +148,7 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
 
         // Update supporting attributes
         body.distToCamera = graph.translation.lend();
-        if(Mapper.extra.has(entity)) {
+        if (Mapper.extra.has(entity)) {
             // Particles have a special algorithm for the solid angles.
             body.viewAngle = (Mapper.extra.get(entity).radius / body.distToCamera);
             body.viewAngleApparent = body.viewAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
@@ -156,10 +166,40 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
             for (int i = 0; i < graph.children.size; i++) {
                 Entity child = graph.children.get(i);
                 // Update
-                update(child, time, graph.translation, base.opacity);
+                update(child, time, graph.translation, getChildrenOpacity(entity, base, fade, opacity));
             }
         }
 
+    }
+
+    private float getChildrenOpacity(Entity entity, Base base, Fade fade, float opacity) {
+        if (Mapper.billboardSet.has(entity)) {
+            return 1 - base.opacity;
+        } else if (fade != null) {
+            return base.opacity;
+        } else {
+            return opacity;
+        }
+    }
+
+    private void updateFadeDistance(Body body, Fade fade) {
+        if (fade.fadePositionObject != null) {
+            fade.currentDistance = Mapper.body.get(fade.fadePositionObject).distToCamera;
+        } else if (fade.fadePosition != null) {
+            fade.currentDistance = D31.set(fade.fadePosition).sub(camera.getPos()).len() * camera.getFovFactor();
+        } else {
+            fade.currentDistance = D31.set(body.pos).sub(camera.getPos()).len() * camera.getFovFactor();
+        }
+        body.distToCamera = fade.fadePositionObject == null ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.fadePositionObject).distToCamera;
+    }
+
+    private void updateFadeOpacity(Base base, Fade fade) {
+        if (fade.fadeIn != null) {
+            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, 0, 1);
+        }
+        if (fade.fadeOut != null) {
+            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, 1, 0);
+        }
     }
 
     protected float getVisibilityOpacityFactor(Base base) {

@@ -17,7 +17,6 @@ import gaiasky.util.tree.OctreeNode;
 public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
 
     private final GraphUpdater graphUpdater;
-    private final FadeUpdater fadeUpdater;
     private final ParticleSetUpdater particleSetUpdater;
     private final ParticleSetExtractor particleSetExtractor;
 
@@ -25,7 +24,6 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
         super(family, priority);
 
         this.graphUpdater = new GraphUpdater(null, 0, GaiaSky.instance.time);
-        this.fadeUpdater = new FadeUpdater(null, 0);
         this.particleSetUpdater = new ParticleSetUpdater(null, 0);
         this.particleSetExtractor = new ParticleSetExtractor(null, 0);
         particleSetExtractor.setRenderer(GaiaSky.instance.sceneRenderer);
@@ -89,7 +87,6 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
      */
     protected void updateOctreeObjects(Base base, GraphNode graph, Octree octree, float deltaTime) {
         updateGraph(base, graph, octree, GaiaSky.instance.time);
-        updateFade(octree, deltaTime);
         updateParticleSet(octree, deltaTime);
         extractParticleSet(octree);
     }
@@ -102,14 +99,6 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
             // Use octant opacity
             var octant = Mapper.octant.get(entity);
             graphUpdater.update(entity, time, graph.translation, base.opacity * octant.octant.opacity);
-        }
-    }
-
-    private void updateFade(Octree octree, float deltaTime) {
-        int size = octree.roulette.size();
-        for (int i = 0; i < size; i++) {
-            Entity entity = ((OctreeObjectView) octree.roulette.get(i)).getEntity();
-            fadeUpdater.updateEntity(entity, deltaTime);
         }
     }
 

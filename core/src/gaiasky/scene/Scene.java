@@ -190,7 +190,6 @@ public class Scene {
 
             // Regular update systems.
             OctreeUpdater octreeUpdateSystem = new OctreeUpdater(families.octrees, priority++);
-            FadeUpdater fadeUpdateSystem = new FadeUpdater(families.fadeNodes, priority++);
             ParticleSetUpdater particleSetUpdateSystem = new ParticleSetUpdater(families.particleSets, priority++);
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models, priority++);
             TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
@@ -212,10 +211,9 @@ public class Scene {
             // Remove all remaining systems.
             engine.removeAllSystems();
 
-            // 1. First updater: scene graph and fade update systems.
+            // 1. First updater: scene graph and octree update systems.
             engine.addSystem(sceneGraphUpdateSystem);
             engine.addSystem(octreeUpdateSystem);
-            engine.addSystem(fadeUpdateSystem);
 
             // 2. Update --- these can run in parallel.
             engine.addSystem(particleSetUpdateSystem);

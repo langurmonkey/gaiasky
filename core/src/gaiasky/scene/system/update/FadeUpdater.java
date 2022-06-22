@@ -33,7 +33,6 @@ public class FadeUpdater extends IteratingSystem implements EntityUpdater {
 
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
-        var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var fade = Mapper.fade.get(entity);
 
@@ -47,19 +46,5 @@ public class FadeUpdater extends IteratingSystem implements EntityUpdater {
             fade.currentDistance = D31.set(body.pos).sub(camera.getPos()).len() * camera.getFovFactor();
         }
         body.distToCamera = fade.fadePositionObject == null ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.fadePositionObject).distToCamera;
-
-        // Opacity
-        updateOpacity(base, fade);
-
-        // Visibility fading
-        base.opacity *= base.getVisibilityOpacityFactor();
-    }
-
-    private void updateOpacity(Base base, Fade fade) {
-        if (fade.fadeIn != null)
-            base.opacity *= MathUtilsd.lint((float) fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, 0, 1);
-        if (fade.fadeOut != null)
-            base.opacity *= MathUtilsd.lint((float) fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, 1, 0);
-
     }
 }
