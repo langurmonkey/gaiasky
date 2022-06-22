@@ -36,6 +36,7 @@ import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -820,6 +821,16 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public float getAbsmag() {
         return 0;
+    }
+
+    public String getLocalizedName() {
+        String name = getName();
+        String base = name.toLowerCase(Locale.ROOT).replace(' ', '_');
+        if (I18n.hasObject(base)) {
+            return I18n.obj(base);
+        } else {
+            return name;
+        }
     }
 
     public String getName() {
