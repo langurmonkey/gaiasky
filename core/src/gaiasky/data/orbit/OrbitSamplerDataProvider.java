@@ -99,13 +99,13 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         double stepMs = orbitalMs / (double) numSamples;
 
         Instant d;
-        if (period > 40000 ) {
+        if (period > 40000) {
             // For long-period, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.8));
-        } else if(parameter.orbit != null && parameter.orbit.ct.isEnabled(ComponentType.Moons)){
+        } else if (parameter.orbit != null && parameter.orbit.ct.isEnabled(ComponentType.Moons)) {
             // For moon orbits, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.4));
-        } else if(parameter.entity != null && parameter.entity.getComponent(Base.class).ct.isEnabled(ComponentType.Moons)){
+        } else if (parameter.entity != null && parameter.entity.getComponent(Base.class).ct.isEnabled(ComponentType.Moons)) {
             // For moon orbits, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.4));
         } else {
