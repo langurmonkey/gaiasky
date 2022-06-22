@@ -1081,6 +1081,15 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     /**
+     * Sets the absolute size of this entity
+     *
+     * @param size
+     */
+    public void setSizeKm(Double size) {
+        this.size = (float) (size * Constants.KM_TO_U);
+    }
+
+    /**
      * Sets the absolute size (diameter) of this entity
      *
      * @param size The diameter in internal units
