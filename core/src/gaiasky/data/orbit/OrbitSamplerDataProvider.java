@@ -13,6 +13,7 @@ import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.gui.ConsoleLogger;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.component.Base;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
@@ -102,6 +103,9 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             // For long-period, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.8));
         } else if(parameter.orbit != null && parameter.orbit.ct.isEnabled(ComponentType.Moons)){
+            // For moon orbits, it is better to recompute more often because they can deviate significantly.
+            d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.4));
+        } else if(parameter.entity != null && parameter.entity.getComponent(Base.class).ct.isEnabled(ComponentType.Moons)){
             // For moon orbits, it is better to recompute more often because they can deviate significantly.
             d = Instant.ofEpochMilli(parameter.ini.getTime() - (long) (orbitalMs * 0.4));
         } else {

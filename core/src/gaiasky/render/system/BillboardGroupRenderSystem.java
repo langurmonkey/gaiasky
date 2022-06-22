@@ -183,6 +183,7 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
      * @return The GPU data object.
      */
     private GpuData convertDataToGpu(BillboardDataset bd, ColorGenerator cg) {
+        StdRandom.setSeed(11447799l);
         GpuData ad = new GpuData();
         // Dataset
         ad.dataset = bd;

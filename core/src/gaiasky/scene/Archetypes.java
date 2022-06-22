@@ -152,7 +152,7 @@ public class Archetypes {
             addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, RenderType.class);
 
             // BillboardGroup
-            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
+            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class, Text.class);
 
             // Text2D
             addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class);

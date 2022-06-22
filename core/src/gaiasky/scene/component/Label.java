@@ -20,10 +20,14 @@ public class Label implements Component {
      * Sets the position of the label, in parsecs and in the internal reference
      * frame.
      *
-     * @param labelposition The position of the label in internal cartesian coordinates.
+     * @param labelPosition The position of the label in internal cartesian coordinates.
      */
-    public void setLabelposition(double[] labelposition) {
-        if (labelposition != null)
-            this.labelPosition = new Vector3b(labelposition[0] * Constants.PC_TO_U, labelposition[1] * Constants.PC_TO_U, labelposition[2] * Constants.PC_TO_U);
+    public void setLabelPosition(double[] labelPosition) {
+        if (labelPosition != null)
+            this.labelPosition = new Vector3b(labelPosition[0] * Constants.PC_TO_U, labelPosition[1] * Constants.PC_TO_U, labelPosition[2] * Constants.PC_TO_U);
+    }
+
+    public void setLabelposition(double[] labelPosition) {
+        setLabelPosition(labelPosition);
     }
 }

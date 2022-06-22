@@ -34,10 +34,12 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private final Vector3 F31 = new Vector3();
     private final Vector3 F32 = new Vector3();
 
+    private Label label;
     private GraphNode graph;
     private SolidAngle sa;
     private Text text;
     private Cluster cluster;
+    private BillboardSet bbSet;
 
     public LabelView() {
     }
@@ -51,10 +53,12 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     @Override
     protected void entityChanged() {
         super.entityChanged();
+        this.label = Mapper.label.get(entity);
         this.graph = Mapper.graph.get(entity);
         this.sa = Mapper.sa.get(entity);
         this.text = Mapper.text.get(entity);
         this.cluster = Mapper.cluster.get(entity);
+        this.bbSet = Mapper.billboardSet.get(entity);
     }
 
     @Override
@@ -73,6 +77,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         } else if (cluster != null) {
             // Clusters
             renderCluster(batch, shader, sys, rc, camera);
+        } else if (bbSet != null) {
+            // Billboard sets
+            renderBillboardSet(batch, shader, sys, rc, camera);
         }
     }
 
@@ -99,6 +106,15 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         shader.setUniformf("u_thLabel", 1f);
 
         render3DLabel(batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text(), pos, body.distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), body.size / 2d, base.forceLabel);
+    }
+
+    public void renderBillboardSet(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        Vector3d pos = D31;
+        textPosition(camera, pos);
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+        render3DLabel(batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text(), pos, body.distToCamera, textScale(), textSize() * camera.getFovFactor(), body.size / 2d, base.forceLabel);
     }
 
     public void renderStarSet(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
@@ -186,20 +202,24 @@ public class LabelView extends RenderView implements I3DTextRenderable {
      */
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
-        graph.translation.put(out);
-        double len = out.len();
-        out.clamp(0, len - getRadius()).scl(0.9f);
+        if(label != null && label.labelPosition != null) {
+            out.set(label.labelPosition).add(cam.getInversePos());
+        } else {
+            graph.translation.put(out);
+            double len = out.len();
+            out.clamp(0, len - getRadius()).scl(0.9f);
 
-        Vector3d aux = D32;
-        aux.set(cam.getUp());
+            Vector3d aux = D32;
+            aux.set(cam.getUp());
 
-        aux.crs(out).nor();
+            aux.crs(out).nor();
 
-        float dist = -0.015f * cam.getFovFactor() * (float) out.len();
+            float dist = -0.015f * cam.getFovFactor() * (float) out.len();
 
-        aux.add(cam.getUp()).nor().scl(dist);
+            aux.add(cam.getUp()).nor().scl(dist);
 
-        out.add(aux);
+            out.add(aux);
+        }
 
         GlobalResources.applyRelativisticAberration(out, cam);
         RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
