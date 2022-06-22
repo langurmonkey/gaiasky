@@ -39,12 +39,14 @@ public class FadeUpdater extends IteratingSystem implements EntityUpdater {
 
         var camera = GaiaSky.instance.getICamera();
 
-        if (fade.positionObject == null) {
-            fade.currentDistance = D31.set(body.pos).sub(camera.getPos()).len() * camera.getFovFactor();
+        if (fade.fadePositionObject != null) {
+            fade.currentDistance = Mapper.body.get(fade.fadePositionObject).distToCamera;
+        } else if (fade.fadePosition != null) {
+            fade.currentDistance = D31.set(fade.fadePosition).sub(camera.getPos()).len() * camera.getFovFactor();
         } else {
-            fade.currentDistance = Mapper.body.get(fade.positionObject).distToCamera;
+            fade.currentDistance = D31.set(body.pos).sub(camera.getPos()).len() * camera.getFovFactor();
         }
-        body.distToCamera = fade.positionObject == null ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.positionObject).distToCamera;
+        body.distToCamera = fade.fadePositionObject == null ? body.pos.dst(camera.getPos(), B31).doubleValue() : Mapper.body.get(fade.fadePositionObject).distToCamera;
 
         // Opacity
         updateOpacity(base, fade);

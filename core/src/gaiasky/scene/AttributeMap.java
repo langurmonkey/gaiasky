@@ -93,7 +93,7 @@ public class AttributeMap {
         putAll(AffineTransformations.class, "transformations");
 
         // Fade
-        putAll(Fade.class, "fadein", "fadeout", "fade", "fadepc", "positionobjectname");
+        putAll(Fade.class, "fadein", "fadeIn", "fadeout", "fadeOut", "fade", "fadepc", "fadePc", "positionobjectname", "fadeObjectName", "fadePosition");
 
         // DatasetDescription
         putAll(DatasetDescription.class, "catalogInfo", "cataloginfo");

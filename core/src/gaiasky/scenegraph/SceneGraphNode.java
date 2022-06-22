@@ -1105,10 +1105,28 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     /**
      * Sets the absolute size (diameter) of this entity
      *
+     * @param size The diameter in km
+     */
+    public void setSizeKm(Double size) {
+        this.size = (float) (size * Constants.KM_TO_U);
+    }
+
+    /**
+     * Sets the absolute size (diameter) of this entity
+     *
      * @param size The diameter in internal units
      */
     public void setSize(Long size) {
         this.size = (float) size;
+    }
+
+    /**
+     * Sets the absolute size (diameter) of this entity
+     *
+     * @param size The diameter in km
+     */
+    public void setSizeKm(Long size) {
+        this.size = (float) (size * Constants.KM_TO_U);
     }
 
     public Vector2d getPosSph() {

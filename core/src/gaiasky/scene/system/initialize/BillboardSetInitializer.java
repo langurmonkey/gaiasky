@@ -17,6 +17,7 @@ import gaiasky.scene.entity.BillboardSetRadio;
 import gaiasky.scene.entity.EntityRadio;
 import gaiasky.scenegraph.particle.BillboardDataset;
 import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
@@ -38,6 +39,10 @@ public class BillboardSetInitializer extends InitSystem {
     @Override
     public void initializeEntity(Entity entity) {
         var billboard = Mapper.billboardSet.get(entity);
+        var body = Mapper.body.get(entity);
+        // TODO size is given here in KM, fix in data file
+        body.size = (float) (body.size * Constants.KM_TO_U);
+
         reloadData(billboard);
     }
 

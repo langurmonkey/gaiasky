@@ -2,7 +2,6 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
 
@@ -26,8 +25,8 @@ public class FadeNodeInitializer extends InitSystem {
     @Override
     public void setUpEntity(Entity entity) {
         var fade = Mapper.fade.get(entity);
-        if (fade.positionObjectName != null) {
-            fade.positionObject = index.getNode(fade.positionObjectName);
+        if (fade.fadePositionObjectName != null) {
+            fade.fadePositionObject = index.getNode(fade.fadePositionObjectName);
         }
     }
 }

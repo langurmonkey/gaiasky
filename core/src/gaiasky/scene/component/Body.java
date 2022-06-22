@@ -20,7 +20,7 @@ public class Body implements Component {
     public Vector2d posSph = new Vector2d();
 
     /**
-     * Size factor in internal units.
+     * Body size in internal units.
      */
     public float size;
 
