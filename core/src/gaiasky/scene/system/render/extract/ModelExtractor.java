@@ -17,6 +17,8 @@ import net.jafama.FastMath;
  */
 public class ModelExtractor extends AbstractExtractSystem {
 
+    protected static double BBGAL_TH = Math.toRadians(0.9);
+
     public ModelExtractor(Family family, int priority) {
         super(family, priority);
     }
@@ -40,50 +42,74 @@ public class ModelExtractor extends AbstractExtractSystem {
             var atmosphere = Mapper.atmosphere.get(entity);
             var cloud = Mapper.cloud.get(entity);
             var render = Mapper.render.get(entity);
+
             // TODO restore
             // camera.checkClosestBody(this);
-            double thPoint = (sa.thresholdPoint * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
-            if (body.viewAngleApparent >= thPoint) {
-                double thQuad2 = sa.thresholdQuad * camera.getFovFactor() * 2 / scaffolding.sizeScaleFactor;
-                double thQuad1 = thQuad2 / 8.0 / scaffolding.sizeScaleFactor;
-                if (body.viewAngleApparent < thPoint * 4) {
-                    scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.viewAngleApparent, thPoint, thPoint * 4, 1, 0);
-                } else {
-                    scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.viewAngleApparent, thQuad1, thQuad2, 0, 1);
+
+            if (Mapper.tagBillboardGalaxy.has(entity)) {
+                // Billboard galaxies
+                double thPoint = (BBGAL_TH * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
+                if (body.viewAngleApparent >= thPoint) {
+                    addToRender(render, RenderGroup.MODEL_DIFFUSE);
+                } else if (base.opacity > 0) {
+                    addToRender(render, RenderGroup.BILLBOARD_GAL);
                 }
 
-                if (body.viewAngleApparent < thQuad1) {
-                    addToRender(render, RenderGroup.BILLBOARD_SSO);
-                } else if (body.viewAngleApparent > thQuad2) {
-                    addToRenderModel(render, model);
-                } else {
-                    // Both
-                    addToRender(render, RenderGroup.BILLBOARD_SSO);
-                    addToRenderModel(render, model);
-                }
-                if (renderText(base, body, sa)) {
+                if (renderText() || base.forceLabel) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
-            }
-            if (!isInRender(render, RenderGroup.FONT_LABEL) && base.forceLabel) {
-                addToRender(render, RenderGroup.FONT_LABEL);
-            }
+            } else if (Mapper.tagQuatOrientation.has(entity)) {
+                // Simple billboards
+                if (body.viewAngleApparent >= sa.thresholdNone) {
+                    addToRender(render, RenderGroup.MODEL_DIFFUSE);
+                    if (renderText()) {
+                        addToRender(render, RenderGroup.FONT_LABEL);
+                    }
+                }
+            } else {
+                // Rest of models
+                double thPoint = (sa.thresholdPoint * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
+                if (body.viewAngleApparent >= thPoint) {
+                    double thQuad2 = sa.thresholdQuad * camera.getFovFactor() * 2 / scaffolding.sizeScaleFactor;
+                    double thQuad1 = thQuad2 / 8.0 / scaffolding.sizeScaleFactor;
+                    if (body.viewAngleApparent < thPoint * 4) {
+                        scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.viewAngleApparent, thPoint, thPoint * 4, 1, 0);
+                    } else {
+                        scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.viewAngleApparent, thQuad1, thQuad2, 0, 1);
+                    }
 
+                    if (body.viewAngleApparent < thQuad1) {
+                        addToRender(render, RenderGroup.BILLBOARD_SSO);
+                    } else if (body.viewAngleApparent > thQuad2) {
+                        addToRenderModel(render, model);
+                    } else {
+                        // Both
+                        addToRender(render, RenderGroup.BILLBOARD_SSO);
+                        addToRenderModel(render, model);
+                    }
+                    if (renderText(base, body, sa)) {
+                        addToRender(render, RenderGroup.FONT_LABEL);
+                    }
+                }
+                if (!isInRender(render, RenderGroup.FONT_LABEL) && base.forceLabel) {
+                    addToRender(render, RenderGroup.FONT_LABEL);
+                }
 
-            // Atmosphere (only planets)
-            if (atmosphere != null &&
-                    atmosphere.atmosphere != null &&
-                    isInRender(render, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) &&
-                    !coord.timeOverflow) {
-                addToRender(render, RenderGroup.MODEL_ATM);
-            }
+                // Atmosphere (only planets)
+                if (atmosphere != null &&
+                        atmosphere.atmosphere != null &&
+                        isInRender(render, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) &&
+                        !coord.timeOverflow) {
+                    addToRender(render, RenderGroup.MODEL_ATM);
+                }
 
-            // Cloud (only planets)
-            if (cloud != null &&
-                    cloud.cloud != null &&
-                    isInRender(render, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) &&
-                    !coord.timeOverflow) {
-                addToRender(render, RenderGroup.MODEL_CLOUD);
+                // Cloud (only planets)
+                if (cloud != null &&
+                        cloud.cloud != null &&
+                        isInRender(render, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) &&
+                        !coord.timeOverflow) {
+                    addToRender(render, RenderGroup.MODEL_CLOUD);
+                }
             }
         }
     }

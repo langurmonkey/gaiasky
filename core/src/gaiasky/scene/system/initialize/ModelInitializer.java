@@ -66,8 +66,13 @@ public class ModelInitializer extends InitSystem {
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
 
-        // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
-        body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
+        if(!Mapper.tagQuatOrientation.has(entity)) {
+            // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
+            body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
+        } else {
+            // Billboards, just double it
+            body.size = body.size * 2f;
+        }
 
         // First init spacecraft if needed
         if (isSpacecraft) {
@@ -219,6 +224,8 @@ public class ModelInitializer extends InitSystem {
         sa.thresholdQuad = baseThreshold / 8.0;
         sa.thresholdLabel = Math.toRadians(0.2);
 
+        text.textScale = 0.3f;
+        text.viewAnglePow = 1f;
         text.labelFactor = 1e1f;
         scaffolding.billboardSizeFactor = 0.6e-3f;
     }

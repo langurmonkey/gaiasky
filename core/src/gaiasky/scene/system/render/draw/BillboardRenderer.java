@@ -230,6 +230,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
             // Render mesh
             mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
+
         } else if (Mapper.starSet.has(entity)) {
             /*
              *  STARS IN SETS

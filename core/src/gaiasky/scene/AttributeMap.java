@@ -39,10 +39,10 @@ public class AttributeMap {
 
     public Map<String, Class<? extends Component>> initialize() {
         // Base
-        putAll(Base.class, "id", "name", "names", "opacity", "ct");
+        putAll(Base.class, "id", "name", "names", "altName", "altname", "opacity", "ct");
 
         // Body
-        putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm", "diameter", "diameterKm", "color", "labelcolor");
+        putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm", "radiusPc", "diameter", "diameterKm", "color", "labelcolor");
 
         // GraphNode
         putAll(GraphNode.class, "parent");

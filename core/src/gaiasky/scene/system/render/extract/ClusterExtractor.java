@@ -18,9 +18,9 @@ public class ClusterExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
 
         if (shouldRender(base)) {
+            var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
 
             if (body.viewAngleApparent >= ClusterUpdater.TH_ANGLE) {

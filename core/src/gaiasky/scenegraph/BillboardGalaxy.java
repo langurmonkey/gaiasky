@@ -45,7 +45,6 @@ public class BillboardGalaxy extends Billboard {
             if (renderText()) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
-
         }
     }
 

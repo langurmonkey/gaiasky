@@ -45,7 +45,6 @@ public class Body implements Component {
     public float[] color;
     public float[] labelColor = Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
 
-
     public void setPos(double[] pos) {
         setPosition(pos);
     }
@@ -101,12 +100,19 @@ public class Body implements Component {
     public void setRadius(Double radius) {
         setSize(radius * 2.0);
     }
+
     public void setRadiusKm(Double radiusKm) {
-        setRadius(radiusKm * Constants.KM_TO_U);
+        setSizeKm(radiusKm * 2.0);
     }
+
+    public void setRadiusPc(Double radiusPc) {
+        setSizePc(radiusPc * 2.0);
+    }
+
     public void setDiameter(Double diameter) {
         setSize(diameter);
     }
+
     public void setDiameterKm(Double diameterKm) {
         setDiameter(diameterKm * Constants.KM_TO_U);
     }
@@ -128,7 +134,7 @@ public class Body implements Component {
     public void setColor(float[] color) {
         this.color = color;
     }
-    
+
     /**
      * Sets the label color, as an RGBA double array.
      *

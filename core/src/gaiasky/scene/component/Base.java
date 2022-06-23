@@ -67,7 +67,6 @@ public class Base implements Component {
      */
     public boolean initialUpdate = false;
 
-
     public String getName() {
         return names != null ? names[0] : null;
     }
@@ -175,6 +174,15 @@ public class Base implements Component {
             }
         }
     }
+
+    public void setAltname(String altname) {
+        setAltName(altname);
+    }
+
+    public void setAltName(String altname) {
+        this.addName(altname);
+    }
+
     public void setCt(String ct) {
         this.ct = new ComponentTypes();
         if (!ct.isEmpty())
@@ -197,6 +205,7 @@ public class Base implements Component {
     /**
      * Computes the elapsed number of milliseconds since the last visibility state change
      * for the given base component.
+     *
      * @return The elapsed time [ms] since the last visibility state change.
      */
     public long msSinceStateChange() {
@@ -205,6 +214,7 @@ public class Base implements Component {
 
     /**
      * Gets the visibility opacity factor for this base component.
+     *
      * @return The visibility opacity factor.
      */
     public float getVisibilityOpacityFactor() {

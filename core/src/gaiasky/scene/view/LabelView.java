@@ -83,6 +83,10 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         }
     }
 
+    public void renderBillboard(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+
+    }
+
     public void renderCelestial(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (camera.getCurrent() instanceof FovCamera) {
             render2DLabel(batch, shader, rc, ((TextRenderer) sys).font2d, camera, text(), body.pos.put(D31));
@@ -202,7 +206,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
      */
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
-        if(label != null && label.labelPosition != null) {
+        if (label != null && label.labelPosition != null) {
             out.set(label.labelPosition).add(cam.getInversePos());
         } else {
             graph.translation.put(out);
@@ -274,12 +278,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public float getTextOpacity() {
-        if (Mapper.tagQuatOrientation.has(entity)) {
-            // Billboard labels should go with the model opacity.
-            return Math.min(base.opacity, Mapper.modelScaffolding.get(entity).fadeOpacity);
-        } else {
-            return base.opacity;
-        }
+        return base.opacity;
     }
 
     protected void render2DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, RenderingContext rc, BitmapFont font, ICamera camera, String label, Vector3d pos3d) {

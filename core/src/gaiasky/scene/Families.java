@@ -3,6 +3,7 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagBackgroundModel;
+import gaiasky.scene.component.tag.TagBillboardGalaxy;
 import gaiasky.scene.component.tag.TagOctreeObject;
 
 /**
@@ -18,6 +19,7 @@ public class Families {
             orbits,
             locations,
             billboardSets,
+            billboardGalaxies,
             axes,
             raymarchings,
             catalogInfos,
@@ -37,6 +39,7 @@ public class Families {
         orbits = Family.all(Trajectory.class, Verts.class).get();
         locations = Family.all(LocationMark.class).get();
         billboardSets = Family.all(BillboardSet.class).get();
+        billboardGalaxies = Family.all(TagBillboardGalaxy.class).get();
         axes = Family.all(Axis.class, RefSysTransform.class).get();
         raymarchings = Family.all(Raymarching.class).get();
         catalogInfos = Family.all(DatasetDescription.class).get();
