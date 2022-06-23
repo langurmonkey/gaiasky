@@ -195,10 +195,10 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
 
     private void updateFadeOpacity(Base base, Fade fade) {
         if (fade.fadeIn != null) {
-            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, 0, 1);
+            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, fade.fadeInMap.x, fade.fadeInMap.y);
         }
         if (fade.fadeOut != null) {
-            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, 1, 0);
+            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, fade.fadeOutMap.x, fade.fadeOutMap.y);
         }
     }
 

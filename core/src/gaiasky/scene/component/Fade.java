@@ -10,12 +10,12 @@ public class Fade implements Component {
     /**
      * Fade in low and high limits
      */
-    public Vector2d fadeIn;
+    public Vector2d fadeIn, fadeInMap;
 
     /**
      * Fade out low and high limits
      */
-    public Vector2d fadeOut;
+    public Vector2d fadeOut, fadeOutMap;
 
     /**
      * The current distance at each cycle, in internal units
@@ -48,6 +48,18 @@ public class Fade implements Component {
             this.fadeIn = null;
     }
 
+    /**
+     * Sets the values to which the fade in distances are mapped. If not set, they are initialized
+     * automatically with [0,1].
+     * @param fadeInMap The values.
+     */
+    public void setFadeInMap(double[] fadeInMap) {
+        if (fadeInMap != null)
+            this.fadeInMap = new Vector2d(fadeInMap[0], fadeInMap[1]);
+        else
+            this.fadeInMap = null;
+    }
+
     public void setFadeout(double[] fadeOut) {
        setFadeOut(fadeOut);
     }
@@ -56,6 +68,18 @@ public class Fade implements Component {
             this.fadeOut = new Vector2d(fadeOut[0] * Constants.PC_TO_U, fadeOut[1] * Constants.PC_TO_U);
         else
             this.fadeOut = null;
+    }
+
+    /**
+     * Sets the values to which the fade out distances are mapped. If not set, they are initialized
+     * automatically with [1,0].
+     * @param fadeOutMap The values.
+     */
+    public void setFadeOutMap(double[] fadeOutMap) {
+        if (fadeOutMap != null)
+            this.fadeOutMap = new Vector2d(fadeOutMap[0], fadeOutMap[1]);
+        else
+            this.fadeOutMap = null;
     }
 
     public void setFade(double[] fade) {

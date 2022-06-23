@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
+import gaiasky.util.math.Vector2d;
 
 /**
  * Initializes objects with a {@link gaiasky.scene.component.Fade} component.
@@ -20,6 +21,16 @@ public class FadeNodeInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
+        var fade = Mapper.fade.get(entity);
+
+        // Initialize default mappings, if no mappings are set
+        if(fade.fadeIn != null && fade.fadeInMap == null) {
+           fade.fadeInMap = new Vector2d(0, 1);
+        }
+        if(fade.fadeOut != null && fade.fadeOutMap == null) {
+            fade.fadeOutMap = new Vector2d(1, 0);
+        }
+
     }
 
     @Override

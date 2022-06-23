@@ -154,8 +154,14 @@ public class Billboard extends ModelBody {
     }
 
     public void setFade(double[] fadein) {
+        setFadeIn(fadein);
+    }
+    public void setFadeIn(double[] fadein) {
         fade = fadein;
         fade[0] *= Constants.PC_TO_U;
         fade[1] *= Constants.PC_TO_U;
     }
+
+    public void setFadeInMap(double[] x){}
+    public void setFadeOutMap(double[] x){}
 }
