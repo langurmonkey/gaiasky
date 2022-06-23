@@ -5,7 +5,7 @@ import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.render.extract.*;
+import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scenegraph.camera.ICamera;

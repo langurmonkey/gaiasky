@@ -29,7 +29,7 @@ import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scene.render.extract.TrajectoryExtractor;
+import gaiasky.scene.system.render.extract.TrajectoryExtractor;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;

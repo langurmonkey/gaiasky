@@ -10,7 +10,7 @@ import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.scene.render.draw.TextRenderer;
+import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;

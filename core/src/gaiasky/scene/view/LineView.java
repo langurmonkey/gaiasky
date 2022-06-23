@@ -8,7 +8,6 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
-import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scenegraph.camera.ICamera;
 
@@ -55,7 +54,7 @@ public class LineView extends AbstractView implements ILineRenderable {
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        /** Not needed, implemented in {@link gaiasky.scene.render.draw.line.LineEntityRenderSystem}. **/
+        /** Not needed, implemented in {@link gaiasky.scene.system.render.draw.line.LineEntityRenderSystem}. **/
     }
 
     @Override

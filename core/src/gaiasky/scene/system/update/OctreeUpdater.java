@@ -8,7 +8,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Octree;
-import gaiasky.scene.render.extract.ParticleSetExtractor;
+import gaiasky.scene.system.render.extract.ParticleSetExtractor;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.time.ITimeFrameProvider;
