@@ -40,6 +40,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private Text text;
     private Cluster cluster;
     private BillboardSet bbSet;
+    private Constel constel;
 
     public LabelView() {
     }
@@ -59,6 +60,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.text = Mapper.text.get(entity);
         this.cluster = Mapper.cluster.get(entity);
         this.bbSet = Mapper.billboardSet.get(entity);
+        this.constel = Mapper.constel.get(entity);
     }
 
     @Override
@@ -80,11 +82,19 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         } else if (bbSet != null) {
             // Billboard sets
             renderBillboardSet(batch, shader, sys, rc, camera);
+        } else if (constel != null) {
+            // Constellation
+            renderConstellation(batch, shader, sys, rc, camera);
         }
     }
 
-    public void renderBillboard(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-
+    public void renderConstellation(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        Vector3d pos = D31;
+        textPosition(camera, pos);
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1);
+        shader.setUniformf("u_thLabel", 1);
+        render3DLabel(batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text(), pos, body.distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), getRadius(), base.forceLabel);
     }
 
     public void renderCelestial(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
@@ -184,6 +194,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public float textSize() {
+        if (constel != null) {
+            return .2e7f;
+        }
         return (float) (text.labelMax * body.distToCamera * text.labelFactor);
     }
 
@@ -192,6 +205,8 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         if (set != null) {
             // Star sets
             return .5f / Settings.settings.scene.label.size;
+        } else if (constel != null) {
+            return .2f / Settings.settings.scene.label.size;
         } else {
             // Rest
             return text.textScale >= 0 ? text.textScale : (float) FastMath.atan(text.labelMax) * text.labelFactor * 4e2f;
@@ -206,7 +221,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
      */
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
-        if (label != null && label.labelPosition != null) {
+        if (constel != null) {
+            out.set(body.pos);
+        } else if (label != null && label.labelPosition != null) {
             out.set(label.labelPosition).add(cam.getInversePos());
         } else {
             graph.translation.put(out);

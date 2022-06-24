@@ -27,6 +27,9 @@ public class ConstellationInitializer extends InitSystem {
         if (body.color == null) {
             body.color = new float[] { .5f, 1f, .5f, constel.alpha };
         }
+        if (body.labelColor == null) {
+            body.labelColor = new float[] { .5f, 1f, .5f, constel.alpha };
+        }
 
         EventManager.instance.subscribe(new ConstellationRadio(entity), Event.CONSTELLATION_UPDATE_CMD);
 
