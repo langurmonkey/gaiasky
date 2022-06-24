@@ -4,7 +4,9 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.view.PositionView;
 import gaiasky.scenegraph.Position;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.Star;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
@@ -155,9 +157,16 @@ public class Index {
         return ok;
     }
 
+    public Map<Integer, IPosition> getHipMap() {
+        return hipMap;
+    }
+
     public void addToHipMap(Entity entity) {
-        if (Mapper.octant.has(entity)) {
-            // TODO add octree stars to hip map
+        if (Mapper.octree.has(entity)) {
+            var octree = Mapper.octree.get(entity);
+            Set<Entity> set = octree.parenthood.keySet();
+            for (Entity e : set)
+                addToHipMap(e);
         } else {
             synchronized (hipMap) {
                 Archetype starArchetype = archetypes.get(Star.class);

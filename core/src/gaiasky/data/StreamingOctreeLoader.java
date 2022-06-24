@@ -478,7 +478,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                         }
 
                     // Update constellations :S
-                    GaiaSky.postRunnable(() -> Constellation.updateConstellations(GaiaSky.instance.sceneGraph));
+                    GaiaSky.postRunnable(() -> EventManager.publish(Event.CONSTELLATION_UPDATE_CMD, this, GaiaSky.instance.scene, GaiaSky.instance.sceneGraph));
 
                 }
                 this.abort.set(false);

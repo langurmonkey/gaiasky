@@ -136,9 +136,13 @@ public class Scene {
             EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
             EntitySystem clusterInit = new ClusterInitializer(setUp, families.clusters, priority++);
+            EntitySystem constellationInit = new ConstellationInitializer(setUp, families.constellations, priority++);
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit, trajectoryInit, modelInit, locInit, billboardSetInit, axesInit, raymarchingInit, fadeInit, datasetDescInit, backgroundInit, clusterInit);
+            runOnce(baseInit, particleSetInit, particleInit,
+                    trajectoryInit, modelInit, locInit, billboardSetInit,
+                    axesInit, raymarchingInit, fadeInit, datasetDescInit,
+                    backgroundInit, clusterInit, constellationInit);
         }
     }
 
@@ -185,6 +189,7 @@ public class Scene {
         if (engine != null) {
             int priority = 0;
             // Scene graph update system needs to run first.
+            ConstellationUpdater constellationUpdateSystem = new ConstellationUpdater(families.constellations, priority++);
             GraphUpdater sceneGraphUpdateSystem = new GraphUpdater(families.roots, priority++, GaiaSky.instance.time);
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
 
@@ -207,11 +212,13 @@ public class Scene {
             AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, sceneRenderer);
             AbstractExtractSystem clusterExtractor = newExtractor(ClusterExtractor.class, families.clusters, priority++, sceneRenderer);
             AbstractExtractSystem billboardSetExtractor = newExtractor(BillboardSetExtractor.class, families.billboardSets, priority++, sceneRenderer);
+            AbstractExtractSystem constellationExtractor = newExtractor(ConstellationExtractor.class, families.constellations, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
 
             // 1. First updater: scene graph and octree update systems.
+            engine.addSystem(constellationUpdateSystem);
             engine.addSystem(sceneGraphUpdateSystem);
             engine.addSystem(octreeUpdateSystem);
 
@@ -233,6 +240,7 @@ public class Scene {
             engine.addSystem(backgroundExtractor);
             engine.addSystem(clusterExtractor);
             engine.addSystem(billboardSetExtractor);
+            engine.addSystem(constellationExtractor);
         }
     }
 

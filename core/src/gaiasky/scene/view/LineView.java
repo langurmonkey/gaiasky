@@ -8,6 +8,7 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
+import gaiasky.scene.component.Constel;
 import gaiasky.scene.component.Verts;
 import gaiasky.scenegraph.camera.ICamera;
 
@@ -19,6 +20,7 @@ public class LineView extends AbstractView implements ILineRenderable {
     private Base base;
     private Body body;
     private Verts verts;
+    private Constel constel;
 
     /** Creates an empty line view. **/
     public LineView() {
@@ -45,11 +47,12 @@ public class LineView extends AbstractView implements ILineRenderable {
         this.base = Mapper.base.get(entity);
         this.body = Mapper.body.get(entity);
         this.verts = Mapper.verts.get(entity);
+        this.constel = Mapper.constel.get(entity);
     }
 
     @Override
     public float getLineWidth() {
-        return verts != null ? verts.primitiveSize : 0.6f;
+        return verts != null ? verts.primitiveSize : (constel != null ? constel.lineWidth : 0.6f);
     }
 
     @Override

@@ -15,7 +15,9 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.tree.IPosition;
 
 import java.time.Instant;
 
@@ -48,19 +50,52 @@ public class LineEntityRenderSystem {
         var base = Mapper.base.get(entity);
         var trajectory = Mapper.trajectory.get(entity);
         var set = Mapper.starSet.get(render.entity);
+        var constel = Mapper.constel.get(render.entity);
+
         if (trajectory != null) {
             // Orbits.
             var verts = Mapper.verts.get(entity);
             var graph = Mapper.graph.get(entity);
             var body = Mapper.body.get(entity);
-            renderTrajectory(render, base, body, graph, trajectory, verts, renderer, camera, alpha);
+            renderTrajectory(render, base, body, graph, trajectory, verts, renderer, alpha);
         } else if (set != null) {
             // Star sets.
             renderStarSet(render, base, set, renderer, camera, alpha);
+        } else if (constel != null) {
+            // Constellations
+            var body = Mapper.body.get(entity);
+            renderConstellation(render, base, body, constel, renderer, camera, alpha);
         }
     }
 
-    private void renderTrajectory(Render render, Base base, Body body, GraphNode graph, Trajectory trajectory, Verts verts, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+    private void renderConstellation(Render render, Base base, Body body, Constel constel, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        alpha *= constel.alpha * base.opacity;
+
+        Vector3d p1 = D31;
+        Vector3d p2 = D32;
+        Vector3b campos = camera.getPos();
+
+        lineView.setEntity(render.entity);
+
+        for (IPosition[] pair : constel.lines) {
+            if (pair != null) {
+                getPosition(pair[0], campos, p1, constel);
+                getPosition(pair[1], campos, p2, constel);
+
+                renderer.addLine(lineView, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, body.color[0], body.color[1], body.color[2], alpha);
+            }
+        }
+    }
+
+    private void getPosition(IPosition posBean, Vector3b camPos, Vector3d out, Constel constel) {
+        Vector3d vel = D33.setZero();
+        if (posBean.getVelocity() != null && !posBean.getVelocity().hasNaN()) {
+            vel.set(posBean.getVelocity()).scl(constel.deltaYears);
+        }
+        out.set(posBean.getPosition()).sub(camPos).add(vel);
+    }
+
+    private void renderTrajectory(Render render, Base base, Body body, GraphNode graph, Trajectory trajectory, Verts verts, LinePrimitiveRenderer renderer, float alpha) {
         if (!trajectory.onlyBody) {
             var localTransformD = trajectory.localTransformD;
             var oc = trajectory.oc;

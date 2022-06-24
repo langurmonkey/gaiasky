@@ -1376,6 +1376,11 @@ public enum Event {
     NEW_LOCATION_RECORD,
 
     /**
+     * Command to update constellations. Contains the scene object.
+     */
+    CONSTELLATION_UPDATE_CMD,
+
+    /**
      * Informs of the material generation, contains a boolean (start, finish)
      */
     PROCEDURAL_GENERATION_SURFACE_INFO,

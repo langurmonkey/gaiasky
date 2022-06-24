@@ -1,6 +1,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.ISceneGraph;
@@ -8,16 +9,9 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
 public class Constel implements Component {
-    public static final Array<Constellation> allConstellations = new Array<>(false, 88);
     public double deltaYears;
 
-    public static void updateConstellations(ISceneGraph sceneGraph) {
-        for (Constellation c : allConstellations) {
-            c.setUp(sceneGraph);
-        }
-    }
-
-    public float alpha = .2f;
+    public float alpha;
     public boolean allLoaded = false;
     public Vector3d posd;
 
@@ -27,6 +21,8 @@ public class Constel implements Component {
      * The lines themselves as pairs of positions
      **/
     public IPosition[][] lines;
+
+    public float lineWidth;
 
     public void setIds(double[][] ids) {
         this.ids = new Array<>(ids.length);

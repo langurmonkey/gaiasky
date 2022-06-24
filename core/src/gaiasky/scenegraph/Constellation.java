@@ -9,6 +9,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.api.ILineRenderable;
@@ -34,15 +37,8 @@ import java.util.Map;
 /**
  * Represents a constellation object.
  */
-public class Constellation extends SceneGraphNode implements ILineRenderable, I3DTextRenderable {
-    private static final Array<Constellation> allConstellations = new Array<>(false, 88);
+public class Constellation extends SceneGraphNode implements ILineRenderable, I3DTextRenderable, IObserver {
     private double deltaYears;
-
-    public static void updateConstellations(ISceneGraph sceneGraph) {
-        for (Constellation c : allConstellations) {
-            c.setUp(sceneGraph);
-        }
-    }
 
     private float alpha = .2f;
     private boolean allLoaded = false;
@@ -57,7 +53,7 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
 
     public Constellation() {
         super();
-        setColor(new float[]{ .5f, 1f, .5f, alpha });
+        setColor(new float[] { .5f, 1f, .5f, alpha });
         this.posd = new Vector3d();
     }
 
@@ -69,7 +65,7 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
 
     @Override
     public void initialize() {
-        allConstellations.add(this);
+        EventManager.instance.subscribe(this, Event.CONSTELLATION_UPDATE_CMD);
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera) {
@@ -144,7 +140,6 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
                 renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, cc[0], cc[1], cc[2], alpha);
             }
         }
-
     }
 
     private void getPosition(IPosition posBean, Vector3b camPos, Vector3d out) {
@@ -184,9 +179,9 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
 
     public void setIds(double[][] ids) {
         this.ids = new Array<>(ids.length);
-        for(double[] dd : ids) {
+        for (double[] dd : ids) {
             int[] ii = new int[dd.length];
-            for(int j =0; j < dd.length; j++)
+            for (int j = 0; j < dd.length; j++)
                 ii[j] = (int) Math.round(dd[j]);
             this.ids.add(ii);
         }
@@ -260,5 +255,13 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
     @Override
     public int getGlPrimitive() {
         return GL20.GL_LINES;
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.CONSTELLATION_UPDATE_CMD) {
+            SceneGraph sg = (SceneGraph) data[1];
+            setUp(sg);
+        }
     }
 }
