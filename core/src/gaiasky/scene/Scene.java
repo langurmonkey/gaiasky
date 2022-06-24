@@ -213,6 +213,7 @@ public class Scene {
             AbstractExtractSystem clusterExtractor = newExtractor(ClusterExtractor.class, families.clusters, priority++, sceneRenderer);
             AbstractExtractSystem billboardSetExtractor = newExtractor(BillboardSetExtractor.class, families.billboardSets, priority++, sceneRenderer);
             AbstractExtractSystem constellationExtractor = newExtractor(ConstellationExtractor.class, families.constellations, priority++, sceneRenderer);
+            AbstractExtractSystem boundariesExtractor = newExtractor(BoundariesExtractor.class, families.boundaries, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -241,6 +242,7 @@ public class Scene {
             engine.addSystem(clusterExtractor);
             engine.addSystem(billboardSetExtractor);
             engine.addSystem(constellationExtractor);
+            engine.addSystem(boundariesExtractor);
         }
     }
 

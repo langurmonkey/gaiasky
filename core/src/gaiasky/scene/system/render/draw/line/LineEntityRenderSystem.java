@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
@@ -20,6 +21,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Implements line rendering for the different families of entities.
@@ -51,6 +53,7 @@ public class LineEntityRenderSystem {
         var trajectory = Mapper.trajectory.get(entity);
         var set = Mapper.starSet.get(render.entity);
         var constel = Mapper.constel.get(render.entity);
+        var bound = Mapper.bound.get(render.entity);
 
         if (trajectory != null) {
             // Orbits.
@@ -65,6 +68,26 @@ public class LineEntityRenderSystem {
             // Constellations
             var body = Mapper.body.get(entity);
             renderConstellation(render, base, body, constel, renderer, camera, alpha);
+        } else if (bound != null) {
+            // Constellation boundaries
+            var body = Mapper.body.get(entity);
+            renderConstellationBoundaries(render, base, body, bound, renderer, alpha);
+        }
+    }
+
+    public void renderConstellationBoundaries(Render render, Base base, Body body, Boundaries bound, LinePrimitiveRenderer renderer, float alpha) {
+        alpha *= 0.3f;
+        lineView.setEntity(render.entity);
+
+        // This is so that the shape renderer does not mess up the z-buffer
+        for (List<Vector3d> points : bound.boundaries) {
+            Vector3d previous = null;
+            for (Vector3d point : points) {
+                if (previous != null) {
+                    renderer.addLine(lineView, (float) previous.x, (float) previous.y, (float) previous.z, (float) point.x, (float) point.y, (float) point.z, body.color[0], body.color[1], body.color[2], alpha * base.opacity);
+                }
+                previous = point;
+            }
         }
     }
 

@@ -29,7 +29,8 @@ public class Families {
             sphericalGrids,
             clusters,
             octrees,
-            constellations;
+            constellations,
+            boundaries;
 
     public Families() {
         roots = Family.all(GraphRoot.class).get();
@@ -51,6 +52,7 @@ public class Families {
         clusters = Family.all(Cluster.class).get();
         octrees = Family.all(Octree.class).get();
         constellations = Family.all(Constel.class).get();
+        boundaries = Family.all(Boundaries.class).get();
     }
 
 }
