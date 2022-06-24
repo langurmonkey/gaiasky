@@ -319,6 +319,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         this.epoch = AstroUtils.getJulianDate(epoch);
     }
 
+    public void setEpoch(Long epoch) {
+        this.epoch = AstroUtils.getJulianDate(epoch);
+    }
+
     @Override
     public void loadData() {
         Entity octreeWrapper = loadOctreeData();
