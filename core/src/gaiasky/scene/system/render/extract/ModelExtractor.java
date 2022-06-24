@@ -25,6 +25,10 @@ public class ModelExtractor extends AbstractExtractSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        extractEntity(entity);
+    }
+
+    public void extractEntity(Entity entity) {
         addToRenderLists(entity, camera);
     }
 
@@ -124,7 +128,6 @@ public class ModelExtractor extends AbstractExtractSystem {
     }
 
     private boolean renderText(Base base, Body body, SolidAngle sa) {
-        double thOverFactor = sa.thresholdPoint / Settings.settings.scene.label.number;
         return base.names != null
                 && GaiaSky.instance.isOn(ComponentTypes.ComponentType.Labels)
                 && (base.forceLabel || FastMath.pow(body.viewAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);

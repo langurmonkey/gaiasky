@@ -5,6 +5,7 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagBackgroundModel;
 import gaiasky.scene.component.tag.TagBillboardGalaxy;
 import gaiasky.scene.component.tag.TagOctreeObject;
+import gaiasky.scene.component.tag.TagSetElement;
 
 /**
  * A simple utility object that collects the most-used families.
@@ -34,11 +35,11 @@ public class Families {
 
     public Families() {
         roots = Family.all(GraphRoot.class).get();
-        graphNodes = Family.all(Base.class, GraphNode.class).exclude(TagOctreeObject.class).get();
+        graphNodes = Family.all(Base.class, GraphNode.class).exclude(TagOctreeObject.class, TagSetElement.class).get();
         models = Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get();
         particleSets = Family.one(ParticleSet.class, StarSet.class).exclude(TagOctreeObject.class).get();
         particles = Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get();
-        orbits = Family.all(Trajectory.class, Verts.class).get();
+        orbits = Family.all(Trajectory.class, Verts.class).exclude(TagSetElement.class).get();
         locations = Family.all(LocationMark.class).get();
         billboardSets = Family.all(BillboardSet.class).get();
         billboardGalaxies = Family.all(TagBillboardGalaxy.class).get();

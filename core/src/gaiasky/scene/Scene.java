@@ -137,12 +137,14 @@ public class Scene {
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
             EntitySystem clusterInit = new ClusterInitializer(setUp, families.clusters, priority++);
             EntitySystem constellationInit = new ConstellationInitializer(setUp, families.constellations, priority++);
+            EntitySystem elementsSetInit = new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit,
                     trajectoryInit, modelInit, locInit, billboardSetInit,
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
-                    backgroundInit, clusterInit, constellationInit);
+                    backgroundInit, clusterInit, constellationInit,
+                    elementsSetInit);
         }
     }
 
@@ -195,6 +197,7 @@ public class Scene {
 
             // Regular update systems.
             OctreeUpdater octreeUpdateSystem = new OctreeUpdater(families.octrees, priority++);
+            ElementsSetUpdater elementsSetUpdater = new ElementsSetUpdater(families.orbitalElementSets, priority++);
             ParticleSetUpdater particleSetUpdateSystem = new ParticleSetUpdater(families.particleSets, priority++);
             ModelUpdater modelUpdateSystem = new ModelUpdater(families.models, priority++);
             TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
@@ -205,6 +208,7 @@ public class Scene {
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
+            AbstractExtractSystem elementsSetExtractor = newExtractor(ElementsSetExtractor.class, families.orbitalElementSets, priority++, sceneRenderer);
             AbstractExtractSystem particleSetExtractor = newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, sceneRenderer);
             AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, sceneRenderer);
             AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, sceneRenderer);
@@ -222,6 +226,7 @@ public class Scene {
             engine.addSystem(constellationUpdateSystem);
             engine.addSystem(sceneGraphUpdateSystem);
             engine.addSystem(octreeUpdateSystem);
+            engine.addSystem(elementsSetUpdater);
 
             // 2. Update --- these can run in parallel.
             engine.addSystem(particleSetUpdateSystem);
@@ -234,6 +239,7 @@ public class Scene {
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
+            engine.addSystem(elementsSetExtractor);
             engine.addSystem(particleSetExtractor);
             engine.addSystem(particleExtractor);
             engine.addSystem(modelExtractor);

@@ -21,6 +21,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
      * Threshold solid angle for trajectories.
      **/
     protected static float SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(1.5);
+
     public static void setSolidAngleThreshold(float angleDeg) {
         SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(angleDeg);
     }
@@ -39,6 +40,10 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        extractEntity(entity);
+    }
+
+    public void extractEntity(Entity entity) {
         addToRenderLists(entity, camera);
     }
 

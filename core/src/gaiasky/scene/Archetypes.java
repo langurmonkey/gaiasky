@@ -167,7 +167,7 @@ public class Archetypes {
             addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class);
 
             // ParticleGroup
-            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagSet.class);
+            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagNoProcessChildren.class);
 
             // StarGroup
             addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class);
@@ -185,13 +185,13 @@ public class Archetypes {
             addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());
 
             // OrbitalElementsGroup
-            addArchetype(OrbitalElementsGroup.class.getName(), GenericCatalog.class.getName(), OrbitElementsSet.class, TagSet.class);
+            addArchetype(OrbitalElementsGroup.class.getName(), GenericCatalog.class.getName(), OrbitElementsSet.class, TagNoProcessChildren.class);
 
             // Invisible
             addArchetype(Invisible.class.getName(), CelestialBody.class.getName(), Raymarching.class);
 
             // AbstractOctreeWrapper
-            addArchetype(OctreeWrapper.class.getName(), SceneGraphNode.class.getName(), Fade.class, Octree.class, Octant.class, DatasetDescription.class);
+            addArchetype(OctreeWrapper.class.getName(), SceneGraphNode.class.getName(), Fade.class, Octree.class, Octant.class, DatasetDescription.class, TagNoProcessChildren.class);
 
 
             return archetypes;

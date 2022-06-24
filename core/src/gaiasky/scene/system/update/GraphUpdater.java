@@ -158,10 +158,9 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
             body.viewAngleApparent = body.viewAngle / camera.getFovFactor();
         }
 
-        // Only update non-set elements
-        boolean isSet = Mapper.tagSet.has(entity);
-        boolean isOctree = Mapper.octree.has(entity);
-        if (!isSet && !isOctree && graph.children != null) {
+        // Some elements (sets, octrees) process their own children.
+        boolean processChildren = !Mapper.tagNoProcessChildren.has(entity);
+        if (processChildren && graph.children != null) {
             // Go down a level
             for (int i = 0; i < graph.children.size; i++) {
                 Entity child = graph.children.get(i);

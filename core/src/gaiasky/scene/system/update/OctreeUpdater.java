@@ -18,15 +18,12 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
 
     private final GraphUpdater graphUpdater;
     private final ParticleSetUpdater particleSetUpdater;
-    private final ParticleSetExtractor particleSetExtractor;
 
     public OctreeUpdater(Family family, int priority) {
         super(family, priority);
 
         this.graphUpdater = new GraphUpdater(null, 0, GaiaSky.instance.time);
         this.particleSetUpdater = new ParticleSetUpdater(null, 0);
-        this.particleSetExtractor = new ParticleSetExtractor(null, 0);
-        particleSetExtractor.setRenderer(GaiaSky.instance.sceneRenderer);
     }
 
     @Override
@@ -58,11 +55,6 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
                 // Call the update method of all entities in the roulette list.
                 updateOctreeObjects(base, graph, octree, deltaTime);
 
-                // Reset roulette.
-                octree.roulette.clear();
-
-                // Render the octree with lines.
-                //addToRenderLists(camera, root);
 
                 // Update focus, just in case
                 //IFocus focus = camera.getFocus();
@@ -74,6 +66,7 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
                 //    }
                 //}
             } else {
+                // TODO what is this for?
                 // Just update children
                 //for (SceneGraphNode node : children) {
                 //    node.update(time, translation, camera);
@@ -83,12 +76,11 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
     }
 
     /**
-     * Updates and extracts all observed octree objects.
+     * Updates all observed octree objects.
      */
     protected void updateOctreeObjects(Base base, GraphNode graph, Octree octree, float deltaTime) {
         updateGraph(base, graph, octree, GaiaSky.instance.time);
         updateParticleSet(octree, deltaTime);
-        extractParticleSet(octree);
     }
 
     private void updateGraph(Base base, GraphNode graph, Octree octree, ITimeFrameProvider time) {
@@ -107,14 +99,6 @@ public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
         for (int i = 0; i < size; i++) {
             Entity entity = ((OctreeObjectView) octree.roulette.get(i)).getEntity();
             particleSetUpdater.updateEntity(entity, deltaTime);
-        }
-    }
-
-    private void extractParticleSet(Octree octree) {
-        int size = octree.roulette.size();
-        for (int i = 0; i < size; i++) {
-            Entity entity = ((OctreeObjectView) octree.roulette.get(i)).getEntity();
-            particleSetExtractor.extractEntity(entity);
         }
     }
 }
