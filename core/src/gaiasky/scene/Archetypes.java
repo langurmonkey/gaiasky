@@ -142,6 +142,9 @@ public class Archetypes {
             // FadeNode
             addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);
 
+            // MeshObject
+            addArchetype(MeshObject.class.getName(), SceneGraphNode.class.getName(), Mesh.class, Fade.class, Label.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
+
             // BackgroundModel
             addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
 

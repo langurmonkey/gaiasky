@@ -138,13 +138,14 @@ public class Scene {
             EntitySystem clusterInit = new ClusterInitializer(setUp, families.clusters, priority++);
             EntitySystem constellationInit = new ConstellationInitializer(setUp, families.constellations, priority++);
             EntitySystem elementsSetInit = new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++);
+            EntitySystem meshInit = new MeshInitializer(setUp, families.meshes, priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit,
                     trajectoryInit, modelInit, locInit, billboardSetInit,
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
                     backgroundInit, clusterInit, constellationInit,
-                    elementsSetInit);
+                    elementsSetInit, meshInit);
         }
     }
 
@@ -205,6 +206,7 @@ public class Scene {
             ClusterUpdater clusterUpdateSystem = new ClusterUpdater(families.clusters, priority++);
             RaymarchingUpdater raymarchingUpdater = new RaymarchingUpdater(families.raymarchings, priority++);
             BillboardSetUpdater billboardSetUpdater = new BillboardSetUpdater(families.billboardSets, priority++);
+            MeshUpdater meshUpdater = new MeshUpdater(families.meshes, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -218,6 +220,7 @@ public class Scene {
             AbstractExtractSystem billboardSetExtractor = newExtractor(BillboardSetExtractor.class, families.billboardSets, priority++, sceneRenderer);
             AbstractExtractSystem constellationExtractor = newExtractor(ConstellationExtractor.class, families.constellations, priority++, sceneRenderer);
             AbstractExtractSystem boundariesExtractor = newExtractor(BoundariesExtractor.class, families.boundaries, priority++, sceneRenderer);
+            AbstractExtractSystem meshExtractor = newExtractor(MeshExtractor.class, families.meshes, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -236,6 +239,7 @@ public class Scene {
             engine.addSystem(clusterUpdateSystem);
             engine.addSystem(raymarchingUpdater);
             engine.addSystem(billboardSetUpdater);
+            engine.addSystem(meshUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -249,6 +253,7 @@ public class Scene {
             engine.addSystem(billboardSetExtractor);
             engine.addSystem(constellationExtractor);
             engine.addSystem(boundariesExtractor);
+            engine.addSystem(meshExtractor);
         }
     }
 

@@ -6,18 +6,20 @@
 package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.util.math.Matrix4d;
 
 public class TranslateTransform implements ITransform {
     /** Translation **/
-    float[] vector;
+    double[] vector;
 
     public void apply(Matrix4 mat){
+        mat.translate((float) vector[0], (float) vector[1], (float) vector[2]);
+    }
+    public void apply(Matrix4d mat){
         mat.translate(vector[0], vector[1], vector[2]);
     }
-    
+
     public void setVector(double[] vector){
-        this.vector = new float[vector.length];
-        for(int i =0; i< vector.length; i++)
-            this.vector[i] = (float) vector[i];
+        this.vector = vector;
     }
 }

@@ -6,24 +6,26 @@
 package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.util.math.Matrix4d;
 
 public class RotateTransform implements ITransform {
-    /** Rotation axis **/
-    float[] axis;
-    /** Rotation angle **/
-    float angle;
+    /** Rotation axis. **/
+    double[] axis;
+    /** Rotation angle. **/
+    double angle;
     
     public void apply(Matrix4 mat){
+        mat.rotate((float) axis[0], (float) axis[1], (float) axis[2], (float) angle);
+    }
+    public void apply(Matrix4d mat){
         mat.rotate(axis[0], axis[1], axis[2], angle);
     }
-    
+
     public void setAxis(double[] axis){
-        this.axis = new float[axis.length];
-        for(int i =0; i< axis.length; i++)
-            this.axis[i] = (float) axis[i];
+        this.axis = axis;
     }
     
     public void setAngle(Double angle){
-        this.angle = angle.floatValue();
+        this.angle = angle;
     }
 }

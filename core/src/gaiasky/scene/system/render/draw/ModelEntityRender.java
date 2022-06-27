@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
@@ -18,7 +17,6 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.Environment;
@@ -65,6 +63,9 @@ public class ModelEntityRender {
         } else if (Mapper.cluster.has(entity)) {
             // Cluster
             renderStarClusterModel(entity, model, Mapper.cluster.get(entity), batch, alpha);
+        }else if (Mapper.mesh.has(entity)) {
+            // Mesh
+            renderMeshModel(entity, model, Mapper.mesh.get(entity), batch, alpha);
         } else {
             boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
             // Generic model.
@@ -100,6 +101,36 @@ public class ModelEntityRender {
 
             mc.update(alpha * alphaFactor, relativistic);
             batch.render(mc.instance, mc.env);
+        }
+    }
+
+    /**
+     * Renders a mesh, tipically an iso-surface.
+     * @param entity The entity.
+     * @param model The model component.
+     * @param mesh The mesh component.
+     * @param batch The batch.
+     * @param alpha The alpha value.
+     */
+    private void renderMeshModel(Entity entity, Model model, Mesh mesh, IntModelBatch batch, float alpha) {
+        if (model.model != null) {
+            var graph = Mapper.graph.get(entity);
+            var base = Mapper.base.get(entity);
+
+            var mc = model.model;
+
+            if (mesh.shading == Mesh.MeshShading.ADDITIVE) {
+                mc.update(graph.localTransform, alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE);
+                // Depth reads, no depth writes
+                mc.setDepthTest(GL20.GL_LEQUAL, false);
+            } else {
+                mc.update(graph.localTransform, alpha * base.opacity);
+                // Depth reads and writes
+                mc.setDepthTest(GL20.GL_LEQUAL, true);
+            }
+            // Render
+            if (mc.instance != null)
+                batch.render(mc.instance, mc.env);
         }
     }
 

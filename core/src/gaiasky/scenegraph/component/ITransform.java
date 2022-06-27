@@ -6,10 +6,12 @@
 package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.util.math.Matrix4d;
 
 /**
  * Represents a generic matrix transformation
  */
 public interface ITransform {
     void apply(Matrix4 mat);
+    void apply(Matrix4d mat);
 }

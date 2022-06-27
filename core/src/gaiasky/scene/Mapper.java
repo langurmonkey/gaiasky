@@ -36,6 +36,7 @@ public class Mapper {
     public static final ComponentMapper<Distance> distance = ComponentMapper.getFor(Distance.class);
     public static final ComponentMapper<ProperMotion> pm = ComponentMapper.getFor(ProperMotion.class);
     public static final ComponentMapper<Model> model = ComponentMapper.getFor(Model.class);
+    public static final ComponentMapper<Mesh> mesh = ComponentMapper.getFor(Mesh.class);
     public static final ComponentMapper<SolidAngle> sa = ComponentMapper.getFor(SolidAngle.class);
     public static final ComponentMapper<Text> text = ComponentMapper.getFor(Text.class);
     public static final ComponentMapper<Atmosphere> atmosphere = ComponentMapper.getFor(Atmosphere.class);

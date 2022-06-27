@@ -198,11 +198,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin);
         typesLabel.addListener(new OwnTextTooltip(types, skin));
         t.add(typesLabel).colspan(2).left().row();
-        OwnLabel desc = new OwnLabel(TextUtils.capString(ci.description, cap), skin);
-        desc.addListener(new OwnTextTooltip(ci.description, skin));
+        String description = ci.description != null ? ci.description : "";
+        OwnLabel desc = new OwnLabel(TextUtils.capString(description, cap), skin);
+        desc.addListener(new OwnTextTooltip(description, skin));
         t.add(desc).left().expandX();
         Link info = new Link("(i)", skin.get("link", Label.LabelStyle.class), null);
-        info.addListener(new OwnTextTooltip(ci.description, skin));
+        info.addListener(new OwnTextTooltip(description, skin));
         t.add(info).left().padLeft(pad);
 
         if (ci.nParticles > 0) {

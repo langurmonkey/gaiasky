@@ -15,6 +15,7 @@ public class Families {
     public final Family roots,
             graphNodes,
             models,
+            meshes,
             particleSets,
             particles,
             orbits,
@@ -37,6 +38,7 @@ public class Families {
         roots = Family.all(GraphRoot.class).get();
         graphNodes = Family.all(Base.class, GraphNode.class).exclude(TagOctreeObject.class, TagSetElement.class).get();
         models = Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).get();
+        meshes = Family.all(Base.class, Body.class, Mesh.class, Model.class).get();
         particleSets = Family.one(ParticleSet.class, StarSet.class).exclude(TagOctreeObject.class).get();
         particles = Family.all(Base.class, Celestial.class, ProperMotion.class, RenderType.class, ParticleExtra.class).get();
         orbits = Family.all(Trajectory.class, Verts.class).exclude(TagSetElement.class).get();

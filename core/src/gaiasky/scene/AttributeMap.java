@@ -96,7 +96,7 @@ public class AttributeMap {
         putAll(Fade.class, "fadein", "fadeIn", "fadeInMap", "fadeout", "fadeOut", "fadeOutMap", "fade", "fadepc", "fadePc", "positionobjectname", "fadeObjectName", "fadePosition");
 
         // DatasetDescription
-        putAll(DatasetDescription.class, "catalogInfo", "cataloginfo");
+        putAll(DatasetDescription.class, "catalogInfo", "cataloginfo", "description:MeshObject");
 
         // Label
         putAll(Label.class, "label", "label2d", "labelposition");
@@ -133,6 +133,9 @@ public class AttributeMap {
 
         // ParticleExtra
         putAll(ParticleExtra.class, "primitiveRenderScale");
+
+        // Mesh
+        putAll(Mesh.class, "shading", "additiveblending");
 
         return attributeMap;
     }
