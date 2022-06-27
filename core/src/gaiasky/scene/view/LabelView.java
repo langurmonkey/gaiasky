@@ -41,6 +41,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private Cluster cluster;
     private BillboardSet bbSet;
     private Constel constel;
+    private Mesh mesh;
 
     public LabelView() {
     }
@@ -61,6 +62,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.cluster = Mapper.cluster.get(entity);
         this.bbSet = Mapper.billboardSet.get(entity);
         this.constel = Mapper.constel.get(entity);
+        this.mesh = Mapper.mesh.get(entity);
     }
 
     @Override
@@ -85,7 +87,19 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         } else if (constel != null) {
             // Constellation
             renderConstellation(batch, shader, sys, rc, camera);
+        } else if (mesh != null) {
+            // Mesh
+            renderMesh(batch, shader, sys, rc, camera);
         }
+    }
+
+    public void renderMesh(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera){
+        Vector3d pos = D31;
+        textPosition(camera, pos);
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+        render3DLabel(batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, text(), pos, body.distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), getRadius(), base.forceLabel);
     }
 
     public void renderConstellation(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {

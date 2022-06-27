@@ -32,7 +32,12 @@ public class MeshInitializer extends InitSystem {
         var graph = Mapper.graph.get(entity);
         var model = Mapper.model.get(entity);
         var mesh = Mapper.mesh.get(entity);
+        var text = Mapper.text.get(entity);
         ModelComponent mc = model.model;
+
+        text.textScale = 0.2f;
+        text.labelFactor = 0.8e-3f;
+        text.labelMax = 1f;
 
         AssetManager manager = AssetBean.manager();
         if (mc != null) {
