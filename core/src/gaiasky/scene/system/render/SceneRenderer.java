@@ -353,6 +353,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
+        // ORBITAL ELEMENTS PARTICLES
+        AbstractRenderSystem elementsProc = new ElementsRenderer(ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
+        elementsProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        elementsProc.addPostRunnables(regularBlendR, depthWritesR);
+
         // ORBITAL ELEMENTS GROUP
         AbstractRenderSystem elementsSetProc = new ElementsSetRenderer(ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
         elementsSetProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -411,6 +416,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(particleGroupProc);
         addRenderSystem(starGroupProc);
         addRenderSystem(variableGroupProc);
+        addRenderSystem(elementsProc);
         addRenderSystem(elementsSetProc);
 
         // Diffuse meshes
