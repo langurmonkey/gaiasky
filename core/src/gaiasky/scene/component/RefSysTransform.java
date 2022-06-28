@@ -13,20 +13,21 @@ public class RefSysTransform implements Component {
     private static final Log logger = Logger.getLogger(RefSysTransform.class);
     public String transformName;
     public Matrix4d matrix;
+    public Matrix4 matrixf;
+    public boolean floatVersion = false;
 
     public void setTransformFunction(String transformFunction) {
         setTransformName(transformFunction);
     }
     public void setTransformName(String transformFunction) {
-        this.transformName = transformFunction;
         setMatrix(transformFunction);
     }
 
-    public void setMatrix(String matrix) {
-        this.transformName = matrix;
-        if (matrix != null && !matrix.isEmpty()) {
+    public void setMatrix(String transformName) {
+        this.transformName = transformName;
+        if (transformName != null && !transformName.isEmpty()) {
             try {
-                Method m = ClassReflection.getMethod(Coordinates.class, matrix);
+                Method m = ClassReflection.getMethod(Coordinates.class, transformName);
                 Object obj = m.invoke(null);
 
                 Matrix4d trf = null;
@@ -36,8 +37,19 @@ public class RefSysTransform implements Component {
                     trf = new Matrix4d((Matrix4d) obj);
                 }
                 this.matrix = trf;
+
+                if(floatVersion) {
+                    this.matrixf = this.matrix.putIn(new Matrix4());
+                }
             } catch (Exception e) {
                 logger.error(e);
+            }
+        } else {
+            if(matrix != null) {
+                matrix.idt();
+            }
+            if(matrixf != null) {
+                matrixf.idt();
             }
         }
     }

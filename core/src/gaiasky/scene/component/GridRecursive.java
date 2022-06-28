@@ -24,4 +24,5 @@ public class GridRecursive implements Component {
     // Regime: 1 - normal with depth buffer, 2 - rescaling quad
     public byte regime = 1;
 
+
 }

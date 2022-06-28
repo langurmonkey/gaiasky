@@ -12,7 +12,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
-import gaiasky.scene.system.render.draw.text.GridAnnotationsRenderSystem;
+import gaiasky.scene.system.render.draw.text.AnnotationsEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -28,14 +28,14 @@ public class TextRenderer extends FontRenderSystem {
     private final ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
 
-    private final GridAnnotationsRenderSystem girdRenderer;
+    private final AnnotationsEntityRenderSystem girdRenderer;
 
     private final LabelView view;
     public TextRenderer(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
 
-        this.girdRenderer = new GridAnnotationsRenderSystem();
+        this.girdRenderer = new AnnotationsEntityRenderSystem();
         this.view = new LabelView();
     }
 

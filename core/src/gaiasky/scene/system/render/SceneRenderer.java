@@ -433,6 +433,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Galaxy & nebulae billboards, recursive grid
         addRenderSystem(billboardSpritesProc);
         addRenderSystem(billboardGalaxiesProc);
+        addRenderSystem(modelRecGridProc);
 
         // Primitives
         addRenderSystem(pointProc);

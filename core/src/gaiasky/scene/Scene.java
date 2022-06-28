@@ -139,13 +139,14 @@ public class Scene {
             EntitySystem constellationInit = new ConstellationInitializer(setUp, families.constellations, priority++);
             EntitySystem elementsSetInit = new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++);
             EntitySystem meshInit = new MeshInitializer(setUp, families.meshes, priority++);
+            EntitySystem recGridInit = new GridRecInitializer(setUp, families.gridRecs, priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit,
                     trajectoryInit, modelInit, locInit, billboardSetInit,
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
                     backgroundInit, clusterInit, constellationInit,
-                    elementsSetInit, meshInit);
+                    elementsSetInit, meshInit, recGridInit);
         }
     }
 
@@ -207,6 +208,7 @@ public class Scene {
             RaymarchingUpdater raymarchingUpdater = new RaymarchingUpdater(families.raymarchings, priority++);
             BillboardSetUpdater billboardSetUpdater = new BillboardSetUpdater(families.billboardSets, priority++);
             MeshUpdater meshUpdater = new MeshUpdater(families.meshes, priority++);
+            GridRecUpdater gridRecUpdater = new GridRecUpdater(families.gridRecs, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -221,6 +223,7 @@ public class Scene {
             AbstractExtractSystem constellationExtractor = newExtractor(ConstellationExtractor.class, families.constellations, priority++, sceneRenderer);
             AbstractExtractSystem boundariesExtractor = newExtractor(BoundariesExtractor.class, families.boundaries, priority++, sceneRenderer);
             AbstractExtractSystem meshExtractor = newExtractor(MeshExtractor.class, families.meshes, priority++, sceneRenderer);
+            AbstractExtractSystem gridRecExtractor = newExtractor(GridRecExtractor.class, families.gridRecs, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -240,6 +243,7 @@ public class Scene {
             engine.addSystem(raymarchingUpdater);
             engine.addSystem(billboardSetUpdater);
             engine.addSystem(meshUpdater);
+            engine.addSystem(gridRecUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -254,6 +258,7 @@ public class Scene {
             engine.addSystem(constellationExtractor);
             engine.addSystem(boundariesExtractor);
             engine.addSystem(meshExtractor);
+            engine.addSystem(gridRecExtractor);
         }
     }
 

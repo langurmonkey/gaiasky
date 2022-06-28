@@ -17,7 +17,7 @@ import gaiasky.util.math.Vector3d;
 /**
  * Renders grid annotations.
  */
-public class GridAnnotationsRenderSystem {
+public class AnnotationsEntityRenderSystem {
 
     private static final float ANNOTATIONS_ALPHA = 0.8f;
 

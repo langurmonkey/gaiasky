@@ -58,6 +58,7 @@ public class Mapper {
     public static final ComponentMapper<ParentOrientation> parentOrientation = ComponentMapper.getFor(ParentOrientation.class);
     public static final ComponentMapper<Raymarching> raymarching = ComponentMapper.getFor(Raymarching.class);
     public static final ComponentMapper<GridUV> grid = ComponentMapper.getFor(GridUV.class);
+    public static final ComponentMapper<GridRecursive> gridRec = ComponentMapper.getFor(GridRecursive.class);
 
     // Tags
     public static final ComponentMapper<TagQuaternionOrientation> tagQuatOrientation = ComponentMapper.getFor(TagQuaternionOrientation.class);

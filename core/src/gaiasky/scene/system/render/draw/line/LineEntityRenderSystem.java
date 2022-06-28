@@ -9,6 +9,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.view.LineView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
@@ -54,6 +55,7 @@ public class LineEntityRenderSystem {
         var set = Mapper.starSet.get(render.entity);
         var constel = Mapper.constel.get(render.entity);
         var bound = Mapper.bound.get(render.entity);
+        var gridRec = Mapper.gridRec.get(render.entity);
 
         if (trajectory != null) {
             // Orbits.
@@ -65,13 +67,27 @@ public class LineEntityRenderSystem {
             // Star sets.
             renderStarSet(render, base, set, renderer, camera, alpha);
         } else if (constel != null) {
-            // Constellations
+            // Constellations.
             var body = Mapper.body.get(entity);
             renderConstellation(render, base, body, constel, renderer, camera, alpha);
         } else if (bound != null) {
-            // Constellation boundaries
+            // Constellation boundaries.
             var body = Mapper.body.get(entity);
             renderConstellationBoundaries(render, base, body, bound, renderer, alpha);
+        } else if (gridRec != null) {
+            // Recursive grid projection lines.
+            renderGridRec(render, base, gridRec, renderer, GaiaSky.instance.getICamera(), alpha);
+        }
+    }
+
+    public void renderGridRec(Render render, Base base, GridRecursive gr, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        // Here, we must have a focus and be in refsys mode.
+        IFocus focus = camera.getFocus();
+        if (focus != null) {
+            // Line in ZX
+            renderer.addLine(lineView, gr.a.x, gr.a.y, gr.a.z, gr.b.x, gr.b.y, gr.b.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
+            // Line in Y
+            renderer.addLine(lineView, gr.c.x, gr.c.y, gr.c.z, gr.d.x, gr.d.y, gr.d.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
         }
     }
 
@@ -79,7 +95,7 @@ public class LineEntityRenderSystem {
         alpha *= 0.3f;
         lineView.setEntity(render.entity);
 
-        // This is so that the shape renderer does not mess up the z-buffer
+        // This is so that the shape renderer does not mess up the z-buffer.
         for (List<Vector3d> points : bound.boundaries) {
             Vector3d previous = null;
             for (Vector3d point : points) {

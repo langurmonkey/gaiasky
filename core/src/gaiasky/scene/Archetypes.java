@@ -152,7 +152,7 @@ public class Archetypes {
             addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(), GridUV.class);
 
             // RecursiveGrid
-            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, RenderType.class);
+            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Text.class, RenderType.class);
 
             // BillboardGroup
             addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class, Text.class);

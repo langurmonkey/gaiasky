@@ -66,6 +66,9 @@ public class ModelEntityRender {
         }else if (Mapper.mesh.has(entity)) {
             // Mesh
             renderMeshModel(entity, model, Mapper.mesh.get(entity), batch, alpha);
+        } else if(Mapper.gridRec.has(entity)) {
+            // Recursive grid
+            renderRecursiveGridModel(entity, model, Mapper.gridRec.get(entity), batch, alpha);
         } else {
             boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
             // Generic model.
@@ -102,6 +105,33 @@ public class ModelEntityRender {
             mc.update(alpha * alphaFactor, relativistic);
             batch.render(mc.instance, mc.env);
         }
+    }
+
+    /**
+     * Renders the recursive grid.
+     * @param entity The entity.
+     * @param model The model component.
+     * @param gr The recursive grid component.
+     * @param modelBatch The batch.
+     * @param alpha The alpha value.
+     */
+    public void renderRecursiveGridModel(Entity entity, Model model, GridRecursive gr, IntModelBatch modelBatch, float alpha) {
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+
+        ModelComponent mc = model.model;
+
+        mc.update(alpha * body.color[3] * base.opacity);
+        if (gr.regime == 1)
+            mc.setDepthTest(GL20.GL_LEQUAL, false);
+        else
+            mc.setDepthTest(0, false);
+        mc.setFloatExtAttribute(FloatAttribute.TessQuality, gr.scalingFading.getFirst().floatValue());
+        // Fading in u_heightScale
+        mc.setFloatExtAttribute(FloatAttribute.HeightScale, gr.scalingFading.getSecond().floatValue());
+        // FovFactor
+        mc.setFloatExtAttribute(FloatAttribute.Ts, gr.fovFactor * 0.5f * Settings.settings.scene.lineWidth);
+        modelBatch.render(mc.instance, mc.env);
     }
 
     /**

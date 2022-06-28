@@ -37,6 +37,7 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
@@ -130,79 +131,79 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
     private void initAnnotations() {
         annotations = new ArrayList<>();
-        annotation(1d * Constants.M_TO_U, "1 m");
-        annotation(50d * Constants.M_TO_U, "50 m");
-        annotation(100d * Constants.M_TO_U, "100 m");
-        annotation(200d * Constants.M_TO_U, "200 m");
-        annotation(500d * Constants.M_TO_U, "500 m");
+        annotation(1d * Constants.M_TO_U, "1 " + I18n.msg("gui.unit.m"));
+        annotation(50d * Constants.M_TO_U, "50 " + I18n.msg("gui.unit.m"));
+        annotation(100d * Constants.M_TO_U, "100 " + I18n.msg("gui.unit.m"));
+        annotation(200d * Constants.M_TO_U, "200 " + I18n.msg("gui.unit.m"));
+        annotation(500d * Constants.M_TO_U, "500 " + I18n.msg("gui.unit.m"));
 
-        annotation(1d * Constants.KM_TO_U, "1 Km");
-        annotation(10d * Constants.KM_TO_U, "10 Km");
-        annotation(100d * Constants.KM_TO_U, "100 Km");
-        annotation(250d * Constants.KM_TO_U, "250 Km");
-        annotation(500d * Constants.KM_TO_U, "500 Km");
-        annotation(1000d * Constants.KM_TO_U, "1000 Km");
-        annotation(2500d * Constants.KM_TO_U, "2500 Km");
-        annotation(5000d * Constants.KM_TO_U, "5000 Km");
-        annotation(10000d * Constants.KM_TO_U, "10000 Km");
-        annotation(75000d * Constants.KM_TO_U, "75000 Km");
-        annotation(370000d * Constants.KM_TO_U, "370000 Km");
-        annotation(1500000d * Constants.KM_TO_U, "1.5M Km");
-        annotation(5000000d * Constants.KM_TO_U, "5M Km");
-        annotation(10000000d * Constants.KM_TO_U, "10M Km");
+        annotation(1d * Constants.KM_TO_U, "1 " + I18n.msg("gui.unit.km"));
+        annotation(10d * Constants.KM_TO_U, "10 " + I18n.msg("gui.unit.km"));
+        annotation(100d * Constants.KM_TO_U, "100 " + I18n.msg("gui.unit.km"));
+        annotation(250d * Constants.KM_TO_U, "250 " + I18n.msg("gui.unit.km"));
+        annotation(500d * Constants.KM_TO_U, "500 " + I18n.msg("gui.unit.km"));
+        annotation(1000d * Constants.KM_TO_U, "1000 " + I18n.msg("gui.unit.km"));
+        annotation(2500d * Constants.KM_TO_U, "2500 " + I18n.msg("gui.unit.km"));
+        annotation(5000d * Constants.KM_TO_U, "5000 " + I18n.msg("gui.unit.km"));
+        annotation(10000d * Constants.KM_TO_U, "10000 " + I18n.msg("gui.unit.km"));
+        annotation(75000d * Constants.KM_TO_U, "75000 " + I18n.msg("gui.unit.km"));
+        annotation(370000d * Constants.KM_TO_U, "370000 " + I18n.msg("gui.unit.km"));
+        annotation(1500000d * Constants.KM_TO_U, "1.5M " + I18n.msg("gui.unit.km"));
+        annotation(5000000d * Constants.KM_TO_U, "5M " + I18n.msg("gui.unit.km"));
+        annotation(10000000d * Constants.KM_TO_U, "10M " + I18n.msg("gui.unit.km"));
 
-        annotation(0.1d * Constants.AU_TO_U, "0.1 AU");
-        annotation(0.5d * Constants.AU_TO_U, "0.5 AU");
-        annotation(1d * Constants.AU_TO_U, "1 AU");
-        annotation(2d * Constants.AU_TO_U, "2 AU");
-        annotation(5d * Constants.AU_TO_U, "5 AU");
-        annotation(10d * Constants.AU_TO_U, "10 AU");
-        annotation(50d * Constants.AU_TO_U, "50 AU");
-        annotation(100d * Constants.AU_TO_U, "100 AU");
-        annotation(500d * Constants.AU_TO_U, "500 AU");
-        annotation(1000d * Constants.AU_TO_U, "1000 AU");
-        annotation(5000d * Constants.AU_TO_U, "5000 AU");
-        annotation(10000d * Constants.AU_TO_U, "10000 AU");
-        annotation(50000d * Constants.AU_TO_U, "50000 AU");
+        annotation(0.1d * Constants.AU_TO_U, "0.1 " + I18n.msg("gui.unit.au"));
+        annotation(0.5d * Constants.AU_TO_U, "0.5 " + I18n.msg("gui.unit.au"));
+        annotation(1d * Constants.AU_TO_U, "1 " + I18n.msg("gui.unit.au"));
+        annotation(2d * Constants.AU_TO_U, "2 " + I18n.msg("gui.unit.au"));
+        annotation(5d * Constants.AU_TO_U, "5 " + I18n.msg("gui.unit.au"));
+        annotation(10d * Constants.AU_TO_U, "10 " + I18n.msg("gui.unit.au"));
+        annotation(50d * Constants.AU_TO_U, "50 " + I18n.msg("gui.unit.au"));
+        annotation(100d * Constants.AU_TO_U, "100 " + I18n.msg("gui.unit.au"));
+        annotation(500d * Constants.AU_TO_U, "500 " + I18n.msg("gui.unit.au"));
+        annotation(1000d * Constants.AU_TO_U, "1000 " + I18n.msg("gui.unit.au"));
+        annotation(5000d * Constants.AU_TO_U, "5000 " + I18n.msg("gui.unit.au"));
+        annotation(10000d * Constants.AU_TO_U, "10000 " + I18n.msg("gui.unit.au"));
+        annotation(50000d * Constants.AU_TO_U, "50000 " + I18n.msg("gui.unit.au"));
 
-        annotation(1d * Constants.LY_TO_U, "1 ly");
-        annotation(2d * Constants.LY_TO_U, "2 ly");
+        annotation(1d * Constants.LY_TO_U, "1 " + I18n.msg("gui.unit.ly"));
+        annotation(2d * Constants.LY_TO_U, "2 " + I18n.msg("gui.unit.ly"));
 
-        annotation(1d * Constants.PC_TO_U, "1 pc");
-        annotation(2.5d * Constants.PC_TO_U, "2.5 pc");
-        annotation(5d * Constants.PC_TO_U, "5 pc");
-        annotation(10d * Constants.PC_TO_U, "10 pc");
-        annotation(25d * Constants.PC_TO_U, "25 pc");
-        annotation(50d * Constants.PC_TO_U, "50 pc");
-        annotation(100d * Constants.PC_TO_U, "100 pc");
-        annotation(250d * Constants.PC_TO_U, "250 pc");
-        annotation(500d * Constants.PC_TO_U, "500 pc");
+        annotation(1d * Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.pc"));
+        annotation(2.5d * Constants.PC_TO_U, "2.5 " + I18n.msg("gui.unit.pc"));
+        annotation(5d * Constants.PC_TO_U, "5 " + I18n.msg("gui.unit.pc"));
+        annotation(10d * Constants.PC_TO_U, "10 " + I18n.msg("gui.unit.pc"));
+        annotation(25d * Constants.PC_TO_U, "25 " + I18n.msg("gui.unit.pc"));
+        annotation(50d * Constants.PC_TO_U, "50 " + I18n.msg("gui.unit.pc"));
+        annotation(100d * Constants.PC_TO_U, "100 " + I18n.msg("gui.unit.pc"));
+        annotation(250d * Constants.PC_TO_U, "250 " + I18n.msg("gui.unit.pc"));
+        annotation(500d * Constants.PC_TO_U, "500 " + I18n.msg("gui.unit.pc"));
 
-        annotation(1000d * Constants.PC_TO_U, "1 Kpc");
-        annotation(2500d * Constants.PC_TO_U, "2.5 Kpc");
-        annotation(5000d * Constants.PC_TO_U, "5 Kpc");
-        annotation(10000d * Constants.PC_TO_U, "10 Kpc");
-        annotation(25000d * Constants.PC_TO_U, "25 Kpc");
-        annotation(50000d * Constants.PC_TO_U, "50 Kpc");
-        annotation(100000d * Constants.PC_TO_U, "100 Kpc");
-        annotation(250000d * Constants.PC_TO_U, "250 Kpc");
-        annotation(500000d * Constants.PC_TO_U, "500 Kpc");
+        annotation(1000d * Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.kpc"));
+        annotation(2500d * Constants.PC_TO_U, "2.5 " + I18n.msg("gui.unit.kpc"));
+        annotation(5000d * Constants.PC_TO_U, "5 " + I18n.msg("gui.unit.kpc"));
+        annotation(10000d * Constants.PC_TO_U, "10 " + I18n.msg("gui.unit.kpc"));
+        annotation(25000d * Constants.PC_TO_U, "25 " + I18n.msg("gui.unit.kpc"));
+        annotation(50000d * Constants.PC_TO_U, "50 " + I18n.msg("gui.unit.kpc"));
+        annotation(100000d * Constants.PC_TO_U, "100 " + I18n.msg("gui.unit.kpc"));
+        annotation(250000d * Constants.PC_TO_U, "250 " + I18n.msg("gui.unit.kpc"));
+        annotation(500000d * Constants.PC_TO_U, "500 " + I18n.msg("gui.unit.kpc"));
 
-        annotation(1000000d * Constants.PC_TO_U, "1 Mpc");
-        annotation(2500000d * Constants.PC_TO_U, "2.5 Mpc");
-        annotation(5000000d * Constants.PC_TO_U, "5 Mpc");
-        annotation(10000000d * Constants.PC_TO_U, "10 Mpc");
-        annotation(25000000d * Constants.PC_TO_U, "25 Mpc");
-        annotation(50000000d * Constants.PC_TO_U, "50 Mpc");
-        annotation(100000000d * Constants.PC_TO_U, "100 Mpc");
-        annotation(500000000d * Constants.PC_TO_U, "500 Mpc");
+        annotation(1000000d * Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.mpc"));
+        annotation(2500000d * Constants.PC_TO_U, "2.5 " + I18n.msg("gui.unit.mpc"));
+        annotation(5000000d * Constants.PC_TO_U, "5 " + I18n.msg("gui.unit.mpc"));
+        annotation(10000000d * Constants.PC_TO_U, "10 " + I18n.msg("gui.unit.mpc"));
+        annotation(25000000d * Constants.PC_TO_U, "25 " + I18n.msg("gui.unit.mpc"));
+        annotation(50000000d * Constants.PC_TO_U, "50 " + I18n.msg("gui.unit.mpc"));
+        annotation(100000000d * Constants.PC_TO_U, "100 " + I18n.msg("gui.unit.mpc"));
+        annotation(500000000d * Constants.PC_TO_U, "500 " + I18n.msg("gui.unit.mpc"));
 
-        annotation(1000000000d * Constants.PC_TO_U, "1 Gpc");
-        annotation(2500000000d * Constants.PC_TO_U, "2.5 Gpc");
-        annotation(5000000000d * Constants.PC_TO_U, "5 Gpc");
-        annotation(10000000000d * Constants.PC_TO_U, "10 Gpc");
-        annotation(50000000000d * Constants.PC_TO_U, "50 Gpc");
-        annotation(100000000000d * Constants.PC_TO_U, "100 Gpc");
+        annotation(1000000000d * Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.mpc"));
+        annotation(2500000000d * Constants.PC_TO_U, "2.5 " + I18n.msg("gui.unit.mpc"));
+        annotation(5000000000d * Constants.PC_TO_U, "5 " + I18n.msg("gui.unit.mpc"));
+        annotation(10000000000d * Constants.PC_TO_U, "10 " + I18n.msg("gui.unit.mpc"));
+        annotation(50000000000d * Constants.PC_TO_U, "50 " + I18n.msg("gui.unit.mpc"));
+        annotation(100000000000d * Constants.PC_TO_U, "100 " + I18n.msg("gui.unit.mpc"));
     }
 
     public Matrix4d getCoordinateSystemd(){
@@ -605,12 +606,12 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
                     // Activate ecliptic
                     transformName = "eclipticToEquatorial";
                     cc = ccEcl;
-                    labelcolor = ccEq;
+                    labelcolor = ccEcl;
                 } else if (ct.equals(ComponentType.Galactic)) {
                     // Activate galactic
                     transformName = "galacticToEquatorial";
                     cc = ccGal;
-                    labelcolor = ccEq;
+                    labelcolor = ccGal;
                 }
                 updateCoordinateSystem();
                 mc.setColorAttribute(ColorAttribute.Diffuse, cc);
