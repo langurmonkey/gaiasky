@@ -4,17 +4,25 @@ import com.badlogic.ashley.core.*;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.component.Focus;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.*;
+import gaiasky.scene.view.FocusView;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
+
+import static com.badlogic.gdx.utils.JsonValue.ValueType.object;
 
 /**
  * Represents a scene, contains and manages the engine. The engine contains
@@ -37,6 +45,9 @@ public class Scene {
     /** Archetypes map, links old scene graph model objects to artemis archetypes. **/
     private Archetypes archetypes;
 
+    /** The focus view. **/
+    private FocusView focusView;
+
     /** Access to the index. **/
     public Index index() {
         return index;
@@ -52,6 +63,7 @@ public class Scene {
 
     public void initialize() {
         engine = new PooledEngine();
+        focusView = new FocusView();
 
         // Initialize families.
         families = new Families();
@@ -140,13 +152,14 @@ public class Scene {
             EntitySystem elementsSetInit = new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++);
             EntitySystem meshInit = new MeshInitializer(setUp, families.meshes, priority++);
             EntitySystem recGridInit = new GridRecInitializer(setUp, families.gridRecs, priority++);
+            EntitySystem rulerInit = new RulerInitializer(setUp, families.rulers, priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit,
                     trajectoryInit, modelInit, locInit, billboardSetInit,
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
                     backgroundInit, clusterInit, constellationInit,
-                    elementsSetInit, meshInit, recGridInit);
+                    elementsSetInit, meshInit, recGridInit, rulerInit);
         }
     }
 
@@ -209,6 +222,7 @@ public class Scene {
             BillboardSetUpdater billboardSetUpdater = new BillboardSetUpdater(families.billboardSets, priority++);
             MeshUpdater meshUpdater = new MeshUpdater(families.meshes, priority++);
             GridRecUpdater gridRecUpdater = new GridRecUpdater(families.gridRecs, priority++);
+            RulerUpdater rulerUpdater = new RulerUpdater(families.rulers, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -224,6 +238,7 @@ public class Scene {
             AbstractExtractSystem boundariesExtractor = newExtractor(BoundariesExtractor.class, families.boundaries, priority++, sceneRenderer);
             AbstractExtractSystem meshExtractor = newExtractor(MeshExtractor.class, families.meshes, priority++, sceneRenderer);
             AbstractExtractSystem gridRecExtractor = newExtractor(GridRecExtractor.class, families.gridRecs, priority++, sceneRenderer);
+            AbstractExtractSystem rulerExtractor = newExtractor(RulerExtractor.class, families.rulers, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -244,6 +259,7 @@ public class Scene {
             engine.addSystem(billboardSetUpdater);
             engine.addSystem(meshUpdater);
             engine.addSystem(gridRecUpdater);
+            engine.addSystem(rulerUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -259,6 +275,7 @@ public class Scene {
             engine.addSystem(boundariesExtractor);
             engine.addSystem(meshExtractor);
             engine.addSystem(gridRecExtractor);
+            engine.addSystem(rulerExtractor);
         }
     }
 
@@ -369,6 +386,35 @@ public class Scene {
         if (removeFromIndex) {
             index.remove(entity);
         }
+    }
+
+    private Vector3b aux3b = new Vector3b();
+
+    /**
+     * Gets the current position of the object identified by the given name.
+     * The given position is in the internal reference system and corrects stars
+     * for proper motions and other objects for their specific motions as well.
+     *
+     * @param name The name of the object
+     * @param out  The out double array
+     *
+     * @return The out double array if the object exists, has a position and out has 3 or more
+     * slots. Null otherwise.
+     */
+    public double[] getObjectPosition(String name, double[] out) {
+        if (out.length >= 3 && name != null) {
+            name = name.toLowerCase().trim();
+            if (index.containsNode(name)) {
+                Entity entity = index.getNode(name);
+                focusView.setEntity(entity);
+                focusView.getAbsolutePosition(name, aux3b);
+                out[0] = aux3b.x.doubleValue();
+                out[1] = aux3b.y.doubleValue();
+                out[2] = aux3b.z.doubleValue();
+                return out;
+            }
+        }
+        return null;
     }
 
 }

@@ -37,10 +37,13 @@ public class GridRecInitializer extends InitSystem {
         var label = Mapper.label.get(entity);
         var model = Mapper.model.get(entity);
         var text = Mapper.text.get(entity);
+        var line = Mapper.line.get(entity);
 
         text.textScale = 1;
         text.labelFactor = 2e-3f;
         text.labelMax = 1f;
+
+        line.lineWidth = 0.5f;
 
         transform.floatVersion = true;
         transform.setTransformName(Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? "galacticToEquatorial" : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? "eclipticToEquatorial" : null));

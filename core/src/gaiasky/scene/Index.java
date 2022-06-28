@@ -76,6 +76,12 @@ public class Index {
         }
     }
 
+    public boolean containsNode(String name) {
+        synchronized (index) {
+            return index.containsKey(name.toLowerCase().trim());
+        }
+    }
+
     /**
      * Adds the given node to the index. Returns false if it was not added due to a naming conflict (name already exists)
      * with the same object (same class and same names).

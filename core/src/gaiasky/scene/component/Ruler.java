@@ -15,4 +15,24 @@ public class Ruler implements Component {
     public boolean rulerOk = false;
     public String dist;
     public DecimalFormat nf = new DecimalFormat("0.#########E0");
+
+    public String getName0() {
+        return name0;
+    }
+
+    public void setName0(String name0) {
+        this.name0 = name0;
+    }
+
+    public String getName1() {
+        return name1;
+    }
+
+    public void setName1(String name1) {
+        this.name1 = name1;
+    }
+
+    public boolean rulerOk() {
+        return rulerOk;
+    }
 }

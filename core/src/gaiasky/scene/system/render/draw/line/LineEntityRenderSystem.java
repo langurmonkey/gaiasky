@@ -20,6 +20,7 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
+import net.jafama.FastMath;
 
 import java.time.Instant;
 import java.util.List;
@@ -51,33 +52,54 @@ public class LineEntityRenderSystem {
     public void render(final Render render, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         final var entity = render.entity;
         var base = Mapper.base.get(entity);
-        var trajectory = Mapper.trajectory.get(entity);
-        var set = Mapper.starSet.get(render.entity);
-        var constel = Mapper.constel.get(render.entity);
-        var bound = Mapper.bound.get(render.entity);
-        var gridRec = Mapper.gridRec.get(render.entity);
 
-        if (trajectory != null) {
+        if (Mapper.trajectory.has(entity)) {
             // Orbits.
             var verts = Mapper.verts.get(entity);
             var graph = Mapper.graph.get(entity);
             var body = Mapper.body.get(entity);
-            renderTrajectory(render, base, body, graph, trajectory, verts, renderer, alpha);
-        } else if (set != null) {
+            renderTrajectory(render, base, body, graph, Mapper.trajectory.get(entity), verts, renderer, alpha);
+        } else if (Mapper.starSet.has(entity)) {
             // Star sets.
-            renderStarSet(render, base, set, renderer, camera, alpha);
-        } else if (constel != null) {
+            renderStarSet(render, base, Mapper.starSet.get(entity), renderer, camera, alpha);
+        } else if (Mapper.constel.has(entity)) {
             // Constellations.
-            var body = Mapper.body.get(entity);
-            renderConstellation(render, base, body, constel, renderer, camera, alpha);
-        } else if (bound != null) {
+            renderConstellation(render, base, Mapper.body.get(entity), Mapper.constel.get(entity), renderer, camera, alpha);
+        } else if (Mapper.bound.has(entity)) {
             // Constellation boundaries.
-            var body = Mapper.body.get(entity);
-            renderConstellationBoundaries(render, base, body, bound, renderer, alpha);
-        } else if (gridRec != null) {
+            renderConstellationBoundaries(render, base, Mapper.body.get(entity), Mapper.bound.get(entity), renderer, alpha);
+        } else if (Mapper.gridRec.has(entity)) {
             // Recursive grid projection lines.
-            renderGridRec(render, base, gridRec, renderer, GaiaSky.instance.getICamera(), alpha);
+            renderGridRec(render, base, Mapper.gridRec.get(entity), renderer, GaiaSky.instance.getICamera(), alpha);
+        } else if (Mapper.ruler.has(entity)) {
+            // Cosmic ruler
+            renderRuler(render, Mapper.body.get(entity), Mapper.ruler.get(entity), renderer, GaiaSky.instance.getICamera(), alpha);
         }
+    }
+
+    public void renderRuler(Render render, Body body, Ruler ruler, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        double va = 0.01 * camera.getFovFactor();
+
+        // Main line
+        renderer.addLine(lineView, ruler.p0.x, ruler.p0.y, ruler.p0.z, ruler.p1.x, ruler.p1.y, ruler.p1.z, body.color[0], body.color[1], body.color[2], body.color[3] * alpha);
+        // Cap 1
+        addCap(body, ruler.p0, ruler.p1, va, renderer, alpha);
+        // Cap 1
+        addCap(body, ruler.p1, ruler.p0, va, renderer, alpha);
+    }
+
+    private void addCap(Body body, Vector3d p0, Vector3d p1, double va, LinePrimitiveRenderer renderer, float alpha) {
+        // cpos-p0
+        Vector3d cp = D32.set(p0);
+        // cross(cpos-p0, p0-p1)
+        Vector3d crs = D31.set(p1).sub(p0).crs(cp);
+
+        double d = p0.len();
+        double caplen = FastMath.tan(va) * d;
+        crs.setLength(caplen);
+        Vector3d aux0 = D32.set(p0).add(crs);
+        Vector3d aux1 = D33.set(p0).sub(crs);
+        renderer.addLine(lineView, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, body.color[0], body.color[1], body.color[2], alpha);
     }
 
     public void renderGridRec(Render render, Base base, GridRecursive gr, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {

@@ -152,7 +152,7 @@ public class Archetypes {
             addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(), GridUV.class);
 
             // RecursiveGrid
-            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Text.class, RenderType.class);
+            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Text.class, Line.class, RenderType.class);
 
             // BillboardGroup
             addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class, Text.class);
@@ -176,13 +176,13 @@ public class Archetypes {
             addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class);
 
             // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class);
+            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class);
 
             // ConstellationBoundaries
             addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
 
             // CosmicRuler
-            addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class);
+            addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class, Line.class, Text.class);
 
             // GenericCatalog
             addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());

@@ -21,6 +21,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
@@ -47,7 +48,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
         super();
         this.parentName = "Universe";
         this.setName("Cosmicruler");
-        this.cc = new float[] { 1f, 1f, 0f };
+        this.cc = ColorUtils.gYellow;
         setCt("Ruler");
         EventManager.instance.subscribe(this, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR);
     }
@@ -87,7 +88,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
         crs.setLength(caplen);
         Vector3d aux0 = D32.get().set(p0).add(crs);
         Vector3d aux1 = D33.get().set(p0).sub(crs);
-        renderer.addLine(this, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, cc[0], cc[1], cc[2], alpha);
+        renderer.addLine(this, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, cc[0], cc[1], cc[2], cc[3] * alpha);
     }
 
     // Render Label

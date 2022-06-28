@@ -22,8 +22,6 @@ public class Constel implements Component {
      **/
     public IPosition[][] lines;
 
-    public float lineWidth;
-
     public void setIds(double[][] ids) {
         this.ids = new Array<>(ids.length);
         for(double[] dd : ids) {

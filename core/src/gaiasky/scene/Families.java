@@ -26,6 +26,7 @@ public class Families {
             raymarchings,
             catalogInfos,
             gridRecs,
+            rulers,
             orbitalElementSets,
             fadeNodes,
             backgroundModels,
@@ -50,6 +51,7 @@ public class Families {
         raymarchings = Family.all(Raymarching.class).get();
         catalogInfos = Family.all(DatasetDescription.class).get();
         gridRecs = Family.all(GridRecursive.class).get();
+        rulers = Family.all(Ruler.class).get();
         orbitalElementSets = Family.all(OrbitElementsSet.class).get();
         fadeNodes = Family.all(Fade.class).exclude(TagOctreeObject.class).get();
         backgroundModels = Family.all(TagBackgroundModel.class).get();

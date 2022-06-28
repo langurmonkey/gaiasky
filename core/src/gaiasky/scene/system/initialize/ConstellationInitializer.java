@@ -19,10 +19,12 @@ public class ConstellationInitializer extends InitSystem {
     public void initializeEntity(Entity entity) {
         var body = Mapper.body.get(entity);
         var constel = Mapper.constel.get(entity);
+        var line = Mapper.line.get(entity);
 
         constel.posd = new Vector3d();
-        constel.lineWidth = 1;
         constel.alpha = 0.4f;
+
+        line.lineWidth = 1;
 
         if (body.color == null) {
             body.color = new float[] { 0.5f, 1f, 0.5f, constel.alpha };

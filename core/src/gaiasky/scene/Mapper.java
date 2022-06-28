@@ -39,6 +39,7 @@ public class Mapper {
     public static final ComponentMapper<Mesh> mesh = ComponentMapper.getFor(Mesh.class);
     public static final ComponentMapper<SolidAngle> sa = ComponentMapper.getFor(SolidAngle.class);
     public static final ComponentMapper<Text> text = ComponentMapper.getFor(Text.class);
+    public static final ComponentMapper<Line> line = ComponentMapper.getFor(Line.class);
     public static final ComponentMapper<Atmosphere> atmosphere = ComponentMapper.getFor(Atmosphere.class);
     public static final ComponentMapper<Cloud> cloud = ComponentMapper.getFor(Cloud.class);
     public static final ComponentMapper<ModelScaffolding> modelScaffolding = ComponentMapper.getFor(ModelScaffolding.class);
@@ -59,6 +60,7 @@ public class Mapper {
     public static final ComponentMapper<Raymarching> raymarching = ComponentMapper.getFor(Raymarching.class);
     public static final ComponentMapper<GridUV> grid = ComponentMapper.getFor(GridUV.class);
     public static final ComponentMapper<GridRecursive> gridRec = ComponentMapper.getFor(GridRecursive.class);
+    public static final ComponentMapper<Ruler> ruler = ComponentMapper.getFor(Ruler.class);
 
     // Tags
     public static final ComponentMapper<TagQuaternionOrientation> tagQuatOrientation = ComponentMapper.getFor(TagQuaternionOrientation.class);
