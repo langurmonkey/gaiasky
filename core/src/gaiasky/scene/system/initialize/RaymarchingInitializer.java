@@ -15,9 +15,9 @@ import java.time.Instant;
 /**
  * Initializes invisible and raymarching container entities.
  */
-public class InvisibleInitializer extends InitSystem {
+public class RaymarchingInitializer extends InitSystem {
 
-    public InvisibleInitializer(boolean setUp, Family family, int priority) {
+    public RaymarchingInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }
 

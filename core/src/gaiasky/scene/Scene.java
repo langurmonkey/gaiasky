@@ -4,15 +4,11 @@ import com.badlogic.ashley.core.*;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
-import gaiasky.scene.component.Focus;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.math.Vector3b;
@@ -21,8 +17,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
-
-import static com.badlogic.gdx.utils.JsonValue.ValueType.object;
 
 /**
  * Represents a scene, contains and manages the engine. The engine contains
@@ -144,7 +138,7 @@ public class Scene {
             EntitySystem locInit = new LocInitializer(setUp, families.locations, priority++);
             EntitySystem billboardSetInit = new BillboardSetInitializer(setUp, families.billboardSets, priority++);
             EntitySystem axesInit = new AxesInitializer(setUp, families.axes, priority++);
-            EntitySystem raymarchingInit = new InvisibleInitializer(setUp, families.raymarchings, priority++);
+            EntitySystem raymarchingInit = new RaymarchingInitializer(setUp, families.raymarchings, priority++);
             EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
             EntitySystem clusterInit = new ClusterInitializer(setUp, families.clusters, priority++);
