@@ -47,6 +47,17 @@ public class LabelEntityRenderSystem {
         nf = new DecimalFormat("0.###E0");
     }
 
+    public void renderRuler(LabelView view, Base base, Body body, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        // 3D distance font
+        Vector3d pos = D31;
+        view.textPosition(camera, pos);
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), base.forceLabel);
+    }
+
     public void renderRecursiveGrid(LabelView view, Base base, Body body, Label label, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         var gr = Mapper.gridRec.get(view.getEntity());
 

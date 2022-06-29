@@ -50,6 +50,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private BillboardSet bbSet;
     private Constel constel;
     private Mesh mesh;
+    private Ruler ruler;
 
     private LabelEntityRenderSystem renderSystem;
 
@@ -74,6 +75,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.bbSet = Mapper.billboardSet.get(entity);
         this.constel = Mapper.constel.get(entity);
         this.mesh = Mapper.mesh.get(entity);
+        this.ruler = Mapper.ruler.get(entity);
     }
 
     @Override
@@ -104,6 +106,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         } else if (Mapper.gridRec.has(entity)) {
             // Recursive grid
             renderSystem.renderRecursiveGrid(this, base, body, label, batch, shader, sys, rc, camera);
+        } else if (ruler != null) {
+            // Ruler
+            renderSystem.renderRuler(this, base, body, batch, shader, sys, rc, camera);
         }
     }
 
@@ -141,7 +146,11 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         } else if (label != null && label.labelPosition != null) {
             out.set(label.labelPosition).add(cam.getInversePos());
         } else {
-            graph.translation.put(out);
+            if (ruler == null) {
+                graph.translation.put(out);
+            } else {
+                out.set(ruler.m);
+            }
             double len = out.len();
             out.clamp(0, len - getRadius()).scl(0.9f);
 
@@ -163,7 +172,11 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public String text() {
-        return base.getLocalizedName();
+        if(ruler == null) {
+            return base.getLocalizedName();
+        } else {
+            return ruler.dist;
+        }
     }
 
     @Override
