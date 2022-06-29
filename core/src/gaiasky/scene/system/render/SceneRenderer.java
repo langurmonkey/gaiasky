@@ -389,6 +389,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL CLOUDS
         AbstractRenderSystem modelCloudProc = new ModelRenderer(MODEL_CLOUD, alphas, renderAssets.mbCloud);
 
+        // PARTICLE EFFECTS
+        AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderer(null, alphas, renderAssets.particleEffectShaders);
+        particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
+        particleEffectsProc.addPostRunnables(regularBlendR);
+
+        // SHAPES
+        AbstractRenderSystem shapeProc = new ShapeRenderer(SHAPE, alphas, globalResources.getShapeShader());
+        shapeProc.addPreRunnables(regularBlendR, depthTestR);
+
 
         /* ===============================
          * ADD RENDER SYSTEMS TO PROCESSOR
@@ -450,6 +459,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelStarsProc);
         addRenderSystem(modelAtmProc);
         addRenderSystem(modelCloudProc);
+
+        addRenderSystem(shapeProc);
+        addRenderSystem(particleEffectsProc);
 
         // Additive meshes
         addRenderSystem(modelMeshAdditiveProc);

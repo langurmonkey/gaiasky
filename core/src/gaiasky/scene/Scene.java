@@ -153,13 +153,15 @@ public class Scene {
             EntitySystem meshInit = new MeshInitializer(setUp, families.meshes, priority++);
             EntitySystem recGridInit = new GridRecInitializer(setUp, families.gridRecs, priority++);
             EntitySystem rulerInit = new RulerInitializer(setUp, families.rulers, priority++);
+            EntitySystem titleInit = new TitleInitializer(setUp, families.titles, priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit,
                     trajectoryInit, modelInit, locInit, billboardSetInit,
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
                     backgroundInit, clusterInit, constellationInit,
-                    elementsSetInit, meshInit, recGridInit, rulerInit);
+                    elementsSetInit, meshInit, recGridInit, rulerInit,
+                    titleInit);
         }
     }
 
@@ -224,6 +226,7 @@ public class Scene {
             GridRecUpdater gridRecUpdater = new GridRecUpdater(families.gridRecs, priority++);
             RulerUpdater rulerUpdater = new RulerUpdater(families.rulers, priority++);
             AxesUpdater axesUpdater = new AxesUpdater(families.axes, priority++);
+            TitleUpdater titleUpdater = new TitleUpdater(families.titles, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -241,6 +244,7 @@ public class Scene {
             AbstractExtractSystem gridRecExtractor = newExtractor(GridRecExtractor.class, families.gridRecs, priority++, sceneRenderer);
             AbstractExtractSystem rulerExtractor = newExtractor(RulerExtractor.class, families.rulers, priority++, sceneRenderer);
             AbstractExtractSystem axesExtractor = newExtractor(AxesExtractor.class, families.axes, priority++, sceneRenderer);
+            AbstractExtractSystem titleExtractor = newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -263,6 +267,7 @@ public class Scene {
             engine.addSystem(gridRecUpdater);
             engine.addSystem(rulerUpdater);
             engine.addSystem(axesUpdater);
+            engine.addSystem(titleUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -280,6 +285,7 @@ public class Scene {
             engine.addSystem(gridRecExtractor);
             engine.addSystem(rulerExtractor);
             engine.addSystem(axesExtractor);
+            engine.addSystem(titleExtractor);
         }
     }
 

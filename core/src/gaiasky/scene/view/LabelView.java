@@ -109,6 +109,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         } else if (ruler != null) {
             // Ruler
             renderSystem.renderRuler(this, base, body, batch, shader, sys, rc, camera);
+        } else if(Mapper.title.has(entity)) {
+            // Title
+            renderSystem.renderTitle(this, body, Mapper.title.get(entity), batch, shader, sys, rc, camera);
         }
     }
 

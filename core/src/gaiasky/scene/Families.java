@@ -34,7 +34,8 @@ public class Families {
             clusters,
             octrees,
             constellations,
-            boundaries;
+            boundaries,
+            titles;
 
     public Families() {
         roots = Family.all(GraphRoot.class).get();
@@ -60,6 +61,7 @@ public class Families {
         octrees = Family.all(Octree.class).get();
         constellations = Family.all(Constel.class).get();
         boundaries = Family.all(Boundaries.class).get();
+        titles = Family.all(Title.class).get();
     }
 
 }

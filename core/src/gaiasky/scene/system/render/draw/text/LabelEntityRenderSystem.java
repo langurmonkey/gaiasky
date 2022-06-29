@@ -47,6 +47,20 @@ public class LabelEntityRenderSystem {
         nf = new DecimalFormat("0.###E0");
     }
 
+    public void renderTitle(LabelView view, Body body, Title title, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        shader.setUniformf("u_viewAngle", (float) body.viewAngleApparent);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+
+        // Resize batch
+        batch.setProjectionMatrix(batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
+
+        // Text
+        render2DLabel(batch, shader, rc, ((TextRenderer) sys).fontTitles, camera, view.text(), 0, 96f, title.scale * 1.6f, title.align);
+
+        title.lineHeight = ((TextRenderer) sys).fontTitles.getLineHeight();
+    }
+
     public void renderRuler(LabelView view, Base base, Body body, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         // 3D distance font
         Vector3d pos = D31;
