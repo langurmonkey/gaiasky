@@ -60,7 +60,7 @@ public class LineEntityRenderSystem {
             var body = Mapper.body.get(entity);
             renderTrajectory(render, base, body, graph, Mapper.trajectory.get(entity), verts, renderer, alpha);
         } else if (Mapper.starSet.has(entity)) {
-            // Star sets.
+            // Star sets (velocity vectors).
             renderStarSet(render, base, Mapper.starSet.get(entity), renderer, camera, alpha);
         } else if (Mapper.constel.has(entity)) {
             // Constellations.
@@ -296,7 +296,7 @@ public class LineEntityRenderSystem {
     public void renderStarSet(Render render, Base base, StarSet set, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         lineView.setEntity(render.entity);
 
-        alpha *= GaiaSky.instance.sgr.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
+        alpha *= GaiaSky.instance.sceneRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
         int n = (int) getMaxProperMotionLines(set);
         for (int i = n - 1; i >= 0; i--) {

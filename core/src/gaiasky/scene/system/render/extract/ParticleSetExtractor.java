@@ -46,7 +46,7 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
         if (Settings.settings.scene.star.group.billboard) {
             addToRender(render, RenderGroup.BILLBOARD_STAR);
         }
-        if (GaiaSky.instance.sgr.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
+        if (GaiaSky.instance.sceneRenderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
             addToRender(render, RenderGroup.LINE);
         }
         if (renderText()) {
