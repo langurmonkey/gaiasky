@@ -223,6 +223,7 @@ public class Scene {
             MeshUpdater meshUpdater = new MeshUpdater(families.meshes, priority++);
             GridRecUpdater gridRecUpdater = new GridRecUpdater(families.gridRecs, priority++);
             RulerUpdater rulerUpdater = new RulerUpdater(families.rulers, priority++);
+            AxesUpdater axesUpdater = new AxesUpdater(families.axes, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -239,6 +240,7 @@ public class Scene {
             AbstractExtractSystem meshExtractor = newExtractor(MeshExtractor.class, families.meshes, priority++, sceneRenderer);
             AbstractExtractSystem gridRecExtractor = newExtractor(GridRecExtractor.class, families.gridRecs, priority++, sceneRenderer);
             AbstractExtractSystem rulerExtractor = newExtractor(RulerExtractor.class, families.rulers, priority++, sceneRenderer);
+            AbstractExtractSystem axesExtractor = newExtractor(AxesExtractor.class, families.axes, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -260,6 +262,7 @@ public class Scene {
             engine.addSystem(meshUpdater);
             engine.addSystem(gridRecUpdater);
             engine.addSystem(rulerUpdater);
+            engine.addSystem(axesUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -276,6 +279,7 @@ public class Scene {
             engine.addSystem(meshExtractor);
             engine.addSystem(gridRecExtractor);
             engine.addSystem(rulerExtractor);
+            engine.addSystem(axesExtractor);
         }
     }
 

@@ -74,6 +74,25 @@ public class LineEntityRenderSystem {
         } else if (Mapper.ruler.has(entity)) {
             // Cosmic ruler
             renderRuler(render, Mapper.body.get(entity), Mapper.ruler.get(entity), renderer, GaiaSky.instance.getICamera(), alpha);
+        } else if (Mapper.axis.has(entity)) {
+            // Axes
+           renderAxes(render, Mapper.axis.get(entity), renderer, GaiaSky.instance.getICamera(), alpha);
+        }
+    }
+
+    public void renderAxes(Render render, Axis axis, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        if (alpha > 0) {
+            Vector3d o = axis.o;
+            Vector3d x = axis.x;
+            Vector3d y = axis.y;
+            Vector3d z = axis.z;
+            float[][] axesColors = axis.axesColors;
+            // X
+            renderer.addLine(lineView, o.x, o.y, o.z, x.x, x.y, x.z, axesColors[0][0], axesColors[0][1], axesColors[0][2], alpha);
+            // Y
+            renderer.addLine(lineView, o.x, o.y, o.z, y.x, y.y, y.z, axesColors[1][0], axesColors[1][1], axesColors[1][2], alpha);
+            // Z
+            renderer.addLine(lineView, o.x, o.y, o.z, z.x, z.y, z.z, axesColors[2][0], axesColors[2][1], axesColors[2][2], alpha);
         }
     }
 

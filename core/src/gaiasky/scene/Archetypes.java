@@ -161,7 +161,7 @@ public class Archetypes {
             addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class);
 
             // Axes
-            addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, RefSysTransform.class);
+            addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, RefSysTransform.class, Line.class);
 
             // Loc
             addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class);

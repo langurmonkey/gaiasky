@@ -4,15 +4,15 @@ import com.badlogic.ashley.core.Component;
 import gaiasky.util.math.Vector3d;
 
 public class Axis implements Component {
-    public static final double LINE_SIZE_RAD = Math.tan(Math.toRadians(2.9));
-    public Vector3d o = new Vector3d();
-    public Vector3d x = new Vector3d();
-    public Vector3d y = new Vector3d();
-    public Vector3d z = new Vector3d();
+
+    public Vector3d o;
+    public Vector3d x;
+    public Vector3d y;
+    public Vector3d z;
     // Base vectors
-    public Vector3d b0 = new Vector3d(1, 0, 0);
-    public Vector3d b1 = new Vector3d(0, 1, 0);
-    public Vector3d b2 = new Vector3d(0, 0, 1);
+    public Vector3d b0;
+    public Vector3d b1;
+    public Vector3d b2;
 
     // RGBA colors for each of the bases XYZ -> [3][3]
     public float[][] axesColors;

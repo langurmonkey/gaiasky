@@ -9,6 +9,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Initializes axes objects.
@@ -21,6 +22,20 @@ public class AxesInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
+        var axis = Mapper.axis.get(entity);
+        var line = Mapper.line.get(entity);
+
+        line.lineWidth = 1;
+
+        // Base
+        axis.b0 = new Vector3d(1, 0, 0);
+        axis.b1 = new Vector3d(0, 1, 0);
+        axis.b2 = new Vector3d(0, 0, 1);
+
+        axis.o = new Vector3d();
+        axis.x = new Vector3d();
+        axis.y = new Vector3d();
+        axis.z = new Vector3d();
     }
 
     @Override

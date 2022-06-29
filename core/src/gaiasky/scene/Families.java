@@ -47,7 +47,7 @@ public class Families {
         locations = Family.all(LocationMark.class).get();
         billboardSets = Family.all(BillboardSet.class).get();
         billboardGalaxies = Family.all(TagBillboardGalaxy.class).get();
-        axes = Family.all(Axis.class, RefSysTransform.class).get();
+        axes = Family.all(Axis.class).get();
         raymarchings = Family.all(Raymarching.class).get();
         catalogInfos = Family.all(DatasetDescription.class).get();
         gridRecs = Family.all(GridRecursive.class).get();
