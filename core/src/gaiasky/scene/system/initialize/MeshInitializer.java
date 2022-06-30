@@ -6,9 +6,16 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.data.AssetBean;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Mesh;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class MeshInitializer extends InitSystem {
     public MeshInitializer(boolean setUp, Family family, int priority) {
@@ -32,12 +39,14 @@ public class MeshInitializer extends InitSystem {
         var graph = Mapper.graph.get(entity);
         var model = Mapper.model.get(entity);
         var mesh = Mapper.mesh.get(entity);
-        var text = Mapper.text.get(entity);
+        var label = Mapper.label.get(entity);
         ModelComponent mc = model.model;
 
-        text.textScale = 0.2f;
-        text.labelFactor = 0.8e-3f;
-        text.labelMax = 1f;
+        label.textScale = 0.2f;
+        label.labelFactor = 0.8e-3f;
+        label.labelMax = 1f;
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderMesh(l, b, s, f, r, c);
 
         AssetManager manager = AssetBean.manager();
         if (mc != null) {

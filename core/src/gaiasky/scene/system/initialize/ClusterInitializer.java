@@ -10,7 +10,12 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
@@ -18,8 +23,10 @@ import gaiasky.util.ModelCache;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntMeshPartBuilder;
 import gaiasky.util.gdx.IntModelBuilder;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Environment;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
@@ -39,15 +46,17 @@ public class ClusterInitializer extends InitSystem {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var cluster = Mapper.cluster.get(entity);
-        var text = Mapper.text.get(entity);
+        var label = Mapper.label.get(entity);
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units
         body.size = (float) (Math.tan(Math.toRadians(cluster.raddeg)) * cluster.dist * 2);
 
-        text.textScale = 0.2f;
-        text.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
-        text.labelFactor = 1;
+        label.textScale = 0.2f;
+        label.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
+        label.labelFactor = 1;
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderCluster(l, b, s, f, r, c);
 
     }
 

@@ -12,13 +12,20 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
 
 /**
@@ -49,17 +56,17 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         var pm = Mapper.pm.get(entity);
         var extra = Mapper.extra.get(entity);
         var sa = Mapper.sa.get(entity);
-        var text = Mapper.text.get(entity);
+        var label = Mapper.label.get(entity);
         var render = Mapper.renderType.get(entity);
         var hip = Mapper.hip.get(entity);
         var dist = Mapper.distance.get(entity);
 
         if (hip != null) {
             // Initialize star
-            initializeStar(base, body, celestial, mag, pm, extra, sa, text, render, dist);
+            initializeStar(base, body, celestial, mag, pm, extra, sa, label, render, dist);
         } else {
             // Initialize particle
-            initializeParticle(base, body, celestial, mag, pm, extra, sa, text, render);
+            initializeParticle(base, body, celestial, mag, pm, extra, sa, label, render);
         }
     }
 
@@ -85,7 +92,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
 
     }
 
-    private void baseInitialization(ProperMotion pm, ParticleExtra extra, Celestial celestial, SolidAngle sa, Text text, RenderType render) {
+    private void baseInitialization(ProperMotion pm, ParticleExtra extra, Celestial celestial, SolidAngle sa, Label label, RenderType render) {
         if (pm.pm == null) {
             pm.pm = new Vector3();
             pm.pmSph = new Vector3();
@@ -110,13 +117,13 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
     }
 
-    private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render) {
-        baseInitialization(pm, extra, celestial, sa, text, render);
+    private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render) {
+        baseInitialization(pm, extra, celestial, sa, label, render);
 
         sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
-        text.textScale = 0.1f;
-        text.labelFactor = 1.3e-1f;
-        text.labelMax = 0.005f;
+        label.textScale = 0.1f;
+        label.labelFactor = 1.3e-1f;
+        label.labelMax = 0.005f;
 
         // Actual initialization
         setDerivedAttributes(body, celestial, mag, extra, false);
@@ -129,13 +136,15 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
     }
 
-    private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Text text, RenderType render, Distance dist) {
-        baseInitialization(pm, extra, celestial, sa, text, render);
+    private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Distance dist) {
+        baseInitialization(pm, extra, celestial, sa, label, render);
 
         sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;
-        text.textScale = 0.2f;
-        text.labelFactor = 1.3e-1f;
-        text.labelMax = 0.01f;
+        label.textScale = 0.2f;
+        label.labelFactor = 1.3e-1f;
+        label.labelMax = 0.01f;
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderCelestial(l, b, s, f, r, c);
 
         setDerivedAttributes(body, celestial, mag, extra, true);
 

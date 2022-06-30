@@ -4,8 +4,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.RulerRadio;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class RulerInitializer extends InitSystem {
     public RulerInitializer(boolean setUp, Family family, int priority) {
@@ -14,12 +21,14 @@ public class RulerInitializer extends InitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-        var text = Mapper.text.get(entity);
+        var label = Mapper.label.get(entity);
         var line = Mapper.line.get(entity);
 
-        text.textScale = 0.2f;
-        text.labelFactor = 0.0005f;
-        text.labelMax = 1f;
+        label.textScale = 0.2f;
+        label.labelFactor = 0.0005f;
+        label.labelMax = 1f;
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderRuler(l, b, s, f, r, c);
 
         line.lineWidth = 1f;
 

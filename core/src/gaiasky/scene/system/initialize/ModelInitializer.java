@@ -14,12 +14,17 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.SpacecraftRadio;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Planet;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -27,6 +32,8 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsd;
@@ -54,7 +61,7 @@ public class ModelInitializer extends InitSystem {
         var model = Mapper.model.get(entity);
         var scaffolding = Mapper.modelScaffolding.get(entity);
         var sa = Mapper.sa.get(entity);
-        var text = Mapper.text.get(entity);
+        var label = Mapper.label.get(entity);
         var atmosphere = Mapper.atmosphere.get(entity);
         var cloud = Mapper.cloud.get(entity);
         var attitude = Mapper.attitude.get(entity);
@@ -65,6 +72,10 @@ public class ModelInitializer extends InitSystem {
         boolean isSatellite = attitude != null;
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
+
+        // All celestial labels use the same consumer.
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderCelestial(l, b, s, f, r, c);
 
         if(!Mapper.tagQuatOrientation.has(entity)) {
             // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
@@ -80,20 +91,20 @@ public class ModelInitializer extends InitSystem {
         }
 
         // Initialize model body
-        initializeModel(base, body, model, celestial, sa, text, scaffolding, graph);
+        initializeModel(base, body, model, celestial, sa, label, scaffolding, graph);
 
         // Init billboard
         if (isBillboard) {
-            initializeBillboard(scaffolding, sa, text);
+            initializeBillboard(scaffolding, sa, label);
         }
 
         if (isSatellite) {
-            initializeSatellite(attitude, scaffolding, sa, text);
+            initializeSatellite(attitude, scaffolding, sa, label);
         }
 
         if (isPlanet) {
             // Initialize planet
-            initializePlanet(base, body, scaffolding, sa, text, atmosphere, cloud);
+            initializePlanet(base, body, scaffolding, sa, label, atmosphere, cloud);
             EntityUtils.setColor2Data(body, celestial, 0.6f);
         } else {
             EntityUtils.setColor2Data(body, celestial, 0.1f);
@@ -189,7 +200,7 @@ public class ModelInitializer extends InitSystem {
         setToMachine(engine.machines[engine.currentMachine], false, body, model, scaffolding, engine);
     }
 
-    private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Text text, ModelScaffolding scaffolding, GraphNode graph) {
+    private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph) {
         // Default values
         celestial.innerRad = 0.2f;
         graph.orientation = new Matrix4d();
@@ -199,8 +210,8 @@ public class ModelInitializer extends InitSystem {
         sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number)
                 * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
 
-        text.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
-        text.labelFactor = 1;
+        label.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
+        label.labelFactor = 1;
 
         if (isRandomizeModel(scaffolding)) {
             // Ignore current model component (if any) and create a random one
@@ -217,25 +228,26 @@ public class ModelInitializer extends InitSystem {
         }
     }
 
-    private void initializeBillboard(ModelScaffolding scaffolding, SolidAngle sa, Text text) {
+    private void initializeBillboard(ModelScaffolding scaffolding, SolidAngle sa, Label label) {
         double baseThreshold = Math.toRadians(0.30);
         sa.thresholdNone = 0.002;
         sa.thresholdPoint = baseThreshold / 1e9;
         sa.thresholdQuad = baseThreshold / 8.0;
         sa.thresholdLabel = Math.toRadians(0.2);
 
-        text.textScale = 0.3f;
-        text.viewAnglePow = 1f;
-        text.labelFactor = 1e1f;
+        label.textScale = 0.3f;
+        label.viewAnglePow = 1f;
+        label.labelFactor = 1e1f;
+
         scaffolding.billboardSizeFactor = 0.6e-3f;
     }
 
-    private void initializePlanet(Base base, Body body, ModelScaffolding scaffolding, SolidAngle sa, Text text, Atmosphere atmosphere, Cloud cloud) {
+    private void initializePlanet(Base base, Body body, ModelScaffolding scaffolding, SolidAngle sa, Label label, Atmosphere atmosphere, Cloud cloud) {
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e6;
         sa.thresholdPoint = thPoint / 3e4;
         sa.thresholdQuad = thPoint / 2.0;
-        text.labelFactor = (float) (1.5e1 * Constants.DISTANCE_SCALE_FACTOR);
+        label.labelFactor = (float) (1.5e1 * Constants.DISTANCE_SCALE_FACTOR);
 
         if (isRandomizeCloud(scaffolding)) {
             // Ignore current cloud component (if any) and create a random one
@@ -256,14 +268,14 @@ public class ModelInitializer extends InitSystem {
         }
     }
 
-    public void initializeSatellite(Attitude attitude, ModelScaffolding scaffolding, SolidAngle sa, Text text) {
+    public void initializeSatellite(Attitude attitude, ModelScaffolding scaffolding, SolidAngle sa, Label label) {
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e18;
         sa.thresholdPoint = thPoint / 3.3e10;
         sa.thresholdQuad = thPoint / 8.0;
         sa.thresholdLabel = (Math.toRadians(1e-7) / Settings.settings.scene.label.number);
-        text.labelFactor = (float) (0.5e1 * Constants.DISTANCE_SCALE_FACTOR);
-        text.labelMax = text.labelMax * 2f;
+        label.labelFactor = (float) (0.5e1 * Constants.DISTANCE_SCALE_FACTOR);
+        label.labelMax = label.labelMax * 2f;
 
         scaffolding.billboardSizeFactor = 10f;
         attitude.nonRotatedPos = new Vector3d();

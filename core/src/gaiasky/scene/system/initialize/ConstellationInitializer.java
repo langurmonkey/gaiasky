@@ -4,8 +4,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.ConstellationRadio;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
@@ -20,6 +27,7 @@ public class ConstellationInitializer extends InitSystem {
         var body = Mapper.body.get(entity);
         var constel = Mapper.constel.get(entity);
         var line = Mapper.line.get(entity);
+        var label = Mapper.label.get(entity);
 
         constel.posd = new Vector3d();
         constel.alpha = 0.4f;
@@ -30,6 +38,9 @@ public class ConstellationInitializer extends InitSystem {
             body.color = new float[] { 0.5f, 1f, 0.5f, constel.alpha };
             body.labelColor = new float[] { 0.5f, 1f, 0.5f, constel.alpha };
         }
+
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderConstellation(l, b, s, f, r, c);
 
         EventManager.instance.subscribe(new ConstellationRadio(entity), Event.CONSTELLATION_UPDATE_CMD);
 

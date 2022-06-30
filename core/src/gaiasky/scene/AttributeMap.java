@@ -62,9 +62,6 @@ public class AttributeMap {
         // SolidAngleThresholds
         putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
 
-        // Text
-        putAll(Text.class, "labelFactor", "labelMax", "textScale");
-
         // ModelScaffolding
         putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locthoverfactor", "shadowvalues");
 
@@ -99,7 +96,7 @@ public class AttributeMap {
         putAll(DatasetDescription.class, "catalogInfo", "cataloginfo", "description:MeshObject");
 
         // Label
-        putAll(Label.class, "label", "label2d", "labelposition");
+        putAll(Label.class, "label", "label2d", "labelposition", "labelFactor", "labelMax", "textScale");
 
         // RenderType
         putAll(RenderType.class, "rendergroup", "billboardRenderGroup:Particle");

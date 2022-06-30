@@ -17,9 +17,9 @@ import java.util.Locale;
 public class RenderView extends BaseView implements IRenderable {
 
     /** Particle component, maybe. **/
-    protected ParticleExtra extra;
+    public ParticleExtra extra;
     /** Star set component **/
-    protected StarSet set;
+    public StarSet set;
 
     public RenderView() {
     }

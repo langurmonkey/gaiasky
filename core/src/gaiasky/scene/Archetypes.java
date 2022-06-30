@@ -92,7 +92,7 @@ public class Archetypes {
 
             // Celestial
             addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class,
-                    Coordinates.class, Rotation.class, Text.class, SolidAngle.class);
+                    Coordinates.class, Rotation.class, Label.class, SolidAngle.class);
 
             // ModelBody
             addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class, AffineTransformations.class);
@@ -119,7 +119,7 @@ public class Archetypes {
             addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
 
             // StarCluster
-            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class, Text.class);
+            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class, Label.class);
 
             // Billboard
             addArchetype(Billboard.class.getName(), ModelBody.class.getName(), TagQuaternionOrientation.class, Fade.class);
@@ -143,7 +143,7 @@ public class Archetypes {
             addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);
 
             // MeshObject
-            addArchetype(MeshObject.class.getName(), SceneGraphNode.class.getName(), Mesh.class, Fade.class, Label.class, Text.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
+            addArchetype(MeshObject.class.getName(), SceneGraphNode.class.getName(), Mesh.class, Fade.class, Label.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
 
             // BackgroundModel
             addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
@@ -152,13 +152,13 @@ public class Archetypes {
             addArchetype(SphericalGrid.class.getName(), BackgroundModel.class.getName(), GridUV.class);
 
             // RecursiveGrid
-            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Text.class, Line.class, RenderType.class);
+            addArchetype(RecursiveGrid.class.getName(), SceneGraphNode.class.getName(), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Line.class, RenderType.class);
 
             // BillboardGroup
-            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class, Text.class);
+            addArchetype(BillboardGroup.class.getName(), SceneGraphNode.class.getName(), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
 
             // Text2D
-            addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class);
+            addArchetype(Text2D.class.getName(), SceneGraphNode.class.getName(), Fade.class, Title.class, Label.class);
 
             // Axes
             addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, RefSysTransform.class, Line.class);
@@ -173,16 +173,16 @@ public class Archetypes {
             addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagNoProcessChildren.class);
 
             // StarGroup
-            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class);
+            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class, Label.class);
 
             // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class);
+            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class, Label.class);
 
             // ConstellationBoundaries
             addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
 
             // CosmicRuler
-            addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class, Line.class, Text.class);
+            addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class, Line.class, Label.class);
 
             // GenericCatalog
             addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());

@@ -6,8 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.TitleRadio;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class TitleInitializer extends InitSystem {
     public TitleInitializer(boolean setUp, Family family, int priority) {
@@ -17,6 +24,10 @@ public class TitleInitializer extends InitSystem {
     @Override
     public void initializeEntity(Entity entity) {
         var body = Mapper.body.get(entity);
+        var label = Mapper.label.get(entity);
+
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderTitle(l, b, s, f, r, c);
 
         EventManager.instance.subscribe(new TitleRadio(entity), Event.UI_THEME_RELOAD_INFO);
 

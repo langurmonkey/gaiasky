@@ -15,6 +15,8 @@ import gaiasky.event.EventManager;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.AttributeMap;
 import gaiasky.scene.component.Base;
+import gaiasky.util.Functions.Function3;
+import gaiasky.util.Functions.Function6;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
@@ -47,10 +49,6 @@ public class NewJsonLoader extends AbstractSceneLoader {
         this.attributeMap.initialize();
     }
 
-    @FunctionalInterface
-    interface Function6<One, Two, Three, Four> {
-        Four apply(One one, Two two, Three three);
-    }
 
     @Override
     public void loadData() throws FileNotFoundException {
@@ -110,7 +108,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
      * @param function The function to run for each attribute. The parameters of the function are the value class, the value
      *                 object and the JSON attribute. It returns a boolean.
      */
-    public void processJson(JsonValue json, Function6<Class<?>, Object, JsonValue, Boolean> function) throws ReflectionException {
+    public void processJson(JsonValue json, Function3<Class<?>, Object, JsonValue, Boolean> function) throws ReflectionException {
         JsonValue attribute = json.child;
         while (attribute != null) {
             // We skip some param names

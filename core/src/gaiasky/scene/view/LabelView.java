@@ -40,15 +40,14 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     private final Vector3 F31 = new Vector3();
     private final Vector3 F32 = new Vector3();
 
-    private Label label;
-    private GraphNode graph;
-    private SolidAngle sa;
-    private Text text;
-    private Cluster cluster;
-    private BillboardSet bbSet;
-    private Constel constel;
-    private Mesh mesh;
-    private Ruler ruler;
+    public Label label;
+    public GraphNode graph;
+    public SolidAngle sa;
+    public Cluster cluster;
+    public BillboardSet bbSet;
+    public Constel constel;
+    public Mesh mesh;
+    public Ruler ruler;
 
     private LabelEntityRenderSystem renderSystem;
 
@@ -68,7 +67,6 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.label = Mapper.label.get(entity);
         this.graph = Mapper.graph.get(entity);
         this.sa = Mapper.sa.get(entity);
-        this.text = Mapper.text.get(entity);
         this.cluster = Mapper.cluster.get(entity);
         this.bbSet = Mapper.billboardSet.get(entity);
         this.constel = Mapper.constel.get(entity);
@@ -83,33 +81,35 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        label.renderConsumer.apply(renderSystem, this, batch, shader, sys, rc, camera);
+
         if (Mapper.celestial.has(entity)) {
             // Celestial: planets, single stars, particles, etc.
-            renderSystem.renderCelestial(this, base, body, text, sa, batch, shader, sys, rc, camera);
+            renderSystem.renderCelestial(this, batch, shader, sys, rc, camera);
         } else if (set != null) {
             // Star sets.
-            renderSystem.renderStarSet(this, set, batch, shader, sys, rc, camera);
+            renderSystem.renderStarSet(this, batch, shader, sys, rc, camera);
         } else if (cluster != null) {
             // Clusters
-            renderSystem.renderCluster(this, base, body, batch, shader, sys, rc, camera);
+            renderSystem.renderCluster(this, batch, shader, sys, rc, camera);
         } else if (bbSet != null) {
             // Billboard sets
-            renderSystem.renderBillboardSet(this, base, body, batch, shader, sys, rc, camera);
+            renderSystem.renderBillboardSet(this, batch, shader, sys, rc, camera);
         } else if (constel != null) {
             // Constellation
-            renderSystem.renderConstellation(this, base, body, batch, shader, sys, rc, camera);
+            renderSystem.renderConstellation(this, batch, shader, sys, rc, camera);
         } else if (mesh != null) {
             // Mesh
-            renderSystem.renderMesh(this, base, body, batch, shader, sys, rc, camera);
+            renderSystem.renderMesh(this, batch, shader, sys, rc, camera);
         } else if (Mapper.gridRec.has(entity)) {
             // Recursive grid
-            renderSystem.renderRecursiveGrid(this, base, body, label, batch, shader, sys, rc, camera);
+            renderSystem.renderRecursiveGrid(this, batch, shader, sys, rc, camera);
         } else if (ruler != null) {
             // Ruler
-            renderSystem.renderRuler(this, base, body, batch, shader, sys, rc, camera);
+            renderSystem.renderRuler(this, batch, shader, sys, rc, camera);
         } else if(Mapper.title.has(entity)) {
             // Title
-            renderSystem.renderTitle(this, body, Mapper.title.get(entity), batch, shader, sys, rc, camera);
+            renderSystem.renderTitle(this, batch, shader, sys, rc, camera);
         }
     }
 
@@ -118,7 +118,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         if (constel != null) {
             return .2e7f;
         }
-        return (float) (text.labelMax * body.distToCamera * text.labelFactor);
+        return (float) (label.labelMax * body.distToCamera * label.labelFactor);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             return .2f / Settings.settings.scene.label.size;
         } else {
             // Rest
-            return text.textScale >= 0 ? text.textScale : (float) FastMath.atan(text.labelMax) * text.labelFactor * 4e2f;
+            return label.textScale >= 0 ? label.textScale : (float) FastMath.atan(label.labelMax) * label.labelFactor * 4e2f;
         }
     }
 

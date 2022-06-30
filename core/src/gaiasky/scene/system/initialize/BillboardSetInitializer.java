@@ -11,15 +11,22 @@ import gaiasky.GaiaSky;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.BillboardSet;
 import gaiasky.scene.entity.BillboardSetRadio;
 import gaiasky.scene.entity.EntityRadio;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.BillboardDataset;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -40,11 +47,13 @@ public class BillboardSetInitializer extends InitSystem {
     public void initializeEntity(Entity entity) {
         var billboard = Mapper.billboardSet.get(entity);
         var body = Mapper.body.get(entity);
-        var text = Mapper.text.get(entity);
+        var label = Mapper.label.get(entity);
 
-        text.textScale = 3;
-        text.labelMax = (float) (2e-3 / Constants.DISTANCE_SCALE_FACTOR);
-        text.labelFactor = 1;
+        label.textScale = 3;
+        label.labelMax = (float) (2e-3 / Constants.DISTANCE_SCALE_FACTOR);
+        label.labelFactor = 1;
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderBillboardSet(l, b, s, f, r, c);
 
         reloadData(billboard);
     }

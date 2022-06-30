@@ -1,5 +1,6 @@
 package gaiasky.scene.view;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
@@ -11,9 +12,9 @@ import gaiasky.scene.component.Body;
 public abstract class BaseView extends AbstractView {
 
     /** The base component. **/
-    protected Base base;
+    public Base base;
     /** The body component. **/
-    protected Body body;
+    public Body body;
 
     public BaseView() {
     }
@@ -35,5 +36,9 @@ public abstract class BaseView extends AbstractView {
 
     public void setColor(float[] color) {
         body.setColor(color);
+    }
+
+    public <T extends Component> T getComponent(Class<T> c) {
+       return entity.getComponent(c) ;
     }
 }

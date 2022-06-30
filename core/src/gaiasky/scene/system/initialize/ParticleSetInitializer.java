@@ -8,10 +8,15 @@ import gaiasky.data.group.IParticleGroupDataProvider;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
@@ -19,6 +24,8 @@ import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -175,6 +182,11 @@ public class ParticleSetInitializer extends InitSystem {
         // Maps.
         set.forceLabelStars = new HashSet<>();
         set.labelColors = new HashMap<>();
+
+        // Labels.
+        var label = Mapper.label.get(entity);
+        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
+                -> rs.renderStarSet(l, b, s, f, r, c);
     }
 
     public void computeMinMeanMaxDistances(ParticleSet set) {
