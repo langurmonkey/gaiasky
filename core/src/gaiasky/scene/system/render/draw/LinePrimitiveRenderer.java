@@ -15,9 +15,11 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
+import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.scene.view.LineView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -28,18 +30,19 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;
 
-public class LinePrimitiveRenderer extends ImmediateModeRenderSystem {
+public class LinePrimitiveRenderer extends LineRenderSystem {
     protected static final Log logger = Logger.getLogger(LinePrimitiveRenderer.class);
 
     protected ICamera camera;
     protected Vector3 aux2;
 
+    protected LineView view;
+
     private ExtShaderProgram shaderProgram;
-    private final LineEntityRenderSystem lineRenderSystem;
 
     public LinePrimitiveRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders, -1);
-        lineRenderSystem = new LineEntityRenderSystem();
+        super(rg, alphas, shaders);
+        view = new LineView();
         aux2 = new Vector3();
     }
 
@@ -104,9 +107,11 @@ public class LinePrimitiveRenderer extends ImmediateModeRenderSystem {
         this.camera = camera;
         renderables.forEach(r -> {
             Render render = (Render) r;
-            lineRenderSystem.render(render, this, camera, getAlpha(render));
+            view.setEntity(render.entity);
 
-            Gdx.gl.glLineWidth(getLineWidth(render) * 1.5f * Settings.settings.scene.lineWidth);
+            view.render(this, camera, getAlpha(render));
+
+            Gdx.gl.glLineWidth(view.getLineWidth() * 1.5f * Settings.settings.scene.lineWidth);
 
             for (int md = 0; md < meshIdx; md++) {
                 MeshData meshDouble = meshes.get(md);

@@ -6,6 +6,9 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
+import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;
@@ -25,7 +28,10 @@ public class AxesInitializer extends InitSystem {
         var axis = Mapper.axis.get(entity);
         var line = Mapper.line.get(entity);
 
-        line.lineWidth = 1;
+        // Lines.
+        line.lineWidth = 1f;
+        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
+                -> rs.renderAxes(e, r, c, a);
 
         // Base
         axis.b0 = new Vector3d(1, 0, 0);

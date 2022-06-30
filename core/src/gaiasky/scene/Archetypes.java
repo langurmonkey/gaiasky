@@ -134,7 +134,7 @@ public class Archetypes {
             addArchetype(Polyline.class.getName(), VertsObject.class.getName(), Arrow.class);
 
             // Orbit
-            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class);
+            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class, Line.class);
 
             // HeliotropicOrbit
             addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), TagHeliotropic.class);
@@ -173,13 +173,13 @@ public class Archetypes {
             addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagNoProcessChildren.class);
 
             // StarGroup
-            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class, Label.class);
+            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class, Label.class, Line.class);
 
             // Constellation
             addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class, Label.class);
 
             // ConstellationBoundaries
-            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class);
+            addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class, Line.class);
 
             // CosmicRuler
             addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class, Line.class, Label.class);

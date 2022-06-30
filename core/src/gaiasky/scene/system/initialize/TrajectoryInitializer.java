@@ -14,6 +14,9 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.TrajectoryUtils;
+import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
+import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL20;
 
@@ -39,6 +42,7 @@ public class TrajectoryInitializer extends InitSystem {
         var body = Mapper.body.get(entity);
         var trajectory = Mapper.trajectory.get(entity);
         var verts = Mapper.verts.get(entity);
+        var line = Mapper.line.get(entity);
 
         if (!trajectory.onlyBody) {
             try {
@@ -59,6 +63,9 @@ public class TrajectoryInitializer extends InitSystem {
         // All trajectories have the same primitive and render group.
         verts.glPrimitive = GL20.GL_LINE_STRIP;
         verts.renderGroup = RenderGroup.LINE_GPU;
+
+        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
+                -> rs.renderTrajectory(e, r, c, a);
 
         // Initialize default colors if needed
         if (body.color == null) {

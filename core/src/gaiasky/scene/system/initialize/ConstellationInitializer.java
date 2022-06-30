@@ -8,6 +8,8 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.ConstellationRadio;
+import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
+import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -32,15 +34,20 @@ public class ConstellationInitializer extends InitSystem {
         constel.posd = new Vector3d();
         constel.alpha = 0.4f;
 
-        line.lineWidth = 1;
 
         if (body.color == null) {
             body.color = new float[] { 0.5f, 1f, 0.5f, constel.alpha };
             body.labelColor = new float[] { 0.5f, 1f, 0.5f, constel.alpha };
         }
 
+        // Labels.
         label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
                 -> rs.renderConstellation(l, b, s, f, r, c);
+
+        // Lines.
+        line.lineWidth = 1;
+        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
+                -> rs.renderConstellation(e, r, c, a);
 
         EventManager.instance.subscribe(new ConstellationRadio(entity), Event.CONSTELLATION_UPDATE_CMD);
 

@@ -7,18 +7,23 @@ import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
+import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * An entity view that implements the {@link ILineRenderable} methods.
  */
 public class LineView extends BaseView implements ILineRenderable {
-    private Verts verts;
-    private Line line;
+    public Verts verts;
+    public Line line;
+
+    private LineEntityRenderSystem renderSystem;
 
     /** Creates an empty line view. **/
     public LineView() {
         super();
+        renderSystem = new LineEntityRenderSystem(this);
     }
 
     /**
@@ -44,7 +49,8 @@ public class LineView extends BaseView implements ILineRenderable {
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        /** Not needed, implemented in {@link gaiasky.scene.system.render.draw.line.LineEntityRenderSystem}. **/
+        // Run consumer.
+        line.renderConsumer.apply(renderSystem, entity, (LinePrimitiveRenderer) renderer, camera, alpha);
     }
 
     @Override

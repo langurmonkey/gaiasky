@@ -323,7 +323,8 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
 
         renderables.forEach(r -> {
             Render render = (Render) r;
-            lineRenderSystem.render(render, this, camera, getAlpha(render));
+            view.setEntity(render.entity);
+            view.render(this, camera, getAlpha(render));
         });
 
         // Sort phase

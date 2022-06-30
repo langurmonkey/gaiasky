@@ -143,6 +143,7 @@ public class Scene {
             EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
             EntitySystem clusterInit = new ClusterInitializer(setUp, families.clusters, priority++);
             EntitySystem constellationInit = new ConstellationInitializer(setUp, families.constellations, priority++);
+            EntitySystem boundariesInit = new BoundariesInitializer(setUp, families.boundaries, priority++);
             EntitySystem elementsSetInit = new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++);
             EntitySystem meshInit = new MeshInitializer(setUp, families.meshes, priority++);
             EntitySystem recGridInit = new GridRecInitializer(setUp, families.gridRecs, priority++);
@@ -154,7 +155,7 @@ public class Scene {
             runOnce(baseInit, particleSetInit, particleInit,
                     trajectoryInit, modelInit, locInit, billboardSetInit,
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
-                    backgroundInit, clusterInit, constellationInit,
+                    backgroundInit, clusterInit, constellationInit, boundariesInit,
                     elementsSetInit, meshInit, recGridInit, rulerInit,
                     titleInit, keyframeInit);
         }

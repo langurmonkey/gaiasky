@@ -1,5 +1,6 @@
 package gaiasky.scene.system.render.draw.line;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
@@ -48,40 +49,14 @@ public class LineEntityRenderSystem {
     public LineEntityRenderSystem() {
         this.lineView = new LineView();
     }
-
-    public void render(final Render render, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
-        final var entity = render.entity;
-        var base = Mapper.base.get(entity);
-
-        if (Mapper.trajectory.has(entity)) {
-            // Orbits.
-            var verts = Mapper.verts.get(entity);
-            var graph = Mapper.graph.get(entity);
-            var body = Mapper.body.get(entity);
-            renderTrajectory(render, base, body, graph, Mapper.trajectory.get(entity), verts, renderer, alpha);
-        } else if (Mapper.starSet.has(entity)) {
-            // Star sets (velocity vectors).
-            renderStarSet(render, base, Mapper.starSet.get(entity), renderer, camera, alpha);
-        } else if (Mapper.constel.has(entity)) {
-            // Constellations.
-            renderConstellation(render, base, Mapper.body.get(entity), Mapper.constel.get(entity), renderer, camera, alpha);
-        } else if (Mapper.bound.has(entity)) {
-            // Constellation boundaries.
-            renderConstellationBoundaries(render, base, Mapper.body.get(entity), Mapper.bound.get(entity), renderer, alpha);
-        } else if (Mapper.gridRec.has(entity)) {
-            // Recursive grid projection lines.
-            renderGridRec(render, base, Mapper.gridRec.get(entity), renderer, GaiaSky.instance.getICamera(), alpha);
-        } else if (Mapper.ruler.has(entity)) {
-            // Cosmic ruler
-            renderRuler(render, Mapper.body.get(entity), Mapper.ruler.get(entity), renderer, GaiaSky.instance.getICamera(), alpha);
-        } else if (Mapper.axis.has(entity)) {
-            // Axes
-           renderAxes(render, Mapper.axis.get(entity), renderer, GaiaSky.instance.getICamera(), alpha);
-        }
+    public LineEntityRenderSystem(LineView view) {
+        this.lineView = view;
     }
 
-    public void renderAxes(Render render, Axis axis, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+    public void renderAxes(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         if (alpha > 0) {
+            var axis = Mapper.axis.get(entity);
+
             Vector3d o = axis.o;
             Vector3d x = axis.x;
             Vector3d y = axis.y;
@@ -96,7 +71,10 @@ public class LineEntityRenderSystem {
         }
     }
 
-    public void renderRuler(Render render, Body body, Ruler ruler, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+    public void renderRuler(Entity  entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        var body = lineView.body;
+        var ruler = Mapper.ruler.get(entity);
+
         double va = 0.01 * camera.getFovFactor();
 
         // Main line
@@ -121,7 +99,10 @@ public class LineEntityRenderSystem {
         renderer.addLine(lineView, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, body.color[0], body.color[1], body.color[2], alpha);
     }
 
-    public void renderGridRec(Render render, Base base, GridRecursive gr, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+    public void renderGridRec(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        var base = lineView.base;
+        var gr = Mapper.gridRec.get(entity);
+
         // Here, we must have a focus and be in refsys mode.
         IFocus focus = camera.getFocus();
         if (focus != null) {
@@ -132,9 +113,13 @@ public class LineEntityRenderSystem {
         }
     }
 
-    public void renderConstellationBoundaries(Render render, Base base, Body body, Boundaries bound, LinePrimitiveRenderer renderer, float alpha) {
+    public void renderConstellationBoundaries(Entity entity,  LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        var base = lineView.base;
+        var body = lineView.body;
+        var bound = Mapper.bound.get(entity);
+
         alpha *= 0.3f;
-        lineView.setEntity(render.entity);
+        lineView.setEntity(entity);
 
         // This is so that the shape renderer does not mess up the z-buffer.
         for (List<Vector3d> points : bound.boundaries) {
@@ -148,14 +133,18 @@ public class LineEntityRenderSystem {
         }
     }
 
-    private void renderConstellation(Render render, Base base, Body body, Constel constel, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+    public void renderConstellation(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        var base = lineView.base;
+        var body = lineView.body;
+        var constel = Mapper.constel.get(entity);
+
         alpha *= constel.alpha * base.opacity;
 
         Vector3d p1 = D31;
         Vector3d p2 = D32;
         Vector3b campos = camera.getPos();
 
-        lineView.setEntity(render.entity);
+        lineView.setEntity(entity);
 
         for (IPosition[] pair : constel.lines) {
             if (pair != null) {
@@ -175,8 +164,14 @@ public class LineEntityRenderSystem {
         out.set(posBean.getPosition()).sub(camPos).add(vel);
     }
 
-    private void renderTrajectory(Render render, Base base, Body body, GraphNode graph, Trajectory trajectory, Verts verts, LinePrimitiveRenderer renderer, float alpha) {
+    public void renderTrajectory(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        var trajectory = Mapper.trajectory.get(entity);
         if (!trajectory.onlyBody) {
+            var base = lineView.base;
+            var body = lineView.body;
+            var verts = lineView.verts;
+            var graph = Mapper.graph.get(entity);
+
             var localTransformD = trajectory.localTransformD;
             var oc = trajectory.oc;
             var orbitTrail = trajectory.orbitTrail;
@@ -218,7 +213,7 @@ public class LineEntityRenderSystem {
                 }
             }
 
-            lineView.setEntity(render.entity);
+            lineView.setEntity(entity);
 
             // This is so that the shape renderer does not mess up the z-buffer
             int n = 0;
@@ -293,8 +288,11 @@ public class LineEntityRenderSystem {
     /**
      * Renders the proper motions of a star set.
      */
-    public void renderStarSet(Render render, Base base, StarSet set, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
-        lineView.setEntity(render.entity);
+    public void renderStarSet(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        var base = lineView.base;
+        var set = Mapper.starSet.get(entity);
+
+        lineView.setEntity(entity);
 
         alpha *= GaiaSky.instance.sceneRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();

@@ -17,7 +17,7 @@ public class Verts implements Component {
     /** Whether to close the polyline (connect end point to start point) or not **/
     public boolean closedLoop = true;
 
-    // Line width
+    // Line width or point size.
     public float primitiveSize = 1f;
 
     public PointCloudData pointCloudData;

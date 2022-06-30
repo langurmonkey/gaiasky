@@ -12,6 +12,8 @@ import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GridRecursive;
 import gaiasky.scene.entity.GridRecursiveRadio;
+import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
+import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -45,13 +47,19 @@ public class GridRecInitializer extends InitSystem {
         var label = Mapper.label.get(entity);
         var line = Mapper.line.get(entity);
 
+        // Labels.
         label.textScale = 1;
         label.labelFactor = 2e-3f;
         label.labelMax = 1f;
+        label.label = true;
+        label.labelPosition = new Vector3b();
         label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
                 -> rs.renderRecursiveGrid(l, b, s, f, r, c);
 
+        // Lines.
         line.lineWidth = 0.5f;
+        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
+                -> rs.renderGridRec(e, r, c, a);
 
         transform.floatVersion = true;
         transform.setTransformName(Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? "galacticToEquatorial" : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? "eclipticToEquatorial" : null));
@@ -59,8 +67,7 @@ public class GridRecInitializer extends InitSystem {
 
         body.color = Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? gr.ccGal : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? gr.ccEcl : gr.ccEq);
         body.labelColor = body.color;
-        label.label = true;
-        label.labelPosition = new Vector3b();
+
 
         gr.p01 = new Vector3d();
         gr.p02 = new Vector3d();

@@ -13,6 +13,8 @@ import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
+import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
@@ -187,6 +189,12 @@ public class ParticleSetInitializer extends InitSystem {
         var label = Mapper.label.get(entity);
         label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
                 -> rs.renderStarSet(l, b, s, f, r, c);
+
+        // Lines.
+        var line = Mapper.line.get(entity);
+        line.lineWidth = 0.6f;
+        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
+                -> rs.renderStarSet(e, r, c, a);
     }
 
     public void computeMinMeanMaxDistances(ParticleSet set) {
