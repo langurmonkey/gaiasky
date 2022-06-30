@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
@@ -17,7 +16,7 @@ import gaiasky.util.math.Matrix4d;
 /**
  * Updates background models and UV grids.
  */
-public class BackgroundUpdater extends IteratingSystem implements EntityUpdater {
+public class BackgroundUpdater extends AbstractUpdateSystem  {
 
     public BackgroundUpdater(Family family, int priority) {
         super(family, priority);

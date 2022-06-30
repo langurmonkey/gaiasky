@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
@@ -21,7 +20,7 @@ import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
-public class GridRecUpdater extends IteratingSystem implements EntityUpdater {
+public class GridRecUpdater extends AbstractUpdateSystem {
 
     private final Vector3d D33, D34;
     private final Vector3 F31, F34;

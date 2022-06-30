@@ -13,19 +13,16 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.math.Vector3d;
 
 /**
  * A view which exposes common vertex buffer renderable operations.
  * Can be reused for multiple entities by using {@link #setEntity(Entity)}.
  */
-public class VertsView extends AbstractView implements IGPUVertsRenderable {
+public class VertsView extends BaseView implements IGPUVertsRenderable {
 
     /** The verts component . **/
     private Verts verts;
-    /** The base component. **/
-    private Base base;
-    /** The body component. **/
-    private Body body;
     /** The graph component. **/
     private GraphNode graph;
     /** The trajectory component (if any). **/
@@ -41,17 +38,15 @@ public class VertsView extends AbstractView implements IGPUVertsRenderable {
 
     @Override
     protected void entityCheck(Entity entity) {
-        check(entity, Mapper.base, Base.class);
-        check(entity, Mapper.body, Body.class);
+        super.entityCheck(entity);
         check(entity, Mapper.verts, Verts.class);
         check(entity, Mapper.graph, GraphNode.class);
     }
 
     @Override
     protected void entityChanged() {
+        super.entityChanged();
         this.verts = Mapper.verts.get(entity);
-        this.base = Mapper.base.get(entity);
-        this.body = Mapper.body.get(entity);
         this.graph = Mapper.graph.get(entity);
         this.trajectory = Mapper.trajectory.get(entity);
     }
@@ -139,5 +134,64 @@ public class VertsView extends AbstractView implements IGPUVertsRenderable {
     @Override
     public float getOpacity() {
         return base.opacity;
+    }
+
+    /**
+     * Sets the 3D points of the line in the internal reference system.
+     *
+     * @param points Vector with the points. If length is not multiple of 3, some points are discarded.
+     */
+    public void setPoints(double[] points) {
+        int n = points.length;
+        if (n % 3 != 0) {
+            n = n - n % 3;
+        }
+        if (verts.pointCloudData == null)
+            verts.pointCloudData = new PointCloudData(n / 3);
+        else
+            verts.pointCloudData.clear();
+
+        verts.pointCloudData.addPoints(points);
+        markForUpdate();
+    }
+
+    /**
+     * Adds the given points to this data
+     *
+     * @param points The points to add
+     */
+    public void addPoints(double[] points) {
+        if (verts.pointCloudData == null) {
+            setPoints(points);
+        } else {
+            verts.pointCloudData.addPoints(points);
+            markForUpdate();
+        }
+    }
+
+    /**
+     * Adds the given point ot this data
+     *
+     * @param point The point to add
+     */
+    public void addPoint(Vector3d point) {
+        if (verts.pointCloudData == null) {
+            setPoints(point.values());
+        } else {
+            verts.pointCloudData.addPoint(point);
+            markForUpdate();
+        }
+
+    }
+
+    public boolean isEmpty() {
+        return verts.pointCloudData.isEmpty();
+    }
+
+    /**
+     * Clears the data from this object, both in RAM and VRAM
+     */
+    public void clear() {
+        setPoints(new double[] {});
     }
 }

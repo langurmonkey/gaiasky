@@ -17,7 +17,7 @@ import gaiasky.util.coord.AstroUtils;
 /**
  * Updates particle and star sets.
  */
-public class ParticleSetUpdater extends IteratingSystem implements EntityUpdater {
+public class ParticleSetUpdater extends AbstractUpdateSystem {
 
     private final ParticleUtils utils;
 

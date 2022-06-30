@@ -2,12 +2,11 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 
-public class BillboardSetUpdater extends IteratingSystem implements EntityUpdater {
+public class BillboardSetUpdater extends AbstractUpdateSystem {
 
     private final Matrix4 M41;
     public BillboardSetUpdater(Family family, int priority) {

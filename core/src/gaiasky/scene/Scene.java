@@ -148,6 +148,7 @@ public class Scene {
             EntitySystem recGridInit = new GridRecInitializer(setUp, families.gridRecs, priority++);
             EntitySystem rulerInit = new RulerInitializer(setUp, families.rulers, priority++);
             EntitySystem titleInit = new TitleInitializer(setUp, families.titles, priority++);
+            EntitySystem keyframeInit = new KeyframeInitializer(this, setUp, families.keyframes, priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit,
@@ -155,7 +156,7 @@ public class Scene {
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
                     backgroundInit, clusterInit, constellationInit,
                     elementsSetInit, meshInit, recGridInit, rulerInit,
-                    titleInit);
+                    titleInit, keyframeInit);
         }
     }
 
@@ -221,6 +222,7 @@ public class Scene {
             RulerUpdater rulerUpdater = new RulerUpdater(families.rulers, priority++);
             AxesUpdater axesUpdater = new AxesUpdater(families.axes, priority++);
             TitleUpdater titleUpdater = new TitleUpdater(families.titles, priority++);
+            KeyframeUpdater keyframeUpdater = new KeyframeUpdater(families.keyframes, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -239,6 +241,7 @@ public class Scene {
             AbstractExtractSystem rulerExtractor = newExtractor(RulerExtractor.class, families.rulers, priority++, sceneRenderer);
             AbstractExtractSystem axesExtractor = newExtractor(AxesExtractor.class, families.axes, priority++, sceneRenderer);
             AbstractExtractSystem titleExtractor = newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer);
+            AbstractExtractSystem keyframeExtractor = newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -262,6 +265,7 @@ public class Scene {
             engine.addSystem(rulerUpdater);
             engine.addSystem(axesUpdater);
             engine.addSystem(titleUpdater);
+            engine.addSystem(keyframeUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -280,6 +284,7 @@ public class Scene {
             engine.addSystem(rulerExtractor);
             engine.addSystem(axesExtractor);
             engine.addSystem(titleExtractor);
+            engine.addSystem(keyframeExtractor);
         }
     }
 

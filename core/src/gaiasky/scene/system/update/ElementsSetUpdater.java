@@ -2,14 +2,13 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.util.time.ITimeFrameProvider;
 
-public class ElementsSetUpdater extends IteratingSystem implements EntityUpdater {
+public class ElementsSetUpdater extends AbstractUpdateSystem {
 
     private final GraphUpdater graphUpdater;
     private final TrajectoryUpdater trajectoryUpdater;

@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.camera.rec.Keyframe;
 
-public class KeyframedPath implements Component {
+public class Keyframes implements Component {
 
     /**
      * Keyframe objects.
@@ -23,38 +23,38 @@ public class KeyframedPath implements Component {
     /**
      * The actual path.
      **/
-    public Verts path;
+    public Entity path;
     /**
      * The segments joining the knots.
      **/
-    public Verts segments;
+    public Entity segments;
     /**
      * The knots, or keyframe positions.
      **/
-    public Verts knots;
+    public Entity knots;
     /**
      * Knots which are also seams.
      **/
-    public Verts knotsSeam;
+    public Entity knotsSeam;
     /**
      * Selected knot.
      **/
-    public Verts selectedKnot;
+    public Entity selectedKnot;
 
     /**
      * High-lighted knot.
      */
-    public Verts highlightedKnot;
+    public Entity highlightedKnot;
 
     /**
      * Contains pairs of {direction, up} representing the orientation at each knot.
      **/
-    public Array<Verts> orientations;
+    public Array<Entity> orientations;
 
     /**
      * Objects.
      **/
-    public Array<Verts> objects;
+    public Array<Entity> objects;
 
     /**
      * Invisible focus for camera.
@@ -65,4 +65,10 @@ public class KeyframedPath implements Component {
      * Multiplier to primitive size
      **/
     public final float ss = 1f;
+
+    public void clearOrientations() {
+        for (Entity vo : orientations)
+            objects.removeValue(vo, true);
+        orientations.clear();
+    }
 }

@@ -12,10 +12,7 @@ import gaiasky.scenegraph.camera.ICamera;
 /**
  * An entity view that implements the {@link ILineRenderable} methods.
  */
-public class LineView extends AbstractView implements ILineRenderable {
-
-    private Base base;
-    private Body body;
+public class LineView extends BaseView implements ILineRenderable {
     private Verts verts;
     private Line line;
 
@@ -34,15 +31,8 @@ public class LineView extends AbstractView implements ILineRenderable {
     }
 
     @Override
-    protected void entityCheck(Entity entity) {
-        check(entity, Mapper.base, Base.class);
-        check(entity, Mapper.body, Body.class);
-    }
-
-    @Override
     protected void entityChanged() {
-        this.base = Mapper.base.get(entity);
-        this.body = Mapper.body.get(entity);
+        super.entityChanged();
         this.verts = Mapper.verts.get(entity);
         this.line = Mapper.line.get(entity);
     }

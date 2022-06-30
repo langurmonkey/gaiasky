@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
 import gaiasky.util.math.MathUtilsd;
@@ -10,7 +9,7 @@ import gaiasky.util.math.MathUtilsd;
 /**
  * Updates star clusters.
  */
-public class ClusterUpdater extends IteratingSystem implements EntityUpdater {
+public class ClusterUpdater extends AbstractUpdateSystem {
 
     public static final double TH_ANGLE = Math.toRadians(0.5);
     public static final double TH_ANGLE_OVERLAP = Math.toRadians(0.7);

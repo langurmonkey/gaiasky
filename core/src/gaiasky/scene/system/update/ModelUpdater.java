@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -29,7 +28,7 @@ import java.util.Date;
 /**
  * Updates model objects.
  */
-public class ModelUpdater extends IteratingSystem implements EntityUpdater {
+public class ModelUpdater extends AbstractUpdateSystem {
 
     // At what distance the light has the maximum intensity
     private static final double LIGHT_X0 = 0.1 * Constants.AU_TO_U;

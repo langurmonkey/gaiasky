@@ -2,11 +2,10 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 
-public class AxesUpdater extends IteratingSystem implements EntityUpdater {
+public class AxesUpdater extends AbstractUpdateSystem {
     public static final double LINE_SIZE_RAD = Math.tan(Math.toRadians(2.9));
 
     public AxesUpdater(Family family, int priority) {

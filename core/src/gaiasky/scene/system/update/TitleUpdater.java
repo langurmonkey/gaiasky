@@ -2,11 +2,10 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 
-public class TitleUpdater extends IteratingSystem implements EntityUpdater {
+public class TitleUpdater extends AbstractUpdateSystem {
     public TitleUpdater(Family family, int priority) {
         super(family, priority);
     }

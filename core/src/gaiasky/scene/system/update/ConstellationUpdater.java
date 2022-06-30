@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.camera.ICamera;
@@ -12,7 +11,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
-public class ConstellationUpdater extends IteratingSystem implements EntityUpdater {
+public class ConstellationUpdater extends AbstractUpdateSystem {
     private final Vector3d D31;
 
     public ConstellationUpdater(Family family, int priority) {

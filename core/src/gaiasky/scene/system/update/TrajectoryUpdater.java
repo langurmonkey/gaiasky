@@ -2,8 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
@@ -22,7 +20,7 @@ import java.time.Instant;
 /**
  * Updates trajectories and orbit objects of all classes and types.
  */
-public class TrajectoryUpdater extends IteratingSystem implements EntityUpdater {
+public class TrajectoryUpdater extends AbstractUpdateSystem {
 
     private final TrajectoryUtils utils;
     private final ITimeFrameProvider time;

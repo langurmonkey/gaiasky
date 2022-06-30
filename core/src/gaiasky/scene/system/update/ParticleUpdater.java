@@ -2,12 +2,11 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 
 /**
  * Updates single particles and star objects.
  */
-public class ParticleUpdater extends IteratingSystem implements EntityUpdater {
+public class ParticleUpdater extends AbstractUpdateSystem {
 
     public ParticleUpdater(Family family, int priority) {
         super(family, priority);

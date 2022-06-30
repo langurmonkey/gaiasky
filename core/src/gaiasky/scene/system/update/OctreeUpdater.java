@@ -2,19 +2,17 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Octree;
-import gaiasky.scene.system.render.extract.ParticleSetExtractor;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
-public class OctreeUpdater extends IteratingSystem implements EntityUpdater {
+public class OctreeUpdater extends AbstractUpdateSystem {
 
     private final GraphUpdater graphUpdater;
     private final ParticleSetUpdater particleSetUpdater;

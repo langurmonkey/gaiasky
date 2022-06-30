@@ -18,7 +18,6 @@ public class PointView extends RenderView implements IPointRenderable {
 
     /** Creates an empty line view. **/
     public PointView() {
-
     }
 
     @Override

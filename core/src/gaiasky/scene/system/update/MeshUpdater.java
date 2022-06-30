@@ -2,10 +2,9 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.scene.Mapper;
 
-public class MeshUpdater extends IteratingSystem implements EntityUpdater {
+public class MeshUpdater extends AbstractUpdateSystem {
 
     private float[] auxArray;
 

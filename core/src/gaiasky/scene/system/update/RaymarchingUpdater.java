@@ -2,12 +2,11 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 
-public class RaymarchingUpdater extends IteratingSystem implements EntityUpdater {
+public class RaymarchingUpdater extends AbstractUpdateSystem {
     public RaymarchingUpdater(Family family, int priority) {
         super(family, priority);
     }

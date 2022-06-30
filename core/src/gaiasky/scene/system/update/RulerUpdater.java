@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -13,7 +12,7 @@ import gaiasky.util.Settings;
 
 import java.text.DecimalFormat;
 
-public class RulerUpdater extends IteratingSystem implements EntityUpdater {
+public class RulerUpdater extends AbstractUpdateSystem {
 
     private final DecimalFormat nf;
 

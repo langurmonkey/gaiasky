@@ -36,9 +36,7 @@ import java.text.DecimalFormat;
  */
 public class LabelView extends RenderView implements I3DTextRenderable {
 
-    private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
-    private final Vector3d D33 = new Vector3d();
     private final Vector3 F31 = new Vector3();
     private final Vector3 F32 = new Vector3();
 

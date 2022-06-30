@@ -18,12 +18,8 @@ import gaiasky.util.tree.OctreeNode;
 /**
  * An entity view that implements the {@link IFocus} methods.
  */
-public class FocusView extends AbstractView implements IFocus {
+public class FocusView extends BaseView implements IFocus {
 
-    /** The base component. **/
-    private Base base;
-    /** The body component. **/
-    private Body body;
     /** The graph component. **/
     private GraphNode graph;
     /** The octant component. **/
@@ -54,15 +50,13 @@ public class FocusView extends AbstractView implements IFocus {
 
     @Override
     protected void entityCheck(Entity entity) {
-        check(entity, Mapper.base, Base.class);
-        check(entity, Mapper.body, Body.class);
+        super.entityCheck(entity);
         check(entity, Mapper.graph, GraphNode.class);
     }
 
     @Override
     protected void entityChanged() {
-        this.base = Mapper.base.get(entity);
-        this.body = Mapper.body.get(entity);
+        super.entityChanged();
         this.graph = Mapper.graph.get(entity);
         this.octant = Mapper.octant.get(entity);
         this.mag = Mapper.magnitude.get(entity);
@@ -89,6 +83,10 @@ public class FocusView extends AbstractView implements IFocus {
     @Override
     public String getName() {
         return base.getName();
+    }
+
+    public void setName(String name) {
+        base.setName(name);
     }
 
     @Override
