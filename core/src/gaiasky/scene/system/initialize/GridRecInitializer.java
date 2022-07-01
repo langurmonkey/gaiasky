@@ -7,13 +7,16 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GridRecursive;
+import gaiasky.scene.component.Model;
 import gaiasky.scene.entity.GridRecursiveRadio;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -22,6 +25,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
@@ -79,6 +83,8 @@ public class GridRecInitializer extends InitSystem {
         gr.d = new Vector3d();
 
         // Init billboard model
+        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                mer.renderRecursiveGridModel(e, m ,b, a, t, r, rg, s, rel);
 
         model.model = new ModelComponent();
         model.model.setType("twofacedbillboard");

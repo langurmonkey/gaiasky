@@ -9,13 +9,16 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.data.AssetBean;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.RenderingContext;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Model;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.math.Matrix4d;
 
@@ -35,6 +38,9 @@ public class BackgroundModelInitializer extends InitSystem {
         var renderType = Mapper.renderType.get(entity);
 
         // Force texture loading
+        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                mer.renderGenericModel(e, m ,b, a, t, r, rg, s, rel);
+
         model.model.forceInit = true;
 
         model.model.initialize(null);

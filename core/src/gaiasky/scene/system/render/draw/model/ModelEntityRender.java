@@ -1,4 +1,4 @@
-package gaiasky.scene.system.render.draw;
+package gaiasky.scene.system.render.draw.model;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.GL20;
@@ -39,58 +39,42 @@ public class ModelEntityRender {
     /**
      * Renders a single entity as a model. The entity is assumed to have a {@link gaiasky.scene.component.Model} component.
      *
-     * @param entity            The entity to render.
-     * @param batch             The model batch to use.
-     * @param camera            The camera.
-     * @param alpha             The opacity value in [0,1].
-     * @param t                 The time, in seconds, since the start of the session.
-     * @param rc                The rendering context object.
-     * @param renderGroup       The render group.
-     * @param shadowEnvironment Whether to prepare the shadow environment, to render the shadow map.
+     * @param entity      The entity to render.
+     * @param batch       The model batch to use.
+     * @param camera      The camera.
+     * @param alpha       The opacity value in [0,1].
+     * @param t           The time, in seconds, since the start of the session.
+     * @param rc          The rendering context object.
+     * @param renderGroup The render group.
+     * @param shadow      Whether to prepare the shadow environment, to render the shadow map.
      */
-    public void render(Entity entity, IntModelBatch batch, ICamera camera, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadowEnvironment) {
+    public void render(Entity entity, IntModelBatch batch, ICamera camera, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow) {
         var model = Mapper.model.get(entity);
-        var scaffolding = Mapper.modelScaffolding.get(entity);
-        if (Mapper.atmosphere.has(entity)) {
-            // Planet.
-            renderPlanet(entity, model, scaffolding, batch, alpha, t, rc, renderGroup);
-        } else if (Mapper.extra.has(entity)) {
-            // Single particle/star.
-            renderParticleStarModel(entity, model, batch, alpha, t);
-        } else if (Mapper.starSet.has(entity)) {
-            // Star set.
-            renderParticleStarSetModel(entity, model, batch, alpha, t);
-        } else if (Mapper.cluster.has(entity)) {
-            // Cluster
-            renderStarClusterModel(entity, model, Mapper.cluster.get(entity), batch, alpha);
-        }else if (Mapper.mesh.has(entity)) {
-            // Mesh
-            renderMeshModel(entity, model, Mapper.mesh.get(entity), batch, alpha);
-        } else if(Mapper.gridRec.has(entity)) {
-            // Recursive grid
-            renderRecursiveGridModel(entity, model, Mapper.gridRec.get(entity), batch, alpha);
-        } else {
-            boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
-            // Generic model.
-            renderGenericModel(entity, model, scaffolding, batch, alpha, relativistic, shadowEnvironment);
-        }
+        boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
+
+        // Just run consumer.
+        model.renderConsumer.apply(this, entity, model, batch, alpha, t, rc, renderGroup, relativistic, shadow);
     }
 
     /**
      * Renders a generic model.
      *
-     * @param model             The model component.
-     * @param scaffolding       The scaffolding component.
-     * @param batch             The batch.
-     * @param alpha             The alpha value.
-     * @param relativistic      Whether to apply relativistic effects.
-     * @param shadowEnvironment Whether to prepare the shadow environment.
+     * @param model        The model component.
+     * @param batch        The batch.
+     * @param alpha        The alpha value.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    private void renderGenericModel(Entity entity, Model model, ModelScaffolding scaffolding, IntModelBatch batch, float alpha, boolean relativistic, boolean shadowEnvironment) {
+    public void renderGenericModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+
         ModelComponent mc = model.model;
         if (mc != null && mc.isModelInitialised()) {
             var base = Mapper.base.get(entity);
-            if (scaffolding != null && shadowEnvironment) {
+            if (scaffolding != null && shadow) {
                 prepareShadowEnvironment(model, scaffolding);
             }
 
@@ -109,19 +93,25 @@ public class ModelEntityRender {
 
     /**
      * Renders the recursive grid.
-     * @param entity The entity.
-     * @param model The model component.
-     * @param gr The recursive grid component.
-     * @param modelBatch The batch.
-     * @param alpha The alpha value.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param modelBatch   The batch.
+     * @param alpha        The alpha value.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    public void renderRecursiveGridModel(Entity entity, Model model, GridRecursive gr, IntModelBatch modelBatch, float alpha) {
+    public void renderRecursiveGridModel(Entity entity, Model model, IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
+        var gr = Mapper.gridRec.get(entity);
 
         ModelComponent mc = model.model;
 
-        mc.update(alpha * body.color[3] * base.opacity);
+        mc.update(alpha * body.color[3] * base.opacity, relativistic);
         if (gr.regime == 1)
             mc.setDepthTest(GL20.GL_LEQUAL, false);
         else
@@ -135,26 +125,32 @@ public class ModelEntityRender {
     }
 
     /**
-     * Renders a mesh, tipically an iso-surface.
-     * @param entity The entity.
-     * @param model The model component.
-     * @param mesh The mesh component.
-     * @param batch The batch.
-     * @param alpha The alpha value.
+     * Renders a mesh, typically an iso-surface.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The batch.
+     * @param alpha        The alpha value.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    private void renderMeshModel(Entity entity, Model model, Mesh mesh, IntModelBatch batch, float alpha) {
+    public void renderMeshModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
         if (model.model != null) {
             var graph = Mapper.graph.get(entity);
             var base = Mapper.base.get(entity);
+            var mesh = Mapper.mesh.get(entity);
 
             var mc = model.model;
 
             if (mesh.shading == Mesh.MeshShading.ADDITIVE) {
-                mc.update(graph.localTransform, alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE);
+                mc.update(relativistic, graph.localTransform, alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE);
                 // Depth reads, no depth writes
                 mc.setDepthTest(GL20.GL_LEQUAL, false);
             } else {
-                mc.update(graph.localTransform, alpha * base.opacity);
+                mc.update(relativistic, graph.localTransform, alpha * base.opacity);
                 // Depth reads and writes
                 mc.setDepthTest(GL20.GL_LEQUAL, true);
             }
@@ -166,18 +162,24 @@ public class ModelEntityRender {
 
     /**
      * Renders a star cluster entity as a model.
-     * @param entity The entity.
-     * @param model The model component.
-     * @param cluster The cluster component.
-     * @param modelBatch The model batch.
-     * @param alpha The model alpha.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param modelBatch   The model batch.
+     * @param alpha        The model alpha.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    private void renderStarClusterModel(Entity entity, Model model, Cluster cluster, IntModelBatch modelBatch, float alpha) {
+    public void renderStarClusterModel(Entity entity, Model model, IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
         ModelComponent mc = model.model;
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
+        var cluster = Mapper.cluster.get(entity);
 
-        mc.update(null, alpha * base.opacity * cluster.fadeAlpha, GL20.GL_ONE, GL20.GL_ONE);
+        mc.update(relativistic, null, alpha * base.opacity * cluster.fadeAlpha, GL20.GL_ONE, GL20.GL_ONE);
         // Depth reads, no depth writes
         mc.setDepthTest(GL20.GL_LEQUAL, false);
         mc.instance.transform.set(graph.localTransform);
@@ -186,13 +188,18 @@ public class ModelEntityRender {
 
     /**
      * Renders the model of a single star or particle.
-     * @param entity The entity.
-     * @param model The model component.
-     * @param batch The model batch.
-     * @param alpha The model alpha.
-     * @param t The time.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The model batch.
+     * @param alpha        The model alpha.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    private void renderParticleStarSetModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t) {
+    public void renderParticleStarSetModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
         var set = Mapper.starSet.get(entity);
 
         var mc = model.model;
@@ -209,11 +216,13 @@ public class ModelEntityRender {
                 double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
                 mc.instance.transform.idt()
                         .translate(
-                        (float) set.proximity.updating[0].pos.x,
-                        (float) set.proximity.updating[0].pos.y,
-                        (float) set.proximity.updating[0].pos.z)
+                                (float) set.proximity.updating[0].pos.x,
+                                (float) set.proximity.updating[0].pos.y,
+                                (float) set.proximity.updating[0].pos.z)
                         .scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
-                mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
+                if (relativistic) {
+                    mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
+                }
                 mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
                 batch.render(mc.instance, mc.env);
             }
@@ -222,15 +231,19 @@ public class ModelEntityRender {
 
     /**
      * Renders the model of a single star or particle.
-     * @param entity The entity.
-     * @param model The model component.
-     * @param batch The model batch.
-     * @param alpha The model alpha.
-     * @param t The time.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The model batch.
+     * @param alpha        The model alpha.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    private void renderParticleStarModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t) {
+    public void renderParticleStarModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
         var body = Mapper.body.get(entity);
-        var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
         var extra = Mapper.extra.get(entity);
         var dist = Mapper.distance.get(entity);
@@ -241,7 +254,7 @@ public class ModelEntityRender {
         float opacity = (float) MathUtilsd.lint(body.distToCamera, dist.distance / 50f, dist.distance, 1f, 0f);
         ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(cc[0], cc[1], cc[2], 1f);
         ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
-        mc.update(alpha * opacity);
+        mc.update(alpha * opacity, relativistic);
         // Local transform
         graph.translation.setToTranslation(mc.instance.transform).scl((float) (extra.radius * 2d));
         batch.render(mc.instance, mc.env);
@@ -250,19 +263,25 @@ public class ModelEntityRender {
     /**
      * Renders a spacecraft. Not used right now.
      *
-     * @param model             The model component.
-     * @param scaffolding       The scaffolding component.
-     * @param graph             The graph component.
-     * @param batch             The model batch.
-     * @param alpha             The alpha value.
-     * @param shadowEnvironment Whether to prepare the shadow environment.
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The model batch.
+     * @param alpha        The model alpha.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    private void renderSpacecraft(Model model, ModelScaffolding scaffolding, GraphNode graph, IntModelBatch batch, float alpha, boolean shadowEnvironment) {
+    public void renderSpacecraft(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+        var graph = Mapper.graph.get(entity);
+
         ICamera cam = GaiaSky.instance.getICamera();
         ModelComponent mc = model.model;
         if (mc.isModelInitialised()) {
             // Good, render
-            if (shadowEnvironment) {
+            if (shadow) {
                 prepareShadowEnvironment(model, scaffolding);
             }
             mc.setTransparency(alpha * scaffolding.fadeOpacity);
@@ -282,26 +301,28 @@ public class ModelEntityRender {
     /**
      * Renders a planet.
      *
-     * @param entity      The entity.
-     * @param model       The model component.
-     * @param scaffolding The scaffolding component.
-     * @param batch       The batch.
-     * @param alpha       The alpha value.
-     * @param t           The time, in seconds, since the session start.
-     * @param rc          The rendering context.
-     * @param renderGroup The render group.
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The batch.
+     * @param alpha        The alpha value.
+     * @param t            The time, in seconds, since the session start.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
      */
-    private void renderPlanet(Entity entity, Model model, ModelScaffolding scaffolding, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup) {
+    public void renderPlanet(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow, boolean relativistic) {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
+        var scaffolding = Mapper.modelScaffolding.get(entity);
         var atmosphere = Mapper.atmosphere.get(entity);
         var cloud = Mapper.cloud.get(entity);
         if (renderGroup == RenderGroup.MODEL_ATM) {
             // Atmosphere
-            renderAtmosphere(batch, entity, body, model, scaffolding, atmosphere, GaiaSky.instance.sgr.alphas[ComponentType.Atmospheres.ordinal()], rc);
+            renderAtmosphere(entity, body, model, scaffolding, batch, atmosphere, GaiaSky.instance.sgr.alphas[ComponentType.Atmospheres.ordinal()], rc);
         } else if (renderGroup == RenderGroup.MODEL_CLOUD) {
             // Clouds
-            renderClouds(batch, entity, base, model, cloud, GaiaSky.instance.sgr.alphas[ComponentType.Clouds.ordinal()], t);
+            renderClouds(entity, base, model, cloud, batch, GaiaSky.instance.sgr.alphas[ComponentType.Clouds.ordinal()], t);
         } else {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
@@ -315,8 +336,10 @@ public class ModelEntityRender {
                 }
             }
             // Regular planet, render model normally
-            prepareShadowEnvironment(model, scaffolding);
-            model.model.update(alpha * base.opacity);
+            if (shadow) {
+                prepareShadowEnvironment(model, scaffolding);
+            }
+            model.model.update(alpha * base.opacity, relativistic);
             batch.render(model.model.instance, model.model.env);
         }
     }
@@ -325,11 +348,11 @@ public class ModelEntityRender {
      * Renders the atmosphere of a planet.
      */
     public void renderAtmosphere(
-            IntModelBatch modelBatch,
             Entity entity,
             Body body,
             Model model,
             ModelScaffolding scaffolding,
+            IntModelBatch batch,
             Atmosphere atmosphere,
             float alpha,
             RenderingContext rc) {
@@ -343,21 +366,21 @@ public class ModelEntityRender {
             AtmosphereComponent ac = atmosphere.atmosphere;
             ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, graph, rotation, scaffolding, rc.vrOffset);
             ac.mc.updateRelativisticEffects(cam);
-            modelBatch.render(ac.mc.instance, model.model.env);
+            batch.render(ac.mc.instance, model.model.env);
         }
     }
 
     /**
      * Renders the cloud layer of a planet.
      */
-    public void renderClouds(IntModelBatch modelBatch, Entity entity, Base base, Model model, Cloud cloud, float alpha, double t) {
+    public void renderClouds(Entity entity, Base base, Model model, Cloud cloud, IntModelBatch batch, float alpha, double t) {
         CloudComponent clc = cloud.cloud;
         clc.touch();
         ICamera cam = GaiaSky.instance.getICamera();
         clc.mc.updateRelativisticEffects(cam);
         clc.mc.updateVelocityBufferUniforms(cam);
         clc.mc.setTransparency(alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
-        modelBatch.render(clc.mc.instance, model.model.env);
+        batch.render(clc.mc.instance, model.model.env);
     }
 
     /**

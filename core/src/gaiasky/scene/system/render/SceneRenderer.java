@@ -35,6 +35,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.draw.*;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
@@ -105,7 +106,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private Camera cameraLight;
 
     /** Contains the candidates for regular and tessellated shadow maps. **/
-    private List<Entity> shadowCandidates, shadowCandidatesTess;
+    private List<Entity> shadowCandidates/*, shadowCandidatesTess */;
 
     // Dimension 1: number of shadows, dimension 2: number of lights
     public FrameBuffer[][] shadowMapFb;
@@ -763,7 +764,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             if (shadowMapFb != null && smCombinedMap != null) {
                 addCandidates(models, shadowCandidates);
-                addCandidates(modelsTess, shadowCandidatesTess);
+                //addCandidates(modelsTess, shadowCandidatesTess);
 
                 // Clear maps
                 smTexMap.clear();
@@ -1103,9 +1104,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     if (fb != null)
                         fb.dispose();
                 }
-            shadowMapFb = null;
         }
-        shadowMapCombined = null;
 
         // Shadow map frame buffer
         shadowMapFb = new FrameBuffer[Settings.settings.scene.renderer.shadow.number][Constants.N_DIR_LIGHTS];
@@ -1128,10 +1127,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         if (shadowCandidates == null) {
             shadowCandidates = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
-            shadowCandidatesTess = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
+            //shadowCandidatesTess = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
         }
         shadowCandidates.clear();
-        shadowCandidatesTess.clear();
+        //shadowCandidatesTess.clear();
     }
 
     private void buildGlowData() {

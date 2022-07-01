@@ -6,14 +6,18 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.data.AssetBean;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Mesh;
+import gaiasky.scene.component.Model;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -25,8 +29,11 @@ public class MeshInitializer extends InitSystem {
     @Override
     public void initializeEntity(Entity entity) {
         var model = Mapper.model.get(entity);
-        ModelComponent mc = model.model;
 
+        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                mer.renderMeshModel(e, m ,b, a, t, r, rg, s, rel);
+
+        ModelComponent mc = model.model;
         if (mc != null) {
             mc.initialize(true);
         }

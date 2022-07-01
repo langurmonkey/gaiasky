@@ -11,6 +11,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;

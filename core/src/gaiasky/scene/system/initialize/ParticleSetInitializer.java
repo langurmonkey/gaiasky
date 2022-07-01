@@ -76,7 +76,7 @@ public class ParticleSetInitializer extends InitSystem {
             starSet.variableStars = starSet.pointData.size() > 0 && starSet.pointData.get(0) instanceof VariableRecord;
             initSortingData(entity, starSet);
             // Load model in main thread
-            GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), Mapper.model.get(entity)));
+            GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), Mapper.model.get(entity), true));
         }
 
     }

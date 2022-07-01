@@ -25,4 +25,9 @@ public class Consumers {
     public interface Consumer7<One, Two, Three, Four, Five, Six, Seven> {
         void apply(One one, Two two, Three three, Four four, Five five, Six six, Seven seven);
     }
+
+    @FunctionalInterface
+    public interface Consumer10<One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten> {
+        void apply(One one, Two two, Three three, Four four, Five five, Six six, Seven seven, Eight eight, Nine nine, Ten ten);
+    }
 }

@@ -9,8 +9,11 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
+import gaiasky.render.RenderGroup;
+import gaiasky.render.RenderingContext;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
@@ -19,6 +22,7 @@ import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Environment;
@@ -121,8 +125,19 @@ public class ParticleUtils {
      *
      * @param manager The asset manager.
      * @param model   The model component.
+     * @param starSet Whether it is a single particle or a star set.
      */
-    public void initModel(final AssetManager manager, final Model model) {
+    public void initModel(final AssetManager manager, final Model model, boolean starSet) {
+        if(starSet) {
+            // Star set.
+            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                    mer.renderParticleStarSetModel(e, m, b, a, t, r, rg, s, rel);
+        } else {
+            // Single star particle.
+            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                    mer.renderParticleStarModel(e, m, b, a, t, r, rg, s, rel);
+        }
+
         if (model == null) {
             throw new RuntimeException("The incoming star model component can't be null!");
         }

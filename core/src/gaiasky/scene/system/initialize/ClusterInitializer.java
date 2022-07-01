@@ -10,9 +10,12 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Model;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -22,6 +25,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntMeshPartBuilder;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntModelBuilder;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.model.IntModelInstance;
@@ -85,6 +89,9 @@ public class ClusterInitializer extends InitSystem {
             cluster.model = (modelBuilder.end());
             cluster.modelTransform = new Matrix4();
         }
+
+        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                mer.renderStarClusterModel(e, m ,b, a, t, r, rg, s, rel);
 
         model.model = new ModelComponent(false);
         model.model.initialize(null);

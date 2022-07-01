@@ -75,7 +75,7 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         // Set up stars
         if (Mapper.hip.has(entity)) {
             var model = Mapper.model.get(entity);
-            utils.initModel(AssetBean.manager(), model);
+            utils.initModel(AssetBean.manager(), model, false);
 
             var mag = Mapper.magnitude.get(entity);
             var coordinates = Mapper.coordinates.get(entity);

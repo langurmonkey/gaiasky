@@ -14,12 +14,14 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.SpacecraftRadio;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.MachineDefinition;
@@ -32,7 +34,9 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
@@ -104,7 +108,7 @@ public class ModelInitializer extends InitSystem {
 
         if (isPlanet) {
             // Initialize planet
-            initializePlanet(base, body, scaffolding, sa, label, atmosphere, cloud);
+            initializePlanet(base, body, model, scaffolding, sa, label, atmosphere, cloud);
             EntityUtils.setColor2Data(body, celestial, 0.6f);
         } else {
             EntityUtils.setColor2Data(body, celestial, 0.1f);
@@ -168,6 +172,9 @@ public class ModelInitializer extends InitSystem {
     }
 
     private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
+        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                mer.renderSpacecraft(e, m ,b, a, t, r, rg, s, rel);
+
         base.ct = new ComponentTypes(ComponentType.Satellites);
         engine.rotationMatrix = new Matrix4();
 
@@ -201,6 +208,11 @@ public class ModelInitializer extends InitSystem {
     }
 
     private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph) {
+        if(model.renderConsumer == null) {
+            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                    mer.renderGenericModel(e, m, b, a, t, r, rg, s, rel);
+        }
+
         // Default values
         celestial.innerRad = 0.2f;
         graph.orientation = new Matrix4d();
@@ -242,7 +254,10 @@ public class ModelInitializer extends InitSystem {
         scaffolding.billboardSizeFactor = 0.6e-3f;
     }
 
-    private void initializePlanet(Base base, Body body, ModelScaffolding scaffolding, SolidAngle sa, Label label, Atmosphere atmosphere, Cloud cloud) {
+    private void initializePlanet(Base base, Body body, Model model, ModelScaffolding scaffolding, SolidAngle sa, Label label, Atmosphere atmosphere, Cloud cloud) {
+        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                mer.renderPlanet(e, m ,b, a, t, r, rg, s, rel);
+
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e6;
         sa.thresholdPoint = thPoint / 3e4;

@@ -740,7 +740,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
 
             if (shadowMapFb != null && smCombinedMap != null) {
                 addCandidates(models, shadowCandidates);
-                addCandidates(modelsTess, shadowCandidatesTess);
+                //addCandidates(modelsTess, shadowCandidatesTess);
 
                 // Clear maps
                 smTexMap.clear();
@@ -1080,9 +1080,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
                     if (fb != null)
                         fb.dispose();
                 }
-            shadowMapFb = null;
         }
-        shadowMapCombined = null;
 
         // Shadow map frame buffer
         shadowMapFb = new FrameBuffer[Settings.settings.scene.renderer.shadow.number][Constants.N_DIR_LIGHTS];
