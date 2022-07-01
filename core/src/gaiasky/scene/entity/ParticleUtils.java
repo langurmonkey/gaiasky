@@ -85,6 +85,7 @@ public class ParticleUtils {
         }
         return 1;
     }
+
     public float getColor(int index, ParticleSet set, Highlight highlight) {
         return highlight.highlighted ? Color.toFloatBits(highlight.hlc[0], highlight.hlc[1], highlight.hlc[2], highlight.hlc[3]) : set.pointData.get(index).col();
     }
@@ -125,19 +126,8 @@ public class ParticleUtils {
      *
      * @param manager The asset manager.
      * @param model   The model component.
-     * @param starSet Whether it is a single particle or a star set.
      */
-    public void initModel(final AssetManager manager, final Model model, boolean starSet) {
-        if(starSet) {
-            // Star set.
-            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                    mer.renderParticleStarSetModel(e, m, b, a, t, r, rg, s, rel);
-        } else {
-            // Single star particle.
-            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                    mer.renderParticleStarModel(e, m, b, a, t, r, rg, s, rel);
-        }
-
+    public void initModel(final AssetManager manager, final Model model) {
         if (model == null) {
             throw new RuntimeException("The incoming star model component can't be null!");
         }

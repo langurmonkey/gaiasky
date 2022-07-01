@@ -17,6 +17,8 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.Environment;
@@ -29,6 +31,7 @@ import gaiasky.util.math.MathUtilsd;
  * have a {@link Model} component.
  */
 public class ModelEntityRender {
+    private static final Log logger = Logger.getLogger(ModelEntityRender.class);
 
     private final ParticleUtils utils;
 
@@ -50,10 +53,17 @@ public class ModelEntityRender {
      */
     public void render(Entity entity, IntModelBatch batch, ICamera camera, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean shadow) {
         var model = Mapper.model.get(entity);
-        boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
+        if (model != null) {
+            if (model.renderConsumer != null) {
+                boolean relativistic = !(Mapper.engine.has(entity) && camera.getMode().isSpacecraft());
 
-        // Just run consumer.
-        model.renderConsumer.apply(this, entity, model, batch, alpha, t, rc, renderGroup, relativistic, shadow);
+                // Just run consumer.
+                model.renderConsumer.apply(this, entity, model, batch, alpha, t, rc, renderGroup, relativistic, shadow);
+            } else {
+                var base = Mapper.base.get(entity);
+                logger.error("Entity '" + base.getLocalizedName() + "' does not have a model render consumer!");
+            }
+        }
     }
 
     /**

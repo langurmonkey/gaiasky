@@ -18,12 +18,14 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
@@ -75,7 +77,9 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         // Set up stars
         if (Mapper.hip.has(entity)) {
             var model = Mapper.model.get(entity);
-            utils.initModel(AssetBean.manager(), model, false);
+            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                    mer.renderParticleStarModel(e, m, b, a, t, r, rg, s, rel);
+            utils.initModel(AssetBean.manager(), model);
 
             var mag = Mapper.magnitude.get(entity);
             var coordinates = Mapper.coordinates.get(entity);

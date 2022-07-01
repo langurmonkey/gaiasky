@@ -642,11 +642,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          * SCENE GRAPH UPDATER
          */
         updateProcess = () -> {
-            // Update scene.
-            scene.update(time, cameraManager);
-
             // Update scene graph.
             sceneGraph.update(time, cameraManager);
+
+            // Update scene.
+            scene.update(time, cameraManager);
 
             // Swap proximity buffers.
             cameraManager.swapBuffers();

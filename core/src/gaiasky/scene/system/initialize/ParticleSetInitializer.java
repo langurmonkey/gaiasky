@@ -8,6 +8,7 @@ import gaiasky.data.group.IParticleGroupDataProvider;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
@@ -15,6 +16,7 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.scene.system.render.draw.model.ModelEntityRender;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
@@ -26,6 +28,7 @@ import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
@@ -75,8 +78,14 @@ public class ParticleSetInitializer extends InitSystem {
             // Is it a catalog of variable stars?
             starSet.variableStars = starSet.pointData.size() > 0 && starSet.pointData.get(0) instanceof VariableRecord;
             initSortingData(entity, starSet);
+
+            var model = Mapper.model.get(entity);
+            // Star set.
+            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+                    mer.renderParticleStarSetModel(e, m, b, a, t, r, rg, s, rel);
+
             // Load model in main thread
-            GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), Mapper.model.get(entity), true));
+            GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
         }
 
     }
