@@ -50,7 +50,9 @@ public class LineView extends BaseView implements ILineRenderable {
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         // Run consumer.
-        line.renderConsumer.apply(renderSystem, entity, (LinePrimitiveRenderer) renderer, camera, alpha);
+        if (line.renderConsumer != null) {
+            line.renderConsumer.apply(renderSystem, entity, (LinePrimitiveRenderer) renderer, camera, alpha);
+        }
     }
 
     @Override

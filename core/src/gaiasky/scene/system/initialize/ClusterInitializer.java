@@ -15,7 +15,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Model;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -90,7 +90,7 @@ public class ClusterInitializer extends InitSystem {
             cluster.modelTransform = new Matrix4();
         }
 
-        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                 mer.renderStarClusterModel(e, m ,b, a, t, r, rg, s, rel);
 
         model.model = new ModelComponent(false);

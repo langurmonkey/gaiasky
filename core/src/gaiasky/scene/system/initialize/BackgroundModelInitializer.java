@@ -14,7 +14,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Model;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
@@ -38,7 +38,7 @@ public class BackgroundModelInitializer extends InitSystem {
         var renderType = Mapper.renderType.get(entity);
 
         // Force texture loading
-        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                 mer.renderGenericModel(e, m ,b, a, t, r, rg, s, rel);
 
         model.model.forceInit = true;

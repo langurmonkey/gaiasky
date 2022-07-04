@@ -81,35 +81,8 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        label.renderConsumer.apply(renderSystem, this, batch, shader, sys, rc, camera);
-
-        if (Mapper.celestial.has(entity)) {
-            // Celestial: planets, single stars, particles, etc.
-            renderSystem.renderCelestial(this, batch, shader, sys, rc, camera);
-        } else if (set != null) {
-            // Star sets.
-            renderSystem.renderStarSet(this, batch, shader, sys, rc, camera);
-        } else if (cluster != null) {
-            // Clusters
-            renderSystem.renderCluster(this, batch, shader, sys, rc, camera);
-        } else if (bbSet != null) {
-            // Billboard sets
-            renderSystem.renderBillboardSet(this, batch, shader, sys, rc, camera);
-        } else if (constel != null) {
-            // Constellation
-            renderSystem.renderConstellation(this, batch, shader, sys, rc, camera);
-        } else if (mesh != null) {
-            // Mesh
-            renderSystem.renderMesh(this, batch, shader, sys, rc, camera);
-        } else if (Mapper.gridRec.has(entity)) {
-            // Recursive grid
-            renderSystem.renderRecursiveGrid(this, batch, shader, sys, rc, camera);
-        } else if (ruler != null) {
-            // Ruler
-            renderSystem.renderRuler(this, batch, shader, sys, rc, camera);
-        } else if(Mapper.title.has(entity)) {
-            // Title
-            renderSystem.renderTitle(this, batch, shader, sys, rc, camera);
+        if (label.renderConsumer != null) {
+            label.renderConsumer.apply(renderSystem, this, batch, shader, sys, rc, camera);
         }
     }
 
@@ -173,7 +146,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public String text() {
-        if(ruler == null) {
+        if (ruler == null) {
             return base.getLocalizedName();
         } else {
             return ruler.dist;

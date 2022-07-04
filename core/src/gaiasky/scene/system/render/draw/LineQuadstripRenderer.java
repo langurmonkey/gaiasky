@@ -40,7 +40,6 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     private Array<Line> provLines;
     private final LineArraySorter sorter;
     private final Pool<double[]> doublePool;
-    private final LineEntityRenderSystem lineRenderSystem;
 
     private class MeshDataExt extends MeshData {
         int uvOffset;
@@ -67,7 +66,6 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
 
     public LineQuadstripRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        lineRenderSystem = new LineEntityRenderSystem();
         doublePool = new DoubleArrayPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
         provisionalLines = new Array<>();
         provLines = new Array<>();

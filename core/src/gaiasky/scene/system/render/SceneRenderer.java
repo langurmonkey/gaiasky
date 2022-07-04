@@ -35,7 +35,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.draw.*;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
@@ -121,7 +121,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     public Map<Entity, Matrix4> smCombinedMap;
 
     /** Contains the code to render models. **/
-    private ModelEntityRender shadowModelRenderer;
+    private ModelEntityRenderSystem shadowModelRenderer;
 
     // Light glow pre-render
     private FrameBuffer glowFb;
@@ -149,7 +149,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.globalResources = globalResources;
         this.rendering = new AtomicBoolean(false);
         this.renderAssets = new RenderAssets(globalResources);
-        this.shadowModelRenderer = new ModelEntityRender();
+        this.shadowModelRenderer = new ModelEntityRenderSystem();
     }
 
     @Override

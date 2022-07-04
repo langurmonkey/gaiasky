@@ -21,7 +21,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.SpacecraftRadio;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.MachineDefinition;
@@ -36,7 +36,6 @@ import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
@@ -172,7 +171,7 @@ public class ModelInitializer extends InitSystem {
     }
 
     private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
-        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                 mer.renderSpacecraft(e, m ,b, a, t, r, rg, s, rel);
 
         base.ct = new ComponentTypes(ComponentType.Satellites);
@@ -209,7 +208,7 @@ public class ModelInitializer extends InitSystem {
 
     private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph) {
         if(model.renderConsumer == null) {
-            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+            model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                     mer.renderGenericModel(e, m, b, a, t, r, rg, s, rel);
         }
 
@@ -255,7 +254,7 @@ public class ModelInitializer extends InitSystem {
     }
 
     private void initializePlanet(Base base, Body body, Model model, ModelScaffolding scaffolding, SolidAngle sa, Label label, Atmosphere atmosphere, Cloud cloud) {
-        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                 mer.renderPlanet(e, m ,b, a, t, r, rg, s, rel);
 
         double thPoint = sa.thresholdPoint;

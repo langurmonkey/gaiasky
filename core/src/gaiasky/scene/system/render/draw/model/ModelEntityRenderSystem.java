@@ -17,8 +17,6 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.Environment;
@@ -30,12 +28,11 @@ import gaiasky.util.math.MathUtilsd;
  * Contains the logic to render model entities, the ones that
  * have a {@link Model} component.
  */
-public class ModelEntityRender {
-    private static final Log logger = Logger.getLogger(ModelEntityRender.class);
+public class ModelEntityRenderSystem {
 
     private final ParticleUtils utils;
 
-    public ModelEntityRender() {
+    public ModelEntityRenderSystem() {
         this.utils = new ParticleUtils();
     }
 
@@ -59,9 +56,6 @@ public class ModelEntityRender {
 
                 // Just run consumer.
                 model.renderConsumer.apply(this, entity, model, batch, alpha, t, rc, renderGroup, relativistic, shadow);
-            } else {
-                var base = Mapper.base.get(entity);
-                logger.error("Entity '" + base.getLocalizedName() + "' does not have a model render consumer!");
             }
         }
     }

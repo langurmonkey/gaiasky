@@ -1,6 +1,5 @@
 package gaiasky.scene.entity;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -9,20 +8,13 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
-import gaiasky.render.RenderGroup;
-import gaiasky.render.RenderingContext;
-import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
-import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Environment;

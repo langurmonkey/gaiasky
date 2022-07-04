@@ -16,7 +16,7 @@ import gaiasky.scene.component.Model;
 import gaiasky.scene.entity.GridRecursiveRadio;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -83,7 +83,7 @@ public class GridRecInitializer extends InitSystem {
         gr.d = new Vector3d();
 
         // Init billboard model
-        model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                 mer.renderRecursiveGridModel(e, m ,b, a, t, r, rg, s, rel);
 
         model.model = new ModelComponent();

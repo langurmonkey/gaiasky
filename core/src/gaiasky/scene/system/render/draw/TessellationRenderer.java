@@ -11,7 +11,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;
@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL41;
  */
 public class TessellationRenderer extends AbstractRenderSystem {
     private final IntModelBatch batch;
-    private ModelEntityRender renderObject;
+    private ModelEntityRenderSystem renderObject;
 
     /**
      * Creates a new model batch render component.
@@ -33,7 +33,7 @@ public class TessellationRenderer extends AbstractRenderSystem {
     public TessellationRenderer(RenderGroup rg, float[] alphas, IntModelBatch batch) {
         super(rg, alphas, null);
         this.batch = batch;
-        this.renderObject = new ModelEntityRender();
+        this.renderObject = new ModelEntityRenderSystem();
     }
 
     @Override

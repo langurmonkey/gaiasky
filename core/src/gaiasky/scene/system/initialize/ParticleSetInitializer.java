@@ -16,7 +16,7 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.scene.system.render.draw.model.ModelEntityRender;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
@@ -81,7 +81,7 @@ public class ParticleSetInitializer extends InitSystem {
 
             var model = Mapper.model.get(entity);
             // Star set.
-            model.renderConsumer = (ModelEntityRender mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
+            model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                     mer.renderParticleStarSetModel(e, m, b, a, t, r, rg, s, rel);
 
             // Load model in main thread
