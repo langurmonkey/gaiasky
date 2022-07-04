@@ -687,13 +687,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Init GUIs, step 2
         reinitialiseGUI2();
 
-        // Publish visibility
+        // Publish visibility.
         EventManager.publish(Event.VISIBILITY_OF_COMPONENTS, this, sgr.visible);
 
-        // Key bindings
+        // Key bindings.
         inputMultiplexer.addProcessor(new KeyboardInputController(Gdx.input));
 
+        // Broadcast scene.
         EventManager.publish(Event.SCENE_GRAPH_LOADED, this, sceneGraph);
+        EventManager.publish(Event.SCENE_LOADED, this, scene);
 
         touchSceneGraph();
 

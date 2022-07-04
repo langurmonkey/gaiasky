@@ -24,7 +24,7 @@ public class SceneGraphBuilderSystem extends InitSystem {
     public void initializeEntity(Entity entity) {
         var graph = entity.getComponent(GraphNode.class);
         if (graph.parentName != null)  {
-            var parent = index.getNode(graph.parentName);
+            var parent = index.getEntity(graph.parentName);
             if(parent != null) {
                 addChild(parent, entity, true);
             } else {

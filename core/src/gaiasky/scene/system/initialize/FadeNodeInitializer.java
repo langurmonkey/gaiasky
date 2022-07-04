@@ -37,7 +37,7 @@ public class FadeNodeInitializer extends InitSystem {
     public void setUpEntity(Entity entity) {
         var fade = Mapper.fade.get(entity);
         if (fade.fadePositionObjectName != null) {
-            fade.fadePositionObject = index.getNode(fade.fadePositionObjectName);
+            fade.fadePositionObject = index.getEntity(fade.fadePositionObjectName);
         }
     }
 }

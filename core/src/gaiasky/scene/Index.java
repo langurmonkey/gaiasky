@@ -4,9 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.view.PositionView;
 import gaiasky.scenegraph.Position;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.Star;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
@@ -68,7 +66,7 @@ public class Index {
      *
      * @return The entity, or null if it does not exist.
      */
-    public Entity getNode(String name) {
+    public Entity getEntity(String name) {
         synchronized (index) {
             name = name.toLowerCase().strip();
             Entity entity = index.get(name);
@@ -76,7 +74,12 @@ public class Index {
         }
     }
 
-    public boolean containsNode(String name) {
+    /**
+     * Checks whether the index contains an entity with the given name.
+     * @param name The name of the entity.
+     * @return True if the index contains an entity with the given name. False otherwise.
+     */
+    public boolean containsEntity(String name) {
         synchronized (index) {
             return index.containsKey(name.toLowerCase().trim());
         }

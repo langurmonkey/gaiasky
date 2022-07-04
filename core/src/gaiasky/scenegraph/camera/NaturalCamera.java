@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -29,6 +30,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.component.RotationComponent;
@@ -144,6 +147,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public IFocus focus, focusBak;
 
+    /** The focus view, holding the reference to the current focus entity. **/
+    private FocusView focusView;
+
     /**
      * The tracking object, if any
      */
@@ -205,8 +211,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /** We use this lock to update any attributes of this camera **/
     private final Object updateLock = new Object();
+    /** Has the direction diverted from the focus? **/
     boolean diverted = false;
-    boolean vr = false;
+    /** Whether VR is active or not. **/
+    boolean vr;
 
     /**
      * Flag that marks whether the projection has already been modified.
@@ -253,14 +261,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private Sprite spriteFocus, spriteClosest, spriteHome;
     private Texture crosshairArrow, gravWaveCrosshair;
 
+    /** A reference to the main scene. **/
+    private Scene scene;
+
     public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr, ShaderProgram spriteShader, ShaderProgram shapeShader) {
         super(parent);
-        vrOffset = new Vector3d();
-        vel = new Vector3d();
-        accel = new Vector3d();
-        force = new Vector3b();
-        posBak = new Vector3d();
-        previousOrientation = new Matrix4d();
+        this.vrOffset = new Vector3d();
+        this.vel = new Vector3d();
+        this.accel = new Vector3d();
+        this.force = new Vector3b();
+        this.posBak = new Vector3d();
+        this.previousOrientation = new Matrix4d();
+        this.focusView = new FocusView();
         this.vr = vr;
         initialize(spriteShader, shapeShader);
 
@@ -382,7 +394,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD, Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD, Event.CATALOG_VISIBLE, Event.CATALOG_REMOVE, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD, Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD, Event.CATALOG_VISIBLE, Event.CATALOG_REMOVE, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -1203,6 +1215,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * The speed scaling function.
      *
      * @param min The minimum speed.
+     *
      * @return The speed scaling.
      */
     public double speedScaling(double min) {
@@ -1251,6 +1264,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
+        case SCENE_LOADED:
+            this.scene = (Scene) data[0];
+            break;
         case FOCUS_CHANGE_CMD:
             setTrackingObject(null, null);
             // Check the type of the parameter: IFocus or String
@@ -1262,14 +1278,39 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 centerFocus = (Boolean) data[1];
 
             if (data[0] instanceof String) {
-                SceneGraphNode sgn = GaiaSky.instance.sceneGraph.getNode((String) data[0]);
+                String focusName = (String) data[0];
+
+                // Old scenegraph
+                SceneGraphNode sgn = GaiaSky.instance.sceneGraph.getNode(focusName);
                 if (sgn instanceof IFocus) {
                     focus = (IFocus) sgn;
                     diverted = !centerFocus;
                 }
+
+                // New scene
+                Entity entity = scene.getEntity(focusName);
+                try {
+                    focusView.setEntity(entity);
+                } catch (Exception e) {
+                    // Nothing
+                } finally {
+                    // TODO restore this
+                    //focus = focusView;
+                    diverted = !centerFocus;
+                }
+
             } else if (data[0] instanceof IFocus) {
                 focus = (IFocus) data[0];
                 diverted = !centerFocus;
+            } else if (data[0] instanceof Entity) {
+                try {
+                    focusView.setEntity((Entity) data[0]);
+                } catch (Exception e) {
+                    // Nothing
+                } finally {
+                    focus = focusView;
+                    diverted = !centerFocus;
+                }
             }
             setFocus(focus);
 

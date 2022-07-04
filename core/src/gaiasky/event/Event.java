@@ -907,6 +907,10 @@ public enum Event {
      **/
     SCENE_GRAPH_LOADED,
     /**
+     * Informs the scene has been loaded. Program can start.
+     **/
+    SCENE_LOADED,
+    /**
      * Removes an object from the scene graph. Contains the name of the object or the object itself plus and optional
      * Boolean indicating whether to remove it from the index. Defaults to true.
      */

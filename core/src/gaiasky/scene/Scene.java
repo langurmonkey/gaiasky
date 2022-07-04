@@ -191,7 +191,7 @@ public class Scene {
             // Run once
             runOnce(sceneGraphBuilderSystem);
 
-            GraphNode rootGraph = Mapper.graph.get(index.getNode("Universe"));
+            GraphNode rootGraph = Mapper.graph.get(index.getEntity("Universe"));
             logger.info("Initialized " + (rootGraph.numChildren + 1) + " into the scene graph.");
         }
     }
@@ -401,6 +401,17 @@ public class Scene {
     private Vector3b aux3b = new Vector3b();
 
     /**
+     * Returns the entity with the given name, or null if it does not exist.
+     *
+     * @param name The name of the entity to retrieve.
+     * @return The entity.
+     */
+    public Entity getEntity(String name) {
+       return index.getEntity(name);
+    }
+
+
+    /**
      * Gets the current position of the object identified by the given name.
      * The given position is in the internal reference system and corrects stars
      * for proper motions and other objects for their specific motions as well.
@@ -414,8 +425,8 @@ public class Scene {
     public double[] getObjectPosition(String name, double[] out) {
         if (out.length >= 3 && name != null) {
             name = name.toLowerCase().trim();
-            if (index.containsNode(name)) {
-                Entity entity = index.getNode(name);
+            if (index.containsEntity(name)) {
+                Entity entity = index.getEntity(name);
                 focusView.setEntity(entity);
                 focusView.getAbsolutePosition(name, aux3b);
                 out[0] = aux3b.x.doubleValue();
