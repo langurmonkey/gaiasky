@@ -14,9 +14,11 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Model;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.IsFocusActive;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -39,7 +41,7 @@ import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 /**
  * Initializes star cluster entities.
  */
-public class ClusterInitializer extends InitSystem {
+public class ClusterInitializer extends AbstractInitSystem {
 
     public ClusterInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -51,6 +53,10 @@ public class ClusterInitializer extends InitSystem {
         var body = Mapper.body.get(entity);
         var cluster = Mapper.cluster.get(entity);
         var label = Mapper.label.get(entity);
+        var focus = Mapper.focus.get(entity);
+
+        // Focus active
+        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveCtOpacity(e, b);
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units

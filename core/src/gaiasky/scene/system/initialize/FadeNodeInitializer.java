@@ -9,7 +9,7 @@ import gaiasky.util.math.Vector2d;
 /**
  * Initializes objects with a {@link gaiasky.scene.component.Fade} component.
  */
-public class FadeNodeInitializer extends InitSystem {
+public class FadeNodeInitializer extends AbstractInitSystem {
 
     /** The index reference. **/
     private final Index index;

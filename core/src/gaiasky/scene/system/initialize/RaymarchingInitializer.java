@@ -8,6 +8,8 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.component.Base;
+import gaiasky.scene.view.IsFocusActive;
 import gaiasky.util.Settings;
 
 import java.time.Instant;
@@ -15,7 +17,7 @@ import java.time.Instant;
 /**
  * Initializes invisible and raymarching container entities.
  */
-public class RaymarchingInitializer extends InitSystem {
+public class RaymarchingInitializer extends AbstractInitSystem {
 
     public RaymarchingInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -26,6 +28,10 @@ public class RaymarchingInitializer extends InitSystem {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
+        var focus = Mapper.focus.get(entity);
+
+        // Focus active
+        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
 
         if(graph.parentName == null) {
             graph.parentName = Scene.ROOT_NAME;

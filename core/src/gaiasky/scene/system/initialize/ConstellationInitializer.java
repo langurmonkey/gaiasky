@@ -18,7 +18,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
-public class ConstellationInitializer extends InitSystem {
+public class ConstellationInitializer extends AbstractInitSystem {
 
     public ConstellationInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

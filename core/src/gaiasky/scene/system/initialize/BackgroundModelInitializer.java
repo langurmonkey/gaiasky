@@ -25,7 +25,7 @@ import gaiasky.util.math.Matrix4d;
 /**
  * Initializes background models and UV grid objects.
  */
-public class BackgroundModelInitializer extends InitSystem {
+public class BackgroundModelInitializer extends AbstractInitSystem {
 
     public BackgroundModelInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

@@ -126,7 +126,7 @@ public class GraphUpdater extends EntitySystem implements EntityUpdater {
         }
 
         graph.translation.set(parentTransform);
-        // TODO updateLocalValues() works out body position!
+        /* TODO updateLocalValues() works out body position! */
         // updateLocalValues() method -> can usually run in later systems
         graph.translation.add(body.pos);
 

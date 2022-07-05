@@ -311,7 +311,7 @@ public class Proximity {
         }
 
         @Override
-        public boolean isActive() {
+        public boolean isFocusActive() {
             return true;
         }
 

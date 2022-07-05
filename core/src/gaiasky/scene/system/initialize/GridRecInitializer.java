@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GridRecInitializer extends InitSystem {
+public class GridRecInitializer extends AbstractInitSystem {
     public GridRecInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }

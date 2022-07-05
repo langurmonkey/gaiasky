@@ -737,7 +737,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return pointData.size();
     }
 
-    public boolean isActive() {
+    public boolean isFocusActive() {
         return focusIndex >= 0;
     }
 

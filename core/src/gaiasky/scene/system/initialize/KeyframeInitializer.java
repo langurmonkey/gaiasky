@@ -9,7 +9,7 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.entity.KeyframeUtils;
 import gaiasky.util.color.ColorUtils;
 
-public class KeyframeInitializer extends InitSystem {
+public class KeyframeInitializer extends AbstractInitSystem {
 
     private KeyframeUtils utils;
 

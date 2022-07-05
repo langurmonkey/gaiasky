@@ -16,6 +16,7 @@ import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.*;
@@ -165,7 +166,7 @@ public class ParticleSet implements Component {
     // Last sort position
     public Vector3d lastSortCameraPos, cPosD;
 
-    protected final Vector3d D31 = new Vector3d();
+    public final Vector3d D31 = new Vector3d();
 
     public float[] getColorMin() {
         return ccMin;
@@ -397,6 +398,17 @@ public class ParticleSet implements Component {
      */
     public boolean isVisible(int index) {
         return visibilityArray != null && visibilityArray[index] != (byte) 0;
+    }
+
+    public Vector3b getAbsolutePosition(String name, Vector3b out) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            IParticleRecord pb = pointData.get(idx);
+            out.set(pb.x(), pb.y(), pb.z());
+            return out;
+        } else {
+            return null;
+        }
     }
 
 }

@@ -16,7 +16,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-public class TitleInitializer extends InitSystem {
+public class TitleInitializer extends AbstractInitSystem {
     public TitleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }

@@ -251,14 +251,13 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
 
         Vector3d aux = D32.get();
         aux.set(cam.getUp());
-
         aux.crs(out).nor();
 
         float dist = -0.015f * (float) out.len();
-
         aux.add(cam.getUp()).nor().scl(dist);
 
         out.add(aux);
+
         GlobalResources.applyRelativisticAberration(out, cam);
         RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
     }
@@ -298,7 +297,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
     }
 
     @Override
-    public boolean isActive() {
+    public boolean isFocusActive() {
         return GaiaSky.instance.isOn(ct) && this.opacity > 0;
     }
 

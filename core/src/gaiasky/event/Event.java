@@ -895,12 +895,22 @@ public enum Event {
      * whether to add the object to the scene graph index. Defaults to true.
      **/
     SCENE_GRAPH_ADD_OBJECT_CMD,
+    /**
+     * Sends an object to be added to the scene. Contains the object and an optional Boolean indicating
+     * whether to add the object to the scene index. Defaults to true.
+     **/
+    SCENE_ADD_OBJECT_CMD,
 
     /**
      * Sends an object to be added to a scene graph, without using a post runnable. Contains the object and an optional
      * Boolean indicating whether to add the object to the scene graph index. Defaults to true.
      */
     SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD,
+    /**
+     * Sends an object to be added to a scene, without using a post runnable. Contains the object and an optional
+     * Boolean indicating whether to add the object to the scene index. Defaults to true.
+     */
+    SCENE_ADD_OBJECT_NO_POST_CMD,
 
     /**
      * Informs the scene graph has been loaded. Program can start.
@@ -916,9 +926,18 @@ public enum Event {
      */
     SCENE_GRAPH_REMOVE_OBJECT_CMD,
     /**
+     * Removes an object from the scene. Contains the name of the object or the object itself plus and optional
+     * Boolean indicating whether to remove it from the index. Defaults to true.
+     */
+    SCENE_REMOVE_OBJECT_CMD,
+    /**
      * Recomputes the names of the scene graph objects with the current locale.
      */
     SCENE_GRAPH_RELOAD_NAMES_CMD,
+    /**
+     * Recomputes the names of the scene entities with the current locale.
+     */
+    SCENE_RELOAD_NAMES_CMD,
 
     /**
      * Takes a screenshot. contains the width, height (integers) and the folder name and filename

@@ -10,7 +10,7 @@ import gaiasky.scene.component.tag.TagSetElement;
  * it needs to carry out is tag all children elements with a {@link TagSetElement}
  * component.
  */
-public class OrbitElementsSetInitializer extends InitSystem {
+public class OrbitElementsSetInitializer extends AbstractInitSystem {
 
     public OrbitElementsSetInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

@@ -8,6 +8,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
@@ -40,8 +41,25 @@ public class StarSet extends ParticleSet {
     /** Stars with special label colors. **/
     public Map<Integer, float[]> labelColors;
 
-    private final Vector3d D32 = new Vector3d();
-    private final Vector3d D33 = new Vector3d();
+    public final Vector3d D32 = new Vector3d();
+    public final Vector3d D33 = new Vector3d();
+
+    public Vector3b getAbsolutePosition(String name, Vector3b aux) {
+        Vector3d vec = getAbsolutePosition(name, D31);
+        aux.set(vec);
+        return aux;
+    }
+
+    public Vector3d getAbsolutePosition(String name, Vector3d aux) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            IParticleRecord sb = pointData.get(idx);
+            fetchPosition(sb, null, aux, currDeltaYears);
+            return aux;
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Updates the parameters of the focus, if the focus is active in this group

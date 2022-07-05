@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * Initializes old ParticleGroup and StarGroup objects.
  */
-public class ParticleSetInitializer extends InitSystem {
+public class ParticleSetInitializer extends AbstractInitSystem {
     private static final Log logger = Logger.getLogger(ParticleSetInitializer.class);
 
     private final ParticleUtils utils;

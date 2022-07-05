@@ -20,6 +20,7 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.IsFocusActive;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
@@ -33,7 +34,7 @@ import gaiasky.util.math.Vector3b;
 /**
  * Initializes the old Particle and Star objects.
  */
-public class ParticleInitializer extends InitSystem implements IObserver {
+public class ParticleInitializer extends AbstractInitSystem implements IObserver {
 
     private final ParticleUtils utils;
     private Vector3b B31;
@@ -62,6 +63,10 @@ public class ParticleInitializer extends InitSystem implements IObserver {
         var render = Mapper.renderType.get(entity);
         var hip = Mapper.hip.get(entity);
         var dist = Mapper.distance.get(entity);
+        var focus = Mapper.focus.get(entity);
+
+        // Focus active
+        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
 
         if (hip != null) {
             // Initialize star

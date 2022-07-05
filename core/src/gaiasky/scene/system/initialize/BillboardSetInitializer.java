@@ -2,12 +2,6 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.Method;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaiasky.GaiaSky;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -16,7 +10,6 @@ import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.BillboardSet;
 import gaiasky.scene.entity.BillboardSetRadio;
-import gaiasky.scene.entity.EntityRadio;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -24,16 +17,14 @@ import gaiasky.scenegraph.particle.BillboardDataset;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.List;
 
-public class BillboardSetInitializer extends InitSystem {
+public class BillboardSetInitializer extends AbstractInitSystem {
 
 
     private final Vector3d D31;

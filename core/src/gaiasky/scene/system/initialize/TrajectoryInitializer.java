@@ -4,12 +4,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
-import gaiasky.data.orbit.OrbitFileDataProvider;
-import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
-import gaiasky.data.util.PointCloudData;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
@@ -17,13 +13,12 @@ import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL20;
 
 /**
  * Initializes entities with a {@link Trajectory} component.
  */
-public class TrajectoryInitializer extends InitSystem {
+public class TrajectoryInitializer extends AbstractInitSystem {
 
     /**
      * The trajectory utils instance.

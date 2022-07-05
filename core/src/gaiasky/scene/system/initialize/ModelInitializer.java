@@ -23,6 +23,7 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.SpacecraftRadio;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.IsFocusActive;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Planet;
@@ -48,7 +49,7 @@ import gaiasky.util.math.Vector3d;
  * HeliotropicSatellite, GenericSpacecraft, Spacecraft, Billboard and
  * BillboardGalaxy.
  */
-public class ModelInitializer extends InitSystem {
+public class ModelInitializer extends AbstractInitSystem {
 
     public ModelInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -70,6 +71,7 @@ public class ModelInitializer extends InitSystem {
         var attitude = Mapper.attitude.get(entity);
         var engine = Mapper.engine.get(entity);
         var fade = Mapper.fade.get(entity);
+        var focus = Mapper.focus.get(entity);
 
         boolean isPlanet = atmosphere != null || cloud != null;
         boolean isSatellite = attitude != null;
@@ -94,7 +96,7 @@ public class ModelInitializer extends InitSystem {
         }
 
         // Initialize model body
-        initializeModel(base, body, model, celestial, sa, label, scaffolding, graph);
+        initializeModel(base, body, model, celestial, sa, label, scaffolding, graph, focus);
 
         // Init billboard
         if (isBillboard) {
@@ -206,7 +208,9 @@ public class ModelInitializer extends InitSystem {
         setToMachine(engine.machines[engine.currentMachine], false, body, model, scaffolding, engine);
     }
 
-    private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph) {
+    private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus) {
+        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
+
         if(model.renderConsumer == null) {
             model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
                     mer.renderGenericModel(e, m, b, a, t, r, rg, s, rel);

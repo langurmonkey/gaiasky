@@ -187,7 +187,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         return absmag;
     }
 
-    public boolean isActive() {
+    public boolean isFocusActive() {
         return true;
     }
 

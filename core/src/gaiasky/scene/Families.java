@@ -33,11 +33,12 @@ public class Families {
             constellations,
             boundaries,
             titles,
-    keyframes;
+            keyframes,
+            shapes;
 
     public Families() {
         roots = Family.all(GraphRoot.class).exclude(TagNoProcess.class).get();
-        graphNodes = Family.all(Base.class, GraphNode.class).exclude(TagNoProcess.class,TagOctreeObject.class, TagSetElement.class).get();
+        graphNodes = Family.all(Base.class, GraphNode.class).exclude(TagNoProcess.class, TagOctreeObject.class, TagSetElement.class).get();
         models = Family.all(Base.class, Body.class, Celestial.class, Model.class, ModelScaffolding.class).exclude(TagNoProcess.class).get();
         meshes = Family.all(Base.class, Body.class, Mesh.class, Model.class).exclude(TagNoProcess.class).get();
         particleSets = Family.one(ParticleSet.class, StarSet.class).exclude(TagNoProcess.class, TagOctreeObject.class).get();
@@ -61,6 +62,7 @@ public class Families {
         boundaries = Family.all(Boundaries.class).exclude(TagNoProcess.class).get();
         titles = Family.all(Title.class).exclude(TagNoProcess.class).get();
         keyframes = Family.all(Keyframes.class).exclude(TagNoProcess.class).get();
+        shapes = Family.all(Shape.class).exclude(TagNoProcess.class).get();
     }
 
 }

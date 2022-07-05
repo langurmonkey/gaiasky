@@ -120,7 +120,7 @@ public class FocusView extends BaseView implements IFocus {
     }
 
     @Override
-    public boolean isActive() {
+    public boolean isFocusActive() {
         return false;
     }
 
@@ -276,7 +276,7 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public boolean isCoordinatesTimeOverflow() {
-        return false;
+        return Mapper.coordinates.has(entity) && Mapper.coordinates.get(entity).timeOverflow;
     }
 
     @Override
@@ -291,7 +291,7 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public boolean isCopy() {
-        return false;
+        return base.copy;
     }
 
     @Override

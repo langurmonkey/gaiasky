@@ -5,6 +5,7 @@
 
 package gaiasky;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
@@ -703,7 +704,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.SCENE_GRAPH_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR);
+        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_GRAPH_RELOAD_NAMES_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR);
 
         // Re-enable input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -1580,7 +1581,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case SCENE_GRAPH_ADD_OBJECT_CMD:
             final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
-            final boolean addToIndex = data.length == 1 || (Boolean) data[1];
+            boolean addToIndex = data.length == 1 || (Boolean) data[1];
             if (sceneGraph != null) {
                 postRunnable(() -> {
                     try {
@@ -1591,12 +1592,36 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 });
             }
             break;
+        case SCENE_ADD_OBJECT_CMD:
+            final Entity toAdd = (Entity) data[0];
+            addToIndex = data.length == 1 || (Boolean) data[1];
+            if (scene != null) {
+                postRunnable(() -> {
+                    try {
+                        scene.insert(toAdd, addToIndex);
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+                });
+            }
+            break;
         case SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD:
             final SceneGraphNode nodeToAddp = (SceneGraphNode) data[0];
-            final boolean addToIndexp = data.length == 1 || (Boolean) data[1];
+            boolean addToIndexp = data.length == 1 || (Boolean) data[1];
             if (sceneGraph != null) {
                 try {
                     sceneGraph.insert(nodeToAddp, addToIndexp);
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            }
+            break;
+        case SCENE_ADD_OBJECT_NO_POST_CMD:
+            final Entity toAddPost = (Entity) data[0];
+            addToIndexp = data.length == 1 || (Boolean) data[1];
+            if (scene != null) {
+                try {
+                    scene.insert(toAddPost, addToIndexp);
                 } catch (Exception e) {
                     logger.error(e);
                 }
@@ -1612,13 +1637,33 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 aux = (SceneGraphNode) data[0];
             }
             final SceneGraphNode nodeToRemove = aux;
-            final boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
+            boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
             if (sceneGraph != null) {
                 postRunnable(() -> sceneGraph.remove(nodeToRemove, removeFromIndex));
             }
             break;
+        case SCENE_REMOVE_OBJECT_CMD:
+            Entity toRemove;
+            if (data[0] instanceof String) {
+                toRemove = scene.getEntity((String) data[0]);
+                if (toRemove == null)
+                    return;
+            } else {
+                toRemove = (Entity) data[0];
+            }
+            final Entity entityToRemove = toRemove;
+            removeFromIndex = data.length == 1 || (Boolean) data[1];
+            if (scene != null) {
+                postRunnable(() -> scene.remove(entityToRemove, removeFromIndex));
+            }
+            break;
         case SCENE_GRAPH_RELOAD_NAMES_CMD:
             postRunnable(() -> sceneGraph.getRoot().updateLocalizedNameRecursive());
+            break;
+        case SCENE_RELOAD_NAMES_CMD:
+            postRunnable(() -> {
+                scene.updateLocalizedNames();
+            });
             break;
         case UI_SCALE_CMD:
             if (guis != null) {

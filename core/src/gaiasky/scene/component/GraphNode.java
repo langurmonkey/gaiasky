@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 
@@ -71,6 +72,35 @@ public class GraphNode implements Component {
 
     public void initChildren(int size) {
         children = new Array<>(false, size);
+    }
+
+    /**
+     * Adds a child to the given node and updates the number of children in this
+     * entity and in all ancestors.
+     *
+     * @param me                  The current entity that owns this graph node.
+     * @param child               The child entity to add.
+     * @param updateAncestorCount Whether to update the ancestors number of children.
+     * @param numChildren         The number of children this will hold.
+     */
+    public final void addChild(Entity me, Entity child, boolean updateAncestorCount, int numChildren) {
+        if (this.children == null) {
+            initChildren(numChildren);
+        }
+        this.children.add(child);
+        var childGraph = Mapper.graph.get(child);
+        childGraph.parent = me;
+        this.numChildren++;
+
+        if (updateAncestorCount) {
+            // Update num children in ancestors
+            Entity ancestor = this.parent;
+            while (ancestor != null) {
+                var ancestorGraph = Mapper.graph.get(ancestor);
+                ancestorGraph.numChildren++;
+                ancestor = ancestorGraph.parent;
+            }
+        }
     }
 
     /**

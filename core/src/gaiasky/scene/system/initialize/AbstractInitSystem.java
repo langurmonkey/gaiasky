@@ -7,7 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
-public abstract class InitSystem extends IteratingSystem implements EntityInitializer {
+public abstract class AbstractInitSystem extends IteratingSystem implements EntityInitializer {
     protected Log logger;
 
     protected Engine engineBackup;
@@ -21,13 +21,13 @@ public abstract class InitSystem extends IteratingSystem implements EntityInitia
 
     private InitializerMode mode;
 
-    public InitSystem(boolean setUp, Family family, int priority) {
+    public AbstractInitSystem(boolean setUp, Family family, int priority) {
         super(family, priority);
         this.mode = setUp ? InitializerMode.SETUP : InitializerMode.INIT;
         this.logger = Logger.getLogger(getClass());
     }
 
-    public InitSystem(Family family, int priority) {
+    public AbstractInitSystem(Family family, int priority) {
         // Initialize by default
         this(false, family, priority);
     }

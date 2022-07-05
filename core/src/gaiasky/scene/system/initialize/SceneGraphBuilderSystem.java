@@ -10,7 +10,7 @@ import gaiasky.util.i18n.I18n;
 /**
  * Builds the scene graph once all nodes are in the index.
  */
-public class SceneGraphBuilderSystem extends InitSystem {
+public class SceneGraphBuilderSystem extends AbstractInitSystem {
 
     /** The index reference. **/
     private Index index;

@@ -16,7 +16,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-public class RulerInitializer extends InitSystem {
+public class RulerInitializer extends AbstractInitSystem {
     public RulerInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }

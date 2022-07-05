@@ -253,7 +253,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     }
 
     @Override
-    public boolean isActive() {
+    public boolean isFocusActive() {
         return false;
     }
 

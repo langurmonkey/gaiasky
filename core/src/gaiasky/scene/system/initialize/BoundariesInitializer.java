@@ -7,7 +7,7 @@ import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 
-public class BoundariesInitializer extends InitSystem{
+public class BoundariesInitializer extends AbstractInitSystem {
     public BoundariesInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }

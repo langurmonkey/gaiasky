@@ -21,7 +21,7 @@ import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-public class MeshInitializer extends InitSystem {
+public class MeshInitializer extends AbstractInitSystem {
     public MeshInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }

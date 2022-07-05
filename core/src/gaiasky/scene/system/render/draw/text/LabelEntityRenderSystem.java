@@ -47,6 +47,18 @@ public class LabelEntityRenderSystem {
         nf = new DecimalFormat("0.###E0");
     }
 
+    public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        var body = view.body;
+
+        Vector3d pos = D31;
+        view.textPosition(camera, pos);
+        shader.setUniformf("u_viewAngle", (float) body.viewAngle * 500f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.base.forceLabel);
+    }
+
     public void renderTitle(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         var title = view.getComponent(Title.class);
 
@@ -178,7 +190,7 @@ public class LabelEntityRenderSystem {
         }
     }
 
-    public void renderCluster(LabelView view,  ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+    public void renderCluster(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = D31;
         view.textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", view.base.forceLabel ? 2f : (float) view.body.viewAngle * 500f);

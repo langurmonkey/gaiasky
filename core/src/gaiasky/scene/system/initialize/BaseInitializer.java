@@ -12,7 +12,7 @@ import gaiasky.util.math.Vector3b;
 /**
  * Initializes the base and graph components of entities.
  */
-public class BaseInitializer extends InitSystem {
+public class BaseInitializer extends AbstractInitSystem {
 
     private Scene scene;
 

@@ -2,7 +2,6 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -17,7 +16,7 @@ import java.nio.file.Path;
 /**
  * Initializes objects that have a {@link DatasetDescription} component.
  */
-public class DatasetDescriptionInitializer extends InitSystem {
+public class DatasetDescriptionInitializer extends AbstractInitSystem {
 
     public DatasetDescriptionInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

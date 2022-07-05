@@ -9,8 +9,11 @@ import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scene.view.FocusView;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -150,6 +153,7 @@ public class Scene {
             EntitySystem rulerInit = new RulerInitializer(setUp, families.rulers, priority++);
             EntitySystem titleInit = new TitleInitializer(setUp, families.titles, priority++);
             EntitySystem keyframeInit = new KeyframeInitializer(this, setUp, families.keyframes, priority++);
+            EntitySystem shapeInit = new ShapeInitializer(setUp, families.shapes, priority++);
 
             // Run once
             runOnce(baseInit, particleSetInit, particleInit,
@@ -157,7 +161,7 @@ public class Scene {
                     axesInit, raymarchingInit, fadeInit, datasetDescInit,
                     backgroundInit, clusterInit, constellationInit, boundariesInit,
                     elementsSetInit, meshInit, recGridInit, rulerInit,
-                    titleInit, keyframeInit);
+                    titleInit, keyframeInit, shapeInit);
         }
     }
 
@@ -224,6 +228,7 @@ public class Scene {
             AxesUpdater axesUpdater = new AxesUpdater(families.axes, priority++);
             TitleUpdater titleUpdater = new TitleUpdater(families.titles, priority++);
             KeyframeUpdater keyframeUpdater = new KeyframeUpdater(families.keyframes, priority++);
+            ShapeUpdater shapeUpdater = new ShapeUpdater(families.shapes, priority++);
 
             // Extract systems.
             AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
@@ -243,6 +248,7 @@ public class Scene {
             AbstractExtractSystem axesExtractor = newExtractor(AxesExtractor.class, families.axes, priority++, sceneRenderer);
             AbstractExtractSystem titleExtractor = newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer);
             AbstractExtractSystem keyframeExtractor = newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer);
+            AbstractExtractSystem shapeExtractor = newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer);
 
             // Remove all remaining systems.
             engine.removeAllSystems();
@@ -267,6 +273,7 @@ public class Scene {
             engine.addSystem(axesUpdater);
             engine.addSystem(titleUpdater);
             engine.addSystem(keyframeUpdater);
+            engine.addSystem(shapeUpdater);
 
             // 3. Extract --- these can also run in parallel.
             engine.addSystem(octreeExtractor);
@@ -286,6 +293,7 @@ public class Scene {
             engine.addSystem(axesExtractor);
             engine.addSystem(titleExtractor);
             engine.addSystem(keyframeExtractor);
+            engine.addSystem(shapeExtractor);
         }
     }
 
@@ -379,6 +387,28 @@ public class Scene {
             }
     }
 
+    public void insert(Entity entity, boolean addToIndex) {
+        var base = Mapper.base.get(entity);
+        var graph = Mapper.graph.get(entity);
+        Entity parent = getEntity(graph.parentName);
+        boolean ok = true;
+        if (addToIndex) {
+            ok = index.addToIndex(entity);
+        }
+        if (!ok) {
+            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity).getName() +")"));
+        } else {
+            if (parent != null) {
+                var parentGraph = Mapper.graph.get(parent);
+                parentGraph.addChild(parent, entity, true, 1);
+            } else {
+                throw new RuntimeException(I18n.msg("error.parent.notfound", base.getName(), graph.parentName));
+            }
+        }
+        // Add to engine
+        engine.addEntity(entity);
+    }
+
     /**
      * Removes the given entity from the scene.
      *
@@ -398,18 +428,44 @@ public class Scene {
         }
     }
 
+    /**
+     * Updates the localized names of all entities in the scene.
+     */
+    public void updateLocalizedNames() {
+        var entities = engine.getEntities();
+        engine.getEntities().forEach((entity) -> {
+            var base = Mapper.base.get(entity);
+            base.updateLocalizedName();
+        });
+    }
+
     private Vector3b aux3b = new Vector3b();
 
     /**
      * Returns the entity with the given name, or null if it does not exist.
      *
      * @param name The name of the entity to retrieve.
+     *
      * @return The entity.
      */
     public Entity getEntity(String name) {
-       return index.getEntity(name);
+        return index.getEntity(name);
     }
 
+    /**
+     * Returns the focus entity with the given name, if it exists.
+     *
+     * @param name The name.
+     *
+     * @return The entity.
+     */
+    public Entity findFocus(String name) {
+        Entity entity = getEntity(name);
+        if (Mapper.focus.has(entity))
+            return entity;
+        else
+            return null;
+    }
 
     /**
      * Gets the current position of the object identified by the given name.

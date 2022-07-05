@@ -5,6 +5,7 @@
 
 package gaiasky.script;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
@@ -29,7 +30,14 @@ import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Archetype;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
+import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.system.initialize.BaseInitializer;
+import gaiasky.scene.system.initialize.ShapeInitializer;
 import gaiasky.scene.system.render.extract.TrajectoryExtractor;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -87,6 +95,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private final Set<AtomicBoolean> stops;
 
+    private SceneGraph sceneGraph;
+    private Scene scene;
+
     public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
         this.em = EventManager.instance;
         this.manager = manager;
@@ -106,7 +117,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         aux3b3 = new Vector3b();
         aux2d1 = new Vector2d();
 
-        em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE);
+        em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE, Event.SCENE_LOADED, Event.SCENE_GRAPH_LOADED);
     }
 
     private void initializeTextures() {
@@ -375,7 +386,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             String focusLowerCase = focus.toLowerCase();
             String otherLowerCase = other.toLowerCase();
-            ISceneGraph sceneGraph = GaiaSky.instance.sceneGraph;
             if (sceneGraph.containsNode(focusLowerCase) && sceneGraph.containsNode(otherLowerCase)) {
                 IFocus focusObj = sceneGraph.findFocus(focusLowerCase);
                 IFocus otherObj = sceneGraph.findFocus(otherLowerCase);
@@ -1120,7 +1130,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public SceneGraphNode getObject(String name, double timeOutSeconds) {
-        ISceneGraph sg = GaiaSky.instance.sceneGraph;
+        ISceneGraph sg = sceneGraph;
         SceneGraphNode obj = sg.getNode(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -1146,8 +1156,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private IFocus getFocus(String name) {
-        ISceneGraph sg = GaiaSky.instance.sceneGraph;
-        return sg.findFocus(name.toLowerCase());
+        return sceneGraph.findFocus(name.toLowerCase());
+    }
+
+    private Entity getFocusEntity(String name) {
+        return scene.findFocus(name);
     }
 
     @Override
@@ -1180,7 +1193,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void refreshAllOrbits() {
-        ISceneGraph sg = GaiaSky.instance.sceneGraph;
+        ISceneGraph sg = sceneGraph;
         postRunnable(() -> {
             Array<SceneGraphNode> l = new Array<>();
             sg.getRoot().getChildrenByType(Orbit.class, l);
@@ -1193,7 +1206,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getObjectRadius(String name) {
-        ISceneGraph sg = GaiaSky.instance.sceneGraph;
+        ISceneGraph sg = sceneGraph;
         IFocus obj = sg.findFocus(name.toLowerCase().trim());
         if (obj == null)
             return -1;
@@ -1235,7 +1248,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             String nameLowerCase = name.toLowerCase().trim();
-            ISceneGraph sg = GaiaSky.instance.sceneGraph;
+            ISceneGraph sg = sceneGraph;
             if (sg.containsNode(nameLowerCase)) {
                 IFocus focus = sg.findFocus(nameLowerCase);
                 goToObject(focus, viewAngle, waitTimeSeconds, stop);
@@ -1472,7 +1485,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     void landAtObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
             stops.add(stop);
-            ISceneGraph sg = GaiaSky.instance.sceneGraph;
+            ISceneGraph sg = sceneGraph;
             String nameStub = object.getCandidateName() + " [loc]";
 
             if (!sg.containsNode(nameStub)) {
@@ -3101,39 +3114,103 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void addShapeAroundObject(String shapeName, String shape, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject) {
-        if (checkString(shapeName, "shapeName") && checkStringEnum(shape, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
-            final var shapeLc = shape.toLowerCase();
+    public void addShapeAroundObject(String shapeName, String shapeType, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject) {
+        if (checkString(shapeName, "shapeName") && checkStringEnum(shapeType, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
+            final var shapeLc = shapeType.toLowerCase();
             postRunnable(() -> {
-                IFocus object = getFocus(objectName);
-                float[] color = new float[] { r, g, b, a };
-                int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
-                final ShapeObject shapeObj;
-                if (trackObject) {
-                    shapeObj = new ShapeObject(new String[] { shapeName.trim() }, "Universe", object, objectName, showLabel, color);
-                } else {
-                    shapeObj = new ShapeObject(new String[] { shapeName.trim() }, "Universe", object.getAbsolutePosition(objectName, new Vector3b()), objectName, showLabel, color);
+                // OLD
+                {
+                    IFocus trackingObject = getFocus(objectName);
+                    float[] color = new float[] { r, g, b, a };
+                    int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                    final ShapeObject shapeObj;
+                    if (trackObject) {
+                        shapeObj = new ShapeObject(new String[] { shapeName.trim() }, SceneGraphNode.ROOT_NAME, trackingObject, objectName, showLabel, color);
+                    } else {
+                        shapeObj = new ShapeObject(new String[] { shapeName.trim() }, SceneGraphNode.ROOT_NAME, trackingObject.getAbsolutePosition(objectName, new Vector3b()), objectName, showLabel, color);
+                    }
+                    shapeObj.setLabelcolor(new float[] { r, g, b, a });
+                    shapeObj.ct = new ComponentTypes(ComponentType.Others.ordinal());
+                    shapeObj.size = (float) (size * Constants.KM_TO_U);
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("quality", 25L);
+                    params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 15L);
+                    params.put("recursion", 3L);
+                    params.put("diameter", 1.0);
+                    params.put("width", 1.0);
+                    params.put("height", 1.0);
+                    params.put("depth", 1.0);
+                    params.put("innerradius", 0.6);
+                    params.put("outerradius", 1.0);
+                    params.put("sphere-in-ring", false);
+                    params.put("flip", false);
+                    shapeObj.setModel(shapeLc, primitiveInt, params);
+
+                    shapeObj.doneLoading(GaiaSky.instance.assetManager);
+
+                    EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, shapeObj, false);
                 }
-                shapeObj.setLabelcolor(new float[] { r, g, b, a });
-                shapeObj.ct = new ComponentTypes(ComponentType.Others.ordinal());
-                shapeObj.size = (float) (size * Constants.KM_TO_U);
-                Map<String, Object> params = new HashMap<>();
-                params.put("quality", 25L);
-                params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 15L);
-                params.put("recursion", 3L);
-                params.put("diameter", 1.0);
-                params.put("width", 1.0);
-                params.put("height", 1.0);
-                params.put("depth", 1.0);
-                params.put("innerradius", 0.6);
-                params.put("outerradius", 1.0);
-                params.put("sphere-in-ring", false);
-                params.put("flip", false);
-                shapeObj.setModel(shapeLc, primitiveInt, params);
 
-                shapeObj.doneLoading(GaiaSky.instance.assetManager);
+                // NEW
+                {
+                    Entity trackingObject = getFocusEntity(objectName);
+                    float[] color = new float[] { r, g, b, a };
+                    int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                    // Create shape
+                    Archetype at = scene.archetypes().get(ShapeObject.class.getName());
+                    Entity newShape = at.createEntity();
 
-                EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, shapeObj, false);
+                    var base = Mapper.base.get(newShape);
+                    base.setName(shapeName.trim());
+                    base.ct =  new ComponentTypes(ComponentType.Others.ordinal());
+
+                    var body = Mapper.body.get(newShape);
+                    body.setColor(color);
+                    body.setLabelColor(new float[] { r, g, b, a });
+                    body.size = (float) (size * Constants.KM_TO_U);
+
+                    var graph = Mapper.graph.get(newShape);
+                    graph.setParent(Scene.ROOT_NAME);
+
+                    var shape = Mapper.shape.get(newShape);
+                    if(trackObject) {
+                        shape.track = new FocusView(trackingObject);
+                    } else {
+                        body.pos = EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3b());
+                    }
+                    shape.trackName = objectName;
+
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("quality", 25L);
+                    params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 15L);
+                    params.put("recursion", 3L);
+                    params.put("diameter", 1.0);
+                    params.put("width", 1.0);
+                    params.put("height", 1.0);
+                    params.put("depth", 1.0);
+                    params.put("innerradius", 0.6);
+                    params.put("outerradius", 1.0);
+                    params.put("sphere-in-ring", false);
+                    params.put("flip", false);
+
+                    var model = Mapper.model.get(newShape);
+                    shape.modelShape = shapeLc;
+                    shape.primitiveType = primitiveInt;
+                    shape.modelParams = params;
+
+                    // Initialize shape.
+                    BaseInitializer bi = new BaseInitializer(scene, true, null, 0);
+                    ShapeInitializer si = new ShapeInitializer(true, null, 0);
+
+                    bi.initializeEntity(newShape);
+                    si.initializeEntity(newShape);
+
+                    bi.setUpEntity(newShape);
+                    si.setUpEntity(newShape);
+
+                    // Add to scene.
+                    EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, newShape, false);
+                }
             });
         }
     }
@@ -3302,6 +3379,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 if (stop != null)
                     stop.set(true);
             }
+            break;
+        case SCENE_LOADED:
+            this.scene = (Scene) data[0];
+            break;
+        case SCENE_GRAPH_LOADED:
+            this.sceneGraph = (SceneGraph) data[0];
             break;
         default:
             break;

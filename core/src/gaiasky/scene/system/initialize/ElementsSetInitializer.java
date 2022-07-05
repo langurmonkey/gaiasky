@@ -15,7 +15,7 @@ import gaiasky.scene.entity.ElementsSetRadio;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 
-public class ElementsSetInitializer extends InitSystem {
+public class ElementsSetInitializer extends AbstractInitSystem {
     public ElementsSetInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
     }

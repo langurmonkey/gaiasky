@@ -127,14 +127,15 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             }
             double len = out.len();
             out.clamp(0, len - getRadius()).scl(0.9f);
+            if(Mapper.shape.has(entity)){
+                out.x += getRadius() * 0.5;
+            }
 
             Vector3d aux = D32;
             aux.set(cam.getUp());
-
             aux.crs(out).nor();
 
             float dist = -0.015f * cam.getFovFactor() * (float) out.len();
-
             aux.add(cam.getUp()).nor().scl(dist);
 
             out.add(aux);

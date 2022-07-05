@@ -4,12 +4,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.Scene;
 
 /**
  * Initializes the name and id indices.
  */
-public class IndexInitializer extends InitSystem {
+public class IndexInitializer extends AbstractInitSystem {
 
     /** The index reference. **/
     private Index index;

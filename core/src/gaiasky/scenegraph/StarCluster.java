@@ -363,7 +363,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     @Override
-    public boolean isActive() {
+    public boolean isFocusActive() {
         return GaiaSky.instance.isOn(ct) && this.opacity > 0;
     }
 
@@ -404,7 +404,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     @Override
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
-        if (isActive()) {
+        if (isFocusActive()) {
             Vector3 pos = F31.get();
             Vector3b aux = B31.get();
             Vector3b posb = getAbsolutePosition(aux).add(camera.posinv);
@@ -445,7 +445,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        if (isActive()) {
+        if (isFocusActive()) {
             Vector3b aux = B31.get();
             Vector3b posb = getAbsolutePosition(aux).add(camera.getInversePos());
 

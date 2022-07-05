@@ -9,7 +9,7 @@ import gaiasky.util.Constants;
 /**
  * Initializes location mark entities.
  */
-public class LocInitializer extends InitSystem {
+public class LocInitializer extends AbstractInitSystem {
 
     public LocInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

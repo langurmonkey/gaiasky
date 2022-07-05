@@ -1,6 +1,7 @@
 package gaiasky.scene.system.render.draw.model;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
@@ -93,6 +94,33 @@ public class ModelEntityRenderSystem {
             mc.update(alpha * alphaFactor, relativistic);
             batch.render(mc.instance, mc.env);
         }
+    }
+
+    /**
+     * Renders a wireframe/shape model.
+     *
+     * @param entity       The entity.
+     * @param model        The model component.
+     * @param batch        The batch.
+     * @param alpha        The alpha value.
+     * @param t            The time.
+     * @param rc           The rendering context.
+     * @param renderGroup  The render group.
+     * @param relativistic Whether to apply relativistic effects.
+     * @param shadow       Whether to prepare the shadow environment.
+     */
+    public void renderShape(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
+        var mc = model.model;
+        var base = Mapper.base.get(entity);
+        var body = Mapper.body.get(entity);
+        var graph = Mapper.graph.get(entity);
+
+        mc.update(null, alpha * base.opacity * body.color[3], GL20.GL_ONE, GL20.GL_ONE);
+        // Depth reads, no depth writes
+        mc.setDepthTest(GL20.GL_LEQUAL, false);
+        Gdx.gl20.glLineWidth(1.5f);
+        mc.instance.transform.set(graph.localTransform);
+        batch.render(mc.instance, mc.env);
     }
 
     /**

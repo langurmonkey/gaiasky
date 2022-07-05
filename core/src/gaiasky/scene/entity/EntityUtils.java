@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
@@ -19,7 +20,8 @@ public class EntityUtils {
      * Returns the absolute position of this entity in the native coordinates
      * (equatorial system) and internal units.
      *
-     * @param out Auxiliary vector to put the result in.
+     * @param entity The entity.
+     * @param out    Auxiliary vector to put the result in.
      *
      * @return The vector with the position.
      */
@@ -35,6 +37,28 @@ public class EntityUtils {
                 out.add(Mapper.body.get(e).pos);
             }
             return out;
+        }
+    }
+
+    /**
+     * Returns the absolute position of the entity identified by the given name
+     * within this entity in the native coordinates (equatorial system) and internal units.
+     *
+     * @param entity The entity.
+     * @param name   The name.
+     * @param out    Auxiliary vector to put the result in.
+     *
+     * @return The vector with the position.
+     */
+    public static Vector3b getAbsolutePosition(Entity entity, String name, Vector3b out) {
+        synchronized (entity) {
+            if(Mapper.particleSet.has(entity)) {
+                return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
+            } else if(Mapper.starSet.has(entity)) {
+                return Mapper.starSet.get(entity).getAbsolutePosition(name, out);
+            } else {
+                return getAbsolutePosition(entity, out);
+            }
         }
     }
 

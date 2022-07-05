@@ -98,12 +98,12 @@ public interface IFocus {
     ComponentTypes getCt();
 
     /**
-     * Returns whether this focus object is active or not. Useful for particle
-     * groups.
+     * Returns whether this focus object is active or not. The active status
+     * determines whether the object can be focussed or not.
      *
      * @return The active status.
      */
-    boolean isActive();
+    boolean isFocusActive();
 
     /**
      * Returns the position.

@@ -17,7 +17,7 @@ import gaiasky.util.math.Vector3d;
 /**
  * Initializes axes objects.
  */
-public class AxesInitializer extends InitSystem {
+public class AxesInitializer extends AbstractInitSystem {
 
     public AxesInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
