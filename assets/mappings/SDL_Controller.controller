@@ -1,6 +1,6 @@
 #Controller mappings definition file for a generic SDL controller
 axis.dpad.h=-1
-axis.dpad.v=-1
+axis.dpad.v=1
 axis.lstick.h=0
 axis.lstick.h.sensitivity=1.0
 axis.lstick.v=1
@@ -22,10 +22,10 @@ button.dpad.r=14
 button.dpad.u=11
 button.lb=9
 button.lstick=7
-button.lt=8
+button.lt=-1
 button.rb=10
 button.rstick=8
-button.rt=9
+button.rt=-1
 button.select=4
 button.start=6
 button.x=2

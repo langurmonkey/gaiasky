@@ -98,6 +98,9 @@ public abstract class AbstractCamera implements ICamera {
      */
     protected IFocus closest;
 
+    /** The last input event was by a gamepad. **/
+    protected boolean gamepadInput;
+
     private void initNearFar() {
         CAM_NEAR = 0.5d * Constants.M_TO_U;
         CAM_FAR = Constants.MPC_TO_U;
@@ -400,5 +403,10 @@ public abstract class AbstractCamera implements ICamera {
     @Override
     public void setPreviousProjView(Matrix4 mat) {
         prevCombined.set(mat);
+    }
+
+    @Override
+    public void setGamepadInput(boolean state) {
+        this.gamepadInput = state;
     }
 }

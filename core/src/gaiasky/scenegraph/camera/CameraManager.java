@@ -43,10 +43,6 @@ public class CameraManager implements ICamera, IObserver {
          **/
         GAME_MODE,
         /**
-         * Gaia Scene
-         **/
-        GAIA_SCENE_MODE,
-        /**
          * SPACECRAFT_MODE
          **/
         SPACECRAFT_MODE,
@@ -166,27 +162,26 @@ public class CameraManager implements ICamera, IObserver {
     protected Vector3d velocity, velocityNormalized;
 
     public CameraManager(AssetManager manager, CameraMode mode, boolean vr, GlobalResources globalResources) {
-        // Initialize
         // Initialize Cameras
-        naturalCamera = new NaturalCamera(manager, this, vr, globalResources.getSpriteShader(), globalResources.getShapeShader());
-        fovCamera = new FovCamera(manager, this, globalResources.getSpriteBatch());
-        spacecraftCamera = new SpacecraftCamera(this);
-        relativisticCamera = new RelativisticCamera(manager, this);
+        this.naturalCamera = new NaturalCamera(manager, this, vr, globalResources.getSpriteShader(), globalResources.getShapeShader());
+        this.fovCamera = new FovCamera(manager, this, globalResources.getSpriteBatch());
+        this.spacecraftCamera = new SpacecraftCamera(this);
+        this.relativisticCamera = new RelativisticCamera(manager, this);
 
-        cameras = new ICamera[]{naturalCamera, fovCamera, spacecraftCamera};
+        this.cameras = new ICamera[]{naturalCamera, fovCamera, spacecraftCamera};
 
         this.mode = mode;
-        lastPos = new Vector3d();
-        in = new Vector3d();
-        inb = new Vector3b();
-        out = new Vector3d();
-        vec = new Vector3();
-        v0 = new Vector3();
-        v1 = new Vector3();
-        isec = new Vector3();
-        velocity = new Vector3d();
-        velocityNormalized = new Vector3d();
-        localTransformInv = new Matrix4();
+        this.lastPos = new Vector3d();
+        this.in = new Vector3d();
+        this.inb = new Vector3b();
+        this.out = new Vector3d();
+        this.vec = new Vector3();
+        this.v0 = new Vector3();
+        this.v1 = new Vector3();
+        this.isec = new Vector3();
+        this.velocity = new Vector3d();
+        this.velocityNormalized = new Vector3d();
+        this.localTransformInv = new Matrix4();
 
         updateCurrentCamera();
 
@@ -213,7 +208,6 @@ public class CameraManager implements ICamera, IObserver {
                 EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, false );
             case FREE_MODE:
             case FOCUS_MODE:
-            case GAIA_SCENE_MODE:
                 aux = backupCam(current);
                 current = naturalCamera;
                 restoreCam(naturalCamera, aux);
@@ -305,6 +299,11 @@ public class CameraManager implements ICamera, IObserver {
 
     public void swapBuffers(){
         current.swapBuffers();
+    }
+
+    @Override
+    public void setGamepadInput(boolean state) {
+        current.setGamepadInput(state);
     }
 
     /**
@@ -427,13 +426,13 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Runs on each camera after a mode change.
      */
-    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
         previousMode = this.mode;
         previousCam = this.current;
-        this.mode = mode;
+        this.mode = newMode;
         updateCurrentCamera();
         for (ICamera cam : cameras) {
-            cam.updateMode(previousCam, previousMode, mode, centerFocus, postEvent);
+            cam.updateMode(previousCam, previousMode, newMode, centerFocus, postEvent);
         }
 
         if (postEvent) {
@@ -445,11 +444,11 @@ public class CameraManager implements ICamera, IObserver {
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case CAMERA_MODE_CMD -> {
-            CameraMode cm = (CameraMode) data[0];
+            CameraMode newCameraMode = (CameraMode) data[0];
             boolean centerFocus = true;
             if (data.length > 1)
                 centerFocus = (Boolean) data[1];
-            updateMode(current, this.mode, cm, centerFocus, true);
+            updateMode(current, this.mode, newCameraMode, centerFocus, true);
         }
         case FOV_CHANGE_NOTIFICATION -> updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         default -> {
