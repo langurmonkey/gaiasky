@@ -149,16 +149,9 @@ public class Index {
                         }
                     }
 
-                    // Particle sets add names of each particle
-                    ParticleSet particleSet = Mapper.particleSet.get(entity);
-                    if (particleSet != null) {
-                        if (particleSet.index != null) {
-                            Set<String> keys = particleSet.index.keySet();
-                            for (String key : keys) {
-                                index.put(key, entity);
-                            }
-                        }
-                    }
+                    // Particle/star sets add names of each contained particle.
+                    addParticleSet(entity, Mapper.particleSet.get(entity));
+                    addParticleSet(entity, Mapper.starSet.get(entity));
 
                 }
             }
@@ -167,6 +160,17 @@ public class Index {
             logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity).getName() + ")"));
         }
         return ok;
+    }
+
+    private void addParticleSet(Entity entity, ParticleSet particleSet) {
+        if (particleSet != null) {
+            if (particleSet.index != null) {
+                Set<String> keys = particleSet.index.keySet();
+                for (String key : keys) {
+                    index.put(key, entity);
+                }
+            }
+        }
     }
 
     public Map<Integer, IPosition> getHipMap() {

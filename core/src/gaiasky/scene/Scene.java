@@ -434,7 +434,6 @@ public class Scene {
      * Updates the localized names of all entities in the scene.
      */
     public void updateLocalizedNames() {
-        var entities = engine.getEntities();
         engine.getEntities().forEach((entity) -> {
             var base = Mapper.base.get(entity);
             base.updateLocalizedName();

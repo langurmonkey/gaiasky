@@ -4,6 +4,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Octant;
+import gaiasky.scene.view.OctreeObjectView;
+import gaiasky.util.tree.OctreeNode;
 
 /**
  * Initializes the name and id indices.
@@ -24,16 +27,39 @@ public class IndexInitializer extends AbstractInitSystem {
         index.addToIndex(entity);
 
         // Unwrap octree objects
-        if (Mapper.octant.has(entity)) {
+        if (Mapper.octree.has(entity)) {
+            var octree = Mapper.octree.get(entity);
             var octant = Mapper.octant.get(entity);
-            // TODO add all children to index
-            //for (SceneGraphNode ownode : ow.children) {
-            //    addToIndex(ownode);
-            //}
+            initializeOctant(octant.octant);
         }
 
         // Add entity to HIP map, for constellations
         index.addToHipMap(entity);
+
+    }
+
+    private void initializeOctant(OctreeNode octant) {
+        if (octant != null) {
+
+            // Add objects to index.
+            if(octant.objects != null) {
+                octant.objects.forEach((object) -> {
+                    if (object instanceof OctreeObjectView) {
+                        index.addToIndex(((OctreeObjectView) object).getEntity());
+                    }
+                });
+            }
+
+            // Process children octants.
+            if(octant.children != null) {
+                for(OctreeNode child : octant.children) {
+                    if(child != null) {
+                        initializeOctant(child);
+                    }
+                }
+            }
+        }
+        ;
 
     }
 
