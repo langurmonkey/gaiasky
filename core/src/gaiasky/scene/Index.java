@@ -3,17 +3,17 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.view.PositionView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Position;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Contains the index of objects. For each object name, the index keeps a reference to the
@@ -25,6 +25,7 @@ public class Index {
 
     /** Quick lookup map. Name to node. **/
     protected Map<String, Entity> index;
+
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations.
@@ -76,7 +77,9 @@ public class Index {
 
     /**
      * Checks whether the index contains an entity with the given name.
+     *
      * @param name The name of the entity.
+     *
      * @return True if the index contains an entity with the given name. False otherwise.
      */
     public boolean containsEntity(String name) {
@@ -254,6 +257,47 @@ public class Index {
             for (String key : keys) {
                 index.remove(key);
             }
+        }
+    }
+
+    /**
+     * Returns focus entities in this index matching the given string by name, to a maximum
+     * of <code>maxResults</code>. The <code>abort</code> atomic boolean can be used to stop
+     * the computation.
+     *
+     * @param name       The name.
+     * @param results    The set where the results are to be stored.
+     * @param maxResults The maximum number of results.
+     * @param abort      To enable abortion mid-computation.
+     */
+    public synchronized void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
+        Set<String> keys = index.keySet();
+        name = name.toLowerCase().trim();
+
+        int i = 0;
+        // Starts with
+        for (String key : keys) {
+            if (abort != null && abort.get())
+                return;
+            Entity entity = index.get(key);
+            if (Mapper.focus.has(entity) && key.startsWith(name)) {
+                results.add(key);
+                i++;
+            }
+            if (i >= maxResults)
+                return;
+        }
+        // Contains
+        for (String key : keys) {
+            if (abort != null && abort.get())
+                return;
+            Entity entity = index.get(key);
+            if (Mapper.focus.has(entity) && key.contains(name)) {
+                results.add(key);
+                i++;
+            }
+            if (i >= maxResults)
+                return;
         }
     }
 }

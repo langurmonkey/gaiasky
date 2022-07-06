@@ -51,7 +51,7 @@ public class SceneGraph implements ISceneGraph {
         root.names = new String[] { SceneGraphNode.ROOT_NAME };
 
         // String-to-node map
-        index = new HashMap<>((int)(numNodes * 1.25));
+        index = new HashMap<>((int) (numNodes * 1.25));
         // HIP map with 121k * 1.25
         hipMap = new HashMap<>(151250);
 
@@ -118,7 +118,7 @@ public class SceneGraph implements ISceneGraph {
             ok = addToIndex(node);
         }
         if (!ok) {
-            logger.warn(I18n.msg("error.object.exists", node.getName() + "(" + node.getClass().getSimpleName().toLowerCase() +")"));
+            logger.warn(I18n.msg("error.object.exists", node.getName() + "(" + node.getClass().getSimpleName().toLowerCase() + ")"));
         } else {
             if (parent != null) {
                 parent.addChild(node, true);

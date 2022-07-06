@@ -20,6 +20,7 @@ import gaiasky.data.SceneGraphJsonLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer;
+import gaiasky.scene.Scene;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -48,6 +49,43 @@ import java.util.ArrayList;
  */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
+
+
+    private Skin skin;
+
+    private PreferencesWindow preferencesWindow;
+    private AboutWindow aboutWindow;
+    private SearchDialog searchDialog;
+
+    /**
+     * Keyframes window
+     **/
+    private KeyframesWindow keyframesWindow;
+
+    /**
+     * Individual visibility
+     */
+    private IndividualVisibilityWindow indVisWindow;
+
+    /**
+     * Mode change info popup
+     */
+    public Table modeChangeTable;
+
+    private RemoveActorThread removeActorThread;
+
+    /**
+     * Last open location
+     */
+    private Path lastOpenLocation;
+
+    /* Slave config window */
+    private SlaveConfigWindow slaveConfigWindow;
+
+    /** Scene graph reference. **/
+    protected final ISceneGraph sceneGraph;
+    /** Scene reference. **/
+    protected final Scene scene;
 
     /**
      * Registered GUI array
@@ -81,10 +119,11 @@ public class GuiRegistry implements IObserver {
     /**
      * Create new GUI registry object.
      */
-    public GuiRegistry(final Skin skin, final ISceneGraph sceneGraph, final CatalogManager catalogManager) {
+    public GuiRegistry(final Skin skin, final ISceneGraph sceneGraph, final Scene scene,  final CatalogManager catalogManager) {
         super();
         this.skin = skin;
         this.sceneGraph = sceneGraph;
+        this.scene = scene;
         this.guis = new Array<>(true, 2);
         this.catalogManager = catalogManager;
         // Windows which are visible from any GUI
@@ -275,40 +314,6 @@ public class GuiRegistry implements IObserver {
         }
     }
 
-    private Skin skin;
-
-    private PreferencesWindow preferencesWindow;
-    private AboutWindow aboutWindow;
-    private SearchDialog searchDialog;
-
-    /**
-     * Keyframes window
-     **/
-    private KeyframesWindow keyframesWindow;
-
-    /**
-     * Individual visibility
-     */
-    private IndividualVisibilityWindow indVisWindow;
-
-    /**
-     * Mode change info popup
-     */
-    public Table modeChangeTable;
-
-    private RemoveActorThread removeActorThread;
-
-    /**
-     * Last open location
-     */
-    private Path lastOpenLocation;
-
-    /* Slave config window */
-    private SlaveConfigWindow slaveConfigWindow;
-
-    // Scene Graph
-    protected final ISceneGraph sceneGraph;
-
     public void dispose() {
         EventManager.instance.removeAllSubscriptions(this);
         if (searchDialog != null)
@@ -323,7 +328,7 @@ public class GuiRegistry implements IObserver {
             switch (event) {
             case SHOW_SEARCH_ACTION:
                 if (searchDialog == null) {
-                    searchDialog = new SearchDialog(skin, ui, sceneGraph, true);
+                    searchDialog = new SearchDialog(skin, ui, sceneGraph, scene, true);
                 } else {
                     searchDialog.clearText();
                 }

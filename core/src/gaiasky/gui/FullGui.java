@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.scene.Scene;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -75,6 +76,7 @@ public class FullGui extends AbstractGui {
     protected float pad, pad5;
 
     protected ISceneGraph sg;
+    protected Scene scene;
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
 
@@ -540,6 +542,9 @@ public class FullGui extends AbstractGui {
 
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
+    }
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
     @Override

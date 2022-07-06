@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Scene;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
@@ -52,6 +53,7 @@ public class SearchDialog extends GenericDialog {
     private Cell<?> infoCell;
     private OwnLabel infoMessage;
     private final ISceneGraph sg;
+    private final Scene scene;
     // Matching nodes
     private final SortedSet<String> matching;
     private Array<OwnLabel> matchingLabels;
@@ -62,9 +64,10 @@ public class SearchDialog extends GenericDialog {
 
     private final Array<Task> tasks;
 
-    public SearchDialog(Skin skin, Stage ui, final ISceneGraph sg, boolean suggestions) {
+    public SearchDialog(Skin skin, Stage ui, final ISceneGraph sg, final Scene scene, boolean suggestions) {
         super(I18n.msg("gui.objects.search"), skin, ui);
         this.sg = sg;
+        this.scene = scene;
         this.aux = new Vector2();
         this.matching = new TreeSet<>();
         this.matchingLabels = new Array<>(10);
@@ -136,10 +139,11 @@ public class SearchDialog extends GenericDialog {
                                 public void run() {
                                     synchronized (matching) {
                                         matchingNodes(name, sg);
+                                        matchingNodes(name, scene);
+
                                         if (!matching.isEmpty()) {
                                             cIdx = -1;
                                             candidates.clear();
-                                            int n = matching.size();
                                             matching.stream().forEach(match -> {
                                                 OwnLabel m = new OwnLabel(match, skin);
                                                 m.addListener((evt) -> {
@@ -264,6 +268,11 @@ public class SearchDialog extends GenericDialog {
         matching.clear();
         matchingLabels.clear();
         sg.matchingFocusableNodes(text, matching, 10, null);
+    }
+    private void matchingNodes(String text, Scene scene) {
+        matching.clear();
+        matchingLabels.clear();
+        scene.matchingFocusableNodes(text, matching, 10, null);
     }
 
     private boolean checkString(String text, ISceneGraph sg) {

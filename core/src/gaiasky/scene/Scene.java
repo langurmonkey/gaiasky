@@ -20,6 +20,8 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents a scene, contains and manages the engine. The engine contains
@@ -465,6 +467,30 @@ public class Scene {
             return entity;
         else
             return null;
+    }
+
+    /**
+     * Returns focus entities matching the given string by name, to a maximum
+     * of 10 results.
+     *
+     * @param name       The name.
+     * @param results    The set where the results are to be stored.
+     */
+    public void findMatchingFocusEntity(String name, SortedSet<String> results) {
+        index.matchingFocusableNodes(name, results, 10, null);
+    }
+
+    /**
+     * Returns focus entities matching the given string by name, to a maximum
+     * of <code>maxResults</code>.
+     *
+     * @param name       The name.
+     * @param results    The set where the results are to be stored.
+     * @param maxResults The maximum number of results.
+     * @param abort      To enable abortion mid-computation.
+     */
+    public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
+        index.matchingFocusableNodes(name, results, maxResults, abort);
     }
 
     /**
