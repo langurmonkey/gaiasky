@@ -1981,7 +1981,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     if (event instanceof ChangeEvent) {
                         // Get currently selected mappings
                         ControllerMappings cm = new ControllerMappings(controllerName, Path.of(controllerMappings.getSelected().file));
-                        ControllerConfigWindow ccw = new ControllerConfigWindow(controllerName, cm, stage, skin);
+                        GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, cm, stage, skin);
                         ccw.setAcceptRunnable(() -> {
                             if (ccw.savedFile != null) {
                                 // File was saved, reload, select

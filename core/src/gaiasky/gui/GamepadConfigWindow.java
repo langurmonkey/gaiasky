@@ -33,10 +33,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Dialog to configure a controller interactively
+ * Dialog to configure a gamepad interactively.
  */
-public class ControllerConfigWindow extends GenericDialog implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(ControllerConfigWindow.class);
+public class GamepadConfigWindow extends GenericDialog implements IObserver {
+    private static final Logger.Log logger = Logger.getLogger(GamepadConfigWindow.class);
 
     private final String none;
     private final String button;
@@ -108,8 +108,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         }
     }
 
-
-    public ControllerConfigWindow(String controllerName, ControllerMappings mappings, Stage stage, Skin skin) {
+    public GamepadConfigWindow(String controllerName, ControllerMappings mappings, Stage stage, Skin skin) {
         super("Configure controller: " + controllerName, skin, stage);
         this.controllerName = controllerName;
         this.mappings = mappings;
@@ -168,45 +167,44 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         inputFields = new HashMap<>();
         inputInfo = new HashMap<>();
         // Buttons
-        inputInfo.put(Gamepad.A, new Trio<>(a, new float[]{310, -50}, I18n.msg("gui.controller.action.primary")));
-        inputInfo.put(Gamepad.B, new Trio<>(b, new float[]{397, -120}, I18n.msg("gui.controller.action.back")));
-        inputInfo.put(Gamepad.X, new Trio<>(x, new float[]{227, -120}, I18n.msg("gui.controller.action.secondary")));
-        inputInfo.put(Gamepad.Y, new Trio<>(y, new float[]{310, -190}, I18n.msg("gui.controller.action.tertiary")));
+        inputInfo.put(Gamepad.A, new Trio<>(a, new float[] { 310, -50 }, I18n.msg("gui.controller.action.primary")));
+        inputInfo.put(Gamepad.B, new Trio<>(b, new float[] { 397, -120 }, I18n.msg("gui.controller.action.back")));
+        inputInfo.put(Gamepad.X, new Trio<>(x, new float[] { 227, -120 }, I18n.msg("gui.controller.action.secondary")));
+        inputInfo.put(Gamepad.Y, new Trio<>(y, new float[] { 310, -190 }, I18n.msg("gui.controller.action.tertiary")));
         // Left stick
-        inputInfo.put(Gamepad.LSTICK, new Trio<>(stick, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.click")));
-        inputInfo.put(Gamepad.LSTICK_H, new Trio<>(stickH, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.horizontal")));
-        inputInfo.put(Gamepad.LSTICK_V, new Trio<>(stickV, new float[]{-322, -122}, I18n.msg("gui.controller.lstick.vertical")));
+        inputInfo.put(Gamepad.LSTICK, new Trio<>(stick, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.click")));
+        inputInfo.put(Gamepad.LSTICK_H, new Trio<>(stickH, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.horizontal")));
+        inputInfo.put(Gamepad.LSTICK_V, new Trio<>(stickV, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.vertical")));
         // Right stick
-        inputInfo.put(Gamepad.RSTICK, new Trio<>(stick, new float[]{160, 50}, I18n.msg("gui.controller.rstick.click")));
-        inputInfo.put(Gamepad.RSTICK_H, new Trio<>(stickH, new float[]{160, 50}, I18n.msg("gui.controller.rstick.horizontal")));
-        inputInfo.put(Gamepad.RSTICK_V, new Trio<>(stickV, new float[]{160, 50}, I18n.msg("gui.controller.rstick.vertical")));
+        inputInfo.put(Gamepad.RSTICK, new Trio<>(stick, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.click")));
+        inputInfo.put(Gamepad.RSTICK_H, new Trio<>(stickH, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.horizontal")));
+        inputInfo.put(Gamepad.RSTICK_V, new Trio<>(stickV, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.vertical")));
         // Dpad
-        inputInfo.put(Gamepad.DPAD_UP, new Trio<>(dPadU, new float[]{-155, 10}, I18n.msg("gui.controller.dpad.up")));
-        inputInfo.put(Gamepad.DPAD_DOWN, new Trio<>(dPadD, new float[]{-155, 85}, I18n.msg("gui.controller.dpad.down")));
-        inputInfo.put(Gamepad.DPAD_LEFT, new Trio<>(dPadL, new float[]{-194, 49}, I18n.msg("gui.controller.dpad.left")));
-        inputInfo.put(Gamepad.DPAD_RIGHT, new Trio<>(dPadR, new float[]{-120, 49}, I18n.msg("gui.controller.dpad.right")));
+        inputInfo.put(Gamepad.DPAD_UP, new Trio<>(dPadU, new float[] { -155, 10 }, I18n.msg("gui.controller.dpad.up")));
+        inputInfo.put(Gamepad.DPAD_DOWN, new Trio<>(dPadD, new float[] { -155, 85 }, I18n.msg("gui.controller.dpad.down")));
+        inputInfo.put(Gamepad.DPAD_LEFT, new Trio<>(dPadL, new float[] { -194, 49 }, I18n.msg("gui.controller.dpad.left")));
+        inputInfo.put(Gamepad.DPAD_RIGHT, new Trio<>(dPadR, new float[] { -120, 49 }, I18n.msg("gui.controller.dpad.right")));
         // Start/select
-        inputInfo.put(Gamepad.START, new Trio<>(startSelect, new float[]{75, -170}, I18n.msg("gui.controller.start")));
-        inputInfo.put(Gamepad.SELECT, new Trio<>(startSelect, new float[]{-75, -170}, I18n.msg("gui.controller.select")));
+        inputInfo.put(Gamepad.START, new Trio<>(startSelect, new float[] { 75, -170 }, I18n.msg("gui.controller.start")));
+        inputInfo.put(Gamepad.SELECT, new Trio<>(startSelect, new float[] { -75, -170 }, I18n.msg("gui.controller.select")));
         // Bumpers
-        inputInfo.put(Gamepad.LB, new Trio<>(lb, new float[]{-322, -282}, I18n.msg("gui.controller.lb")));
-        inputInfo.put(Gamepad.RB, new Trio<>(rb, new float[]{322, -282}, I18n.msg("gui.controller.rb")));
+        inputInfo.put(Gamepad.LB, new Trio<>(lb, new float[] { -322, -282 }, I18n.msg("gui.controller.lb")));
+        inputInfo.put(Gamepad.RB, new Trio<>(rb, new float[] { 322, -282 }, I18n.msg("gui.controller.rb")));
         // Triggers
-        inputInfo.put(Gamepad.LT, new Trio<>(lt, new float[]{-354, -265}, I18n.msg("gui.controller.lt")));
-        inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[]{354, -265}, I18n.msg("gui.controller.rt")));
+        inputInfo.put(Gamepad.LT, new Trio<>(lt, new float[] { -354, -265 }, I18n.msg("gui.controller.lt")));
+        inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[] { 354, -265 }, I18n.msg("gui.controller.rt")));
 
         // Remove all controller listeners
         Settings.settings.controls.gamepad.removeAllControllerListeners();
 
         // Park our own
-        ConfigControllerListener ccl = new ConfigControllerListener();
+        ConfigGamepadListener ccl = new ConfigGamepadListener();
         Settings.settings.controls.gamepad.addControllerListener(ccl);
 
         // Build UI
         buildSuper();
 
     }
-
 
     @Override
     protected void build() {
@@ -344,7 +342,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     }
 
     private String getMappingsValue(Gamepad gpd, ControllerMappings m) {
-        if(m == null)
+        if (m == null)
             return none;
 
         String b = button + " ";
@@ -489,22 +487,24 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
             elementCell.clearActor();
         }
     }
+
     /**
-     * Returns an integer array with [0] the code and [1] the type
+     * Returns an integer array with [0] the code and [1] the type.
      *
-     * @param gp The gamepad input
-     * @return The array with the configuration
+     * @param gp The gamepad input.
+     *
+     * @return The array with the configuration.
      */
     protected int[] getInput(Gamepad gp) {
         OwnTextField i = inputFields.get(gp);
         String text = i.getText();
         if (text.equalsIgnoreCase(none)) {
-            return new int[]{-1, -1};
+            return new int[] { -1, -1 };
         } else {
             String[] tokens = text.split("\\s+");
             if (tokens.length != 2) {
                 logger.error("Failed to parse " + gp);
-                return new int[]{-1, -1};
+                return new int[] { -1, -1 };
             } else {
                 try {
                     int code = Parser.parseIntException(tokens[1]);
@@ -516,10 +516,10 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
                             type = TYPE_AXIS;
                         }
                     }
-                    return new int[]{code, type};
+                    return new int[] { code, type };
                 } catch (Exception e) {
                     logger.error("Failed to parse " + gp);
-                    return new int[]{-1, -1};
+                    return new int[] { -1, -1 };
                 }
             }
         }
@@ -624,12 +624,15 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     public void notify(final Event event, Object source, final Object... data) {
     }
 
-    private class ConfigControllerListener implements ControllerListener {
+    /**
+     * Listens to gamepad input events in order to configure the axes and buttons.
+     */
+    private class ConfigGamepadListener implements ControllerListener {
         boolean capturingAxis = false;
         long lastT = System.currentTimeMillis();
         long lastAxisT = System.currentTimeMillis();
-        long minDelayT = 400;
-        long minAxisT = 500;
+        long minDelayT = 800;
+        long minAxisT = 800;
         double[] axes = new double[40];
 
         @Override

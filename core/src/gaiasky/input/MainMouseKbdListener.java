@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
@@ -28,9 +28,9 @@ import java.util.Comparator;
 import java.util.Objects;
 
 /**
- * Input listener for the natural camera.
+ * Mouse and keyboard input listener for the natural camera.
  */
-public class NaturalMouseKbdListener extends MouseKbdListener implements IObserver {
+public class MainMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
 
     /**
      * The button for rotating the camera either around its center or around the
@@ -83,8 +83,10 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
     /** We're dragging or selecting a keyframe **/
     private boolean keyframeBeingDragged = false;
 
+    private final NaturalCamera camera;
+
     protected static class GaiaGestureListener extends GestureAdapter {
-        public NaturalMouseKbdListener inputListener;
+        public MainMouseKbdListener inputListener;
         private float previousZoom;
 
         @Override
@@ -130,11 +132,11 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
     public final GaiaGestureListener gestureListener;
 
-    protected NaturalMouseKbdListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
+    protected MainMouseKbdListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
         super(gestureListener, camera);
+        this.camera = camera;
         this.gestureListener = gestureListener;
         this.gestureListener.inputListener = this;
-        this.camera = camera;
         this.comp = new ViewAngleComparator<>();
         // 1% of width
         this.MOVE_PX_DIST = (float) Math.max(5, Gdx.graphics.getWidth() * 0.01);
@@ -149,7 +151,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
         this.lastDrag = new Vector2();
     }
 
-    public NaturalMouseKbdListener(final NaturalCamera camera) {
+    public MainMouseKbdListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
         EventManager.instance.subscribe(this, Event.TOUCH_DOWN, Event.TOUCH_UP, Event.TOUCH_DRAGGED, Event.SCROLLED, Event.KEY_DOWN, Event.KEY_UP);
     }
@@ -245,7 +247,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                 }
             }
         }
-        camera.setInputByController(false);
+        camera.setGamepadInput(false);
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
@@ -311,7 +313,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
             this.button = -1;
         }
-        camera.setInputByController(false);
+        camera.setGamepadInput(false);
         return super.touchUp(screenX, screenY, pointer, button);
     }
 
@@ -360,7 +362,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
             if (dragDx != 0)
                 camera.addForwardForce(dragDx);
         }
-        camera.setInputByController(false);
+        camera.setGamepadInput(false);
         return false;
     }
 
@@ -394,7 +396,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
     public boolean zoom(float amount) {
         if (alwaysScroll)
             camera.addForwardForce(amount);
-        camera.setInputByController(false);
+        camera.setGamepadInput(false);
         return false;
     }
 

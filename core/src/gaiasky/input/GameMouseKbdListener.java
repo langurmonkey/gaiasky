@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -14,17 +14,18 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.ModePopupInfo;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
 import org.lwjgl.glfw.GLFW;
 
-public class GameMouseKbdListener extends MouseKbdListener implements IObserver {
-    private static final Log logger = Logger.getLogger(GameMouseKbdListener.class);
-
+/**
+ * Mouse and keyboard input listener for the natural camera in game mode.
+ */
+public class GameMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
     private float prevX = 0, prevY = 0;
     private float dx = 0, dy = 0;
     private boolean prevValid = false;
+    private final NaturalCamera camera;
 
     private static class GameGestureListener extends GestureAdapter {
         private GameGestureListener() {
@@ -33,6 +34,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     public GameMouseKbdListener(GameGestureListener l, NaturalCamera naturalCamera) {
         super(l, naturalCamera);
+        this.camera = naturalCamera;
         EventManager.instance.subscribe(this, Event.MOUSE_CAPTURE_CMD, Event.MOUSE_CAPTURE_TOGGLE);
     }
 
@@ -49,7 +51,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         if (anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)) {
             camera.vel.setZero();
             if (anyPressed(Keys.Q, Keys.E, Keys.SPACE, Keys.C)) {
-                camera.setInputByController(false);
+                camera.setGamepadInput(false);
             }
         }
 
@@ -162,7 +164,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
         camera.addPitch(dy, true);
 
         updatePreviousMousePosition(x, y);
-        camera.setInputByController(false);
+        camera.setGamepadInput(false);
         return true;
     }
 

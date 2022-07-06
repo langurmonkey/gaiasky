@@ -3,24 +3,28 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.gui;
+package gaiasky.input;
 
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.IntSet;
-import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.gui.IInputListener;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 
-public abstract class MouseKbdListener extends GestureDetector implements IInputListener {
+/**
+ * Abstract mouse and keyboard input listener. Provides tracking of pressed keys.
+ */
+public abstract class AbstractMouseKbdListener extends GestureDetector implements IInputListener {
 
-    protected NaturalCamera camera;
+    protected ICamera iCamera;
     /** Holds the pressed keys at any moment **/
     protected IntSet pressedKeys;
 
 
-    protected MouseKbdListener(GestureListener gl, NaturalCamera camera){
+    protected AbstractMouseKbdListener(GestureListener gl, ICamera camera){
         super(gl);
         pressedKeys = new IntSet();
-        this.camera = camera;
+        this.iCamera = camera;
     }
 
     public void addPressedKey(int keycode) {
@@ -35,7 +39,7 @@ public abstract class MouseKbdListener extends GestureDetector implements IInput
         boolean b = false;
         if (Settings.settings.runtime.inputEnabled) {
             b = pressedKeys.add(keycode);
-            camera.setInputByController(false);
+            iCamera.setGamepadInput(false);
         }
         return b;
 
@@ -44,7 +48,7 @@ public abstract class MouseKbdListener extends GestureDetector implements IInput
     @Override
     public boolean keyUp(int keycode) {
         boolean b = pressedKeys.remove(keycode);
-        camera.setInputByController(false);
+        iCamera.setGamepadInput(false);
         return b;
 
     }

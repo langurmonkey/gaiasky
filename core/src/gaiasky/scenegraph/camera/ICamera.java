@@ -204,4 +204,7 @@ public interface ICamera {
 
     void swapBuffers();
 
+    /** Main input mode is a gamepad. **/
+    void setGamepadInput(boolean state);
+
 }

@@ -29,6 +29,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
+import gaiasky.input.GameMouseKbdListener;
+import gaiasky.input.AbstractMouseKbdListener;
+import gaiasky.input.MainGamepadListener;
+import gaiasky.input.MainMouseKbdListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
@@ -50,7 +54,13 @@ import gaiasky.util.tree.OctreeNode;
 import org.lwjgl.opengl.GL30;
 
 /**
- * Models the movement of the camera
+ * Models the default camera in Gaia Sky.
+ * The camera has four modes:
+ * <ul>
+ *     <li>Focus mode</li>: An object acts as a focus, camera movement is relative to it.
+ *     <li>Free mode</li>: The camera is free to move around.
+ *     <li>Game mode</li>: Like free mode, but the mouse and keyboard bindings change to WASD+mouse look.
+ * </ul>
  */
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
@@ -135,10 +145,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private boolean fullStop = true;
 
-    /**
-     * Entities for the GAIA_SCENE_MODE mode
-     **/
-    protected CelestialBody entity1 = null, entity2 = null, entity3 = null;
 
     private CameraMode lastMode;
 
@@ -203,12 +209,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private IFocus home;
 
-    /**
-     * Holds whether the last input was issued by currentMouseKbdListener. Useful to keep
-     * things rolling even if currentMouseKbdListener sticks do not move
-     **/
-    boolean inputByController = false;
-
     /** We use this lock to update any attributes of this camera **/
     private final Object updateLock = new Object();
     /** Has the direction diverted from the focus? **/
@@ -229,22 +229,22 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private static final double HUD_SCALE_MAX = 3.0f;
 
     /**
-     * The current listener
+     * The current listener.
      */
-    private MouseKbdListener currentMouseKbdListener;
+    private AbstractMouseKbdListener currentMouseKbdListener;
     /**
-     * Implements the regular mouse+kbd camera input
+     * Implements the regular mouse+kbd camera input.
      **/
-    private NaturalMouseKbdListener naturalMouseKbdListener;
+    private MainMouseKbdListener naturalMouseKbdListener;
     /**
-     * Implements WASD movement + mouse look camera input
+     * Implements WASD movement + mouse look camera input.
      */
     private GameMouseKbdListener gameMouseKbdListener;
 
     /**
-     * Implements gamepad camera input
+     * Implements gamepad camera input.
      **/
-    private NaturalControllerListener controllerListener;
+    private MainGamepadListener gamepadListener;
 
     /**
      * VR listener
@@ -330,11 +330,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         nextClosestPosition = new Vector3b();
 
         // Mouse and keyboard listeners
-        naturalMouseKbdListener = new NaturalMouseKbdListener(this);
+        naturalMouseKbdListener = new MainMouseKbdListener(this);
         gameMouseKbdListener = new GameMouseKbdListener(this);
         currentMouseKbdListener = null;
         // Controller listeners
-        controllerListener = new NaturalControllerListener(this, Settings.settings.controls.gamepad.mappingsFile);
+        gamepadListener = new MainGamepadListener(this, Settings.settings.controls.gamepad.mappingsFile);
         ControllerConnectionListener controllerConnectionListener = new ControllerConnectionListener();
         Controllers.addListener(controllerConnectionListener);
         if (vr)
@@ -428,7 +428,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private void camUpdate(double dt, ITimeFrameProvider time) {
         currentMouseKbdListener.update();
-        controllerListener.update();
+        gamepadListener.update();
         if (Settings.settings.runtime.openVr)
             openVRListener.update();
 
@@ -585,31 +585,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 }
                 updateLateral(dt, translateUnits);
             }
-            break;
-        case GAIA_SCENE_MODE:
-            if (entity1 == null || entity2 == null) {
-                entity1 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Gaia");
-                entity2 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Earth");
-                entity3 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Mars");
-            }
-            SceneGraphNode focusCopy = entity1.getLineCopy();
-            focusCopy.getRoot().translation.set(0, 0, 0);
-            focusCopy.getRoot().update(time, null, this);
-            focusCopy.translation.put(this.pos);
-
-            this.pos.add(0, 0, entity1.getRadius() * 5.0);
-            this.posinv.set(this.pos).scl(-1);
-            this.direction.set(0, 0, -1);
-            this.up.set(0, 1, 0);
-            closestBody = entity1;
-
-            // Return to pool
-            SceneGraphNode ape = focusCopy;
-            do {
-                ape.returnToPool();
-                ape = ape.parent;
-            } while (ape != null);
-
             break;
         default:
             break;
@@ -1026,8 +1001,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             rotate(up, -yaw.z * rotateSpeed);
         }
 
-        defaultState(pitch, !Settings.settings.scene.camera.cinematic && !inputByController);
-        defaultState(yaw, !Settings.settings.scene.camera.cinematic && !inputByController);
+        defaultState(pitch, !Settings.settings.scene.camera.cinematic && !gamepadInput);
+        defaultState(yaw, !Settings.settings.scene.camera.cinematic && !gamepadInput);
     }
 
     private void updateRoll(double dt, double rotateSpeed) {
@@ -1035,7 +1010,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // Roll
             rotate(direction, -roll.z * rotateSpeed);
         }
-        defaultState(roll, !Settings.settings.scene.camera.cinematic && !inputByController);
+        defaultState(roll, !Settings.settings.scene.camera.cinematic && !gamepadInput);
     }
 
     /**
@@ -1054,8 +1029,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             rotateAround(rotationCenter, up, -horizontal.z * Settings.settings.scene.camera.rotate);
         }
 
-        defaultState(vertical, !Settings.settings.scene.camera.cinematic && !inputByController);
-        defaultState(horizontal, !Settings.settings.scene.camera.cinematic && !inputByController);
+        defaultState(vertical, !Settings.settings.scene.camera.cinematic && !gamepadInput);
+        defaultState(horizontal, !Settings.settings.scene.camera.cinematic && !gamepadInput);
 
     }
 
@@ -1133,7 +1108,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         facingFocus = false;
     }
 
-    private void setMouseKbdListener(MouseKbdListener newListener) {
+    private void setMouseKbdListener(AbstractMouseKbdListener newListener) {
         InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
         // Remove from input processors
         if (currentMouseKbdListener != null) {
@@ -1166,18 +1141,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 diverted = !centerFocus;
                 checkFocus();
             case FREE_MODE:
-            case GAIA_SCENE_MODE:
             case GAME_MODE:
-                MouseKbdListener newListener = newMode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
+                AbstractMouseKbdListener newListener = newMode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
                 setMouseKbdListener(newListener);
-                addControllerListener();
+                addGamepadListener();
                 if (Settings.settings.runtime.openVr)
                     GaiaSky.instance.vrContext.addListener(openVRListener);
                 break;
             default:
                 // Unregister input controllers
                 im.removeProcessor(currentMouseKbdListener);
-                removeControllerListener();
+                removeGamepadListener();
                 // Remove vr listener
                 if (Settings.settings.runtime.openVr)
                     GaiaSky.instance.vrContext.removeListener(openVRListener);
@@ -1186,18 +1160,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
-    public NaturalControllerListener getControllerListener() {
-        return controllerListener;
+    public MainGamepadListener getGamepadListener() {
+        return gamepadListener;
     }
 
-    public void addControllerListener() {
-        Settings.settings.controls.gamepad.addControllerListener(controllerListener);
-        controllerListener.activate();
+    public void addGamepadListener() {
+        Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
+        gamepadListener.activate();
     }
 
-    public void removeControllerListener() {
-        Settings.settings.controls.gamepad.removeControllerListener(controllerListener);
-        controllerListener.deactivate();
+    public void removeGamepadListener() {
+        Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
+        gamepadListener.deactivate();
     }
 
     public void setFocus(IFocus focus) {
@@ -1481,7 +1455,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case CONTROLLER_CONNECTED_INFO:
-            Settings.settings.controls.gamepad.addControllerListener(controllerListener, (String) data[0]);
+            Settings.settings.controls.gamepad.addControllerListener(gamepadListener, (String) data[0]);
             break;
         case CONTROLLER_DISCONNECTED_INFO:
             // Nothing
@@ -1700,10 +1674,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         } else {
             return Double.NaN;
         }
-    }
-
-    public void setInputByController(boolean controller) {
-        this.inputByController = controller;
     }
 
     @Override
@@ -1947,7 +1917,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         this.diverted = diverted;
     }
 
-    public MouseKbdListener getCurrentMouseKbdListener() {
+    public AbstractMouseKbdListener getCurrentMouseKbdListener() {
         return currentMouseKbdListener;
     }
 

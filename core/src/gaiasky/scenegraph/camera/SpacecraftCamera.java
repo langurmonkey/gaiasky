@@ -6,17 +6,18 @@
 package gaiasky.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.input.MainGamepadListener;
+import gaiasky.input.SpacecraftGamepadListener;
+import gaiasky.input.SpacecraftMouseKbdListener;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -46,7 +47,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     /**
      * The input inputListener attached to this camera
      **/
-    private final SpacecraftInputController inputController;
+    private final SpacecraftMouseKbdListener spacecraftMouseKbdListener;
+    /**
+     * Implements gamepad camera input.
+     **/
+    private SpacecraftGamepadListener gamepadListener;
 
     /*
      * Controller listener
@@ -117,10 +122,17 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // fov factor
         fovFactor = camera.fieldOfView / 40f;
 
-        inputController = new SpacecraftInputController(new GestureAdapter());
+        // Initialize mouse+keyboard input listener.
+        spacecraftMouseKbdListener = new SpacecraftMouseKbdListener(this, new GestureAdapter());
+        // Initialize gamepad input listener.
+        gamepadListener = new SpacecraftGamepadListener(this, Settings.settings.controls.gamepad.mappingsFile);
 
         // FOCUS_MODE is changed from GUI
         EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.SPACECRAFT_LOADED, Event.SPACECRAFT_MACHINE_SELECTION_INFO);
+    }
+
+    public Spacecraft getSpacecraft() {
+        return this.sc;
     }
 
     @Override
@@ -164,6 +176,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     public void update(double dt, ITimeFrameProvider time) {
+        spacecraftMouseKbdListener.update();
+        gamepadListener.update();
+
         /* FUTURE POS OF SC */
 
         // We use the simulation time for the integration
@@ -261,10 +276,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             if (mode == CameraMode.SPACECRAFT_MODE && sc != null && previousMode != CameraMode.SPACECRAFT_MODE) {
                 // Enter SC mode
                 GaiaSky.postRunnable(() -> {
-                    // Register input inputListener
-                    if (!im.getProcessors().contains(inputController, true))
-                        im.addProcessor(inputController);
-                    // Register inputListener listener
+                    // Register mouse+keyboard input inputListener.
+                    if (!im.getProcessors().contains(spacecraftMouseKbdListener, true))
+                        im.addProcessor(spacecraftMouseKbdListener);
+                    // Register gamepad listener.
+                    addGamepadListener();
+
                     Controllers.clearListeners();
                     sc.stopAllMovement();
 
@@ -283,9 +300,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                 // Exit SC mode
                 if (sc != null)
                     GaiaSky.postRunnable(() -> {
-                        // Unregister input inputListener
-                        im.removeProcessor(inputController);
-                        // Unregister inputListener listener
+                        // Remove mouse+keyboard input listener.
+                        im.removeProcessor(spacecraftMouseKbdListener);
+                        // Remove gamepad listener.
+                        removeGamepadListener();
+                        // Stop spacecraft.
                         sc.stopAllMovement();
                     });
             }
@@ -312,6 +331,16 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         return false;
     }
 
+    public void addGamepadListener() {
+        Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
+        gamepadListener.activate();
+    }
+
+    public void removeGamepadListener() {
+        Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
+        gamepadListener.deactivate();
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
@@ -333,118 +362,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void render(int rw, int rh) {
-    }
-
-    /**
-     * Input inputListener for the spacecraft camera
-     */
-    private class SpacecraftInputController extends GestureDetector {
-
-        public SpacecraftInputController(GestureListener listener) {
-            super(listener);
-        }
-
-        @Override
-        public boolean keyDown(int keycode) {
-            if (sc != null && Settings.settings.runtime.inputEnabled) {
-                double step = 0.01;
-                switch (keycode) {
-                case Keys.W:
-                    // power 1
-                    sc.setCurrentEnginePower(sc.currentEnginePower + step);
-                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
-                    break;
-                case Keys.S:
-                    // power -1
-                    sc.setCurrentEnginePower(sc.currentEnginePower - step);
-                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
-                    break;
-                case Keys.A:
-                    // roll 1
-                    sc.setRollPower(sc.rollp + step);
-                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
-                    break;
-                case Keys.D:
-                    // roll -1
-                    sc.setRollPower(sc.rollp - step);
-                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
-                    break;
-                case Keys.DOWN:
-                    // pitch 1
-                    sc.setPitchPower(sc.pitchp + step);
-                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
-                    break;
-                case Keys.UP:
-                    // pitch -1
-                    sc.setPitchPower(sc.pitchp - step);
-                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
-                    break;
-                case Keys.LEFT:
-                    // yaw 1
-                    sc.setYawPower(sc.yawp + step);
-                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
-                    break;
-                case Keys.RIGHT:
-                    // yaw -1
-                    sc.setYawPower(sc.yawp - step);
-                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
-                    break;
-                default:
-                    break;
-                }
-            }
-            return false;
-
-        }
-
-        @Override
-        public boolean keyUp(int keycode) {
-            if (sc != null && Settings.settings.runtime.inputEnabled) {
-                switch (keycode) {
-                case Keys.W:
-                case Keys.S:
-                    // power 0
-                    sc.setCurrentEnginePower(0);
-                    break;
-                case Keys.D:
-                case Keys.A:
-                    // roll 0
-                    sc.setRollPower(0);
-                    break;
-                case Keys.UP:
-                case Keys.DOWN:
-                    // pitch 0
-                    sc.setPitchPower(0);
-                    break;
-                case Keys.RIGHT:
-                case Keys.LEFT:
-                    // yaw 0
-                    sc.setYawPower(0);
-                    break;
-                case Keys.L:
-                    // level spaceship
-                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, true);
-                    break;
-                case Keys.K:
-                    // stop spaceship
-                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, true);
-                    break;
-                case Keys.PAGE_UP:
-                    // Increase thrust factor
-                    sc.increaseThrustFactorIndex(true);
-                    break;
-                case Keys.PAGE_DOWN:
-                    // Decrease thrust length
-                    sc.decreaseThrustFactorIndex(true);
-                    break;
-                default:
-                    break;
-                }
-            }
-            return false;
-
-        }
-
     }
 
     @Override

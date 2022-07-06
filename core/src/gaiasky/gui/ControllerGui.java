@@ -1000,7 +1000,7 @@ public class ControllerGui extends AbstractGui {
                 ui.setKeyboardFocus(null);
 
                 // Remove GUI listener, add natural listener
-                cam.addControllerListener();
+                cam.addGamepadListener();
                 removeControllerListener();
             } else {
                 // Show
@@ -1010,8 +1010,8 @@ public class ControllerGui extends AbstractGui {
                 updateFocused();
 
                 // Remove natural listener, add GUI listener
-                cam.removeControllerListener();
-                addControllerListener(cam, cam.getControllerListener().getMappings());
+                cam.removeGamepadListener();
+                addControllerListener(cam, cam.getGamepadListener().getMappings());
             }
 
             break;
@@ -1039,7 +1039,7 @@ public class ControllerGui extends AbstractGui {
             content.remove();
 
             // Remove GUI listener, add natural listener
-            cam.addControllerListener();
+            cam.addGamepadListener();
             removeControllerListener();
             return true;
         }
