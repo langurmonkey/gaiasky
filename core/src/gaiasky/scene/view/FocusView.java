@@ -6,6 +6,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -20,6 +21,8 @@ import gaiasky.util.tree.OctreeNode;
  */
 public class FocusView extends BaseView implements IFocus {
 
+    /** Focus component. **/
+    private Focus focus;
     /** The graph component. **/
     private GraphNode graph;
     /** The octant component. **/
@@ -34,9 +37,13 @@ public class FocusView extends BaseView implements IFocus {
     /** The star set component, if any. **/
     private StarSet starSet;
 
+    /** Implementation of pointer collision. **/
+    private FocusHit focusHit;
+
     /** Creates an empty focus view. **/
     public FocusView() {
         super();
+        focusHit = new FocusHit();
     }
 
     /**
@@ -46,6 +53,7 @@ public class FocusView extends BaseView implements IFocus {
      */
     public FocusView(Entity entity) {
         super(entity);
+        focusHit = new FocusHit();
     }
 
     @Override
@@ -57,12 +65,17 @@ public class FocusView extends BaseView implements IFocus {
     @Override
     protected void entityChanged() {
         super.entityChanged();
+        this.focus = Mapper.focus.get(entity);
         this.graph = Mapper.graph.get(entity);
         this.octant = Mapper.octant.get(entity);
         this.mag = Mapper.magnitude.get(entity);
         this.extra = Mapper.extra.get(entity);
         this.particleSet = Mapper.particleSet.get(entity);
         this.starSet = Mapper.starSet.get(entity);
+    }
+
+    public boolean isParticle() {
+        return extra != null;
     }
 
     @Override
@@ -255,13 +268,17 @@ public class FocusView extends BaseView implements IFocus {
     }
 
     @Override
-    public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
-
+    public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
+        if(focus != null && focus.hitCoordinatesConsumer != null) {
+            focus.hitCoordinatesConsumer.apply(focusHit, this, screenX, screenY, w, h, pixelDist, camera, hits);
+        }
     }
 
     @Override
-    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-
+    public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+        if(focus != null && focus.hitRayConsumer != null) {
+            focus.hitRayConsumer.apply(focusHit, this, p0, p1, camera, hits);
+        }
     }
 
     @Override
@@ -297,5 +314,29 @@ public class FocusView extends BaseView implements IFocus {
     @Override
     public float[] getColor() {
         return body.color;
+    }
+
+    public GraphNode getGraph() {
+        return graph;
+    }
+
+    public Magnitude getMag() {
+        return mag;
+    }
+
+    public ParticleExtra getExtra() {
+        return extra;
+    }
+
+    public ParticleSet getParticleSet() {
+        return particleSet;
+    }
+
+    public StarSet getStarSet() {
+        return starSet;
+    }
+
+    public ParticleSet getSet() {
+        return particleSet != null ? particleSet : starSet;
     }
 }

@@ -909,7 +909,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return (highlighted && catalogInfo != null) ? catalogInfo.hlSizeFactor : getPointscaling();
     }
 
-    public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
         int n = pointData.size();
         if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
             Array<Pair<Integer, Double>> temporalHits = new Array<>();
@@ -940,7 +940,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                         }
 
                         angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / perspectiveCamera.fieldOfView);
-                        double pixelSize = Math.max(pxdist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                        double pixelSize = Math.max(pixelDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                         perspectiveCamera.project(pos);
                         pos.y = perspectiveCamera.viewportHeight - pos.y;
                         if (Settings.settings.program.modeStereo.active) {
@@ -977,7 +977,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         updateFocusDataPos();
     }
 
-    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         int n = pointData.size();
         if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
             Vector3d beamDir = new Vector3d();

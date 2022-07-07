@@ -253,7 +253,7 @@ public class Star extends Particle {
         modelBatch.render(mc.instance, mc.env);
     }
 
-    public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
             Vector3 pos = F31.get();
             Vector3b aux = B31.get();
@@ -277,7 +277,7 @@ public class Star extends Particle {
                 }
 
                 angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
-                double pixelSize = Math.max(minPixDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                double pixelSize = Math.max(pixelDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
                 perspectiveCamera.project(pos);
                 pos.y = perspectiveCamera.viewportHeight - pos.y;
                 if (Settings.settings.program.modeStereo.active) {

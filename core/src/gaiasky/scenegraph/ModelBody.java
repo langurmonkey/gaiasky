@@ -501,10 +501,10 @@ public abstract class ModelBody extends CelestialBody {
      * If we render the model, we set up a sphere at the object's position with
      * its radius and check for intersections with the ray
      */
-    public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
             if (viewAngleApparent < thresholdQuad * camera.getFovFactor()) {
-                super.addHit(screenX, screenY, w, h, minPixDist, camera, hits);
+                super.addHitCoordinate(screenX, screenY, w, h, pixelDist, camera, hits);
             } else {
                 Vector3 auxf = F31.get();
                 Vector3d aux1d = D31.get();
@@ -537,10 +537,10 @@ public abstract class ModelBody extends CelestialBody {
 
     }
 
-    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
             if (viewAngleApparent < thresholdQuad * camera.getFovFactor()) {
-                super.addHit(p0, p1, camera, hits);
+                super.addHitRay(p0, p1, camera, hits);
             } else {
                 Vector3d aux1d = D31.get();
 

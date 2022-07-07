@@ -1,4 +1,4 @@
-package gaiasky.scene.view;
+package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
@@ -7,9 +7,9 @@ import gaiasky.scene.component.Base;
 import gaiasky.scenegraph.IFocus;
 
 /**
- * This class contains the implementation of {@link IFocus#isFocusActive()}
+ * This class contains the implementation of {@link IFocus#isFocusActive()}.
  */
-public class IsFocusActive {
+public class FocusActive {
 
     public boolean isFocusActiveTrue(Entity entity, Base base) {
         return true;

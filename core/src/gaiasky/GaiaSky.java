@@ -1391,10 +1391,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         gui.render(graphics.getWidth(), graphics.getHeight());
     }
 
-    public Array<IFocus> getFocusableEntities() {
-        return sceneGraph.getFocusableObjects();
-    }
-
     public FrameBuffer getFrameBuffer(final int w, final int h) {
         final int key = getKey(w, h);
         if (!frameBufferMap.containsKey(key)) {

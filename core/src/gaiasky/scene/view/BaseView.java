@@ -41,4 +41,17 @@ public abstract class BaseView extends AbstractView {
     public <T extends Component> T getComponent(Class<T> c) {
        return entity.getComponent(c) ;
     }
+
+    public float getOpacity() {
+        assert base != null;
+        return base.opacity;
+    }
+
+    public Base getBase() {
+        return base;
+    }
+
+    public Body getBody() {
+        return body;
+    }
 }

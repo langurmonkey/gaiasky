@@ -365,7 +365,7 @@ public class ParticleSet implements Component {
         focusViewAngleApparent = focusViewAngle * Settings.settings.scene.star.brightness;
     }
 
-    private void updateFocusDataPos() {
+    public void updateFocusDataPos() {
         if (focusIndex < 0) {
             focus = null;
         } else {
@@ -411,4 +411,32 @@ public class ParticleSet implements Component {
         }
     }
 
+    /**
+     * Fetches the real position of the particle. It will apply the necessary
+     * integrations (i.e. proper motion).
+     *
+     * @param pb          The particle bean
+     * @param campos      The position of the camera. If null, the camera position is
+     *                    not subtracted so that the coordinates are given in the global
+     *                    reference system instead of the camera reference system.
+     * @param destination The destination factor
+     * @param deltaYears  The delta years
+     *
+     * @return The vector for chaining
+     */
+    public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
+        if (campos != null)
+            return destination.set(pb.x(), pb.y(), pb.z()).sub(campos);
+        else
+            return destination.set(pb.x(), pb.y(), pb.z());
+    }
+
+    /**
+     * Returns the delta years to integrate the proper motion.
+     *
+     * @return The current delta years.
+     */
+    public double getDeltaYears() {
+        return 0;
+    }
 }

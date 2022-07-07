@@ -1,6 +1,8 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
@@ -398,7 +400,7 @@ public class Scene {
             ok = index.addToIndex(entity);
         }
         if (!ok) {
-            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity).getName() +")"));
+            logger.warn(I18n.msg("error.object.exists", base.getName() + "(" + archetypes.findArchetype(entity).getName() + ")"));
         } else {
             if (parent != null) {
                 var parentGraph = Mapper.graph.get(parent);
@@ -472,8 +474,8 @@ public class Scene {
      * Returns focus entities matching the given string by name, to a maximum
      * of 10 results.
      *
-     * @param name       The name.
-     * @param results    The set where the results are to be stored.
+     * @param name    The name.
+     * @param results The set where the results are to be stored.
      */
     public void findMatchingFocusEntity(String name, SortedSet<String> results) {
         index.matchingFocusableNodes(name, results, 10, null);
@@ -490,6 +492,23 @@ public class Scene {
      */
     public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
         index.matchingFocusableNodes(name, results, maxResults, abort);
+    }
+
+    /**
+     * Returns a list with all the entities which are focusable.
+     *
+     * @return A list with all focusable entities in this scene.
+     */
+    public Array<Entity> findFocusableEntities() {
+        Array<Entity> list = new Array<>();
+
+        engine.getEntities().forEach((entity) -> {
+            if (Mapper.focus.has(entity)) {
+                list.add(entity);
+            }
+        });
+
+        return list;
     }
 
     /**

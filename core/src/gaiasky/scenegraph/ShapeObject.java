@@ -44,7 +44,7 @@ import net.jafama.FastMath;
 import java.util.Locale;
 import java.util.Map;
 
-public class ShapeObject extends SceneGraphNode implements IFocus, IModelRenderable, I3DTextRenderable {
+public class ShapeObject extends SceneGraphNode implements IModelRenderable, I3DTextRenderable {
 
     private ModelComponent mc;
 
@@ -286,92 +286,6 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
         return trackName;
     }
 
-    @Override
-    public long getCandidateId() {
-        return id;
-    }
-
-    @Override
-    public String getCandidateName() {
-        return names[0];
-    }
-
-    @Override
-    public boolean isFocusActive() {
-        return GaiaSky.instance.isOn(ct) && this.opacity > 0;
-    }
-
-    /**
-     * Adds all the children that are focusable objects to the list.
-     *
-     * @param list The list of focusable objects.
-     */
-    public void addFocusableObjects(Array<IFocus> list) {
-        list.add(this);
-        super.addFocusableObjects(list);
-    }
-
-    @Override
-    public double getCandidateViewAngleApparent() {
-        return this.viewAngleApparent;
-    }
-
-    @Override
-    public float getAppmag() {
-        return 0f;
-    }
-
-    @Override
-    public float getAbsmag() {
-        return 0f;
-    }
-
-    @Override
-    public RotationComponent getRotationComponent() {
-        return null;
-    }
-
-    @Override
-    public Quaterniond getOrientationQuaternion() {
-        return null;
-    }
-
-    @Override
-    public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
-    }
-
-    @Override
-    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-    }
-
-    @Override
-    public void makeFocus() {
-    }
-
-    @Override
-    public IFocus getFocus(String name) {
-        return this;
-    }
-
-    @Override
-    public String getClosestName() {
-        return getName();
-    }
-
-    @Override
-    public double getClosestDistToCamera() {
-        return getDistToCamera();
-    }
-
-    @Override
-    public Vector3b getClosestAbsolutePos(Vector3b out) {
-        return getAbsolutePosition(out);
-    }
-
-    @Override
-    public boolean isCoordinatesTimeOverflow() {
-        return false;
-    }
 
     @Override
     public float getTextOpacity() {

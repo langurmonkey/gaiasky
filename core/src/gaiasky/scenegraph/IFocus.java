@@ -316,15 +316,15 @@ public interface IFocus {
      * Adds this focus to the hits list if it is hit by the [screenX, screenY]
      * position.
      *
-     * @param screenX The x position of the hit.
-     * @param screenY The y position of the hit.
-     * @param w       The viewport width.
-     * @param h       The viewport height.
-     * @param pxdist  The minimum pixel distance to consider as hit.
-     * @param camera  The camera.
-     * @param hits    The list where to add the element.
+     * @param screenX   The x position of the hit.
+     * @param screenY   The y position of the hit.
+     * @param w         The viewport width.
+     * @param h         The viewport height.
+     * @param pixelDist The minimum pixel distance to consider as hit.
+     * @param camera    The camera.
+     * @param hits      The list where to add the element.
      */
-    void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits);
+    void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits);
 
     /**
      * Adds this focus to the hits list if it is hit by the given ray.
@@ -334,7 +334,7 @@ public interface IFocus {
      * @param camera The camera.
      * @param hits   The list where the focus is to be added.
      */
-    void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
+    void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
 
     /**
      * Hook that runs when the candidate is actually made focus.

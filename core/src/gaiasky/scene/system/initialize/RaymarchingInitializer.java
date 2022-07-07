@@ -9,7 +9,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Base;
-import gaiasky.scene.view.IsFocusActive;
+import gaiasky.scene.entity.FocusActive;
 import gaiasky.util.Settings;
 
 import java.time.Instant;
@@ -31,7 +31,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         var focus = Mapper.focus.get(entity);
 
         // Focus active
-        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
+        focus.activeConsumer = (FocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
 
         if(graph.parentName == null) {
             graph.parentName = Scene.ROOT_NAME;

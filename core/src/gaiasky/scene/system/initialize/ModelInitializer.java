@@ -20,14 +20,18 @@ import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.SpacecraftRadio;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
-import gaiasky.scene.view.IsFocusActive;
+import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -78,6 +82,12 @@ public class ModelInitializer extends AbstractInitSystem {
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
 
+        // Focus hits.
+        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitCoordinateModel(v, x, y, w, h, p, c, l);
+        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitRayModel(v, a, b, c, l);
+
         // All celestial labels use the same consumer.
         label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
                 -> rs.renderCelestial(l, b, s, f, r, c);
@@ -86,7 +96,7 @@ public class ModelInitializer extends AbstractInitSystem {
             // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
             body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
         } else {
-            // Billboards, just double it
+            // Billboards, just double it.
             body.size = body.size * 2f;
         }
 
@@ -209,7 +219,7 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus) {
-        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
+        focus.activeConsumer = (FocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
 
         if(model.renderConsumer == null) {
             model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->

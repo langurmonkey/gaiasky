@@ -201,7 +201,7 @@ public class OpenVRListener implements VRDeviceListener {
     }
 
     private Array<IFocus> getHits(Vector3d p0, Vector3d p1) {
-        Array<IFocus> l = GaiaSky.instance.getFocusableEntities();
+        Array<IFocus> l = cam.getSceneGraph().getFocusableObjects();
 
         Array<IFocus> hits = new Array<>();
 
@@ -209,7 +209,7 @@ public class OpenVRListener implements VRDeviceListener {
         // Add all hits
         while (it.hasNext()) {
             IFocus s = it.next();
-            s.addHit(p0, p1, cam, hits);
+            s.addHitRay(p0, p1, cam, hits);
         }
 
         return hits;

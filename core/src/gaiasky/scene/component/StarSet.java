@@ -77,17 +77,6 @@ public class StarSet extends ParticleSet {
         this.focusViewAngleApparent = this.focusViewAngle * Settings.settings.scene.star.brightness;
     }
 
-    public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d out, double deltaYears) {
-        Vector3d pm = D32.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
-        Vector3d dest = D33.set(pb.x(), pb.y(), pb.z());
-        if (campos != null && !campos.hasNaN())
-            dest.sub(campos).add(pm);
-        else
-            dest.add(pm);
-
-        return out.set(dest);
-    }
-
     /**
      * Sets the epoch to use for the stars in this set.
      *
@@ -124,5 +113,21 @@ public class StarSet extends ParticleSet {
         this.variabilityEpochJd = epochJd;
     }
 
+    @Override
+    public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d out, double deltaYears) {
+        Vector3d pm = D32.set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
+        Vector3d dest = D33.set(pb.x(), pb.y(), pb.z());
+        if (campos != null && !campos.hasNaN())
+            dest.sub(campos).add(pm);
+        else
+            dest.add(pm);
+
+        return out.set(dest);
+    }
+
+    @Override
+    public double getDeltaYears() {
+        return currDeltaYears;
+    }
 
 }

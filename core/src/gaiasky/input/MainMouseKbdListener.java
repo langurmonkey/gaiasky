@@ -198,13 +198,13 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     private Array<IFocus> getHits(int screenX, int screenY) {
-        Array<IFocus> l = GaiaSky.instance.getFocusableEntities();
+        Array<IFocus> l = camera.getSceneGraph().getFocusableObjects();
 
         Array<IFocus> hits = new Array<>();
 
         // Add all hits
         for (IFocus s : l) {
-            s.addHit(screenX, screenY, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), MIN_PIX_DIST, camera, hits);
+            s.addHitCoordinate(screenX, screenY, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), MIN_PIX_DIST, camera, hits);
         }
 
         return hits;

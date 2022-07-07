@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
@@ -16,11 +17,15 @@ import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Model;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
-import gaiasky.scene.view.IsFocusActive;
+import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
@@ -37,6 +42,7 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Initializes star cluster entities.
@@ -55,8 +61,14 @@ public class ClusterInitializer extends AbstractInitSystem {
         var label = Mapper.label.get(entity);
         var focus = Mapper.focus.get(entity);
 
-        // Focus active
-        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveCtOpacity(e, b);
+        // Focus active.
+        focus.activeConsumer = (FocusActive i, Entity e, Base b) -> i.isFocusActiveCtOpacity(e, b);
+
+        // Focus hits.
+        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitCoordinateCluster(v, x, y, w, h, p, c, l);
+        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitRayCluster(v, a, b, c, l);
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units

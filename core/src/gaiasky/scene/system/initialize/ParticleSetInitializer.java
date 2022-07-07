@@ -2,6 +2,7 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.data.group.IParticleGroupDataProvider;
@@ -13,14 +14,18 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
@@ -59,6 +64,13 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var base = Mapper.base.get(entity);
         var particleSet = Mapper.particleSet.get(entity);
         var starSet = Mapper.starSet.get(entity);
+        var focus = Mapper.focus.get(entity);
+
+        // Focus hits.
+        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitCoordinateParticleSet(v, x, y, w, h, p, c, l);
+        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitRayParticleSet(v, a, b, c, l);
 
         // Initialize particle set
         if (starSet == null) {

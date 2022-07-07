@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
@@ -17,12 +18,16 @@ import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
-import gaiasky.scene.view.IsFocusActive;
+import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
@@ -30,6 +35,7 @@ import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Initializes the old Particle and Star objects.
@@ -66,14 +72,14 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         var focus = Mapper.focus.get(entity);
 
         // Focus active
-        focus.activeConsumer = (IsFocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
+        focus.activeConsumer = (FocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
 
         if (hip != null) {
             // Initialize star
-            initializeStar(base, body, celestial, mag, pm, extra, sa, label, render, dist);
+            initializeStar(base, body, celestial, mag, pm, extra, sa, label, render, dist, focus);
         } else {
             // Initialize particle
-            initializeParticle(base, body, celestial, mag, pm, extra, sa, label, render);
+            initializeParticle(base, body, celestial, mag, pm, extra, sa, label, render, focus);
         }
     }
 
@@ -126,7 +132,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
     }
 
-    private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render) {
+    private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, label, render);
 
         sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
@@ -143,9 +149,15 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         // Relation between the particle size and actual star size (normalized for
         // the Sun, 695700 Km of radius)
         extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
+
+        // Focus hits.
+        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitCoordinateCelestial(v, x, y, w, h, p, c, l);
+        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitRayCelestial(v, a, b, c, l);
     }
 
-    private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Distance dist) {
+    private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Distance dist, Focus focus) {
         baseInitialization(pm, extra, celestial, sa, label, render);
 
         sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;
@@ -164,6 +176,12 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         // the Sun, 695700 Km of radius)
         extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
         dist.distance = 172.4643429 * extra.radius;
+
+        // Focus hits.
+        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitCoordinateStar(v, x, y, w, h, p, c, l);
+        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
+                -> f.addHitRayCelestial(v, a, b, c, l);
     }
 
     private void setDerivedAttributes(Body body, Celestial celestial, Magnitude mag, ParticleExtra extra, boolean isStar) {

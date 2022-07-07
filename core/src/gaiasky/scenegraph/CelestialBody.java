@@ -334,7 +334,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         return null;
     }
 
-    public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
             Vector3 pos = F31.get();
             Vector3b aux = B31.get();
@@ -358,7 +358,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
                 }
 
                 angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pCamera.fieldOfView);
-                double pixelSize = Math.max(minPixDist, ((angle * pCamera.viewportHeight) / pCamera.fieldOfView) / 2);
+                double pixelSize = Math.max(pixelDist, ((angle * pCamera.viewportHeight) / pCamera.fieldOfView) / 2);
                 pCamera.project(pos);
                 pos.y = pCamera.viewportHeight - pos.y;
                 if (Settings.settings.program.modeStereo.active) {
@@ -373,7 +373,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         }
     }
 
-    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
             Vector3b aux = B31.get();
             Vector3b posb = getAbsolutePosition(aux).add(camera.getInversePos());
