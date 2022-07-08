@@ -64,7 +64,7 @@ public class Settings {
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
     public static final String DOCUMENTATION = "https://gaia.ari.uni-heidelberg.de/gaiasky/docs";
-    public static final String REPOSITORY = "https://gitlab.com/gaiasky/gaiasky";
+    public static final String REPOSITORY = "https://codeberg.org/gaiasky/gaiasky";
     public static final String ICON_URL;
     public static final String REPO_ISSUES = REPOSITORY + "/issues";
     public static final String AUTHOR_NAME = "Toni Sagristà Sellés";
@@ -404,7 +404,7 @@ public class Settings {
             public void updateSpeedLimit() {
                 switch (speedLimitIndex) {
                 case 0 ->
-                        // 100 km/h is 0.027 km/s
+                    // 100 km/h is 0.027 km/s
                         speedLimit = 0.0277777778 * Constants.KM_TO_U;
                 case 1 -> speedLimit = 0.5 * Constants.C * Constants.M_TO_U;
                 case 2 -> speedLimit = 0.8 * Constants.C * Constants.M_TO_U;
@@ -414,10 +414,10 @@ public class Settings {
                 case 6 -> speedLimit = Constants.C * Constants.M_TO_U;
                 case 7 -> speedLimit = 2.0 * Constants.C * Constants.M_TO_U;
                 case 8 ->
-                        // 10 c
+                    // 10 c
                         speedLimit = 10.0 * Constants.C * Constants.M_TO_U;
                 case 9 ->
-                        // 1000 c
+                    // 1000 c
                         speedLimit = 1000.0 * Constants.C * Constants.M_TO_U;
                 case 10 -> speedLimit = Constants.AU_TO_U;
                 case 11 -> speedLimit = 10.0 * Constants.AU_TO_U;
@@ -426,13 +426,13 @@ public class Settings {
                 case 14 -> speedLimit = Constants.PC_TO_U;
                 case 15 -> speedLimit = 2.0 * Constants.PC_TO_U;
                 case 16 ->
-                        // 10 pc/s
+                    // 10 pc/s
                         speedLimit = 10.0 * Constants.PC_TO_U;
                 case 17 ->
-                        // 1000 pc/s
+                    // 1000 pc/s
                         speedLimit = 1000.0 * Constants.PC_TO_U;
                 case 18 ->
-                        // No limit
+                    // No limit
                         speedLimit = -1;
                 }
             }
@@ -1017,6 +1017,14 @@ public class Settings {
             public String versionCheck;
             public String dataMirror = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/";
             public String dataDescriptor;
+
+            public void setVersionCheck(String versionCheck) {
+                // Make sure it points to codeberg.
+                if (versionCheck.startsWith("https://gitlab.com")) {
+                    versionCheck = "https://codeberg.org/api/v1/repos/gaiasky/gaiasky/tags";
+                }
+                this.versionCheck = versionCheck;
+            }
         }
 
         @Override

@@ -30,7 +30,7 @@ tmp_file="/tmp/prelog"
 [[ -z $title ]] && title=$high
 
 # Use default $repo_url if it is not set
-[[ -z $repo_url ]] && repo_url="https://gitlab.com/gaiasky/gaiasky"
+[[ -z $repo_url ]] && repo_url="https://codeberg.org/gaiasky/gaiasky"
 
 # Run git log
 git log $low...$high --pretty=format:'%s ' | sort -u > $tmp_file

@@ -3,7 +3,7 @@
   <id>gaiasky</id>
   <url type="homepage">https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/</url>
   <url type="help">https://gaia.ari.uni-heidelberg.de/gaiasky/docs</url>
-  <url type="bugtracker">https://gitlab.com/gaiasky/gaiasky/-/issues</url>
+  <url type="bugtracker">https://codeberg.org/gaiasky/gaiasky/issues</url>
 
   <name>Gaia Sky</name>
   <summary>3D universe simulator for desktop and VR with support for more than a billion objects</summary>
@@ -27,7 +27,7 @@
 
   <releases>
     <release version="3.2.1" date="2022-06-21" urgency="high">
-      <url>https://gitlab.com/gaiasky/gaiasky/blob/master/CHANGELOG.md</url>
+      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.2.1.41e4b0a5b/releasenotes.txt</url>
     </release>
   </releases>
 
