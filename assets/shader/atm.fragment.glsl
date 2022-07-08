@@ -44,7 +44,8 @@ void main(void) {
     float scl = smoothstep(0.05, 0.2, lma);
     fragColor.a = (v_heightNormalized * (1.0 - v_fadeFactor) + lma * v_fadeFactor) * scl;
 
-    fragColor.rgb = fragColor.rgb * 0.95;
+    fragColor = clamp(fragColor, 0.0, 1.0);
+
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
     #ifdef ssrFlag

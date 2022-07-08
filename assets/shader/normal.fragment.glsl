@@ -507,11 +507,11 @@ void main() {
         fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
     #endif
 
-    // Prevent saturation
-    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
+    fragColor.rgb = clamp(fragColor.rgb, 0.0, 1.0);
     if (fragColor.a <= 0.0) {
         discard;
     }
+
     #ifdef ssrFlag
         normalBuffer = vec4(normalVector.xyz, 1.0);
     #endif // ssrFlag
