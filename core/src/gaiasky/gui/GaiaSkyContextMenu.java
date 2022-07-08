@@ -19,6 +19,7 @@ import gaiasky.GaiaSky;
 import gaiasky.data.stars.UncertaintiesHandler;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -36,7 +37,6 @@ import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnImage;
 
 import java.util.Collection;
-import java.util.Locale;
 
 public class GaiaSkyContextMenu extends ContextMenu {
 
@@ -174,6 +174,17 @@ public class GaiaSkyContextMenu extends ContextMenu {
                         }
                     });
 
+                    GaiaSky.postRunnable(() -> {
+                        ImmutableArray<Entity> shapes = scene.engine.getEntitiesFor(scene.getFamilies().shapes);
+                        for (Entity entity : shapes) {
+                            var shape = Mapper.shape.get(entity);
+                            if (shape.track != null && shape.track == candidate) {
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesObj, candidate, false);
+                            } else if (shape.trackName != null && shape.trackName.equalsIgnoreCase(candidateName)) {
+                                EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, removeShapesObj, candidate, false);
+                            }
+                        }
+                    });
                 }
                 return false;
             });
@@ -420,7 +431,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 cim.add(img).right().padRight(pad).expand();
                 cim.addListener(event -> {
                     if (event instanceof ChangeEvent) {
-                        EventManager.publish(Event.CATALOG_VISIBLE, cim,  ci.name, !ci.isVisible(true));
+                        EventManager.publish(Event.CATALOG_VISIBLE, cim, ci.name, !ci.isVisible(true));
                         return true;
                     }
                     return false;
