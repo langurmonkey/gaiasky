@@ -8,7 +8,7 @@ There are several ways to contribute to the Gaia Sky project:
 
 ### Merge requests and source code
 
-Start by checking out the official documentation ([here](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)) to get acquainted with the project. It may also help decide what part you actually want to contribute to. Merge requests should be accompanied with extensive and comprehensive comments. In case that changes in the documentations are needed, a new merge request should be created in the [documentation project](https://gitlab.com/gaiasky/gaiasky-docs).
+Start by checking out the official documentation ([here](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)) to get acquainted with the project. It may also help decide what part you actually want to contribute to. Merge requests should be accompanied with extensive and comprehensive comments. In case that changes in the documentations are needed, a new merge request should be created in the [documentation project](https://codeberg.org/gaiasky/gaiasky-docs).
 
 Merge requests should never contain configuration files unless totally necessary (do not commit your `conf/global.properties`). Also, make sure that the project compiles and all the dependencies are well specified in the `build.gradle` file. 
 

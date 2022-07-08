@@ -388,7 +388,7 @@ program:
   # Pointers to some resources
   url:
     # URL to check for new versions
-    versionCheck: https://gitlab.com/api/v4/projects/langurmonkey%2Fgaiasky/repository/tags
+    versionCheck: https://codeberg.org/api/v1/repos/gaiasky/gaiasky/tags
     # Data repository location
     dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
     # Data descriptor file location

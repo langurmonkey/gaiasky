@@ -57,21 +57,14 @@ public class VersionChecker implements Runnable {
                     // Check tag is major.minor.rev
                     if (tag.matches("^(\\D{1})?\\d+.\\d+(\\D{1})?(.\\d+)?$")) {
                         Integer version = stringToVersionNumber(tag);
-                        String commitDate = result.get(i).get("commit").getString("committed_date");
-                        //Format 2016-12-07T10:41:35Z
-                        //    or 2016-12-07T10:41:35+01:00
-                        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnn'Z'");
+                        String commitDate = result.get(i).get("commit").getString("created");
+                        //Format 2016-12-07T10:41:35+01:00
+                        DateTimeFormatter df = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
                         try {
                             LocalDateTime tagDate = LocalDateTime.parse(commitDate, df);
                             tags.add(new VersionObject(result.get(i), version, tagDate.toInstant(ZoneOffset.UTC)));
                         } catch (DateTimeParseException e) {
-                            df = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-                            try {
-                                LocalDateTime tagDate = LocalDateTime.parse(commitDate, df);
-                                tags.add(new VersionObject(result.get(i), version, tagDate.toInstant(ZoneOffset.UTC)));
-                            }catch(DateTimeParseException e1) {
-                                logger.error(e1, "Can't parse datetime: " + commitDate);
-                            }
+                            logger.error(e, "Can't parse datetime: " + commitDate);
                         }
                     }
                 }
@@ -96,6 +89,7 @@ public class VersionChecker implements Runnable {
     }
 
     public static final int MAX_VERSION_NUMBER = 1000000;
+
     /**
      * Attempts to convert a tag string (maj.min.rev) to an integer
      * number:
@@ -111,13 +105,14 @@ public class VersionChecker implements Runnable {
      * version number (1000000) is given.
      *
      * @param tag The tag string
+     *
      * @return The integer
      */
     public static Integer stringToVersionNumber(String tag) {
         try {
             Integer v = 0;
             String[] tokens = tag.split("\\.");
-            if(tokens == null || tokens.length < 3){
+            if (tokens == null || tokens.length < 3) {
                 logger.info("Could not parse version '" + tag + "', assuming development version");
                 return MAX_VERSION_NUMBER;
             }
