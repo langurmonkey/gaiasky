@@ -5,6 +5,8 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -17,6 +19,7 @@ import gaiasky.GaiaSky;
 import gaiasky.data.stars.UncertaintiesHandler;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Scene;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.CatalogInfo;
@@ -48,8 +51,6 @@ public class GaiaSkyContextMenu extends ContextMenu {
     // Screen coordinates
     private final int screenX;
     private final int screenY;
-    // Scene graph
-    private final ISceneGraph sg;
     // Default pad
     private final float pad;
 
@@ -58,20 +59,24 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
     private final CatalogManager catalogManager;
 
+    private final ISceneGraph sceneGraph;
+    private final Scene scene;
+
     // Uncertainties disabled by default
     private final boolean uncertainties = false;
     // Rel effects off
     private final boolean relativisticEffects = false;
 
-    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final IFocus candidate, final CatalogManager catalogManager) {
+    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final IFocus candidate, final CatalogManager catalogManager, final ISceneGraph sceneGraph, final Scene scene) {
         super(skin, styleName);
         this.skin = skin;
         this.screenX = (int) (screenX / Settings.settings.program.ui.scale);
         this.screenY = screenY;
-        this.sg = GaiaSky.instance.sceneGraph;
         this.candidate = candidate;
         this.catalogManager = catalogManager;
         this.pad = 8f;
+        this.scene = scene;
+        this.sceneGraph = sceneGraph;
         if (candidate != null) {
             this.candidateName = candidate.getCandidateName();
             this.candidateNameShort = TextUtils.capString(this.candidateName, 10);
@@ -154,11 +159,9 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem removeShapesObj = new MenuItem(I18n.msg("context.shape.remove", candidateNameShort), skin, skin.getDrawable("iconic-delete"));
             removeShapesObj.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    ISceneGraph sg = GaiaSky.instance.sceneGraph;
-                    Array<SceneGraphNode> l = new Array<>();
-                    sg.getRoot().getChildrenByType(ShapeObject.class, l);
-
                     GaiaSky.postRunnable(() -> {
+                        Array<SceneGraphNode> l = new Array<>();
+                        sceneGraph.getRoot().getChildrenByType(ShapeObject.class, l);
                         for (SceneGraphNode n : l) {
                             ShapeObject shapeObject = (ShapeObject) n;
                             IFocus tr = shapeObject.getTrack();
@@ -179,13 +182,18 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem removeShapesAll = new MenuItem(I18n.msg("context.shape.remove.all"), skin, skin.getDrawable("iconic-delete"));
             removeShapesAll.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    ISceneGraph sg = GaiaSky.instance.sceneGraph;
-                    Array<SceneGraphNode> l = new Array<>();
-                    sg.getRoot().getChildrenByType(ShapeObject.class, l);
-
                     GaiaSky.postRunnable(() -> {
+                        Array<SceneGraphNode> l = new Array<>();
+                        sceneGraph.getRoot().getChildrenByType(ShapeObject.class, l);
                         for (SceneGraphNode n : l) {
                             EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, removeShapesAll, n, false);
+                        }
+                    });
+
+                    GaiaSky.postRunnable(() -> {
+                        ImmutableArray<Entity> shapes = scene.engine.getEntitiesFor(scene.getFamilies().shapes);
+                        for (Entity shape : shapes) {
+                            EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesAll, shape, false);
                         }
                     });
 
@@ -285,9 +293,9 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addSeparator();
 
             // Cosmic ruler
-            CosmicRuler cr = (CosmicRuler) sg.getNode("Cosmicruler");
+            CosmicRuler cr = (CosmicRuler) sceneGraph.getNode("Cosmicruler");
             if (cr == null) {
-                sg.insert((cr = new CosmicRuler()), true);
+                sceneGraph.insert((cr = new CosmicRuler()), true);
             }
             MenuItem rulerAttach0 = null, rulerAttach1 = null;
             if (!cr.hasObject0() && !cr.hasObject1()) {
@@ -344,9 +352,9 @@ public class GaiaSkyContextMenu extends ContextMenu {
         }
 
         // Clear ruler
-        CosmicRuler cr = (CosmicRuler) sg.getNode("Cosmicruler");
+        CosmicRuler cr = (CosmicRuler) sceneGraph.getNode("Cosmicruler");
         if (cr == null) {
-            sg.insert((cr = new CosmicRuler()), true);
+            sceneGraph.insert((cr = new CosmicRuler()), true);
         }
         if (cr.rulerOk() || cr.hasAttached()) {
             MenuItem clearRuler = new MenuItem(I18n.msg("context.ruler.clear"), skin, rulerDwb);

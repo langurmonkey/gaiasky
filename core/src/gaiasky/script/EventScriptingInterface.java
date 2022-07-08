@@ -34,8 +34,6 @@ import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.EntityUtils;
-import gaiasky.scene.system.initialize.BaseInitializer;
-import gaiasky.scene.system.initialize.ShapeInitializer;
 import gaiasky.scene.system.render.extract.TrajectoryExtractor;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
@@ -3199,14 +3197,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     shape.modelParams = params;
 
                     // Initialize shape.
-                    BaseInitializer bi = new BaseInitializer(scene, true, null, 0);
-                    ShapeInitializer si = new ShapeInitializer(true, null, 0);
-
-                    bi.initializeEntity(newShape);
-                    si.initializeEntity(newShape);
-
-                    bi.setUpEntity(newShape);
-                    si.setUpEntity(newShape);
+                    scene.initializeEntity(newShape);
+                    scene.setUpEntity(newShape);
 
                     // Add to scene.
                     EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, newShape, false);

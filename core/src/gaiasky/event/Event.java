@@ -931,6 +931,11 @@ public enum Event {
      */
     SCENE_REMOVE_OBJECT_CMD,
     /**
+     * Removes an object from the scene without using a post runnable. Contains the name of the object or the object itself plus and optional
+     * Boolean indicating whether to remove it from the index. Defaults to true.
+     */
+    SCENE_REMOVE_OBJECT_NO_POST_CMD,
+    /**
      * Recomputes the names of the scene graph objects with the current locale.
      */
     SCENE_GRAPH_RELOAD_NAMES_CMD,

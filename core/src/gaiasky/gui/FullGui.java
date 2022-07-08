@@ -75,7 +75,7 @@ public class FullGui extends AbstractGui {
 
     protected float pad, pad5;
 
-    protected ISceneGraph sg;
+    protected ISceneGraph sceneGraph;
     protected Scene scene;
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
@@ -510,7 +510,7 @@ public class FullGui extends AbstractGui {
             int screenX = Gdx.input.getX();
             int screenY = Gdx.input.getY();
 
-            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate, catalogManager);
+            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate, catalogManager, sceneGraph, scene);
 
             int h = (int) getGuiStage().getHeight();
 
@@ -541,7 +541,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void setSceneGraph(ISceneGraph sg) {
-        this.sg = sg;
+        this.sceneGraph = sg;
     }
     public void setScene(Scene scene) {
         this.scene = scene;
@@ -565,7 +565,7 @@ public class FullGui extends AbstractGui {
 
     public void addControlsWindow() {
         controlsWindow = new ControlsWindow(Settings.settings.getSuperShortApplicationName(), skin, ui, catalogManager);
-        controlsWindow.setSceneGraph(sg);
+        controlsWindow.setSceneGraph(sceneGraph);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();
         controlsWindow.left();

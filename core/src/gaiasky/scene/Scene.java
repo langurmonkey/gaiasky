@@ -618,4 +618,7 @@ public class Scene {
         return null;
     }
 
+    public Families getFamilies() {
+        return families;
+    }
 }
