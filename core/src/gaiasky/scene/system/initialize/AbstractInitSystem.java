@@ -40,6 +40,14 @@ public abstract class AbstractInitSystem extends IteratingSystem implements Enti
         this.mode = InitializerMode.SETUP;
     }
 
+    public boolean isModeInit() {
+        return this.mode != null && this.mode == InitializerMode.INIT;
+    }
+
+    public boolean isModeSetUp() {
+        return this.mode != null && this.mode == InitializerMode.SETUP;
+    }
+
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         switch (mode) {

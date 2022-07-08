@@ -49,6 +49,13 @@ public class Scene {
     /** The focus view. **/
     private FocusView focusView;
 
+    /** Holds all initialization systems. **/
+    private Array<AbstractInitSystem> initializers;
+    /** Holds all update systems. **/
+    private Array<AbstractUpdateSystem> updaters;
+    /** Holds all extract systems. **/
+    private Array<AbstractExtractSystem> extractors;
+
     /** Access to the index. **/
     public Index index() {
         return index;
@@ -86,7 +93,7 @@ public class Scene {
      * delta time of 0. Useful for running one-time initialization and
      * loading tasks.
      *
-     * @param systems The systems.
+     * @param systems The systems to run.
      */
     public void runOnce(EntitySystem... systems) {
         enable(systems);
@@ -95,7 +102,20 @@ public class Scene {
     }
 
     /**
-     * Enables the given entity systems.
+     * Runs the given entity systems only once with a dummy
+     * delta time of 0. Useful for running one-time initialization and
+     * loading tasks.
+     *
+     * @param array The systems array to run.
+     */
+    public void runOnce(Array<? extends EntitySystem> array) {
+        enable(array);
+        engine.update(0f);
+        disable(array);
+    }
+
+    /**
+     * Enable the given entity systems.
      *
      * @param systems The systems.
      */
@@ -106,7 +126,16 @@ public class Scene {
     }
 
     /**
-     * Disables the given entity systems.
+     * Enable the given entity systems.
+     *
+     * @param array The systems.
+     */
+    public void enable(Array<? extends EntitySystem> array) {
+        array.forEach((system) -> engine.addSystem(system));
+    }
+
+    /**
+     * Disable the given entity systems.
      *
      * @param systems The systems.
      */
@@ -114,6 +143,15 @@ public class Scene {
         for (EntitySystem system : systems) {
             engine.removeSystem(system);
         }
+    }
+
+    /**
+     * Disable the given entity systems.
+     *
+     * @param array The systems.
+     */
+    public void disable(Array<? extends EntitySystem> array) {
+        array.forEach((system) -> engine.removeSystem(system));
     }
 
     /**
@@ -132,40 +170,66 @@ public class Scene {
         initializeEntities(true);
     }
 
+    public void addSystemsToEngine(Array<? extends EntitySystem> systems) {
+        if (engine != null) {
+            for (EntitySystem system : systems) {
+                engine.addSystem(system);
+            }
+        }
+    }
+
+    /**
+     * Add a new initializer system to the scene.
+     */
+    private void addInitializer(AbstractInitSystem system) {
+        initializers.add(system);
+    }
+
+    /**
+     * Add a new updater system to the scene.
+     */
+    private void addUpdater(AbstractUpdateSystem system) {
+        updaters.add(system);
+    }
+
+    /**
+     * Add a new extractor system to the scene.
+     */
+    private void addExtractor(AbstractExtractSystem system) {
+        extractors.add(system);
+    }
+
     private void initializeEntities(boolean setUp) {
         if (engine != null) {
-            // Prepare systems
             int priority = 0;
-            EntitySystem baseInit = new BaseInitializer(this, setUp, families.graphNodes, priority++);
-            EntitySystem fadeInit = new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++);
-            EntitySystem particleSetInit = new ParticleSetInitializer(setUp, families.particleSets, priority++);
-            EntitySystem particleInit = new ParticleInitializer(setUp, families.particles, priority++);
-            EntitySystem modelInit = new ModelInitializer(setUp, families.models, priority++);
-            EntitySystem trajectoryInit = new TrajectoryInitializer(setUp, families.orbits, priority++);
-            EntitySystem locInit = new LocInitializer(setUp, families.locations, priority++);
-            EntitySystem billboardSetInit = new BillboardSetInitializer(setUp, families.billboardSets, priority++);
-            EntitySystem axesInit = new AxesInitializer(setUp, families.axes, priority++);
-            EntitySystem raymarchingInit = new RaymarchingInitializer(setUp, families.raymarchings, priority++);
-            EntitySystem datasetDescInit = new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++);
-            EntitySystem backgroundInit = new BackgroundModelInitializer(setUp, families.backgroundModels, priority++);
-            EntitySystem clusterInit = new ClusterInitializer(setUp, families.clusters, priority++);
-            EntitySystem constellationInit = new ConstellationInitializer(setUp, families.constellations, priority++);
-            EntitySystem boundariesInit = new BoundariesInitializer(setUp, families.boundaries, priority++);
-            EntitySystem elementsSetInit = new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++);
-            EntitySystem meshInit = new MeshInitializer(setUp, families.meshes, priority++);
-            EntitySystem recGridInit = new GridRecInitializer(setUp, families.gridRecs, priority++);
-            EntitySystem rulerInit = new RulerInitializer(setUp, families.rulers, priority++);
-            EntitySystem titleInit = new TitleInitializer(setUp, families.titles, priority++);
-            EntitySystem keyframeInit = new KeyframeInitializer(this, setUp, families.keyframes, priority++);
-            EntitySystem shapeInit = new ShapeInitializer(setUp, families.shapes, priority++);
+
+            // Prepare systems.
+            initializers = new Array<>(21);
+            addInitializer(new BaseInitializer(this, setUp, families.graphNodes, priority++));
+            addInitializer(new FadeNodeInitializer(index, setUp, families.fadeNodes, priority++));
+            addInitializer(new ParticleSetInitializer(setUp, families.particleSets, priority++));
+            addInitializer(new ParticleInitializer(setUp, families.particles, priority++));
+            addInitializer(new ModelInitializer(setUp, families.models, priority++));
+            addInitializer(new TrajectoryInitializer(setUp, families.orbits, priority++));
+            addInitializer(new LocInitializer(setUp, families.locations, priority++));
+            addInitializer(new BillboardSetInitializer(setUp, families.billboardSets, priority++));
+            addInitializer(new AxesInitializer(setUp, families.axes, priority++));
+            addInitializer(new RaymarchingInitializer(setUp, families.raymarchings, priority++));
+            addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++));
+            addInitializer(new BackgroundModelInitializer(setUp, families.backgroundModels, priority++));
+            addInitializer(new ClusterInitializer(setUp, families.clusters, priority++));
+            addInitializer(new ConstellationInitializer(setUp, families.constellations, priority++));
+            addInitializer(new BoundariesInitializer(setUp, families.boundaries, priority++));
+            addInitializer(new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++));
+            addInitializer(new MeshInitializer(setUp, families.meshes, priority++));
+            addInitializer(new GridRecInitializer(setUp, families.gridRecs, priority++));
+            addInitializer(new RulerInitializer(setUp, families.rulers, priority++));
+            addInitializer(new TitleInitializer(setUp, families.titles, priority++));
+            addInitializer(new KeyframeInitializer(this, setUp, families.keyframes, priority++));
+            addInitializer(new ShapeInitializer(setUp, families.shapes, priority++));
 
             // Run once
-            runOnce(baseInit, particleSetInit, particleInit,
-                    trajectoryInit, modelInit, locInit, billboardSetInit,
-                    axesInit, raymarchingInit, fadeInit, datasetDescInit,
-                    backgroundInit, clusterInit, constellationInit, boundariesInit,
-                    elementsSetInit, meshInit, recGridInit, rulerInit,
-                    titleInit, keyframeInit, shapeInit);
+            runOnce(initializers);
         }
     }
 
@@ -179,10 +243,10 @@ public class Scene {
             index = new Index(archetypes);
             index.initialize(numEntities);
 
-            // Prepare system
+            // Prepare system.
             EntitySystem indexSystem = new IndexInitializer(index, Family.all(Base.class).get(), 0);
 
-            // Run once
+            // Run once.
             runOnce(indexSystem);
         }
     }
@@ -193,10 +257,10 @@ public class Scene {
      */
     public void buildSceneGraph() {
         if (engine != null) {
-            // Prepare system
+            // Prepare system.
             EntitySystem sceneGraphBuilderSystem = new SceneGraphBuilderSystem(index, families.graphNodes, 0);
 
-            // Run once
+            // Run once.
             runOnce(sceneGraphBuilderSystem);
 
             GraphNode rootGraph = Mapper.graph.get(index.getEntity("Universe"));
@@ -211,93 +275,109 @@ public class Scene {
     public void prepareUpdateSystems(ISceneRenderer sceneRenderer) {
         if (engine != null) {
             int priority = 0;
+
             // Scene graph update system needs to run first.
-            ConstellationUpdater constellationUpdateSystem = new ConstellationUpdater(families.constellations, priority++);
+            updaters = new Array<>(18);
+            addUpdater(new ConstellationUpdater(families.constellations, priority++));
             GraphUpdater sceneGraphUpdateSystem = new GraphUpdater(families.roots, priority++, GaiaSky.instance.time);
             sceneGraphUpdateSystem.setCamera(GaiaSky.instance.getCameraManager());
+            addUpdater(sceneGraphUpdateSystem);
 
             // Regular update systems.
-            OctreeUpdater octreeUpdateSystem = new OctreeUpdater(families.octrees, priority++);
-            ElementsSetUpdater elementsSetUpdater = new ElementsSetUpdater(families.orbitalElementSets, priority++);
-            ParticleSetUpdater particleSetUpdateSystem = new ParticleSetUpdater(families.particleSets, priority++);
-            ModelUpdater modelUpdateSystem = new ModelUpdater(families.models, priority++);
-            TrajectoryUpdater trajectoryUpdateSystem = new TrajectoryUpdater(families.orbits, priority++);
-            BackgroundUpdater backgroundUpdateSystem = new BackgroundUpdater(families.backgroundModels, priority++);
-            ClusterUpdater clusterUpdateSystem = new ClusterUpdater(families.clusters, priority++);
-            RaymarchingUpdater raymarchingUpdater = new RaymarchingUpdater(families.raymarchings, priority++);
-            BillboardSetUpdater billboardSetUpdater = new BillboardSetUpdater(families.billboardSets, priority++);
-            MeshUpdater meshUpdater = new MeshUpdater(families.meshes, priority++);
-            GridRecUpdater gridRecUpdater = new GridRecUpdater(families.gridRecs, priority++);
-            RulerUpdater rulerUpdater = new RulerUpdater(families.rulers, priority++);
-            AxesUpdater axesUpdater = new AxesUpdater(families.axes, priority++);
-            TitleUpdater titleUpdater = new TitleUpdater(families.titles, priority++);
-            KeyframeUpdater keyframeUpdater = new KeyframeUpdater(families.keyframes, priority++);
-            ShapeUpdater shapeUpdater = new ShapeUpdater(families.shapes, priority++);
+            addUpdater(new OctreeUpdater(families.octrees, priority++));
+            addUpdater(new ElementsSetUpdater(families.orbitalElementSets, priority++));
+            addUpdater(new ParticleSetUpdater(families.particleSets, priority++));
+            addUpdater(new ModelUpdater(families.models, priority++));
+            addUpdater(new TrajectoryUpdater(families.orbits, priority++));
+            addUpdater(new BackgroundUpdater(families.backgroundModels, priority++));
+            addUpdater(new ClusterUpdater(families.clusters, priority++));
+            addUpdater(new RaymarchingUpdater(families.raymarchings, priority++));
+            addUpdater(new BillboardSetUpdater(families.billboardSets, priority++));
+            addUpdater(new MeshUpdater(families.meshes, priority++));
+            addUpdater(new GridRecUpdater(families.gridRecs, priority++));
+            addUpdater(new RulerUpdater(families.rulers, priority++));
+            addUpdater(new AxesUpdater(families.axes, priority++));
+            addUpdater(new TitleUpdater(families.titles, priority++));
+            addUpdater(new KeyframeUpdater(families.keyframes, priority++));
+            addUpdater(new ShapeUpdater(families.shapes, priority++));
 
             // Extract systems.
-            AbstractExtractSystem octreeExtractor = newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer);
-            AbstractExtractSystem elementsSetExtractor = newExtractor(ElementsSetExtractor.class, families.orbitalElementSets, priority++, sceneRenderer);
-            AbstractExtractSystem particleSetExtractor = newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, sceneRenderer);
-            AbstractExtractSystem particleExtractor = newExtractor(ParticleExtractor.class, families.particles, priority++, sceneRenderer);
-            AbstractExtractSystem modelExtractor = newExtractor(ModelExtractor.class, families.models, priority++, sceneRenderer);
-            AbstractExtractSystem trajectoryExtractor = newExtractor(TrajectoryExtractor.class, families.orbits, priority++, sceneRenderer);
-            AbstractExtractSystem backgroundExtractor = newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, sceneRenderer);
-            AbstractExtractSystem clusterExtractor = newExtractor(ClusterExtractor.class, families.clusters, priority++, sceneRenderer);
-            AbstractExtractSystem billboardSetExtractor = newExtractor(BillboardSetExtractor.class, families.billboardSets, priority++, sceneRenderer);
-            AbstractExtractSystem constellationExtractor = newExtractor(ConstellationExtractor.class, families.constellations, priority++, sceneRenderer);
-            AbstractExtractSystem boundariesExtractor = newExtractor(BoundariesExtractor.class, families.boundaries, priority++, sceneRenderer);
-            AbstractExtractSystem meshExtractor = newExtractor(MeshExtractor.class, families.meshes, priority++, sceneRenderer);
-            AbstractExtractSystem gridRecExtractor = newExtractor(GridRecExtractor.class, families.gridRecs, priority++, sceneRenderer);
-            AbstractExtractSystem rulerExtractor = newExtractor(RulerExtractor.class, families.rulers, priority++, sceneRenderer);
-            AbstractExtractSystem axesExtractor = newExtractor(AxesExtractor.class, families.axes, priority++, sceneRenderer);
-            AbstractExtractSystem titleExtractor = newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer);
-            AbstractExtractSystem keyframeExtractor = newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer);
-            AbstractExtractSystem shapeExtractor = newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer);
+            extractors = new Array<>(18);
+            addExtractor(newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer));
+            addExtractor(newExtractor(ElementsSetExtractor.class, families.orbitalElementSets, priority++, sceneRenderer));
+            addExtractor(newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, sceneRenderer));
+            addExtractor(newExtractor(ParticleExtractor.class, families.particles, priority++, sceneRenderer));
+            addExtractor(newExtractor(ModelExtractor.class, families.models, priority++, sceneRenderer));
+            addExtractor(newExtractor(TrajectoryExtractor.class, families.orbits, priority++, sceneRenderer));
+            addExtractor(newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, sceneRenderer));
+            addExtractor(newExtractor(ClusterExtractor.class, families.clusters, priority++, sceneRenderer));
+            addExtractor(newExtractor(BillboardSetExtractor.class, families.billboardSets, priority++, sceneRenderer));
+            addExtractor(newExtractor(ConstellationExtractor.class, families.constellations, priority++, sceneRenderer));
+            addExtractor(newExtractor(BoundariesExtractor.class, families.boundaries, priority++, sceneRenderer));
+            addExtractor(newExtractor(MeshExtractor.class, families.meshes, priority++, sceneRenderer));
+            addExtractor(newExtractor(GridRecExtractor.class, families.gridRecs, priority++, sceneRenderer));
+            addExtractor(newExtractor(RulerExtractor.class, families.rulers, priority++, sceneRenderer));
+            addExtractor(newExtractor(AxesExtractor.class, families.axes, priority++, sceneRenderer));
+            addExtractor(newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer));
+            addExtractor(newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer));
+            addExtractor(newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer));
 
             // Remove all remaining systems.
             engine.removeAllSystems();
 
-            // 1. First updater: scene graph and octree update systems.
-            engine.addSystem(constellationUpdateSystem);
-            engine.addSystem(sceneGraphUpdateSystem);
-            engine.addSystem(octreeUpdateSystem);
-            engine.addSystem(elementsSetUpdater);
+            // Add updater systems.
+            addSystemsToEngine(updaters);
 
-            // 2. Update --- these can run in parallel.
-            engine.addSystem(particleSetUpdateSystem);
-            engine.addSystem(modelUpdateSystem);
-            engine.addSystem(trajectoryUpdateSystem);
-            engine.addSystem(backgroundUpdateSystem);
-            engine.addSystem(clusterUpdateSystem);
-            engine.addSystem(raymarchingUpdater);
-            engine.addSystem(billboardSetUpdater);
-            engine.addSystem(meshUpdater);
-            engine.addSystem(gridRecUpdater);
-            engine.addSystem(rulerUpdater);
-            engine.addSystem(axesUpdater);
-            engine.addSystem(titleUpdater);
-            engine.addSystem(keyframeUpdater);
-            engine.addSystem(shapeUpdater);
+            // Add extractors.
+            addSystemsToEngine(extractors);
+        }
+    }
 
-            // 3. Extract --- these can also run in parallel.
-            engine.addSystem(octreeExtractor);
-            engine.addSystem(elementsSetExtractor);
-            engine.addSystem(particleSetExtractor);
-            engine.addSystem(particleExtractor);
-            engine.addSystem(modelExtractor);
-            engine.addSystem(trajectoryExtractor);
-            engine.addSystem(backgroundExtractor);
-            engine.addSystem(clusterExtractor);
-            engine.addSystem(billboardSetExtractor);
-            engine.addSystem(constellationExtractor);
-            engine.addSystem(boundariesExtractor);
-            engine.addSystem(meshExtractor);
-            engine.addSystem(gridRecExtractor);
-            engine.addSystem(rulerExtractor);
-            engine.addSystem(axesExtractor);
-            engine.addSystem(titleExtractor);
-            engine.addSystem(keyframeExtractor);
-            engine.addSystem(shapeExtractor);
+    /**
+     * Runs the matching initialization systems on the given entity. The systems
+     * are matched using their families.
+     *
+     * @param entity The entity to initialize.
+     */
+    public void initializeEntity(Entity entity) {
+        if (initializers != null) {
+            for (AbstractInitSystem system : initializers) {
+                if (system.getFamily().matches(entity)) {
+                    system.initializeEntity(entity);
+                }
+            }
+        }
+    }
+
+    /**
+     * Runs the matching setup systems on the given entity. The systems
+     * are matched using their families.
+     *
+     * @param entity The entity to set up.
+     */
+    public void setUpEntity(Entity entity) {
+        if (initializers != null) {
+            for (AbstractInitSystem system : initializers) {
+                if (system.getFamily().matches(entity)) {
+                    system.setUpEntity(entity);
+                }
+            }
+        }
+    }
+
+    /**
+     * Runs the matching update systems on the given entity. The systems
+     * are matched using their families.
+     *
+     * @param entity The entity to update.
+     */
+    public void updateEntity(Entity entity, float deltaTime) {
+        if (updaters != null) {
+            for (AbstractUpdateSystem system : updaters) {
+                if (system.getFamily().matches(entity)) {
+                    system.updateEntity(entity, deltaTime);
+                }
+            }
         }
     }
 
