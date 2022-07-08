@@ -16,6 +16,8 @@ public abstract class AbstractControllerMappings implements IControllerMappings 
 
     public double AXIS_VALUE_POW = 4d;
 
+    public double ZERO_POINT = 0.1;
+
     public int AXIS_LSTICK_H = -1;
     public double AXIS_LSTICK_H_SENS = 1d;
     public int AXIS_RSTICK_H = -1;
@@ -51,6 +53,11 @@ public abstract class AbstractControllerMappings implements IControllerMappings 
 
     public int BUTTON_LSTICK = -1;
     public int BUTTON_RSTICK = -1;
+
+    @Override
+    public double getZeroPoint() {
+        return ZERO_POINT;
+    }
 
     @Override
     public double getAxisValuePower() {

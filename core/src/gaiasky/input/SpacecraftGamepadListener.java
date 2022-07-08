@@ -22,10 +22,24 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
     private static final Log logger = Logger.getLogger(SpacecraftGamepadListener.class);
 
     private final SpacecraftCamera cam;
+    private Controller lastController;
 
     public SpacecraftGamepadListener(SpacecraftCamera cam, String mappingsFile) {
         super(mappingsFile);
         this.cam = cam;
+    }
+
+    @Override
+    public void update() {
+        if (lastController != null) {
+            double thrust = lastController.getAxis(mappings.getAxisLstickV());
+            double thrustFwd = lastController.getAxis(mappings.getAxisRT());
+            double thrustBwd = lastController.getAxis(mappings.getAxisLT());
+
+            if (Math.abs(thrust) < 0.05 && Math.abs(thrustFwd) < 0.05 && Math.abs(thrustBwd) < 0.05) {
+                cam.getSpacecraft().setCurrentEnginePower(0);
+            }
+        }
     }
 
     @Override
@@ -86,16 +100,19 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
 
         removePressedKey(buttonCode);
 
+        lastController = controller;
         return true;
     }
 
     @Override
     public boolean axisMoved(Controller controller, int axisCode, float value) {
-        Spacecraft sc = cam.getSpacecraft();
-        if (Math.abs(value) > 0.1)
-            logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
+        logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
 
+        Spacecraft sc = cam.getSpacecraft();
         boolean treated = false;
+
+        // Zero point
+        value = (float) applyZeroPoint(value);
 
         // Apply power function to axis reading.
         double val = Math.signum(value) * Math.pow(Math.abs(value), mappings.getAxisValuePower());
@@ -135,6 +152,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
         if (treated)
             cam.setGamepadInput(true);
 
+        lastController = controller;
         return treated;
     }
 }

@@ -26,12 +26,18 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     protected final EventManager em;
     protected final IntSet pressedKeys;
 
+
     public AbstractGamepadListener(String mappingsFile) {
         this.em = EventManager.instance;
         this.pressedKeys = new IntSet();
         updateControllerMappings(mappingsFile);
 
         em.subscribe(this, Event.RELOAD_CONTROLLER_MAPPINGS);
+    }
+
+    /** Zero-point function for the axes. **/
+    protected double applyZeroPoint(double value) {
+        return Math.abs(value) >= mappings.getZeroPoint() ? value : 0;
     }
 
     public IControllerMappings getMappings() {
