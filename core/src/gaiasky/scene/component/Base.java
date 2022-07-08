@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Archetype;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
@@ -11,6 +12,10 @@ import gaiasky.util.math.MathUtilsd;
 import java.util.Locale;
 
 public class Base implements Component {
+
+    /** Reference to the archetype used to create this entity, if any. **/
+    public Archetype archetype;
+
     /**
      * The internal identifier
      **/

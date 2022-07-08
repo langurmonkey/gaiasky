@@ -44,8 +44,15 @@ public class Archetype {
     }
 
     public Entity createEntity() {
+        
         Entity entity = engine.createEntity();
         addComponentsRecursive(entity);
+
+        // Set archetype reference.
+        if(Mapper.base.has(entity)) {
+            Mapper.base.get(entity).archetype = this;
+        }
+
         return entity;
     }
 
