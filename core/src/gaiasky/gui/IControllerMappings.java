@@ -8,6 +8,14 @@ package gaiasky.gui;
 public interface IControllerMappings {
 
     /**
+     * The configured axis zero point. Axis values below this value
+     * are considered zero.
+     *
+     * return The zero point.
+     */
+    double getZeroPoint();
+
+    /**
      * Power to apply to the linear value: val = val^pow
      *
      * @return The configured value power.

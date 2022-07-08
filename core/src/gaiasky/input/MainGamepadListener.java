@@ -21,12 +21,10 @@ public class MainGamepadListener extends AbstractGamepadListener {
 
     private final NaturalCamera cam;
 
-
     public MainGamepadListener(NaturalCamera cam, String mappingsFile) {
         super(mappingsFile);
         this.cam = cam;
     }
-
 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
@@ -79,10 +77,12 @@ public class MainGamepadListener extends AbstractGamepadListener {
 
     @Override
     public boolean axisMoved(Controller controller, int axisCode, float value) {
-        if (Math.abs(value) > 0.1)
-            logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
+        logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
 
         boolean treated = false;
+
+        // Zero point
+        value = (float) applyZeroPoint(value);
 
         // Apply power function to axis reading
         double val = Math.signum(value) * Math.pow(Math.abs(value), mappings.getAxisValuePower());
@@ -96,8 +96,6 @@ public class MainGamepadListener extends AbstractGamepadListener {
             }
             treated = true;
         } else if (axisCode == mappings.getAxisLstickV()) {
-            if (Math.abs(val) < 0.005)
-                val = 0;
             cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
             treated = true;
         } else if (axisCode == mappings.getAxisRstickH()) {
