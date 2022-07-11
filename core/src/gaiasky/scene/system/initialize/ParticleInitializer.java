@@ -17,6 +17,7 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
@@ -58,9 +59,13 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         var hip = Mapper.hip.get(entity);
         var dist = Mapper.distance.get(entity);
         var focus = Mapper.focus.get(entity);
+        var bb = Mapper.billboard.get(entity);
 
-        // Focus active
+        // Focus active.
         focus.activeConsumer = FocusActive::isFocusActiveTrue;
+
+        // Billboard renderer.
+        bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardCelestial;
 
         if (hip != null) {
             // Initialize star
@@ -117,6 +122,8 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         }
         float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
+
+
     }
 
     private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus) {

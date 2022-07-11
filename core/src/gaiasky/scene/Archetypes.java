@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
+import gaiasky.scene.component.Billboard;
 import gaiasky.scene.component.tag.*;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
@@ -92,7 +93,7 @@ public class Archetypes {
 
             // Celestial
             addArchetype(CelestialBody.class.getName(), SceneGraphNode.class.getName(), Celestial.class, Magnitude.class,
-                    Coordinates.class, Rotation.class, Label.class, SolidAngle.class, Focus.class);
+                    Coordinates.class, Rotation.class, Label.class, SolidAngle.class, Focus.class, Billboard.class);
 
             // ModelBody
             addArchetype(ModelBody.class.getName(), CelestialBody.class.getName(), Model.class, ModelScaffolding.class, AffineTransformations.class);
@@ -119,13 +120,13 @@ public class Archetypes {
             addArchetype(Spacecraft.class.getName(), GenericSpacecraft.class.getName(), MotorEngine.class);
 
             // StarCluster
-            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class, Label.class, Focus.class);
+            addArchetype(StarCluster.class.getName(), SceneGraphNode.class.getName(), Model.class, Cluster.class, ProperMotion.class, Label.class, Focus.class, Billboard.class);
 
             // Billboard
-            addArchetype(Billboard.class.getName(), ModelBody.class.getName(), TagQuaternionOrientation.class, Fade.class);
+            addArchetype(gaiasky.scenegraph.Billboard.class.getName(), ModelBody.class.getName(), TagQuaternionOrientation.class, Fade.class);
 
             // BillboardGalaxy
-            addArchetype(BillboardGalaxy.class.getName(), Billboard.class.getName(), TagBillboardGalaxy.class);
+            addArchetype(BillboardGalaxy.class.getName(), gaiasky.scenegraph.Billboard.class.getName(), TagBillboardGalaxy.class);
 
             // VertsObject
             addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);
@@ -173,7 +174,7 @@ public class Archetypes {
             addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagNoProcessChildren.class, Focus.class);
 
             // StarGroup
-            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class, Label.class, Line.class, Focus.class);
+            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class, Label.class, Line.class, Focus.class, Billboard.class);
 
             // Constellation
             addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class, Label.class);
@@ -205,6 +206,7 @@ public class Archetypes {
         }
     }
 
+    @SafeVarargs
     private void addArchetype(String archetypeName, String parentArchetypeName, Class<? extends Component>... classes) {
         Archetype parent = null;
         if (parentArchetypeName != null && this.archetypes.containsKey(parentArchetypeName)) {
@@ -213,6 +215,7 @@ public class Archetypes {
         this.archetypes.put(archetypeName, new Archetype(engine, parent, archetypeName, classes));
     }
 
+    @SafeVarargs
     private void addArchetype(String archetypeName, Class<? extends Component>... classes) {
         addArchetype(archetypeName, null, classes);
     }

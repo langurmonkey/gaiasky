@@ -18,6 +18,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Model;
 import gaiasky.scene.entity.FocusHit;
+import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
@@ -88,6 +89,7 @@ public class ClusterInitializer extends AbstractInitSystem {
         var body = Mapper.body.get(entity);
         var model = Mapper.model.get(entity);
         var cluster = Mapper.cluster.get(entity);
+        var bb = Mapper.billboard.get(entity);
 
         if (cluster.clusterTex == null) {
             cluster.clusterTex = new Texture(Settings.settings.data.dataFileHandle("data/tex/base/cluster-tex.png"), true);
@@ -105,6 +107,10 @@ public class ClusterInitializer extends AbstractInitSystem {
             cluster.modelTransform = new Matrix4();
         }
 
+        // Billboard.
+        bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardCluster;
+
+        // Model.
         model.renderConsumer = ModelEntityRenderSystem::renderStarClusterModel;
 
         model.model = new ModelComponent(false);

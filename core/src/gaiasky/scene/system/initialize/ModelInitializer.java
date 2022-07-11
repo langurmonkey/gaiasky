@@ -22,6 +22,7 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.entity.SpacecraftRadio;
+import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
@@ -76,11 +77,13 @@ public class ModelInitializer extends AbstractInitSystem {
         var engine = Mapper.engine.get(entity);
         var fade = Mapper.fade.get(entity);
         var focus = Mapper.focus.get(entity);
+        var bb = Mapper.billboard.get(entity);
 
         boolean isPlanet = atmosphere != null || cloud != null;
         boolean isSatellite = attitude != null;
         boolean isSpacecraft = engine != null;
         boolean isBillboard = fade != null;
+        boolean isBillboardGal = Mapper.tagBillboardGalaxy.has(entity);
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateModel;
@@ -89,7 +92,7 @@ public class ModelInitializer extends AbstractInitSystem {
         // All celestial labels use the same consumer.
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
 
-        if(!Mapper.tagQuatOrientation.has(entity)) {
+        if (!Mapper.tagQuatOrientation.has(entity)) {
             // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
             body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
         } else {
@@ -103,7 +106,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
 
         // Initialize model body
-        initializeModel(base, body, model, celestial, sa, label, scaffolding, graph, focus);
+        initializeModel(base, body, model, celestial, bb, sa, label, scaffolding, graph, focus, isBillboardGal);
 
         // Init billboard
         if (isBillboard) {
@@ -137,29 +140,29 @@ public class ModelInitializer extends AbstractInitSystem {
 
         AssetManager manager = AssetBean.manager();
         if (model != null && model.model != null) {
-            // All models
+            // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
         }
         if (atmosphere != null || cloud != null) {
-            // Planets
+            // Planets.
             initializeAtmosphere(manager, atmosphere.atmosphere, model.model, body.size);
             initializeClouds(manager, cloud.cloud);
         }
         if (parentOrientation != null) {
-            // Satellites
+            // Satellites.
             if (parentOrientation.parentOrientation) {
                 parentOrientation.parentrc = graph.parent.getComponent(Rotation.class).rc;
             }
             parentOrientation.orientationf = new Matrix4();
         }
         if (attitude != null) {
-            // Heliotropic satellites
+            // Heliotropic satellites.
             if (attitude.attitudeLocation != null && manager.isLoaded(attitude.attitudeLocation)) {
                 attitude.attitudeServer = manager.get(attitude.attitudeLocation);
             }
         }
         if (engine != null) {
-            // Spacecraft
+            // Spacecraft.
             // Broadcast me
             // TODO activate
             //EventManager.publish(Event.SPACECRAFT_LOADED, this, this);
@@ -167,9 +170,9 @@ public class ModelInitializer extends AbstractInitSystem {
             EventManager.instance.subscribe(new SpacecraftRadio(entity), Event.CAMERA_MODE_CMD, Event.SPACECRAFT_STABILISE_CMD, Event.SPACECRAFT_STOP_CMD, Event.SPACECRAFT_THRUST_DECREASE_CMD, Event.SPACECRAFT_THRUST_INCREASE_CMD, Event.SPACECRAFT_THRUST_SET_CMD, Event.SPACECRAFT_MACHINE_SELECTION_CMD);
         }
         if (fade != null) {
-            // Billboards -- add depth test attribute, set to false
+            // Billboards -- add depth test attribute, set to false.
             if (model.model != null && model.model.instance != null) {
-                // Disable depth test
+                // Disable depth test.
                 Array<gaiasky.util.gdx.shader.Material> mats = model.model.instance.materials;
                 for (Material mat : mats) {
                     mat.set(new DepthTestAttribute(false));
@@ -214,10 +217,15 @@ public class ModelInitializer extends AbstractInitSystem {
         setToMachine(engine.machines[engine.currentMachine], false, body, model, scaffolding, engine);
     }
 
-    private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus) {
+    private void initializeModel(Base base, Body body, Model model, Celestial celestial, Billboard bb, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus, boolean isBillboardGal) {
+        // Billboard.
+        bb.renderConsumer = isBillboardGal ? BillboardEntityRenderSystem::renderBillboardGalaxy : BillboardEntityRenderSystem::renderBillboardCelestial;
+
+        // Focus consumer.
         focus.activeConsumer = FocusActive::isFocusActiveTrue;
 
-        if(model.renderConsumer == null) {
+        // Model renderer.
+        if (model.renderConsumer == null) {
             model.renderConsumer = ModelEntityRenderSystem::renderGenericModel;
         }
 
