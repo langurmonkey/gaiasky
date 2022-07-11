@@ -216,8 +216,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
             var scaffolding = Mapper.modelScaffolding.get(entity);
             float size = (float) (getRenderSizeBillboard(camera, body, scaffolding) / Constants.DISTANCE_SCALE_FACTOR);
 
-            Vector3 aux = F31;
-            shader.setUniformf("u_pos", graph.translation.put(aux));
+            shader.setUniformf("u_pos", graph.translation.put(F31));
             shader.setUniformf("u_size", size);
 
             shader.setUniformf("u_color", celestial.colorPale[0], celestial.colorPale[1], celestial.colorPale[2], alpha);
@@ -306,7 +305,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
             // Render the mesh
             mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
-        } else if(Mapper.cluster.has(entity)) {
+        } else if (Mapper.cluster.has(entity)) {
             /*
              * STAR CLUSTERS
              */
@@ -319,8 +318,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
             float fa = (1 - cluster.fadeAlpha) * 0.6f;
 
-            Vector3 aux = F31;
-            shader.setUniformf("u_pos", graph.translation.put(aux));
+            shader.setUniformf("u_pos", graph.translation.put(F31));
             shader.setUniformf("u_size", body.size);
             shader.setUniformf("u_color", body.color[0] * fa, body.color[1] * fa, body.color[2] * fa, body.color[3] * alpha * base.opacity * 6.5f);
             // Sprite.render
@@ -335,6 +333,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     public float getRenderSizeCelestial(ICamera camera, Entity entity, Body body, SolidAngle sa, ModelScaffolding scaffolding, ParticleExtra extra) {
         if (extra != null) {
             // Stars, particles
+            boolean star = Mapper.hip.has(entity);
             extra.computedSize = body.size;
             if (body.viewAngle > thdownOverFovfactor) {
                 double dist = body.distToCamera;
@@ -344,9 +343,9 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
                 extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
             }
 
-            extra.computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
+            extra.computedSize *= Settings.settings.scene.star.pointSize * (star ? 0.1f : 0.2f);
             return (float) ((extra.computedSize / Constants.DISTANCE_SCALE_FACTOR) * extra.primitiveRenderScale);
-        } else if(Mapper.fade.has(entity)) {
+        } else if (Mapper.fade.has(entity)) {
             // Regular billboards
             return getRenderSizeBillboard(camera, body, scaffolding);
         } else {

@@ -41,13 +41,11 @@ public class ConstellationInitializer extends AbstractInitSystem {
         }
 
         // Labels.
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderConstellation(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderConstellation;
 
         // Lines.
         line.lineWidth = 1;
-        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
-                -> rs.renderConstellation(e, r, c, a);
+        line.renderConsumer = LineEntityRenderSystem::renderConstellation;
 
         EventManager.instance.subscribe(new ConstellationRadio(entity), Event.CONSTELLATION_UPDATE_CMD);
 

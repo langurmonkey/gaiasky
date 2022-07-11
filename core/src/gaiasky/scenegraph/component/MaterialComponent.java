@@ -319,7 +319,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
         // Add reflection cubemap if SSR is off and this material has metallic attributes
         if (metallic != null || metallicColor != null) {
-            if (!Settings.settings.postprocess.ssr) {
+            if (!Settings.settings.postprocess.ssr.active) {
                 reflectionCubemap.prepareCubemap(manager);
                 material.set(new CubemapAttribute(CubemapAttribute.ReflectionCubemap, reflectionCubemap.cubemap));
             }

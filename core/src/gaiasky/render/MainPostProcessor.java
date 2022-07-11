@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IPostProcessor;
+import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
+import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -47,22 +49,18 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Centralized repository for all post-processing effects in Gaia Sky.
+ */
 public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
 
+    /** The asset manager. **/
     private AssetManager manager;
+    /** The actual post processors. **/
     private PostProcessBean[] pps;
 
-    float bloomFboScale = 0.5f;
-
-    // Intensity of flare
-    float flareIntensity = 0.15f;
-    // Number of flares
-    int nGhosts = 8;
-    // Number of samples for the light glow
-    int lightGlowNSamples = 1;
-
-    // Aspect ratio
+    /** Aspect ratio cache. **/
     float ar;
 
     BackgroundModel blurObject;
@@ -76,7 +74,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    // Contains a map by name with [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
+    /**
+     * Contains a map by name with
+     * [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
+      */
     private final Map<String, Object[]> raymarchingDef;
 
     private void addRayMarchingDef(String name, Object[] list) {
@@ -102,10 +103,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void initialize(AssetManager manager) {
         this.manager = manager;
+        LensFlareSettings settings = Settings.settings.postprocess.lensFlare;
+        lensDirtName = Settings.settings.data.dataFile(GlobalResources.unpackAssetPath(settings.texLensDirt));
+        lensColorName = Settings.settings.data.dataFile(settings.texLensColor);
+        lensStarburstName = Settings.settings.data.dataFile(settings.texLensStarburst);
+
         starTextureName = Settings.settings.scene.star.getStarTexture();
-        lensDirtName = Settings.settings.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg"));
-        lensColorName = Settings.settings.data.dataFile("data/tex/base/lenscolor.png");
-        lensStarburstName = Settings.settings.data.dataFile("data/tex/base/lensstarburst.jpg");
         manager.load(starTextureName, Texture.class);
         manager.load(lensDirtName, Texture.class);
         manager.load(lensColorName, Texture.class);
@@ -134,15 +137,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     private int[] getSize(RenderType type) {
-        switch (type) {
-        case screen:
-            return new int[] { (int) Math.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) Math.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale) };
-        case screenshot:
-            return new int[] { Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1] };
-        case frame:
-            return new int[] { Settings.settings.frame.resolution[0], Settings.settings.frame.resolution[1] };
-        }
-        return null;
+        return switch (type) {
+            case screen -> new int[] { (int) Math.round(Settings.settings.graphics.resolution[0] * Settings.settings.graphics.backBufferScale), (int) Math.round(Settings.settings.graphics.resolution[1] * Settings.settings.graphics.backBufferScale) };
+            case screenshot -> new int[] { Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1] };
+            case frame -> new int[] { Settings.settings.frame.resolution[0], Settings.settings.frame.resolution[1] };
+        };
     }
 
     private PostProcessBean newPostProcessor(RenderType rt, float width, float height, float targetWidth, float targetHeight, AssetManager manager) {
@@ -193,13 +192,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         // SSR
         SSR ssrEffect = new SSR();
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
-        ssrEffect.setEnabled(Settings.settings.postprocess.ssr && !vr && !safeMode);
+        ssrEffect.setEnabled(Settings.settings.postprocess.ssr.active && !vr && !safeMode);
         ppb.set(ssrEffect);
 
         // CAMERA MOTION BLUR
         CameraMotion cameraBlur = new CameraMotion(width, height);
         cameraBlur.setBlurScale(.8f);
-        cameraBlur.setEnabled(Settings.settings.postprocess.motionBlur && !vr && !safeMode);
+        cameraBlur.setEnabled(Settings.settings.postprocess.motionBlur.active && !vr && !safeMode);
         ppb.set(cameraBlur);
         updateCameraBlur(ppb, gq);
 
@@ -211,6 +210,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
 
         // LIGHT GLOW
+        LightGlowSettings glowSettings = Settings.settings.postprocess.lightGlow;
         Texture glow = manager.get(starTextureName);
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         LightGlow lightGlow = new LightGlow(5, 5);
@@ -218,7 +218,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
         lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackbufferScale(Settings.settings.runtime.openVr ? (float) Settings.settings.graphics.backBufferScale : 1);
-        lightGlow.setEnabled(!SysUtils.isMac() && Settings.settings.postprocess.lightGlow);
+        lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
@@ -227,38 +227,38 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             This is a pretty brutal patch for macOS. For some obscure reason,
             the sucker will welcome you with a nice cozy blank screen if
             the activation of the light glow effect is
-            not delayed. No time to get to the bottom of this.
+            not delayed. No time or willpower to get to the bottom of this.
          **/
-        if (SysUtils.isMac() && Settings.settings.postprocess.lightGlow) {
+        if (SysUtils.isMac() && glowSettings.active) {
             Task enableLG = new Task() {
                 @Override
                 public void run() {
                     logger.info("Enabling light glow effect...");
-                    ppb.get(LightGlow.class).setEnabled(Settings.settings.postprocess.lightGlow);
+                    ppb.get(LightGlow.class).setEnabled(glowSettings.active);
                 }
             };
             Timer.schedule(enableLG, 5);
         }
 
         // LENS FLARE
-        float lensFboScale = 0.2f;
+        LensFlareSettings lensSettings = Settings.settings.postprocess.lensFlare;
         Texture lensColor = manager.get(lensColorName);
         lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lensDirt = manager.get(lensDirtName);
         lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lensStarBurst = manager.get(lensStarburstName);
         lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        LensFlare lensFlare = new LensFlare((int) (width * lensFboScale), (int) (height * lensFboScale));
-        lensFlare.setGhosts(nGhosts);
-        lensFlare.setHaloWidth(0.5f);
+        LensFlare lensFlare = new LensFlare((int) (width * lensSettings.fboScale), (int) (height * lensSettings.fboScale));
+        lensFlare.setGhosts(lensSettings.numGhosts);
+        lensFlare.setHaloWidth(lensSettings.haloWidth);
         lensFlare.setLensColorTexture(lensColor);
         lensFlare.setLensDirtTexture(lensDirt);
         lensFlare.setLensStarburstTexture(lensStarBurst);
-        lensFlare.setFlareIntesity(Settings.settings.postprocess.lensFlare ? flareIntensity : 0f);
-        lensFlare.setFlareSaturation(0.8f);
+        lensFlare.setFlareIntesity(lensSettings.active ? lensSettings.intensity : 0f);
+        lensFlare.setFlareSaturation(lensSettings.flareSaturation);
         lensFlare.setBaseIntesity(1f);
-        lensFlare.setBias(-0.98f);
-        lensFlare.setBlurPasses(35);
+        lensFlare.setBias(lensSettings.bias);
+        lensFlare.setBlurPasses(lensSettings.blurPasses);
         ppb.set(lensFlare);
 
         // UNSHARP MASK
@@ -271,7 +271,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         initAntiAliasing(Settings.settings.postprocess.antialias, width, height, ppb);
 
         // BLOOM
-        Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
+        Bloom bloom = new Bloom((int) (width * Settings.settings.postprocess.bloom.fboScale), (int) (height * Settings.settings.postprocess.bloom.fboScale));
         bloom.setBloomIntesnity(Settings.settings.postprocess.bloom.intensity);
         bloom.setBlurPasses(20);
         bloom.setBlurAmount(10);
@@ -385,7 +385,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             lightglow.setNSamples(samples);
             lightglow.setViewportSize(lgw, lgh);
         }
-        lightGlowNSamples = samples;
+        Settings.settings.postprocess.lightGlow.samples = samples;
     }
 
     private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
@@ -676,8 +676,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             break;
         case LENS_FLARE_CMD:
             active = (Boolean) data[0];
-            int numGhosts = active ? nGhosts : 0;
-            float intensity = active ? flareIntensity : 0;
+            int numGhosts = active ? Settings.settings.postprocess.lensFlare.numGhosts : 0;
+            float intensity = active ? Settings.settings.postprocess.lensFlare.intensity : 0;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -767,7 +767,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         fisheye.setEnabled(active);
                     LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
                     if (glow != null)
-                        glow.setNSamples(active ? 1 : lightGlowNSamples);
+                        glow.setNSamples(active ? 1 : Settings.settings.postprocess.lightGlow.samples);
                 }
             }
             break;
@@ -800,14 +800,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             break;
         case CUBEMAP_CMD:
             boolean cubemap = (Boolean) data[0];
-            enabled = !cubemap && Settings.settings.postprocess.motionBlur && !Settings.settings.runtime.openVr;
+            enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openVr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     ppb.get(CameraMotion.class).setEnabled(enabled);
                     LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                     if (lightglow != null) {
-                        lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
+                        lightglow.setNSamples(enabled ? 1 : Settings.settings.postprocess.lightGlow.samples);
                         lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
                     }
                 }
@@ -821,19 +821,19 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
             break;
         case ANTIALIASING_CMD:
-            final Antialias aavalue = (Antialias) data[0];
+            final Antialias antiAliasingValue = (Antialias) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         Antialiasing antialiasing = getAA(ppb);
-                        if (aavalue.isPostProcessAntialias()) {
+                        if (antiAliasingValue.isPostProcessAntialias()) {
                             // clean
                             if (antialiasing != null) {
                                 ppb.remove(antialiasing.getClass());
                             }
                             // update
-                            initAntiAliasing(aavalue, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
+                            initAntiAliasing(antiAliasingValue, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
                             // ensure motion blur and levels go after
                             ppb.remove(Levels.class);
                             initLevels(ppb);

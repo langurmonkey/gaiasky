@@ -29,13 +29,11 @@ public class RulerInitializer extends AbstractInitSystem {
         label.textScale = 0.2f;
         label.labelFactor = 0.0005f;
         label.labelMax = 1f;
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderRuler(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderRuler;
 
         // Lines.
         line.lineWidth = 1f;
-        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
-                -> rs.renderRuler(e, r, c, a);
+        line.renderConsumer = LineEntityRenderSystem::renderRuler;
 
         EventManager.instance.subscribe(new RulerRadio(entity), Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR);
     }

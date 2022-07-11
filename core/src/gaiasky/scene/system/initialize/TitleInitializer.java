@@ -26,8 +26,7 @@ public class TitleInitializer extends AbstractInitSystem {
         var body = Mapper.body.get(entity);
         var label = Mapper.label.get(entity);
 
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderTitle(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderTitle;
 
         EventManager.instance.subscribe(new TitleRadio(entity), Event.UI_THEME_RELOAD_INFO);
 

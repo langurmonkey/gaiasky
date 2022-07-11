@@ -249,9 +249,9 @@ public class SettingsMorph {
         postprocess.bloom.intensity = f32("postprocess.bloom.intensity", p);
         postprocess.unsharpMask = new UnsharpMaskSettings();
         postprocess.unsharpMask.factor = f32("postprocess.unsharpmask.factor", p);
-        postprocess.motionBlur = f32("postprocess.motionblur", p) != 0;
-        postprocess.lensFlare = bool("postprocess.lensflare", p);
-        postprocess.lightGlow = bool("postprocess.lightscattering", p);
+        postprocess.motionBlur.active = f32("postprocess.motionblur", p) != 0;
+        postprocess.lensFlare.active = bool("postprocess.lensflare", p);
+        postprocess.lightGlow.active = bool("postprocess.lightscattering", p);
         postprocess.fisheye = bool("postprocess.fisheye", p);
         var levels = new LevelsSettings();
         levels.brightness = f32("postprocess.brightness", p);

@@ -30,8 +30,7 @@ public class AxesInitializer extends AbstractInitSystem {
 
         // Lines.
         line.lineWidth = 1f;
-        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
-                -> rs.renderAxes(e, r, c, a);
+        line.renderConsumer = LineEntityRenderSystem::renderAxes;
 
         // Base
         axis.b0 = new Vector3d(1, 0, 0);

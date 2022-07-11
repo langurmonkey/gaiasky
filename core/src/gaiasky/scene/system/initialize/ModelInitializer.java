@@ -83,14 +83,11 @@ public class ModelInitializer extends AbstractInitSystem {
         boolean isBillboard = fade != null;
 
         // Focus hits.
-        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
-                -> f.addHitCoordinateModel(v, x, y, w, h, p, c, l);
-        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
-                -> f.addHitRayModel(v, a, b, c, l);
+        focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateModel;
+        focus.hitRayConsumer = FocusHit::addHitRayModel;
 
         // All celestial labels use the same consumer.
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderCelestial(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
 
         if(!Mapper.tagQuatOrientation.has(entity)) {
             // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
@@ -183,8 +180,7 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
-        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                mer.renderSpacecraft(e, m ,b, a, t, r, rg, s, rel);
+        model.renderConsumer = ModelEntityRenderSystem::renderSpacecraft;
 
         base.ct = new ComponentTypes(ComponentType.Satellites);
         engine.rotationMatrix = new Matrix4();
@@ -219,11 +215,10 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     private void initializeModel(Base base, Body body, Model model, Celestial celestial, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus) {
-        focus.activeConsumer = (FocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
+        focus.activeConsumer = FocusActive::isFocusActiveTrue;
 
         if(model.renderConsumer == null) {
-            model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                    mer.renderGenericModel(e, m, b, a, t, r, rg, s, rel);
+            model.renderConsumer = ModelEntityRenderSystem::renderGenericModel;
         }
 
         // Default values
@@ -268,8 +263,7 @@ public class ModelInitializer extends AbstractInitSystem {
     }
 
     private void initializePlanet(Base base, Body body, Model model, ModelScaffolding scaffolding, SolidAngle sa, Label label, Atmosphere atmosphere, Cloud cloud) {
-        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                mer.renderPlanet(e, m ,b, a, t, r, rg, s, rel);
+        model.renderConsumer = ModelEntityRenderSystem::renderPlanet;
 
         double thPoint = sa.thresholdPoint;
         sa.thresholdNone = thPoint / 1e6;

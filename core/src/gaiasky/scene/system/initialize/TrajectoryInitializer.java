@@ -59,8 +59,7 @@ public class TrajectoryInitializer extends AbstractInitSystem {
         verts.glPrimitive = GL20.GL_LINE_STRIP;
         verts.renderGroup = RenderGroup.LINE_GPU;
 
-        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
-                -> rs.renderTrajectory(e, r, c, a);
+        line.renderConsumer = LineEntityRenderSystem::renderTrajectory;
 
         // Initialize default colors if needed
         if (body.color == null) {

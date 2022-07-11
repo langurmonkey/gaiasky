@@ -417,13 +417,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             }
             return false;
         });
-        lensFlare.setChecked(settings.postprocess.lensFlare);
+        lensFlare.setChecked(settings.postprocess.lensFlare.active);
 
         // LIGHT GLOW
         OwnLabel lightGlowLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
         CheckBox lightGlow = new OwnCheckBox("", skin);
         lightGlow.setName("light scattering");
-        lightGlow.setChecked(settings.postprocess.lightGlow);
+        lightGlow.setChecked(settings.postprocess.lightGlow.active);
         lightGlow.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.LIGHT_SCATTERING_CMD, lightGlow, lightGlow.isChecked());
@@ -735,7 +735,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // SSR
             OwnLabel ssrLabel = new OwnLabel(I18n.msg("gui.ssr"), skin);
             ssr = new OwnCheckBox("", skin);
-            ssr.setChecked(!safeMode && !vr && settings.postprocess.ssr);
+            ssr.setChecked(!safeMode && !vr && settings.postprocess.ssr.active);
             ssr.setDisabled(safeMode || vr);
             OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
             ssrTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.ssr.info"), skin));
@@ -748,7 +748,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
             motionBlur = new OwnCheckBox("", skin);
             motionBlur.setName("motion blur");
-            motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur);
+            motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur.active);
             motionBlur.setDisabled(safeMode || vr);
 
             experimental.add(motionBlurLabel).left().padRight(pad20).padBottom(pad5);
@@ -1913,8 +1913,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private void updateBackupValues() {
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
-        lensflareBak = settings.postprocess.lensFlare;
-        lightGlowBak = settings.postprocess.lightGlow;
+        lensflareBak = settings.postprocess.lensFlare.active;
+        lightGlowBak = settings.postprocess.lightGlow.active;
         brightnessBak = settings.postprocess.levels.brightness;
         contrastBak = settings.postprocess.levels.contrast;
         hueBak = settings.postprocess.levels.hue;
@@ -2149,13 +2149,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Motion blur
         if (motionBlur != null) {
-            reloadRenderSystem = reloadRenderSystem || settings.postprocess.motionBlur != motionBlur.isChecked();
+            reloadRenderSystem = reloadRenderSystem || settings.postprocess.motionBlur.active != motionBlur.isChecked();
             GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked()));
         }
 
         // SSR
         if (ssr != null) {
-            reloadRenderSystem = reloadRenderSystem || settings.postprocess.ssr != ssr.isChecked();
+            reloadRenderSystem = reloadRenderSystem || settings.postprocess.ssr.active != ssr.isChecked();
             GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
         }
 

@@ -226,7 +226,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                     materials.put("base", model.materials.first());
             }
             // Add skybox to materials if reflection present
-            if (!Settings.settings.postprocess.ssr) {
+            if (!Settings.settings.postprocess.ssr.active) {
                 addReflectionCubemapAttribute(model.materials);
             }
         } else if (type != null) {
@@ -549,7 +549,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void updateVelocityBufferUniforms(Material mat, ICamera camera) {
-        if (Settings.settings.postprocess.motionBlur) {
+        if (Settings.settings.postprocess.motionBlur.active) {
             vbc.updateVelocityBufferMaterial(mat, camera);
         } else if (vbc.hasVelocityBuffer(mat)) {
             vbc.removeVelocityBufferMaterial(mat);

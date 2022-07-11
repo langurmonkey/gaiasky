@@ -67,10 +67,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var focus = Mapper.focus.get(entity);
 
         // Focus hits.
-        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
-                -> f.addHitCoordinateParticleSet(v, x, y, w, h, p, c, l);
-        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
-                -> f.addHitRayParticleSet(v, a, b, c, l);
+        focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateParticleSet;
+        focus.hitRayConsumer = FocusHit::addHitRayParticleSet;
 
         // Initialize particle set
         if (starSet == null) {
@@ -93,8 +91,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
             var model = Mapper.model.get(entity);
             // Star set.
-            model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                    mer.renderParticleStarSetModel(e, m, b, a, t, r, rg, s, rel);
+            model.renderConsumer = ModelEntityRenderSystem::renderParticleStarSetModel;
 
             // Load model in main thread
             GaiaSky.postRunnable(() -> utils.initModel(AssetBean.manager(), model));
@@ -208,14 +205,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
 
         // Labels.
         var label = Mapper.label.get(entity);
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderStarSet(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderStarSet;
 
         // Lines.
         var line = Mapper.line.get(entity);
         line.lineWidth = 0.6f;
-        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
-                -> rs.renderStarSet(e, r, c, a);
+        line.renderConsumer = LineEntityRenderSystem::renderStarSet;
     }
 
     public void computeMinMeanMaxDistances(ParticleSet set) {

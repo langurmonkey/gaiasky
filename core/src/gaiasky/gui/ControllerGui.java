@@ -494,7 +494,7 @@ public class ControllerGui extends AbstractGui {
         flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
         optionsModel[0][1] = flareButton;
         flareButton.setWidth(ww);
-        flareButton.setChecked(Settings.settings.postprocess.lensFlare);
+        flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
         flareButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.LENS_FLARE_CMD, flareButton, flareButton.isChecked());
@@ -508,7 +508,7 @@ public class ControllerGui extends AbstractGui {
         starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
         optionsModel[0][2] = starGlowButton;
         starGlowButton.setWidth(ww);
-        starGlowButton.setChecked(Settings.settings.postprocess.lightGlow);
+        starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
         starGlowButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.LIGHT_SCATTERING_CMD, starGlowButton, starGlowButton.isChecked());
@@ -522,7 +522,7 @@ public class ControllerGui extends AbstractGui {
         motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
         optionsModel[0][3] = motionBlurButton;
         motionBlurButton.setWidth(ww);
-        motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur);
+        motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur.active);
         motionBlurButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.MOTION_BLUR_CMD, motionBlurButton, motionBlurButton.isChecked());

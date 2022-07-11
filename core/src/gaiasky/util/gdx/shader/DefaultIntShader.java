@@ -848,7 +848,7 @@ public class DefaultIntShader extends BaseIntShader {
                 prefix += "#define " + CubemapAttribute.ReflectionCubemapAlias + "Flag\n";
             }
         }
-        if (Settings.settings.postprocess.ssr) {
+        if (Settings.settings.postprocess.ssr.active) {
             prefix += "#define ssrFlag\n";
         }
 

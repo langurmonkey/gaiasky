@@ -48,8 +48,7 @@ public class ShapeInitializer extends AbstractInitSystem {
         label.textScale = 0.2f;
         label.labelMax = 1f;
         label.labelFactor = (float) (0.5e-3f * Constants.DISTANCE_SCALE_FACTOR);
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderShape(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderShape;
 
         line.lineWidth = 1.5f;
 
@@ -62,8 +61,7 @@ public class ShapeInitializer extends AbstractInitSystem {
         var modelComp = Mapper.model.get(entity);
         var shape = Mapper.shape.get(entity);
 
-        modelComp.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                mer.renderShape(e, m ,b, a, t, r, rg, s, rel);
+        modelComp.renderConsumer = ModelEntityRenderSystem::renderShape;
 
         graph.localTransform = new Matrix4();
         Pair<IntModel, Map<String, Material>> m = ModelCache.cache.getModel(shape.modelShape, shape.modelParams, Bits.indexes(Usage.Position), shape.primitiveType);

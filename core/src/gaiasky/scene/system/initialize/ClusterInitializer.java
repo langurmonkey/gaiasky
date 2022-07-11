@@ -62,13 +62,11 @@ public class ClusterInitializer extends AbstractInitSystem {
         var focus = Mapper.focus.get(entity);
 
         // Focus active.
-        focus.activeConsumer = (FocusActive i, Entity e, Base b) -> i.isFocusActiveCtOpacity(e, b);
+        focus.activeConsumer = FocusActive::isFocusActiveCtOpacity;
 
         // Focus hits.
-        focus.hitCoordinatesConsumer = (FocusHit f, FocusView v, Integer x, Integer y, Integer w, Integer h, Integer p, NaturalCamera c, Array<IFocus> l)
-                -> f.addHitCoordinateCluster(v, x, y, w, h, p, c, l);
-        focus.hitRayConsumer = (FocusHit f, FocusView v, Vector3d a, Vector3d b, NaturalCamera c, Array<IFocus> l)
-                -> f.addHitRayCluster(v, a, b, c, l);
+        focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateCluster;
+        focus.hitRayConsumer = FocusHit::addHitRayCluster;
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units
@@ -77,8 +75,7 @@ public class ClusterInitializer extends AbstractInitSystem {
         label.textScale = 0.2f;
         label.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
         label.labelFactor = 1;
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderCluster(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderCluster;
 
     }
 
@@ -108,8 +105,7 @@ public class ClusterInitializer extends AbstractInitSystem {
             cluster.modelTransform = new Matrix4();
         }
 
-        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                mer.renderStarClusterModel(e, m ,b, a, t, r, rg, s, rel);
+        model.renderConsumer = ModelEntityRenderSystem::renderStarClusterModel;
 
         model.model = new ModelComponent(false);
         model.model.initialize(null);

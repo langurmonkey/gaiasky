@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30200
+configVersion: 30202
 
 #
 # Data configuration
@@ -181,7 +181,7 @@ scene:
     # be balanced with the dataset and the draw distance.
     # 6.0 M is calibrated to use 6 GB heap space with the default dataset
     maxStars: 7000000
-    # The octant thersholds:
+    # The octant thresholds:
     # - radius/distance above which we start painting stars in octant with fade in. Angle in radians.
     # - radius/distance below which we paint stars in octant with fade out. Above this angle, inner stars are painted with full brightness. Angle in radians.
     threshold: [1.4, 1.8]
@@ -226,7 +226,7 @@ scene:
     home: false
   # Initialization configuration
   initialization:
-    # Lazy initalization of textures
+    # Lazy initialization of textures
     lazyTexture: true
     # Lazy initialization of meshes
     lazyMesh: true
@@ -295,7 +295,7 @@ program:
   pointer:
     # Display the coordinates of the pointer projected on the sides of the window
     coordinates: true
-    # Pointer guides configuraiton
+    # Pointer guides configuration
     guides:
       # Display pointer guides
       active: false
@@ -364,7 +364,7 @@ program:
       roll: 0.0
   # Default location of script files, leave empty for default
   scriptsLocation: null
-  # User interface configuraiton
+  # User interface configuration
   ui:
     # The UI theme, in [dark-green|dark-blue|dark-orange|night-red]
     theme: dark-green
@@ -392,6 +392,7 @@ program:
     # Data repository location
     dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
     # Data descriptor file location
+    # This can also point to a local repository
     dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030200.json
 
 #
@@ -458,7 +459,7 @@ screenshot:
 camrecorder:
   # Target frame rate of the camrecorder system
   targetFps: 60
-  # Keyframe configruation
+  # Keyframe configuration
   keyframe:
     # Interpolation method for the camera position, in [SPLINE|LINEAR]
     position: SPLINE
@@ -477,21 +478,38 @@ postprocess:
   bloom:
     # Intensity of bloom
     intensity: 0.0
+    # Frame buffer scale
+    fboScale: 0.5
   # Unsharp mask effect
   unsharpMask:
     # Sharpen factor, in [0,3]
     factor: 0.0
-  # Activate/deactivate motion blur effect
-  motionBlur: false
-  # Activate/deactivate screen space reflections
-  ssr: false
-  # Activate/deactivate lens flare effect
-  lensFlare: true
-  # Activate/deactivate light glow effect
-  lightGlow: true
+  # Motion blur effect
+  motionBlur:
+    active: false
+  # Screen space reflections
+  ssr:
+    active: false
+  # Lens flare effect settings
+  lensFlare:
+    active: true
+    intensity: 0.15
+    numGhosts: 8
+    haloWidth: 0.5
+    blurPasses: 35
+    flareSaturation: 0.8
+    bias: -0.98
+    texLensColor: data/tex/base/lenscolor.png
+    texLensDirt: data/tex/base/lensdirt%#QUAL#%.jpg
+    texLensStarburst: data/tex/base/lensstarburst.jpg
+    fboScale: 0.2
+  # Light glow effect
+  lightGlow:
+    active: true
+    samples: 10
   # Activate/deactivate fisheye transformation
   fisheye: false
-  # Image levels configuraiton
+  # Image levels
   levels:
     # Brightness level in [-1,1] (default=0)
     brightness: 0.0
@@ -503,13 +521,13 @@ postprocess:
     saturation: 1.0
     # Gamma correction value in [0,3] (default=1)
     gamma: 1.0
-  # Tone mapping algorhtims
+  # Tone mapping algorithms
   toneMapping:
-    # Alrogrithm to use, one of [AUTO|EXPOSURE|ACES|UNCHARTED|FILMIC|NONE]
+    # Algorithm to use, one of [AUTO|EXPOSURE|ACES|UNCHARTED|FILMIC|NONE]
     type: NONE
     # When type=exposure, set the exposure here, in [0,n]
     exposure: 0.0
-    
+
 #
 # Spacecraft configuration
 #
@@ -520,7 +538,7 @@ spacecraft:
   showAxes: false
 
 #
-# Proxy configuraiton
+# Proxy configuration
 #
 
 #proxy:

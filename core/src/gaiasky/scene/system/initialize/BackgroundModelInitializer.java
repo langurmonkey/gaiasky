@@ -38,8 +38,7 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
         var renderType = Mapper.renderType.get(entity);
 
         // Force texture loading
-        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                mer.renderGenericModel(e, m ,b, a, t, r, rg, s, rel);
+        model.renderConsumer = ModelEntityRenderSystem::renderGenericModel;
 
         model.model.forceInit = true;
 

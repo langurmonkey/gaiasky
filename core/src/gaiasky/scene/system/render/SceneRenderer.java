@@ -201,7 +201,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             buildShadowMapData();
         }
 
-        if (Settings.settings.postprocess.lightGlow) {
+        if (Settings.settings.postprocess.lightGlow.active) {
             buildGlowData();
         }
     }
@@ -519,7 +519,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         if (frameBuffer == null) {
             frameBuffer = glowFb;
         }
-        if (Settings.settings.postprocess.lightGlow && frameBuffer != null) {
+        if (Settings.settings.postprocess.lightGlow.active && frameBuffer != null) {
             // Get all billboard stars
             Array<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
 

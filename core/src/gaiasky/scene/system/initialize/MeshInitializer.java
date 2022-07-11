@@ -30,8 +30,7 @@ public class MeshInitializer extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
         var model = Mapper.model.get(entity);
 
-        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                mer.renderMeshModel(e, m ,b, a, t, r, rg, s, rel);
+        model.renderConsumer = ModelEntityRenderSystem::renderMeshModel;
 
         ModelComponent mc = model.model;
         if (mc != null) {
@@ -52,8 +51,7 @@ public class MeshInitializer extends AbstractInitSystem {
         label.textScale = 0.2f;
         label.labelFactor = 0.8e-3f;
         label.labelMax = 1f;
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderMesh(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderMesh;
 
         AssetManager manager = AssetBean.manager();
         if (mc != null) {

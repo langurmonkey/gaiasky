@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gaiasky.GaiaSky;
-import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -21,6 +20,7 @@ import gaiasky.gui.KeyBindings;
 import gaiasky.gui.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
@@ -1366,12 +1366,12 @@ public class Settings {
         public Antialias antialias;
         public BloomSettings bloom;
         public UnsharpMaskSettings unsharpMask;
+        public LensFlareSettings lensFlare;
+        public LightGlowSettings lightGlow;
         public LevelsSettings levels;
         public ToneMappingSettings toneMapping;
-        public boolean ssr;
-        public boolean motionBlur;
-        public boolean lensFlare;
-        public boolean lightGlow;
+        public SSRSettings ssr;
+        public MotionBlurSettings motionBlur;
         public boolean fisheye;
 
         public PostprocessSettings() {
@@ -1385,11 +1385,33 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class BloomSettings {
             public float intensity;
+            public float fboScale = 0.5f;
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UnsharpMaskSettings {
             public float factor;
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class LensFlareSettings {
+            public boolean active;
+            public float intensity = 0.15f;
+            public int numGhosts = 8;
+            public float haloWidth = 0.5f;
+            public int blurPasses = 35;
+            public float flareSaturation = 0.8f;
+            public float bias = -0.98f;
+            public String texLensColor = "data/tex/base/lenscolor.png";
+            public String texLensDirt = "data/tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg";
+            public String texLensStarburst = "data/tex/base/lensstarburst.jpg";
+            public float fboScale = 0.2f;
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class LightGlowSettings {
+            public boolean active;
+            public int samples = 1;
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
@@ -1411,6 +1433,16 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class SSRSettings {
+            public boolean active;
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class MotionBlurSettings {
+            public boolean active;
+        }
+
         public Antialias getAntialias(int code) {
             return switch (code) {
                 case -1 -> Antialias.FXAA;
@@ -1425,10 +1457,10 @@ public class Settings {
             switch (event) {
             case BLOOM_CMD -> bloom.intensity = (float) data[0];
             case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
-            case LENS_FLARE_CMD -> lensFlare = (Boolean) data[0];
-            case LIGHT_SCATTERING_CMD -> lightGlow = (Boolean) data[0];
-            case SSR_CMD -> ssr = (Boolean) data[0];
-            case MOTION_BLUR_CMD -> motionBlur = (Boolean) data[0];
+            case LENS_FLARE_CMD -> lensFlare.active = (Boolean) data[0];
+            case LIGHT_SCATTERING_CMD -> lightGlow.active = (Boolean) data[0];
+            case SSR_CMD -> ssr.active = (Boolean) data[0];
+            case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
             case FISHEYE_CMD -> {
                 fisheye = (Boolean) data[0];
 

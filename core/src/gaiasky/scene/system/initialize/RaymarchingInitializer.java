@@ -31,7 +31,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         var focus = Mapper.focus.get(entity);
 
         // Focus active
-        focus.activeConsumer = (FocusActive i, Entity e, Base b) -> i.isFocusActiveTrue(e, b);
+        focus.activeConsumer = FocusActive::isFocusActiveTrue;
 
         if(graph.parentName == null) {
             graph.parentName = Scene.ROOT_NAME;

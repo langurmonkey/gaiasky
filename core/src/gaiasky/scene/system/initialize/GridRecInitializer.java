@@ -57,13 +57,11 @@ public class GridRecInitializer extends AbstractInitSystem {
         label.labelMax = 1f;
         label.label = true;
         label.labelPosition = new Vector3b();
-        label.renderConsumer = (LabelEntityRenderSystem rs, LabelView l, ExtSpriteBatch b, ExtShaderProgram s, FontRenderSystem f, RenderingContext r, ICamera c)
-                -> rs.renderRecursiveGrid(l, b, s, f, r, c);
+        label.renderConsumer = LabelEntityRenderSystem::renderRecursiveGrid;
 
         // Lines.
         line.lineWidth = 0.5f;
-        line.renderConsumer = (LineEntityRenderSystem rs, Entity e, LinePrimitiveRenderer r, ICamera c, Float a)
-                -> rs.renderGridRec(e, r, c, a);
+        line.renderConsumer = LineEntityRenderSystem::renderGridRec;
 
         transform.floatVersion = true;
         transform.setTransformName(Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? "galacticToEquatorial" : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? "eclipticToEquatorial" : null));
@@ -83,8 +81,7 @@ public class GridRecInitializer extends AbstractInitSystem {
         gr.d = new Vector3d();
 
         // Init billboard model
-        model.renderConsumer = (ModelEntityRenderSystem mer, Entity e, Model m, IntModelBatch b, Float a, Double t, RenderingContext r, RenderGroup rg, Boolean s, Boolean rel) ->
-                mer.renderRecursiveGridModel(e, m ,b, a, t, r, rg, s, rel);
+        model.renderConsumer = ModelEntityRenderSystem::renderRecursiveGridModel;
 
         model.model = new ModelComponent();
         model.model.setType("twofacedbillboard");
