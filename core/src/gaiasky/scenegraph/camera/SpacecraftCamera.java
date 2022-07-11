@@ -37,7 +37,7 @@ import org.apfloat.Apfloat;
 public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     /**
-     * Direction and up vectors
+     * Direction and up vectors.
      **/
     public Vector3d direction, up;
     public Vector3b relpos;
@@ -189,7 +189,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scaccel.set(sc.accel);
         scvel.set(sc.vel);
         scpos.set(sc.pos);
-        scpos = ((SpacecraftCoordinates)sc.getCoordinates()).computePosition(dt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
+        scpos = ((SpacecraftCoordinates) sc.getCoordinates()).computePosition(dt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
         scdir.set(sc.direction);
         scup.set(sc.up);
         sc.computeDirectionUp(dt, dirup);
@@ -356,7 +356,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         }
     }
 
-    private void updateTargetDistance(){
+    private void updateTargetDistance() {
         this.targetDistance = sc.size * 3.5;
     }
 

@@ -81,6 +81,8 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         double mass = spacecraft.mass();
 
         spacecraft.currentEnginePower(Math.signum(currentEnginePower));
+        currentEnginePower = spacecraft.currentEnginePower();
+
         // Compute force from thrust
         thrust.set(direction).scl(spacecraft.thrustMagnitude() * spacecraft.thrustFactor()[spacecraft.thrustFactorIndex()] * currentEnginePower);
         force.set(thrust);
