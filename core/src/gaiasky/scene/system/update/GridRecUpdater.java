@@ -58,7 +58,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         body.distToCamera = getDistanceToOrigin(camera);
         fade.currentDistance = body.distToCamera;
         gr.regime = body.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
-        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.getFocus() != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
             // Baked fade-in as we get close to focus
             IFocus focus = camera.getFocus();
             base.opacity *= MathUtilsd.lint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
@@ -71,7 +71,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         getGridScaling(body.distToCamera, gr.scalingFading);
 
         // Compute projection lines to refsys
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.getFocus() != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
             IFocus focus = camera.getFocus();
             Vector3d cpos = D33;
             Vector3d fpos = D34;
@@ -151,10 +151,10 @@ public class GridRecUpdater extends AbstractUpdateSystem {
     }
 
     private double getDistanceToOrigin(ICamera camera) {
-        IFocus focus = camera.getFocus();
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || focus == null) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || !camera.hasFocus()) {
             return camera.getPos().lend();
         } else {
+            IFocus focus = camera.getFocus();
             return focus.getDistToCamera();
         }
     }

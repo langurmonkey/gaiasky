@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -22,7 +23,10 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.view.FilterView;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
@@ -58,6 +62,8 @@ public class SearchDialog extends GenericDialog {
     private final SortedSet<String> matching;
     private Array<OwnLabel> matchingLabels;
     private Table candidates;
+    private FocusView view;
+    private FilterView filterView;
     private int cIdx = -1;
     private Vector2 aux;
     private boolean suggestions;
@@ -72,6 +78,8 @@ public class SearchDialog extends GenericDialog {
         this.matching = new TreeSet<>();
         this.matchingLabels = new Array<>(10);
         this.tasks = new Array<>(20);
+        this.view = new FocusView();
+        this.filterView = new FilterView();
 
         setModal(false);
         setAcceptText(I18n.msg("gui.close"));
@@ -117,7 +125,7 @@ public class SearchDialog extends GenericDialog {
                 if (ie.getType() == Type.keyUp) {
                     if (code == Keys.ESCAPE || code == Keys.ENTER) {
                         if (cIdx >= 0) {
-                            checkString(searchInput.getText(), sg);
+                            checkString(searchInput.getText(), scene);
                         }
                         removeCandidates();
                         me.remove();
@@ -138,7 +146,6 @@ public class SearchDialog extends GenericDialog {
                             Task task = new Task() {
                                 public void run() {
                                     synchronized (matching) {
-                                        matchingNodes(name, sg);
                                         matchingNodes(name, scene);
 
                                         if (!matching.isEmpty()) {
@@ -150,7 +157,7 @@ public class SearchDialog extends GenericDialog {
                                                     if (evt instanceof InputEvent) {
                                                         InputEvent iEvt = (InputEvent) evt;
                                                         if (iEvt.getType() == Type.touchDown) {
-                                                            checkString(match, sg);
+                                                            checkString(match, scene);
                                                             searchInput.setText(match);
                                                             accept();
                                                             return true;
@@ -180,16 +187,16 @@ public class SearchDialog extends GenericDialog {
                             Timer.schedule(task, 0.5f);
 
                             // Actually check and select
-                            if (!checkString(name, sg)) {
+                            if (!checkString(name, scene)) {
                                 if (name.matches("[0-9]+")) {
                                     // Check with 'HIP '
-                                    if (checkString("hip " + name, sg)) {
+                                    if (checkString("hip " + name, scene)) {
                                         cancelTasks();
                                         removeCandidates();
                                     }
                                 } else if (name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")) {
                                     // Check without 'HIP '
-                                    if (checkString(name.substring(4), sg)) {
+                                    if (checkString(name.substring(4), scene)) {
                                         cancelTasks();
                                         removeCandidates();
                                     }
@@ -275,7 +282,7 @@ public class SearchDialog extends GenericDialog {
         scene.matchingFocusableNodes(text, matching, 10, null);
     }
 
-    private boolean checkString(String text, ISceneGraph sg) {
+    private boolean checkStringSceneGraph(String text, ISceneGraph sg) {
         try {
             if (sg.containsNode(text)) {
                 SceneGraphNode node = sg.getNode(text);
@@ -300,6 +307,46 @@ public class SearchDialog extends GenericDialog {
                         info(I18n.msg("gui.objects.search.dataset.invisible", text, ci.get().name));
                     } else {
                         info(I18n.msg("gui.objects.search.invisible", text, focus.getCt().toString()));
+                    }
+                    return true;
+                }
+            } else {
+                info(null);
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return false;
+    }
+
+    private boolean checkString(String text, Scene scene) {
+        try {
+            if (scene.index().containsEntity(text)) {
+                Entity entity = scene.getEntity(text);
+                if (Mapper.focus.has(entity)) {
+                    view.setEntity(entity);
+                    view.getFocus(text);
+                    filterView.setEntity(entity);
+
+                    boolean timeOverflow = view.isCoordinatesTimeOverflow();
+                    boolean canSelect = view.getSet() == null || view.getSet().canSelect(filterView);
+                    boolean ctOn = GaiaSky.instance.isOn(view.getCt());
+                    Optional<CatalogInfo> ci = GaiaSky.instance.getCatalogInfoFromEntity(entity);
+                    boolean datasetVisible = ci.isEmpty() || ci.get().isVisible(true);
+                    if (!timeOverflow && canSelect && ctOn && datasetVisible) {
+                        GaiaSky.postRunnable(() -> {
+                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, true);
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, entity, true);
+                        });
+                        info(null);
+                    } else if (timeOverflow) {
+                        info(I18n.msg("gui.objects.search.timerange", text));
+                    } else if (!canSelect) {
+                        info(I18n.msg("gui.objects.search.filter", text));
+                    } else if (!datasetVisible) {
+                        info(I18n.msg("gui.objects.search.dataset.invisible", text, ci.get().name));
+                    } else {
+                        info(I18n.msg("gui.objects.search.invisible", text, Mapper.base.get(entity).ct.toString()));
                     }
                     return true;
                 }

@@ -34,12 +34,13 @@ import gaiasky.input.AbstractMouseKbdListener;
 import gaiasky.input.MainGamepadListener;
 import gaiasky.input.MainMouseKbdListener;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.component.RotationComponent;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
@@ -145,16 +146,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private boolean fullStop = true;
 
-
     private CameraMode lastMode;
 
     /**
      * The focus entity
      */
-    public IFocus focus, focusBak;
+    public FocusView focus, focusBak;
 
-    /** The focus view object, holding the reference to the current focus entity. This gets
-     * set to {@link NaturalCamera#focus} when necessary. **/
+    /**
+     * Auxiliary focus view object, used to reduce the amount of allocations.
+     */
     private FocusView focusView;
 
     /**
@@ -276,6 +277,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         this.force = new Vector3b();
         this.posBak = new Vector3d();
         this.previousOrientation = new Matrix4d();
+        this.focus = new FocusView();
         this.focusView = new FocusView();
         this.vr = vr;
         initialize(spriteShader, shapeShader);
@@ -446,7 +448,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
         switch (m) {
         case FOCUS_MODE:
-            if (focus != null && !focus.isCoordinatesTimeOverflow()) {
+            if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow()) {
                 final double appMagCamera, appMagEarth;
                 synchronized (updateLock) {
                     focusBak = focus;
@@ -1178,9 +1180,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         gamepadListener.deactivate();
     }
 
-    public void setFocus(IFocus focus) {
-        if (focus != null && GaiaSky.instance.isOn(focus.getCt())) {
-            this.focus = focus;
+    public void setFocus(Entity newFocus) {
+        if (newFocus != null && GaiaSky.instance.isOn(Mapper.base.get(newFocus).ct)) {
+            this.focus.setEntity(newFocus);
             this.focus.makeFocus();
             // Reset facing focus.
             this.facingFocus = false;
@@ -1247,12 +1249,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case SCENE_LOADED:
             this.scene = (Scene) data[0];
-            this.focusView.setScene(this.scene);
+            this.focus.setScene(this.scene);
             break;
         case FOCUS_CHANGE_CMD:
             setTrackingObject(null, null);
             // Check the type of the parameter: IFocus or String
-            IFocus focus = null;
+            Entity newFocus = null;
 
             // Center focus or not
             boolean centerFocus = !Settings.settings.runtime.openVr;
@@ -1262,39 +1264,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (data[0] instanceof String) {
                 String focusName = (String) data[0];
 
-                // Old scene graph
-                SceneGraphNode sgn = sceneGraph.getNode(focusName);
-                if (sgn instanceof IFocus) {
-                    focus = (IFocus) sgn;
-                    diverted = !centerFocus;
-                }
-
-                // New scene
-                Entity entity = scene.getEntity(focusName);
-                try {
-                    focusView.setEntity(entity);
-                } catch (Exception e) {
-                    // Nothing
-                } finally {
-                    // TODO restore this
-                    focus = focusView;
-                    diverted = !centerFocus;
-                }
-
-            } else if (data[0] instanceof IFocus) {
-                focus = (IFocus) data[0];
+                newFocus = scene.getEntity(focusName);
                 diverted = !centerFocus;
+
             } else if (data[0] instanceof Entity) {
-                try {
-                    focusView.setEntity((Entity) data[0]);
-                } catch (Exception e) {
-                    // Nothing
-                } finally {
-                    focus = focusView;
-                    diverted = !centerFocus;
-                }
+                newFocus = (Entity) data[0];
+                diverted = !centerFocus;
             }
-            setFocus(focus);
+            setFocus(newFocus);
 
             checkFocus();
 
@@ -1427,19 +1404,23 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FOCUS_NOT_AVAILABLE:
             if (getMode().isFocus()) {
                 boolean found = false;
-                if (data[0] instanceof IFocus) {
-                    focus = (IFocus) data[0];
-                    found = isFocus(focus);
-                } else if (data[0] instanceof OctreeWrapper) {
-                    OctreeWrapper octree = (OctreeWrapper) data[0];
-                    OctreeNode octant = this.focus.getOctant();
-                    if (octant != null && octant.getRoot() == octree.root) {
-                        found = true;
-                    }
-                } else if (data[0] instanceof GenericCatalog) {
-                    GenericCatalog gc = (GenericCatalog) data[0];
-                    if (gc.children != null && gc.children.contains((SceneGraphNode) this.focus, true)) {
-                        found = true;
+                if (data[0] instanceof Entity) {
+                    var entity = (Entity) data[0];
+                    if(Mapper.octree.has(entity)) {
+                        // Octree wrapper.
+                        var root = Mapper.octant.get(entity);
+                        OctreeNode octant = this.focus.getOctant();
+                        if (octant != null && octant.getRoot() == root.octant) {
+                            found = true;
+                        }
+                    }else if(Mapper.datasetDescription.has(entity)) {
+                        // Generic catalog.
+                        var graph = Mapper.graph.get(entity);
+                        found = graph.children != null && graph.children.contains(focus.getEntity(), true);
+                    } else if (Mapper.focus.has(entity)) {
+                        // Focus.
+                        focus.setEntity(entity);
+                        found = isFocus(entity);
                     }
                 }
                 if (found) {
@@ -1595,8 +1576,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public boolean isFocus(IFocus focus) {
-        return this.focus != null && this.focus == focus;
+    public boolean isFocus(Entity focus) {
+        return this.focus != null && this.focus.getEntity() == focus;
     }
 
     @Override
@@ -1604,11 +1585,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return getMode().equals(CameraMode.FOCUS_MODE) ? this.focus : null;
     }
 
+    @Override
+    public boolean hasFocus() {
+        return focus != null && !focus.isEmpty();
+    }
+
     /**
      * Checks the position of the camera does not collide with the focus object.
      */
     public void checkFocus() {
-        if (focus != null && !(focus instanceof Star) && !(focus instanceof ParticleGroup)) {
+        if (focus.getEntity() != null && !Mapper.hip.has(focus.getEntity()) && focus.getSet() == null) {
             // Move camera if too close to focus
             this.focus.getAbsolutePosition(aux1b);
             if (pos.dstd(aux1b, aux2b) < this.focus.getRadius()) {
@@ -1636,7 +1622,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The magnitude.
      */
     private double computeFocusApparentMagnitudeCamera() {
-        if (focus instanceof CelestialBody) {
+        if (focus.getMag() != null) {
             // m - H = 5 * log10(r * D) + g
             // m: apparent magnitude
             // H: absolute magnitude
@@ -1647,7 +1633,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             IFocus starAncestor = focus.getFirstStarAncestor();
             double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
             return 5d * Math.log10(distStarAu * distCamAu) + focus.getAbsmag();
-
         } else {
             // m - M = 5 * log10(d) - 5
             // m: apparent magnitude
@@ -1664,8 +1649,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     private double computeFocusApparentMagnitudeEarth() {
         // Apparent magnitude from Earth (planets, etc)
-        SceneGraphNode earth = sceneGraph.getNode("Earth");
-        if (focus instanceof CelestialBody && earth != null) {
+        Entity earth = scene.getEntity("Earth");
+        if (focus.getMag() != null && earth != null) {
             // Distance between earth and the body
             // Apparent magnitude in Solar System bodies
             // m - H = 5 * log10(r * D) + g
@@ -1674,8 +1659,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // r: dist to star [AU]
             // D: dist to Earth [AU]
             // g: term for phase effects (~0)
-            double distEarthAu = earth.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
-            IFocus starAncestor = focus.getFirstStarAncestor();
+            double distEarthAu = EntityUtils.getAbsolutePosition(earth, aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
+            IFocus starAncestor = focus.getFirstStarAncestor(focusView);
             double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
             return 5d * Math.log10(distStarAu * distEarthAu) + focus.getAbsmag();
         } else {

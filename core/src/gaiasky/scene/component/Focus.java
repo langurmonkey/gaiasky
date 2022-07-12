@@ -18,8 +18,8 @@ public class Focus implements Component {
     public Function3<FocusActive, Entity, Base, Boolean> activeFunction;
 
     /** Consumer that computes whether the focus is hit by a ray. **/
-    public Consumer6<FocusHit, FocusView, Vector3d, Vector3d, NaturalCamera, Array<IFocus>> hitRayConsumer;
+    public Consumer6<FocusHit, FocusView, Vector3d, Vector3d, NaturalCamera, Array<Entity>> hitRayConsumer;
 
     /** Consumer that computes whether the focus is hit by the given screen coordinates. **/
-    public Consumer9<FocusHit, FocusView, Integer, Integer, Integer, Integer, Integer, NaturalCamera, Array<IFocus>> hitCoordinatesConsumer;
+    public Consumer9<FocusHit, FocusView, Integer, Integer, Integer, Integer, Integer, NaturalCamera, Array<Entity>> hitCoordinatesConsumer;
 }

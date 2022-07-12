@@ -38,6 +38,7 @@ import gaiasky.render.api.IMainRenderer;
 import gaiasky.render.api.IPostProcessor;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.*;
@@ -820,9 +821,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun
      */
     private void goHome() {
-        final IFocus homeObject = sceneGraph.findFocus(settings.scene.homeObject);
+        final Entity homeObject = scene.findFocus(settings.scene.homeObject);
         boolean isOn = true;
-        if (homeObject != null && (isOn = GaiaSky.instance.isOn(homeObject.getCt())) && !settings.program.net.slave.active) {
+        if (homeObject != null && (isOn = GaiaSky.instance.isOn(Mapper.base.get(homeObject).ct)) && !settings.program.net.slave.active) {
             // Set focus to Earth
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, homeObject, true);
@@ -843,7 +844,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             Task t = new Task() {
                 @Override
                 public void run() {
-                    logger.info("The home object '" + settings.scene.homeObject + "' is invisible due to its type(s): " + homeObject.getCt());
+                    logger.info("The home object '" + settings.scene.homeObject + "' is invisible due to its type(s): " + Mapper.base.get(homeObject).ct);
                 }
             };
             Timer.schedule(t, 1);
@@ -1455,6 +1456,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public Optional<CatalogInfo> getCatalogInfoFromObject(SceneGraphNode node) {
         if (node instanceof FadeNode) {
             return catalogManager.getByObject((FadeNode) node);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<CatalogInfo> getCatalogInfoFromEntity(Entity entity) {
+        if(Mapper.datasetDescription.has(entity)) {
+            return catalogManager.getByEntity(entity);
         }
         return Optional.empty();
     }

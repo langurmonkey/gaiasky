@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -14,6 +15,8 @@ import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Planet;
@@ -168,7 +171,7 @@ public class CameraManager implements ICamera, IObserver {
         this.spacecraftCamera = new SpacecraftCamera(this);
         this.relativisticCamera = new RelativisticCamera(manager, this);
 
-        this.cameras = new ICamera[]{naturalCamera, fovCamera, spacecraftCamera};
+        this.cameras = new ICamera[] { naturalCamera, fovCamera, spacecraftCamera };
 
         this.mode = mode;
         this.lastPos = new Vector3d();
@@ -204,26 +207,26 @@ public class CameraManager implements ICamera, IObserver {
         AbstractCamera aux;
         // Update
         switch (mode) {
-            case GAME_MODE:
-                EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, false );
-            case FREE_MODE:
-            case FOCUS_MODE:
-                aux = backupCam(current);
-                current = naturalCamera;
-                restoreCam(naturalCamera, aux);
-                break;
-            case SPACECRAFT_MODE:
-                aux = backupCam(current);
-                current = spacecraftCamera;
-                restoreCam(spacecraftCamera, aux);
-                break;
-            case GAIA_FOV1_MODE:
-            case GAIA_FOV2_MODE:
-            case GAIA_FOVS_MODE:
-                current = fovCamera;
-                break;
-            default:
-                break;
+        case GAME_MODE:
+            EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, false);
+        case FREE_MODE:
+        case FOCUS_MODE:
+            aux = backupCam(current);
+            current = naturalCamera;
+            restoreCam(naturalCamera, aux);
+            break;
+        case SPACECRAFT_MODE:
+            aux = backupCam(current);
+            current = spacecraftCamera;
+            restoreCam(spacecraftCamera, aux);
+            break;
+        case GAIA_FOV1_MODE:
+        case GAIA_FOV2_MODE:
+        case GAIA_FOVS_MODE:
+            current = fovCamera;
+            break;
+        default:
+            break;
         }
 
     }
@@ -297,7 +300,7 @@ public class CameraManager implements ICamera, IObserver {
         return current.getUp();
     }
 
-    public void swapBuffers(){
+    public void swapBuffers() {
         current.swapBuffers();
     }
 
@@ -339,12 +342,13 @@ public class CameraManager implements ICamera, IObserver {
 
         int screenX = Gdx.input.getX();
         int screenY = Gdx.input.getY();
-        int width = Gdx.graphics.getWidth();;
+        int width = Gdx.graphics.getWidth();
+        ;
         int height = Gdx.graphics.getHeight();
 
         // This check is for windows, which crashes when the window is minimized
         // as graphics.get[Width|Height]() returns 0.
-        if(width > 0 && height > 0) {
+        if (width > 0 && height > 0) {
             // Update Pointer and view Alpha/Delta
             updateRADEC(screenX, screenY, width / 2, height / 2);
         }
@@ -372,7 +376,7 @@ public class CameraManager implements ICamera, IObserver {
         IFocus newClosest = getClosest();
         EventManager.publish(Event.CAMERA_CLOSEST_INFO, this, newClosest, getClosestBody(), getClosestParticle());
 
-        if(newClosest != previousClosest){
+        if (newClosest != previousClosest) {
             EventManager.publish(Event.CAMERA_NEW_CLOSEST, this, newClosest);
             previousClosest = newClosest;
         }
@@ -401,7 +405,7 @@ public class CameraManager implements ICamera, IObserver {
             double viewDEC = out.y * Nature.TO_DEG;
 
             EventManager.publish(Event.RA_DEC_UPDATED, this, pointerRA, pointerDEC, viewRA, viewDEC, pointerX, pointerY);
-        }catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             // Something fishy with the pointer coordinates
         }
 
@@ -410,10 +414,10 @@ public class CameraManager implements ICamera, IObserver {
     private void updateFocusLatLon(int screenX, int screenY) {
         if (isNatural()) {
             // Hover over planets gets us lat/lon
-            if (current.getFocus() != null && current.getFocus() instanceof Planet) {
-                Planet p = (Planet) current.getFocus();
+            if (current.hasFocus() && Mapper.atmosphere.has(((FocusView) current.getFocus()).getEntity())) {
+                FocusView e = (FocusView) current.getFocus();
                 double[] lonlat = new double[2];
-                boolean ok = CameraUtils.getLonLat(p, getCurrent(), screenX, screenY, v0, v1, vec, isec, in, out, localTransformInv, lonlat);
+                boolean ok = CameraUtils.getLonLat(e, e.getEntity(), getCurrent(), screenX, screenY, v0, v1, vec, isec, in, out, localTransformInv, lonlat);
 
                 if (ok)
                     EventManager.publish(Event.LON_LAT_UPDATED, this, lonlat[0], lonlat[1], screenX, screenY);
@@ -509,7 +513,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public boolean isFocus(IFocus cb) {
+    public boolean isFocus(Entity cb) {
         return current.isFocus(cb);
     }
 
@@ -521,6 +525,11 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public IFocus getFocus() {
         return current.getFocus();
+    }
+
+    @Override
+    public boolean hasFocus() {
+        return current.hasFocus();
     }
 
     @Override
@@ -574,7 +583,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public IFocus getCloseLightSource(int i){
+    public IFocus getCloseLightSource(int i) {
         return current.getCloseLightSource(i);
     }
 
@@ -654,6 +663,7 @@ public class CameraManager implements ICamera, IObserver {
      * Stores the normalized rays representing the camera frustum in world space in a 4x4 matrix.  Each row is a vector.
      *
      * @param frustumCorners The matrix to fill
+     *
      * @return The same matrix
      */
     public Matrix4 getFrustumCornersWorld(Matrix4 frustumCorners) {
@@ -706,8 +716,9 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Stores the normalized rays representing the camera frustum in eye space in a 4x4 matrix.  Each row is a vector.
      *
-     * @param cam The perspective camera
+     * @param cam            The perspective camera
      * @param frustumCorners The matrix to fill
+     *
      * @return The same matrix
      */
     public static Matrix4 getFrustumCornersEye(PerspectiveCamera cam, Matrix4 frustumCorners) {

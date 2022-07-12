@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.CelestialBody;
@@ -21,14 +22,14 @@ public interface ICamera {
 
     /**
      * Returns the perspective camera.
-     * 
+     *
      * @return The perspective camera.
      */
     PerspectiveCamera getCamera();
 
     /**
      * Sets the active camera
-     * 
+     *
      * @param perspectiveCamera The perspective camera.
      */
     void setCamera(PerspectiveCamera perspectiveCamera);
@@ -50,11 +51,13 @@ public interface ICamera {
     Vector3b getPos();
 
     void setPos(Vector3d pos);
+
     void setPos(Vector3b pos);
 
     Vector3b getPreviousPos();
 
     void setPreviousPos(Vector3d pos);
+
     void setPreviousPos(Vector3b pos);
 
     void setDirection(Vector3d dir);
@@ -85,11 +88,9 @@ public interface ICamera {
 
     /**
      * Updates the camera.
-     * 
-     * @param dt
-     *            The time since the las frame in seconds.
-     * @param time
-     *            The frame time provider (simulation time).
+     *
+     * @param dt   The time since the las frame in seconds.
+     * @param time The frame time provider (simulation time).
      */
     void update(double dt, ITimeFrameProvider time);
 
@@ -104,7 +105,7 @@ public interface ICamera {
      * vertical angle is the field of view and corrects the horizontal using the
      * aspect ratio. It depends on the viewport size and the field of view
      * itself.
-     * 
+     *
      * @return The angle in radians.
      */
     float getAngleEdge();
@@ -115,7 +116,7 @@ public interface ICamera {
 
     /**
      * Gets the current velocity of the camera in km/h.
-     * 
+     *
      * @return The velocity in km/h.
      */
     double getSpeed();
@@ -123,33 +124,38 @@ public interface ICamera {
     /**
      * Gets the distance from the camera to the centre of our reference frame
      * (Sun)
-     * 
+     *
      * @return The distance
      */
     double getDistance();
 
     /**
-     * Returns the focus if any
-     * 
-     * @return The focus object if it is in focus mode. Null otherwise
+     * Returns the focus if any.
+     *
+     * @return The focus object if it is in focus mode. Null otherwise.
      */
     IFocus getFocus();
 
     /**
-     * Checks if this body is the current focus
-     * 
-     * @param cb
-     *            The body
-     * @return Whether the body is focus
+     * Checks whether the current camera has a focus set.
+     * @return True if the camera has a focus.
      */
-    boolean isFocus(IFocus cb);
+    boolean hasFocus();
+
+    /**
+     * Checks if the given entity is the current focus.
+     *
+     * @param entity The entity.
+     *
+     * @return Whether the entity is focus.
+     */
+    boolean isFocus(Entity entity);
 
     /**
      * Called after updating the body's distance to the cam, it updates the
      * closest body in the camera to figure out the camera near
-     * 
-     * @param  focus
-     *            The body to check
+     *
+     * @param focus The body to check
      */
     void checkClosestBody(IFocus focus);
 
@@ -165,7 +171,7 @@ public interface ICamera {
 
     /**
      * Gets the current closest particle to this camera
-     * 
+     *
      * @return The closest particle
      */
     IFocus getClosestParticle();
@@ -180,9 +186,8 @@ public interface ICamera {
     /**
      * Sets the current closest particle to this camera. This will be only set if
      * the given particle is closer than the current.
-     * 
-     * @param particle
-     *            The candidate particle
+     *
+     * @param particle The candidate particle
      */
     void checkClosestParticle(IFocus particle);
 
@@ -193,6 +198,7 @@ public interface ICamera {
 
     /**
      * Sets the closest of all
+     *
      * @param focus The new closest object
      */
     void setClosest(IFocus focus);
@@ -200,6 +206,7 @@ public interface ICamera {
     void updateFrustumPlanes();
 
     double getNear();
+
     double getFar();
 
     void swapBuffers();

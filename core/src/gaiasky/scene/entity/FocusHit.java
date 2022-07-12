@@ -1,5 +1,6 @@
 package gaiasky.scene.entity;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
@@ -52,11 +53,11 @@ public class FocusHit {
         return pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize;
     }
 
-    public void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
         addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, 1, camera, hits);
     }
 
-    private void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, float angleScaleFactor, NaturalCamera camera, Array<IFocus> hits) {
+    private void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, float angleScaleFactor, NaturalCamera camera, Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
 
@@ -91,13 +92,13 @@ public class FocusHit {
                 // Check click distance
                 if (checkClickDistance(screenX, screenY, pos, camera, pCamera, pixelSize)) {
                     //Hit
-                    hits.add(view);
+                    hits.add(entity);
                 }
             }
         }
     }
 
-    public void addHitRayCelestial(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRayCelestial(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
 
@@ -113,7 +114,7 @@ public class FocusHit {
                 double value = distToLine / dist;
 
                 if (value < 0.01) {
-                    hits.add(view);
+                    hits.add(entity);
                 }
             }
         }
@@ -123,7 +124,7 @@ public class FocusHit {
      * If we render the model, we set up a sphere at the object's position with
      * its radius and check for intersections with the ray
      */
-    public void addHitCoordinateModel(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinateModel(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
             var sa = Mapper.sa.get(entity);
@@ -156,14 +157,14 @@ public class FocusHit {
                     boolean intersect = Intersectord.checkIntersectRaySpehre(aux3d, aux2d, aux1d, view.getRadius());
                     if (intersect) {
                         //Hit
-                        hits.add(view);
+                        hits.add(entity);
                     }
                 }
             }
         }
     }
 
-    public void addHitRayModel(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRayModel(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
             var sa = Mapper.sa.get(entity);
@@ -181,17 +182,17 @@ public class FocusHit {
                 boolean intersect = Intersectord.checkIntersectRaySpehre(p0, p1, aux1d, view.getRadius());
                 if (intersect) {
                     //Hit
-                    hits.add(view);
+                    hits.add(entity);
                 }
             }
         }
     }
 
-    public void addHitCoordinateStar(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinateStar(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
         addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness * 1e3f, camera, hits);
     }
 
-    public void addHitCoordinateParticleSet(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinateParticleSet(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
         var set = view.getSet();
         List<IParticleRecord> pointData = set.pointData;
         int n = pointData.size();
@@ -255,7 +256,7 @@ public class FocusHit {
                 // We found the best hit
                 set.candidateFocusIndex = best.getFirst();
                 set.updateFocusDataPos();
-                hits.add(view);
+                hits.add(entity);
                 return;
             }
 
@@ -264,7 +265,7 @@ public class FocusHit {
         set.updateFocusDataPos();
     }
 
-    public void addHitRayParticleSet(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRayParticleSet(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
         var set = view.getSet();
         List<IParticleRecord> pointData = set.pointData;
         int n = pointData.size();
@@ -307,7 +308,7 @@ public class FocusHit {
                 // We found the best hit
                 set.candidateFocusIndex = best.getFirst();
                 set.updateFocusDataPos();
-                hits.add(view);
+                hits.add(entity);
                 return;
             }
 
@@ -316,7 +317,7 @@ public class FocusHit {
         set.updateFocusDataPos();
     }
 
-    public void addHitCoordinateCluster(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitCoordinateCluster(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
         if (hitCondition(view)) {
             var entity = view.getEntity();
 
@@ -353,13 +354,13 @@ public class FocusHit {
                 // Check click distance
                 if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
                     //Hit
-                    hits.add(view);
+                    hits.add(entity);
                 }
             }
         }
     }
 
-    public void addHitRayCluster(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    public void addHitRayCluster(FocusView view, Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
         if (hitCondition(view)) {
             var entity = view.getEntity();
 
@@ -375,7 +376,7 @@ public class FocusHit {
                 double value = distToLine / dist;
 
                 if (value < 0.01) {
-                    hits.add(view);
+                    hits.add(entity);
                 }
             }
         }

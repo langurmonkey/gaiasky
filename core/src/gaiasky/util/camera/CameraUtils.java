@@ -5,11 +5,16 @@
 
 package gaiasky.util.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.system.update.ModelUpdater;
+import gaiasky.scene.view.FocusView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Nature;
@@ -21,12 +26,25 @@ import gaiasky.util.math.Vector3d;
  */
 public class CameraUtils {
 
+    private static ModelUpdater updater = new ModelUpdater(null, 0);
+
     /**
-     * Checks if the planet p is hit by the screen position x and y.
+     * Checks if the entity e is hit by the screen position x and y.
      *
-     * @param p The planet
+     * @param e The entity.
      * @return Whether an intersection has occurred
      */
+    public static boolean intersectScreenSphere(IFocus f, Entity e, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection) {
+        var graph = Mapper.graph.get(e);
+        graph.translation.put(vec);
+        v0.set(sx, sy, 0f);
+        v1.set(sx, sy, 0.5f);
+        camera.getCamera().unproject(v0);
+        camera.getCamera().unproject(v1);
+        Ray ray = new Ray(v0, v1.sub(v0).nor());
+        return Intersector.intersectRaySphere(ray, vec, (float) f.getRadius(), intersection);
+    }
+
     public static boolean intersectScreenSphere(Planet p, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection) {
         p.translation.put(vec);
         v0.set(sx, sy, 0f);
@@ -59,13 +77,13 @@ public class CameraUtils {
         return true;
     }
 
-    public static boolean getLonLat(Planet p, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection, Vector3d in, Vector3d out, Matrix4 localTransformInv, double[] lonlat) {
+    public static boolean getLonLat(FocusView f, Entity e, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection, Vector3d in, Vector3d out, Matrix4 localTransformInv, double[] lonlat) {
 
-        boolean inter = intersectScreenSphere(p, camera, sx, sy, v0, v1, vec, intersection);
+        boolean inter = intersectScreenSphere(f, e, camera, sx, sy, v0, v1, vec, intersection);
 
         if (inter) {
             // We found an intersection point
-            p.setToLocalTransform(1, localTransformInv, false);
+            updater.setToLocalTransform(e, f.getBody(), f.getGraph(), 1, localTransformInv, false);
             localTransformInv.inv();
             intersection.mul(localTransformInv);
 

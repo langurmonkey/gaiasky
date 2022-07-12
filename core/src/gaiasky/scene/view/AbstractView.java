@@ -46,13 +46,22 @@ public abstract class AbstractView {
      * all component references to null.
      */
     public void clearEntity() {
-       this.entity = null;
-       entityCleared();
+        this.entity = null;
+        entityCleared();
     }
 
     /** Returns the current entity under this view. **/
     public Entity getEntity() {
-       return this.entity;
+        return this.entity;
+    }
+
+    /**
+     * Checks whether an entity is set in this view.
+     *
+     * @return True if an entity is not set. False otherwise.
+     */
+    public boolean isEmpty() {
+        return entity == null;
     }
 
     /**
@@ -88,4 +97,5 @@ public abstract class AbstractView {
      * should set all component references to null.
      */
     protected abstract void entityCleared();
+
 }

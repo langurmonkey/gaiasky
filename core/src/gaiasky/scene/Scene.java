@@ -500,8 +500,8 @@ public class Scene {
      * @param removeFromIndex Whether to remove it from the index too.
      */
     public void remove(Entity entity, boolean removeFromIndex) {
-        var graph = Mapper.graph.get(entity);
-        if (entity != null && graph.parent != null) {
+        if (entity != null && Mapper.graph.get(entity).parent != null) {
+            var graph = Mapper.graph.get(entity);
             var parentGraph = Mapper.graph.get(graph.parent);
             parentGraph.removeChild(entity, true);
         } else {

@@ -844,7 +844,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         this.pointData = null;
         // Remove focus if needed
         CameraManager cam = GaiaSky.instance.getCameraManager();
-        if (cam != null && cam.getFocus() != null && cam.getFocus() == this) {
+        if (cam != null && cam.hasFocus() && cam.getFocus() == this) {
             this.setFocusIndex(-1);
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
         }

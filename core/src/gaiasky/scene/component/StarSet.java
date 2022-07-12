@@ -1,6 +1,8 @@
 package gaiasky.scene.component;
 
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
@@ -179,5 +181,12 @@ public class StarSet extends ParticleSet {
         return this.proximity.updating[0].col;
     }
 
+    public void markForUpdate(Render render) {
+        if (variableStars) {
+            EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, render);
+        } else {
+            EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, render);
+        }
+    }
 
 }

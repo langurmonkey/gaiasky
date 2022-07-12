@@ -108,7 +108,7 @@ public class LabelEntityRenderSystem {
         }
 
         // Projection lines labels
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && camera.getFocus() != null && gr.d01 > 0 && gr.d02 > 0) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && camera.hasFocus() && gr.d01 > 0 && gr.d02 > 0) {
             DistanceUnits du = Settings.settings.program.ui.distanceUnits;
             shader.setUniform4fv("u_color", gr.ccL, 0, 4);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(gr.d01, du);
@@ -130,9 +130,9 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thLabel", 1);
 
-        IFocus focus = camera.getFocus();
         Vector3b v = B31.setZero();
-        if (Settings.settings.program.recursiveGrid.origin.isFocus() && focus != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
+            IFocus focus = camera.getFocus();
             focus.getAbsolutePosition(v);
         }
         float ff = camera.getFovFactor();

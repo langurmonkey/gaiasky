@@ -5,6 +5,7 @@
 
 package gaiasky.gui.components;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -25,6 +26,8 @@ import gaiasky.event.IObserver;
 import gaiasky.gui.BookmarksManager.BookmarkNode;
 import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.NewBookmarkFolderDialog;
+import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -42,6 +45,9 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     static private final Vector2 tmpCoords = new Vector2();
 
     protected ISceneGraph sg;
+    protected Scene scene;
+
+    protected FocusView view;
 
     protected Tree<TreeNode, String> bookmarksTree;
     protected TextField searchBox;
@@ -63,6 +69,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         folderIcon = skin.getDrawable("iconic-folder-small");
         bookmarkIcon = skin.getDrawable("iconic-bookmark-small");
         contextMenus = new HashSet<>();
+        view = new FocusView();
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.BOOKMARKS_ADD, Event.BOOKMARKS_REMOVE, Event.BOOKMARKS_REMOVE_ALL);
     }
 
@@ -226,9 +233,8 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 });
                                 cm.addItem(moveDown);
 
-
                                 // Move to...
-                                if(target.node.parent != null) {
+                                if (target.node.parent != null) {
                                     MenuItem move = new MenuItem(I18n.msg("gui.bookmark.context.move", target.getValue(), "/"), skin);
                                     move.addListener(evt -> {
                                         if (evt instanceof ChangeEvent) {
@@ -314,8 +320,8 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
 
     }
 
-    private void newMenu(ContextMenu cm){
-        for(ContextMenu menu : contextMenus){
+    private void newMenu(ContextMenu cm) {
+        for (ContextMenu menu : contextMenus) {
             menu.remove();
         }
         contextMenus.add(cm);
@@ -407,6 +413,10 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         this.sg = sg;
     }
 
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
     private void info(String info1, String info2) {
         if (info1 == null) {
             infoMessage1.setText("");
@@ -436,16 +446,16 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         switch (event) {
         case FOCUS_CHANGED:
             // Update focus selection in focus list
-            SceneGraphNode sgn;
+            FocusView focus = null;
             if (data[0] instanceof String) {
-                sgn = sg.getNode((String) data[0]);
-            } else {
-                sgn = (SceneGraphNode) data[0];
+                view.setEntity(scene.getEntity((String) data[0]));
+                focus = view;
+            } else if (data[0] instanceof FocusView) {
+                focus = (FocusView) data[0];
             }
             // Select only if data[1] is true
-            if (sgn != null) {
-                SceneGraphNode node = (SceneGraphNode) data[0];
-                selectBookmark(node.getName(), false);
+            if (focus != null) {
+                selectBookmark(focus.getName(), false);
             }
             break;
         case BOOKMARKS_ADD:

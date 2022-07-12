@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -327,7 +328,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public boolean isFocus(IFocus cb) {
+    public boolean hasFocus() {
+        return false;
+    }
+
+    @Override
+    public boolean isFocus(Entity entity) {
         return false;
     }
 

@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
@@ -19,6 +20,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
 import gaiasky.util.coord.IBodyCoordinates;
@@ -1358,5 +1360,13 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public boolean isForceLabel(String name) {
         return this.forceLabel;
+    }
+
+    public void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+
+    }
+
+    public void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
+
     }
 }

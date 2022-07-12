@@ -1,5 +1,6 @@
 package gaiasky.util.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
@@ -449,7 +450,17 @@ public class Proximity {
         }
 
         @Override
+        public void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+
+        }
+
+        @Override
         public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+
+        }
+
+        @Override
+        public void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
 
         }
 

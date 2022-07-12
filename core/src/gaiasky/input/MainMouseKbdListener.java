@@ -5,6 +5,7 @@
 
 package gaiasky.input;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
@@ -16,6 +17,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -51,7 +53,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     /** The key for rolling the camera **/
     public int rollKey = Keys.SHIFT_LEFT;
     /** FOCUS_MODE comparator **/
-    private final Comparator<IFocus> comp;
+    private final Comparator<Entity> comp;
 
     /** The current (first) button being pressed. */
     protected int button = -1;
@@ -84,6 +86,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     private boolean keyframeBeingDragged = false;
 
     private final NaturalCamera camera;
+
+    private final FocusView view;
 
     protected static class GaiaGestureListener extends GestureAdapter {
         public MainMouseKbdListener inputListener;
@@ -147,6 +151,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         this.noAccelSmoothing = 16.0;
         this.noAccelFactor = 10.0;
 
+        this.view = new FocusView();
+
         this.currentDrag = new Vector2();
         this.lastDrag = new Vector2();
     }
@@ -197,21 +203,21 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         Objects.requireNonNull(getKeyframesPathObject()).moveSelection(screenX, screenY, camera);
     }
 
-    private Array<IFocus> getHits(int screenX, int screenY) {
-        Array<IFocus> l = camera.getSceneGraph().getFocusableObjects();
-
-        Array<IFocus> hits = new Array<>();
+    private Array<Entity> getHits(int screenX, int screenY) {
+        Array<Entity> l = camera.getScene().findFocusableEntities();
+        Array<Entity> hits = new Array<>();
 
         // Add all hits
-        for (IFocus s : l) {
-            s.addHitCoordinate(screenX, screenY, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), MIN_PIX_DIST, camera, hits);
+        for (Entity entity : l) {
+            view.setEntity(entity);
+            view.addEntityHitCoordinate(screenX, screenY, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), MIN_PIX_DIST, camera, hits);
         }
 
         return hits;
     }
 
-    private IFocus getBestHit(int screenX, int screenY) {
-        Array<IFocus> hits = getHits(screenX, screenY);
+    private Entity getBestHit(int screenX, int screenY) {
+        Array<Entity> hits = getHits(screenX, screenY);
         if (hits.size != 0) {
             // Sort using distance
             hits.sort(comp);
@@ -235,12 +241,12 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 this.button = button;
             }
             if (button == Buttons.RIGHT) {
-                // Select keyframes
+                // Select keyframes.
                 if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected())) {
                     IFocus hit;
                     keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
                     if(keyframeBeingDragged){
-                        // FOCUS_MODE, do not center
+                        // FOCUS_MODE, do not center.
                         EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit, false);
                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, false);
                     }
@@ -263,7 +269,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 final long lastLeftTime = lastClickTime;
 
                 GaiaSky.postRunnable(() -> {
-                    // 5% of width pixels distance
+                    // 5% of width pixels distance.
                     if (!Settings.settings.scene.camera.cinematic || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
                         boolean stopped = camera.stopMovement();
                         boolean focusRemoved = GaiaSky.instance.mainGui != null && GaiaSky.instance.mainGui.cancelTouchFocus();
@@ -272,7 +278,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
                         if (doubleClick && !stopped && !focusRemoved) {
                             // Select star, if any
-                            IFocus hit = getBestHit(screenX, screenY);
+                            Entity hit = getBestHit(screenX, screenY);
                             if (hit != null) {
                                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
                                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
@@ -299,7 +305,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                             camera.setPitch(0);
 
                             // Right click, context menu
-                            IFocus hit = getBestHit(screenX, screenY);
+                            Entity hit = getBestHit(screenX, screenY);
                             EventManager.publish(Event.POPUP_MENU_FOCUS, this, hit, screenX, screenY);
                         }
                     });

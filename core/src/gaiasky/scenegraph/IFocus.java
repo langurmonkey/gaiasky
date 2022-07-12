@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scenegraph.camera.ICamera;
@@ -323,6 +324,7 @@ public interface IFocus {
      * @param hits      The list where to add the element.
      */
     void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits);
+    void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits);
 
     /**
      * Adds this focus to the hits list if it is hit by the given ray.
@@ -333,6 +335,7 @@ public interface IFocus {
      * @param hits   The list where the focus is to be added.
      */
     void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
+    void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits);
 
     /**
      * Hook that runs when the candidate is actually made focus.

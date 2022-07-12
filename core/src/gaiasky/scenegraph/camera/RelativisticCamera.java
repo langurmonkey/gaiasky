@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -106,7 +107,12 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public boolean isFocus(IFocus cb) {
+    public boolean hasFocus() {
+        return false;
+    }
+
+    @Override
+    public boolean isFocus(Entity entity) {
         return false;
     }
 

@@ -2,9 +2,12 @@ package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import gaiasky.GaiaSky;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Body;
+import gaiasky.util.Settings;
 
 /**
  * A basic view with the base and body components that all entities have.
@@ -59,5 +62,25 @@ public abstract class BaseView extends AbstractView {
 
     public Body getBody() {
         return body;
+    }
+
+    public boolean isVisible() {
+        return base.visible || base.msSinceStateChange() <= Settings.settings.scene.fadeMs;
+    }
+
+    public void setVisible(boolean visible) {
+        base.visible = visible;
+        base.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
+    }
+
+    public boolean isVisible(boolean attributeValue) {
+        if (attributeValue)
+            return base.visible;
+        else
+            return this.isVisible();
+    }
+
+    public boolean hasCt(ComponentType ct) {
+        return ct != null && base.ct.isEnabled(ct);
     }
 }

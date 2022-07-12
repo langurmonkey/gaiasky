@@ -5,9 +5,11 @@
 
 package gaiasky.util;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.i18n.I18n;
@@ -71,6 +73,25 @@ public class CatalogManager implements IObserver {
         return Optional.empty();
     }
 
+    public Optional<CatalogInfo> getByEntity(Entity node) {
+        OctreeNode octant = null;
+        if (Mapper.octant.has(node)) {
+            var oct = Mapper.octant.get(node);
+            octant = oct.octant != null ? oct.octant.getRoot() : null;
+        }
+        for (CatalogInfo ci : cis) {
+            if(octant != null) {
+                // Octree branch
+                if(Mapper.octree.has(ci.entity) && Mapper.octant.get(ci.entity).octant == octant)
+                    return Optional.of(ci);
+            } else {
+                if (ci.entity == node)
+                    return Optional.of(ci);
+            }
+        }
+        return Optional.empty();
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
@@ -103,7 +124,7 @@ public class CatalogManager implements IObserver {
             String dsName = (String) data[0];
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
-                EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.object);
+                EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.entity);
                 ci.removeCatalog();
                 ciMap.remove(dsName);
                 cis.remove(ci);
@@ -115,7 +136,7 @@ public class CatalogManager implements IObserver {
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
                 if (!visible)
-                    EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.object);
+                    EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.entity);
                 ci.setVisibility(visible);
                 logger.info(I18n.msg("notif.visibility." + (visible ? "on" : "off"), ci.name));
             }

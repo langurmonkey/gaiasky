@@ -22,6 +22,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.components.*;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Scene;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.MusicManager;
@@ -61,6 +62,11 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
      * The scene graph
      */
     private ISceneGraph sg;
+
+    /**
+     * The scene.
+     */
+    private Scene scene;
 
     private final CatalogManager catalogManager;
 
@@ -221,6 +227,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         /* ----BOOKMARKS---- */
         BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, ui);
         bookmarksComponent.setSceneGraph(sg);
+        bookmarksComponent.setScene(scene);
         bookmarksComponent.initialize();
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
@@ -240,7 +247,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         //	panes.put(gaiaComponent.getClass().getSimpleName(), gaia);
 
         /* ----MUSIC GROUP---- */
-        if(MusicManager.initialized()) {
+        if (MusicManager.initialized()) {
             MusicComponent musicComponent = new MusicComponent(skin, ui);
             musicComponent.initialize();
 
@@ -389,7 +396,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         // Calculate new size
         guiLayout.pack();
         if (windowScroll != null) {
-            float unitsPerPixel = ((ScreenViewport)ui.getViewport()).getUnitsPerPixel();
+            float unitsPerPixel = ((ScreenViewport) ui.getViewport()).getUnitsPerPixel();
             windowScroll.setHeight(Math.min(guiLayout.getHeight(), ui.getHeight() - 120 * unitsPerPixel));
             windowScroll.pack();
 
@@ -407,6 +414,10 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
     public void setVisibilityToggles(ComponentType[] entities, boolean[] visible) {

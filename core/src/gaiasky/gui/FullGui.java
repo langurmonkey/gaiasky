@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -82,12 +84,14 @@ public class FullGui extends AbstractGui {
 
     private final GlobalResources globalResources;
     private final CatalogManager catalogManager;
+    private final FocusView view;
 
     public FullGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources, final CatalogManager catalogManager) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.globalResources = globalResources;
         this.catalogManager = catalogManager;
+        this.view = new FocusView();
     }
 
     @Override
@@ -506,11 +510,12 @@ public class FullGui extends AbstractGui {
             pointerYCoord.setVisible(display);
             break;
         case POPUP_MENU_FOCUS:
-            final IFocus candidate = (IFocus) data[0];
+            final Entity candidate = (Entity) data[0];
             int screenX = Gdx.input.getX();
             int screenY = Gdx.input.getY();
 
-            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate, catalogManager, sceneGraph, scene);
+            view.setEntity(candidate);
+            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, view, catalogManager, sceneGraph, scene);
 
             int h = (int) getGuiStage().getHeight();
 
@@ -566,6 +571,7 @@ public class FullGui extends AbstractGui {
     public void addControlsWindow() {
         controlsWindow = new ControlsWindow(Settings.settings.getSuperShortApplicationName(), skin, ui, catalogManager);
         controlsWindow.setSceneGraph(sceneGraph);
+        controlsWindow.setScene(scene);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();
         controlsWindow.left();

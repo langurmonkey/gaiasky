@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -316,13 +317,18 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public boolean isFocus(IFocus cb) {
+    public boolean isFocus(Entity entity) {
         return false;
     }
 
     @Override
     public IFocus getFocus() {
         return null;
+    }
+
+    @Override
+    public boolean hasFocus() {
+        return false;
     }
 
     @Override

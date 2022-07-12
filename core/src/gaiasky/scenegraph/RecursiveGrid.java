@@ -240,7 +240,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             if (label) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
-            if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.getFocus() != null) {
+            if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
                 addToRender(this, RenderGroup.LINE);
             }
         }
@@ -253,7 +253,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         this.regime = this.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
         this.opacity = opacity * this.getVisibilityOpacityFactor();
         super.updateOpacity();
-        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.getFocus() != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
             // Baked fade-in as we get close to focus
             IFocus focus = camera.getFocus();
             this.opacity *= MathUtilsd.lint(this.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
@@ -266,7 +266,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         getGridScaling(distToCamera, scalingFading);
 
         // Compute projection lines to refsys
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.getFocus() != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
             IFocus focus = camera.getFocus();
             Vector3d cpos = D33.get();
             Vector3d fpos = D34.get();
@@ -366,10 +366,10 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     }
 
     private double getDistanceToOrigin(ICamera camera) {
-        IFocus focus = camera.getFocus();
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || focus == null) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || !camera.hasFocus()) {
             return camera.getPos().lend();
         } else {
+            IFocus focus = camera.getFocus();
             return focus.getDistToCamera();
         }
     }
@@ -415,7 +415,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         }
 
         // Projection lines labels
-        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && camera.getFocus() != null && d01 > 0 && d02 > 0) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && camera.hasFocus() && d01 > 0 && d02 > 0) {
             DistanceUnits du = Settings.settings.program.ui.distanceUnits;
             shader.setUniform4fv("u_color", ccL, 0, 4);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(d01, du);
@@ -436,9 +436,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thLabel", 1);
 
-        IFocus focus = camera.getFocus();
         Vector3b v = B31.get().setZero();
-        if (Settings.settings.program.recursiveGrid.origin.isFocus() && focus != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
+            IFocus focus = camera.getFocus();
             focus.getAbsolutePosition(v);
         }
         float ff = camera.getFovFactor();
@@ -468,8 +468,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         // Here, we must have a focus and be in refsys mode
-        IFocus focus = camera.getFocus();
-        if (focus != null) {
+        if (camera.hasFocus()) {
+            IFocus focus = camera.getFocus();
             // Line in ZX
             renderer.addLine(this, a.x, a.y, a.z, b.x, b.y, b.z, ccL[0], ccL[1], ccL[2], ccL[3] * alpha * opacity);
             // Line in Y

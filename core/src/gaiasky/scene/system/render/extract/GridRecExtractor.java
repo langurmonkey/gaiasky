@@ -22,7 +22,7 @@ public class GridRecExtractor extends AbstractExtractSystem{
             if (label.label) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
-            if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.getFocus() != null) {
+            if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.hasFocus()) {
                 addToRender(render, RenderGroup.LINE);
             }
         }

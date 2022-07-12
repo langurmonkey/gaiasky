@@ -2,7 +2,10 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.Index;
+import gaiasky.scene.view.FilterView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -406,6 +409,25 @@ public class ParticleSet implements Component {
         return visibilityArray != null && visibilityArray[index] != (byte) 0;
     }
 
+    /**
+     * Sets the visibility of the particle with the given index. If the visibility
+     * has changed, it marks the particle group for update.
+     *
+     * @param index   The index of the particle
+     * @param visible Visibility flag
+     */
+    public void setVisible(int index, boolean visible, Render render) {
+        boolean previousVisibility = this.visibilityArray[index] != 0;
+        this.visibilityArray[index] = (byte) (visible ? 1 : 0);
+        if (previousVisibility != visible) {
+            markForUpdate(render);
+        }
+    }
+
+    public void markForUpdate(Render render) {
+        EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, render);
+    }
+
     /** Returns the current focus position, if any, in the out vector. **/
     public Vector3b getAbsolutePosition(Vector3b out) {
         return out.set(focusPosition);
@@ -475,5 +497,9 @@ public class ParticleSet implements Component {
 
     public String getClosestName() {
         return this.proximity.updating[0].name;
+    }
+
+    public boolean canSelect(FilterView view) {
+        return candidateFocusIndex < 0 || candidateFocusIndex >= pointData.size() || view.filter(candidateFocusIndex);
     }
 }

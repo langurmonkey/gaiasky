@@ -104,8 +104,8 @@ public class LineEntityRenderSystem {
         var gr = Mapper.gridRec.get(entity);
 
         // Here, we must have a focus and be in refsys mode.
-        IFocus focus = camera.getFocus();
-        if (focus != null) {
+        if (camera.hasFocus()) {
+            IFocus focus = camera.getFocus();
             // Line in ZX
             renderer.addLine(lineView, gr.a.x, gr.a.y, gr.a.z, gr.b.x, gr.b.y, gr.b.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
             // Line in Y

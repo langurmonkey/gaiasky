@@ -21,6 +21,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.CatalogInfo;
@@ -213,7 +214,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(removeShapesAll);
 
-            if (candidate instanceof Planet) {
+            if (candidate instanceof FocusView && Mapper.atmosphere.has(((FocusView) candidate).getEntity())) {
                 addSeparator();
 
                 MenuItem landOn = new MenuItem(I18n.msg("context.landon", candidateNameShort), skin, skin.getDrawable("land-on"));
@@ -227,7 +228,8 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 addItem(landOn);
 
                 double[] lonlat = new double[2];
-                boolean ok = CameraUtils.getLonLat((Planet) candidate, GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
+                FocusView view = (FocusView) candidate;
+                boolean ok = CameraUtils.getLonLat(view, view.getEntity(), GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
                 if (ok) {
                     final Double pointerLon = lonlat[0];
                     final Double pointerLat = lonlat[1];
