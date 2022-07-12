@@ -22,15 +22,15 @@ public class EntityUtils {
      *
      * @param entity The entity.
      * @param out    Auxiliary vector to put the result in.
-     *
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(Entity entity, Vector3b out) {
         synchronized (entity) {
-            Body body = Mapper.body.get(entity);
+            var body = Mapper.body.get(entity);
             out.set(body.pos);
-            Entity e = entity;
-            GraphNode graph = Mapper.graph.get(e);
+
+            var e = entity;
+            var graph = Mapper.graph.get(e);
             while (graph.parent != null) {
                 e = graph.parent;
                 graph = Mapper.graph.get(e);
@@ -40,6 +40,7 @@ public class EntityUtils {
         }
     }
 
+
     /**
      * Returns the absolute position of the entity identified by the given name
      * within this entity in the native coordinates (equatorial system) and internal units.
@@ -47,14 +48,13 @@ public class EntityUtils {
      * @param entity The entity.
      * @param name   The name.
      * @param out    Auxiliary vector to put the result in.
-     *
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(Entity entity, String name, Vector3b out) {
         synchronized (entity) {
-            if(Mapper.particleSet.has(entity)) {
+            if (Mapper.particleSet.has(entity)) {
                 return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
-            } else if(Mapper.starSet.has(entity)) {
+            } else if (Mapper.starSet.has(entity)) {
                 return Mapper.starSet.get(entity).getAbsolutePosition(name, out);
             } else {
                 return getAbsolutePosition(entity, out);

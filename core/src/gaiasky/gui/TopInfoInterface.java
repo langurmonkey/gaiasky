@@ -5,11 +5,15 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -43,12 +47,17 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel s1;
     private final OwnLabel s2;
     private String lastFocusName;
+    private final Scene scene;
+    private final FocusView view;
 
-    public TopInfoInterface(Skin skin) {
+    public TopInfoInterface(Skin skin, Scene scene) {
         super(skin);
         this.setBackground("table-bg");
 
         float pad = 18f;
+
+        this.scene = scene;
+        view = new FocusView();
 
         dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
@@ -143,12 +152,15 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             break;
         case FOCUS_CHANGE_CMD:
             IFocus f = null;
+            Entity e;
             if (data[0] instanceof String) {
-                SceneGraphNode sgn = GaiaSky.instance.sceneGraph.getNode((String) data[0]);
-                if (sgn instanceof IFocus)
-                    f = (IFocus) sgn;
+                e = scene.getEntity((String) data[0]);
             } else {
-                f = (IFocus) data[0];
+                e = (Entity) data[0];
+            }
+            if (Mapper.focus.has(e)) {
+                view.setEntity(e);
+                f = view;
             }
             if (f != null) {
                 String candidate = f.getCandidateName();

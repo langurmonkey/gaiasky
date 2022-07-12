@@ -386,4 +386,7 @@ public interface IFocus {
      */
     float[] getColor();
 
+    boolean isForceLabel();
+    boolean isForceLabel(String name);
+
 }

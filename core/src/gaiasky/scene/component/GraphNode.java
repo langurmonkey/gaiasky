@@ -132,17 +132,35 @@ public class GraphNode implements Component, ICopy {
             return me;
         } else {
             var parentGraph = Mapper.graph.get(this.parent);
-            return parentGraph.getRoot(this.parent);
+            if (parentGraph == null) {
+                return this.parent;
+            } else {
+                return parentGraph.getRoot(this.parent);
+            }
         }
     }
 
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());
+        copy.parent = null;
         copy.parentName = parentName;
         copy.translation = new Vector3b(translation);
-        if(localTransform != null) {
-            copy.localTransform = new Matrix4(localTransform);
+        if (copy.children != null) {
+            copy.children.clear();
+        }
+
+        if (localTransform != null) {
+            if (copy.localTransform == null) {
+                copy.localTransform = new Matrix4();
+            }
+            copy.localTransform.set(localTransform);
+        }
+        if (orientation != null) {
+            if (copy.orientation == null) {
+                copy.orientation = new Matrix4d();
+            }
+            copy.orientation.set(orientation);
         }
         return copy;
     }

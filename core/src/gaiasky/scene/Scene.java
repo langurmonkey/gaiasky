@@ -647,7 +647,8 @@ public class Scene {
                 copy.add(componentCopy);
             } else {
                 try {
-                    component.getClass().getDeclaredConstructor().newInstance();
+                    Component componentCopy = component.getClass().getDeclaredConstructor().newInstance();
+                    copy.add(componentCopy);
                 } catch (Exception e) {
                     logger.error("Could not create copy of component " + component.getClass().getSimpleName());
                 }

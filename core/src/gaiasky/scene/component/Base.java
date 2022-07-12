@@ -252,4 +252,5 @@ public class Base implements Component, ICopy {
         copy.opacity = opacity;
         return copy;
     }
+
 }

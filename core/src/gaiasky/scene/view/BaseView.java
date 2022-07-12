@@ -83,4 +83,17 @@ public abstract class BaseView extends AbstractView {
     public boolean hasCt(ComponentType ct) {
         return ct != null && base.ct.isEnabled(ct);
     }
+
+    public void setForceLabel(Boolean forceLabel) {
+        base.forceLabel = forceLabel;
+    }
+
+    public void setForcelabel(Boolean forceLabel) {
+        setForceLabel(forceLabel);
+    }
+
+    public boolean isForceLabel() {
+        return base.forceLabel;
+    }
+
 }

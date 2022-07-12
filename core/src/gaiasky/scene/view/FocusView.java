@@ -199,8 +199,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public String getCandidateName() {
         if (getSet() != null) {
             return getSet().getCandidateName();
+        } else {
+            return getName();
         }
-        return null;
     }
 
     @Override
@@ -301,7 +302,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * when time is on
      *
      * @param time The current time
-     *
      * @return True if position should be recomputed for this entity
      */
     protected boolean mustUpdatePosition(ITimeFrameProvider time) {
@@ -508,6 +508,22 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public OctreeNode getOctant() {
         return octant != null ? octant.octant : null;
+    }
+
+    public void setForceLabel(Boolean forceLabel, String name) {
+        if (starSet != null) {
+            starSet.setForceLabel(forceLabel, name);
+        } else {
+            setForcelabel(forceLabel);
+        }
+    }
+
+    public boolean isForceLabel(String name) {
+        if (starSet != null) {
+            return starSet.isForceLabel(name);
+        } else {
+            return base.forceLabel;
+        }
     }
 
     @Override

@@ -189,4 +189,27 @@ public class StarSet extends ParticleSet {
         }
     }
 
+    public void setForceLabel(Boolean forceLabel, String name) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            if (forceLabelStars.contains(idx)) {
+                if (!forceLabel) {
+                    // Remove from forceLabelStars
+                    forceLabelStars.remove(idx);
+                }
+            } else if (forceLabel) {
+                // Add to forceLabelStars
+                forceLabelStars.add(idx);
+            }
+        }
+    }
+
+    public boolean isForceLabel(String name) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            return forceLabelStars.contains(idx);
+        }
+        return false;
+    }
+
 }

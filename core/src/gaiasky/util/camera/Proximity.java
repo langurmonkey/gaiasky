@@ -498,5 +498,15 @@ public class Proximity {
         public float[] getColor() {
             return col;
         }
+
+        @Override
+        public boolean isForceLabel() {
+            return false;
+        }
+
+        @Override
+        public boolean isForceLabel(String name) {
+            return false;
+        }
     }
 }

@@ -156,7 +156,7 @@ public class FullGui extends AbstractGui {
         interfaces.add(messagesInterface);
 
         // TOP INFO - TOP CENTER
-        topInfoInterface = new TopInfoInterface(skin);
+        topInfoInterface = new TopInfoInterface(skin, scene);
         topInfoInterface.top();
         topInfoInterface.pad(pad5, pad, pad5, pad);
         ti = new Container<>(topInfoInterface);
