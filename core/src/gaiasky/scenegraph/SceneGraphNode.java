@@ -882,9 +882,9 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @return The first ancestor of type {@link Star}.
      */
-    public SceneGraphNode getFirstStarAncestor() {
+    public IFocus getFirstStarAncestor() {
         if (this instanceof Star) {
-            return this;
+            return (Star) this;
         } else if (parent != null) {
             return parent.getFirstStarAncestor();
         } else {
@@ -953,28 +953,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      */
     public boolean isValidPosition() {
         return true;
-    }
-
-    /**
-     * Gets a copy of this entity which mimics its state in the next time step with position,
-     * orientation, etc.
-     *
-     * @return A copy of this entity in the next time step
-     */
-    public IFocus getNext(ITimeFrameProvider time, ICamera camera, boolean force) {
-        if (!mustUpdatePosition(time) && !force) {
-            return (IFocus) this;
-        } else {
-            // Get copy of focus and update it to know where it will be in the
-            // next step
-            SceneGraphNode fc = this;
-            SceneGraphNode fccopy = fc.getLineCopy();
-            SceneGraphNode root = fccopy.getRoot();
-            root.translation.set(camera.getInversePos());
-            root.update(time, root.translation, camera);
-
-            return (IFocus) fccopy;
-        }
     }
 
     /**

@@ -8,42 +8,27 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.RenderGroup;
-import gaiasky.render.RenderingContext;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.Model;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
-import gaiasky.scene.view.FocusView;
-import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntMeshPartBuilder;
-import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntModelBuilder;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Environment;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
-import gaiasky.util.math.Vector3d;
 
 /**
  * Initializes star cluster entities.
@@ -63,7 +48,7 @@ public class ClusterInitializer extends AbstractInitSystem {
         var focus = Mapper.focus.get(entity);
 
         // Focus active.
-        focus.activeConsumer = FocusActive::isFocusActiveCtOpacity;
+        focus.activeFunction = FocusActive::isFocusActiveCtOpacity;
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateCluster;

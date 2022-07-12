@@ -3,15 +3,14 @@ package gaiasky.scene.view;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
@@ -46,11 +45,15 @@ public class FocusView extends BaseView implements IFocus {
     /** Reference to the scene. **/
     private Scene scene;
 
+    /** The focus active computer. **/
+    private FocusActive focusActive;
+
     /** Creates a focus view with the given scene. **/
     public FocusView(Scene scene) {
         super();
         this.scene = scene;
         this.focusHit = new FocusHit();
+        this.focusActive = new FocusActive();
     }
 
     /** Creates an empty focus view. **/
@@ -146,11 +149,18 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public String getClosestName() {
-        return null;
+        if(getSet() != null) {
+            return getSet().getClosestName();
+        } else {
+            return getName();
+        }
     }
 
     @Override
     public String getCandidateName() {
+        if (getSet() != null) {
+            return getSet().getCandidateName();
+        }
         return null;
     }
 
@@ -161,7 +171,7 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public boolean isFocusActive() {
-        return false;
+        return focus.activeFunction.apply(focusActive, entity, base);
     }
 
     @Override
@@ -170,33 +180,60 @@ public class FocusView extends BaseView implements IFocus {
     }
 
     @Override
-    public SceneGraphNode getFirstStarAncestor() {
-        return null;
+    public IFocus getFirstStarAncestor() {
+        if (Mapper.hip.has(entity) || starSet != null || particleSet != null) {
+            return this;
+        } else if (graph.parent != null) {
+            return new FocusView(getStarAncestor(graph.parent));
+        } else {
+            return null;
+        }
+    }
+
+    private Entity getStarAncestor(Entity me) {
+        if (me == null) {
+            return null;
+        }
+        if (Mapper.hip.has(me)) {
+            return me;
+        } else if (Mapper.graph.has(me)) {
+            var graph = Mapper.graph.get(me);
+            return getStarAncestor(graph.parent);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public Vector3b getAbsolutePosition(Vector3b out) {
-        return EntityUtils.getAbsolutePosition(entity, out);
+        if (getSet() != null) {
+            return getSet().getAbsolutePosition(out);
+        } else {
+            return EntityUtils.getAbsolutePosition(entity, out);
+        }
     }
 
     @Override
     public Vector3b getAbsolutePosition(String name, Vector3b out) {
-        return base.hasName(name) ? getAbsolutePosition(out) : null;
+        if (getSet() != null) {
+            return getSet().getAbsolutePosition(name, out);
+        } else {
+            return EntityUtils.getAbsolutePosition(entity, out);
+        }
     }
 
     @Override
     public Vector3b getClosestAbsolutePos(Vector3b out) {
-        return null;
+        if (starSet != null) {
+            return out.set(starSet.proximity.updating[0].absolutePos);
+        } else {
+            return getAbsolutePosition(out);
+        }
     }
 
     @Override
     public Vector2d getPosSph() {
         return body.posSph;
-    }
-
-    @Override
-    public IFocus getNext(ITimeFrameProvider time, ICamera camera, boolean force) {
-        return null;
     }
 
     /**
@@ -213,10 +250,8 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public Vector3b getPredictedPosition(Vector3b out, ITimeFrameProvider time, ICamera camera, boolean force) {
-        if (particleSet != null) {
-            return particleSet.getAbsolutePosition(out);
-        } else if (starSet != null) {
-            return starSet.getAbsolutePosition(out);
+        if (getSet() != null) {
+            return getSet().getAbsolutePosition(out);
         } else {
             if (!mustUpdatePosition(time) && !force) {
                 return getAbsolutePosition(out);
@@ -251,10 +286,8 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public double getDistToCamera() {
-        if (particleSet != null) {
-            return particleSet.focusDistToCamera;
-        } else if (starSet != null) {
-            return starSet.focusDistToCamera;
+        if (getSet() != null) {
+            return getSet().focusDistToCamera;
         } else {
             return body.distToCamera;
         }
@@ -262,7 +295,11 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public double getClosestDistToCamera() {
-        return 0;
+        if (starSet != null) {
+            return starSet.getClosestDistToCamera();
+        } else {
+            return getDistToCamera();
+        }
     }
 
     @Override
@@ -277,7 +314,11 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public double getCandidateViewAngleApparent() {
-        return 0;
+        if (getSet() != null) {
+            return getSet().getCandidateViewAngleApparent();
+        } else {
+            return getViewAngleApparent();
+        }
     }
 
     @Override
@@ -337,11 +378,17 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public RotationComponent getRotationComponent() {
-        return null;
+        return Mapper.rotation.has(entity) ? Mapper.rotation.get(entity).rc : null;
     }
 
     @Override
     public Quaterniond getOrientationQuaternion() {
+        if (Mapper.attitude.has(entity)) {
+            var attitude = Mapper.attitude.get(entity);
+            if (attitude.attitude != null) {
+                return attitude.attitude.getQuaternion();
+            }
+        }
         return null;
     }
 

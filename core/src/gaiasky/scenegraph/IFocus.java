@@ -117,13 +117,13 @@ public interface IFocus {
      *
      * @return The first ancestor of type {@link Star}.
      */
-    SceneGraphNode getFirstStarAncestor();
+    IFocus getFirstStarAncestor();
 
     /**
      * Returns the absolute position of this entity in the native coordinates
      * (equatorial system).
      *
-     * @param out Vector3d where to put the return value.
+     * @param out The out vector.
      *
      * @return The absolute position, same as aux.
      */
@@ -155,8 +155,6 @@ public interface IFocus {
      * @return The position in alpha, delta.
      */
     Vector2d getPosSph();
-
-    IFocus getNext(ITimeFrameProvider time, ICamera camera, boolean force);
 
     /**
      * Gets the position of this entity in the next time step in the

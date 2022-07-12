@@ -622,10 +622,6 @@ public class Scene {
         return families;
     }
 
-    public void removeEntity(Entity entity) {
-
-    }
-
     public Entity getLineCopy(Entity entity) {
         var copy = getSimpleCopy(entity);
         var graph = Mapper.graph.get(entity);

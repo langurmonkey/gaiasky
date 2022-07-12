@@ -14,9 +14,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.RenderGroup;
-import gaiasky.render.RenderingContext;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
@@ -26,13 +23,8 @@ import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
-import gaiasky.scene.view.FocusView;
-import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Planet;
-import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -40,9 +32,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
-import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsd;
@@ -224,7 +213,7 @@ public class ModelInitializer extends AbstractInitSystem {
         bb.renderConsumer = isBillboardGal ? BillboardEntityRenderSystem::renderBillboardGalaxy : BillboardEntityRenderSystem::renderBillboardCelestial;
 
         // Focus consumer.
-        focus.activeConsumer = FocusActive::isFocusActiveTrue;
+        focus.activeFunction = FocusActive::isFocusActiveTrue;
 
         // Model renderer.
         if (model.renderConsumer == null) {

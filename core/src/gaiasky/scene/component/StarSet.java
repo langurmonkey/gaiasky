@@ -1,6 +1,8 @@
 package gaiasky.scene.component;
 
 import gaiasky.GaiaSky;
+import gaiasky.scene.view.FocusView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
@@ -129,5 +131,53 @@ public class StarSet extends ParticleSet {
     public double getDeltaYears() {
         return currDeltaYears;
     }
+
+    public int getHip() {
+        if (focus != null && focus.hip() > 0)
+            return focus.hip();
+        return -1;
+    }
+
+    public long getCandidateId() {
+        return pointData.get(candidateFocusIndex).id();
+    }
+
+    public String getCandidateName() {
+        return pointData.get(candidateFocusIndex).names()[0];
+    }
+
+    public double getCandidateViewAngleApparent() {
+        if (candidateFocusIndex >= 0) {
+            IParticleRecord candidate = pointData.get(candidateFocusIndex);
+            Vector3d aux = candidate.pos(D31);
+            ICamera camera = GaiaSky.instance.getICamera();
+            double va = (float) ((candidate.radius() / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
+            return va * Settings.settings.scene.star.brightness;
+        } else {
+            return -1;
+        }
+    }
+
+    public double getClosestDistToCamera() {
+        return this.proximity.updating[0].distToCamera;
+    }
+
+
+    public double getClosestSize() {
+        return this.proximity.updating[0].size;
+    }
+
+    public Vector3d getClosestPos(Vector3d out) {
+        return out.set(this.proximity.updating[0].pos);
+    }
+
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
+        return out.set(this.proximity.updating[0].absolutePos);
+    }
+
+    public float[] getClosestCol() {
+        return this.proximity.updating[0].col;
+    }
+
 
 }

@@ -62,7 +62,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         var bb = Mapper.billboard.get(entity);
 
         // Focus active.
-        focus.activeConsumer = FocusActive::isFocusActiveTrue;
+        focus.activeFunction = FocusActive::isFocusActiveTrue;
 
         // Billboard renderer.
         bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardCelestial;

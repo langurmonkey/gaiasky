@@ -155,7 +155,7 @@ public class OctreeWrapper extends FadeNode {
                 // Update focus, just in case
                 IFocus focus = camera.getFocus();
                 if (focus != null) {
-                    SceneGraphNode star = focus.getFirstStarAncestor();
+                    SceneGraphNode star = (SceneGraphNode) focus.getFirstStarAncestor();
                     OctreeNode parent = parenthood.get(star);
                     if (parent != null && !parent.isObserved()) {
                         star.update(time, star.parent.translation, camera);

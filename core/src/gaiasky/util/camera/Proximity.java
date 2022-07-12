@@ -321,7 +321,7 @@ public class Proximity {
         }
 
         @Override
-        public SceneGraphNode getFirstStarAncestor() {
+        public IFocus getFirstStarAncestor() {
             return null;
         }
 
@@ -345,11 +345,6 @@ public class Proximity {
 
         @Override
         public Vector2d getPosSph() {
-            return null;
-        }
-
-        @Override
-        public IFocus getNext(ITimeFrameProvider time, ICamera camera, boolean force) {
             return null;
         }
 

@@ -765,7 +765,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     // Myself?
-    public SceneGraphNode getFirstStarAncestor() {
+    public IFocus getFirstStarAncestor() {
         return this;
     }
 

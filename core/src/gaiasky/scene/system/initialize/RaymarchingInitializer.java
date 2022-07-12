@@ -8,7 +8,6 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.component.Base;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.util.Settings;
 
@@ -31,7 +30,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         var focus = Mapper.focus.get(entity);
 
         // Focus active
-        focus.activeConsumer = FocusActive::isFocusActiveTrue;
+        focus.activeFunction = FocusActive::isFocusActiveTrue;
 
         if(graph.parentName == null) {
             graph.parentName = Scene.ROOT_NAME;

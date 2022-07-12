@@ -451,4 +451,29 @@ public class ParticleSet implements Component {
     public double getDeltaYears() {
         return 0;
     }
+
+    public String getCandidateName() {
+        return pointData.get(candidateFocusIndex).names() != null ? pointData.get(candidateFocusIndex).names()[0] : getName();
+    }
+
+    private String getName() {
+        if (focus != null && focus.names() != null)
+            return focus.names()[0];
+        return null;
+    }
+
+    public double getCandidateViewAngleApparent() {
+        if (candidateFocusIndex >= 0) {
+            IParticleRecord candidate = pointData.get(candidateFocusIndex);
+            Vector3d aux = candidate.pos(D31);
+            ICamera camera = GaiaSky.instance.getICamera();
+            return (float) ((.5e2f / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
+        } else {
+            return -1;
+        }
+    }
+
+    public String getClosestName() {
+        return this.proximity.updating[0].name;
+    }
 }
