@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IPostProcessor;
+import gaiasky.scene.Scene;
 import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
 import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
 import gaiasky.util.SysUtils;
@@ -60,6 +61,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     /** The actual post processors. **/
     private PostProcessBean[] pps;
 
+    /** Reference to the scene. **/
+    private Scene scene;
+
     /** Aspect ratio cache. **/
     float ar;
 
@@ -77,7 +81,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     /**
      * Contains a map by name with
      * [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
-      */
+     */
     private final Map<String, Object[]> raymarchingDef;
 
     private void addRayMarchingDef(String name, Object[] list) {
@@ -85,18 +89,19 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             raymarchingDef.put(name, list);
     }
 
-    public MainPostProcessor() {
+    public MainPostProcessor(Scene scene) {
         ShaderLoader.BasePath = "shader/postprocess/";
 
-        auxb = new Vector3b();
-        auxf = new Vector3();
-        prevCampos = new Vector3b();
-        prevViewProj = new Matrix4();
-        view = new Matrix4();
-        projection = new Matrix4();
-        combined = new Matrix4();
-        frustumCorners = new Matrix4();
-        raymarchingDef = new HashMap<>();
+        this.scene = scene;
+        this.auxb = new Vector3b();
+        this.auxf = new Vector3();
+        this.prevCampos = new Vector3b();
+        this.prevViewProj = new Matrix4();
+        this.view = new Matrix4();
+        this.projection = new Matrix4();
+        this.combined = new Matrix4();
+        this.frustumCorners = new Matrix4();
+        this.raymarchingDef = new HashMap<>();
 
         EventManager.instance.subscribe(this, Event.RAYMARCHING_CMD);
     }
@@ -123,7 +128,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_GRAPH_LOADED, Event.SCENE_LOADED);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -223,11 +228,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         updateGlow(ppb, gq);
 
         /**
-            TODO
-            This is a pretty brutal patch for macOS. For some obscure reason,
-            the sucker will welcome you with a nice cozy blank screen if
-            the activation of the light glow effect is
-            not delayed. No time or willpower to get to the bottom of this.
+         TODO
+         This is a pretty brutal patch for macOS. For some obscure reason,
+         the sucker will welcome you with a nice cozy blank screen if
+         the activation of the light glow effect is
+         not delayed. No time or willpower to get to the bottom of this.
          **/
         if (SysUtils.isMac() && glowSettings.active) {
             Task enableLG = new Task() {
@@ -495,6 +500,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     @Override
     public void notify(Event event, Object source, final Object... data) {
         switch (event) {
+        case SCENE_LOADED:
+            this.scene = (Scene) data[0];
+            break;
         case SCENE_GRAPH_LOADED:
             initializeOffscreenPostProcessors();
             break;

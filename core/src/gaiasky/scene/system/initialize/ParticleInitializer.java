@@ -68,17 +68,17 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardCelestial;
 
         if (hip != null) {
-            // Initialize star
+            // Initialize star.
             initializeStar(base, body, celestial, mag, pm, extra, sa, label, render, dist, focus);
         } else {
-            // Initialize particle
+            // Initialize particle.
             initializeParticle(base, body, celestial, mag, pm, extra, sa, label, render, focus);
         }
     }
 
     @Override
     public void setUpEntity(Entity entity) {
-        // Set up stars
+        // Set up stars.
         if (Mapper.hip.has(entity)) {
             var model = Mapper.model.get(entity);
             model.renderConsumer = ModelEntityRenderSystem::renderParticleStarModel;
@@ -108,7 +108,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
             pm.hasPm = pm.pm.len2() != 0;
         }
 
-        // Defaults
+        // Defaults.
         sa.thresholdNone = Settings.settings.scene.star.threshold.none;
         sa.thresholdPoint = Settings.settings.scene.star.threshold.point;
         sa.thresholdQuad = Settings.settings.scene.star.threshold.quad;
@@ -134,14 +134,14 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         label.labelFactor = 1.3e-1f;
         label.labelMax = 0.005f;
 
-        // Actual initialization
+        // Actual initialization.
         setDerivedAttributes(body, celestial, mag, extra, false);
 
         if (base.ct == null)
             base.ct = new ComponentTypes(ComponentType.Galaxies);
 
         // Relation between the particle size and actual star size (normalized for
-        // the Sun, 695700 Km of radius)
+        // the Sun, 695700 Km of radius).
         extra.radius = body.size * Constants.STAR_SIZE_FACTOR;
 
         // Focus hits.

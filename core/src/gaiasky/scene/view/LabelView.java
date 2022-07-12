@@ -75,6 +75,18 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     @Override
+    protected void entityCleared() {
+        this.label = null;
+        this.graph = null;
+        this.sa = null;
+        this.cluster = null;
+        this.bbSet = null;
+        this.constel = null;
+        this.mesh = null;
+        this.ruler = null;
+    }
+
+    @Override
     public boolean renderText() {
         return true;
     }
@@ -127,7 +139,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             }
             double len = out.len();
             out.clamp(0, len - getRadius()).scl(0.9f);
-            if(Mapper.shape.has(entity)){
+            if (Mapper.shape.has(entity)) {
                 out.x += getRadius() * 0.5;
             }
 

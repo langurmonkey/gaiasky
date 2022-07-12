@@ -52,6 +52,13 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
     }
 
     @Override
+    protected void entityCleared() {
+        this.verts = null;
+        this.graph = null;
+        this.trajectory = null;
+    }
+
+    @Override
     public void markForUpdate() {
         EventManager.publish(Event.GPU_DISPOSE_VERTS_OBJECT, Mapper.render.get(entity), verts.renderGroup);
     }

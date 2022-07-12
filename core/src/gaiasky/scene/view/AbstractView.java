@@ -41,6 +41,15 @@ public abstract class AbstractView {
         entityChanged();
     }
 
+    /**
+     * Removes the entity (if any) of this view and sets
+     * all component references to null.
+     */
+    public void clearEntity() {
+       this.entity = null;
+       entityCleared();
+    }
+
     /** Returns the current entity under this view. **/
     public Entity getEntity() {
        return this.entity;
@@ -73,4 +82,10 @@ public abstract class AbstractView {
      * This method is typically used to initialize the view components.
      */
     protected abstract void entityChanged();
+
+    /**
+     * This method is called when the entity of this view is cleared. It
+     * should set all component references to null.
+     */
+    protected abstract void entityCleared();
 }

@@ -8,11 +8,8 @@ package gaiasky.data;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import gaiasky.data.stars.AbstractCatalogLoader;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.Scene;
 import gaiasky.scenegraph.StarCluster;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -44,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -254,7 +250,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
 
         var cluster = Mapper.cluster.get(entity);
         cluster.raddeg = radius;
-        cluster.nstars = nstars;
+        cluster.numStars = nstars;
         cluster.dist = posSph.z;
 
         scene.engine.addEntity(entity);

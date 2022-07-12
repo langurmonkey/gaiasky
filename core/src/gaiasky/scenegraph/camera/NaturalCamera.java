@@ -153,7 +153,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public IFocus focus, focusBak;
 
-    /** The focus view, holding the reference to the current focus entity. **/
+    /** The focus view object, holding the reference to the current focus entity. This gets
+     * set to {@link NaturalCamera#focus} when necessary. **/
     private FocusView focusView;
 
     /**
@@ -1132,7 +1133,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Updates the camera mode
+     * Updates the camera mode.
      */
     @Override
     public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
@@ -1152,10 +1153,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     GaiaSky.instance.vrContext.addListener(openVRListener);
                 break;
             default:
-                // Unregister input controllers
+                // Unregister input controllers.
                 im.removeProcessor(currentMouseKbdListener);
                 removeGamepadListener();
-                // Remove vr listener
+                // Remove vr listener.
                 if (Settings.settings.runtime.openVr)
                     GaiaSky.instance.vrContext.removeListener(openVRListener);
                 break;
@@ -1181,9 +1182,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (focus != null && GaiaSky.instance.isOn(focus.getCt())) {
             this.focus = focus;
             this.focus.makeFocus();
-            // Reset facing focus
+            // Reset facing focus.
             this.facingFocus = false;
-            // Create event to notify focus change
+            // Create event to notify focus change.
             EventManager.publish(Event.FOCUS_CHANGED, this, focus);
         }
     }
@@ -1246,6 +1247,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case SCENE_LOADED:
             this.scene = (Scene) data[0];
+            this.focusView.setScene(this.scene);
             break;
         case FOCUS_CHANGE_CMD:
             setTrackingObject(null, null);
@@ -1260,7 +1262,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (data[0] instanceof String) {
                 String focusName = (String) data[0];
 
-                // Old scenegraph
+                // Old scene graph
                 SceneGraphNode sgn = sceneGraph.getNode(focusName);
                 if (sgn instanceof IFocus) {
                     focus = (IFocus) sgn;
@@ -1275,7 +1277,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // Nothing
                 } finally {
                     // TODO restore this
-                    //focus = focusView;
+                    focus = focusView;
                     diverted = !centerFocus;
                 }
 

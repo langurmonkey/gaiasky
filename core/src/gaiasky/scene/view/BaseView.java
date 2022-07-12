@@ -34,6 +34,12 @@ public abstract class BaseView extends AbstractView {
         this.body = Mapper.body.get(entity);
     }
 
+    @Override
+    protected void entityCleared() {
+        this.base = null;
+        this.body = null;
+    }
+
     public void setColor(float[] color) {
         body.setColor(color);
     }

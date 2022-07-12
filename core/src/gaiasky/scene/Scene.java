@@ -1,18 +1,18 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ReflectionPool;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.system.render.extract.*;
+import gaiasky.scene.component.ICopy;
 import gaiasky.scene.system.initialize.*;
+import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
@@ -71,7 +71,7 @@ public class Scene {
 
     public void initialize() {
         engine = new PooledEngine();
-        focusView = new FocusView();
+        focusView = new FocusView(this);
 
         // Initialize families.
         families = new Families();
@@ -621,4 +621,43 @@ public class Scene {
     public Families getFamilies() {
         return families;
     }
+
+    public void removeEntity(Entity entity) {
+
+    }
+
+    public Entity getLineCopy(Entity entity) {
+        var copy = getSimpleCopy(entity);
+        var graph = Mapper.graph.get(entity);
+        if (graph.parent != null) {
+            var parentCopy = getLineCopy(graph.parent);
+            var parentCopyGraph = Mapper.graph.get(parentCopy);
+            parentCopyGraph.addChild(parentCopy, copy, false, 1);
+        }
+        return copy;
+    }
+
+    public Entity getSimpleCopy(Entity entity) {
+        Entity copy = engine.createEntity();
+        /*
+         * Copy components. Only components that implement the {@link ICopy} interface
+         * are actually copied. The rest are created by reflection with their
+         * default configurations.
+         */
+        for (Component component : entity.getComponents()) {
+            if (component instanceof ICopy) {
+                ICopy iCopy = (ICopy) component;
+                Component componentCopy = iCopy.getCopy(engine);
+                copy.add(componentCopy);
+            } else {
+                try {
+                    component.getClass().getDeclaredConstructor().newInstance();
+                } catch (Exception e) {
+                    logger.error("Could not create copy of component " + component.getClass().getSimpleName());
+                }
+            }
+        }
+        return copy;
+    }
+
 }

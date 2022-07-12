@@ -3,6 +3,7 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Index;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -287,6 +288,7 @@ public class ParticleSet implements Component {
     public void setColornoise(Double colorNoise) {
         setColorNoise(colorNoise);
     }
+
     public void setColorNoise(Double colorNoise) {
         this.colorNoise = colorNoise.floatValue();
     }
@@ -340,6 +342,10 @@ public class ParticleSet implements Component {
      */
     public double getFocusSize() {
         return isStars ? focus.size() : 1e5 * Constants.KM_TO_U;
+    }
+
+    public void setFocusIndex(String name) {
+        candidateFocusIndex = index.getOrDefault(name, -1);
     }
 
     // Radius in stars is different!
@@ -400,6 +406,12 @@ public class ParticleSet implements Component {
         return visibilityArray != null && visibilityArray[index] != (byte) 0;
     }
 
+    /** Returns the current focus position, if any, in the out vector. **/
+    public Vector3b getAbsolutePosition(Vector3b out) {
+        return out.set(focusPosition);
+    }
+
+    /** Returns the position of the particle with the given name, if any, in the out vector. **/
     public Vector3b getAbsolutePosition(String name, Vector3b out) {
         if (index.containsKey(name)) {
             int idx = index.get(name);

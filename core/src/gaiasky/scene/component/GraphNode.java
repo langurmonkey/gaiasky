@@ -1,15 +1,15 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 
-public class GraphNode implements Component {
+public class GraphNode implements Component, ICopy {
 
     /**
      * The first name of the parent object.
@@ -125,5 +125,25 @@ public class GraphNode implements Component {
                 }
             }
         }
+    }
+
+    public Entity getRoot(Entity me) {
+        if (this.parent == null) {
+            return me;
+        } else {
+            var parentGraph = Mapper.graph.get(this.parent);
+            return parentGraph.getRoot(this.parent);
+        }
+    }
+
+    @Override
+    public Component getCopy(Engine engine) {
+        var copy = engine.createComponent(this.getClass());
+        copy.parentName = parentName;
+        copy.translation = new Vector3b(translation);
+        if(localTransform != null) {
+            copy.localTransform = new Matrix4(localTransform);
+        }
+        return copy;
     }
 }

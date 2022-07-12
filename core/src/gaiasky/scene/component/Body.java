@@ -1,13 +1,14 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 
-public class Body implements Component {
+public class Body implements Component, ICopy {
     /**
      * Position of this entity in the local reference system. The units are
      * {@link gaiasky.util.Constants#U_TO_KM} by default.
@@ -161,5 +162,16 @@ public class Body implements Component {
     @Deprecated
     public void setLabelcolor(float[] color) {
         setLabelColor(color);
+    }
+
+    @Override
+    public Component getCopy(Engine engine) {
+        var copy = engine.createComponent(this.getClass());
+        copy.viewAngle = viewAngle;
+        copy.viewAngleApparent = viewAngleApparent;
+        copy.size = size;
+        copy.distToCamera = distToCamera;
+        copy.pos.set(pos);
+        return copy;
     }
 }

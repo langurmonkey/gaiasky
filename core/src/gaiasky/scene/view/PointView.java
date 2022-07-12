@@ -38,6 +38,11 @@ public class PointView extends RenderView implements IPointRenderable {
     }
 
     @Override
+    protected void entityCleared() {
+        this.verts = null;
+    }
+
+    @Override
     public void blend() {
         EntityUtils.blend(verts);
     }

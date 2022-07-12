@@ -467,7 +467,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         guis = new ArrayList<>(3);
 
         // Post-processor
-        postProcessor = new MainPostProcessor();
+        postProcessor = new MainPostProcessor(null);
 
         // Scene graph renderer
         sgr = new SceneGraphRenderer(vrContext, globalResources);
@@ -1724,7 +1724,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (postProcessor != null) {
                 postProcessor.dispose();
             } else {
-                postProcessor = new MainPostProcessor();
+                postProcessor = new MainPostProcessor(scene);
             }
             // Initialize
             postProcessor.initialize(assetManager);

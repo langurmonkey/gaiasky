@@ -2,8 +2,11 @@ package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool.Poolable;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.FocusHit;
@@ -40,10 +43,19 @@ public class FocusView extends BaseView implements IFocus {
     /** Implementation of pointer collision. **/
     private FocusHit focusHit;
 
+    /** Reference to the scene. **/
+    private Scene scene;
+
+    /** Creates a focus view with the given scene. **/
+    public FocusView(Scene scene) {
+        super();
+        this.scene = scene;
+        this.focusHit = new FocusHit();
+    }
+
     /** Creates an empty focus view. **/
     public FocusView() {
-        super();
-        focusHit = new FocusHit();
+        this((Scene) null);
     }
 
     /**
@@ -53,7 +65,7 @@ public class FocusView extends BaseView implements IFocus {
      */
     public FocusView(Entity entity) {
         super(entity);
-        focusHit = new FocusHit();
+        this.focusHit = new FocusHit();
     }
 
     @Override
@@ -72,6 +84,21 @@ public class FocusView extends BaseView implements IFocus {
         this.extra = Mapper.extra.get(entity);
         this.particleSet = Mapper.particleSet.get(entity);
         this.starSet = Mapper.starSet.get(entity);
+    }
+
+    @Override
+    protected void entityCleared() {
+        this.focus = null;
+        this.graph = null;
+        this.octant = null;
+        this.mag = null;
+        this.extra = null;
+        this.particleSet = null;
+        this.starSet = null;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
     public boolean isParticle() {
@@ -172,14 +199,65 @@ public class FocusView extends BaseView implements IFocus {
         return null;
     }
 
+    /**
+     * Whether position must be recomputed for this entity. By default, only
+     * when time is on
+     *
+     * @param time The current time
+     *
+     * @return True if position should be recomputed for this entity
+     */
+    protected boolean mustUpdatePosition(ITimeFrameProvider time) {
+        return time.getHdiff() != 0;
+    }
+
     @Override
-    public Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force) {
-        return null;
+    public Vector3b getPredictedPosition(Vector3b out, ITimeFrameProvider time, ICamera camera, boolean force) {
+        if (particleSet != null) {
+            return particleSet.getAbsolutePosition(out);
+        } else if (starSet != null) {
+            return starSet.getAbsolutePosition(out);
+        } else {
+            if (!mustUpdatePosition(time) && !force) {
+                return getAbsolutePosition(out);
+            } else {
+                // Get a line copy of focus and update it.
+                var copy = scene.getLineCopy(entity);
+
+                // Get root of line copy.
+                var copyGraph = Mapper.graph.get(copy);
+                var root = copyGraph.getRoot(copy);
+                // This updates the graph node for all entities in the line.
+                scene.updateEntity(root, (float) time.getHdiff());
+
+                // This updates the rest of components of our entity.
+                scene.updateEntity(copy, (float) time.getHdiff());
+
+                EntityUtils.getAbsolutePosition(copy, out);
+
+                // Return all to pool.
+                var currentEntity = copy;
+                do {
+                    var graph = Mapper.graph.get(currentEntity);
+                    var parent = graph.parent;
+                    ((Poolable) currentEntity).reset();
+                    currentEntity = parent;
+                } while (currentEntity != null);
+
+                return out;
+            }
+        }
     }
 
     @Override
     public double getDistToCamera() {
-        return body.distToCamera;
+        if (particleSet != null) {
+            return particleSet.focusDistToCamera;
+        } else if (starSet != null) {
+            return starSet.focusDistToCamera;
+        } else {
+            return body.distToCamera;
+        }
     }
 
     @Override
@@ -269,26 +347,35 @@ public class FocusView extends BaseView implements IFocus {
 
     @Override
     public void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits) {
-        if(focus != null && focus.hitCoordinatesConsumer != null) {
+        if (focus != null && focus.hitCoordinatesConsumer != null) {
             focus.hitCoordinatesConsumer.apply(focusHit, this, screenX, screenY, w, h, pixelDist, camera, hits);
         }
     }
 
     @Override
     public void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        if(focus != null && focus.hitRayConsumer != null) {
+        if (focus != null && focus.hitRayConsumer != null) {
             focus.hitRayConsumer.apply(focusHit, this, p0, p1, camera, hits);
         }
     }
 
     @Override
     public void makeFocus() {
-
+        if (particleSet != null) {
+            particleSet.makeFocus();
+        } else if (starSet != null) {
+            starSet.makeFocus();
+        }
     }
 
     @Override
     public IFocus getFocus(String name) {
-        return null;
+        if (particleSet != null) {
+            particleSet.setFocusIndex(name);
+        } else if (starSet != null) {
+            starSet.setFocusIndex(name);
+        }
+        return this;
     }
 
     @Override

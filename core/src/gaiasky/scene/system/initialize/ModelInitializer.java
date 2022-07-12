@@ -143,11 +143,13 @@ public class ModelInitializer extends AbstractInitSystem {
             // All models.
             model.model.doneLoading(manager, graph.localTransform, body.color);
         }
-        if (atmosphere != null || cloud != null) {
-            // Planets.
+        if (atmosphere != null && model != null) {
             initializeAtmosphere(manager, atmosphere.atmosphere, model.model, body.size);
+        }
+        if (cloud != null) {
             initializeClouds(manager, cloud.cloud);
         }
+
         if (parentOrientation != null) {
             // Satellites.
             if (parentOrientation.parentOrientation) {

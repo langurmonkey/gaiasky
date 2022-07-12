@@ -33,6 +33,11 @@ public class PositionView extends AbstractView implements IPosition {
     }
 
     @Override
+    protected void entityCleared() {
+        this.body = null;
+    }
+
+    @Override
     public Vector3b getPosition() {
         return body.pos;
     }

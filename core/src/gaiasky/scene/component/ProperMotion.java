@@ -1,13 +1,14 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.coord.AstroUtils;
 
 /**
  * Proper motion component.
  */
-public class ProperMotion implements Component {
+public class ProperMotion implements Component, ICopy {
 
     /** Proper motion epoch in julian days. Defaults to J2015.5. **/
     public double epochJd = AstroUtils.JD_J2015_5;
@@ -35,5 +36,13 @@ public class ProperMotion implements Component {
      */
     public void setEpochYear(Double epochYear) {
         this.epochJd = AstroUtils.getJulianDate(epochYear);
+    }
+
+    @Override
+    public Component getCopy(Engine engine) {
+        var copy = engine.createComponent(this.getClass());
+        copy.pm = new Vector3(pm);
+        copy.hasPm = hasPm;
+        return copy;
     }
 }

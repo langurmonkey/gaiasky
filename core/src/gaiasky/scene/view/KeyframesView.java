@@ -58,6 +58,11 @@ public class KeyframesView extends BaseView {
         this.kf = Mapper.keyframes.get(entity);
     }
 
+    @Override
+    protected void entityCleared() {
+        this.kf = null;
+    }
+
     /**
      * Refreshes the positions and orientations from the keyframes
      */

@@ -31,6 +31,11 @@ public class OctreeObjectView extends PositionView implements IOctreeObject {
         this.set = Mapper.starSet.get(entity);
     }
 
+    @Override
+    protected void entityCleared() {
+        this.set = null;
+    }
+
 
     @Override
     public int getStarCount() {

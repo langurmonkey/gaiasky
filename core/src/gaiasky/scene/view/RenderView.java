@@ -36,6 +36,12 @@ public class RenderView extends BaseView implements IRenderable {
     }
 
     @Override
+    protected void entityCleared() {
+        this.extra = null;
+        this.set = null;
+    }
+
+    @Override
     public ComponentTypes getComponentType() {
         return base.ct;
     }

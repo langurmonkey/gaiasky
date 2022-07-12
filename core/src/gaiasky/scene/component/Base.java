@@ -1,6 +1,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -11,7 +12,7 @@ import gaiasky.util.math.MathUtilsd;
 
 import java.util.Locale;
 
-public class Base implements Component {
+public class Base implements Component, ICopy {
 
     /** Reference to the archetype used to create this entity, if any. **/
     public Archetype archetype;
@@ -235,5 +236,20 @@ public class Base implements Component {
             opacity = 1 - opacity;
         }
         return opacity;
+    }
+
+    @Override
+    public Component getCopy(Engine engine) {
+        var copy = engine.createComponent(this.getClass());
+        copy.copy = true;
+        copy.names = names;
+        copy.archetype = archetype;
+        copy.visible = visible;
+        copy.ct = ct;
+        copy.id = id;
+        copy.lastStateChangeTimeMs = lastStateChangeTimeMs;
+        copy.localizedNameIndex = localizedNameIndex;
+        copy.opacity = opacity;
+        return copy;
     }
 }

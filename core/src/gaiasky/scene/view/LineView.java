@@ -43,6 +43,12 @@ public class LineView extends BaseView implements ILineRenderable {
     }
 
     @Override
+    protected void entityCleared() {
+        this.verts = null;
+        this.line = null;
+    }
+
+    @Override
     public float getLineWidth() {
         return verts != null ? verts.primitiveSize : (line != null ? line.lineWidth : 0.6f);
     }

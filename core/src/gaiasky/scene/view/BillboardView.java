@@ -25,4 +25,11 @@ public class BillboardView extends BaseView {
         graph = Mapper.graph.get(entity);
         celestial = Mapper.celestial.get(entity);
     }
+
+    @Override
+    protected void entityCleared() {
+        this.billboard = null;
+        this.graph = null;
+        this.celestial = null;
+    }
 }

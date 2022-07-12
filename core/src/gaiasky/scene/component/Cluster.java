@@ -1,6 +1,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.util.gdx.model.IntModel;
@@ -8,7 +9,7 @@ import gaiasky.util.gdx.model.IntModel;
 /**
  * Some properties for star cluster objects.
  */
-public class Cluster implements Component {
+public class Cluster implements Component, ICopy {
 
     // The texture, for when the cluster is far away
     public Texture clusterTex;
@@ -20,7 +21,7 @@ public class Cluster implements Component {
     public double raddeg;
 
     // Number of stars of this cluster
-    public int nstars;
+    public int numStars;
 
     // Years since epoch
     public double ySinceEpoch;
@@ -33,4 +34,18 @@ public class Cluster implements Component {
 
     public IntModel model;
     public Matrix4 modelTransform;
+
+    public void setNstars(Integer numStars) {
+        this.numStars = numStars;
+    }
+
+    @Override
+    public Component getCopy(Engine engine) {
+        var copy = engine.createComponent(this.getClass());
+        copy.dist = dist;
+        copy.raddeg = raddeg;
+        copy.numStars = numStars;
+        copy.modelTransform = new Matrix4(modelTransform);
+        return copy;
+    }
 }

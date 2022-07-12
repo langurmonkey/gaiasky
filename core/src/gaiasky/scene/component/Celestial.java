@@ -1,8 +1,9 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
 
-public class Celestial implements Component {
+public class Celestial implements Component, ICopy {
     /** Threshold over fov factor **/
     public float thOverFactor;
 
@@ -23,5 +24,10 @@ public class Celestial implements Component {
 
     public void setColorbv(Double colorbv) {
         this.colorbv = colorbv.floatValue();
+    }
+
+    @Override
+    public Component getCopy(Engine engine) {
+        return engine.createComponent(this.getClass());
     }
 }
