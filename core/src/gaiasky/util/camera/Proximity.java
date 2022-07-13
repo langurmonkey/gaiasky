@@ -262,6 +262,11 @@ public class Proximity {
         }
 
         @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
         public long getId() {
             return -1;
         }
@@ -318,6 +323,11 @@ public class Proximity {
 
         @Override
         public Vector3b getPos() {
+            return null;
+        }
+
+        @Override
+        public Entity getFirstStarAncestorEntity() {
             return null;
         }
 

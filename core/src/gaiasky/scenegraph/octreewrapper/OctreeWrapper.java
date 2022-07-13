@@ -5,12 +5,14 @@
 
 package gaiasky.scenegraph.octreewrapper;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -155,10 +157,13 @@ public class OctreeWrapper extends FadeNode {
                 // Update focus, just in case
                 if (camera.hasFocus()) {
                     IFocus focus = camera.getFocus();
-                    SceneGraphNode star = (SceneGraphNode) focus.getFirstStarAncestor();
-                    OctreeNode parent = parenthood.get(star);
-                    if (parent != null && !parent.isObserved()) {
-                        star.update(time, star.parent.translation, camera);
+                    var ancestor = focus.getFirstStarAncestor();
+                    if (ancestor instanceof SceneGraphNode) {
+                        SceneGraphNode star = (SceneGraphNode) ancestor;
+                        OctreeNode parent = parenthood.get(star);
+                        if (parent != null && !parent.isObserved()) {
+                            star.update(time, star.parent.translation, camera);
+                        }
                     }
                 }
             } else {

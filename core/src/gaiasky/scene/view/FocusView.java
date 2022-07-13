@@ -241,6 +241,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         }
     }
 
+    @Override
     public Entity getFirstStarAncestorEntity() {
         if (Mapper.hip.has(entity) || starSet != null || particleSet != null) {
             return entity;

@@ -37,6 +37,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -111,6 +112,8 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.cPosD = new Vector3d();
         set.lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         set.proximity = new Proximity(Constants.N_DIR_LIGHTS);
+        set.focusPosition = new Vector3d();
+        set.focusPositionSph = new Vector2d();
     }
 
     private void initializeParticleSet(Entity entity, ParticleSet set) {

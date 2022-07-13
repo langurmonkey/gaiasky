@@ -21,6 +21,12 @@ import gaiasky.util.tree.OctreeNode;
 public interface IFocus {
 
     /**
+     * Whether this focus object actually contains a focus.
+     * @return True if the focus is not set, false otherwise.
+     */
+    boolean isEmpty();
+
+    /**
      * Returns the unique id of this focus.
      *
      * @return The id.
@@ -114,10 +120,11 @@ public interface IFocus {
     Vector3b getPos();
 
     /**
-     * Gets the first ancestor of this node that is of type {@link Star}.
+     * Gets the first ancestor of this node that is a star.
      *
-     * @return The first ancestor of type {@link Star}.
+     * @return The first star ancestor.
      */
+    Entity getFirstStarAncestorEntity();
     IFocus getFirstStarAncestor();
 
     /**

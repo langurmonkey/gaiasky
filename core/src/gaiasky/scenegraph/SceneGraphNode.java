@@ -894,6 +894,10 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         }
     }
 
+    public Entity getFirstStarAncestorEntity() {
+        return null;
+    }
+
     @Override
     public int getStarCount() {
         return 0;
@@ -1368,5 +1372,9 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits) {
 
+    }
+
+    public boolean isEmpty() {
+        return false;
     }
 }

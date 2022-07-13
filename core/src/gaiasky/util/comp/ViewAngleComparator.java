@@ -5,6 +5,8 @@
 
 package gaiasky.util.comp;
 
+import com.badlogic.ashley.core.Entity;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 
 import java.util.Comparator;
@@ -14,9 +16,14 @@ import java.util.Comparator;
  */
 public class ViewAngleComparator<T> implements Comparator<T> {
 
+    private FocusView view1 = new FocusView();
+    private FocusView view2 = new FocusView();
+
     @Override
     public int compare(T o1, T o2) {
-        return Double.compare(((IFocus) o1).getCandidateViewAngleApparent(), ((IFocus) o2).getCandidateViewAngleApparent());
+        view1.setEntity((Entity) o1);
+        view2.setEntity((Entity) o2);
+        return Double.compare(view1.getCandidateViewAngleApparent(), view2.getCandidateViewAngleApparent());
     }
 
 }

@@ -4,11 +4,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Octree;
 import gaiasky.scene.view.OctreeObjectView;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
@@ -17,9 +21,12 @@ public class OctreeUpdater extends AbstractUpdateSystem {
     private final GraphUpdater graphUpdater;
     private final ParticleSetUpdater particleSetUpdater;
 
-    public OctreeUpdater(Family family, int priority) {
+    private final Scene scene;
+
+    public OctreeUpdater(Scene scene, Family family, int priority) {
         super(family, priority);
 
+        this.scene = scene;
         this.graphUpdater = new GraphUpdater(null, 0, GaiaSky.instance.time);
         this.particleSetUpdater = new ParticleSetUpdater(null, 0);
     }
@@ -53,16 +60,19 @@ public class OctreeUpdater extends AbstractUpdateSystem {
                 // Call the update method of all entities in the roulette list.
                 updateOctreeObjects(base, graph, octree, deltaTime);
 
-
                 // Update focus, just in case
-                //IFocus focus = camera.getFocus();
-                //if (focus != null) {
-                //    SceneGraphNode star = focus.getFirstStarAncestor();
-                //    OctreeNode parent = parenthood.get(star);
-                //    if (parent != null && !parent.isObserved()) {
-                //        star.update(time, star.parent.translation, camera);
-                //    }
-                //}
+                IFocus focus = camera.getFocus();
+                if (focus != null && !focus.isEmpty()) {
+                    Entity star = focus.getFirstStarAncestorEntity();
+                    OctreeNode parent = octree.parenthood.get(star);
+                    if (parent != null && !parent.isObserved()) {
+                        var starGraph = Mapper.graph.get(star);
+                        Vector3b starParentTranslation = null;
+
+                        scene.updateEntityGraph(entity, GaiaSky.instance.time, starParentTranslation, 1);
+                        scene.updateEntity(entity, (float) GaiaSky.instance.time.getDt());
+                    }
+                }
             } else {
                 // TODO what is this for?
                 // Just update children

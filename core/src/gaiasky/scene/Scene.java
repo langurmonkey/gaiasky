@@ -2,8 +2,6 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ReflectionPool;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
@@ -284,7 +282,7 @@ public class Scene {
             addUpdater(sceneGraphUpdateSystem);
 
             // Regular update systems.
-            addUpdater(new OctreeUpdater(families.octrees, priority++));
+            addUpdater(new OctreeUpdater(this, families.octrees, priority++));
             addUpdater(new ElementsSetUpdater(families.orbitalElementSets, priority++));
             addUpdater(new ParticleSetUpdater(families.particleSets, priority++));
             addUpdater(new ModelUpdater(families.models, priority++));
@@ -382,6 +380,34 @@ public class Scene {
     }
 
     /**
+     * Updates the entity graph for the given entity with the given parent translation vector. Use
+     * with caution, this may have unforeseen consequences, as the process usually updates the
+     * whole scene graph starting at the root. This by-passes the usual procedure to update
+     * a single entity and its subtree.
+     * @param entity The entity to update.
+     * @param time The time object.
+     * @param parentTranslation The parent translation.
+     * @param opacity The opacity value.
+     */
+    public void updateEntityGraph(Entity entity, ITimeFrameProvider time, Vector3b parentTranslation, float opacity) {
+        var updater = findUpdater(GraphUpdater.class);
+        if (updater != null) {
+            updater.update(entity, time, parentTranslation, opacity);
+        }
+    }
+
+    private <T extends EntityUpdater> T findUpdater(Class<T> updaterClass) {
+        if (updaters != null) {
+            for (EntityUpdater updater : updaters) {
+                if (updater.getClass().isAssignableFrom(updaterClass)) {
+                    return (T) updater;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Creates a new extractor system with the given class, family and priority.
      *
      * @param extractorClass The extractor class. Must extend {@link AbstractExtractSystem}.
@@ -391,19 +417,13 @@ public class Scene {
      *
      * @return The new system instance.
      */
-    private AbstractExtractSystem newExtractor(Class<? extends AbstractExtractSystem> extractorClass, Family family, int priority, ISceneRenderer sceneRenderer) {
+    private <T extends AbstractExtractSystem> T newExtractor(Class<T> extractorClass, Family family, int priority, ISceneRenderer sceneRenderer) {
         try {
-            Constructor c = extractorClass.getDeclaredConstructor(Family.class, int.class);
-            AbstractExtractSystem system = (AbstractExtractSystem) c.newInstance(family, priority);
+            Constructor<T> c =  extractorClass.getDeclaredConstructor(Family.class, int.class);
+            T system = c.newInstance(family, priority);
             system.setRenderer(sceneRenderer);
             return system;
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
