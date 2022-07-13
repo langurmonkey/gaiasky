@@ -551,7 +551,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     appMagEarth = computeFocusApparentMagnitudeEarth();
                 }
 
-                EventManager.publish(Event.FOCUS_INFO_UPDATED, this, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius(), appMagCamera, appMagEarth);
+                EventManager.publish(Event.FOCUS_INFO_UPDATED, this, focus.getDistToCamera() - focus.getRadius(), focus.getSolidAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius(), appMagCamera, appMagEarth);
             } else {
                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
             }
@@ -761,7 +761,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             addPitch(deltaY, acceleration);
         } else if (parent.mode.equals(CameraMode.FOCUS_MODE)) {
             double th = 30;
-            double solidAngleDeg = Math.toDegrees(focus.getViewAngle());
+            double solidAngleDeg = Math.toDegrees(focus.getSolidAngle());
 
             if (focusLookKeyPressed) {
                 diverted = true;

@@ -1273,9 +1273,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 target = Math.toRadians(20d);
 
             long prevTime = TimeUtils.millis();
-            if (object.getViewAngle() < target) {
+            if (object.getSolidAngle() < target) {
                 // Add forward movement while distance > target distance
-                while (object.getViewAngle() < target && (stop == null || !stop.get())) {
+                while (object.getSolidAngle() < target && (stop == null || !stop.get())) {
                     // dt in ms
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
@@ -1289,7 +1289,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
             } else {
                 // Add backward movement while distance > target distance
-                while (object.getViewAngleApparent() > target && (stop == null || !stop.get())) {
+                while (object.getSolidAngleApparent() > target && (stop == null || !stop.get())) {
                     // dt in ms
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();

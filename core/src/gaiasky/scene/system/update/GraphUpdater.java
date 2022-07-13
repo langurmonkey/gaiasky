@@ -1,10 +1,7 @@
 package gaiasky.scene.system.update;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
@@ -114,12 +111,12 @@ public class GraphUpdater extends AbstractUpdateSystem {
         body.distToCamera = graph.translation.lend();
         if (Mapper.extra.has(entity)) {
             // Particles have a special algorithm for the solid angles.
-            body.viewAngle = (Mapper.extra.get(entity).radius / body.distToCamera);
-            body.viewAngleApparent = body.viewAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
+            body.solidAngle = (Mapper.extra.get(entity).radius / body.distToCamera);
+            body.solidAngleApparent = body.solidAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
         } else {
             // Regular objects.
-            body.viewAngle = FastMath.atan(body.size / body.distToCamera);
-            body.viewAngleApparent = body.viewAngle / camera.getFovFactor();
+            body.solidAngle = FastMath.atan(body.size / body.distToCamera);
+            body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
         }
 
         // Some elements (sets, octrees) process their own children.

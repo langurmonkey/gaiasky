@@ -378,7 +378,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     @Override
-    public double getCandidateViewAngleApparent() {
+    public double getCandidateSolidAngleApparent() {
         return this.viewAngleApparent;
     }
 

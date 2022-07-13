@@ -34,7 +34,7 @@ public class ClusterUpdater extends AbstractUpdateSystem {
         var cluster = Mapper.cluster.get(entity);
 
         base.opacity *= 0.1f * base.getVisibilityOpacityFactor();
-        cluster.fadeAlpha = (float) MathUtilsd.lint(body.viewAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
+        cluster.fadeAlpha = (float) MathUtilsd.lint(body.solidAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
         body.labelColor[3] = 8.0f * cluster.fadeAlpha;
 
         graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);

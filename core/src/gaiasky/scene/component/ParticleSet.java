@@ -4,15 +4,10 @@ import com.badlogic.ashley.core.Component;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scene.Index;
 import gaiasky.scene.view.FilterView;
-import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
-import gaiasky.scenegraph.particle.PointParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
@@ -484,7 +479,7 @@ public class ParticleSet implements Component {
         return null;
     }
 
-    public double getCandidateViewAngleApparent() {
+    public double getCandidateSolidAngleApparent() {
         if (candidateFocusIndex >= 0) {
             IParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(D31);
@@ -501,5 +496,30 @@ public class ParticleSet implements Component {
 
     public boolean canSelect(FilterView view) {
         return candidateFocusIndex < 0 || candidateFocusIndex >= pointData.size() || view.filter(candidateFocusIndex);
+    }
+
+    public Vector2d getPosSph() {
+        return focusPositionSph;
+    }
+
+    public double getAlpha() {
+        return focusPositionSph.x;
+    }
+
+    public double getDelta() {
+        return focusPositionSph.y;
+    }
+
+    public double getDistToCamera() {
+        return focusDistToCamera;
+    }
+
+    public double getSolidAngle() {
+        return focusViewAngle;
+    }
+
+    // FOCUS_MODE apparent view angle
+    public double getSolidAngleApparent() {
+        return focusViewAngleApparent;
     }
 }

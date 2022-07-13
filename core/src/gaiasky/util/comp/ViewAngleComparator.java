@@ -7,12 +7,11 @@ package gaiasky.util.comp;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
 
 import java.util.Comparator;
 
 /**
- * Compares entities. Further entities go first, nearer entities go last.
+ * Compares entities depending on their solid angle.
  */
 public class ViewAngleComparator<T> implements Comparator<T> {
 
@@ -23,7 +22,7 @@ public class ViewAngleComparator<T> implements Comparator<T> {
     public int compare(T o1, T o2) {
         view1.setEntity((Entity) o1);
         view2.setEntity((Entity) o2);
-        return Double.compare(view1.getCandidateViewAngleApparent(), view2.getCandidateViewAngleApparent());
+        return Double.compare(view1.getCandidateSolidAngleApparent(), view2.getCandidateSolidAngleApparent());
     }
 
 }

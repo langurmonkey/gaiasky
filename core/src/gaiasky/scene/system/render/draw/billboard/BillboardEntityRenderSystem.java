@@ -72,7 +72,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_color", view.celestial.colorPale[0], celestial.colorPale[1], celestial.colorPale[2], alpha);
         shader.setUniformf("u_alpha", alpha * base.opacity);
         shader.setUniformf("u_distance", (float) body.distToCamera);
-        shader.setUniformf("u_apparent_angle", (float) body.viewAngleApparent);
+        shader.setUniformf("u_apparent_angle", (float) body.solidAngleApparent);
         shader.setUniformf("u_time", (float) GaiaSky.instance.getT() / 5f);
 
         shader.setUniformf("u_radius", size);
@@ -170,9 +170,9 @@ public class BillboardEntityRenderSystem implements IObserver {
             // Stars, particles
             boolean star = Mapper.hip.has(entity);
             extra.computedSize = body.size;
-            if (body.viewAngle > thdownOverFovfactor) {
+            if (body.solidAngle > thdownOverFovfactor) {
                 double dist = body.distToCamera;
-                if (body.viewAngle > thupOverFovfactor) {
+                if (body.solidAngle > thupOverFovfactor) {
                     dist = (float) extra.radius / Constants.THRESHOLD_UP;
                 }
                 extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
@@ -187,7 +187,7 @@ public class BillboardEntityRenderSystem implements IObserver {
             // Models
             float thAngleQuad = (float) sa.thresholdQuad * camera.getFovFactor();
             double size = 0f;
-            if (body.viewAngle >= sa.thresholdPoint * camera.getFovFactor()) {
+            if (body.solidAngle >= sa.thresholdPoint * camera.getFovFactor()) {
                 size = Math.tan(thAngleQuad) * body.distToCamera * scaffolding.billboardSizeFactor;
             }
             return (float) size;
@@ -233,7 +233,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_color", color[0], color[1], color[2], a);
         shader.setUniformf("u_inner_rad", (float) celestial.innerRad);
         shader.setUniformf("u_distance", (float) body.distToCamera);
-        shader.setUniformf("u_apparent_angle", (float) body.viewAngleApparent);
+        shader.setUniformf("u_apparent_angle", (float) body.solidAngleApparent);
         shader.setUniformf("u_thpoint", (float) sa.thresholdPoint * camera.getFovFactor());
 
         // Whether light scattering is enabled or not

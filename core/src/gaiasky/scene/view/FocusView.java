@@ -3,9 +3,7 @@ package gaiasky.scene.view;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
-import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.*;
@@ -17,7 +15,6 @@ import gaiasky.scenegraph.IVisibilitySwitch;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
-import gaiasky.util.Settings;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -295,7 +292,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public Vector2d getPosSph() {
-        return body.posSph;
+        var set = getSet();
+        if (set != null) {
+            return set.getPosSph();
+        } else {
+            return body.posSph;
+        }
     }
 
     /**
@@ -303,6 +305,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * when time is on
      *
      * @param time The current time
+     *
      * @return True if position should be recomputed for this entity
      */
     protected boolean mustUpdatePosition(ITimeFrameProvider time) {
@@ -347,8 +350,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getDistToCamera() {
-        if (getSet() != null) {
-            return getSet().focusDistToCamera;
+        var set = getSet();
+        if (set != null) {
+            return set.getDistToCamera();
         } else {
             return body.distToCamera;
         }
@@ -364,42 +368,73 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public double getViewAngle() {
-        return body.viewAngle;
-    }
-
-    @Override
-    public double getViewAngleApparent() {
-        return body.viewAngleApparent;
-    }
-
-    @Override
-    public double getCandidateViewAngleApparent() {
-        if (getSet() != null) {
-            return getSet().getCandidateViewAngleApparent();
+    public double getSolidAngle() {
+        var set = getSet();
+        if (set != null) {
+            return set.getSolidAngle();
         } else {
-            return getViewAngleApparent();
+            return body.solidAngle;
+        }
+    }
+
+    @Override
+    public double getSolidAngleApparent() {
+        var set = getSet();
+        if (set != null) {
+            return set.getSolidAngleApparent();
+        } else {
+            return body.solidAngleApparent;
+        }
+    }
+
+    @Override
+    public double getCandidateSolidAngleApparent() {
+        var set = getSet();
+        if (set != null) {
+            return set.getCandidateSolidAngleApparent();
+        } else {
+            return getSolidAngleApparent();
         }
     }
 
     @Override
     public double getAlpha() {
-        return body.posSph.x;
+        var set = getSet();
+        if (set != null) {
+            return set.getAlpha();
+        } else {
+            return body.posSph.x;
+        }
     }
 
     @Override
     public double getDelta() {
-        return body.posSph.y;
+        var set = getSet();
+        if (set != null) {
+            return set.getDelta();
+        } else {
+            return body.posSph.y;
+        }
     }
 
     @Override
     public double getSize() {
-        return body.size;
+        var set = getSet();
+        if (set != null) {
+            return set.getSize();
+        } else {
+            return body.size;
+        }
     }
 
     @Override
     public double getRadius() {
-        return extra != null ? extra.radius : body.size / 2.0;
+        var set = getSet();
+        if (set != null) {
+            return set.getRadius();
+        } else {
+            return extra != null ? extra.radius : body.size / 2.0;
+        }
     }
 
     @Override
@@ -424,12 +459,24 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public float getAppmag() {
-        return mag.appmag;
+        if (starSet != null) {
+            return starSet.focus.appmag();
+        } else if (particleSet != null) {
+            return 0;
+        } else {
+            return mag.appmag;
+        }
     }
 
     @Override
     public float getAbsmag() {
-        return mag.absmag;
+        if (starSet != null) {
+            return starSet.focus.absmag();
+        } else if (particleSet != null) {
+            return 0;
+        } else {
+            return mag.absmag;
+        }
     }
 
     @Override

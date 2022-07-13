@@ -358,7 +358,7 @@ public class ModelEntityRenderSystem {
         } else {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
-                float atmOpacity = (float) MathUtilsd.lint(body.viewAngle, 0.00745329f, 0.02490659f, 0f, 1f);
+                float atmOpacity = (float) MathUtilsd.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
                 if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0) {
                     var graph = Mapper.graph.get(entity);
                     var rotation = Mapper.rotation.get(entity);
@@ -391,7 +391,7 @@ public class ModelEntityRenderSystem {
 
         // Atmosphere fades in between 1 and 2 degrees of view angle apparent
         ICamera cam = GaiaSky.instance.getICamera();
-        float atmOpacity = (float) MathUtilsd.lint(body.viewAngle, 0.00745329f, 0.02490659f, 0f, 1f);
+        float atmOpacity = (float) MathUtilsd.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
         if (atmOpacity > 0) {
             var graph = Mapper.graph.get(entity);
             var rotation = Mapper.rotation.get(entity);

@@ -1195,7 +1195,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @return The view angle in radians.
      */
-    public double getViewAngle() {
+    public double getSolidAngle() {
         return viewAngle;
     }
 
@@ -1205,7 +1205,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @return The apparent view angle in radians.
      */
-    public double getViewAngleApparent() {
+    public double getSolidAngleApparent() {
         return viewAngleApparent;
     }
 

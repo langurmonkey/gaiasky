@@ -197,7 +197,7 @@ public interface IFocus {
      *
      * @return The view angle in radians.
      */
-    double getViewAngle();
+    double getSolidAngle();
 
     /**
      * Returns the current apparent view angle (view angle corrected with the
@@ -205,7 +205,7 @@ public interface IFocus {
      *
      * @return The apparent view angle in radians.
      */
-    double getViewAngleApparent();
+    double getSolidAngleApparent();
 
     /**
      * Returns the candidate apparent view angle (view angle corrected with the
@@ -213,7 +213,7 @@ public interface IFocus {
      *
      * @return The apparent view angle in radians.
      */
-    double getCandidateViewAngleApparent();
+    double getCandidateSolidAngleApparent();
 
     /**
      * Returns the right ascension angle of this focus object.

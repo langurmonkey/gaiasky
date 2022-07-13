@@ -148,7 +148,7 @@ public class StarSet extends ParticleSet {
         return pointData.get(candidateFocusIndex).names()[0];
     }
 
-    public double getCandidateViewAngleApparent() {
+    public double getCandidateSolidAngleApparent() {
         if (candidateFocusIndex >= 0) {
             IParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(D31);

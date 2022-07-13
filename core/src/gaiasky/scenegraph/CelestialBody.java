@@ -201,7 +201,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         super.addFocusableObjects(list);
     }
 
-    public double getViewAngle() {
+    public double getSolidAngle() {
         return viewAngle;
     }
 
@@ -419,8 +419,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     @Override
-    public double getCandidateViewAngleApparent() {
-        return getViewAngleApparent();
+    public double getCandidateSolidAngleApparent() {
+        return getSolidAngleApparent();
     }
 
     @Override

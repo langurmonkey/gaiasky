@@ -33,12 +33,12 @@ public class Body implements Component, ICopy {
     /**
      * The view angle, in radians.
      */
-    public double viewAngle;
+    public double solidAngle;
 
     /**
      * The view angle corrected with the field of view angle, in radians.
      */
-    public double viewAngleApparent;
+    public double solidAngleApparent;
 
     /**
      * Base RGB color
@@ -167,8 +167,8 @@ public class Body implements Component, ICopy {
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());
-        copy.viewAngle = viewAngle;
-        copy.viewAngleApparent = viewAngleApparent;
+        copy.solidAngle = solidAngle;
+        copy.solidAngleApparent = solidAngleApparent;
         copy.size = size;
         copy.distToCamera = distToCamera;
         copy.pos.set(pos);

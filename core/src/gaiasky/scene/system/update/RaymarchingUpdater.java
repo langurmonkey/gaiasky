@@ -25,7 +25,7 @@ public class RaymarchingUpdater extends AbstractUpdateSystem {
             var body = Mapper.body.get(entity);
 
             // Check enable/disable
-            if (body.viewAngleApparent > Math.toRadians(0.001)) {
+            if (body.solidAngleApparent > Math.toRadians(0.001)) {
                 if (!rm.isOn) {
                     // Turn on
                     EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), true, body.pos);

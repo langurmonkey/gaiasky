@@ -708,7 +708,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    public double getCandidateViewAngleApparent() {
+    public double getCandidateSolidAngleApparent() {
         if (candidateFocusIndex >= 0) {
             IParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(D31.get());

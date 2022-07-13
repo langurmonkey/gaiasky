@@ -23,14 +23,14 @@ public class ClusterExtractor extends AbstractExtractSystem {
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
 
-            if (body.viewAngleApparent >= ClusterUpdater.TH_ANGLE) {
+            if (body.solidAngleApparent >= ClusterUpdater.TH_ANGLE) {
                 addToRender(render, RenderGroup.MODEL_VERT_ADDITIVE);
             }
-            if (body.viewAngleApparent >= ClusterUpdater.TH_ANGLE || base.forceLabel) {
+            if (body.solidAngleApparent >= ClusterUpdater.TH_ANGLE || base.forceLabel) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
 
-            if (body.viewAngleApparent < ClusterUpdater.TH_ANGLE_OVERLAP) {
+            if (body.solidAngleApparent < ClusterUpdater.TH_ANGLE_OVERLAP) {
                 addToRender(render, RenderGroup.BILLBOARD_SPRITE);
             }
         }

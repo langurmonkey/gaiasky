@@ -136,7 +136,7 @@ public class ConsoleLogger implements IObserver {
             break;
         case FOCUS_CHANGED:
             if (data[0] != null) {
-                IFocus sgn = null;
+                IFocus sgn;
                 if (data[0] instanceof String) {
                     sgn = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
                 } else {

@@ -11,6 +11,7 @@ import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
@@ -179,7 +180,8 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
             if (data[0] instanceof String) {
                 particleSet.focusIndex = data[0].equals(base.getName()) ? particleSet.focusIndex : -1;
             } else {
-                particleSet.focusIndex = data[0] == this ? particleSet.focusIndex : -1;
+                FocusView view = (FocusView) data[0];
+                particleSet.focusIndex = (view.getSet() == particleSet) ? particleSet.focusIndex : -1;
             }
             utils.updateFocusDataPos(particleSet);
             break;

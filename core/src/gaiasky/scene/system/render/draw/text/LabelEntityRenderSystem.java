@@ -52,7 +52,7 @@ public class LabelEntityRenderSystem {
 
         Vector3d pos = D31;
         view.textPosition(camera, pos);
-        shader.setUniformf("u_viewAngle", (float) body.viewAngle * 500f);
+        shader.setUniformf("u_viewAngle", (float) body.solidAngle * 500f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
 
@@ -62,7 +62,7 @@ public class LabelEntityRenderSystem {
     public void renderTitle(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         var title = view.getComponent(Title.class);
 
-        shader.setUniformf("u_viewAngle", (float) view.body.viewAngleApparent);
+        shader.setUniformf("u_viewAngle", (float) view.body.solidAngleApparent);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
 
@@ -182,7 +182,7 @@ public class LabelEntityRenderSystem {
             // 3D distance font
             Vector3d pos = D31;
             view.textPosition(camera, pos);
-            shader.setUniformf("u_viewAngle", view.base.forceLabel ? 2f : (float) view.body.viewAngleApparent);
+            shader.setUniformf("u_viewAngle", view.base.forceLabel ? 2f : (float) view.body.solidAngleApparent);
             shader.setUniformf("u_viewAnglePow", view.base.forceLabel ? 1f : view.label.viewAnglePow);
             shader.setUniformf("u_thLabel", view.base.forceLabel ? 1f : (float) view.sa.thresholdLabel);
 
@@ -193,7 +193,7 @@ public class LabelEntityRenderSystem {
     public void renderCluster(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = D31;
         view.textPosition(camera, pos);
-        shader.setUniformf("u_viewAngle", view.base.forceLabel ? 2f : (float) view.body.viewAngle * 500f);
+        shader.setUniformf("u_viewAngle", view.base.forceLabel ? 2f : (float) view.body.solidAngle * 500f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
 

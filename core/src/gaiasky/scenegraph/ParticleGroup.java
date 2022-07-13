@@ -801,12 +801,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     // FOCUS_MODE view angle
-    public double getViewAngle() {
+    public double getSolidAngle() {
         return focusViewAngle;
     }
 
     // FOCUS_MODE apparent view angle
-    public double getViewAngleApparent() {
+    public double getSolidAngleApparent() {
         return focusViewAngleApparent;
     }
 
@@ -1092,7 +1092,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public double getCandidateViewAngleApparent() {
+    public double getCandidateSolidAngleApparent() {
         if (candidateFocusIndex >= 0) {
             IParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(D31.get());

@@ -68,7 +68,7 @@ public class FocusHit {
 
             if (camera.direction.dot(posd) > 0) {
                 // The object is in front of us
-                double angle = view.getViewAngle() * angleScaleFactor;
+                double angle = view.getSolidAngle() * angleScaleFactor;
 
                 PerspectiveCamera pCamera;
                 if (Settings.settings.program.modeStereo.active) {
@@ -129,7 +129,7 @@ public class FocusHit {
             var entity = view.getEntity();
             var sa = Mapper.sa.get(entity);
 
-            if (view.getViewAngleApparent() < sa.thresholdQuad * camera.getFovFactor()) {
+            if (view.getSolidAngleApparent() < sa.thresholdQuad * camera.getFovFactor()) {
                 addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, camera, hits);
             } else {
                 var graph = Mapper.graph.get(entity);
@@ -169,7 +169,7 @@ public class FocusHit {
             var entity = view.getEntity();
             var sa = Mapper.sa.get(entity);
 
-            if (view.getViewAngleApparent() < sa.thresholdQuad * camera.getFovFactor()) {
+            if (view.getSolidAngleApparent() < sa.thresholdQuad * camera.getFovFactor()) {
                 addHitRayCelestial(view, p0, p1, camera, hits);
             } else {
                 var graph = Mapper.graph.get(entity);
@@ -330,7 +330,7 @@ public class FocusHit {
                 // The star is in front of us
                 // Diminish the size of the star
                 // when we are close by
-                double angle = view.getViewAngle();
+                double angle = view.getSolidAngle();
 
                 PerspectiveCamera pcamera;
                 if (Settings.settings.program.modeStereo.active) {

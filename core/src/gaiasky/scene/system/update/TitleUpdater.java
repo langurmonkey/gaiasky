@@ -24,8 +24,8 @@ public class TitleUpdater extends AbstractUpdateSystem {
         // Propagate upwards if necessary
         setParentOpacity(entity);
 
-        body.viewAngle = 80f;
-        body.viewAngleApparent = body.viewAngle / camera.getFovFactor();
+        body.solidAngle = 80f;
+        body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
 
     }
 

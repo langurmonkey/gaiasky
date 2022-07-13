@@ -375,17 +375,17 @@ public class Proximity {
         }
 
         @Override
-        public double getViewAngle() {
+        public double getSolidAngle() {
             return 0;
         }
 
         @Override
-        public double getViewAngleApparent() {
+        public double getSolidAngleApparent() {
             return 0;
         }
 
         @Override
-        public double getCandidateViewAngleApparent() {
+        public double getCandidateSolidAngleApparent() {
             return 0;
         }
 

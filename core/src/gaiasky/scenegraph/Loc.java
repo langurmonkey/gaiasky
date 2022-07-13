@@ -269,7 +269,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     }
 
     @Override
-    public double getCandidateViewAngleApparent() {
+    public double getCandidateSolidAngleApparent() {
         return viewAngleApparent;
     }
 

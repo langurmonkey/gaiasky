@@ -52,7 +52,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
             addToRender(render, renderType.renderGroup);
 
             boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
-            if (body.viewAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number && hasPm) {
+            if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number && hasPm) {
                 addToRender(render, RenderGroup.LINE);
             }
         }
@@ -66,7 +66,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
             // Render as point, do nothing
             addToRender(render, RenderGroup.BILLBOARD_STAR);
         } else {
-            if (body.viewAngleApparent >= Settings.settings.scene.star.threshold.point) {
+            if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point) {
                 addToRender(render, RenderGroup.BILLBOARD_STAR);
                 if (body.distToCamera < Mapper.distance.get(entity).distance) {
                     //camera.checkClosestBody(this);
@@ -74,7 +74,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
                 }
             }
             boolean hasPm = Mapper.pm.has(entity) && Mapper.pm.get(entity).hasPm;
-            if (hasPm && body.viewAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number) {
+            if (hasPm && body.solidAngleApparent >= Settings.settings.scene.star.threshold.point / Settings.settings.scene.properMotion.number) {
                 addToRender(render, RenderGroup.LINE);
             }
         }
@@ -88,6 +88,6 @@ public class ParticleExtractor extends AbstractExtractSystem {
     private boolean renderText(Body body, SolidAngle sa, ParticleExtra particleExtra) {
         return particleExtra.computedSize > 0 &&
                 GaiaSky.instance.isOn(ComponentType.Labels) &&
-                body.viewAngleApparent >= (sa.thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
+                body.solidAngleApparent >= (sa.thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
     }
 }

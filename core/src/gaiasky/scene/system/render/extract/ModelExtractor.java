@@ -53,7 +53,7 @@ public class ModelExtractor extends AbstractExtractSystem {
             if (Mapper.tagBillboardGalaxy.has(entity)) {
                 // Billboard galaxies
                 double thPoint = (BBGAL_TH * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
-                if (body.viewAngleApparent >= thPoint) {
+                if (body.solidAngleApparent >= thPoint) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
                 } else if (base.opacity > 0) {
                     addToRender(render, RenderGroup.BILLBOARD_GAL);
@@ -64,7 +64,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                 }
             } else if (Mapper.tagQuatOrientation.has(entity)) {
                 // Simple billboards
-                if (body.viewAngleApparent >= sa.thresholdNone) {
+                if (body.solidAngleApparent >= sa.thresholdNone) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
                     if (renderText()) {
                         addToRender(render, RenderGroup.FONT_LABEL);
@@ -73,18 +73,18 @@ public class ModelExtractor extends AbstractExtractSystem {
             } else {
                 // Rest of models
                 double thPoint = (sa.thresholdPoint * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
-                if (body.viewAngleApparent >= thPoint) {
+                if (body.solidAngleApparent >= thPoint) {
                     double thQuad2 = sa.thresholdQuad * camera.getFovFactor() * 2 / scaffolding.sizeScaleFactor;
                     double thQuad1 = thQuad2 / 8.0 / scaffolding.sizeScaleFactor;
-                    if (body.viewAngleApparent < thPoint * 4) {
-                        scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.viewAngleApparent, thPoint, thPoint * 4, 1, 0);
+                    if (body.solidAngleApparent < thPoint * 4) {
+                        scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.solidAngleApparent, thPoint, thPoint * 4, 1, 0);
                     } else {
-                        scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.viewAngleApparent, thQuad1, thQuad2, 0, 1);
+                        scaffolding.fadeOpacity = (float) MathUtilsd.lint(body.solidAngleApparent, thQuad1, thQuad2, 0, 1);
                     }
 
-                    if (body.viewAngleApparent < thQuad1) {
+                    if (body.solidAngleApparent < thQuad1) {
                         addToRender(render, RenderGroup.BILLBOARD_SSO);
-                    } else if (body.viewAngleApparent > thQuad2) {
+                    } else if (body.solidAngleApparent > thQuad2) {
                         addToRenderModel(render, model);
                     } else {
                         // Both
@@ -130,7 +130,7 @@ public class ModelExtractor extends AbstractExtractSystem {
     private boolean renderText(Base base, Body body, SolidAngle sa) {
         return base.names != null
                 && GaiaSky.instance.isOn(ComponentTypes.ComponentType.Labels)
-                && (base.forceLabel || FastMath.pow(body.viewAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
+                && (base.forceLabel || FastMath.pow(body.solidAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
     }
 
     private float getThOverFactorScl(Base base) {
