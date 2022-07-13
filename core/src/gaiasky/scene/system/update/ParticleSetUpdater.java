@@ -58,6 +58,8 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
             // Delta years
             starSet.currDeltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starSet.epochJd) * Nature.MS_TO_Y;
 
+            updateParticleSet(camera, starSet);
+
             // Update close stars
             for (int i = 0; i < Math.min(starSet.proximity.updating.length, starSet.pointData.size()); i++) {
                 if (utils.filter(starSet.active[i], starSet, datasetDesc)

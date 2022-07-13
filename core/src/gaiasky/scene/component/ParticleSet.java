@@ -13,6 +13,7 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
@@ -125,7 +126,7 @@ public class ParticleSet implements Component {
     /**
      * FOCUS_MODE attributes
      */
-    public double focusDistToCamera, focusViewAngle, focusViewAngleApparent, focusSize;
+    public double focusDistToCamera, focusSolidAngle, focusSolidAngleApparent, focusSize;
 
     /**
      * Proximity particles
@@ -365,8 +366,8 @@ public class ParticleSet implements Component {
         Vector3d aux = D31.set(focusPosition);
         focusDistToCamera = aux.sub(camera.getPos()).len();
         focusSize = getFocusSize();
-        focusViewAngle = (float) ((getRadius() / focusDistToCamera) / camera.getFovFactor());
-        focusViewAngleApparent = focusViewAngle * Settings.settings.scene.star.brightness;
+        focusSolidAngle = (float) ((getRadius() / focusDistToCamera) / camera.getFovFactor());
+        focusSolidAngleApparent = focusSolidAngle * Settings.settings.scene.star.brightness;
     }
 
     public void updateFocusDataPos() {
@@ -469,14 +470,38 @@ public class ParticleSet implements Component {
         return 0;
     }
 
+    public long getId() {
+        return 123L;
+    }
+
     public String getCandidateName() {
         return pointData.get(candidateFocusIndex).names() != null ? pointData.get(candidateFocusIndex).names()[0] : getName();
     }
 
-    private String getName() {
+    public String getName() {
         if (focus != null && focus.names() != null)
             return focus.names()[0];
         return null;
+    }
+
+    public String[] getNames() {
+        if (focus != null && focus.names() != null)
+            return focus.names();
+        return null;
+    }
+
+    public String getLocalizedName() {
+        String name = getName();
+        String base = name.toLowerCase(Locale.ROOT).replace(' ', '_');
+        if (I18n.hasObject(base)) {
+            return I18n.obj(base);
+        } else {
+            return name;
+        }
+    }
+
+    public long getCandidateId() {
+        return 123L;
     }
 
     public double getCandidateSolidAngleApparent() {
@@ -515,11 +540,11 @@ public class ParticleSet implements Component {
     }
 
     public double getSolidAngle() {
-        return focusViewAngle;
+        return focusSolidAngle;
     }
 
     // FOCUS_MODE apparent view angle
     public double getSolidAngleApparent() {
-        return focusViewAngleApparent;
+        return focusSolidAngleApparent;
     }
 }

@@ -111,26 +111,68 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public long getId() {
-        return base.id;
+        var set = getSet();
+        if (set != null) {
+            return set.getId();
+        } else {
+            return base.id;
+        }
     }
 
     @Override
     public long getCandidateId() {
-        return base.id;
+        var set = getSet();
+        if (set != null) {
+            return set.getCandidateId();
+        } else {
+            return base.id;
+        }
     }
 
     @Override
     public String getLocalizedName() {
-        return base.getLocalizedName();
+        var set = getSet();
+        if (set != null) {
+            return set.getLocalizedName();
+        } else {
+            return base.getLocalizedName();
+        }
     }
 
     @Override
     public String getName() {
+        var set = getSet();
+        if (set != null) {
+            var name = set.getName();
+            if (name != null)
+                return name;
+        }
         return base.getName();
     }
 
     public void setName(String name) {
         base.setName(name);
+    }
+
+    @Override
+    public String[] getNames() {
+        var set = getSet();
+        if (set != null) {
+            var names = set.getNames();
+            if (names != null)
+                return names;
+        }
+        return base.names;
+    }
+
+    @Override
+    public boolean hasName(String name) {
+        return base.hasName(name);
+    }
+
+    @Override
+    public boolean hasName(String name, boolean matchCase) {
+        return base.hasName(name, matchCase);
     }
 
     @Override
@@ -166,21 +208,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         } else {
             setVisible(visible);
         }
-    }
-
-    @Override
-    public String[] getNames() {
-        return base.names;
-    }
-
-    @Override
-    public boolean hasName(String name) {
-        return base.hasName(name);
-    }
-
-    @Override
-    public boolean hasName(String name, boolean matchCase) {
-        return base.hasName(name, matchCase);
     }
 
     @Override
@@ -439,17 +466,17 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getHeight(Vector3b camPos) {
-        return 0;
+        return getRadius();
     }
 
     @Override
     public double getHeight(Vector3b camPos, boolean useFuturePosition) {
-        return 0;
+        return getRadius();
     }
 
     @Override
     public double getHeight(Vector3b camPos, Vector3b nextPos) {
-        return 0;
+        return getRadius();
     }
 
     @Override
@@ -558,6 +585,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return octant != null ? octant.octant : null;
     }
 
+    public int getHip() {
+        if (starSet != null) {
+            if (starSet.focus != null && starSet.focus.hip() > 0)
+                return starSet.focus.hip();
+        } else if (Mapper.hip.has(entity)) {
+            return Mapper.hip.get(entity).hip;
+        }
+        return -1;
+    }
+
     public void setForceLabel(Boolean forceLabel, String name) {
         if (starSet != null) {
             starSet.setForceLabel(forceLabel, name);
@@ -606,5 +643,68 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public ParticleSet getSet() {
         return particleSet != null ? particleSet : starSet;
+    }
+
+    public boolean isCluster() {
+        return Mapper.cluster.has(entity);
+    }
+
+    public boolean isCelestial() {
+        return Mapper.celestial.has(entity);
+    }
+
+    public boolean hasProperMotion() {
+        return Mapper.pm.has(entity) || starSet != null;
+    }
+
+    public double getMuAlpha() {
+        if (starSet != null) {
+            if (starSet.focus != null)
+                return starSet.focus.mualpha();
+            else
+                return 0;
+        } else if (Mapper.pm.has(entity)) {
+            var pm = Mapper.pm.get(entity);
+            if (pm.pmSph != null) {
+                return pm.pmSph.x;
+            } else {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    public double getMuDelta() {
+        if (starSet != null) {
+            if (starSet.focus != null)
+                return starSet.focus.mudelta();
+            else
+                return 0;
+        } else if (Mapper.pm.has(entity)) {
+            var pm = Mapper.pm.get(entity);
+            if (pm.pmSph != null) {
+                return pm.pmSph.y;
+            } else {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    public double getRadialVelocity() {
+        if (starSet != null) {
+            if (starSet.focus != null)
+                return starSet.focus.radvel();
+            else
+                return 0;
+        } else if (Mapper.pm.has(entity)) {
+            var pm = Mapper.pm.get(entity);
+            if (pm.pmSph != null) {
+                return pm.pmSph.z;
+            } else {
+                return 0;
+            }
+        }
+        return 0;
     }
 }

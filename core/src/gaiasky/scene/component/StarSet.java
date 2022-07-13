@@ -3,15 +3,9 @@ package gaiasky.scene.component;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.VariableRecord;
-import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -73,12 +67,11 @@ public class StarSet extends ParticleSet {
     public void updateFocus(ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
         Vector3d aux = this.fetchPosition(focus, cPosD, D31, currDeltaYears);
-
         this.focusPosition.set(aux).add(camera.getPos());
         this.focusDistToCamera = aux.len();
         this.focusSize = getFocusSize();
-        this.focusViewAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
-        this.focusViewAngleApparent = this.focusViewAngle * Settings.settings.scene.star.brightness;
+        this.focusSolidAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
+        this.focusSolidAngleApparent = this.focusSolidAngle * Settings.settings.scene.star.brightness;
     }
 
     /**
@@ -138,6 +131,13 @@ public class StarSet extends ParticleSet {
         if (focus != null && focus.hip() > 0)
             return focus.hip();
         return -1;
+    }
+
+    public long getId() {
+        if (focus != null)
+            return focus.id();
+        else
+            return -1;
     }
 
     public long getCandidateId() {

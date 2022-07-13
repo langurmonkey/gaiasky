@@ -15,6 +15,8 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.util.Constants;
+import gaiasky.util.Functions.Function2;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.math.Intersectord;
@@ -53,11 +55,15 @@ public class FocusHit {
         return pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize;
     }
 
-    public void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
-        addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, 1, camera, hits);
+    private double computeHitSolidAngleCelestial(FocusView view, float fovFactor) {
+        return view.getSolidAngle();
     }
 
-    private void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, float angleScaleFactor, NaturalCamera camera, Array<Entity> hits) {
+    public void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
+        addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, 1, this::computeHitSolidAngleCelestial, camera, hits);
+    }
+
+    private void addHitCoordinateCelestial(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, float solidAngleFactor, Function2<FocusView, Float, Double> solidAngleFunction, NaturalCamera camera, Array<Entity> hits) {
         if (hitConditionOverflow(view)) {
             var entity = view.getEntity();
 
@@ -68,29 +74,29 @@ public class FocusHit {
 
             if (camera.direction.dot(posd) > 0) {
                 // The object is in front of us
-                double angle = view.getSolidAngle() * angleScaleFactor;
+                double angle = solidAngleFunction.apply(view, camera.fovFactor) * solidAngleFactor;
 
-                PerspectiveCamera pCamera;
+                PerspectiveCamera perspectiveCamera;
                 if (Settings.settings.program.modeStereo.active) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
-                        pCamera = camera.getCameraStereoLeft();
+                        perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
-                        pCamera = camera.getCameraStereoRight();
+                        perspectiveCamera = camera.getCameraStereoRight();
                     }
-                    pCamera.update();
+                    perspectiveCamera.update();
                 } else {
-                    pCamera = camera.camera;
+                    perspectiveCamera = camera.camera;
                 }
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pCamera.fieldOfView);
-                double pixelSize = Math.max(pixelDist, ((angle * pCamera.viewportHeight) / pCamera.fieldOfView) / 2);
-                pCamera.project(pos);
-                pos.y = pCamera.viewportHeight - pos.y;
+                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                double pixelSize = Math.max(pixelDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                perspectiveCamera.project(pos);
+                pos.y = perspectiveCamera.viewportHeight - pos.y;
                 if (Settings.settings.program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance
-                if (checkClickDistance(screenX, screenY, pos, camera, pCamera, pixelSize)) {
+                if (checkClickDistance(screenX, screenY, pos, camera, perspectiveCamera, pixelSize)) {
                     //Hit
                     hits.add(entity);
                 }
@@ -188,8 +194,15 @@ public class FocusHit {
         }
     }
 
+    private double computeHitSolidAngleStar(FocusView view, float fovFactor) {
+        double solidAngle = view.getSolidAngle();
+        if (solidAngle > Constants.THRESHOLD_DOWN / fovFactor && solidAngle < Constants.THRESHOLD_UP / fovFactor) {
+            return 20f * Constants.THRESHOLD_DOWN / fovFactor;
+        }
+        return solidAngle;
+    }
     public void addHitCoordinateStar(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
-        addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness * 1e3f, camera, hits);
+        addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness * 1e3f, this::computeHitSolidAngleStar, camera, hits);
     }
 
     public void addHitCoordinateParticleSet(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {

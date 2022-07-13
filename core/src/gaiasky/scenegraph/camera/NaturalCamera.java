@@ -1201,7 +1201,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public double speedScaling(double min) {
         double dist;
         double starEdge = 0.5 * Constants.PC_TO_U;
-        if (parent.mode.useFocus() && focus != null) {
+        if (parent.mode.useFocus() && focus != null && !focus.isEmpty()) {
             // FOCUS mode -> use focus object
             dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
         } else if (parent.mode.useClosest() && proximity.effective[0] != null) {
