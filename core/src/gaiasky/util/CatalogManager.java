@@ -42,6 +42,7 @@ public class CatalogManager implements IObserver {
      * Gets the CatalogInfo with the given name, if any
      *
      * @param dsName The name of the dataset
+     *
      * @return The CatalogInfo object, null if it does not exist
      */
     public CatalogInfo get(String dsName) {
@@ -61,9 +62,9 @@ public class CatalogManager implements IObserver {
             octant = node.octant.getRoot();
         }
         for (CatalogInfo ci : cis) {
-            if(octant != null) {
+            if (octant != null) {
                 // Octree branch
-                if(ci.object instanceof OctreeWrapper && ((OctreeWrapper)ci.object).root == octant)
+                if (ci.object instanceof OctreeWrapper && ((OctreeWrapper) ci.object).root == octant)
                     return Optional.of(ci);
             } else {
                 if (ci.object == node)
@@ -73,20 +74,22 @@ public class CatalogManager implements IObserver {
         return Optional.empty();
     }
 
-    public Optional<CatalogInfo> getByEntity(Entity node) {
+    public Optional<CatalogInfo> getByEntity(Entity entity) {
         OctreeNode octant = null;
-        if (Mapper.octant.has(node)) {
-            var oct = Mapper.octant.get(node);
+        if (Mapper.octant.has(entity)) {
+            var oct = Mapper.octant.get(entity);
             octant = oct.octant != null ? oct.octant.getRoot() : null;
         }
         for (CatalogInfo ci : cis) {
-            if(octant != null) {
-                // Octree branch
-                if(Mapper.octree.has(ci.entity) && Mapper.octant.get(ci.entity).octant == octant)
-                    return Optional.of(ci);
-            } else {
-                if (ci.entity == node)
-                    return Optional.of(ci);
+            if (ci.entity != null) {
+                if (octant != null) {
+                    // Octree branch
+                    if (Mapper.octree.has(ci.entity) && Mapper.octant.get(ci.entity).octant == octant)
+                        return Optional.of(ci);
+                } else {
+                    if (ci.entity == entity)
+                        return Optional.of(ci);
+                }
             }
         }
         return Optional.empty();
@@ -99,19 +102,19 @@ public class CatalogManager implements IObserver {
             CatalogInfo ci = (CatalogInfo) data[0];
             boolean addToSg = (Boolean) data[1];
             boolean post = true;
-            if(data.length > 2)
+            if (data.length > 2)
                 post = (Boolean) data[2];
             if (addToSg) {
                 // Insert object into scene graph
                 EventManager.publish(post ? Event.SCENE_GRAPH_ADD_OBJECT_CMD : Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, ci.object, true);
             }
             String key = ci.name;
-            if(ciMap.containsKey(key)){
+            if (ciMap.containsKey(key)) {
                 int i = 1;
-                String newKey = ci.name + "(" + i +")";
-                while(ciMap.containsKey(newKey)){
+                String newKey = ci.name + "(" + i + ")";
+                while (ciMap.containsKey(newKey)) {
                     i++;
-                    newKey = ci.name + "(" + i +")";
+                    newKey = ci.name + "(" + i + ")";
                 }
                 ci.name = newKey;
                 key = newKey;
@@ -158,7 +161,7 @@ public class CatalogManager implements IObserver {
             double scaling = (Double) data[1];
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
-                if(ci.object != null) {
+                if (ci.object != null) {
                     ci.object.setPointscaling((float) scaling);
                 }
             }
