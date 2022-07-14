@@ -384,10 +384,11 @@ public class Scene {
      * with caution, this may have unforeseen consequences, as the process usually updates the
      * whole scene graph starting at the root. This by-passes the usual procedure to update
      * a single entity and its subtree.
-     * @param entity The entity to update.
-     * @param time The time object.
+     *
+     * @param entity            The entity to update.
+     * @param time              The time object.
      * @param parentTranslation The parent translation.
-     * @param opacity The opacity value.
+     * @param opacity           The opacity value.
      */
     public void updateEntityGraph(Entity entity, ITimeFrameProvider time, Vector3b parentTranslation, float opacity) {
         var updater = findUpdater(GraphUpdater.class);
@@ -419,7 +420,7 @@ public class Scene {
      */
     private <T extends AbstractExtractSystem> T newExtractor(Class<T> extractorClass, Family family, int priority, ISceneRenderer sceneRenderer) {
         try {
-            Constructor<T> c =  extractorClass.getDeclaredConstructor(Family.class, int.class);
+            Constructor<T> c = extractorClass.getDeclaredConstructor(Family.class, int.class);
             T system = c.newInstance(family, priority);
             system.setRenderer(sceneRenderer);
             return system;
@@ -605,6 +606,15 @@ public class Scene {
         engine.getEntities().forEach((entity) -> {
             if (Mapper.focus.has(entity)) {
                 list.add(entity);
+            } else if (Mapper.octree.has(entity)) {
+                // LOD objects are not in the scene graph structure.
+                var octree = Mapper.octree.get(entity);
+                Set<Entity> objects = octree.parenthood.keySet();
+                objects.forEach((object) -> {
+                    if (Mapper.focus.has(object)) {
+                        list.add(object);
+                    }
+                });
             }
         });
 
