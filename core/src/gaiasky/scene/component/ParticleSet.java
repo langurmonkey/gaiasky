@@ -106,12 +106,12 @@ public class ParticleSet implements Component {
     /**
      * Index of the particle acting as focus. Negative if we have no focus here.
      */
-    public int focusIndex;
+    public int focusIndex = -1;
 
     /**
      * Candidate to focus.
      */
-    public int candidateFocusIndex;
+    public int candidateFocusIndex = -1;
 
     /**
      * Position of the current focus
