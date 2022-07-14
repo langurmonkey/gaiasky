@@ -40,7 +40,7 @@ public class ModelScaffolding implements Component {
     public double[] shadowMapValues;
 
     /** The seed for random components **/
-    public List<Long> seed = Arrays.asList(1L);
+    public List<Long> seed = List.of(1L);
 
     /** The components to randomize---possible values are ["model", "cloud", "atmosphere"] **/
     public List<String> randomize;

@@ -1,8 +1,10 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -10,11 +12,15 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
+import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.IVisibilitySwitch;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
+import gaiasky.util.Nature;
+import gaiasky.util.Settings;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -49,12 +55,21 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     /** The focus active computer. **/
     private FocusActive focusActive;
 
+    private final Vector3d D32 = new Vector3d();
+    private final Vector3b B31 = new Vector3b();
+    private final Vector3b B33 = new Vector3b();
+    private final Matrix4 mataux = new Matrix4();
+    private final Matrix4d matauxd = new Matrix4d();
+
+    private ModelUpdater updater;
+
     /** Creates a focus view with the given scene. **/
     public FocusView(Scene scene) {
         super();
         this.scene = scene;
         this.focusHit = new FocusHit();
         this.focusActive = new FocusActive();
+        this.updater = new ModelUpdater(null, 0);
     }
 
     /** Creates an empty focus view. **/
@@ -466,21 +481,102 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public double getHeight(Vector3b camPos) {
-        return getRadius();
+        if (isModel()) {
+            return getHeight(camPos, false);
+        } else {
+            return getRadius();
+        }
     }
 
     @Override
     public double getHeight(Vector3b camPos, boolean useFuturePosition) {
-        return getRadius();
+        if (isModel()) {
+            if (useFuturePosition) {
+                Vector3b nextPos = getPredictedPosition(B33, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+                return getHeight(camPos, nextPos);
+            } else {
+                return getHeight(camPos, null);
+            }
+        } else {
+            return getRadius();
+        }
     }
 
     @Override
     public double getHeight(Vector3b camPos, Vector3b nextPos) {
-        return getRadius();
+        if (isModel()) {
+            var model = Mapper.model.get(entity);
+            var mc = model.model;
+            double height = 0;
+            if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
+                double dCam;
+                Vector3b cart = B31;
+                if (nextPos != null) {
+                    cart.set(nextPos);
+                    getPredictedPosition(cart, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+                    dCam = D32.set(camPos).sub(cart).len();
+                } else {
+                    getAbsolutePosition(cart);
+                    dCam = getDistToCamera();
+                }
+                // Only when we have height map and we are below the highest point in the surface
+                if (dCam < getRadius() + mc.mtc.heightScale * Settings.settings.scene.renderer.elevation.multiplier * 4) {
+                    float[][] m = mc.mtc.heightMap;
+                    int W = mc.mtc.heightMap.length;
+                    int H = mc.mtc.heightMap[0].length;
+
+                    // Object-camera normalised vector
+                    cart.scl(-1).add(camPos).nor();
+
+                    updater.setToLocalTransform(entity, body, graph, 1, mataux, false);
+                    mataux.inv();
+                    matauxd.set(mataux.getValues());
+                    cart.mul(matauxd);
+
+                    Vector3d sph = D32;
+                    Coordinates.cartesianToSpherical(cart, sph);
+
+                    double x = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
+                    double y = 1d - (sph.y * Nature.TO_DEG + 90.0) / 180.0;
+
+                    // Bilinear interpolation
+                    int i1 = (int) (W * x);
+                    int i2 = (i1 + 1) % W;
+                    int j1 = (int) (H * y);
+                    int j2 = (j1 + 1) % H;
+
+                    double dx = 1.0 / W;
+                    double dy = 1.0 / H;
+                    double x1 = (double) i1 / (double) W;
+                    double x2 = (x1 + dx) % 1.0;
+                    double y1 = (double) j1 / (double) H;
+                    double y2 = (y1 + dy) % 1.0;
+
+                    double f11 = m[i1][j1];
+                    double f21 = m[i2][j1];
+                    double f12 = m[i1][j2];
+                    double f22 = m[i2][j2];
+
+                    double denominator = (x2 - x1) * (y2 - y1);
+                    height = (((x2 - x) * (y2 - y)) / denominator) * f11 + ((x - x1) * (y2 - y) / denominator) * f21 + ((x2 - x) * (y - y1) / denominator) * f12 + ((x - x1) * (y - y1) / denominator) * f22;
+                }
+            }
+            return getRadius() + height * Settings.settings.scene.renderer.elevation.multiplier;
+
+        } else {
+            return getRadius();
+        }
     }
 
     @Override
     public double getHeightScale() {
+        if (isModel()) {
+            var model = Mapper.model.get(entity);
+            var mc = model.model;
+            if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
+                return mc.mtc.heightScale;
+            }
+        }
         return 0;
     }
 
@@ -490,7 +586,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             return starSet.focus.appmag();
         } else if (particleSet != null) {
             return 0;
-        } else if (mag != null){
+        } else if (mag != null) {
             return mag.appmag;
         } else {
             return 0;
@@ -647,6 +743,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public ParticleSet getSet() {
         return particleSet != null ? particleSet : starSet;
+    }
+
+    public boolean isModel() {
+        return Mapper.modelScaffolding.has(entity);
     }
 
     public boolean isCluster() {
