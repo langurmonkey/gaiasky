@@ -80,7 +80,7 @@ public class ModelEntityRenderSystem {
         if (mc != null && mc.isModelInitialised()) {
             var base = Mapper.base.get(entity);
             if (scaffolding != null && shadow) {
-                prepareShadowEnvironment(model, scaffolding);
+                prepareShadowEnvironment(entity, model, scaffolding);
             }
 
             float alphaFactor;
@@ -314,7 +314,7 @@ public class ModelEntityRenderSystem {
         if (mc.isModelInitialised()) {
             // Good, render
             if (shadow) {
-                prepareShadowEnvironment(model, scaffolding);
+                prepareShadowEnvironment(entity, model, scaffolding);
             }
             mc.setTransparency(alpha * scaffolding.fadeOpacity);
             if (cam.getMode().isSpacecraft())
@@ -369,7 +369,7 @@ public class ModelEntityRenderSystem {
             }
             // Regular planet, render model normally
             if (shadow) {
-                prepareShadowEnvironment(model, scaffolding);
+                prepareShadowEnvironment(entity, model, scaffolding);
             }
             model.model.update(alpha * base.opacity, relativistic);
             batch.render(model.model.instance, model.model.env);
@@ -418,13 +418,13 @@ public class ModelEntityRenderSystem {
     /**
      * Prepares the shadow environment for shadow mapping.
      */
-    protected void prepareShadowEnvironment(Model model, ModelScaffolding scaffolding) {
+    protected void prepareShadowEnvironment(Entity entity, Model model, ModelScaffolding scaffolding) {
         if (Settings.settings.scene.renderer.shadow.active) {
             Environment env = model.model.env;
             SceneRenderer sceneRenderer = GaiaSky.instance.sceneRenderer;
-            if (scaffolding.shadow > 0 && sceneRenderer.smTexMap.containsKey(this)) {
-                Matrix4 combined = sceneRenderer.smCombinedMap.get(this);
-                Texture tex = sceneRenderer.smTexMap.get(this);
+            if (scaffolding.shadow > 0 && sceneRenderer.smTexMap.containsKey(entity)) {
+                Matrix4 combined = sceneRenderer.smCombinedMap.get(entity);
+                Texture tex = sceneRenderer.smTexMap.get(entity);
                 if (env.shadowMap == null) {
                     if (scaffolding.shadowMap == null)
                         scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
