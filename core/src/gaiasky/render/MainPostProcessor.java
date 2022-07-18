@@ -5,6 +5,7 @@
 
 package gaiasky.render;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -17,7 +18,10 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IPostProcessor;
+import gaiasky.scene.Archetype;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.view.BaseView;
 import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
 import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
 import gaiasky.util.SysUtils;
@@ -67,7 +71,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     /** Aspect ratio cache. **/
     float ar;
 
-    BackgroundModel blurObject;
+    Entity blurObject;
+    BaseView blurObjectView;
     boolean blurObjectAdded = false;
 
     Vector3b auxb, prevCampos;
@@ -118,7 +123,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         manager.load(lensDirtName, Texture.class);
         manager.load(lensColorName, Texture.class);
         manager.load(lensStarburstName, Texture.class);
-        initializeBlurObject();
 
         // Raymarching objects
         // [0:shader{string}, 1:enabled {bool}, 2:position{vector3d}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]]
@@ -208,9 +212,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         updateCameraBlur(ppb, gq);
 
         // Add to scene graph
+        initializeBlurObject();
         if (blurObject != null && !blurObjectAdded) {
-            blurObject.doneLoading(manager);
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, blurObject, false));
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, blurObject, false));
+            blurObjectView = new BaseView(blurObject);
             blurObjectAdded = true;
         }
 
@@ -332,29 +337,45 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     private void initializeBlurObject() {
-        // Create blur object
-        BackgroundModel bm = new BackgroundModel();
-        bm.setName("BlurObject1199");
-        bm.setColor(new float[] { 0, 0, 0, 0 });
-        bm.setSize(1d);
-        bm.setCt("");
-        bm.setLabel(false);
-        bm.setParent("Universe");
-        StaticCoordinates sc = new StaticCoordinates();
-        sc.setPosition(new double[] { 0, 0, 0 });
-        bm.setCoordinates(sc);
-        ModelComponent mc = new ModelComponent(true);
-        mc.setType("sphere");
-        Map<String, Object> params = new HashMap<>();
-        params.put("quality", 50l);
-        params.put("diameter", 1.0d);
-        params.put("flip", true);
-        mc.setParams(params);
-        MaterialComponent mtc = new MaterialComponent();
-        mc.setMaterial(mtc);
-        bm.setModel(mc);
-        bm.initialize();
-        blurObject = bm;
+        if(blurObject == null) {
+            var at = scene.archetypes().get(BackgroundModel.class.getName());
+            var entity = at.createEntity();
+
+            var base = Mapper.base.get(entity);
+            base.setName("BlurBackgroundSkybox");
+            base.setCt("");
+
+            var body = Mapper.body.get(entity);
+            body.setColor(new float[] { 0, 0, 0, 0 });
+
+            var label = Mapper.label.get(entity);
+            label.label = false;
+
+            var graph = Mapper.graph.get(entity);
+            graph.setParent(Scene.ROOT_NAME);
+
+            var coord = Mapper.coordinates.get(entity);
+            StaticCoordinates sc = new StaticCoordinates();
+            sc.setPosition(new double[] { 0, 0, 0 });
+            coord.coordinates = sc;
+
+            var model = Mapper.model.get(entity);
+            ModelComponent mc = new ModelComponent(true);
+            mc.setType("sphere");
+            Map<String, Object> params = new HashMap<>();
+            params.put("quality", 50l);
+            params.put("diameter", 1.0d);
+            params.put("flip", true);
+            mc.setParams(params);
+            MaterialComponent mtc = new MaterialComponent();
+            mc.setMaterial(mtc);
+            model.model = mc;
+
+            scene.initializeEntity(entity);
+            scene.setUpEntity(entity);
+
+            blurObject = entity;
+        }
     }
 
     /**
@@ -801,9 +822,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             if (enabled && blurObjectAdded) {
-                blurObject.setVisible(true);
+                blurObjectView.setVisible(true);
             } else if (blurObject != null) {
-                blurObject.setVisible(false);
+                blurObjectView.setVisible(true);
             }
             break;
         case CUBEMAP_CMD:

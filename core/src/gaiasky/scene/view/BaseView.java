@@ -12,7 +12,7 @@ import gaiasky.util.Settings;
 /**
  * A basic view with the base and body components that all entities have.
  */
-public abstract class BaseView extends AbstractView {
+public class BaseView extends AbstractView {
 
     /** The base component. **/
     public Base base;
