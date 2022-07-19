@@ -1442,15 +1442,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public boolean isOn(final int ordinal) {
-        return this.sgr.isOn(ordinal);
+        return this.sceneRenderer.isOn(ordinal);
     }
 
     public boolean isOn(final ComponentType comp) {
-        return this.sgr.isOn(comp);
+        return this.sceneRenderer.isOn(comp);
     }
 
     public boolean isOn(final ComponentTypes cts) {
-        return this.sgr.allOn(cts);
+        return this.sceneRenderer.allOn(cts);
     }
 
     public Optional<CatalogInfo> getCatalogInfoFromObject(SceneGraphNode node) {

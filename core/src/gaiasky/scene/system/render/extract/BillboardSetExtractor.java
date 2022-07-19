@@ -19,9 +19,7 @@ public class BillboardSetExtractor extends AbstractExtractSystem {
         if (shouldRender(base) && (fade.fadeIn == null || fade.currentDistance > fade.fadeIn.x) && (fade.fadeOut == null || fade.currentDistance < fade.fadeOut.y)) {
             var render = Mapper.render.get(entity);
 
-            if (renderText()) {
-                addToRender(render, RenderGroup.FONT_LABEL);
-            }
+            addToRender(render, RenderGroup.FONT_LABEL);
             addToRender(render, RenderGroup.BILLBOARD_GROUP);
         }
     }

@@ -26,10 +26,12 @@ public class RulerInitializer extends AbstractInitSystem {
         var label = Mapper.label.get(entity);
         var line = Mapper.line.get(entity);
 
+        label.label = true;
         label.textScale = 0.2f;
         label.labelFactor = 0.0005f;
         label.labelMax = 1f;
         label.renderConsumer = LabelEntityRenderSystem::renderRuler;
+        label.renderFunction = LabelView::renderTextRuler;
 
         // Lines.
         line.lineWidth = 1f;

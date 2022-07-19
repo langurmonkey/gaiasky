@@ -19,6 +19,8 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.DistanceUnits;
+import gaiasky.util.camera.rec.Keyframe;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -183,7 +185,7 @@ public class LabelEntityRenderSystem {
             Vector3d pos = D31;
             view.textPosition(camera, pos);
             shader.setUniformf("u_viewAngle", view.base.forceLabel ? 2f : (float) view.body.solidAngleApparent);
-            shader.setUniformf("u_viewAnglePow", view.base.forceLabel ? 1f : view.label.viewAnglePow);
+            shader.setUniformf("u_viewAnglePow", view.base.forceLabel ? 1f : view.label.solidAnglePow);
             shader.setUniformf("u_thLabel", view.base.forceLabel ? 1f : (float) view.sa.thresholdLabel);
 
             render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.base.forceLabel);
@@ -270,6 +272,56 @@ public class LabelEntityRenderSystem {
             textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
             render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, star.names()[0], starPosition, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
         }
+    }
+
+    public void renderKeyframe(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        if (!(camera.getCurrent() instanceof FovCamera)) {
+            var kf = Mapper.keyframes.get(view.getEntity());
+            if (kf.selected != null)
+                renderKeyframeLabel(view, kf, kf.selected, batch, shader, sys, rc, camera);
+            if (kf.highlighted != null)
+                renderKeyframeLabel(view, kf, kf.highlighted, batch, shader, sys, rc, camera);
+        }
+
+    }
+
+    private void renderKeyframeLabel(LabelView view, Keyframes kfs, Keyframe kf, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        Vector3d pos = D31;
+        getTextPositionKeyframe(camera, pos, kf);
+        float distToCam = (float) D32.set(kf.pos).add(camera.getInversePos()).len();
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1);
+        shader.setUniformf("u_thLabel", 1);
+        shader.setUniform4fv("u_color", textColour(kfs, kf), 0, 4);
+
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, getText(kf), pos, view.getDistToCamera(), view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor() * distToCam, view.getRadius(), view.base.forceLabel);
+    }
+
+    public float[] textColour(Keyframes kfs, Keyframe kf) {
+        if (kf == kfs.highlighted)
+            return ColorUtils.gYellow;
+        else
+            return ColorUtils.gPink;
+    }
+
+    private String getText(Keyframe kf) {
+        return kf.name;
+    }
+
+    private void getTextPositionKeyframe(ICamera cam, Vector3d out, Keyframe kf) {
+        kf.pos.put(out).add(cam.getInversePos());
+
+        Vector3d aux = D32;
+        aux.set(cam.getUp());
+
+        aux.crs(out).nor();
+
+        aux.add(cam.getUp()).nor().scl(-Math.tan(0.00872) * out.len());
+
+        out.add(aux);
+
+        GlobalResources.applyRelativisticAberration(out, cam);
+        RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
     }
 
     /**

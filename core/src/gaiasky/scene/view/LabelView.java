@@ -4,38 +4,33 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.Pair;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
-
-import java.text.DecimalFormat;
 
 /**
  * An entity view that implements the {@link I3DTextRenderable} methods.
  */
 public class LabelView extends RenderView implements I3DTextRenderable {
 
+    private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3 F31 = new Vector3();
     private final Vector3 F32 = new Vector3();
@@ -86,14 +81,70 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.ruler = null;
     }
 
+    public boolean renderTextCelestial() {
+        return base.names != null && renderTextBase() && (base.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel);
+    }
+
+    public boolean renderTextParticle() {
+        return extra.computedSize > 0 &&
+                renderTextBase() &&
+                body.solidAngleApparent >= (sa.thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
+    }
+
+    public boolean renderTextLocation() {
+        if (renderTextBase() && (body.solidAngle >= LocationMark.LOWER_LIMIT && body.solidAngle <= LocationMark.UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || base.forceLabel)) {
+            var loc = Mapper.loc.get(entity);
+            Vector3d aux = D31;
+            graph.translation.put(aux).scl(-1);
+
+            double cosAlpha = aux.add(loc.location3d.x, loc.location3d.y, loc.location3d.z).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor());
+            return cosAlpha < -0.3f;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean renderTextKeyframe() {
+        var kf = Mapper.keyframes.get(entity);
+        return kf.selected != null;
+    }
+
+    public boolean renderTextRuler() {
+        return renderTextBase() && ruler.rulerOk;
+    }
+
+    public boolean renderTextBackgroundModel() {
+        return renderTextBase() && label.label;
+    }
+
+    public boolean renderTextTitle() {
+        return !Settings.settings.program.modeCubemap.active;
+    }
+
+    public boolean renderTextTrajectory() {
+        return renderTextBase() && base.forceLabel;
+    }
+
+    public boolean renderTextGridRec() {
+        return label.label;
+    }
+
+    public boolean renderTextEssential() {
+        return base.names != null && renderTextBase() && base.opacity > 0;
+    }
+
+    public boolean renderTextBase() {
+        return GaiaSky.instance.isOn(ComponentType.Labels);
+    }
+
     @Override
     public boolean renderText() {
-        return true;
+        return label.renderFunction == null || label.renderFunction.apply(this);
     }
 
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        if (label.renderConsumer != null) {
+        if (label.renderConsumer != null && renderText()) {
             label.renderConsumer.apply(renderSystem, this, batch, shader, sys, rc, camera);
         }
     }
@@ -174,12 +225,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public boolean isLabel() {
-        if (Mapper.label.has(entity)) {
-            return Mapper.label.get(entity).label;
-        } else if (Mapper.loc.has(entity) || Mapper.title.has(entity)) {
-            return false;
-        }
-        return true;
+        return label != null ? label.label : true;
     }
 
     @Override

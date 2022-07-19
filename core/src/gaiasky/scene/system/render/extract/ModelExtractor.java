@@ -59,16 +59,14 @@ public class ModelExtractor extends AbstractExtractSystem {
                     addToRender(render, RenderGroup.BILLBOARD_GAL);
                 }
 
-                if (renderText() || base.forceLabel) {
+                if (base.forceLabel) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
             } else if (Mapper.tagQuatOrientation.has(entity)) {
                 // Simple billboards
                 if (body.solidAngleApparent >= sa.thresholdNone) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
-                    if (renderText()) {
-                        addToRender(render, RenderGroup.FONT_LABEL);
-                    }
+                    addToRender(render, RenderGroup.FONT_LABEL);
                 }
             } else {
                 // Rest of models

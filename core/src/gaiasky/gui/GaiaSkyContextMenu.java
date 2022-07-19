@@ -44,7 +44,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
     // The skin
     private final Skin skin;
     // The candidate, if any
-    private final IFocus candidate;
+    private final FocusView candidate;
     // The name of the candidate
     private String candidateName;
     // Short name of candidate
@@ -68,7 +68,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
     // Rel effects off
     private final boolean relativisticEffects = false;
 
-    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final IFocus candidate, final CatalogManager catalogManager, final ISceneGraph sceneGraph, final Scene scene) {
+    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final FocusView candidate, final CatalogManager catalogManager, final ISceneGraph sceneGraph, final Scene scene) {
         super(skin, styleName);
         this.skin = skin;
         this.screenX = (int) (screenX / Settings.settings.program.ui.scale);

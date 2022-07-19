@@ -1587,7 +1587,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public boolean hasFocus() {
-        return focus != null && !focus.isEmpty();
+        return getMode().equals(CameraMode.FOCUS_MODE) && focus != null && !focus.isEmpty();
     }
 
     /**

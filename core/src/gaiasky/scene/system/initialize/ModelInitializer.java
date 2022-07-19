@@ -23,6 +23,7 @@ import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.AtmosphereComponent;
@@ -79,7 +80,9 @@ public class ModelInitializer extends AbstractInitSystem {
         focus.hitRayConsumer = FocusHit::addHitRayModel;
 
         // All celestial labels use the same consumer.
+        label.label = true;
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
+        label.renderFunction = LabelView::renderTextCelestial;
 
         if (!Mapper.tagQuatOrientation.has(entity)) {
             // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
@@ -255,7 +258,7 @@ public class ModelInitializer extends AbstractInitSystem {
         sa.thresholdLabel = Math.toRadians(0.2);
 
         label.textScale = 0.3f;
-        label.viewAnglePow = 1f;
+        label.solidAnglePow = 1f;
         label.labelFactor = 1e1f;
 
         scaffolding.billboardSizeFactor = 0.6e-3f;

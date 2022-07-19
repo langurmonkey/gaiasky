@@ -37,13 +37,14 @@ public class BillboardSetInitializer extends AbstractInitSystem {
     @Override
     public void initializeEntity(Entity entity) {
         var billboard = Mapper.billboardSet.get(entity);
-        var body = Mapper.body.get(entity);
         var label = Mapper.label.get(entity);
 
+        label.label = true;
         label.textScale = 3;
         label.labelMax = (float) (2e-3 / Constants.DISTANCE_SCALE_FACTOR);
         label.labelFactor = 1;
         label.renderConsumer = LabelEntityRenderSystem::renderBillboardSet;
+        label.renderFunction = LabelView::renderTextBase;
 
         reloadData(billboard);
     }

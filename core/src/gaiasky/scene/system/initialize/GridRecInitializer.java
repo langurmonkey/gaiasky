@@ -7,27 +7,18 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.RenderGroup;
-import gaiasky.render.RenderingContext;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GridRecursive;
-import gaiasky.scene.component.Model;
 import gaiasky.scene.entity.GridRecursiveRadio;
-import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
@@ -58,6 +49,7 @@ public class GridRecInitializer extends AbstractInitSystem {
         label.label = true;
         label.labelPosition = new Vector3b();
         label.renderConsumer = LabelEntityRenderSystem::renderRecursiveGrid;
+        label.renderFunction = LabelView::renderTextGridRec;
 
         // Lines.
         line.lineWidth = 0.5f;

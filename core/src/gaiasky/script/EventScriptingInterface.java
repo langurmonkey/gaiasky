@@ -1480,7 +1480,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 Entity loc = focusView.getChildByNameAndArchetype(locationName.toLowerCase().trim(), scene.archetypes().get(Loc.class));
                 if (loc != null) {
                     var locMark = Mapper.loc.get(loc);
-                    landAtObjectLocation(focusView, locMark.location.x, locMark.location.y, stop);
+                    landAtObjectLocation(object, locMark.location.x, locMark.location.y, stop);
                     return;
                 }
                 logger.info("Location '" + locationName + "' not found on object '" + focusView.getCandidateName() + "'");
@@ -1493,16 +1493,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(name, "name")) {
             Entity entity = getObject(name);
             if (Mapper.focus.has(entity)) {
-                focusView.setEntity(entity);
-                landAtObjectLocation(focusView, longitude, latitude, null);
+                landAtObjectLocation(entity, longitude, latitude, null);
             }
         }
     }
 
-    void landAtObjectLocation(FocusView object, double longitude, double latitude, AtomicBoolean stop) {
-        if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
+    void landAtObjectLocation(Entity entity, double longitude, double latitude, AtomicBoolean stop) {
+        if (checkNotNull(entity, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
+            focusView.setEntity(entity);
             stops.add(stop);
-            String nameStub = object.getCandidateName() + " [loc]";
+            String nameStub = focusView.getCandidateName() + " [loc]";
 
             if (!scene.index().containsEntity(nameStub)) {
                 var archetype = scene.archetypes().get(Invisible.class);
@@ -1517,13 +1517,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             }
             Entity invisible = scene.getEntity(nameStub);
 
-            if (Mapper.atmosphere.has(object.getEntity())) {
+            if (Mapper.atmosphere.has(entity)) {
                 NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
                 double targetAngle = 35 * MathUtilsd.degRad;
-                if (object.getSolidAngle() > targetAngle) {
+                if (focusView.getSolidAngle() > targetAngle) {
                     // Zoom out
-                    while (object.getSolidAngle() > targetAngle && (stop == null || !stop.get())) {
+                    while (focusView.getSolidAngle() > targetAngle && (stop == null || !stop.get())) {
                         cam.addForwardForce(-5d);
                         sleepFrames(1);
                     }
@@ -1532,7 +1532,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
 
                 // Go to object
-                goToObject(object.getEntity(), 20, -1, stop);
+                goToObject(focusView.getEntity(), 20, -1, stop);
 
                 // Save speed, set it to 50
                 double speed = Settings.settings.scene.camera.speed;
@@ -1556,13 +1556,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Get target position
                 Vector3b target = aux3b1;
-                object.getPositionAboveSurface(longitude, latitude, 50, target);
+                focusView.getPositionAboveSurface(longitude, latitude, 50, target);
 
                 // Get object position
-                Vector3b objectPosition = object.getAbsolutePosition(aux3b2);
+                Vector3b objectPosition = focusView.getAbsolutePosition(aux3b2);
 
                 // Check intersection with object
-                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), object.getRadius());
+                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
 
                 if (intersects) {
                     cameraRotate(5d, 5d);
@@ -1571,13 +1571,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 while (intersects && (stop == null || !stop.get())) {
                     sleep(0.1f);
 
-                    objectPosition = object.getAbsolutePosition(aux3b2);
-                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), object.getRadius());
+                    objectPosition = focusView.getAbsolutePosition(aux3b2);
+                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
                 }
 
                 cameraStop();
 
-                Mapper.base.get(invisible).ct = object.base.ct;
+                Mapper.base.get(invisible).ct = focusView.getCt();
                 Mapper.body.get(invisible).pos.set(target);
 
                 // Go to object
@@ -1599,7 +1599,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 Settings.settings.scene.crosshair.focus = crosshair;
 
                 // Land
-                landOnObject(object.getEntity(), stop);
+                landOnObject(focusView.getEntity(), stop);
             }
 
             EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, invisible, true);

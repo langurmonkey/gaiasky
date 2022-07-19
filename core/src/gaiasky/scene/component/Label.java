@@ -1,21 +1,21 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.Consumers.Consumer6;
 import gaiasky.util.Consumers.Consumer7;
-import gaiasky.util.Functions.Function6;
+import gaiasky.util.Functions.Function2;
+import gaiasky.util.Functions.Function3;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
 
-import java.lang.reflect.Method;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Label implements Component {
 
@@ -24,7 +24,7 @@ public class Label implements Component {
     /** Scale parameter for distance field fonts. **/
     public float textScale = -1;
     /** Power to apply to the view angle for labels. **/
-    public float viewAnglePow = 1;
+    public float solidAnglePow = 1;
 
     /**
      * Position of label.
@@ -32,9 +32,12 @@ public class Label implements Component {
     public Vector3b labelPosition;
 
     /**
-     * Whether to draw 2D and 3D labels.
+     * Is it a label or another kind of text?
      */
     public boolean label, label2d;
+
+    /** Function that checks whether the label must be rendered or not. **/
+    public Function<LabelView, Boolean> renderFunction;
 
     /** The label rendering code. **/
     public Consumer7<LabelEntityRenderSystem, LabelView , ExtSpriteBatch, ExtShaderProgram , FontRenderSystem, RenderingContext , ICamera> renderConsumer;

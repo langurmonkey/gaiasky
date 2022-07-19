@@ -41,7 +41,9 @@ public class ConstellationInitializer extends AbstractInitSystem {
         }
 
         // Labels.
+        label.label = true;
         label.renderConsumer = LabelEntityRenderSystem::renderConstellation;
+        label.renderFunction = LabelView::renderTextBase;
 
         // Lines.
         line.lineWidth = 1;

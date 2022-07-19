@@ -21,6 +21,7 @@ import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.view.LabelView;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
@@ -153,10 +154,13 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         baseInitialization(pm, extra, celestial, sa, render);
 
         sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;
+
+        label.label = true;
         label.textScale = 0.2f;
         label.labelFactor = 1.3e-1f;
         label.labelMax = 0.01f;
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
+        label.renderFunction = LabelView::renderTextParticle;
 
         setDerivedAttributes(body, celestial, mag, extra, true);
 

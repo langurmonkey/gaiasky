@@ -5,12 +5,15 @@
 
 package gaiasky.script;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 
@@ -38,36 +41,50 @@ public class HiddenHelperUser implements IObserver {
 
     private long lastCommandTime;
 
+    private Scene scene;
+
+    private FocusView view;
+
     private HiddenHelperUser() {
         super();
         currentTasks = new Array<>(false, 5);
         lastCommandTime = -1;
-        EventManager.instance.subscribe(this, Event.NAVIGATE_TO_OBJECT, Event.LAND_ON_OBJECT, Event.LAND_AT_LOCATION_OF_OBJECT, Event.INPUT_EVENT);
+        view = new FocusView();
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.NAVIGATE_TO_OBJECT, Event.LAND_ON_OBJECT, Event.LAND_AT_LOCATION_OF_OBJECT, Event.INPUT_EVENT);
     }
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
+        case SCENE_LOADED:
+            this.scene = (Scene) data[0];
+            break;
         case NAVIGATE_TO_OBJECT:
-            IFocus body;
-            if (data[0] instanceof String)
-                body = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
-            else
-                body = ((IFocus) data[0]);
+            FocusView body;
+            if (data[0] instanceof String) {
+                var entity = scene.findFocus((String) data[0]);
+                view.setEntity(entity);
+                body = view;
+            } else {
+                body = ((FocusView) data[0]);
+            }
 
-            GoToObjectTask gotoTask = new GoToObjectTask(body, currentTasks);
+            GoToObjectTask gotoTask = new GoToObjectTask(body.getEntity(), currentTasks);
             Thread gotoT = new Thread(gotoTask);
             gotoT.start();
             currentTasks.add(gotoTask);
             lastCommandTime = TimeUtils.millis();
             break;
         case LAND_ON_OBJECT:
-            if (data[0] instanceof String)
-                body = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
-            else
-                body = ((CelestialBody) data[0]);
+            if (data[0] instanceof String) {
+                var entity = scene.findFocus((String) data[0]);
+                view.setEntity(entity);
+                body = view;
+            } else {
+                body = ((FocusView) data[0]);
+            }
 
-            LandOnObjectTask landOnTask = new LandOnObjectTask(body, currentTasks);
+            LandOnObjectTask landOnTask = new LandOnObjectTask(body.getEntity(), currentTasks);
             Thread landonT = new Thread(landOnTask);
             landonT.start();
             currentTasks.add(landOnTask);
@@ -75,19 +92,22 @@ public class HiddenHelperUser implements IObserver {
 
             break;
         case LAND_AT_LOCATION_OF_OBJECT:
-            if (data[0] instanceof String)
-                body = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
-            else
-                body = ((CelestialBody) data[0]);
+            if (data[0] instanceof String) {
+                var entity = scene.findFocus((String) data[0]);
+                view.setEntity(entity);
+                body = view;
+            } else {
+                body = ((FocusView) data[0]);
+            }
 
             HelperTask landAtTask;
             if (data[1] instanceof String) {
                 String locname = (String) data[1];
-                landAtTask = new LandAtLocationTask(body, locname, currentTasks);
+                landAtTask = new LandAtLocationTask(body.getEntity(), locname, currentTasks);
             } else {
                 Double lon = (Double) data[1];
                 Double lat = (Double) data[2];
-                landAtTask = new LandAtLocationTask(body, lon, lat, currentTasks);
+                landAtTask = new LandAtLocationTask(body.getEntity(), lon, lat, currentTasks);
             }
             Thread landAtLoc = new Thread(landAtTask);
             landAtLoc.start();
@@ -127,12 +147,11 @@ public class HiddenHelperUser implements IObserver {
     }
 
     private class GoToObjectTask extends HelperTask {
-        IFocus body;
+        Entity body;
 
-        GoToObjectTask(IFocus body, Array<HelperTask> currentTasks) {
+        GoToObjectTask(Entity entity, Array<HelperTask> currentTasks) {
             super(currentTasks);
-            this.body = body;
-
+            this.body = entity;
         }
 
         @Override
@@ -144,9 +163,9 @@ public class HiddenHelperUser implements IObserver {
     }
 
     private class LandOnObjectTask extends HelperTask {
-        IFocus body;
+        Entity body;
 
-        LandOnObjectTask(IFocus body, Array<HelperTask> currentTasks) {
+        LandOnObjectTask(Entity body, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
         }
@@ -160,17 +179,17 @@ public class HiddenHelperUser implements IObserver {
     }
 
     private class LandAtLocationTask extends HelperTask {
-        IFocus body;
+        Entity body;
         String locName;
         Double lon, lat;
 
-        LandAtLocationTask(IFocus body, String locName, Array<HelperTask> currentTasks) {
+        LandAtLocationTask(Entity body, String locName, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
             this.locName = locName;
         }
 
-        LandAtLocationTask(IFocus body, double lon, double lat, Array<HelperTask> currentTasks) {
+        LandAtLocationTask(Entity body, double lon, double lat, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
             this.lon = lon;

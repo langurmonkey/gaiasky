@@ -1,5 +1,6 @@
 package gaiasky.scene.system.render.extract;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Array;
@@ -9,6 +10,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
@@ -18,11 +20,13 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
 
     protected final ICamera camera;
     protected ISceneRenderer renderer;
+    protected LabelView view;
     protected Array<Array<IRenderable>> renderLists;
 
     public AbstractExtractSystem(Family family, int priority) {
         super(family, priority);
-        this.camera = GaiaSky.instance.cameraManager;;
+        this.camera = GaiaSky.instance.cameraManager;
+        this.view = new LabelView();
     }
 
     public void setRenderer(ISceneRenderer renderer) {
@@ -33,11 +37,6 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
     protected boolean shouldRender(Base base) {
         return GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && base.isVisible();
     }
-
-    public boolean renderText() {
-        return GaiaSky.instance.isOn(ComponentType.Labels);
-    }
-
 
     /**
      * Adds the given renderable to the given render group list.

@@ -49,16 +49,12 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
         if (GaiaSky.instance.sceneRenderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
             addToRender(render, RenderGroup.LINE);
         }
-        if (renderText()) {
-            addToRender(render, RenderGroup.FONT_LABEL);
-        }
+        addToRender(render, RenderGroup.FONT_LABEL);
     }
 
     /** For particle sets. **/
     private void addToRenderLists(Render render) {
         addToRender(render, RenderGroup.PARTICLE_GROUP);
-        if (renderText()) {
-            addToRender(render, RenderGroup.FONT_LABEL);
-        }
+        addToRender(render, RenderGroup.FONT_LABEL);
     }
 }

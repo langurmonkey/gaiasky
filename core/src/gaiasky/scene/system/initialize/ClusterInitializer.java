@@ -16,6 +16,7 @@ import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
@@ -58,10 +59,12 @@ public class ClusterInitializer extends AbstractInitSystem {
         // Compute size from distance and radius, convert to units
         body.size = (float) (Math.tan(Math.toRadians(cluster.raddeg)) * cluster.dist * 2);
 
+        label.label = true;
         label.textScale = 0.2f;
         label.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
         label.labelFactor = 1;
         label.renderConsumer = LabelEntityRenderSystem::renderCluster;
+        label.renderFunction = LabelView::renderTextEssential;
 
     }
 

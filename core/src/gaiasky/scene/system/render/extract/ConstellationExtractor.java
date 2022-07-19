@@ -15,13 +15,11 @@ public class ConstellationExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
 
-        if(shouldRender(base)) {
+        if (shouldRender(base)) {
             var render = Mapper.render.get(entity);
 
             addToRender(render, RenderGroup.LINE);
-            if (renderText()) {
-                addToRender(render, RenderGroup.FONT_LABEL);
-            }
+            addToRender(render, RenderGroup.FONT_LABEL);
         }
     }
 }

@@ -36,9 +36,11 @@ public abstract class AbstractView {
      * @param entity The new entity.
      */
     public void setEntity(Entity entity) {
-        entityCheck(entity);
-        this.entity = entity;
-        entityChanged();
+        if (this.entity != entity) {
+            entityCheck(entity);
+            this.entity = entity;
+            entityChanged();
+        }
     }
 
     /**

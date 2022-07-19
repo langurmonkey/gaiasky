@@ -7,6 +7,8 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.KeyframeUtils;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
 import gaiasky.util.color.ColorUtils;
 
 public class KeyframeInitializer extends AbstractInitSystem {
@@ -22,6 +24,14 @@ public class KeyframeInitializer extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
         var base = Mapper.base.get(entity);
         var kf = Mapper.keyframes.get(entity);
+        var label = Mapper.label.get(entity);
+
+        label.label = false;
+        label.labelFactor = 1;
+        label.labelMax = 0.5e-3f;
+        label.textScale = 0.3f;
+        label.renderConsumer = LabelEntityRenderSystem::renderKeyframe;
+        label.renderFunction = LabelView::renderTextKeyframe;
 
         kf.orientations = new Array<>();
 

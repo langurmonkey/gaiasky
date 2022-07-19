@@ -45,10 +45,12 @@ public class ShapeInitializer extends AbstractInitSystem {
         var line = Mapper.line.get(entity);
         var label = Mapper.label.get(entity);
 
+        label.label = true;
         label.textScale = 0.2f;
         label.labelMax = 1f;
         label.labelFactor = (float) (0.5e-3f * Constants.DISTANCE_SCALE_FACTOR);
         label.renderConsumer = LabelEntityRenderSystem::renderShape;
+        label.renderFunction = LabelView::renderTextEssential;
 
         line.lineWidth = 1.5f;
 

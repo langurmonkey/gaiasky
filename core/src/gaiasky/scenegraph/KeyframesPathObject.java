@@ -605,8 +605,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        if (camera.getCurrent() instanceof FovCamera) {
-        } else {
+        if (!(camera.getCurrent() instanceof FovCamera)) {
             if (selected != null)
                 renderKeyframeLabel(selected, batch, shader, sys, rc, camera);
             if (highlighted != null)

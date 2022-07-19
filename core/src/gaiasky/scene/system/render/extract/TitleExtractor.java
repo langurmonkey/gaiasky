@@ -15,7 +15,7 @@ public class TitleExtractor extends AbstractExtractSystem{
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
 
-        if (shouldRender(base) && renderText()) {
+        if (shouldRender(base)) {
             var render = Mapper.render.get(entity);
             var title = Mapper.title.get(entity);
 
@@ -26,8 +26,4 @@ public class TitleExtractor extends AbstractExtractSystem{
         }
     }
 
-    @Override
-    public boolean renderText() {
-        return !Settings.settings.program.modeCubemap.active;
-    }
 }
