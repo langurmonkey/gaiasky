@@ -62,13 +62,20 @@ public class ModelScaffolding implements Component {
      *
      * @param shadowMapValues The values
      */
-    public void setShadowvalues(double[] shadowMapValues) {
+    public void setShadowValues(double[] shadowMapValues) {
         this.shadowMapValues = shadowMapValues;
     }
+    public void setShadowvalues(double[] shadowMapValues) {
+        this.setShadowValues(shadowMapValues);
+    }
 
-    public void setSizescalefactor(Double sizescalefactor) {
+    public void setSizeScaleFactor(Double sizescalefactor) {
         this.sizeScaleFactor = sizescalefactor.floatValue();
     }
+    public void setSizescalefactor(Double sizescalefactor) {
+        this.setSizeScaleFactor(sizescalefactor); 
+    }
+
     public void setRandomize(String[] randomize) {
         this.randomize = Arrays.asList(randomize);
     }
@@ -86,18 +93,27 @@ public class ModelScaffolding implements Component {
     public void setRandomize(String randomize) {
         this.randomize = Arrays.asList(randomize);
     }
-    public void setRefplane(String refplane) {
+    public void setRefPlane(String refplane) {
         this.refPlane = refplane;
         this.refPlaneTransform = refplane + "toequatorial";
         this.inverseRefPlaneTransform = "equatorialto" + refplane;
     }
-
-    public void setLocvamultiplier(Double locvamultiplier) {
-        this.locVaMultiplier = locvamultiplier.floatValue();
+    public void setRefplane(String refplane) {
+        this.setRefPlane(refplane);
     }
 
-    public void setLocthoverfactor(Double locthoverfactor) {
+    public void setLocVaMultiplier(Double locvamultiplier) {
+        this.locVaMultiplier = locvamultiplier.floatValue();
+    }
+    public void setLocvamultiplier(Double locvamultiplier) {
+        this.setLocVaMultiplier(locvamultiplier); 
+    }
+
+    public void setLocThOverFactor(Double locthoverfactor) {
         this.locThOverFactor = locthoverfactor.floatValue();
+    }
+    public void setLocthoverfactor(Double locthoverfactor) {
+        this.setLocThOverFactor(locthoverfactor);
     }
 
     /**

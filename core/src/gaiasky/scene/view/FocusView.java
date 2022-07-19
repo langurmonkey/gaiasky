@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
+import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.*;
@@ -15,9 +16,11 @@ import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.IVisibilitySwitch;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
+import gaiasky.util.Constants;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
@@ -55,6 +58,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     /** The focus active computer. **/
     private FocusActive focusActive;
 
+    private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3b B31 = new Vector3b();
     private final Vector3b B33 = new Vector3b();
@@ -321,6 +325,41 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         } else {
             return EntityUtils.getAbsolutePosition(entity, out);
         }
+    }
+
+    /**
+     * Returns the cartesian position in the internal reference system above the
+     * surface at the given longitude and latitude and distance.
+     *
+     * @param longitude The longitude in deg
+     * @param latitude  The latitude in deg
+     * @param distance  The distance in km
+     * @param out       The vector to store the result
+     *
+     * @return The cartesian position above the surface of this body
+     */
+    public Vector3b getPositionAboveSurface(double longitude, double latitude, double distance, Vector3b out) {
+        Vector3d aux1 = D31;
+        Vector3d aux2 = D32;
+
+        // Lon/Lat/Radius
+        longitude *= MathUtilsd.degRad;
+        latitude *= MathUtilsd.degRad;
+        double rad = 1;
+        Coordinates.sphericalToCartesian(longitude, latitude, rad, aux1);
+
+        aux2.set(aux1.z, aux1.y, aux1.x).scl(1, -1, -1).scl(-(getRadius() + distance * Constants.KM_TO_U));
+        //aux2.rotate(rc.angle, 0, 1, 0);
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+        Matrix4d ori = new Matrix4d(graph.orientation);
+        var rotation = getRotationComponent();
+        if(rotation != null) {
+            ori.rotate(0, 1, 0, rotation.angle);
+        }
+        aux2.mul(ori);
+
+        getAbsolutePosition(out).add(aux2);
+        return out;
     }
 
     @Override
@@ -810,5 +849,19 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             }
         }
         return 0;
+    }
+
+    public Entity getChildByNameAndArchetype(String name, Archetype archetype) {
+        int size = graph.children.size;
+        for (int i = 0; i < size; i++) {
+            Entity child = graph.children.get(i);
+            if (child != null) {
+                var base = Mapper.base.get(child);
+                if (base.getName().equalsIgnoreCase(name) && archetype.matches(child)) {
+                    return child;
+                }
+            }
+        }
+        return null;
     }
 }

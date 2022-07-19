@@ -1,6 +1,7 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.ISceneRenderer;
@@ -620,6 +621,10 @@ public class Scene {
 
         return list;
     }
+
+  public ImmutableArray<Entity> findEntitiesByFamily(Family family) {
+      return engine.getEntitiesFor(family);
+  }
 
     /**
      * Gets the current position of the object identified by the given name.

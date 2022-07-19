@@ -1042,14 +1042,14 @@ public enum Event {
 
     /**
      * Sets the force label flag on the given object which causes the label to always be rendered regardless of the solid angle.
-     * Contains the object (instance of {@link gaiasky.scenegraph.SceneGraphNode}), the name of the object, a boolean with the new force label state, and the
+     * Contains the entity, the name of the object, a boolean with the new force label state, and the
      * source object.
      */
     FORCE_OBJECT_LABEL_CMD,
 
     /**
      * Sets the label color for a given object.
-     * Contains the object (instance of {@link gaiasky.scenegraph.SceneGraphNode}), the name of the object, the new color
+     * Contains the entity, the name of the object, the new color
      * as a float array (RGBA) in [0,1], and the source object.
      */
     LABEL_COLOR_CMD,

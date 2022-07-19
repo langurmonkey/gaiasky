@@ -34,6 +34,7 @@ import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.system.render.extract.TrajectoryExtractor;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
@@ -93,6 +94,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private final Set<AtomicBoolean> stops;
 
+    private TrajectoryUtils trajectoryUtils;
+    private FocusView focusView;
+
     private SceneGraph sceneGraph;
     private Scene scene;
 
@@ -100,6 +104,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         this.em = EventManager.instance;
         this.manager = manager;
         this.catalogManager = catalogManager;
+        this.focusView = new FocusView();
+        new FocusView();
 
         stops = new HashSet<>();
 
@@ -222,12 +228,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
         if (checkString(focusName, "focusName")) {
-            SceneGraphNode sgn = getObject(focusName);
-            if (sgn instanceof IFocus) {
-                IFocus focus = (IFocus) sgn;
-                focus = focus.getFocus(focusName);
+            Entity entity = getObject(focusName);
+            if (Mapper.focus.has(entity)) {
+                focusView.setEntity(entity);
+                focusView.getFocus(focusName);
                 NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
-                changeFocus(focus, cam, waitTimeSeconds);
+                changeFocus(focusView, cam, waitTimeSeconds);
             } else {
                 logger.error("FOCUS_MODE object does not exist: " + focusName);
             }
@@ -241,18 +247,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraFocusInstant(final String focusName) {
         if (checkString(focusName, "focusName")) {
-            SceneGraphNode sgn = getObject(focusName);
-            if (sgn instanceof IFocus) {
-                IFocus focus = (IFocus) sgn;
-                focus.getFocus(focusName);
+            Entity entity = getObject(focusName);
+            if (Mapper.focus.has(entity)) {
+                focusView.setEntity(entity);
+                focusView.getFocus(focusName);
                 em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
-                em.post(Event.FOCUS_CHANGE_CMD, this, focus);
+                em.post(Event.FOCUS_CHANGE_CMD, this, focusView.getEntity());
 
                 postRunnable(() -> {
                     // Instantly set the camera direction to look towards the focus
                     Vector3b camPos = GaiaSky.instance.cameraManager.getPos();
                     Vector3b dir = new Vector3b();
-                    focus.getAbsolutePosition(dir).sub(camPos);
+                    focusView.getAbsolutePosition(dir).sub(camPos);
                     em.post(Event.CAMERA_DIR_CMD, this, (Object) dir.nor().valuesd());
                 });
                 // Make sure the last action is flushed
@@ -270,11 +276,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public void setCameraFocusInstantAndGo(final String focusName, final boolean sleep) {
         if (checkString(focusName, "focusName")) {
-            SceneGraphNode sgn = getObject(focusName);
-            if (sgn instanceof IFocus) {
-                IFocus focus = (IFocus) sgn;
+            Entity entity = getObject(focusName);
+            if (Mapper.focus.has(entity)) {
+                focusView.setEntity(entity);
+                focusView.getFocus(focusName);
                 em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
-                em.post(Event.FOCUS_CHANGE_CMD, this, focus, true);
+                em.post(Event.FOCUS_CHANGE_CMD, this, focusView.getEntity(), true);
                 em.post(Event.GO_TO_OBJECT_CMD, this);
                 // Make sure the last action is flushed
                 if (sleep)
@@ -656,7 +663,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean setObjectVisibility(String name, boolean visible) {
         String nameLc = name.toLowerCase(Locale.ROOT).trim();
-        SceneGraphNode obj = getObject(nameLc);
+        Entity obj = getObject(nameLc);
         if (obj == null) {
             logger.error("No object found with name '" + name + "'");
             return false;
@@ -668,7 +675,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean getObjectVisibility(String name) {
-        SceneGraphNode obj = getObject(name.toLowerCase().trim());
+        Entity obj = getObject(name.toLowerCase().trim());
         if (obj == null) {
             logger.error("No object found with name '" + name + "'");
             return false;
@@ -688,7 +695,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setForceDisplayLabel(String name, boolean forceLabel) {
         String nameLc = name.toLowerCase(Locale.ROOT).trim();
         if (checkObjectName(nameLc)) {
-            SceneGraphNode obj = getObject(nameLc);
+            Entity obj = getObject(nameLc);
             em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, nameLc, forceLabel);
         }
     }
@@ -697,7 +704,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setLabelColor(String name, double[] color) {
         String nameLc = name.toLowerCase(Locale.ROOT).trim();
         if (checkObjectName(nameLc)) {
-            SceneGraphNode obj = getObject(nameLc);
+            Entity obj = getObject(nameLc);
             em.post(Event.LABEL_COLOR_CMD, this, obj, nameLc, GlobalResources.toFloatArray(color));
         }
     }
@@ -709,13 +716,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean getForceDisplayLabel(String name) {
         String nameLc = name.toLowerCase().trim();
-        SceneGraphNode obj = getObject(nameLc);
+        Entity obj = getObject(nameLc);
         if (obj == null) {
             logger.error("No object found with name '" + name + "'");
             return false;
         }
 
-        return obj.isForceLabel(nameLc);
+        focusView.setEntity(obj);
+        return focusView.isForceLabel(nameLc);
     }
 
     public void setLabelSizeFactor(int factor) {
@@ -1122,20 +1130,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public SceneGraphNode getObject(String name) {
+    public Entity getObject(String name) {
         return getObject(name, 0);
     }
 
     @Override
-    public SceneGraphNode getObject(String name, double timeOutSeconds) {
-        ISceneGraph sg = sceneGraph;
-        SceneGraphNode obj = sg.getNode(name);
+    public Entity getObject(String name, double timeOutSeconds) {
+        Entity obj = scene.getEntity(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
                 // Check with 'HIP '
-                obj = sg.getNode("hip " + name);
+                obj = scene.getEntity("hip " + name);
             } else if (name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")) {
-                obj = sg.getNode(name.substring(4));
+                obj = scene.getEntity(name.substring(4));
             }
         }
 
@@ -1147,14 +1154,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         double elapsedSeconds = 0;
         while (obj == null && elapsedSeconds < timeOutSeconds) {
             sleepFrames(1);
-            obj = sg.getNode(name);
+            obj = scene.getEntity(name);
             elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
         }
         return obj;
     }
 
     private IFocus getFocus(String name) {
-        return sceneGraph.findFocus(name.toLowerCase());
+        Entity entity = scene.findFocus(name.toLowerCase());
+        focusView.setEntity(entity);
+        return focusView;
     }
 
     private Entity getFocusEntity(String name) {
@@ -1163,14 +1172,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setObjectSizeScaling(String name, double scalingFactor) {
-        SceneGraphNode sgn = getObject(name);
-        if (sgn == null) {
+        Entity object = getObject(name);
+        if (object == null) {
             logger.error("Object '" + name + "' does not exist");
             return;
         }
-        if (sgn instanceof ModelBody) {
-            ModelBody m = (ModelBody) sgn;
-            m.setSizescalefactor(scalingFactor);
+        if (Mapper.modelScaffolding.has(object)) {
+            var scaffolding = Mapper.modelScaffolding.get(object);
+            scaffolding.setSizeScaleFactor(scalingFactor);
         } else {
             logger.error("Object '" + name + "' is not a model object");
         }
@@ -1189,31 +1198,33 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         logger.info("Modified scaling of " + modified + " orbits");
     }
 
+    private void initializeTrajectoryUtils() {
+        if (trajectoryUtils == null) {
+            trajectoryUtils = new TrajectoryUtils();
+        }
+    }
+
     @Override
     public void refreshAllOrbits() {
-        ISceneGraph sg = sceneGraph;
+        initializeTrajectoryUtils();
         postRunnable(() -> {
-            Array<SceneGraphNode> l = new Array<>();
-            sg.getRoot().getChildrenByType(Orbit.class, l);
-            for (SceneGraphNode sgn : l) {
-                Orbit o = (Orbit) sgn;
-                o.refreshOrbit(true);
+            var orbits = scene.findEntitiesByFamily(scene.getFamilies().orbits);
+            for (Entity orbit : orbits) {
+                var trajectory = Mapper.trajectory.get(orbit);
+                var verts = Mapper.verts.get(orbit);
+                trajectoryUtils.refreshOrbit(trajectory, verts, true);
             }
         });
     }
 
     @Override
     public double getObjectRadius(String name) {
-        ISceneGraph sg = sceneGraph;
-        IFocus obj = sg.findFocus(name.toLowerCase().trim());
-        if (obj == null)
+        Entity object = scene.findFocus(name.toLowerCase().trim());
+        if (object == null)
             return -1;
-        else if (obj instanceof IStarFocus) {
-            // TODO Remove this dirty hack
-            return obj.getRadius() * 1.4856329941301618 * Constants.U_TO_KM;
-        } else {
-            return obj.getRadius() * Constants.U_TO_KM;
-        }
+
+        focusView.setEntity(object);
+        return focusView.getRadius() * Constants.U_TO_KM;
     }
 
     @Override
@@ -1246,9 +1257,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             String nameLowerCase = name.toLowerCase().trim();
-            ISceneGraph sg = sceneGraph;
-            if (sg.containsNode(nameLowerCase)) {
-                IFocus focus = sg.findFocus(nameLowerCase);
+            if (scene.index().containsEntity(nameLowerCase)) {
+                Entity focus = scene.findFocus(nameLowerCase);
                 goToObject(focus, viewAngle, waitTimeSeconds, stop);
             } else {
                 logger.info("FOCUS_MODE object does not exist: " + name);
@@ -1260,12 +1270,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         goToObject(name, viewAngle, (float) waitTimeSeconds, stop);
     }
 
-    void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
+    void goToObject(Entity object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(viewAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "viewAngle")) {
             stops.add(stop);
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
-            changeFocus(object, cam, waitTimeSeconds);
+            focusView.setEntity(object);
+            changeFocus(focusView, cam, waitTimeSeconds);
 
             /* target angle */
             double target = Math.toRadians(viewAngle);
@@ -1273,9 +1284,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 target = Math.toRadians(20d);
 
             long prevTime = TimeUtils.millis();
-            if (object.getSolidAngle() < target) {
+            if (focusView.getSolidAngle() < target) {
                 // Add forward movement while distance > target distance
-                while (object.getSolidAngle() < target && (stop == null || !stop.get())) {
+                while (focusView.getSolidAngle() < target && (stop == null || !stop.get())) {
                     // dt in ms
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
@@ -1289,7 +1300,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
             } else {
                 // Add backward movement while distance > target distance
-                while (object.getSolidAngleApparent() > target && (stop == null || !stop.get())) {
+                while (focusView.getSolidAngleApparent() > target && (stop == null || !stop.get())) {
                     // dt in ms
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
@@ -1308,7 +1319,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void goToObject(IFocus object, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
+    public void goToObject(Entity object, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
         goToObject(object, viewAngle, (float) waitTimeSeconds, stop);
     }
 
@@ -1320,17 +1331,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void landOnObject(String name) {
         if (checkString(name, "name")) {
-            SceneGraphNode sgn = getObject(name);
-            if (sgn instanceof IFocus)
-                landOnObject((IFocus) sgn, null);
+            Entity target = getObject(name);
+            if (Mapper.focus.has(target)) {
+                landOnObject(target, null);
+            }
         }
     }
 
-    void landOnObject(IFocus object, AtomicBoolean stop) {
+    void landOnObject(Entity object, AtomicBoolean stop) {
         if (checkNotNull(object, "object")) {
 
             stops.add(stop);
-            if (object instanceof Planet) {
+            focusView.setEntity(object);
+
+            if (Mapper.atmosphere.has(object)) {
+                focusView.setEntity(object);
+                // Planets.
                 NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
                 // FOCUS_MODE wait - 2 seconds
                 float waitTimeSeconds = -1;
@@ -1354,17 +1370,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 /*
                  * FOCUS
                  */
-                changeFocus(object, cam, waitTimeSeconds);
+                changeFocus(focusView, cam, waitTimeSeconds);
 
                 /* target distance */
                 double target = 100 * Constants.M_TO_U;
 
                 Vector3b camObj = aux3b1;
-                object.getAbsolutePosition(camObj).add(cam.posinv).nor();
+                focusView.getAbsolutePosition(camObj).add(cam.posinv).nor();
                 Vector3d dir = cam.direction;
 
                 // Add forward movement while distance > target distance
-                boolean distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
+                boolean distanceNotMet = (focusView.getDistToCamera() - focusView.getRadius()) > target;
                 boolean viewNotMet = Math.abs(dir.angle(camObj)) < 90;
 
                 long prevTime = TimeUtils.millis();
@@ -1379,7 +1395,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         cam.stopForwardMovement();
 
                     if (viewNotMet) {
-                        if (object.getDistToCamera() - object.getRadius() < object.getRadius() * 5)
+                        if (focusView.getDistToCamera() - focusView.getRadius() < focusView.getRadius() * 5)
                             // Start turning where we are at n times the radius
                             em.post(Event.CAMERA_TURN, this, 0d, dt / 500d);
                     } else {
@@ -1394,7 +1410,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     // focus.transform.getTranslation(aux);
                     viewNotMet = Math.abs(dir.angle(camObj)) < 90;
-                    distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
+                    distanceNotMet = (focusView.getDistToCamera() - focusView.getRadius()) > target;
                 }
 
                 // STOP
@@ -1403,7 +1419,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Roll till done
                 Vector3d up = cam.up;
                 // aux1 <- camera-object
-                camObj = object.getAbsolutePosition(aux3b1).sub(cam.pos);
+                camObj = focusView.getAbsolutePosition(aux3b1).sub(cam.pos);
                 double ang1 = up.angle(camObj);
                 double ang2 = up.cpy().rotate(cam.direction, 1).angle(camObj);
                 double rollSign = ang1 < ang2 ? -1d : 1d;
@@ -1448,25 +1464,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void landAtObjectLocation(String name, String locationName, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             stops.add(stop);
-            SceneGraphNode sgn = getObject(name);
-            if (sgn instanceof IFocus)
-                landAtObjectLocation((IFocus) sgn, locationName, stop);
+            Entity entity = getObject(name);
+            if (Mapper.focus.has(entity)) {
+                landAtObjectLocation(entity, locationName, stop);
+            }
         }
     }
 
-    public void landAtObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
+    public void landAtObjectLocation(Entity object, String locationName, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
 
             stops.add(stop);
-            if (object instanceof Planet) {
-                Planet planet = (Planet) object;
-                SceneGraphNode sgn = planet.getChildByNameAndType(locationName.toLowerCase().trim(), Loc.class);
-                if (sgn != null) {
-                    Loc location = (Loc) sgn;
-                    landAtObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
+            if (Mapper.atmosphere.has(object)) {
+                focusView.setEntity(object);
+                Entity loc = focusView.getChildByNameAndArchetype(locationName.toLowerCase().trim(), scene.archetypes().get(Loc.class));
+                if (loc != null) {
+                    var locMark = Mapper.loc.get(loc);
+                    landAtObjectLocation(focusView, locMark.location.x, locMark.location.y, stop);
                     return;
                 }
-                logger.info("Location '" + locationName + "' not found on object '" + object.getCandidateName() + "'");
+                logger.info("Location '" + locationName + "' not found on object '" + focusView.getCandidateName() + "'");
             }
         }
     }
@@ -1474,32 +1491,39 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void landAtObjectLocation(String name, double longitude, double latitude) {
         if (checkString(name, "name")) {
-            SceneGraphNode sgn = getObject(name);
-            if (sgn instanceof IFocus)
-                landAtObjectLocation((IFocus) sgn, longitude, latitude, null);
+            Entity entity = getObject(name);
+            if (Mapper.focus.has(entity)) {
+                focusView.setEntity(entity);
+                landAtObjectLocation(focusView, longitude, latitude, null);
+            }
         }
     }
 
-    void landAtObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
+    void landAtObjectLocation(FocusView object, double longitude, double latitude, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
             stops.add(stop);
-            ISceneGraph sg = sceneGraph;
             String nameStub = object.getCandidateName() + " [loc]";
 
-            if (!sg.containsNode(nameStub)) {
-                Invisible invisible = new Invisible(nameStub);
-                EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, invisible, true);
+            if (!scene.index().containsEntity(nameStub)) {
+                var archetype = scene.archetypes().get(Invisible.class);
+                Entity invisible = archetype.createEntity();
+                var base = Mapper.base.get(invisible);
+                base.setName(nameStub);
+                var body = Mapper.body.get(invisible);
+                body.setSizeM(500.0);
+                var graph = Mapper.graph.get(invisible);
+                graph.setParent(Scene.ROOT_NAME);
+                EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, invisible, true);
             }
-            Invisible invisible = (Invisible) getObject(nameStub, 5);
+            Entity invisible = scene.getEntity(nameStub);
 
-            if (object instanceof Planet) {
-                Planet planet = (Planet) object;
+            if (Mapper.atmosphere.has(object.getEntity())) {
                 NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
                 double targetAngle = 35 * MathUtilsd.degRad;
-                if (planet.viewAngle > targetAngle) {
+                if (object.getSolidAngle() > targetAngle) {
                     // Zoom out
-                    while (planet.viewAngle > targetAngle && (stop == null || !stop.get())) {
+                    while (object.getSolidAngle() > targetAngle && (stop == null || !stop.get())) {
                         cam.addForwardForce(-5d);
                         sleepFrames(1);
                     }
@@ -1508,7 +1532,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
 
                 // Go to object
-                goToObject(object, 20, -1, stop);
+                goToObject(object.getEntity(), 20, -1, stop);
 
                 // Save speed, set it to 50
                 double speed = Settings.settings.scene.camera.speed;
@@ -1532,13 +1556,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Get target position
                 Vector3b target = aux3b1;
-                planet.getPositionAboveSurface(longitude, latitude, 50, target);
+                object.getPositionAboveSurface(longitude, latitude, 50, target);
 
                 // Get object position
-                Vector3b objectPosition = planet.getAbsolutePosition(aux3b2);
+                Vector3b objectPosition = object.getAbsolutePosition(aux3b2);
 
                 // Check intersection with object
-                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), planet.getRadius());
+                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), object.getRadius());
 
                 if (intersects) {
                     cameraRotate(5d, 5d);
@@ -1547,14 +1571,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 while (intersects && (stop == null || !stop.get())) {
                     sleep(0.1f);
 
-                    objectPosition = planet.getAbsolutePosition(aux3b2);
-                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), planet.getRadius());
+                    objectPosition = object.getAbsolutePosition(aux3b2);
+                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), object.getRadius());
                 }
 
                 cameraStop();
 
-                invisible.ct = planet.ct;
-                invisible.pos.set(target);
+                Mapper.base.get(invisible).ct = object.base.ct;
+                Mapper.body.get(invisible).pos.set(target);
 
                 // Go to object
                 goToObject(nameStub, 20, 0, stop);
@@ -1575,7 +1599,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 Settings.settings.scene.crosshair.focus = crosshair;
 
                 // Land
-                landOnObject(object, stop);
+                landOnObject(object.getEntity(), stop);
             }
 
             EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, invisible, true);
@@ -1601,14 +1625,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getDistanceTo(String name) {
-        SceneGraphNode sgn = getObject(name);
-        if (sgn instanceof IFocus) {
-            IFocus obj = (IFocus) sgn;
-            if (obj instanceof ParticleGroup) {
-                var pos = obj.getAbsolutePosition(name.toLowerCase().trim(), aux3b1);
+        Entity entity = getObject(name);
+        if (Mapper.focus.has(entity)) {
+            focusView.setEntity(entity);
+            if (focusView.getSet() != null) {
+                var pos = focusView.getAbsolutePosition(name.toLowerCase().trim(), aux3b1);
                 return pos.sub(GaiaSky.instance.getICamera().getPos()).lend() * Constants.U_TO_KM;
             } else {
-                return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
+                return (focusView.getDistToCamera() - focusView.getRadius()) * Constants.U_TO_KM;
             }
         }
 
@@ -1617,11 +1641,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] getStarParameters(String id) {
-        SceneGraphNode sgn = getObject(id);
-        if (sgn instanceof StarGroup) {
+        Entity entity = getObject(id);
+        if (Mapper.starSet.has(entity)) {
+            var set = Mapper.starSet.get(entity);
             // This star group contains the star
-            StarGroup sg = (StarGroup) sgn;
-            IParticleRecord sb = sg.getCandidateBean();
+            IParticleRecord sb = set.getCandidateBean();
             if (sb != null) {
                 double[] rgb = sb.rgb();
                 return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
@@ -1633,10 +1657,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] getObjectPosition(String name) {
-        SceneGraphNode sgn = getObject(name);
-        if (sgn instanceof IFocus) {
-            IFocus obj = (IFocus) sgn;
-            obj.getAbsolutePosition(name.toLowerCase(), aux3b1);
+        Entity entity = getObject(name);
+        if (Mapper.focus.has(entity)) {
+            focusView.setEntity(entity);
+            focusView.getAbsolutePosition(name.toLowerCase(), aux3b1);
             return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
         }
         return null;
@@ -2161,12 +2185,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
      * @param waitTimeSeconds Max time to wait for the camera to face the focus, in
      *                        seconds. If negative, we wait until the end.
      */
-    private void changeFocus(IFocus object, NaturalCamera cam, double waitTimeSeconds) {
+    private void changeFocus(FocusView object, NaturalCamera cam, double waitTimeSeconds) {
         // Post focus change and wait, if needed
-        IFocus currentFocus = cam.getFocus();
-        if (currentFocus instanceof ParticleGroup || currentFocus != object) {
+        FocusView currentFocus = (FocusView) cam.getFocus();
+        if (Mapper.particleSet.has(currentFocus.getEntity()) || currentFocus.getEntity() != object.getEntity()) {
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
-            em.post(Event.FOCUS_CHANGE_CMD, this, object);
+            em.post(Event.FOCUS_CHANGE_CMD, this, object.getEntity());
 
             // Wait til camera is facing focus or
             if (waitTimeSeconds < 0) {
@@ -3160,7 +3184,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     var base = Mapper.base.get(newShape);
                     base.setName(shapeName.trim());
-                    base.ct =  new ComponentTypes(ComponentType.Others.ordinal());
+                    base.ct = new ComponentTypes(ComponentType.Others.ordinal());
 
                     var body = Mapper.body.get(newShape);
                     body.setColor(color);
@@ -3171,7 +3195,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     graph.setParent(Scene.ROOT_NAME);
 
                     var shape = Mapper.shape.get(newShape);
-                    if(trackObject) {
+                    if (trackObject) {
                         shape.track = new FocusView(trackingObject);
                     } else {
                         body.pos = EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3b());
@@ -3483,8 +3507,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private boolean checkObjectName(String name) {
-        SceneGraphNode sgn = getObject(name);
-        return sgn != null;
+        return getObject(name) != null;
     }
 
     private boolean checkFocusName(String name) {

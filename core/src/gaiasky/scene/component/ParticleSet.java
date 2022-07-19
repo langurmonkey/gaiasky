@@ -347,6 +347,13 @@ public class ParticleSet implements Component {
         candidateFocusIndex = index.getOrDefault(name, -1);
     }
 
+    public IParticleRecord getCandidateBean() {
+        if (candidateFocusIndex >= 0)
+            return pointData.get(candidateFocusIndex);
+        else
+            return null;
+    }
+
     // Radius in stars is different!
     public double getRadius() {
         return isStars ? getSize() * Constants.STAR_SIZE_FACTOR : getSize() / 2.0;

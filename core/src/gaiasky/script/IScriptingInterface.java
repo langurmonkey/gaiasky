@@ -5,9 +5,9 @@
 
 package gaiasky.script;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
@@ -1213,7 +1213,7 @@ public interface IScriptingInterface {
      * {@link gaiasky.scenegraph.SceneGraphNode}, or null
      * if it does not exist.
      */
-    SceneGraphNode getObject(String name);
+    Entity getObject(String name);
 
     /**
      * Gets an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
@@ -1226,7 +1226,7 @@ public interface IScriptingInterface {
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      * the timeout has passed.
      */
-    SceneGraphNode getObject(String name, double timeOutSeconds);
+    Entity getObject(String name, double timeOutSeconds);
 
     /**
      * Sets the given size scaling factor to the object identified by
