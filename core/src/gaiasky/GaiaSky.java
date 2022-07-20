@@ -645,10 +645,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         updateProcess = () -> {
             // Update scene graph.
-            sceneGraph.update(time, cameraManager);
+            if (ri != 1) {
+                sceneGraph.update(time, cameraManager);
+            }
 
             // Update scene.
-            scene.update(time, cameraManager);
+            if (ri != 0) {
+                scene.update(time, cameraManager);
+            }
 
             // Swap proximity buffers.
             cameraManager.swapBuffers();
@@ -1461,7 +1465,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public Optional<CatalogInfo> getCatalogInfoFromEntity(Entity entity) {
-        if(Mapper.datasetDescription.has(entity)) {
+        if (Mapper.datasetDescription.has(entity)) {
             return catalogManager.getByEntity(entity);
         }
         return Optional.empty();

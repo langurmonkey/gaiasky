@@ -11,13 +11,11 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.DecalUtils;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Pair;
-import gaiasky.util.Settings;
+import gaiasky.util.*;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.color.ColorUtils;
@@ -47,6 +45,22 @@ public class LabelEntityRenderSystem {
 
     public LabelEntityRenderSystem() {
         nf = new DecimalFormat("0.###E0");
+    }
+
+    public void renderLocation(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        var base = view.base;
+        var body = view.body;
+        var graph = view.graph;
+
+        // Parent scaffolding.
+        var scaffolding = Mapper.modelScaffolding.get(graph.parent);
+
+        Vector3d pos = D31;
+        view.textPosition(camera, pos);
+        shader.setUniformf("u_viewAngle", base.forceLabel ? 2f : (float) (body.solidAngleApparent * scaffolding.locVaMultiplier * Constants.U_TO_KM));
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", base.forceLabel ? 1f : scaffolding.locThresholdLabel / (float) Constants.DISTANCE_SCALE_FACTOR);
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(),  base.forceLabel);
     }
 
     public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {

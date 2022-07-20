@@ -37,7 +37,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
     private ICamera camera;
     private Vector3 F31;
-    private Vector3d D31, D32, D33;
+    private Vector3d  D32;
     private Matrix4d MD4;
     private Quaternion QF;
     private Quaterniond QD;
@@ -46,9 +46,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         super(family, priority);
         this.camera = GaiaSky.instance.cameraManager;
         this.F31 = new Vector3();
-        this.D31 = new Vector3d();
         this.D32 = new Vector3d();
-        this.D33 = new Vector3d();
         this.QF = new Quaternion();
         this.QD = new Quaterniond();
         this.MD4 = new Matrix4d();

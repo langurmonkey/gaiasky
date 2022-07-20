@@ -82,9 +82,8 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
             this.opacity = this.getVisibilityOpacityFactor();
 
-            Vector3d aux = D31.get();
-            this.distToCamera = (float) translation.put(aux).len();
-            this.viewAngle = (float) FastMath.atan(size / distToCamera);
+            this.distToCamera = translation.lend();
+            this.viewAngle = FastMath.atan(size / distToCamera);
             this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
             if (!copy) {
                 addToRenderLists(camera);

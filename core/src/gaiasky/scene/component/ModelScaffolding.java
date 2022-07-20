@@ -2,7 +2,6 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.render.ShadowMapImpl;
-import gaiasky.scenegraph.component.ITransform;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +11,8 @@ public class ModelScaffolding implements Component {
 
     /** Multiplier for Loc view angle **/
     public float locVaMultiplier = 1f;
-    /** ThOverFactor for Locs **/
-    public float locThOverFactor = 1f;
+    /** ThresholdLabel for children locations. **/
+    public float locThresholdLabel = 1f;
 
     /** Size factor, which can be set to scale model objects up or down **/
     public float sizeScaleFactor = 1f;
@@ -110,10 +109,13 @@ public class ModelScaffolding implements Component {
     }
 
     public void setLocThOverFactor(Double locthoverfactor) {
-        this.locThOverFactor = locthoverfactor.floatValue();
+        this.setLocThresholdLabel(locthoverfactor);
     }
     public void setLocthoverfactor(Double locthoverfactor) {
-        this.setLocThOverFactor(locthoverfactor);
+        this.setLocThresholdLabel(locthoverfactor);
+    }
+    public void setLocThresholdLabel(Double val) {
+        this.locThresholdLabel = val.floatValue();
     }
 
     /**

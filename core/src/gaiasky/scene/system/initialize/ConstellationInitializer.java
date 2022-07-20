@@ -15,6 +15,7 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
@@ -44,6 +45,7 @@ public class ConstellationInitializer extends AbstractInitSystem {
         label.label = true;
         label.renderConsumer = LabelEntityRenderSystem::renderConstellation;
         label.renderFunction = LabelView::renderTextBase;
+        label.labelPosition = new Vector3b();
 
         // Lines.
         line.lineWidth = 1;

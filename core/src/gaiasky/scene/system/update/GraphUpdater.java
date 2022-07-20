@@ -23,12 +23,13 @@ import net.jafama.FastMath;
  * we have more than one scene graph.
  */
 public class GraphUpdater extends AbstractUpdateSystem {
-    private static Log logger = Logger.getLogger(GraphUpdater.class);
 
     private ICamera camera;
     private final ITimeFrameProvider time;
     private Vector3d D31;
     private Vector3b B31;
+
+    private ModelUpdater updater;
 
     /**
      * Instantiates a system that will iterate over the entities described by the Family.
@@ -40,6 +41,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
         this.time = time;
         this.D31 = new Vector3d();
         this.B31 = new Vector3b();
+        this.updater = new ModelUpdater(null, 0);
     }
 
     public void setCamera(ICamera camera) {
@@ -65,71 +67,76 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
     public void update(Entity entity, ITimeFrameProvider time, final Vector3b parentTransform, float opacity) {
         var graph = Mapper.graph.get(entity);
-        var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
-        var coordinates = Mapper.coordinates.get(entity);
-        var rotation = Mapper.rotation.get(entity);
-        var fade = Mapper.fade.get(entity);
 
-        // Update local position here
-        if (time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {
-            // Load this object's equatorial cartesian coordinates into pos
-            coordinates.timeOverflow = coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), body.pos) == null;
+        if (graph.mustUpdateFunction == null ||
+                graph.mustUpdateFunction.apply(this, entity, graph)) {
 
-            // Update the spherical position
-            gaiasky.util.coord.Coordinates.cartesianToSpherical(body.pos, D31);
-            body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
+            var base = Mapper.base.get(entity);
+            var body = Mapper.body.get(entity);
+            var coordinates = Mapper.coordinates.get(entity);
+            var rotation = Mapper.rotation.get(entity);
+            var fade = Mapper.fade.get(entity);
 
-            // Update angle
-            if (rotation != null && rotation.rc != null)
-                rotation.rc.update(time);
-        }
+            // Update local position here
+            if (time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {
+                // Load this object's equatorial cartesian coordinates into pos
+                coordinates.timeOverflow = coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), body.pos) == null;
 
-        graph.translation.set(parentTransform);
-        /* TODO updateLocalValues() works out body position! */
-        // updateLocalValues() method -> can usually run in later systems
-        graph.translation.add(body.pos);
+                // Update the spherical position
+                gaiasky.util.coord.Coordinates.cartesianToSpherical(body.pos, D31);
+                body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
 
-        // Update opacity
-        if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
-            base.opacity = opacity;
-            updateFadeDistance(body, fade);
-            updateFadeOpacity(base, fade);
-        } else {
-            base.opacity = opacity;
-        }
-        base.opacity *= base.getVisibilityOpacityFactor();
+                // Update angle
+                if (rotation != null && rotation.rc != null)
+                    rotation.rc.update(time);
+            }
 
-        // Apply proper motion if needed
-        if (Mapper.pm.has(entity)) {
-            var pm = Mapper.pm.get(entity);
-            Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
-            graph.translation.add(pmv);
-        }
+            graph.translation.set(parentTransform);
+            if (graph.positionUpdaterConsumer != null) {
+                graph.positionUpdaterConsumer.apply(this, entity, graph);
+            }
+            graph.translation.add(body.pos);
 
-        // Update supporting attributes
-        body.distToCamera = graph.translation.lend();
-        if (Mapper.extra.has(entity)) {
-            // Particles have a special algorithm for the solid angles.
-            body.solidAngle = (Mapper.extra.get(entity).radius / body.distToCamera);
-            body.solidAngleApparent = body.solidAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
-        } else {
-            // Regular objects.
-            body.solidAngle = FastMath.atan(body.size / body.distToCamera);
-            body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
-        }
+            // Update opacity
+            if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
+                base.opacity = opacity;
+                updateFadeDistance(body, fade);
+                updateFadeOpacity(base, fade);
+            } else {
+                base.opacity = opacity;
+            }
+            base.opacity *= base.getVisibilityOpacityFactor();
 
-        // Some elements (sets, octrees) process their own children.
-        boolean processChildren = !Mapper.tagNoProcessChildren.has(entity);
-        if (processChildren && graph.children != null) {
-            // Go down a level
-            for (int i = 0; i < graph.children.size; i++) {
-                Entity child = graph.children.get(i);
-                // Update
-                update(child, time, graph.translation, getChildrenOpacity(entity, base, fade, opacity));
+            // Apply proper motion if needed
+            if (Mapper.pm.has(entity)) {
+                var pm = Mapper.pm.get(entity);
+                Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
+                graph.translation.add(pmv);
+            }
+
+            // Update supporting attributes
+            body.distToCamera = graph.translation.lend();
+            if (Mapper.extra.has(entity)) {
+                // Particles have a special algorithm for the solid angles.
+                body.solidAngle = (Mapper.extra.get(entity).radius / body.distToCamera);
+                body.solidAngleApparent = body.solidAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
+            } else {
+                // Regular objects.
+                body.solidAngle = FastMath.atan(body.size / body.distToCamera);
+                body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
+            }
+
+            // Some elements (sets, octrees) process their own children.
+            boolean processChildren = !Mapper.tagNoProcessChildren.has(entity);
+            if (processChildren && graph.children != null) {
+                // Go down a level
+                for (int i = 0; i < graph.children.size; i++) {
+                    Entity child = graph.children.get(i);
+                    // Update
+                    update(child, time, graph.translation, getChildrenOpacity(entity, base, fade, opacity));
+                }
             }
         }
-
     }
 
     private float getChildrenOpacity(Entity entity, Base base, Fade fade, float opacity) {
@@ -179,5 +186,33 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
     protected long msSinceStateChange(Base base) {
         return (long) (GaiaSky.instance.getT() * 1000f) - base.lastStateChangeTimeMs;
+    }
+
+    public boolean mustUpdateLoc(Entity entity, GraphNode graph) {
+        var parentBody = Mapper.body.get(graph.parent);
+        var parentSa = Mapper.sa.get(graph.parent);
+
+        return parentBody.solidAngle > parentSa.thresholdQuad * 30f;
+    }
+
+    public void updatePositionLoc(Entity entity, GraphNode graph) {
+        var label = Mapper.label.get(entity);
+        var loc = Mapper.loc.get(entity);
+
+        Entity papa = graph.parent;
+        var pBody = Mapper.body.get(papa);
+        var pGraph = Mapper.graph.get(papa);
+
+        updater.setToLocalTransform(papa, pBody, pGraph, pBody.size, loc.distFactor, graph.localTransform, false);
+
+        loc.location3d.set(0, 0, -.5f);
+        // Latitude [-90..90]
+        loc.location3d.rotate(loc.location.y, 1, 0, 0);
+        // Longitude [0..360]
+        loc.location3d.rotate(loc.location.x + 90, 0, 1, 0);
+
+        loc.location3d.mul(graph.localTransform);
+
+        label.labelPosition.set(loc.location3d).add(camera.getPos());
     }
 }

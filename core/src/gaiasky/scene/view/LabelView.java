@@ -43,6 +43,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     public Constel constel;
     public Mesh mesh;
     public Ruler ruler;
+    public LocationMark loc;
 
     private LabelEntityRenderSystem renderSystem;
 
@@ -67,6 +68,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         this.constel = Mapper.constel.get(entity);
         this.mesh = Mapper.mesh.get(entity);
         this.ruler = Mapper.ruler.get(entity);
+        this.loc = Mapper.loc.get(entity);
     }
 
     @Override
@@ -93,7 +95,6 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     public boolean renderTextLocation() {
         if (renderTextBase() && (body.solidAngle >= LocationMark.LOWER_LIMIT && body.solidAngle <= LocationMark.UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || base.forceLabel)) {
-            var loc = Mapper.loc.get(entity);
             Vector3d aux = D31;
             graph.translation.put(aux).scl(-1);
 
@@ -153,6 +154,8 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     public float textSize() {
         if (constel != null) {
             return .2e7f;
+        } else if(loc != null) {
+            return body.size / 1.5f;
         }
         return (float) (label.labelMax * body.distToCamera * label.labelFactor);
     }
@@ -164,6 +167,8 @@ public class LabelView extends RenderView implements I3DTextRenderable {
             return .5f / Settings.settings.scene.label.size;
         } else if (constel != null) {
             return .2f / Settings.settings.scene.label.size;
+        } else if (loc != null) {
+            return loc.sizeKm * label.textScale / textSize() * (float) Constants.DISTANCE_SCALE_FACTOR;
         } else {
             // Rest
             return label.textScale >= 0 ? label.textScale : (float) FastMath.atan(label.labelMax) * label.labelFactor * 4e2f;
@@ -178,9 +183,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
      */
     @Override
     public void textPosition(ICamera cam, Vector3d out) {
-        if (constel != null) {
-            out.set(body.pos);
-        } else if (label != null && label.labelPosition != null) {
+        if (label != null && label.labelPosition != null) {
             out.set(label.labelPosition).add(cam.getInversePos());
         } else {
             if (ruler == null) {
@@ -210,10 +213,12 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public String text() {
-        if (ruler == null) {
-            return base.getLocalizedName();
-        } else {
+        if (ruler != null) {
             return ruler.dist;
+        } else if(loc != null) {
+            return loc.displayName;
+        } else {
+            return base.getLocalizedName();
         }
     }
 

@@ -165,7 +165,7 @@ public class Archetypes {
             addArchetype(Axes.class.getName(), SceneGraphNode.class.getName(), Axis.class, RefSysTransform.class, Line.class);
 
             // Loc
-            addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class);
+            addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class, Label.class);
 
             // Area
             addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class);

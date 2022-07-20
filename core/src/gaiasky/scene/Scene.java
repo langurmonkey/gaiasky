@@ -226,6 +226,7 @@ public class Scene {
             addInitializer(new TitleInitializer(setUp, families.titles, priority++));
             addInitializer(new KeyframeInitializer(this, setUp, families.keyframes, priority++));
             addInitializer(new ShapeInitializer(setUp, families.shapes, priority++));
+            addInitializer(new LocInitializer(setUp, families.locations, priority));
 
             // Run once
             runOnce(initializers);
@@ -299,6 +300,7 @@ public class Scene {
             addUpdater(new TitleUpdater(families.titles, priority++));
             addUpdater(new KeyframeUpdater(families.keyframes, priority++));
             addUpdater(new ShapeUpdater(families.shapes, priority++));
+            addUpdater(new LocUpdater(families.locations, priority++));
 
             // Extract systems.
             extractors = new Array<>(18);
@@ -320,6 +322,7 @@ public class Scene {
             addExtractor(newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer));
             addExtractor(newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer));
             addExtractor(newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer));
+            addExtractor(newExtractor(LocExtractor.class, families.locations, priority, sceneRenderer));
 
             // Remove all remaining systems.
             engine.removeAllSystems();

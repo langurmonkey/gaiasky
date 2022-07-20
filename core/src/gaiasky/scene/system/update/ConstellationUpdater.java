@@ -30,6 +30,7 @@ public class ConstellationUpdater extends AbstractUpdateSystem {
         ICamera camera = GaiaSky.instance.getICamera();
         var constel = Mapper.constel.get(entity);
         var body = Mapper.body.get(entity);
+        var label = Mapper.label.get(entity);
 
         constel.posd.setZero();
         Vector3d p = D31;
@@ -45,6 +46,7 @@ public class ConstellationUpdater extends AbstractUpdateSystem {
             constel.posd.scl(1d / nStars);
             constel.posd.nor().scl(100d * Constants.PC_TO_U);
             body.pos.set(constel.posd);
+            label.labelPosition.set(body.pos).add(camera.getPos());
 
             constel.deltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
         }
