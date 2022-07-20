@@ -35,7 +35,7 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
     }
 
     protected boolean shouldRender(Base base) {
-        return GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && base.isVisible();
+        return !base.copy && GaiaSky.instance.isOn(base.ct) && base.opacity > 0 && base.isVisible();
     }
 
     /**

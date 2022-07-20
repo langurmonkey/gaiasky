@@ -32,7 +32,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, ILineRenderable {
+public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable {
     private static final float LOWER_LIMIT = 3e-4f;
     private static final float UPPER_LIMIT = 3e-3f;
 
@@ -180,8 +180,6 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
     /**
      * Sets the absolute size of this entity
-     *
-     * @param size
      */
     public void setSize(Double size) {
         this.size = (float) (size * Constants.KM_TO_U);
@@ -211,30 +209,6 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
         return false;
     }
 
-    @Override
-    public float getLineWidth() {
-        return 1.0f;
-    }
-
-    @Override
-    public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        Vector3d pos = D31.get();
-        textPosition(camera, pos);
-
-        Vector3 v = F31.get();
-        pos.put(v);
-        camera.getCamera().project(v);
-        v.set(v.x + 5, renderer.rc.h() - v.y + 5, v.z);
-        v.z = (float) pos.z;
-        camera.getCamera().unproject(v);
-
-        renderer.addLine(this, pos.x, pos.y, pos.z, v.x, v.y, v.z, 0.5f, 0.5f, 1f, 1f);
-    }
-
-    @Override
-    public int getGlPrimitive() {
-        return GL20.GL_LINES;
-    }
 
     @Override
     public long getCandidateId() {

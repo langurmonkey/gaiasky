@@ -63,7 +63,7 @@ public class AttributeMap {
         putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
 
         // ModelScaffolding
-        putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locthoverfactor", "shadowvalues");
+        putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locVaMultiplier", "locthoverfactor", "locThresholdLabel", "shadowvalues");
 
         // Model
         putAll(Model.class, "model");

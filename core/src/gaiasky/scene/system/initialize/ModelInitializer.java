@@ -227,7 +227,10 @@ public class ModelInitializer extends AbstractInitSystem {
         celestial.innerRad = 0.2f;
         graph.orientation = new Matrix4d();
 
-        scaffolding.billboardSizeFactor = 2f;
+        scaffolding.billboardSizeFactor = 2.0f;
+        scaffolding.locThresholdLabel = 1000.0f;
+        scaffolding.locVaMultiplier = 2.8f;
+
         sa.thresholdPoint = Math.toRadians(0.30);
         sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number)
                 * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
