@@ -98,7 +98,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /** Renderer index. 0 for old, 1 for new, 2 for all. **/
-    public int ri = 0;
+    public int ri = 1;
 
     /**
      * Singleton instance.
@@ -651,7 +651,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Update scene.
             if (ri != 0) {
-                scene.update(time, cameraManager);
+                scene.update(time);
             }
 
             // Swap proximity buffers.
@@ -810,8 +810,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Set non-zero time
         time.update(1e-7);
         // Update whole scene graph
+        scene.update(time);
         sceneGraph.update(time, cameraManager);
-        scene.update(time, cameraManager);
         // Clear render lists
         sgr.swapRenderLists();
         sceneRenderer.swapRenderLists();

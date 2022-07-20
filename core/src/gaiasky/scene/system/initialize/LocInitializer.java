@@ -29,13 +29,17 @@ public class LocInitializer extends AbstractInitSystem {
     public void initializeEntity(Entity entity) {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
+        var graph = Mapper.graph.get(entity);
         var loc = Mapper.loc.get(entity);
         var label = Mapper.label.get(entity);
+
+        graph.mustUpdateFunction = GraphUpdater::mustUpdateLoc;
 
         label.label = false;
         label.labelMax = 1;
         label.textScale = 1e-7f;
         label.renderConsumer = LabelEntityRenderSystem::renderLocation;
+        label.depthBufferConsumer = LabelView::noTextDepthBuffer;
         label.renderFunction = LabelView::renderTextLocation;
         label.labelPosition = new Vector3b();
 

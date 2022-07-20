@@ -45,6 +45,7 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         label.labelFactor = 1;
         label.renderConsumer = LabelEntityRenderSystem::renderBillboardSet;
         label.renderFunction = LabelView::renderTextBase;
+        label.depthBufferConsumer = LabelView::noTextDepthBuffer;
 
         reloadData(billboard);
     }

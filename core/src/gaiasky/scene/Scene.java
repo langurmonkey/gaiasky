@@ -437,9 +437,8 @@ public class Scene {
      * Updates the scene. This causes an update to the engine.
      *
      * @param time   The time frame provider object.
-     * @param camera The camera object.
      */
-    public void update(ITimeFrameProvider time, ICamera camera) {
+    public void update(ITimeFrameProvider time) {
         engine.update((float) time.getDt());
     }
 

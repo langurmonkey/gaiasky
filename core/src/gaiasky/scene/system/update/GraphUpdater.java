@@ -29,7 +29,6 @@ public class GraphUpdater extends AbstractUpdateSystem {
     private Vector3d D31;
     private Vector3b B31;
 
-    private ModelUpdater updater;
 
     /**
      * Instantiates a system that will iterate over the entities described by the Family.
@@ -41,7 +40,6 @@ public class GraphUpdater extends AbstractUpdateSystem {
         this.time = time;
         this.D31 = new Vector3d();
         this.B31 = new Vector3b();
-        this.updater = new ModelUpdater(null, 0);
     }
 
     public void setCamera(ICamera camera) {
@@ -74,11 +72,11 @@ public class GraphUpdater extends AbstractUpdateSystem {
             var base = Mapper.base.get(entity);
             var body = Mapper.body.get(entity);
             var coordinates = Mapper.coordinates.get(entity);
-            var rotation = Mapper.rotation.get(entity);
             var fade = Mapper.fade.get(entity);
 
             // Update local position here
             if (time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {
+                var rotation = Mapper.rotation.get(entity);
                 // Load this object's equatorial cartesian coordinates into pos
                 coordinates.timeOverflow = coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), body.pos) == null;
 
@@ -195,24 +193,4 @@ public class GraphUpdater extends AbstractUpdateSystem {
         return parentBody.solidAngle > parentSa.thresholdQuad * 30f;
     }
 
-    public void updatePositionLoc(Entity entity, GraphNode graph) {
-        var label = Mapper.label.get(entity);
-        var loc = Mapper.loc.get(entity);
-
-        Entity papa = graph.parent;
-        var pBody = Mapper.body.get(papa);
-        var pGraph = Mapper.graph.get(papa);
-
-        updater.setToLocalTransform(papa, pBody, pGraph, pBody.size, loc.distFactor, graph.localTransform, false);
-
-        loc.location3d.set(0, 0, -.5f);
-        // Latitude [-90..90]
-        loc.location3d.rotate(loc.location.y, 1, 0, 0);
-        // Longitude [0..360]
-        loc.location3d.rotate(loc.location.x + 90, 0, 1, 0);
-
-        loc.location3d.mul(graph.localTransform);
-
-        label.labelPosition.set(loc.location3d).add(camera.getPos());
-    }
 }

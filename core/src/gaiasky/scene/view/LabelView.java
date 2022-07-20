@@ -154,7 +154,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     public float textSize() {
         if (constel != null) {
             return .2e7f;
-        } else if(loc != null) {
+        } else if (loc != null) {
             return body.size / 1.5f;
         }
         return (float) (label.labelMax * body.distToCamera * label.labelFactor);
@@ -215,7 +215,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     public String text() {
         if (ruler != null) {
             return ruler.dist;
-        } else if(loc != null) {
+        } else if (loc != null) {
             return loc.displayName;
         } else {
             return base.getLocalizedName();
@@ -224,8 +224,20 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public void textDepthBuffer() {
+        label.depthBufferConsumer.accept(this);
+    }
+
+    public void defaultTextDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(false);
+    }
+
+    public void noTextDepthBuffer() {
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDepthMask(false);
+    }
+
+    public void emptyTextDepthBuffer() {
     }
 
     @Override

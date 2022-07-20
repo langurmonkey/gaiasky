@@ -32,6 +32,7 @@ public class KeyframeInitializer extends AbstractInitSystem {
         label.textScale = 0.3f;
         label.renderConsumer = LabelEntityRenderSystem::renderKeyframe;
         label.renderFunction = LabelView::renderTextKeyframe;
+        label.depthBufferConsumer = LabelView::noTextDepthBuffer;
 
         kf.orientations = new Array<>();
 

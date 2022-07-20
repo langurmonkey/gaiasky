@@ -15,6 +15,7 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Label implements Component {
@@ -38,6 +39,9 @@ public class Label implements Component {
 
     /** Function that checks whether the label must be rendered or not. **/
     public Function<LabelView, Boolean> renderFunction;
+
+    /** The function to apply to set up the depth buffer for text rendering. **/
+    public Consumer<LabelView> depthBufferConsumer = LabelView::defaultTextDepthBuffer;
 
     /** The label rendering code. **/
     public Consumer7<LabelEntityRenderSystem, LabelView , ExtSpriteBatch, ExtShaderProgram , FontRenderSystem, RenderingContext , ICamera> renderConsumer;

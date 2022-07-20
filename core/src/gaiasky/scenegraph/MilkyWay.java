@@ -19,8 +19,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.*;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.api.IBillboardDatasetProvider;
 import gaiasky.render.api.IFadeObject;
@@ -44,8 +44,8 @@ import gaiasky.util.tree.LoadStatus;
 import java.util.List;
 
 /**
- * The milky way model. This is obsolete, use {@link BillboardDataset} instead.
- * @deprecated Use {@link BillboardDataset} instead.
+ * The milky way model. This is obsolete, use {@link BillboardGroup} instead.
+ * @deprecated Use {@link BillboardGroup} instead.
  */
 @Deprecated
 public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IStatusObject, IFadeObject, IBillboardDatasetProvider, IObserver {

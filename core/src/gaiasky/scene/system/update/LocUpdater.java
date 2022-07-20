@@ -32,11 +32,7 @@ public class LocUpdater extends AbstractUpdateSystem {
 
         ICamera cam = GaiaSky.instance.getICamera();
         if (parentBody.solidAngle > parentSa.thresholdQuad * 30f || cam.isFocus(entity)) {
-
-            var loc = Mapper.loc.get(entity);
-            var body = Mapper.body.get(entity);
-
-            updateLocalValues(entity, graph, loc, cam);
+            updateLocalValues(entity, graph, Mapper.loc.get(entity), cam);
         }
     }
 

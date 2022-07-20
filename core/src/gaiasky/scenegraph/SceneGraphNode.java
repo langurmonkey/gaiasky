@@ -19,6 +19,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;

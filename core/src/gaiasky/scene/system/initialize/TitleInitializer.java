@@ -29,6 +29,7 @@ public class TitleInitializer extends AbstractInitSystem {
         label.label = false;
         label.renderConsumer = LabelEntityRenderSystem::renderTitle;
         label.renderFunction = LabelView::renderTextTitle;
+        label.depthBufferConsumer = LabelView::emptyTextDepthBuffer;
 
         EventManager.instance.subscribe(new TitleRadio(entity), Event.UI_THEME_RELOAD_INFO);
 
