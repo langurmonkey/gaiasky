@@ -157,7 +157,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         if (ringnormal != null)
             ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
 
-        // Cubemaps
+        // Cube maps
         if (diffuseCubemap != null)
             diffuseCubemap.initialize(manager);
         if (normalCubemap != null)

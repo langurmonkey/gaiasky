@@ -123,14 +123,14 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * @return The directional light with index i
      */
     public DirectionalLight directional(int i) {
-        return ((DirectionalLightsAttribute) env.get(DirectionalLightsAttribute.Type)).lights.get(i);
+        return ((DirectionalLightsAttribute) Objects.requireNonNull(env.get(DirectionalLightsAttribute.Type))).lights.get(i);
     }
 
     /**
      * Turns off all directional lights
      */
     public void clearDirectionals() {
-        Array<DirectionalLight> lights = ((DirectionalLightsAttribute) env.get(DirectionalLightsAttribute.Type)).lights;
+        Array<DirectionalLight> lights = ((DirectionalLightsAttribute) Objects.requireNonNull(env.get(DirectionalLightsAttribute.Type))).lights;
         for (DirectionalLight light : lights) {
             light.color.set(0f, 0f, 0f, 1f);
         }

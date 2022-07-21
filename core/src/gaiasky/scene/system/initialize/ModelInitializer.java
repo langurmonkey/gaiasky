@@ -150,7 +150,7 @@ public class ModelInitializer extends AbstractInitSystem {
             parentOrientation.orientationf = new Matrix4();
         }
         if (attitude != null) {
-            // Heliotropic satellites.
+            // Attitude-based models.
             if (attitude.attitudeLocation != null && manager.isLoaded(attitude.attitudeLocation)) {
                 attitude.attitudeServer = manager.get(attitude.attitudeLocation);
             }
@@ -165,7 +165,7 @@ public class ModelInitializer extends AbstractInitSystem {
         }
         if (fade != null) {
             // Billboards -- add depth test attribute, set to false.
-            if (model.model != null && model.model.instance != null) {
+            if (model != null && model.model != null && model.model.instance != null) {
                 // Disable depth test.
                 Array<gaiasky.util.gdx.shader.Material> mats = model.model.instance.materials;
                 for (Material mat : mats) {

@@ -109,9 +109,9 @@ public class Index {
                                 index.put(nameLowerCase, entity);
                             } else if (!nameLowerCase.isEmpty()) {
                                 Entity conflict = index.get(nameLowerCase);
-                                Base conflictBase = Mapper.base.get(conflict);
-                                Archetype entityArchetype = archetypes.findArchetype(entity);
-                                Archetype conflictArchetype = archetypes.findArchetype(conflict);
+                                var conflictBase = Mapper.base.get(conflict);
+                                var entityArchetype = conflictBase.archetype;
+                                var conflictArchetype = Mapper.base.get(conflict).archetype;
                                 logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName().toLowerCase() + ")", conflictBase.getName() + " (" + conflictArchetype.getName().toLowerCase() + ")"));
                                 String[] names1 = base.names;
                                 String[] names2 = conflictBase.names;
