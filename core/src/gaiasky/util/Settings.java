@@ -1519,6 +1519,7 @@ public class Settings {
         public boolean relativisticAberration = false;
         public boolean gravitationalWaves = false;
         public boolean displayVrGui = false;
+        public boolean octreeLoadActive = false;
 
         // Max clock time, 5 Myr by default
         public long maxTimeMs = 5000000L * (long) Nature.Y_TO_MS;

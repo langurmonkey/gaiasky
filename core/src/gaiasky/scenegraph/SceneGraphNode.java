@@ -19,6 +19,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -40,16 +41,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An object in the scene graph. Serves as a top class which provides the basic functionality.
  */
 public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwitch, IOctreeObject {
+    private static final Logger.Log logger = Logger.getLogger(SceneGraphNode.class);
+
     public static final String ROOT_NAME = "Universe";
 
     protected static TLV3D D31 = new TLV3D(), D32 = new TLV3D(), D33 = new TLV3D(), D34 = new TLV3D();
     protected static TLV3B B31 = new TLV3B(), B32 = new TLV3B(), B33 = new TLV3B(), B34 = new TLV3B();
     protected static TLV3 F31 = new TLV3(), F32 = new TLV3(), F33 = new TLV3(), F34 = new TLV3();
+
+    public static int processed;
 
     /**
      * Inserts the given node into the default scene graph, if it exists.
@@ -470,6 +476,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         this.opacity = opacity;
         translation.set(parentTransform);
 
@@ -1377,5 +1384,19 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public boolean isEmpty() {
         return false;
+    }
+
+    public void printTree(String tab, int level, AtomicInteger count) {
+        logger.debug(count.getAndIncrement() + "|" + level + ":" + tab + getName()
+                + " (" + (children != null ? children.size : 0) + ")"
+                + " [" + this.getClass().getSimpleName() + "]");
+
+        if (children != null) {
+            // Go down a level
+            for (int i = 0; i < children.size; i++) {
+                SceneGraphNode child = children.get(i);
+                child.printTree(tab + "  ", level + 1, count);
+            }
+        }
     }
 }

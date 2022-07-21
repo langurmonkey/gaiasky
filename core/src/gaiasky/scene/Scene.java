@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
@@ -12,11 +14,12 @@ import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.IOctreeObject;
+import gaiasky.util.tree.OctreeNode;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -54,6 +57,9 @@ public class Scene {
     private Array<AbstractUpdateSystem> updaters;
     /** Holds all extract systems. **/
     private Array<AbstractExtractSystem> extractors;
+
+    /** Number of actual objects in the scene. **/
+    private int numberObjects = -1;
 
     /** Access to the index. **/
     public Index index() {
@@ -436,7 +442,7 @@ public class Scene {
     /**
      * Updates the scene. This causes an update to the engine.
      *
-     * @param time   The time frame provider object.
+     * @param time The time frame provider object.
      */
     public void update(ITimeFrameProvider time) {
         engine.update((float) time.getDt());
@@ -515,6 +521,7 @@ public class Scene {
         }
         // Add to engine
         engine.addEntity(entity);
+        reportDebugObjects();
     }
 
     /**
@@ -534,6 +541,7 @@ public class Scene {
         if (removeFromIndex) {
             index.remove(entity);
         }
+        reportDebugObjects();
     }
 
     /**
@@ -624,9 +632,9 @@ public class Scene {
         return list;
     }
 
-  public ImmutableArray<Entity> findEntitiesByFamily(Family family) {
-      return engine.getEntitiesFor(family);
-  }
+    public ImmutableArray<Entity> findEntitiesByFamily(Family family) {
+        return engine.getEntitiesFor(family);
+    }
 
     /**
      * Gets the current position of the object identified by the given name.
@@ -694,4 +702,70 @@ public class Scene {
         return copy;
     }
 
+    public void reportDebugObjects() {
+        updateNumberObjects();
+        EventManager.publish(Event.DEBUG_OBJECTS, this, numberObjects, numberObjects);
+    }
+
+    private void updateNumberObjects() {
+        if (engine != null) {
+            ImmutableArray<Entity> entities = engine.getEntities();
+            numberObjects = 0;
+            for (Entity entity : entities) {
+                numberObjects += getNumberObjects(entity);
+            }
+        }
+    }
+
+    /**
+     * Returns the number of actual objects held by this entity. Most entities count as only
+     * one object, but some, such as particle and star sets, orbital element sets or octrees,
+     * actually hold and wrap many objects.
+     *
+     * @param entity The entity.
+     *
+     * @return The number of objects it holds.
+     */
+    public int getNumberObjects(Entity entity) {
+
+        if (Mapper.particleSet.has(entity)) {
+            return Mapper.particleSet.get(entity).data().size();
+        } else if (Mapper.starSet.has(entity)) {
+            return Mapper.starSet.get(entity).data().size();
+        } else if (Mapper.octree.has(entity)) {
+            var octant = Mapper.octant.get(entity);
+            return getNumberObjects(octant.octant);
+        } else {
+            return 1;
+        }
+    }
+
+    /**
+     * Computes the number of objects in the given octree node, recursively.
+     *
+     * @param node The node.
+     *
+     * @return The number of objects.
+     */
+    public int getNumberObjects(OctreeNode node) {
+        if (node == null) {
+            return 0;
+        } else {
+            int objects = 0;
+
+            // Add own objects.
+            if (node.objects != null && !node.objects.isEmpty()) {
+                for (IOctreeObject o : node.objects) {
+                    objects += o.getStarCount();
+                }
+            }
+
+            // Count recursively.
+            for (OctreeNode child : node.children) {
+                objects += getNumberObjects(child);
+            }
+            return objects;
+        }
+
+    }
 }

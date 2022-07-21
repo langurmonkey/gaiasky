@@ -5,9 +5,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.component.tag.TagNoProcess;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
@@ -17,18 +17,20 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Processes entities in a scene graph, which have a {@link GraphRoot}
  * component. Generally, this should be a single entity unless
  * we have more than one scene graph.
  */
 public class GraphUpdater extends AbstractUpdateSystem {
+    private static final Logger.Log logger = Logger.getLogger(GraphUpdater.class);
 
     private ICamera camera;
     private final ITimeFrameProvider time;
     private Vector3d D31;
     private Vector3b B31;
-
 
     /**
      * Instantiates a system that will iterate over the entities described by the Family.
@@ -43,13 +45,19 @@ public class GraphUpdater extends AbstractUpdateSystem {
     }
 
     public void setCamera(ICamera camera) {
-        synchronized (camera) {
-            this.camera = camera;
-        }
+        this.camera = camera;
     }
 
+    int processed = 0, lastProcessed;
+
     protected void processEntity(Entity entity, float deltaTime) {
+        processed = 0;
         updateEntity(entity, deltaTime);
+        if (lastProcessed != processed) {
+            logger.debug("Number of nodes (new): " + processed);
+            lastProcessed = processed;
+            printTree(entity, " ", 0, new AtomicInteger(1));
+        }
     }
 
     @Override
@@ -57,13 +65,35 @@ public class GraphUpdater extends AbstractUpdateSystem {
         // This runs the root node
         var root = entity.getComponent(GraphNode.class);
 
-        synchronized (camera) {
-            root.translation.set(camera.getInversePos());
-        }
+        root.translation.set(camera.getInversePos());
         update(entity, time, null, 1);
     }
 
+    public void printTree(Entity entity, String tab, int level, AtomicInteger count) {
+        var graph = Mapper.graph.get(entity);
+
+        if (graph.mustUpdateFunction == null ||
+                graph.mustUpdateFunction.apply(this, entity, graph)) {
+
+            var base = Mapper.base.get(entity);
+
+            logger.debug(count.getAndIncrement() + "|" + level + ":" + tab + base.getName()
+                    + " (" + (graph.children != null ? graph.children.size : 0) + ")"
+                    + (base.archetype != null ? " [" + base.archetype.getName() + "]" : ""));
+
+            boolean processChildren = !Mapper.tagNoProcessChildren.has(entity);
+            if (processChildren && graph.children != null) {
+                // Go down a level
+                for (int i = 0; i < graph.children.size; i++) {
+                    Entity child = graph.children.get(i);
+                    printTree(child, tab + "  ", level + 1, count);
+                }
+            }
+        }
+    }
+
     public void update(Entity entity, ITimeFrameProvider time, final Vector3b parentTransform, float opacity) {
+        processed++;
         var graph = Mapper.graph.get(entity);
 
         if (graph.mustUpdateFunction == null ||
@@ -189,8 +219,15 @@ public class GraphUpdater extends AbstractUpdateSystem {
     public boolean mustUpdateLoc(Entity entity, GraphNode graph) {
         var parentBody = Mapper.body.get(graph.parent);
         var parentSa = Mapper.sa.get(graph.parent);
+        var loc = Mapper.loc.get(entity);
 
-        return parentBody.solidAngle > parentSa.thresholdQuad * 30f;
+        boolean update = parentBody.solidAngle > parentSa.thresholdQuad * 30f;
+        if(update) {
+            entity.remove(TagNoProcess.class);
+        } else {
+            entity.add(getEngine().createComponent(TagNoProcess.class));
+        }
+        return update;
     }
 
 }

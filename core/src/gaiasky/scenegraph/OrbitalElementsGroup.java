@@ -80,6 +80,7 @@ public class OrbitalElementsGroup extends GenericCatalog implements IRenderable,
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         this.opacity = opacity;
         translation.set(parentTransform);
         Vector3d aux = D31.get();

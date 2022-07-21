@@ -21,6 +21,7 @@ import gaiasky.util.tree.IPosition;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SceneGraph implements ISceneGraph {
     private static final Log logger = Logger.getLogger(SceneGraph.class);
@@ -100,16 +101,19 @@ public class SceneGraph implements ISceneGraph {
         logger.info(I18n.msg("notif.sg.init", root.numChildren));
     }
 
+
+    int lastProcessed;
     public void update(ITimeFrameProvider time, ICamera camera) {
         root.translation.set(camera.getInversePos());
+        SceneGraphNode.processed = 0;
         root.update(time, null, camera);
-
-        if (!hasOctree) {
-            if (nObjects < 0)
-                nObjects = getNObjects();
-            EventManager.publish(Event.DEBUG_OBJECTS, this, nObjects, nObjects);
+        if(lastProcessed != SceneGraphNode.processed) {
+            logger.debug("Number of nodes (old): " + SceneGraphNode.processed);
+            lastProcessed = SceneGraphNode.processed;
+            root.printTree(" ", 0, new AtomicInteger(1));
         }
     }
+
 
     public void insert(SceneGraphNode node, boolean addToIndex) {
         SceneGraphNode parent = getNode(node.parentName);

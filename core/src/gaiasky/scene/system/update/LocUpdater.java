@@ -25,15 +25,11 @@ public class LocUpdater extends AbstractUpdateSystem {
 
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
+        var loc = Mapper.loc.get(entity);
         var graph = Mapper.graph.get(entity);
 
-        var parentBody = Mapper.body.get(graph.parent);
-        var parentSa = Mapper.sa.get(graph.parent);
-
         ICamera cam = GaiaSky.instance.getICamera();
-        if (parentBody.solidAngle > parentSa.thresholdQuad * 30f || cam.isFocus(entity)) {
-            updateLocalValues(entity, graph, Mapper.loc.get(entity), cam);
-        }
+        updateLocalValues(entity, graph, loc, cam);
     }
 
     public void updateLocalValues(Entity entity, GraphNode graph, LocationMark loc, ICamera cam) {

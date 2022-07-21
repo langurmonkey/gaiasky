@@ -148,6 +148,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         this.opacity = opacity;
         translation.set(parentTransform);
 

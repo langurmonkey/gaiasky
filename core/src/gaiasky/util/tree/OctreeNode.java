@@ -8,9 +8,6 @@ package gaiasky.util.tree;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.IOctantLoader;
-import gaiasky.data.StreamingOctreeLoader;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.ILineRenderable;
@@ -37,8 +34,6 @@ public class OctreeNode implements ILineRenderable {
     public static int nObjectsObserved = 0;
     /** Max depth of the structure this node belongs to. **/
     public static int maxDepth;
-    /** Is dynamic loading active? **/
-    public static boolean LOAD_ACTIVE;
 
     /**
      * Since OctreeNode is not to be parallelized, these can be static.
@@ -525,7 +520,7 @@ public class OctreeNode implements ILineRenderable {
             /*
              * Load lists of pages
              */
-            if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE) {
+            if (status == LoadStatus.NOT_LOADED && Settings.settings.runtime.octreeLoadActive) {
                 // Add to load and go on
                 assert loader != null : "Octant loader is null!";
                 loader.queue(this);

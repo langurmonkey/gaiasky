@@ -48,6 +48,5 @@ public class TessellationShader extends GroundShader {
     public void renderMesh(ExtShaderProgram program, IntMeshPart meshPart){
         // Override primitive
         meshPart.mesh.render(program, GL41.GL_PATCHES, meshPart.offset, meshPart.size, false);
-        //Gdx.gl20.glDrawArrays(GL41.GL_PATCHES, meshPart.offset, meshPart.size);
     }
 }

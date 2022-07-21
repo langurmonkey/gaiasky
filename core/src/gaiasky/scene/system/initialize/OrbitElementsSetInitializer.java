@@ -24,7 +24,7 @@ public class OrbitElementsSetInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         var graph = Mapper.graph.get(entity);
         if (graph != null && graph.children != null) {
-            for(Entity child : graph.children) {
+            for (Entity child : graph.children) {
                 // Tag with set element component
                 child.add(new TagSetElement());
             }

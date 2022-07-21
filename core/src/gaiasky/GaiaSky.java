@@ -645,14 +645,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         updateProcess = () -> {
             // Update scene graph.
-            if (ri != 1) {
-                sceneGraph.update(time, cameraManager);
-            }
+            sceneGraph.update(time, cameraManager);
 
             // Update scene.
-            if (ri != 0) {
-                scene.update(time);
-            }
+            scene.update(time);
 
             // Swap proximity buffers.
             cameraManager.swapBuffers();
@@ -733,22 +729,25 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         final Task debugTask1 = new Task() {
             @Override
             public void run() {
-                // FPS
+                // FPS.
                 EventManager.publish(Event.FPS_INFO, this, 1f / graphics.getDeltaTime());
-                // Current session time
+                // Current session time.
                 EventManager.publish(Event.DEBUG_TIME, this, TimeUtils.timeSinceMillis(startTime) / 1000d);
-                // Memory
+                // Memory.
                 EventManager.publish(Event.DEBUG_RAM, this, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
-                // Observed objects
-                EventManager.publish(Event.DEBUG_OBJECTS, this, OctreeNode.nObjectsObserved, OctreeLoader.instance != null ? OctreeLoader.instance.getNLoadedStars() : -1);
-                // Observed octants
-                EventManager.publish(Event.DEBUG_QUEUE, this, OctreeNode.nOctantsObserved, OctreeLoader.instance != null ? OctreeLoader.instance.getLoadQueueSize() : -1);
-                // VRAM
+                // VRAM.
                 EventManager.publish(Event.DEBUG_VRAM, this, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
-                // Threads
+                // Threads.
                 EventManager.publish(Event.DEBUG_THREADS, this, executorService.pool().getActiveCount(), executorService.pool().getPoolSize());
-                // Dynamic resolution
+                // Dynamic resolution.
                 EventManager.publish(Event.DEBUG_DYN_RES, this, dynamicResolutionLevel, settings.graphics.dynamicResolutionScale[dynamicResolutionLevel]);
+                // Octree objects.
+                if(OctreeLoader.instance != null) {
+                    // Observed objects.
+                    EventManager.publish(Event.DEBUG_OBJECTS, this, OctreeNode.nObjectsObserved, OctreeLoader.instance.getNLoadedStars());
+                    // Observed octants.
+                    EventManager.publish(Event.DEBUG_QUEUE, this, OctreeNode.nOctantsObserved, OctreeLoader.instance.getLoadQueueSize());
+                }
             }
         };
 
@@ -795,7 +794,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         };
         Timer.schedule(logAttributes, 5);
 
-        // Initialized
+        // Initial report.
+        scene.reportDebugObjects();
+
+        // Initialized.
         EventManager.publish(Event.INITIALIZED_INFO, this);
         sgr.setRendering(true);
         sceneRenderer.setRendering(true);
@@ -804,7 +806,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public void touchSceneGraph() {
         // Update whole tree to initialize positions
-        OctreeNode.LOAD_ACTIVE = false;
+        settings.runtime.octreeLoadActive = false;
         boolean timeOnBak = settings.runtime.timeOn;
         settings.runtime.timeOn = true;
         // Set non-zero time
@@ -818,7 +820,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Time back to zero
         time.update(0);
         settings.runtime.timeOn = timeOnBak;
-        OctreeNode.LOAD_ACTIVE = true;
+        settings.runtime.octreeLoadActive = true;
     }
 
     /**

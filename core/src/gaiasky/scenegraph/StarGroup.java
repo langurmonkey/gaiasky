@@ -217,6 +217,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         // Fade node visibility
         if (active.length > 0) {
             cPosD.set(camera.getPos());

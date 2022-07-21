@@ -12,6 +12,8 @@ import gaiasky.util.gdx.shader.attribute.Attributes;
 import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 
+import java.util.Objects;
+
 public class GroundShader extends RelativisticShader {
 
     public static class Inputs extends RelativisticShader.Inputs {
@@ -19,7 +21,6 @@ public class GroundShader extends RelativisticShader {
         public final static Uniform cameraHeight = new Uniform("fCameraHeight");
         public final static Uniform outerRadius = new Uniform("fOuterRadius");
         public final static Uniform innerRadius = new Uniform("fInnerRadius");
-        public final static Uniform innerRadius2 = new Uniform("fInnerRadius2");
         public final static Uniform krESun = new Uniform("fKrESun");
         public final static Uniform kmESun = new Uniform("fKmESun");
         public final static Uniform kr4PI = new Uniform("fKr4PI");
@@ -48,7 +49,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.Alpha))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Alpha))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Alpha)))).value);
             }
         };
 
@@ -61,7 +62,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.CameraHeight))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.CameraHeight))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.CameraHeight)))).value);
             }
         };
 
@@ -74,7 +75,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.OuterRadius))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.OuterRadius))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.OuterRadius)))).value);
             }
         };
 
@@ -87,7 +88,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.InnerRadius))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.InnerRadius))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.InnerRadius)))).value);
             }
         };
 
@@ -100,7 +101,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.KrESun))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.KrESun))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.KrESun)))).value);
             }
         };
 
@@ -113,7 +114,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.KmESun))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.KmESun))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.KmESun)))).value);
             }
         };
 
@@ -126,7 +127,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.Kr4PI))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Kr4PI))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Kr4PI)))).value);
             }
         };
 
@@ -139,7 +140,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.Km4PI))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Km4PI))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Km4PI)))).value);
             }
         };
 
@@ -152,7 +153,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.Scale))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Scale))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Scale)))).value);
             }
         };
 
@@ -165,7 +166,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.ScaleDepth))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.ScaleDepth))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.ScaleDepth)))).value);
             }
         };
 
@@ -178,7 +179,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.ScaleOverScaleDepth))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.ScaleOverScaleDepth))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.ScaleOverScaleDepth)))).value);
             }
         };
 
@@ -191,7 +192,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.nSamples))
-                    shader.set(inputID, (int) ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.nSamples))).value);
+                    shader.set(inputID, (int) ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.nSamples)))).value);
             }
         };
 
@@ -204,7 +205,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.FogDensity))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.FogDensity))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.FogDensity)))).value);
             }
         };
         public final static Setter fogColor = new Setter() {
@@ -216,7 +217,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.FogColor))
-                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.FogColor))).value);
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.FogColor)))).value);
             }
         };
 
@@ -229,7 +230,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(AtmosphereAttribute.G))
-                    shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.G))).value);
+                    shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.G)))).value);
             }
         };
 
@@ -242,7 +243,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.PlanetPos))
-                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.PlanetPos))).value);
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.PlanetPos)))).value);
             }
         };
         public final static Setter cameraPos = new Setter() {
@@ -254,7 +255,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.CameraPos))
-                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.CameraPos))).value);
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.CameraPos)))).value);
             }
         };
         public final static Setter lightPos = new Setter() {
@@ -266,7 +267,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.LightPos))
-                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.LightPos))).value);
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.LightPos)))).value);
             }
         };
         public final static Setter invWavelength = new Setter() {
@@ -278,7 +279,7 @@ public class GroundShader extends RelativisticShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.InvWavelength))
-                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.InvWavelength))).value);
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.InvWavelength)))).value);
             }
         };
 
@@ -307,10 +308,6 @@ public class GroundShader extends RelativisticShader {
     public final int v3LightPos;
     public final int v3CameraPos;
     public final int v3InvWavelength;
-
-    public GroundShader(final IntRenderable renderable) {
-        this(renderable, new Config());
-    }
 
     public GroundShader(final IntRenderable renderable, final Config config) {
         this(renderable, config, createPrefix(renderable, config));

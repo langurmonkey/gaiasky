@@ -254,6 +254,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      */
     @Override
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         this.updateLocalValues(time, camera);
         translation.set(parentTransform).add(pos);
         this.opacity = opacity * this.getVisibilityOpacityFactor();

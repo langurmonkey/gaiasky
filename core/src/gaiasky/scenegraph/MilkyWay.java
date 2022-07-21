@@ -157,6 +157,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IStat
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         this.opacity = opacity * this.opacity;
         translation.set(parentTransform);
         this.currentDistance = camera.getDistance() * camera.getFovFactor();

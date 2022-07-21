@@ -73,6 +73,7 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         // Recompute mean position
         posd.setZero();
         Vector3d p = D31.get();

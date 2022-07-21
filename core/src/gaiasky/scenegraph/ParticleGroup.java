@@ -527,6 +527,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        processed++;
         if (pointData != null) {
             cPosD.set(camera.getPos());
             this.opacity = opacity;
