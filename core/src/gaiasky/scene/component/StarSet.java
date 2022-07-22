@@ -212,4 +212,11 @@ public class StarSet extends ParticleSet {
         return false;
     }
 
+
+    public void setLabelColor(float[] color, String name) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            labelColors.put(idx, color);
+        }
+    }
 }

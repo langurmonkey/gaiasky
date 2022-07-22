@@ -1,11 +1,17 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FilterView;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.ParticleSetUpdaterTask;
+import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
@@ -21,7 +27,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.*;
 
-public class ParticleSet implements Component {
+public class ParticleSet implements Component, IDisposable {
 
     public static long idSeq = 0;
 
@@ -416,6 +422,12 @@ public class ParticleSet implements Component {
         return visibilityArray != null && visibilityArray[index] != (byte) 0;
     }
 
+    public void setVisible(boolean visible, String name, Render render) {
+        if (index.containsKey(name)) {
+            this.setVisible(index.get(name), visible, render);
+        }
+    }
+
     /**
      * Sets the visibility of the particle with the given index. If the visibility
      * has changed, it marks the particle group for update.
@@ -432,7 +444,9 @@ public class ParticleSet implements Component {
     }
 
     public void markForUpdate(Render render) {
-        EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, render);
+        if (render != null) {
+            EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, render);
+        }
     }
 
     /** Returns the current focus position, if any, in the out vector. **/
@@ -557,5 +571,13 @@ public class ParticleSet implements Component {
     // FOCUS_MODE apparent view angle
     public double getSolidAngleApparent() {
         return focusSolidAngleApparent;
+    }
+
+    @Override
+    public void dispose(Entity entity) {
+        this.disposed = true;
+        markForUpdate(Mapper.render.get(entity));
+        // Data to be gc'd
+        this.pointData = null;
     }
 }

@@ -16,7 +16,6 @@ import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.update.ModelUpdater;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.IVisibilitySwitch;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
@@ -24,6 +23,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -48,6 +48,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     private ParticleSet particleSet;
     /** The star set component, if any. **/
     private StarSet starSet;
+    /** The highlight component, initialized lazily. **/
+    private Highlight hl;
 
     /** Implementation of pointer collision. **/
     private FocusHit focusHit;
@@ -219,14 +221,26 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         }
     }
 
+    public boolean isVisibleGroup() {
+        return isVisibleGroup(false);
+    }
+
+    public boolean isVisibleGroup(boolean attributeValue) {
+        return isVisible(attributeValue);
+    }
+
     @Override
     public void setVisible(boolean visible, String name) {
         var set = getSet();
         if (set != null) {
-            set.setVisible(set.index.get(name), visible, Mapper.render.get(entity));
+            set.setVisible(visible, name, Mapper.render.get(entity));
         } else {
             setVisible(visible);
         }
+    }
+
+    public void setVisibleGroup(boolean visibility) {
+        setVisible(visibility);
     }
 
     @Override
@@ -353,7 +367,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         var scaffolding = Mapper.modelScaffolding.get(entity);
         Matrix4d ori = new Matrix4d(graph.orientation);
         var rotation = getRotationComponent();
-        if(rotation != null) {
+        if (rotation != null) {
             ori.rotate(0, 1, 0, rotation.angle);
         }
         aux2.mul(ori);
@@ -738,7 +752,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (starSet != null) {
             starSet.setForceLabel(forceLabel, name);
         } else {
-            setForcelabel(forceLabel);
+            setForceLabel(forceLabel);
         }
     }
 
@@ -747,6 +761,23 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             return starSet.isForceLabel(name);
         } else {
             return base.forceLabel;
+        }
+    }
+
+    /**
+     * Sets the label color, as an RGBA float array.
+     *
+     * @param color The label color.
+     */
+    public void setLabelColor(float[] color) {
+        body.labelColor = color;
+    }
+
+    public void setLabelColor(float[] color, String name) {
+        if (starSet != null) {
+            starSet.setLabelColor(color, name);
+        } else {
+            this.setLabelColor(color);
         }
     }
 
@@ -863,5 +894,64 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             }
         }
         return null;
+    }
+
+    private void initHighlight() {
+        if (hl == null)
+            hl = Mapper.highlight.get(entity);
+    }
+
+    /**
+     * Highlight using a plain color.
+     *
+     * @param state      Whether to highlight.
+     * @param color      The plain color.
+     * @param allVisible All visible.
+     */
+    public void highlight(boolean state, float[] color, boolean allVisible) {
+        initHighlight();
+        var set = getSet();
+        if(set != null) {
+            set.markForUpdate(Mapper.render.get(entity));
+        }
+
+        this.hl.highlighted = state;
+        if (state) {
+            hl.hlplain = true;
+            hl.hlallvisible = allVisible;
+            System.arraycopy(color, 0, hl.hlc, 0, color.length);
+        }
+    }
+
+    /**
+     * Highlight using a colormap.
+     *
+     * @param state Whether to highlight.
+     * @param cmi   Color map index.
+     * @param cma   Color map attribute.
+     * @param cmmin Min mapping value.
+     * @param cmmax Max mapping value.
+     */
+    public void highlight(boolean state, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
+        initHighlight();
+        var set = getSet();
+        if(set != null) {
+            set.markForUpdate(Mapper.render.get(entity));
+        }
+
+        hl.highlighted = state;
+        if (state) {
+            hl.hlplain = false;
+            hl.hlallvisible = allVisible;
+            hl.hlcmi = cmi;
+            hl.hlcma = cma;
+            hl.hlcmmin = cmmin;
+            hl.hlcmmax = cmmax;
+        }
+    }
+
+    public boolean isHighlighted() {
+        initHighlight();
+        return hl.highlighted;
     }
 }

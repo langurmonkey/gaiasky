@@ -1193,6 +1193,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void dispose() {
         this.disposed = true;
+        markForUpdate();
         GaiaSky.instance.sceneGraph.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);

@@ -78,9 +78,6 @@ public class OctreeWrapper extends FadeNode {
 
     /**
      * Adds all the objects of the octree (recursively) to the root list.
-     *
-     * @param octant
-     * @param root
      */
     private void addObjectsDeep(OctreeNode octant, SceneGraphNode root) {
         if (octant.objects != null) {

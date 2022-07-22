@@ -10,10 +10,13 @@ import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ICopy;
+import gaiasky.scene.component.IDisposable;
 import gaiasky.scene.system.initialize.*;
 import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scene.view.FocusView;
+import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
@@ -91,6 +94,9 @@ public class Scene {
         Base base = root.getComponent(Base.class);
         base.setName(ROOT_NAME);
         engine.addEntity(root);
+
+        // Create scene observer
+        new SceneObserver(this);
     }
 
     /**
@@ -541,6 +547,25 @@ public class Scene {
         if (removeFromIndex) {
             index.remove(entity);
         }
+
+        // Remove focus if needed.
+        CameraManager cam = GaiaSky.instance.getCameraManager();
+        if (cam != null && cam.hasFocus() && ((FocusView) cam.getFocus()).getEntity() == entity) {
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+        }
+
+        // Dispose components.
+        var components = entity.getComponents();
+        for (var component : components) {
+            if(component instanceof IDisposable) {
+                ((IDisposable) component).dispose(entity);
+            }
+        }
+
+        // Remove from engine.
+        engine.removeEntity(entity);
+
+        // Report update to number of objects.
         reportDebugObjects();
     }
 

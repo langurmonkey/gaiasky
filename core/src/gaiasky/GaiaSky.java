@@ -742,7 +742,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 // Dynamic resolution.
                 EventManager.publish(Event.DEBUG_DYN_RES, this, dynamicResolutionLevel, settings.graphics.dynamicResolutionScale[dynamicResolutionLevel]);
                 // Octree objects.
-                if(OctreeLoader.instance != null) {
+                if (OctreeLoader.instance != null) {
                     // Observed objects.
                     EventManager.publish(Event.DEBUG_OBJECTS, this, OctreeNode.nObjectsObserved, OctreeLoader.instance.getNLoadedStars());
                     // Observed octants.
@@ -1702,24 +1702,30 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             goHome();
             break;
         case PER_OBJECT_VISIBILITY_CMD:
-            final IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-            String name = (String) data[1];
-            boolean state = (boolean) data[2];
-            vs.setVisible(state, name.toLowerCase());
-            logger.info(I18n.msg("notif.visibility.object.set", vs.getName(), I18n.msg("gui." + state)));
+            if (data[0] instanceof IVisibilitySwitch) {
+                final IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
+                String name = (String) data[1];
+                boolean state = (boolean) data[2];
+                vs.setVisible(state, name.toLowerCase());
+                logger.info(I18n.msg("notif.visibility.object.set", vs.getName(), I18n.msg("gui." + state)));
+            }
             break;
         case FORCE_OBJECT_LABEL_CMD:
-            final SceneGraphNode forceLabelObject = (SceneGraphNode) data[0];
-            name = (String) data[1];
-            state = (boolean) data[2];
-            forceLabelObject.setForceLabel(state, name.toLowerCase());
-            logger.info(I18n.msg("notif.object.flag", "forceLabel", forceLabelObject.getName(), I18n.msg("gui." + state)));
+            if(data[0] instanceof SceneGraphNode) {
+                final SceneGraphNode forceLabelObject = (SceneGraphNode) data[0];
+                String name = (String) data[1];
+                boolean state = (boolean) data[2];
+                forceLabelObject.setForceLabel(state, name.toLowerCase());
+                logger.info(I18n.msg("notif.object.flag", "forceLabel", forceLabelObject.getName(), I18n.msg("gui." + state)));
+            }
             break;
         case LABEL_COLOR_CMD:
-            final SceneGraphNode labelColorObject = (SceneGraphNode) data[0];
-            name = (String) data[1];
-            float[] labelColor = (float[]) data[2];
-            labelColorObject.setLabelcolor(labelColor, name);
+            if(data[0] instanceof SceneGraphNode) {
+                final SceneGraphNode labelColorObject = (SceneGraphNode) data[0];
+                String name = (String) data[1];
+                float[] labelColor = (float[]) data[2];
+                labelColorObject.setLabelcolor(labelColor, name);
+            }
             break;
         case PARK_RUNNABLE:
             synchronized (parkedRunnables) {

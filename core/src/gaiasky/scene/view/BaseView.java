@@ -73,6 +73,10 @@ public class BaseView extends AbstractView {
         base.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
     }
 
+    public void setVisible(boolean visible, String name) {
+        setVisible(visible);
+    }
+
     public boolean isVisible(boolean attributeValue) {
         if (attributeValue)
             return base.visible;

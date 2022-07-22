@@ -10,6 +10,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.OrbitalElementsGroup;
 import gaiasky.scenegraph.ParticleGroup;
@@ -63,6 +64,7 @@ public class CatalogInfo {
 
     // Reference to the entity
     public Entity entity;
+    private final FocusView view;
 
     public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, Entity entity) {
         this(name, description, source, type, hlSizeFactor, (FadeNode) null);
@@ -84,6 +86,7 @@ public class CatalogInfo {
         this.hlColor = new float[4];
         this.hlSizeFactor = hlSizeFactor;
         this.hlAllVisible = true;
+        this.view = new FocusView();
         System.arraycopy(ColorUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
 
         if (this.object != null)
@@ -103,6 +106,13 @@ public class CatalogInfo {
     public boolean isVisible(boolean attributeValue) {
         if (this.object != null) {
             return this.object.isVisibleGroup(attributeValue);
+        } else if (this.entity != null) {
+            boolean ret;
+            synchronized (view) {
+                view.setEntity(this.entity);
+                ret = view.isVisibleGroup(attributeValue);
+            }
+            return ret;
         }
         return true;
     }
@@ -154,6 +164,13 @@ public class CatalogInfo {
             this.object.dispose();
             logger.info(I18n.msg("gui.dataset.remove.info", name));
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.dataset.remove.info", name));
+        } else if (this.entity != null) {
+            if (!isHighlightable()) {
+                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, this, this.entity, true);
+            }
+            logger.info(I18n.msg("gui.dataset.remove.info", name));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.dataset.remove.info", name));
+
         }
     }
 
@@ -164,10 +181,22 @@ public class CatalogInfo {
      */
     public void highlight(boolean hl) {
         this.highlighted = hl;
-        if (plainColor) {
-            object.highlight(hl, hlColor, hlAllVisible);
-        } else {
-            object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
+        if (object != null) {
+            if (plainColor) {
+                object.highlight(hl, hlColor, hlAllVisible);
+            } else {
+                object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
+            }
+        } else if (entity != null) {
+            synchronized (view) {
+                view.setEntity(entity);
+                if (plainColor) {
+                    view.highlight(hl, hlColor, hlAllVisible);
+                } else {
+                    view.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
+                }
+            }
+
         }
     }
 
@@ -175,14 +204,24 @@ public class CatalogInfo {
      * @return True if this is a highlightable catalog, false otherwise.
      */
     public boolean isHighlightable() {
-        return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper || this.object instanceof OrbitalElementsGroup;
+        if (this.object != null) {
+            return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper || this.object instanceof OrbitalElementsGroup;
+        } else if (this.entity != null) {
+            return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity) || Mapper.orbitElementsSet.has(entity);
+        }
+        return false;
     }
 
     /**
      * @return True if this catalog's particles have attributes (they are stars), false otherwise.
      */
     public boolean hasParticleAttributes() {
-        return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper;
+        if (this.object != null) {
+            return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper;
+        } else if (this.entity != null) {
+            return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity);
+        }
+        return false;
     }
 
     /**

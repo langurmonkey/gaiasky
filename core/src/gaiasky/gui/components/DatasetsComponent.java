@@ -20,6 +20,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
+import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.IVisibilitySwitch;
 import gaiasky.scenegraph.MeshObject;
 import gaiasky.util.*;
@@ -81,14 +82,32 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 eye.setCheckedNoFire(!visible);
             }
             EventManager.publish(Event.CATALOG_VISIBLE, this, ci.name, visible);
-            if (ci.object != null && ci.object instanceof MeshObject) {
+            if (ci.object instanceof MeshObject) {
                 EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, ci.object, ci.object.getName(), visible);
             }
+        }
+
+        if(ci.entity != null) {
+            if (source != eye) {
+                eye.setCheckedNoFire(!visible);
+            }
+            EventManager.publish(Event.CATALOG_VISIBLE, this, ci.name, visible);
+            if (Mapper.mesh.has(ci.entity)) {
+                var base = Mapper.base.get(ci.entity);
+                EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, ci.entity, base.getName(), visible);
+            }
+
         }
     }
 
     private void setDatasetHighlight(CatalogInfo ci, OwnImageButton mark, boolean highlight, Actor source) {
         if (ci.object != null) {
+            if (source != mark) {
+                mark.setCheckedNoFire(highlight);
+            }
+            EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight);
+        }
+        if(ci.entity != null) {
             if (source != mark) {
                 mark.setCheckedNoFire(highlight);
             }
@@ -218,7 +237,21 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
             sizeScaling.setName("star brightness");
             sizeScaling.setWidth(320f);
-            sizeScaling.setMappedValue(ci.object.getPointscaling());
+            if (ci.object != null) {
+                sizeScaling.setMappedValue(ci.object.getPointscaling());
+            } else if (ci.entity != null) {
+                var graph = Mapper.graph.get(ci.entity);
+                var hl = Mapper.highlight.get(ci.entity);
+                if (hl != null) {
+                    float pointScaling;
+                    if (Mapper.octree.has(graph.parent)) {
+                        pointScaling = Mapper.highlight.get(graph.parent).pointscaling * hl.pointscaling;
+                    } else {
+                        pointScaling = hl.pointscaling;
+                    }
+                    sizeScaling.setMappedValue(pointScaling);
+                }
+            }
             sizeScaling.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     double val = sizeScaling.getMappedValue();
@@ -231,7 +264,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(sizeScaling).left().colspan(2).padTop(pad9);
             scalingMap.put(ci.name, sizeScaling);
         }
-        Container c = new Container(t);
+        Container<Table> c = new Container<>(t);
         c.setFillParent(true);
         c.align(Align.topLeft);
         c.minHeight(80f);
@@ -255,7 +288,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         catalogWidget.addListener(new InputListener() {
             @Override
             public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
-                if (event != null && event instanceof InputEvent) {
+                if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
                     InputEvent.Type type = ie.getType();
                     if (type == InputEvent.Type.touchDown) {

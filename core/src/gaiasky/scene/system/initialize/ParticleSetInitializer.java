@@ -116,48 +116,59 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.focusPositionSph = new Vector2d();
     }
 
+    private void initializeCatalogInfo(Entity entity, ParticleSet set) {
+        var base = Mapper.base.get(entity);
+        var desc = Mapper.datasetDescription.get(entity);
+
+        Path df = Path.of(Settings.settings.data.dataFile(set.datafile));
+        if (desc.catalogInfo == null) {
+            desc.catalogInfo = new CatalogInfo(base.getName(), base.getName(), df.toString(), CatalogInfoSource.INTERNAL, 1f, entity);
+        }
+
+        if (desc.catalogInfo.nParticles <= 0) {
+            desc.catalogInfo.nParticles = set.pointData != null ? set.pointData.size() : -1;
+        }
+
+        if (desc.catalogInfo.sizeBytes <= 0) {
+            desc.catalogInfo.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
+        }
+
+        // Insert
+        EventManager.publish(Event.CATALOG_ADD, this, desc.catalogInfo, false);
+    }
+
     /**
      * Initializes a particle set. It loads the data from the provider
      *
-     * @param entity            The entity.
-     * @param set               The particle set.
+     * @param entity The entity.
+     * @param set    The particle set.
      */
     private void initializeParticleSet(Entity entity, ParticleSet set) {
-        // Load data
-        try {
-            set.isStars = false;
+        set.isStars = false;
+        boolean initializeDataAndCatalog = set.pointData == null;
 
-            boolean initializeDataAndCatalogInfo = set.pointData == null;
-
-            if (initializeDataAndCatalogInfo) {
+        if (initializeDataAndCatalog && set.provider != null) {
+            // Load data
+            try {
                 Class<?> clazz = Class.forName(set.provider);
                 IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor().newInstance();
                 provider.setProviderParams(set.providerParams);
 
                 set.setData(provider.loadData(set.datafile, set.factor));
+            } catch (Exception e) {
+                Logger.getLogger(this.getClass()).error(e);
+                set.pointData = null;
             }
-
-            computeMinMeanMaxDistances(set);
-            computeMeanPosition(entity, set);
-            setLabelPosition(entity);
-
-            if (initializeDataAndCatalogInfo && Mapper.datasetDescription.has(entity)) {
-                Base base = entity.getComponent(Base.class);
-                DatasetDescription desc = entity.getComponent(DatasetDescription.class);
-                // Create catalog info and broadcast
-                CatalogInfo ci = new CatalogInfo(base.names[0], base.names[0], null, CatalogInfoSource.INTERNAL, 1f, entity);
-                ci.nParticles = set.pointData != null ? set.pointData.size() : -1;
-                Path df = Path.of(Settings.settings.data.dataFile(set.datafile));
-                ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
-
-                // Insert
-                EventManager.publish(Event.CATALOG_ADD, this, ci, false);
-            }
-
-        } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e);
-            set.pointData = null;
         }
+
+        computeMinMeanMaxDistances(set);
+        computeMeanPosition(entity, set);
+        setLabelPosition(entity);
+
+        if (initializeDataAndCatalog && Mapper.datasetDescription.has(entity)) {
+            initializeCatalogInfo(entity, set);
+        }
+
     }
 
     /**
@@ -168,11 +179,12 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      * @param set    The star set.
      */
     public void initializeStarSet(Entity entity, StarSet set) {
-        // Load data
-        try {
-            set.isStars = true;
+        set.isStars = true;
+        boolean initializeDataAndCatalog = set.pointData == null;
 
-            if (set.provider != null && set.pointData == null) {
+        if (initializeDataAndCatalog && set.provider != null) {
+            // Load data
+            try {
                 Class<?> clazz = Class.forName(set.provider);
                 IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
                 provider.setProviderParams(set.providerParams);
@@ -180,11 +192,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 // Set data, generate index
                 List<IParticleRecord> l = provider.loadData(set.datafile, set.factor);
                 set.setData(l);
-            }
 
-        } catch (Exception e) {
-            Logger.getLogger(this.getClass()).error(e);
-            set.pointData = null;
+            } catch (Exception e) {
+                Logger.getLogger(this.getClass()).error(e);
+                set.pointData = null;
+            }
         }
 
         computeMeanPosition(entity, set);
@@ -217,6 +229,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Billboard.
         var bb = Mapper.billboard.get(entity);
         bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardStarSet;
+
+        if (initializeDataAndCatalog && Mapper.datasetDescription.has(entity)) {
+            initializeCatalogInfo(entity, set);
+        }
     }
 
     public void computeMinMeanMaxDistances(ParticleSet set) {
