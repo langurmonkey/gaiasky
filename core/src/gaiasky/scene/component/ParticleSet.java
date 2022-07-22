@@ -308,10 +308,14 @@ public class ParticleSet implements Component {
         this.ccMax = colorMax;
     }
 
-    public void setParticlesizelimits(double[] sizeLimits) {
+    public void setParticleSizeLimits(double[] sizeLimits) {
         if (sizeLimits[0] > sizeLimits[1])
             sizeLimits[0] = sizeLimits[1];
         this.particleSizeLimits = sizeLimits;
+    }
+
+    public void setParticlesizelimits(double[] sizeLimits) {
+        setParticleSizeLimits(sizeLimits);
     }
 
     public IParticleRecord get(int index) {

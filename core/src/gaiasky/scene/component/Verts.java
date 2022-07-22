@@ -35,4 +35,5 @@ public class Verts implements Component {
             Gdx.gl20.glDisable(GL20.GL_BLEND);
         }
     }
+
 }

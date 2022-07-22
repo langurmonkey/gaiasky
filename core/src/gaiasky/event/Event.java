@@ -678,6 +678,8 @@ public enum Event {
      * Passes the OrbitData and the file name.
      **/
     ORBIT_DATA_LOADED,
+    /** Sets the solid angle threshold for orbits and trajectories. **/
+    ORBIT_SOLID_ANGLE_TH_CMD,
     /**
      * Contains the name, the lock orientation boolean value.
      */

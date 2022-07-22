@@ -76,15 +76,6 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     }
 
     /**
-     * Threshold solid angle
-     **/
-    protected static float SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(1.5);
-
-    public static void setSolidAngleThreshold(float angleDeg) {
-        SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(angleDeg);
-    }
-
-    /**
      * Special overlap factor
      */
     protected static final float SHADER_MODEL_OVERLAP_FACTOR = 20f;
@@ -307,7 +298,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                     return;
 
                 boolean added = false;
-                float angleLimit = SOLID_ANGLE_THRESHOLD * camera.getFovFactor();
+                float angleLimit = (float) (Settings.settings.scene.renderer.orbitSolidAngleThreshold * camera.getFovFactor());
                 if (viewAngle > angleLimit) {
                     if (viewAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
                         this.alpha = MathUtilsd.lint(viewAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, cc[3]);

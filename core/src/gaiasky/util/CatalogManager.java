@@ -106,7 +106,12 @@ public class CatalogManager implements IObserver {
                 post = (Boolean) data[2];
             if (addToSg) {
                 // Insert object into scene graph
-                EventManager.publish(post ? Event.SCENE_GRAPH_ADD_OBJECT_CMD : Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, ci.object, true);
+                if(ci.object != null) {
+                    EventManager.publish(post ? Event.SCENE_GRAPH_ADD_OBJECT_CMD : Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, ci.object, true);
+                }
+                if(ci.entity != null) {
+                    EventManager.publish(post ? Event.SCENE_ADD_OBJECT_CMD : Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, ci.entity, true);
+                }
             }
             String key = ci.name;
             if (ciMap.containsKey(key)) {

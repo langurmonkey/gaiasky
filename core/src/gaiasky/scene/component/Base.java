@@ -204,6 +204,10 @@ public class Base implements Component, ICopy {
         }
     }
 
+    public void setComponentType(ComponentType ct) {
+        this.ct = new ComponentTypes(ct);
+    }
+
     public boolean isVisible() {
         return this.visible || msSinceStateChange() <= Settings.settings.scene.fadeMs;
     }

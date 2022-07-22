@@ -3,13 +3,20 @@ package gaiasky.scene.entity;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import gaiasky.GaiaSky;
+import gaiasky.data.group.DatasetOptions;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.*;
+import gaiasky.scene.Scene;
+import gaiasky.scene.component.Body;
+import gaiasky.scene.component.Celestial;
+import gaiasky.scene.component.ParticleSet;
+import gaiasky.scene.component.Verts;
+import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.Settings;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
+
+import java.util.List;
 
 /**
  * This class contains some general utilities applicable to all entities.
@@ -22,6 +29,7 @@ public class EntityUtils {
      *
      * @param entity The entity.
      * @param out    Auxiliary vector to put the result in.
+     *
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(Entity entity, Vector3b out) {
@@ -40,7 +48,6 @@ public class EntityUtils {
         }
     }
 
-
     /**
      * Returns the absolute position of the entity identified by the given name
      * within this entity in the native coordinates (equatorial system) and internal units.
@@ -48,6 +55,7 @@ public class EntityUtils {
      * @param entity The entity.
      * @param name   The name.
      * @param out    Auxiliary vector to put the result in.
+     *
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(Entity entity, String name, Vector3b out) {
@@ -115,4 +123,84 @@ public class EntityUtils {
         celestial.colorPale = new float[] { Math.min(1, body.color[0] + plus), Math.min(1, body.color[1] + plus), Math.min(1, body.color[2] + plus) };
     }
 
+    public static Entity getParticleSet(Scene scene, String name, List<IParticleRecord> data, DatasetOptions datasetOptions) {
+        double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
+        double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
+        double[] particleColor = datasetOptions == null || datasetOptions.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.particleColor;
+        double colorNoise = datasetOptions == null ? 0 : datasetOptions.particleColorNoise;
+        double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
+        double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
+        double[] particleSizeLimits = datasetOptions == null ? new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) } : datasetOptions.particleSizeLimits;
+        double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
+        String ct = datasetOptions == null || datasetOptions.ct == null ? ComponentType.Galaxies.toString() : datasetOptions.ct.toString();
+
+        var archetype = scene.archetypes().get(ParticleGroup.class);
+        Entity entity = archetype.createEntity();
+
+        var base = Mapper.base.get(entity);
+        base.id = ParticleSet.idSeq++;
+        base.setName(name.replace("%%PGID%%", Long.toString(base.id)));
+        base.setCt(ct);
+
+        var body = Mapper.body.get(entity);
+        body.setColor(particleColor);
+        body.setLabelColor(labelColor);
+        body.setSize(particleSize);
+
+        var graph = Mapper.graph.get(entity);
+        graph.setParent(Scene.ROOT_NAME);
+
+        var fade = Mapper.fade.get(entity);
+        fade.setFadeIn(fadeIn);
+        fade.setFadeOut(fadeOut);
+
+
+        var set = Mapper.particleSet.get(entity);
+        set.setData(data);
+        set.setProfileDecay(profileDecay);
+        set.setColorNoise(colorNoise);
+        set.setParticlesizelimits(particleSizeLimits);
+
+        scene.initializeEntity(entity);
+        scene.setUpEntity(entity);
+
+        return entity;
+    }
+
+    public static Entity getStarSet(Scene scene, String name, List<IParticleRecord> data, DatasetOptions datasetOptions) {
+        double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
+        double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
+        double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
+
+        var archetype = scene.archetypes().get(StarGroup.class);
+        Entity entity = archetype.createEntity();
+
+        var base = Mapper.base.get(entity);
+        base.id = ParticleSet.idSeq++;
+        base.setName(name.replace("%%SGID%%", Long.toString(base.id)));
+        base.setComponentType(ComponentType.Stars);
+
+        var body = Mapper.body.get(entity);
+        body.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
+        body.setLabelColor(labelColor);
+        body.setSize(6.0);
+
+        var graph = Mapper.graph.get(entity);
+        graph.setParent(Scene.ROOT_NAME);
+
+        var fade = Mapper.fade.get(entity);
+        fade.setFadeIn(fadeIn);
+        fade.setFadeOut(fadeOut);
+
+        var label = Mapper.label.get(entity);
+        label.setLabelPosition(new double[] { 0.0, -5.0e7, -4e8 });
+
+        var set = Mapper.starSet.get(entity);
+        set.setData(data);
+
+        scene.initializeEntity(entity);
+        scene.setUpEntity(entity);
+
+        return entity;
+    }
 }

@@ -52,7 +52,7 @@ public class Families {
         catalogInfos = Family.all(DatasetDescription.class).exclude(TagNoProcess.class).get();
         gridRecs = Family.all(GridRecursive.class).exclude(TagNoProcess.class).get();
         rulers = Family.all(Ruler.class).exclude(TagNoProcess.class).get();
-        orbitalElementSets = Family.all(OrbitElementsSet.class).get();
+        orbitalElementSets = Family.all(OrbitElementsSet.class).exclude(TagNoProcess.class).get();
         fadeNodes = Family.all(Fade.class).exclude(TagNoProcess.class, TagOctreeObject.class).get();
         backgroundModels = Family.all(TagBackgroundModel.class).exclude(TagNoProcess.class).get();
         sphericalGrids = Family.all(GridUV.class).exclude(TagNoProcess.class).get();

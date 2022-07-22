@@ -627,9 +627,11 @@ public class Settings {
             public double ambient;
             public ShadowSettings shadow;
             public ElevationSettings elevation;
+            @JsonIgnore
+            public double orbitSolidAngleThreshold = Math.toRadians(1.5);
 
             public RendererSettings() {
-                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD);
+                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD);
             }
 
             @JsonIgnoreProperties(ignoreUnknown = true)
@@ -679,6 +681,7 @@ public class Settings {
                 case ELEVATION_MULTIPLIER_CMD -> elevation.multiplier = MathUtilsd.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
                 case ELEVATION_TYPE_CMD -> elevation.type = (ElevationType) data[0];
                 case TESSELLATION_QUALITY_CMD -> elevation.quality = (float) data[0];
+                case ORBIT_SOLID_ANGLE_TH_CMD -> orbitSolidAngleThreshold = (double) data[0];
                 }
             }
 

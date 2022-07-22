@@ -8,6 +8,7 @@ package gaiasky.data;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.StarCluster;
@@ -28,10 +29,7 @@ import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
 import org.apfloat.Apfloat;
-import uk.ac.starlink.table.ColumnInfo;
-import uk.ac.starlink.table.RowSequence;
-import uk.ac.starlink.table.StarTable;
-import uk.ac.starlink.table.StarTableFactory;
+import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
@@ -65,6 +63,8 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
     private Archetype archetype;
     private int numLoaded = 0;
 
+    private Array<Entity> clusters;
+
     private enum ClusterProperties {
         NAME,
         RA,
@@ -80,6 +80,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
 
     @Override
     public void loadData() {
+        clusters = new Array<>();
         // The cluster archetype
         archetype = scene.archetypes().get(StarCluster.class);
         if (active) {
@@ -89,7 +90,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
                     FileHandle f = Settings.settings.data.dataFileHandle(file);
                     InputStream is = f.read();
                     try {
-                        loadClustersCsv(is);
+                        loadClustersCsv(is, clusters);
                     } catch (IOException e) {
                         logger.error(e);
                     } finally {
@@ -103,7 +104,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
                 }
             } else if (dataSource != null) {
                 try {
-                    loadClustersStil(dataSource);
+                    loadClustersStil(dataSource, clusters);
                 } catch (IOException e) {
                     logger.error(e);
                 }
@@ -111,6 +112,10 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
         }
 
         logger.info(I18n.msg("notif.catalog.init", numLoaded));
+    }
+
+    public Array<Entity> getClusters() {
+        return clusters;
     }
 
     @Override
@@ -131,14 +136,13 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
     /**
      * Loads clusters from a STIL data source.
      *
-     * @param ds The data source.
-     *
-     * @throws IOException
+     * @param ds   The data source.
+     * @param list The list to put the loaded objects.
      */
-    private void loadClustersStil(DataSource ds) throws IOException {
+    private void loadClustersStil(DataSource ds, Array<Entity> list) throws IOException {
         // Add extra builders
         StarTableFactory factory = new StarTableFactory();
-        List builders = factory.getDefaultBuilders();
+        List<TableBuilder> builders = factory.getDefaultBuilders();
         builders.add(new CsvTableBuilder());
         builders.add(new AsciiTableBuilder());
 
@@ -172,7 +176,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
             double radius = getDouble(row, ClusterProperties.RADIUS, indices, table, "deg");
             int nstars = getInteger(row, ClusterProperties.NSTARS, indices);
 
-            addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars);
+            addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars, list);
         }
     }
 
@@ -180,10 +184,9 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
      * Loads clusters from a CSV file directly.
      *
      * @param data The CSV file input stream.
-     *
-     * @throws IOException
+     * @param list The list to put the loaded objects.
      */
-    private void loadClustersCsv(InputStream data) throws IOException {
+    private void loadClustersCsv(InputStream data, Array<Entity> list) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
 
         String header = br.readLine();
@@ -215,12 +218,12 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
             double radius = getDouble(tokens, ClusterProperties.RADIUS, indices);
             int nstars = getInteger(tokens, ClusterProperties.NSTARS, indices);
 
-            addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars);
+            addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars, list);
         }
 
     }
 
-    private void addCluster(String[] names, double ra, double rarad, double dec, double decrad, double dist, double distpc, double mualphastar, double mudelta, double radvel, double radius, int nstars) {
+    private void addCluster(String[] names, double ra, double rarad, double dec, double decrad, double dist, double distpc, double mualphastar, double mudelta, double radvel, double radius, int nstars, Array<Entity> list) {
         Vector3b pos = Coordinates.sphericalToCartesian(rarad, decrad, new Apfloat(dist, Constants.PREC), new Vector3b());
 
         Vector3d pmv = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc, new Vector3d());
@@ -254,6 +257,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
         cluster.dist = posSph.z;
 
         scene.engine.addEntity(entity);
+        list.add(entity);
 
         numLoaded += 1;
     }

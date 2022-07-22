@@ -116,24 +116,20 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.focusPositionSph = new Vector2d();
     }
 
-    private void initializeParticleSet(Entity entity, ParticleSet set) {
-        initializeParticleSet(entity, set, true, true);
-    }
-
     /**
      * Initializes a particle set. It loads the data from the provider
      *
      * @param entity            The entity.
      * @param set               The particle set.
-     * @param dataLoad          Whether to load the data.
-     * @param createCatalogInfo Whether to initialize the catalog info.
      */
-    private void initializeParticleSet(Entity entity, ParticleSet set, boolean dataLoad, boolean createCatalogInfo) {
+    private void initializeParticleSet(Entity entity, ParticleSet set) {
         // Load data
         try {
             set.isStars = false;
 
-            if (dataLoad) {
+            boolean initializeDataAndCatalogInfo = set.pointData == null;
+
+            if (initializeDataAndCatalogInfo) {
                 Class<?> clazz = Class.forName(set.provider);
                 IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor().newInstance();
                 provider.setProviderParams(set.providerParams);
@@ -145,7 +141,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
             computeMeanPosition(entity, set);
             setLabelPosition(entity);
 
-            if (createCatalogInfo && Mapper.datasetDescription.has(entity)) {
+            if (initializeDataAndCatalogInfo && Mapper.datasetDescription.has(entity)) {
                 Base base = entity.getComponent(Base.class);
                 DatasetDescription desc = entity.getComponent(DatasetDescription.class);
                 // Create catalog info and broadcast

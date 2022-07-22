@@ -119,7 +119,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem track = new MenuItem(I18n.msg("context.track", candidateNameShort), skin, skin.getDrawable("highlight-on"));
             track.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.CAMERA_TRACKING_OBJECT_CMD, track, candidate, candidateName);
+                    EventManager.publish(Event.CAMERA_TRACKING_OBJECT_CMD, track, candidate.getEntity(), candidateName);
                 }
                 return false;
             });

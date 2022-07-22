@@ -161,7 +161,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * The tracking object, if any
      */
-    private IFocus trackingObject;
+    private FocusView trackingObject;
     /**
      * The name of the tracking object
      */
@@ -279,6 +279,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         this.previousOrientation = new Matrix4d();
         this.focus = new FocusView();
         this.focusView = new FocusView();
+        this.trackingObject = new FocusView();
         this.vr = vr;
         initialize(spriteShader, shapeShader);
 
@@ -1457,7 +1458,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case CAMERA_TRACKING_OBJECT_CMD:
-            final IFocus newTrackingObject = (IFocus) data[0];
+            final Entity newTrackingObject = (Entity) data[0];
             final String newTrackingName = (String) data[1];
             synchronized (updateLock) {
                 this.setTrackingObject(newTrackingObject, newTrackingName != null ? newTrackingName.toLowerCase() : null);
@@ -1913,8 +1914,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         return currentMouseKbdListener;
     }
 
-    private void setTrackingObject(final IFocus trackingObject, final String trackingName) {
-        this.trackingObject = trackingObject;
+    private void setTrackingObject(final Entity trackingObject, final String trackingName) {
+        this.trackingObject.setEntity(trackingObject);
         this.trackingName = trackingName;
         EventManager.publish(Event.CAMERA_TRACKING_OBJECT_UPDATE, this, trackingObject, trackingName);
     }

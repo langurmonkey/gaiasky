@@ -18,7 +18,7 @@ public class KeyframeUtils {
 
     public Entity newVerts(String name, ComponentTypes ct, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize) {
         var entity = scene.archetypes().get(VertsObject.class.getName()).createEntity();
-        entity.add(new TagNoProcess());
+        entity.add(scene.engine.createComponent(TagNoProcess.class));
 
         var base = Mapper.base.get(entity);
         base.setName(name);

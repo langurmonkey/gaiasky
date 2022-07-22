@@ -41,6 +41,7 @@ public class Mapper {
     public static final ComponentMapper<Billboard> billboard = ComponentMapper.getFor(Billboard.class);
     public static final ComponentMapper<SolidAngle> sa = ComponentMapper.getFor(SolidAngle.class);
     public static final ComponentMapper<Line> line = ComponentMapper.getFor(Line.class);
+    public static final ComponentMapper<Arrow> arrow = ComponentMapper.getFor(Arrow.class);
     public static final ComponentMapper<Atmosphere> atmosphere = ComponentMapper.getFor(Atmosphere.class);
     public static final ComponentMapper<Cloud> cloud = ComponentMapper.getFor(Cloud.class);
     public static final ComponentMapper<ModelScaffolding> modelScaffolding = ComponentMapper.getFor(ModelScaffolding.class);

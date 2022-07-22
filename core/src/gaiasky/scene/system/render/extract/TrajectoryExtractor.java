@@ -18,15 +18,6 @@ import gaiasky.util.math.MathUtilsd;
 public class TrajectoryExtractor extends AbstractExtractSystem {
 
     /**
-     * Threshold solid angle for trajectories.
-     **/
-    protected static float SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(1.5);
-
-    public static void setSolidAngleThreshold(float angleDeg) {
-        SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(angleDeg);
-    }
-
-    /**
      * Special overlap factor
      */
     protected static final float SHADER_MODEL_OVERLAP_FACTOR = 20f;
@@ -61,7 +52,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                     return;
 
                 boolean added = false;
-                float angleLimit = SOLID_ANGLE_THRESHOLD * camera.getFovFactor();
+                float angleLimit = (float) Settings.settings.scene.renderer.orbitSolidAngleThreshold * camera.getFovFactor();
                 if (body.solidAngle > angleLimit) {
                     if (body.solidAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
                         trajectory.alpha = MathUtilsd.lint(body.solidAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, body.color[3]);

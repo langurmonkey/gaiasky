@@ -6,7 +6,7 @@ public class Arrow implements Component {
     /**
      * Paint arrow caps
      */
-    private boolean arrowCap = true;
+    public boolean arrowCap = true;
 
     public void setArrowCap(boolean arrowCap) {
         this.arrowCap = arrowCap;
