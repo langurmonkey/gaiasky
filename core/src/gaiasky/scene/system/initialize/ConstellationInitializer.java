@@ -7,6 +7,7 @@ import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scene.entity.ConstellationRadio;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
@@ -19,10 +20,15 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 
+import java.util.Map;
+
 public class ConstellationInitializer extends AbstractInitSystem {
 
-    public ConstellationInitializer(boolean setUp, Family family, int priority) {
+    private final Scene scene;
+
+    public ConstellationInitializer(Scene scene, boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
+        this.scene = scene;
     }
 
     @Override
@@ -34,7 +40,6 @@ public class ConstellationInitializer extends AbstractInitSystem {
 
         constel.posd = new Vector3d();
         constel.alpha = 0.4f;
-
 
         if (body.color == null) {
             body.color = new float[] { 0.5f, 1f, 0.5f, constel.alpha };
@@ -59,9 +64,24 @@ public class ConstellationInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         var constel = Mapper.constel.get(entity);
 
-        int nPairs = constel.ids.size;
-        if (constel.lines == null) {
-            constel.lines = new IPosition[nPairs][];
+        if (!constel.allLoaded) {
+            int nPairs = constel.ids.size;
+            if (constel.lines == null) {
+                constel.lines = new IPosition[nPairs][];
+            }
+            Map<Integer, IPosition> hipMap = scene.index().getHipMap();
+            constel.allLoaded = true;
+            for (int i = 0; i < nPairs; i++) {
+                int[] pair = constel.ids.get(i);
+                IPosition s1, s2;
+                s1 = hipMap.get(pair[0]);
+                s2 = hipMap.get(pair[1]);
+                if (constel.lines[i] == null && s1 != null && s2 != null) {
+                    constel.lines[i] = new IPosition[] { s1, s2 };
+                } else {
+                    constel.allLoaded = false;
+                }
+            }
         }
     }
 }

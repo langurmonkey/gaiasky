@@ -7,6 +7,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagNoProcess;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
@@ -15,6 +16,7 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.IPosition;
 import net.jafama.FastMath;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -219,7 +221,6 @@ public class GraphUpdater extends AbstractUpdateSystem {
     public boolean mustUpdateLoc(Entity entity, GraphNode graph) {
         var parentBody = Mapper.body.get(graph.parent);
         var parentSa = Mapper.sa.get(graph.parent);
-        var loc = Mapper.loc.get(entity);
 
         boolean update = parentBody.solidAngle > parentSa.thresholdQuad * 30f;
         if(update) {

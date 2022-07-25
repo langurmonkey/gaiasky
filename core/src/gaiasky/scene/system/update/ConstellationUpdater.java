@@ -17,7 +17,7 @@ public class ConstellationUpdater extends AbstractUpdateSystem {
     public ConstellationUpdater(Family family, int priority) {
         super(family, priority);
 
-        D31= new Vector3d();
+        D31 = new Vector3d();
     }
 
     @Override

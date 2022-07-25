@@ -228,7 +228,7 @@ public class Scene {
             addInitializer(new RaymarchingInitializer(setUp, families.raymarchings, priority++));
             addInitializer(new BackgroundModelInitializer(setUp, families.backgroundModels, priority++));
             addInitializer(new ClusterInitializer(setUp, families.clusters, priority++));
-            addInitializer(new ConstellationInitializer(setUp, families.constellations, priority++));
+            addInitializer(new ConstellationInitializer(this, setUp, families.constellations, priority++));
             addInitializer(new BoundariesInitializer(setUp, families.boundaries, priority++));
             addInitializer(new ElementsSetInitializer(setUp, families.orbitalElementSets, priority++));
             addInitializer(new MeshInitializer(setUp, families.meshes, priority++));

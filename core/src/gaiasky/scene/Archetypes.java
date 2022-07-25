@@ -180,7 +180,7 @@ public class Archetypes {
             addArchetype(StarGroup.class.getName(), GenericCatalog.class.getName(), StarSet.class, Model.class, Label.class, Line.class, Focus.class, Billboard.class);
 
             // Constellation
-            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class, Label.class);
+            addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class, Label.class, TagNoProcessGraph.class);
 
             // ConstellationBoundaries
             addArchetype(ConstellationBoundaries.class.getName(), SceneGraphNode.class.getName(), Boundaries.class, Line.class);
