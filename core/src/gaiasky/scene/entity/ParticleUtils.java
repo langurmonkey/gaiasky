@@ -40,7 +40,7 @@ public class ParticleUtils {
     }
 
     public float highlightedSizeFactor(Highlight highlight, DatasetDescription datasetDesc) {
-        return (highlight.highlighted && datasetDesc.catalogInfo != null) ? datasetDesc.catalogInfo.hlSizeFactor : getPointscaling(highlight);
+        return ((highlight.highlighted && datasetDesc.catalogInfo != null) ? datasetDesc.catalogInfo.hlSizeFactor : 1) * getPointscaling(highlight);
     }
 
     public float getPointscaling(Highlight highlight) {
