@@ -96,6 +96,11 @@ public class CatalogInfo {
     public void setVisibility(boolean visibility) {
         if (this.object != null) {
             this.object.setVisibleGroup(visibility);
+        } else if (this.entity != null) {
+            synchronized (view) {
+                view.setEntity(this.entity);
+                view.setVisibleGroup(visibility);
+            }
         }
     }
 

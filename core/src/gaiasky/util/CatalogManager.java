@@ -116,10 +116,10 @@ public class CatalogManager implements IObserver {
             String key = ci.name;
             if (ciMap.containsKey(key)) {
                 int i = 1;
-                String newKey = ci.name + "(" + i + ")";
+                String newKey = ci.name + " (" + i + ")";
                 while (ciMap.containsKey(newKey)) {
                     i++;
-                    newKey = ci.name + "(" + i + ")";
+                    newKey = ci.name + " (" + i + ")";
                 }
                 ci.name = newKey;
                 key = newKey;

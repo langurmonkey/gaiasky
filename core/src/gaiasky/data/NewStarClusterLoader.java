@@ -308,15 +308,15 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
         return 0;
     }
 
-    private int getInteger(String[] tokens, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
-        String s = get(tokens, prop, indices);
+    private int getInteger(String[] tokens, ClusterProperties properties, Map<ClusterProperties, Integer> indices) {
+        String s = get(tokens, properties, indices);
         if (s != null)
             return Parser.parseInt(s);
         return 0;
     }
 
-    private int getInteger(Object[] row, ClusterProperties prop, Map<ClusterProperties, Integer> indices) {
-        Object s = get(row, prop, indices);
+    private int getInteger(Object[] row, ClusterProperties properties, Map<ClusterProperties, Integer> indices) {
+        Object s = get(row, properties, indices);
         if (s != null)
             return ((Number) s).intValue();
         return 0;

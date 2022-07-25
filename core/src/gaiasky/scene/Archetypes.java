@@ -141,10 +141,13 @@ public class Archetypes {
             addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), TagHeliotropic.class);
 
             // FadeNode
-            addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class, DatasetDescription.class, Highlight.class);
+            addArchetype(FadeNode.class.getName(), SceneGraphNode.class.getName(), Fade.class, Label.class);
+
+            // GenericCatalog
+            addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName(), DatasetDescription.class, Highlight.class);
 
             // MeshObject
-            addArchetype(MeshObject.class.getName(), SceneGraphNode.class.getName(), Mesh.class, Fade.class, Label.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
+            addArchetype(MeshObject.class.getName(), FadeNode.class.getName(), Mesh.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
 
             // BackgroundModel
             addArchetype(BackgroundModel.class.getName(), FadeNode.class.getName(), TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
@@ -171,10 +174,10 @@ public class Archetypes {
             addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class);
 
             // ParticleGroup
-            addArchetype(ParticleGroup.class.getName(), FadeNode.class.getName(), ParticleSet.class, TagNoProcessChildren.class, Focus.class);
+            addArchetype(ParticleGroup.class.getName(), GenericCatalog.class.getName(), ParticleSet.class, TagNoProcessChildren.class, Focus.class);
 
             // StarGroup
-            addArchetype(StarGroup.class.getName(), FadeNode.class.getName(), StarSet.class, Model.class, Label.class, Line.class, Focus.class, Billboard.class);
+            addArchetype(StarGroup.class.getName(), GenericCatalog.class.getName(), StarSet.class, Model.class, Label.class, Line.class, Focus.class, Billboard.class);
 
             // Constellation
             addArchetype(Constellation.class.getName(), SceneGraphNode.class.getName(), Constel.class, Line.class, Label.class);
@@ -185,9 +188,6 @@ public class Archetypes {
             // CosmicRuler
             addArchetype(CosmicRuler.class.getName(), SceneGraphNode.class.getName(), Ruler.class, Line.class, Label.class);
 
-            // GenericCatalog
-            addArchetype(GenericCatalog.class.getName(), FadeNode.class.getName());
-
             // OrbitalElementsGroup
             addArchetype(OrbitalElementsGroup.class.getName(), GenericCatalog.class.getName(), OrbitElementsSet.class, TagNoProcessChildren.class);
 
@@ -195,7 +195,7 @@ public class Archetypes {
             addArchetype(Invisible.class.getName(), CelestialBody.class.getName(), Raymarching.class, TagInvisible.class);
 
             // AbstractOctreeWrapper
-            addArchetype(OctreeWrapper.class.getName(), SceneGraphNode.class.getName(), Fade.class, Highlight.class, Octree.class, Octant.class, DatasetDescription.class, TagNoProcessChildren.class);
+            addArchetype(OctreeWrapper.class.getName(), SceneGraphNode.class.getName(), Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
 
             // ShapeObject
             addArchetype(ShapeObject.class.getName(), SceneGraphNode.class.getName(), Model.class, Shape.class, Label.class, Line.class);

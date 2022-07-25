@@ -53,6 +53,7 @@ public class SceneGraphJsonLoader {
         // Initialize nodes and look for octrees
         boolean hasOctree = false;
         boolean hasStarGroup = false;
+        int idx = 0;
         for (SceneGraphNode node : nodes) {
             node.initialize();
             if (node instanceof OctreeWrapper) {
@@ -69,6 +70,7 @@ public class SceneGraphJsonLoader {
 
             if (node instanceof StarGroup)
                 hasStarGroup = true;
+            idx++;
         }
 
         sg = new SceneGraph(nodes.size);

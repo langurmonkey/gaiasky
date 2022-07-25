@@ -20,11 +20,4 @@ public class GenericCatalog extends FadeNode {
         super();
     }
 
-    @Override
-    public void initialize() {
-        super.initialize();
-        // Create catalog info
-        initializeCatalogInfo(true, getName(), description, -1, null);
-    }
-
 }

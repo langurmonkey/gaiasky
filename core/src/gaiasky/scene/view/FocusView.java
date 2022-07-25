@@ -211,6 +211,37 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         }
     }
 
+    public int getNumParticles() {
+        var set = getSet();
+        if (set != null) {
+            // Particles in set.
+            return set.data().size();
+        } else if (Mapper.octree.has(entity)) {
+            // Number of objects in root node.
+            return Mapper.octant.get(entity).octant.numObjectsRec;
+        } else if (Mapper.datasetDescription.has(entity)) {
+            if (graph.children != null && !graph.children.isEmpty()) {
+                // Get number of children.
+                return graph.numChildren;
+            } else {
+                // Only us.
+                return 1;
+            }
+        } else {
+            // Only us.
+            return 1;
+        }
+    }
+
+    public String getDataFile() {
+        var set = getSet();
+        if (set != null) {
+            return set.datafile;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public boolean isVisible(String name) {
         var set = getSet();
@@ -911,7 +942,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public void highlight(boolean state, float[] color, boolean allVisible) {
         initHighlight();
         var set = getSet();
-        if(set != null) {
+        if (set != null) {
             set.markForUpdate(Mapper.render.get(entity));
         }
 
@@ -935,7 +966,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public void highlight(boolean state, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
         initHighlight();
         var set = getSet();
-        if(set != null) {
+        if (set != null) {
             set.markForUpdate(Mapper.render.get(entity));
         }
 

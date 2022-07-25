@@ -116,27 +116,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         set.focusPositionSph = new Vector2d();
     }
 
-    private void initializeCatalogInfo(Entity entity, ParticleSet set) {
-        var base = Mapper.base.get(entity);
-        var desc = Mapper.datasetDescription.get(entity);
-
-        Path df = Path.of(Settings.settings.data.dataFile(set.datafile));
-        if (desc.catalogInfo == null) {
-            desc.catalogInfo = new CatalogInfo(base.getName(), base.getName(), df.toString(), CatalogInfoSource.INTERNAL, 1f, entity);
-        }
-
-        if (desc.catalogInfo.nParticles <= 0) {
-            desc.catalogInfo.nParticles = set.pointData != null ? set.pointData.size() : -1;
-        }
-
-        if (desc.catalogInfo.sizeBytes <= 0) {
-            desc.catalogInfo.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
-        }
-
-        // Insert
-        EventManager.publish(Event.CATALOG_ADD, this, desc.catalogInfo, false);
-    }
-
     /**
      * Initializes a particle set. It loads the data from the provider
      *
@@ -145,9 +124,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      */
     private void initializeParticleSet(Entity entity, ParticleSet set) {
         set.isStars = false;
-        boolean initializeDataAndCatalog = set.pointData == null;
+        boolean initializeData = set.pointData == null;
 
-        if (initializeDataAndCatalog && set.provider != null) {
+        if (initializeData && set.provider != null) {
             // Load data
             try {
                 Class<?> clazz = Class.forName(set.provider);
@@ -165,10 +144,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         computeMeanPosition(entity, set);
         setLabelPosition(entity);
 
-        if (initializeDataAndCatalog && Mapper.datasetDescription.has(entity)) {
-            initializeCatalogInfo(entity, set);
-        }
-
     }
 
     /**
@@ -180,9 +155,9 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      */
     public void initializeStarSet(Entity entity, StarSet set) {
         set.isStars = true;
-        boolean initializeDataAndCatalog = set.pointData == null;
+        boolean initializeData = set.pointData == null;
 
-        if (initializeDataAndCatalog && set.provider != null) {
+        if (initializeData && set.provider != null) {
             // Load data
             try {
                 Class<?> clazz = Class.forName(set.provider);
@@ -230,9 +205,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var bb = Mapper.billboard.get(entity);
         bb.renderConsumer = BillboardEntityRenderSystem::renderBillboardStarSet;
 
-        if (initializeDataAndCatalog && Mapper.datasetDescription.has(entity)) {
-            initializeCatalogInfo(entity, set);
-        }
     }
 
     public void computeMinMeanMaxDistances(ParticleSet set) {

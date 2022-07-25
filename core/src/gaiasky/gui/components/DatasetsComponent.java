@@ -87,7 +87,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
         }
 
-        if(ci.entity != null) {
+        if (ci.entity != null) {
             if (source != eye) {
                 eye.setCheckedNoFire(!visible);
             }
@@ -107,7 +107,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
             EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight);
         }
-        if(ci.entity != null) {
+        if (ci.entity != null) {
             if (source != mark) {
                 mark.setCheckedNoFire(highlight);
             }

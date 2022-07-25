@@ -27,10 +27,7 @@ import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
 import org.apfloat.Apfloat;
-import uk.ac.starlink.table.ColumnInfo;
-import uk.ac.starlink.table.RowSequence;
-import uk.ac.starlink.table.StarTable;
-import uk.ac.starlink.table.StarTableFactory;
+import uk.ac.starlink.table.*;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
@@ -105,12 +102,11 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
      * Loads clusters from a STIL data source.
      * @param ds The data source.
      * @param clusters The clusters list.
-     * @throws IOException
      */
     private void loadClustersStil(DataSource ds, Array<StarCluster> clusters) throws IOException {
         // Add extra builders
         StarTableFactory factory = new StarTableFactory();
-        List builders = factory.getDefaultBuilders();
+        List<TableBuilder> builders = factory.getDefaultBuilders();
         builders.add(new CsvTableBuilder());
         builders.add(new AsciiTableBuilder());
 
@@ -156,7 +152,6 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
      * Loads clusters from a CSV file directly.
      * @param data The CSV file input stream.
      * @param clusters The clusters list.
-     * @throws IOException
      */
     private void loadClustersCsv(InputStream data, Array<StarCluster> clusters) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(data));

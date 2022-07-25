@@ -226,7 +226,6 @@ public class Scene {
             addInitializer(new BillboardSetInitializer(setUp, families.billboardSets, priority++));
             addInitializer(new AxesInitializer(setUp, families.axes, priority++));
             addInitializer(new RaymarchingInitializer(setUp, families.raymarchings, priority++));
-            addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority++));
             addInitializer(new BackgroundModelInitializer(setUp, families.backgroundModels, priority++));
             addInitializer(new ClusterInitializer(setUp, families.clusters, priority++));
             addInitializer(new ConstellationInitializer(setUp, families.constellations, priority++));
@@ -238,7 +237,8 @@ public class Scene {
             addInitializer(new TitleInitializer(setUp, families.titles, priority++));
             addInitializer(new KeyframeInitializer(this, setUp, families.keyframes, priority++));
             addInitializer(new ShapeInitializer(setUp, families.shapes, priority++));
-            addInitializer(new LocInitializer(setUp, families.locations, priority));
+            addInitializer(new LocInitializer(setUp, families.locations, priority++));
+            addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority));
 
             // Run once
             runOnce(initializers);

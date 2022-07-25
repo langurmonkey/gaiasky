@@ -401,7 +401,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Event.SCENE_GRAPH_LOADED, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD, Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD, Event.CATALOG_VISIBLE, Event.CATALOG_REMOVE, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
+        EventManager.instance.subscribe(this, Event.SCENE_GRAPH_LOADED, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD,
+                Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN,
+                Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD,
+                Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO,
+                Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -1407,14 +1411,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 boolean found = false;
                 if (data[0] instanceof Entity) {
                     var entity = (Entity) data[0];
-                    if(Mapper.octree.has(entity)) {
+                    if (Mapper.octree.has(entity)) {
                         // Octree wrapper.
                         var root = Mapper.octant.get(entity);
                         OctreeNode octant = this.focus.getOctant();
                         if (octant != null && octant.getRoot() == root.octant) {
                             found = true;
                         }
-                    }else if(Mapper.datasetDescription.has(entity)) {
+                    } else if (Mapper.datasetDescription.has(entity)) {
                         // Generic catalog.
                         var graph = Mapper.graph.get(entity);
                         found = graph.children != null && graph.children.contains(focus.getEntity(), true);

@@ -388,8 +388,7 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_PER_OBJECT_VISIBILITY_ACTION:
                 if (indVisWindow == null) {
-                    final ISceneGraph sg = GaiaSky.instance.sceneGraph;
-                    indVisWindow = new IndividualVisibilityWindow(sg, ui, skin);
+                    indVisWindow = new IndividualVisibilityWindow(scene, sceneGraph, ui, skin);
                 }
                 if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
                     indVisWindow.show(ui);

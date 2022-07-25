@@ -189,6 +189,10 @@ public class Base implements Component, ICopy {
         this.addName(altname);
     }
 
+    public boolean hasCt(ComponentType ct) {
+        return ct != null && this.ct.isEnabled(ct);
+    }
+
     public void setCt(String ct) {
         this.ct = new ComponentTypes();
         if (!ct.isEmpty())
