@@ -53,7 +53,6 @@ public class Area extends SceneGraphNode implements ILineRenderable {
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        int n = loc3d.length;
         for (float[][] linePoints : loc3d) {
             int m = linePoints.length;
             for (int pointIndex = 1; pointIndex < m; pointIndex++) {
@@ -62,7 +61,6 @@ public class Area extends SceneGraphNode implements ILineRenderable {
             // Close line
             renderer.addLine(this, linePoints[m - 1][0], linePoints[m - 1][1], linePoints[m - 1][2], linePoints[0][0], linePoints[0][1], linePoints[0][2], cc[0], cc[1], cc[2], alpha * opacity);
         }
-
     }
 
     @Override
@@ -94,7 +92,6 @@ public class Area extends SceneGraphNode implements ILineRenderable {
             if (!copy) {
                 addToRenderLists(camera);
             }
-            //            }
         }
     }
 

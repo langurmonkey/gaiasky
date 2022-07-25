@@ -238,6 +238,7 @@ public class Scene {
             addInitializer(new KeyframeInitializer(this, setUp, families.keyframes, priority++));
             addInitializer(new ShapeInitializer(setUp, families.shapes, priority++));
             addInitializer(new LocInitializer(setUp, families.locations, priority++));
+            addInitializer(new PerimeterInitializer(setUp, families.perimeters, priority++));
             addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority));
 
             // Run once
@@ -313,6 +314,7 @@ public class Scene {
             addUpdater(new KeyframeUpdater(families.keyframes, priority++));
             addUpdater(new ShapeUpdater(families.shapes, priority++));
             addUpdater(new LocUpdater(families.locations, priority++));
+            addUpdater(new PerimeterUpdater(families.perimeters, priority++));
 
             // Extract systems.
             extractors = new Array<>(18);
@@ -334,7 +336,8 @@ public class Scene {
             addExtractor(newExtractor(TitleExtractor.class, families.titles, priority++, sceneRenderer));
             addExtractor(newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer));
             addExtractor(newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer));
-            addExtractor(newExtractor(LocExtractor.class, families.locations, priority, sceneRenderer));
+            addExtractor(newExtractor(LocExtractor.class, families.locations, priority++, sceneRenderer));
+            addExtractor(newExtractor(PerimeterExtractor.class, families.perimeters, priority, sceneRenderer));
 
             // Remove all remaining systems.
             engine.removeAllSystems();

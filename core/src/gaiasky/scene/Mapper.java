@@ -64,6 +64,7 @@ public class Mapper {
     public static final ComponentMapper<GridRecursive> gridRec = ComponentMapper.getFor(GridRecursive.class);
     public static final ComponentMapper<Ruler> ruler = ComponentMapper.getFor(Ruler.class);
     public static final ComponentMapper<Keyframes> keyframes = ComponentMapper.getFor(Keyframes.class);
+    public static final ComponentMapper<Perimeter> perimeter = ComponentMapper.getFor(Perimeter.class);
 
 
     // Tags

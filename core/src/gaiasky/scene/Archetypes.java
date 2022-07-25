@@ -171,7 +171,7 @@ public class Archetypes {
             addArchetype(Loc.class.getName(), SceneGraphNode.class.getName(), LocationMark.class, Label.class);
 
             // Area
-            addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class);
+            addArchetype(Area.class.getName(), SceneGraphNode.class.getName(), Perimeter.class, Line.class, TagNoProcessGraph.class);
 
             // ParticleGroup
             addArchetype(ParticleGroup.class.getName(), GenericCatalog.class.getName(), ParticleSet.class, TagNoProcessChildren.class, Focus.class);

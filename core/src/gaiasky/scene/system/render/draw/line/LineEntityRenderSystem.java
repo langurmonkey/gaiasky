@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
@@ -49,8 +48,23 @@ public class LineEntityRenderSystem {
     public LineEntityRenderSystem() {
         this.lineView = new LineView();
     }
+
     public LineEntityRenderSystem(LineView view) {
         this.lineView = view;
+    }
+
+    public void renderPerimeter(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        var perimeter = Mapper.perimeter.get(entity);
+        var cc = lineView.body.color;
+
+        for (float[][] linePoints : perimeter.loc3d) {
+            int m = linePoints.length;
+            for (int pointIndex = 1; pointIndex < m; pointIndex++) {
+                renderer.addLine(lineView, linePoints[pointIndex - 1][0], linePoints[pointIndex - 1][1], linePoints[pointIndex - 1][2], linePoints[pointIndex][0], linePoints[pointIndex][1], linePoints[pointIndex][2], cc[0], cc[1], cc[2], alpha * lineView.base.opacity);
+            }
+            // Close line
+            renderer.addLine(lineView, linePoints[m - 1][0], linePoints[m - 1][1], linePoints[m - 1][2], linePoints[0][0], linePoints[0][1], linePoints[0][2], cc[0], cc[1], cc[2], alpha * lineView.base.opacity);
+        }
     }
 
     public void renderAxes(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
@@ -71,7 +85,7 @@ public class LineEntityRenderSystem {
         }
     }
 
-    public void renderRuler(Entity  entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+    public void renderRuler(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var body = lineView.body;
         var ruler = Mapper.ruler.get(entity);
 
@@ -113,7 +127,7 @@ public class LineEntityRenderSystem {
         }
     }
 
-    public void renderConstellationBoundaries(Entity entity,  LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+    public void renderConstellationBoundaries(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var base = lineView.base;
         var body = lineView.body;
         var bound = Mapper.bound.get(entity);
