@@ -131,7 +131,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
         var hl = Mapper.highlight.get(render.entity);
         var desc = Mapper.datasetDescription.get(render.entity);
 
-        float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+        float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
         synchronized (render) {
             if (!set.disposed) {
@@ -165,7 +165,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                             // VARIABLE STARS (magnitudes and times)
                             tempInstanceAttribs[curr.instanceIdx + nVariOffset] = particle.nVari;
                             for (int k = 0; k < particle.nVari; k++) {
-                                tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
                                 tempInstanceAttribs[curr.instanceIdx + variTimesOffset + k] = (float) particle.variTime(k);
                             }
 
@@ -205,7 +205,7 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
                     }
 
                     triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * hlSizeFactor;
+                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                     shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                     // Days since epoch

@@ -148,7 +148,7 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                 var hl = Mapper.highlight.get(render.entity);
                 var desc = Mapper.datasetDescription.get(render.entity);
 
-                float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+                float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
                 synchronized (render) {
                     if (!set.disposed) {
@@ -181,9 +181,9 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                                     tempVerts[curr.vertexIdx + nVariOffset] = particle.nVari;
                                     for (int k = 0; k < particle.nVari; k++) {
                                         if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor);
                                         } else {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * sizeFactor;
                                         }
                                         tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) particle.variTime(k);
                                     }
@@ -224,7 +224,7 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
                             shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && hl.isHlAllVisible() ? opacityLimitsHl : opacityLimits, 0, 2);
 
                             alphaSizeBrRc[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * hlSizeFactor) / camera.getFovFactor();
+                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
                             shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
                             // Days since epoch

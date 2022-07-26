@@ -148,7 +148,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                 var hl = Mapper.highlight.get(render.entity);
                 var desc = Mapper.datasetDescription.get(render.entity);
 
-                float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+                float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
                 synchronized (render) {
                     if (!set.disposed) {
@@ -179,9 +179,9 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
 
                                     // SIZE
                                     if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor);
+                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor);
                                     } else {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
                                     }
 
                                     // POSITION [u]
@@ -218,7 +218,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                             shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && hl.isHlAllVisible() ? opacityLimitsHlShowAll : opacityLimits, 0, 2);
 
                             alphaSizeBrRc[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * hlSizeFactor) / camera.getFovFactor();
+                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
                             shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
                             // Days since epoch

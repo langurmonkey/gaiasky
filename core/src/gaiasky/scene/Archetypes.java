@@ -194,7 +194,7 @@ public class Archetypes {
             // Invisible
             addArchetype(Invisible.class.getName(), CelestialBody.class.getName(), Raymarching.class, TagInvisible.class);
 
-            // AbstractOctreeWrapper
+            // OctreeWrapper
             addArchetype(OctreeWrapper.class.getName(), SceneGraphNode.class.getName(), Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
 
             // ShapeObject

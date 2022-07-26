@@ -115,7 +115,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
         var hl = Mapper.highlight.get(render.entity);
         var desc = Mapper.datasetDescription.get(render.entity);
 
-        float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+        float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
         synchronized (render) {
             if (!set.disposed) {
@@ -147,7 +147,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                             }
 
                             // SIZE
-                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
 
                             // PROPER MOTION [u/yr]
                             tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
@@ -185,7 +185,7 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
                     }
 
                     triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * hlSizeFactor;
+                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                     shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                     // Days since epoch

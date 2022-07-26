@@ -37,6 +37,7 @@ public abstract class AbstractView {
      */
     public void setEntity(Entity entity) {
         if (this.entity != entity) {
+            clearEntity();
             entityCheck(entity);
             this.entity = entity;
             entityChanged();

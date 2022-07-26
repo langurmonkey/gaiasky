@@ -197,10 +197,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         logger.info(I18n.msg("notif.loading", metadata));
 
         MetadataBinaryIO metadataReader = new MetadataBinaryIO();
-        OctreeNode rootOctant = metadataReader.readMetadataMapped(metadata);
+        final OctreeNode rootOctant = metadataReader.readMetadataMapped(metadata);
         rootOctant.setOctantLoader(this, true);
 
-        if (rootOctant != null) {
+        {
             logger.info(I18n.msg("notif.nodeloader", rootOctant.numNodesRec(), metadata));
             logger.info(I18n.msg("notif.loading", particles));
 
@@ -217,7 +217,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoSource.LOD, 1.5f, entity);
             ci.nParticles = params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
-            EventManager.publish(Event.CATALOG_ADD, this, ci, false);
 
             var octree = Mapper.octree.get(entity);
             octree.roulette = new ArrayList<>(Math.min(10, (int) (rootOctant.numObjectsRec * 0.5)));
@@ -249,9 +248,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             }
 
             return entity;
-        } else {
-            logger.info("Dataset not found: " + metadata + " - " + particles);
-            return null;
         }
     }
 
@@ -264,8 +260,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      *                      not (startup)
      *
      * @return True if the octant was loaded, false otherwise
-     *
-     * @throws IOException When the octant file could not be read.
      */
     public boolean loadOctant(final OctreeNode octreeNode, final Entity octreeWrapper, final boolean fullInit) {
         FileHandle octantFile = Settings.settings.data.dataFileHandle(particles + "particles_" + String.format("%06d", octreeNode.pageId) + ".bin");

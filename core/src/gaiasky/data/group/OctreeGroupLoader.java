@@ -82,7 +82,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoSource.LOD, 1.5f, octreeWrapper);
             ci.nParticles = params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
-            EventManager.publish(Event.CATALOG_ADD, this, ci, false);
+            octreeWrapper.setCatalogInfo(ci);
 
             dataVersionHint = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2") ? 0 : 1;
 

@@ -102,7 +102,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
         var hl = Mapper.highlight.get(render.entity);
         var desc = Mapper.datasetDescription.get(render.entity);
 
-        float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+        float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
         synchronized (render) {
             if (!set.disposed) {
@@ -146,7 +146,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                                 }
 
                                 // SIZE
-                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * hlSizeFactor;
+                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
 
                                 // PROPER MOTION [u/yr]
                                 tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
@@ -186,7 +186,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                     }
 
                     triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * hlSizeFactor;
+                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                     shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                     // Days since epoch

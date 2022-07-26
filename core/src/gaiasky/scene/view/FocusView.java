@@ -26,6 +26,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
+import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
 /**
@@ -59,6 +60,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     /** The focus active computer. **/
     private FocusActive focusActive;
+
+    private FocusView auxView;
 
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
@@ -120,6 +123,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         this.extra = null;
         this.particleSet = null;
         this.starSet = null;
+        this.hl = null;
     }
 
     public void setScene(Scene scene) {
@@ -395,7 +399,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
         aux2.set(aux1.z, aux1.y, aux1.x).scl(1, -1, -1).scl(-(getRadius() + distance * Constants.KM_TO_U));
         //aux2.rotate(rc.angle, 0, 1, 0);
-        var scaffolding = Mapper.modelScaffolding.get(entity);
         Matrix4d ori = new Matrix4d(graph.orientation);
         var rotation = getRotationComponent();
         if (rotation != null) {
@@ -927,6 +930,12 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return null;
     }
 
+    private void initAuxView() {
+        if (auxView == null) {
+            auxView = new FocusView();
+        }
+    }
+
     private void initHighlight() {
         if (hl == null)
             hl = Mapper.highlight.get(entity);
@@ -951,6 +960,18 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             hl.hlplain = true;
             hl.hlallvisible = allVisible;
             System.arraycopy(color, 0, hl.hlc, 0, color.length);
+        }
+
+        // In octrees, highlight all objects.
+        if (Mapper.octree.has(entity) && octant != null) {
+            Array<Entity> l = getOctreeObjects(new Array<>());
+            if (l != null && l.size > 0) {
+                initAuxView();
+                for (Entity e : l) {
+                    auxView.setEntity(e);
+                    auxView.highlight(state, color, allVisible);
+                }
+            }
         }
     }
 
@@ -979,10 +1000,49 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             hl.hlcmmin = cmmin;
             hl.hlcmmax = cmmax;
         }
+
+        // In octrees, highlight all objects.
+        if (Mapper.octree.has(entity) && octant != null) {
+            Array<Entity> l = getOctreeObjects(new Array<>());
+            if (l != null && l.size > 0) {
+                initAuxView();
+                for (Entity e : l) {
+                    auxView.setEntity(e);
+                    auxView.highlight(state, cmi, cma, cmmin, cmmax, allVisible);
+                }
+            }
+        }
     }
 
     public boolean isHighlighted() {
         initHighlight();
         return hl.highlighted;
     }
+
+    public Array<Entity> getOctreeObjects(Array<Entity> list) {
+        if (octant == null) {
+            return list;
+        }
+        return getOctreeObjects(octant.octant, list);
+    }
+
+    private Array<Entity> getOctreeObjects(OctreeNode node, Array<Entity> list) {
+        if (node != null && node.objects != null) {
+            for (IOctreeObject object : node.objects) {
+                if (object instanceof OctreeObjectView) {
+                    var oov = (OctreeObjectView) object;
+                    list.add(oov.getEntity());
+                }
+            }
+            if (node.children != null) {
+                for (OctreeNode child : node.children) {
+                    if (child != null) {
+                        getOctreeObjects(child, list);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
 }

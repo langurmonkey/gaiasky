@@ -1,5 +1,6 @@
 package gaiasky.scene.entity;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -29,6 +31,8 @@ import gaiasky.util.math.Vector3d;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.json.XMLTokener.entity;
+
 /**
  * Contains utilities common to particle and star objects and sets.
  */
@@ -39,18 +43,21 @@ public class ParticleUtils {
     public ParticleUtils() {
     }
 
-    public float highlightedSizeFactor(Highlight highlight, DatasetDescription datasetDesc) {
-        return ((highlight.highlighted && datasetDesc.catalogInfo != null) ? datasetDesc.catalogInfo.hlSizeFactor : 1) * getPointscaling(highlight);
+    public float getDatasetSizeFactor(Entity entity, Highlight hl, DatasetDescription dd) {
+        return ((hl != null && hl.highlighted && dd != null && dd.catalogInfo != null) ? dd.catalogInfo.hlSizeFactor : 1) * getPointScaling(hl, Mapper.graph.get(entity));
     }
 
-    public float getPointscaling(Highlight highlight) {
-        //var graph = Mapper.graph.get(entity);
+    public float getPointScaling(Highlight hl, GraphNode graph) {
+        if (hl != null) {
+            if (Mapper.octree.has(graph.parent)) {
+                var hlParent = Mapper.highlight.get(graph.parent);
+                return hl.pointscaling * hlParent.pointscaling;
+            }
 
-        // TODO octree
-        //if(graph.parent instanceof OctreeWrapper) {
-        //    return ((OctreeWrapper) parent).getPointscaling() * pointscaling;
-        //}
-        return highlight.pointscaling;
+            return hl.pointscaling;
+        } else {
+            return 1;
+        }
     }
 
     public double getVariableSizeScaling(final StarSet set, final int idx) {

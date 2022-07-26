@@ -235,7 +235,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         if (ci.isHighlightable()) {
             OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
-            sizeScaling.setName("star brightness");
             sizeScaling.setWidth(320f);
             if (ci.object != null) {
                 sizeScaling.setMappedValue(ci.object.getPointscaling());

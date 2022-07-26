@@ -106,7 +106,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
             var hl = Mapper.highlight.get(render.entity);
             var desc = Mapper.datasetDescription.get(render.entity);
 
-            float hlSizeFactor = utils.highlightedSizeFactor(hl, desc);
+            float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
             if (!set.disposed) {
                 boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
@@ -156,7 +156,7 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                             }
 
                             // SIZE
-                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * hlSizeFactor;
+                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor;
 
                             // PARTICLE POSITION
                             tempInstanceAttribs[curr.instanceIdx + particlePosOffset] = (float) p[0];
@@ -188,8 +188,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
                     double s = .3e-4f;
                     shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
                     shaderProgram.setUniformf("u_falloff", set.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * hlSizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * hlSizeFactor), (float) (set.particleSizeLimits[1] * hlSizeFactor));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * sizeFactor), (float) (set.particleSizeLimits[1] * sizeFactor));
 
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
