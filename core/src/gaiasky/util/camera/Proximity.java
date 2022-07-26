@@ -15,6 +15,8 @@ import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
+import java.util.Arrays;
+
 /**
  * Holds information on the order and properties of nearby particles to the camera.
  */
@@ -185,9 +187,7 @@ public class Proximity {
     }
 
     private void clear(NearbyRecord[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = null;
-        }
+        Arrays.fill(arr, null);
     }
 
     public NearbyRecord convert(IParticleRecord pr, NearbyRecord c, ICamera camera, double deltaYears) {

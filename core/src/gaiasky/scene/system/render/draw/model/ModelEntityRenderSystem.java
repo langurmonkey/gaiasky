@@ -25,6 +25,8 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsd;
 
+import java.util.Objects;
+
 /**
  * Contains the logic to render model entities, the ones that
  * have a {@link Model} component.
@@ -238,25 +240,27 @@ public class ModelEntityRenderSystem {
 
         if (mc != null && mc.isModelInitialised()) {
             mc.touch();
-            float opacity = (float) MathUtilsd.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
-            if (alpha * opacity > 0) {
-                mc.setTransparency(alpha * opacity);
-                float[] col = set.proximity.updating[0].col;
-                ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
-                ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
-                // Local transform
-                double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
-                mc.instance.transform.idt()
-                        .translate(
-                                (float) set.proximity.updating[0].pos.x,
-                                (float) set.proximity.updating[0].pos.y,
-                                (float) set.proximity.updating[0].pos.z)
-                        .scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
-                if (relativistic) {
-                    mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
+            if (set.proximity.updating[0] != null) {
+                float opacity = (float) MathUtilsd.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
+                if (alpha * opacity > 0) {
+                    mc.setTransparency(alpha * opacity);
+                    float[] col = set.proximity.updating[0].col;
+                    ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(col[0], col[1], col[2], 1f);
+                    ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
+                    // Local transform
+                    double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
+                    mc.instance.transform.idt()
+                            .translate(
+                                    (float) set.proximity.updating[0].pos.x,
+                                    (float) set.proximity.updating[0].pos.y,
+                                    (float) set.proximity.updating[0].pos.z)
+                            .scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
+                    if (relativistic) {
+                        mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
+                    }
+                    mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
+                    batch.render(mc.instance, mc.env);
                 }
-                mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
-                batch.render(mc.instance, mc.env);
             }
         }
     }

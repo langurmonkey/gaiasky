@@ -227,16 +227,18 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             super.update(time, parentTransform, camera, opacity);
 
             // Update close stars
+            int j = 0;
             for (int i = 0; i < Math.min(proximity.updating.length, pointData.size()); i++) {
                 if (filter(active[i]) && isVisible(active[i])) {
                     IParticleRecord closeStar = pointData.get(active[i]);
-                    proximity.set(i, active[i], closeStar, camera, currDeltaYears);
-                    camera.checkClosestParticle(proximity.updating[i]);
+                    proximity.set(j, active[i], closeStar, camera, currDeltaYears);
+                    camera.checkClosestParticle(proximity.updating[j]);
 
                     // Model distance
-                    if (i == 0) {
+                    if (j == 0) {
                         modelDist = 172.4643429 * closeStar.radius();
                     }
+                    j++;
                 }
             }
         }
@@ -382,18 +384,20 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         if (mc != null && mc.isModelInitialised()) {
             mc.touch();
-            float opacity = (float) MathUtilsd.lint(proximity.updating[0].distToCamera, modelDist / 50f, modelDist, 1f, 0f);
-            if (alpha * opacity > 0) {
-                mc.setTransparency(alpha * opacity);
-                float[] col = proximity.updating[0].col;
-                ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
-                ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
-                // Local transform
-                double variableScaling = getVariableSizeScaling(proximity.updating[0].index);
-                mc.instance.transform.idt().translate((float) proximity.updating[0].pos.x, (float) proximity.updating[0].pos.y, (float) proximity.updating[0].pos.z).scl((float) (getRadius(active[0]) * 2d * variableScaling));
-                mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
-                mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
-                modelBatch.render(mc.instance, mc.env);
+            if (proximity.updating[0] != null) {
+                float opacity = (float) MathUtilsd.lint(proximity.updating[0].distToCamera, modelDist / 50f, modelDist, 1f, 0f);
+                if (alpha * opacity > 0) {
+                    mc.setTransparency(alpha * opacity);
+                    float[] col = proximity.updating[0].col;
+                    ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(col[0], col[1], col[2], 1f);
+                    ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
+                    // Local transform
+                    double variableScaling = getVariableSizeScaling(proximity.updating[0].index);
+                    mc.instance.transform.idt().translate((float) proximity.updating[0].pos.x, (float) proximity.updating[0].pos.y, (float) proximity.updating[0].pos.z).scl((float) (getRadius(active[0]) * 2d * variableScaling));
+                    mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
+                    mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
+                    modelBatch.render(mc.instance, mc.env);
+                }
             }
         }
     }

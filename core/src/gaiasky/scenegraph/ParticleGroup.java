@@ -159,7 +159,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Proximity particles
      */
-    protected Proximity proximity;
+    protected final Proximity proximity;
 
     // Has been disposed
     public boolean disposed = false;

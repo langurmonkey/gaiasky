@@ -335,20 +335,14 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public Entity getFirstStarAncestorEntity() {
-        if (Mapper.hip.has(entity) || starSet != null || particleSet != null) {
-            return entity;
-        } else if (graph.parent != null) {
-            return getStarAncestor(graph.parent);
-        } else {
-            return null;
-        }
+        return getStarAncestor(entity);
     }
 
     private Entity getStarAncestor(Entity me) {
         if (me == null) {
             return null;
         }
-        if (Mapper.hip.has(me)) {
+        if (Mapper.hip.has(me) || Mapper.starSet.has(me) || Mapper.particleSet.has(me)) {
             return me;
         } else if (Mapper.graph.has(me)) {
             var graph = Mapper.graph.get(me);

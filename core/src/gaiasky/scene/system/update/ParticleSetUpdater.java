@@ -61,17 +61,19 @@ public class ParticleSetUpdater extends AbstractUpdateSystem {
             updateParticleSet(camera, starSet);
 
             // Update close stars
+            int j = 0;
             for (int i = 0; i < Math.min(starSet.proximity.updating.length, starSet.pointData.size()); i++) {
                 if (utils.filter(starSet.active[i], starSet, datasetDesc)
                         && starSet.isVisible(starSet.active[i])) {
                     IParticleRecord closeStar = starSet.pointData.get(starSet.active[i]);
-                    starSet.proximity.set(i, starSet.active[i], closeStar, camera, starSet.currDeltaYears);
-                    camera.checkClosestParticle(starSet.proximity.updating[i]);
+                    starSet.proximity.set(j, starSet.active[i], closeStar, camera, starSet.currDeltaYears);
+                    camera.checkClosestParticle(starSet.proximity.updating[j]);
 
                     // Model distance
-                    if (i == 0) {
+                    if (j == 0) {
                         starSet.modelDist = 172.4643429 * closeStar.radius();
                     }
+                    j++;
                 }
             }
         }
