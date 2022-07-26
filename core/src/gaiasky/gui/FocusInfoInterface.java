@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -654,21 +655,43 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
         case PER_OBJECT_VISIBILITY_CMD -> {
             if (source != objectVisibility) {
-                IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-                String name = (String) data[1];
-                if (vs == currentFocus && currentFocus.hasName(name)) {
-                    boolean visible = (boolean) data[2];
-                    objectVisibility.setCheckedNoFire(!visible);
+                if (data[0] instanceof IVisibilitySwitch) {
+                    IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
+                    String name = (String) data[1];
+                    if (vs == currentFocus && currentFocus.hasName(name)) {
+                        boolean visible = (boolean) data[2];
+                        objectVisibility.setCheckedNoFire(!visible);
+                    }
+                }
+
+                if (data[0] instanceof Entity) {
+                    var entity = (Entity) data[0];
+                    String name = (String) data[1];
+                    if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
+                        boolean visible = (boolean) data[2];
+                        objectVisibility.setCheckedNoFire(!visible);
+                    }
                 }
             }
         }
         case FORCE_OBJECT_LABEL_CMD -> {
             if (source != labelVisibility) {
-                SceneGraphNode sgn = (SceneGraphNode) data[0];
-                String name = (String) data[1];
-                if (sgn == currentFocus && currentFocus.hasName(name)) {
-                    boolean forceLabel = (boolean) data[2];
-                    labelVisibility.setCheckedNoFire(forceLabel);
+                if (data[0] instanceof SceneGraphNode) {
+                    SceneGraphNode sgn = (SceneGraphNode) data[0];
+                    String name = (String) data[1];
+                    if (sgn == currentFocus && currentFocus.hasName(name)) {
+                        boolean forceLabel = (boolean) data[2];
+                        labelVisibility.setCheckedNoFire(forceLabel);
+                    }
+                }
+
+                if (data[0] instanceof Entity) {
+                    var entity = (Entity) data[0];
+                    String name = (String) data[1];
+                    if (currentFocus == view && view.getEntity() == entity && currentFocus.hasName(name)) {
+                        boolean forceLabel = (boolean) data[2];
+                        labelVisibility.setCheckedNoFire(forceLabel);
+                    }
                 }
             }
         }

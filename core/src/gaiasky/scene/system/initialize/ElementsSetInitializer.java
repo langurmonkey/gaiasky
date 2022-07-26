@@ -30,13 +30,9 @@ public class ElementsSetInitializer extends AbstractInitSystem {
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
         var set = Mapper.orbitElementsSet.get(entity);
-        var desc = Mapper.datasetDescription.get(entity);
 
         // Check children which need updating every time
         initializeOrbitsWithOrbit(graph, set);
-
-        // Initialize catalog info if not set
-        initializeCatalogInfo(entity, base, graph, desc);
 
         EventManager.instance.subscribe(new ElementsSetRadio(entity, this), Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
@@ -67,17 +63,6 @@ public class ElementsSetInitializer extends AbstractInitSystem {
                     set.alwaysUpdate.add(e);
                 }
             }
-        }
-    }
-
-    private void initializeCatalogInfo(Entity entity, Base base, GraphNode graph, DatasetDescription desc) {
-        if (desc.catalogInfo == null) {
-            // Create catalog info and broadcast
-            CatalogInfo ci = new CatalogInfo(base.names[0], base.names[0], null, CatalogInfoSource.INTERNAL, 1f, entity);
-            ci.nParticles = graph.children != null ? graph.children.size : -1;
-
-            // Insert
-            EventManager.publish(Event.CATALOG_ADD, this, ci, false);
         }
     }
 }

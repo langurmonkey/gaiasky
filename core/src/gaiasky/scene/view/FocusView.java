@@ -942,6 +942,22 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     /**
+     * Marks the element for update in VRAM.
+     */
+    public void markForUpdate() {
+        var set = getSet();
+        if (set != null) {
+            set.markForUpdate(Mapper.render.get(entity));
+        }
+        if (Mapper.orbitElementsSet.has(entity)) {
+            Mapper.orbitElementsSet.get(entity).markForUpdate(Mapper.render.get(entity));
+        }
+        if (Mapper.verts.has(entity)) {
+            Mapper.verts.get(entity).markForUpdate(Mapper.render.get(entity));
+        }
+    }
+
+    /**
      * Highlight using a plain color.
      *
      * @param state      Whether to highlight.
@@ -950,11 +966,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      */
     public void highlight(boolean state, float[] color, boolean allVisible) {
         initHighlight();
-        var set = getSet();
-        if (set != null) {
-            set.markForUpdate(Mapper.render.get(entity));
-        }
+        markForUpdate();
 
+        // Set highlight properties.
         this.hl.highlighted = state;
         if (state) {
             hl.hlplain = true;
@@ -986,10 +1000,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      */
     public void highlight(boolean state, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
         initHighlight();
-        var set = getSet();
-        if (set != null) {
-            set.markForUpdate(Mapper.render.get(entity));
-        }
+        markForUpdate();
 
         hl.highlighted = state;
         if (state) {

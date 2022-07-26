@@ -221,14 +221,14 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
-            if (source instanceof OrbitalElementsGroup) {
-                OrbitalElementsGroup oeg = (OrbitalElementsGroup) source;
-                int offset = getOffset(oeg);
+            if (source instanceof Render) {
+                var render = (Render) source;
+                int offset = getOffset(render);
                 if (offset >= 0) {
                     clearMeshData(offset);
                 }
-                setOffset(oeg, -1);
-                setInGpu(oeg, false);
+                setOffset(render, -1);
+                setInGpu(render, false);
             }
         }
     }

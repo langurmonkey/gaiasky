@@ -35,7 +35,7 @@ public class DatasetDescription implements Component {
         String desc = (String) map.get("description");
         String source = (String) map.get("source");
         CatalogInfo.CatalogInfoSource type = map.containsKey("type") ? CatalogInfo.CatalogInfoSource.valueOf((String) map.get("type")) : CatalogInfo.CatalogInfoSource.INTERNAL;
-        float size = getFloat(map, "size", -1);
+        float size = getFloat(map, "size", 1);
         long sizeBytes = getLong(map, "sizebytes", -1);
         long nParticles = getLong(map, "nParticles", -1);
         if (nParticles <= 0) {
