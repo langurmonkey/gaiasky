@@ -6,6 +6,7 @@
 package gaiasky.input;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
@@ -17,7 +18,9 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
+import gaiasky.scene.view.KeyframesView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -159,27 +162,39 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     public MainMouseKbdListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
-        EventManager.instance.subscribe(this, Event.TOUCH_DOWN, Event.TOUCH_UP, Event.TOUCH_DRAGGED, Event.SCROLLED, Event.KEY_DOWN, Event.KEY_UP);
+        EventManager.instance.subscribe(this, Event.TOUCH_DOWN, Event.TOUCH_UP, Event.TOUCH_DRAGGED, Event.SCROLLED, Event.KEY_DOWN, Event.KEY_UP, Event.SCENE_LOADED);
     }
 
     private int touched;
     private boolean multiTouch;
 
-    private KeyframesPathObject kpo;
+    /** Reference to the scene. **/
+    private Scene scene;
+    /** Keyframes path entity. **/
+    private Entity kpo;
+    private KeyframesView kfView;
 
-    private KeyframesPathObject getKeyframesPathObject() {
-        if (kpo != null)
-            return kpo;
+    private KeyframesView getKeyframesPathObject() {
+        if (scene != null) {
+            if (kfView == null) {
+                kfView = new KeyframesView(scene);
+            }
+            if (kpo != null) {
+                kfView.setEntity(kpo);
+                return kfView;
+            }
 
-        Array<SceneGraphNode> l = GaiaSky.instance.sceneGraph.getRoot().getChildrenByType(KeyframesPathObject.class, new Array<>(false, 1));
-        if (!l.isEmpty()) {
-            kpo = (KeyframesPathObject) l.get(0);
-            return kpo;
+            ImmutableArray<Entity> l = scene.findEntitiesByFamily(scene.getFamilies().keyframes);
+            if (l.size() > 0) {
+                kpo = l.get(0);
+                kfView.setEntity(kpo);
+                return kfView;
+            }
         }
         return null;
     }
 
-    private IFocus getKeyframeCollision(int screenX, int screenY) {
+    private FocusView getKeyframeCollision(int screenX, int screenY) {
         if (getKeyframesPathObject() != null)
             return getKeyframesPathObject().select(screenX, screenY, MIN_PIX_DIST, camera);
         else
@@ -243,11 +258,11 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             if (button == Buttons.RIGHT) {
                 // Select keyframes.
                 if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected())) {
-                    IFocus hit;
+                    FocusView hit;
                     keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
-                    if(keyframeBeingDragged){
+                    if (keyframeBeingDragged) {
                         // FOCUS_MODE, do not center.
-                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit, false);
+                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit.getEntity(), false);
                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, false);
                     }
                 }
@@ -256,7 +271,6 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         camera.setGamepadInput(false);
         return super.touchDown(screenX, screenY, pointer, button);
     }
-
 
     @Override
     public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
@@ -292,7 +306,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             } else if (button == this.button && button == rightMouseButton) {
                 if (keyframeBeingDragged) {
                     keyframeBeingDragged = false;
-                } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST &&  getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
+                } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                     Objects.requireNonNull(getKeyframesPathObject()).unselect();
                 } else {
@@ -355,7 +369,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 // Drag keyframe
                 dragKeyframe(screenX, screenY, dragDx, dragDy);
             } else {
-                if(camera.getMode().isFree()){
+                if (camera.getMode().isFree()) {
                     // Strafe (pan)
                     camera.setHorizontal(-dragDx * 5f);
                     camera.setVertical(-dragDy * 5f);
@@ -428,7 +442,6 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         }
     }
 
-
     @Override
     public void activate() {
 
@@ -459,6 +472,9 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             break;
         case KEY_UP:
             this.keyUp((int) data[0]);
+            break;
+        case SCENE_LOADED:
+            this.scene = (Scene) data[0];
             break;
         default:
             break;

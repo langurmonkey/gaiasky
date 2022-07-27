@@ -7,11 +7,12 @@ import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.*;
+import gaiasky.scene.component.Keyframes;
+import gaiasky.scene.component.StarSet;
+import gaiasky.scene.component.Title;
 import gaiasky.scene.system.render.draw.TextRenderer;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -308,7 +309,7 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_thLabel", 1);
         shader.setUniform4fv("u_color", textColour(kfs, kf), 0, 4);
 
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, getText(kf), pos, view.getDistToCamera(), view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor() * distToCam, view.getRadius(), view.base.forceLabel);
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, getText(kf), pos, distToCam, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor() * distToCam, view.getRadius(), view.base.forceLabel);
     }
 
     public float[] textColour(Keyframes kfs, Keyframe kf) {

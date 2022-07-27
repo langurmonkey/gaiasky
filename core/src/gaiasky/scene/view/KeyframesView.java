@@ -13,10 +13,8 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.entity.KeyframeUtils;
-import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Invisible;
 import gaiasky.scenegraph.Polyline;
-import gaiasky.scenegraph.VertsObject;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -299,7 +297,7 @@ public class KeyframesView extends BaseView {
         kf.orientations.add(up);
     }
 
-    public IFocus select(int screenX, int screenY, int minPixDist, NaturalCamera camera) {
+    public FocusView select(int screenX, int screenY, int minPixDist, NaturalCamera camera) {
 
         Vector3 pos = F31;
         Vector3d aux = D31;

@@ -17,7 +17,7 @@ public class KeyframeUtils {
         this.scene = scene;
     }
 
-    public Entity newVerts(Scene scene, String name, ComponentTypes ct, Class<?> clazz, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize) {
+    public Entity newVerts(Scene scene, String name, ComponentTypes ct, Class<?> clazz, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean arrowCaps) {
         var entity = scene.archetypes().get(clazz.getName()).createEntity();
 
         var base = Mapper.base.get(entity);
@@ -40,7 +40,15 @@ public class KeyframeUtils {
         // Then, add no-process tag.
         entity.add(scene.engine.createComponent(TagNoProcess.class));
 
+        var arrow = Mapper.arrow.get(entity);
+        if(arrow != null) {
+            arrow.arrowCap = arrowCaps;
+        }
+
         return entity;
+    }
+    public Entity newVerts(Scene scene, String name, ComponentTypes ct, Class<?> clazz, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize) {
+        return newVerts(scene, name, ct, clazz, color, rg, closedLoop, primitiveSize, false);
     }
 
     public Entity newVerts(Scene scene, String name, ComponentTypes ct, Class<?> clazz, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean blend, boolean depth) {
