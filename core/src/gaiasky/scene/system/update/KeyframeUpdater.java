@@ -15,15 +15,12 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D33 = new Vector3d();
 
-
     private GraphUpdater graphUpdater;
-    private ICamera camera;
     private VertsView view;
 
     public KeyframeUpdater(Family family, int priority) {
         super(family, priority);
         graphUpdater = new GraphUpdater(null, 0, GaiaSky.instance.time);
-        camera = GaiaSky.instance.getICamera();
         view = new VertsView();
     }
 
@@ -38,8 +35,11 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
         var graph = Mapper.graph.get(entity);
         var kf = Mapper.keyframes.get(entity);
 
+        ICamera camera = GaiaSky.instance.getICamera();
+        graphUpdater.setCamera(camera);
+
         for (Entity object : kf.objects) {
-           graphUpdater.update(object, GaiaSky.instance.time, graph.translation, base.opacity);
+            graphUpdater.update(object, GaiaSky.instance.time, graph.translation, base.opacity);
         }
 
         // Update length of orientations
@@ -58,7 +58,6 @@ public class KeyframeUpdater extends AbstractUpdateSystem {
             p.x.set(1, p0.x + v.x);
             p.y.set(1, p0.y + v.y);
             p.z.set(1, p0.z + v.z);
-
 
             view.markForUpdate();
         }

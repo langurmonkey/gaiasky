@@ -15,6 +15,8 @@ import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.entity.KeyframeUtils;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Invisible;
+import gaiasky.scenegraph.Polyline;
+import gaiasky.scenegraph.VertsObject;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -30,8 +32,8 @@ public class KeyframesView extends BaseView {
     private Keyframes kf;
 
     private Scene scene;
-    private VertsView verts;
-    private FocusView focus;
+    private final VertsView verts;
+    private final FocusView focus;
     private KeyframeUtils utils;
 
     private Vector3 F31 = new Vector3();
@@ -109,19 +111,27 @@ public class KeyframesView extends BaseView {
         setPathKnots(kfPositions, kfDirections, kfUps, kfSeams);
         if (keyframes.size > 1) {
             // Set points to segments
-            verts.setEntity(kf.segments);
-            verts.setPoints(kfPositions);
+            synchronized (verts) {
+                verts.setEntity(kf.segments);
+                verts.setPoints(kfPositions);
+            }
 
             // Set points to path
             double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
-            verts.setEntity(kf.path);
-            verts.setPoints(pathSamples);
+            synchronized (verts) {
+                verts.setEntity(kf.path);
+                verts.setPoints(pathSamples);
+            }
         } else {
-            verts.setEntity(kf.segments);
-            verts.clear();
+            synchronized (verts) {
+                verts.setEntity(kf.segments);
+                verts.clear();
+            }
 
-            verts.setEntity(kf.path);
-            verts.clear();
+            synchronized (verts) {
+                verts.setEntity(kf.path);
+                verts.clear();
+            }
         }
     }
 
@@ -142,16 +152,18 @@ public class KeyframesView extends BaseView {
     }
 
     public void refreshSingleVector(Entity vo, Vector3d pos, Vector3d vec) {
-        verts.setEntity(vo);
-        PointCloudData p = verts.getPointCloud();
-        p.x.set(0, pos.x);
-        p.y.set(0, pos.y);
-        p.z.set(0, pos.z);
+        synchronized (verts) {
+            verts.setEntity(vo);
+            PointCloudData p = verts.getPointCloud();
+            p.x.set(0, pos.x);
+            p.y.set(0, pos.y);
+            p.z.set(0, pos.z);
 
-        p.x.set(1, pos.x + vec.x);
-        p.y.set(1, pos.y + vec.y);
-        p.z.set(1, pos.z + vec.z);
-        verts.markForUpdate();
+            p.x.set(1, pos.x + vec.x);
+            p.y.set(1, pos.y + vec.y);
+            p.z.set(1, pos.z + vec.z);
+            verts.markForUpdate();
+        }
     }
 
     public void resamplePath() {
@@ -181,8 +193,10 @@ public class KeyframesView extends BaseView {
             kfPositionsSep.add(current);
 
             double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
-            verts.setEntity(kf.path);
-            verts.setPoints(pathSamples);
+            synchronized (verts) {
+                verts.setEntity(kf.path);
+                verts.setPoints(pathSamples);
+            }
         }
     }
 
@@ -211,11 +225,15 @@ public class KeyframesView extends BaseView {
                 ktsni += 3;
             }
         }
-        verts.setEntity(kf.knots);
-        verts.setPoints(ktsN);
+        synchronized (verts) {
+            verts.setEntity(kf.knots);
+            verts.setPoints(ktsN);
+        }
 
-        verts.setEntity(kf.knotsSeam);
-        verts.setPoints(ktsS);
+        synchronized (verts) {
+            verts.setEntity(kf.knotsSeam);
+            verts.setPoints(ktsS);
+        }
 
         int n = kts.length;
         if (kf.orientations.size == (dirs.length + ups.length) / 3) {
@@ -247,24 +265,32 @@ public class KeyframesView extends BaseView {
 
     public void addKnot(Vector3d knot, Vector3d dir, Vector3d up, boolean seam) {
         if (seam) {
-            verts.setEntity(kf.knotsSeam);
-            verts.addPoint(knot);
+            synchronized (verts) {
+                verts.setEntity(kf.knotsSeam);
+                verts.addPoint(knot);
+            }
         } else {
-            verts.setEntity(kf.knots);
-            verts.addPoint(knot);
+            synchronized (verts) {
+                verts.setEntity(kf.knots);
+                verts.addPoint(knot);
+            }
         }
         addKnotOrientation(kf.orientations.size / 2, knot.x, knot.y, knot.z, dir.x, dir.y, dir.z, up.x, up.y, up.z);
     }
 
     private void addKnotOrientation(int idx, double px, double py, double pz, double dx, double dy, double dz, double ux, double uy, double uz) {
-        Entity dir = utils.newVerts("Keyframes.dir", base.ct, ColorUtils.gRed, RenderGroup.LINE, false, 0.6f * kf.ss);
-        Entity up = utils.newVerts("Keyframes.up", base.ct, ColorUtils.gBlue, RenderGroup.LINE, false, 0.6f * kf.ss);
+        Entity dir = utils.newVerts(scene, "Keyframes.dir", base.ct, Polyline.class, ColorUtils.gRed, RenderGroup.LINE, false, 0.6f * kf.ss);
+        Entity up = utils.newVerts(scene, "Keyframes.up", base.ct, Polyline.class, ColorUtils.gBlue, RenderGroup.LINE, false, 0.6f * kf.ss);
 
-        verts.setEntity(dir);
-        verts.setPoints(new double[] { px, py, pz, px + dx, py + dy, pz + dz });
+        synchronized (verts) {
+            verts.setEntity(dir);
+            verts.setPoints(new double[] { px, py, pz, px + dx, py + dy, pz + dz });
+        }
 
-        verts.setEntity(up);
-        verts.setPoints(new double[] { px, py, pz, px + ux, py + uy, pz + uz });
+        synchronized (verts) {
+            verts.setEntity(up);
+            verts.setPoints(new double[] { px, py, pz, px + ux, py + uy, pz + uz });
+        }
 
         kf.objects.add(dir);
         kf.objects.add(up);
@@ -309,9 +335,11 @@ public class KeyframesView extends BaseView {
                     //Hit
                     select(keyframe);
                     initFocus();
-                    focus.setEntity(kf.focus);
-                    focus.getPos().set(kf.selected.pos);
-                    Mapper.base.get(kf.focus).setName(kf.selected.name);
+                    synchronized (focus) {
+                        focus.setEntity(kf.focus);
+                        focus.getPos().set(kf.selected.pos);
+                        Mapper.base.get(kf.focus).setName(kf.selected.name);
+                    }
 
                     return focus;
                 }
@@ -328,8 +356,10 @@ public class KeyframesView extends BaseView {
         unhighlight();
         kf.highlighted = keyframe;
 
-        verts.setEntity(kf.highlightedKnot);
-        verts.setPoints(keyframe.pos.values());
+        synchronized (verts) {
+            verts.setEntity(kf.highlightedKnot);
+            verts.setPoints(keyframe.pos.values());
+        }
     }
 
     public void unhighlight(Keyframe keyframe) {
@@ -342,8 +372,10 @@ public class KeyframesView extends BaseView {
         if (kf.highlighted != null) {
             kf.highlighted = null;
 
-            verts.setEntity(kf.highlightedKnot);
-            verts.clear();
+            synchronized (verts) {
+                verts.setEntity(kf.highlightedKnot);
+                verts.clear();
+            }
         }
     }
 
@@ -351,23 +383,29 @@ public class KeyframesView extends BaseView {
         unselect();
         kf.selected = keyframe;
 
-        verts.setEntity(kf.selectedKnot);
-        verts.setPoints(keyframe.pos.values());
-        if (kf.selected.seam) {
-            verts.setColor(ColorUtils.gRed);
-        } else {
-            verts.setColor(ColorUtils.gPink);
+        synchronized (verts) {
+            verts.setEntity(kf.selectedKnot);
+            verts.setPoints(keyframe.pos.values());
+            if (kf.selected.seam) {
+                verts.setColor(ColorUtils.gRed);
+            } else {
+                verts.setColor(ColorUtils.gPink);
+            }
         }
         int i = kf.keyframes.indexOf(keyframe, true) * 2;
         if (i >= 0) {
             Entity dir = kf.orientations.get(i);
             Entity up = kf.orientations.get(i + 1);
 
-            verts.setEntity(dir);
-            verts.setPrimitiveSize(0.8f * kf.ss);
+            synchronized (verts) {
+                verts.setEntity(dir);
+                verts.setPrimitiveSize(0.8f * kf.ss);
+            }
 
-            verts.setEntity(up);
-            verts.setPrimitiveSize(0.8f * kf.ss);
+            synchronized (verts) {
+                verts.setEntity(up);
+                verts.setPrimitiveSize(0.8f * kf.ss);
+            }
         }
         EventManager.publish(Event.KEYFRAME_SELECT, this, keyframe);
     }
@@ -385,9 +423,11 @@ public class KeyframesView extends BaseView {
             var graph = Mapper.graph.get(focus);
             graph.translation = new Vector3b();
 
+            scene.initializeEntity(focus);
+
             kf.focus = focus;
 
-            EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, focus, false);
+            EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, focus, false);
         }
     }
 
@@ -398,20 +438,28 @@ public class KeyframesView extends BaseView {
                 Entity dir = kf.orientations.get(i);
                 Entity up = kf.orientations.get(i + 1);
 
-                verts.setEntity(dir);
-                verts.setPrimitiveSize(0.6f * kf.ss);
+                synchronized (verts) {
+                    verts.setEntity(dir);
+                    verts.setPrimitiveSize(0.6f * kf.ss);
+                }
 
-                verts.setEntity(up);
-                verts.setPrimitiveSize(0.6f * kf.ss);
+                synchronized (verts) {
+                    verts.setEntity(up);
+                    verts.setPrimitiveSize(0.6f * kf.ss);
+                }
             }
             initFocus();
-            focus.setEntity(kf.focus);
-            focus.setName("");
+            synchronized (focus) {
+                focus.setEntity(kf.focus);
+                focus.setName("");
+            }
             Keyframe aux = kf.selected;
             kf.selected = null;
 
-            verts.setEntity(kf.selectedKnot);
-            verts.clear();
+            synchronized (verts) {
+                verts.setEntity(kf.selectedKnot);
+                verts.clear();
+            }
 
             EventManager.publish(Event.KEYFRAME_UNSELECT, this, aux);
         }
@@ -429,8 +477,10 @@ public class KeyframesView extends BaseView {
             Vector3d newLocation = D32.set(aux).setLength(originalDist);
             kf.selected.pos.set(newLocation).add(camera.getPos());
 
-            verts.setEntity(kf.selectedKnot);
-            verts.setPoints(kf.selected.pos.values());
+            synchronized (verts) {
+                verts.setEntity(kf.selectedKnot);
+                verts.setPoints(kf.selected.pos.values());
+            }
             refreshData();
             return true;
         }
@@ -464,5 +514,26 @@ public class KeyframesView extends BaseView {
             return true;
         }
         return false;
+    }
+
+    public void clearOrientations() {
+        for (Entity vo : kf.orientations)
+            kf.objects.removeValue(vo, true);
+        kf.orientations.clear();
+    }
+
+    public void clear() {
+        // Clear GPU objects
+        VertsView v = new VertsView();
+        for (Entity vo : kf.objects) {
+            v.setEntity(vo);
+            v.clear();
+        }
+
+        // Clear orientations
+        clearOrientations();
+
+        // Unselect
+        unselect();
     }
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
@@ -53,6 +54,50 @@ public class LineEntityRenderSystem {
         this.lineView = view;
     }
 
+    public void renderPolyline(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
+        // Render line CPU
+        float[] cc = lineView.body.color;
+        alpha *= cc[3];
+        var verts = lineView.verts;
+        if (verts.pointCloudData != null && verts.pointCloudData.getNumPoints() > 1) {
+            var render = Mapper.render.get(entity);
+            var graph = Mapper.graph.get(entity);
+
+            Vector3d prev = D31;
+
+            for (int i = 0; i < verts.pointCloudData.getNumPoints(); i++) {
+                verts.pointCloudData.loadPoint(prev, i);
+                prev.add(graph.translation);
+                renderer.addPoint(lineView, (float) prev.x, (float) prev.y, (float) prev.z, cc[0], cc[1], cc[2], alpha);
+
+            }
+            renderer.breakLine();
+
+            // Render cap if needed
+            var arrow = Mapper.arrow.get(entity);
+            if (arrow != null && arrow.arrowCap) {
+                // Get two last points of line
+                Vector3d p1 = D32.set(verts.pointCloudData.getX(0), verts.pointCloudData.getY(0), verts.pointCloudData.getZ(0));
+                Vector3d p2 = D33.set(verts.pointCloudData.getX(1), verts.pointCloudData.getY(1), verts.pointCloudData.getZ(1));
+                Vector3d ppm = D34.set(p1).sub(p2);
+                double p1p2len = ppm.len();
+                p1.sub(camera.getPos());
+                p2.sub(camera.getPos());
+
+                // Add Arrow cap
+                Vector3d p3 = ppm.nor().scl(p1p2len * 0.7).add(p2);
+                p3.rotate(p1, 30);
+                renderer.addPoint(lineView, p1.x, p1.y, p1.z, cc[0], cc[1], cc[2], alpha);
+                renderer.addPoint(lineView, p3.x, p3.y, p3.z, cc[0], cc[1], cc[2], alpha);
+                renderer.breakLine();
+                p3.rotate(p1, -60);
+                renderer.addPoint(lineView, p1.x, p1.y, p1.z, cc[0], cc[1], cc[2], alpha);
+                renderer.addPoint(lineView, p3.x, p3.y, p3.z, cc[0], cc[1], cc[2], alpha);
+                renderer.breakLine();
+
+            }
+        }
+    }
     public void renderPerimeter(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var perimeter = Mapper.perimeter.get(entity);
         var cc = lineView.body.color;

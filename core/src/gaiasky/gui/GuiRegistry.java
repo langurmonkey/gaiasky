@@ -521,7 +521,7 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_KEYFRAMES_WINDOW_ACTION:
                 if (keyframesWindow == null) {
-                    keyframesWindow = new KeyframesWindow(ui, skin);
+                    keyframesWindow = new KeyframesWindow(scene, ui, skin);
                 }
                 if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
                     keyframesWindow.show(ui, 0, 0);

@@ -222,6 +222,7 @@ public class Scene {
             addInitializer(new ParticleInitializer(setUp, families.particles, priority++));
             addInitializer(new ModelInitializer(setUp, families.models, priority++));
             addInitializer(new TrajectoryInitializer(setUp, families.orbits, priority++));
+            addInitializer(new VertsInitializer(setUp, families.verts, priority++));
             addInitializer(new LocInitializer(setUp, families.locations, priority++));
             addInitializer(new BillboardSetInitializer(setUp, families.billboardSets, priority++));
             addInitializer(new AxesInitializer(setUp, families.axes, priority++));
@@ -528,8 +529,11 @@ public class Scene {
                 throw new RuntimeException(I18n.msg("error.parent.notfound", base.getName(), graph.parentName));
             }
         }
-        // Add to engine
-        engine.addEntity(entity);
+        try{
+            engine.addEntity(entity);
+        } catch (IllegalArgumentException e) {
+            logger.debug("Entity " + base.getName() + " already in engine.");
+        }
         reportDebugObjects();
     }
 

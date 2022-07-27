@@ -132,10 +132,10 @@ public class Archetypes {
             addArchetype(VertsObject.class.getName(), SceneGraphNode.class.getName(), Verts.class);
 
             // Polyline
-            addArchetype(Polyline.class.getName(), VertsObject.class.getName(), Arrow.class);
+            addArchetype(Polyline.class.getName(), VertsObject.class.getName(), Arrow.class, Line.class);
 
             // Orbit
-            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class, Line.class);
+            addArchetype(Orbit.class.getName(), Polyline.class.getName(), Trajectory.class, RefSysTransform.class);
 
             // HeliotropicOrbit
             addArchetype(HeliotropicOrbit.class.getName(), Orbit.class.getName(), TagHeliotropic.class);
@@ -199,6 +199,9 @@ public class Archetypes {
 
             // ShapeObject
             addArchetype(ShapeObject.class.getName(), SceneGraphNode.class.getName(), Model.class, Shape.class, Label.class, Line.class);
+
+            // KeyframesPathObject
+            addArchetype(KeyframesPathObject.class.getName(), VertsObject.class.getName(), Keyframes.class, Label.class);
 
             return archetypes;
         } else {

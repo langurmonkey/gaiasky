@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -16,6 +17,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
+import gaiasky.scene.component.Keyframes;
+import gaiasky.scene.view.KeyframesView;
+import gaiasky.scene.view.VertsView;
 import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -114,6 +121,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * Date format
      **/
     private final DateFormat df;
+    private final VertsView vertsView;
+    private final KeyframesView view;
 
     /**
      * Last loaded keyframe file name
@@ -123,7 +132,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Model object to represent the path
      **/
-    private KeyframesPathObject keyframesPathObject;
+    private Entity keyframesPathEntity;
+    private Keyframes keyframesComponent;
 
     private final float buttonSize;
     private final float buttonSizeL;
@@ -211,12 +221,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private final Editing editing;
 
-    public KeyframesWindow(Stage stage, Skin skin) {
+    public KeyframesWindow(Scene scene, Stage stage, Skin skin) {
         super(I18n.msg("gui.keyframes.title"), skin, stage);
 
         buttonSize = 26f;
         buttonSizeL = 28f;
 
+        this.view = new KeyframesView(scene);
+        this.vertsView = new VertsView();
         this.enterExit = false;
         this.editing = new Editing();
         this.keyframes = new Array<>();
@@ -233,16 +245,27 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Build UI
         buildSuper();
 
-        // Add {@link gaiasky.scenegraph.KeyframesPathObject} to model
-        keyframesPathObject = new KeyframesPathObject();
-        keyframesPathObject.setCt("Others");
-        keyframesPathObject.setParent("Universe");
-        keyframesPathObject.setName("Keyframe path");
-        keyframesPathObject.initialize();
-        keyframesPathObject.doneLoading(null);
-        keyframesPathObject.setKeyframes(keyframes);
+        // Add path object to model
+        var entity = scene.archetypes().get(KeyframesPathObject.class).createEntity();
 
-        EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, keyframesPathObject, false);
+        var base = Mapper.base.get(entity);
+        base.setName("keyframed.camera.path");
+        base.setComponentType(ComponentType.Others);
+
+        var graph = Mapper.graph.get(entity);
+        graph.setParent(Scene.ROOT_NAME);
+
+        scene.initializeEntity(entity);
+        scene.setUpEntity(entity);
+
+        keyframesComponent = Mapper.keyframes.get(entity);
+        keyframesComponent.keyframes = keyframes;
+        keyframesPathEntity = entity;
+
+        EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, keyframesPathEntity, false);
+
+        // Set entity to view.
+        view.setEntity(keyframesPathEntity);
 
         // Resizable
         setResizable(false, true);
@@ -341,11 +364,15 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         Keyframe kf0 = keyframes.get(i - 1);
                         Keyframe kf1 = keyframes.get(i);
                         double dist = aux.set(kf1.pos).sub(kf0.pos).len();
-                        kf1.seconds = totalTime * dist/totalDist;
+                        kf1.seconds = totalTime * dist / totalDist;
                     }
                     // Reload window contents
                     reinitialiseKeyframes(keyframes, null);
-                    keyframesPathObject.unselect();
+
+                    synchronized (view) {
+                        view.setEntity(keyframesPathEntity);
+                        view.unselect();
+                    }
                     logger.info(I18n.msg("gui.keyframes.normalize.done"));
 
                 }
@@ -367,7 +394,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                fc.setShowHiddenConsumer((showHidden)-> Settings.settings.program.fileChooser.showHidden = showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));
                 fc.setAcceptedFiles("*.gkf");
                 fc.setResultListener((success, result) -> {
@@ -378,7 +405,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                 Array<Keyframe> kfs = CameraKeyframeManager.instance.loadKeyframesFile(result);
                                 // Update current instance
                                 reinitialiseKeyframes(kfs, null);
-                                keyframesPathObject.unselect();
+                                synchronized (view) {
+                                    view.setEntity(keyframesPathEntity);
+                                    view.unselect();
+                                }
                                 lastKeyframeFileName = result.getFileName().toString();
                                 logger.info(I18n.msg("gui.keyframes.load.success", keyframes.size, result.getFileName()));
                             } catch (RuntimeException e) {
@@ -469,11 +499,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 kpw.setAcceptRunnable(() -> {
                     // Resample
                     GaiaSky.postRunnable(() -> {
-                        keyframesPathObject.resamplePath();
+                        synchronized (view) {
+                            view.setEntity(keyframesPathEntity);
+                            view.resamplePath();
+                        }
                     });
 
                 });
-                kpw.setCancelRunnable(()->{
+                kpw.setCancelRunnable(() -> {
 
                 });
                 kpw.show(stage, me.getWidth(), 0);
@@ -531,6 +564,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * @param cDir  The direction
      * @param cUp   The up
      * @param cTime The time
+     *
      * @return True if the keyframe was added, false otherwise
      */
     private boolean addKeyframe(int index, Vector3d cPos, Vector3d cDir, Vector3d cUp, long cTime) {
@@ -586,6 +620,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * Adds a new keyframe at the given index position using the current camera state and time
      *
      * @param index The position of the keyframe, negative to add at the end
+     *
      * @return True if the keyframe was added, false otherwise
      */
     private boolean addKeyframe(int index) {
@@ -624,10 +659,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             prevT += kf.seconds;
             i++;
         }
-        if (keyframesPathObject != null) {
+        if (keyframesComponent != null) {
             GaiaSky.postRunnable(() -> {
-                keyframesPathObject.setKeyframes(keyframes);
-                keyframesPathObject.refreshData();
+                keyframesComponent.keyframes = keyframes;
+                synchronized (view) {
+                    view.setEntity(keyframesPathEntity);
+                    view.refreshData();
+                }
             });
         }
     }
@@ -692,7 +730,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                                         });
                                     }
                                     editing.unset();
-                                } else if(ievt.getType() == InputEvent.Type.keyUp && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)){
+                                } else if (ievt.getType() == InputEvent.Type.keyUp && (ievt.getKeyCode() == Input.Keys.ENTER || ievt.getKeyCode() == Input.Keys.ESCAPE)) {
                                     ievt.cancel();
                                 }
                             }
@@ -786,12 +824,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         table.add(framesL).left().padRight(pad10).padBottom(pad5);
 
         // Clock - time
-        Image clockimg = new Image(skin.getDrawable("clock"));
-        clockimg.addListener(new OwnTextTooltip(dateFormat.format(Instant.ofEpochMilli(kf.time)), skin));
-        clockimg.setScale(0.7f);
-        clockimg.setOrigin(Align.center);
-        addHighlightListener(clockimg, kf);
-        table.add(clockimg).width(clockimg.getWidth()).left().padRight(pad10).padBottom(pad5);
+        Image clockImg = new Image(skin.getDrawable("clock"));
+        clockImg.addListener(new OwnTextTooltip(dateFormat.format(Instant.ofEpochMilli(kf.time)), skin));
+        clockImg.setScale(0.7f);
+        clockImg.setOrigin(Align.center);
+        addHighlightListener(clockImg, kf);
+        table.add(clockImg).width(clockImg.getWidth()).left().padRight(pad10).padBottom(pad5);
 
         // Frame name
         addFrameName(kf, index, table);
@@ -827,12 +865,18 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 // Make seam
                 kf.seam = seam.isChecked();
                 GaiaSky.postRunnable(() -> {
-                    keyframesPathObject.refreshData();
-                    if (keyframesPathObject.selected == kf) {
-                        if (seam.isChecked())
-                            keyframesPathObject.selectedKnot.setColor(ColorUtils.gRed);
-                        else
-                            keyframesPathObject.selectedKnot.setColor(ColorUtils.gWhite);
+                    synchronized (view) {
+                        view.setEntity(keyframesPathEntity);
+                        view.refreshData();
+                    }
+                    if (keyframesComponent.selected == kf) {
+                        synchronized (vertsView) {
+                            vertsView.setEntity(keyframesComponent.selectedKnot);
+                            if (seam.isChecked())
+                                vertsView.setColor(ColorUtils.gRed);
+                            else
+                                vertsView.setColor(ColorUtils.gWhite);
+                        }
 
                     }
                 });
@@ -906,13 +950,22 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rub.row();
         table.pack();
 
-        if (addToModel && keyframesPathObject != null) {
+        if (addToModel && keyframesComponent != null) {
             GaiaSky.postRunnable(() -> {
                 // Update model data
-                keyframesPathObject.addKnot(kf.pos, kf.dir, kf.up, kf.seam);
-                keyframesPathObject.segments.addPoint(kf.pos);
+                synchronized (view) {
+                    view.setEntity(keyframesPathEntity);
+                    view.addKnot(kf.pos, kf.dir, kf.up, kf.seam);
+                }
+                synchronized (vertsView) {
+                    vertsView.setEntity(keyframesComponent.segments);
+                    vertsView.addPoint(kf.pos);
+                }
                 if (keyframes.size > 1)
-                    keyframesPathObject.resamplePath();
+                    synchronized (view) {
+                        view.setEntity(keyframesPathEntity);
+                        view.resamplePath();
+                    }
             });
         }
 
@@ -922,10 +975,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         a.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
-                if (ie.getType() == InputEvent.Type.enter) {
-                    keyframesPathObject.highlight(kf);
-                } else if (ie.getType() == InputEvent.Type.exit) {
-                    keyframesPathObject.unhighlight(kf);
+                synchronized (view) {
+                    view.setEntity(keyframesPathEntity);
+                    if (ie.getType() == InputEvent.Type.enter) {
+                        view.highlight(kf);
+                    } else if (ie.getType() == InputEvent.Type.exit) {
+                        view.unhighlight(kf);
+                    }
                 }
                 return true;
             }
@@ -938,8 +994,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Subscriptions
         EventManager.instance.subscribe(this, Event.UPDATE_CAM_RECORDER, Event.KEYFRAMES_REFRESH, Event.KEYFRAME_SELECT, Event.KEYFRAME_UNSELECT, Event.KEYFRAME_ADD);
         // Re-add if necessary
-        if (keyframesPathObject.getParent() == null) {
-            EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, keyframesPathObject, false);
+        if (Mapper.graph.get(keyframesPathEntity).parent == null) {
+            EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, keyframesPathEntity, false);
         }
         return super.show(stage, action);
     }
@@ -969,7 +1025,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private void clean(boolean cleanKeyframesList, boolean cleanModel) {
         // Clean camera
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
-        if(focus instanceof Invisible && focus.getName().startsWith("Keyframe")){
+        if (focus instanceof Invisible && focus.getName().startsWith("Keyframe")) {
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, Settings.settings.scene.homeObject);
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
         }
@@ -983,13 +1039,18 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         keyframesTable.clearChildren();
         nameInput.setText("");
         secondsInput.setText("1.0");
-        if (cleanModel)
-            GaiaSky.postRunnable(() -> keyframesPathObject.clear());
+        if (cleanModel) {
+
+            GaiaSky.postRunnable(() -> {
+                view.setEntity(keyframesPathEntity);
+                view.clear();
+            });
+        }
 
     }
 
     private void scrollToSelected() {
-        scrollToKeyframe(keyframesPathObject.selected);
+        scrollToKeyframe(keyframesComponent.selected);
     }
 
     private void scrollToKeyframe(Keyframe kf) {
@@ -1060,11 +1121,14 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         clear();
 
         // Model
-        if (keyframesPathObject != null && keyframesPathObject.getParent() != null) {
+        if (keyframesPathEntity != null && Mapper.graph.get(keyframesPathEntity).parent != null) {
+            var graph = Mapper.graph.get(keyframesPathEntity);
             GaiaSky.postRunnable(() -> {
-                keyframesPathObject.getParent().removeChild(keyframesPathObject, false);
-                keyframesPathObject.clear();
-                keyframesPathObject = null;
+                var parentGraph = Mapper.graph.get(graph.parent);
+                parentGraph.removeChild(keyframesPathEntity, false);
+
+                vertsView.setEntity(keyframesPathEntity);
+                vertsView.clear();
             });
         }
 

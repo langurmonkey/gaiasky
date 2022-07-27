@@ -35,7 +35,8 @@ public class Families {
             titles,
             keyframes,
             shapes,
-            perimeters;
+            perimeters,
+            verts;
 
     public Families() {
         roots = Family.all(GraphRoot.class).exclude(TagNoProcess.class, TagNoProcessGraph.class).get();
@@ -65,6 +66,7 @@ public class Families {
         keyframes = Family.all(Keyframes.class).exclude(TagNoProcess.class).get();
         shapes = Family.all(Shape.class).exclude(TagNoProcess.class).get();
         perimeters = Family.all(Perimeter.class).exclude(TagNoProcess.class).get();
+        verts = Family.all(Verts.class).exclude(Keyframes.class, Trajectory.class, TagNoProcess.class).get();
     }
 
 }
