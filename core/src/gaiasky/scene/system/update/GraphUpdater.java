@@ -2,12 +2,15 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.Gdx;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagNoProcess;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
@@ -16,7 +19,6 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-import gaiasky.util.tree.IPosition;
 import net.jafama.FastMath;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,6 +36,8 @@ public class GraphUpdater extends AbstractUpdateSystem {
     private Vector3d D31;
     private Vector3b B31;
 
+    private SpacecraftView view;
+
     /**
      * Instantiates a system that will iterate over the entities described by the Family.
      *
@@ -44,6 +48,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
         this.time = time;
         this.D31 = new Vector3d();
         this.B31 = new Vector3b();
+        this.view = new SpacecraftView();
     }
 
     public void setCamera(ICamera camera) {
@@ -122,6 +127,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             }
 
             graph.translation.set(parentTransform);
+            // Update local values.
             if (graph.positionUpdaterConsumer != null) {
                 graph.positionUpdaterConsumer.apply(this, entity, graph);
             }
@@ -223,12 +229,70 @@ public class GraphUpdater extends AbstractUpdateSystem {
         var parentSa = Mapper.sa.get(graph.parent);
 
         boolean update = parentBody.solidAngle > parentSa.thresholdQuad * 30f;
-        if(update) {
+        if (update) {
             entity.remove(TagNoProcess.class);
         } else {
             entity.add(getEngine().createComponent(TagNoProcess.class));
         }
         return update;
+    }
+
+    public void updateSpacecraft(Entity entity, GraphNode graph) {
+        view.setEntity(entity);
+        var engine = view.engine;
+
+        if (engine.yawv != 0 || engine.pitchv != 0 || engine.rollv != 0 || engine.vel.len2() != 0 || engine.render) {
+            var coord = Mapper.coordinates.get(entity);
+
+            // We use the simulation time for the integration
+            // Poll keys
+            if (camera.getMode().isSpacecraft()) {
+                view.pollKeys(Gdx.graphics.getDeltaTime());
+            }
+
+            double dt = time.getDt();
+
+            // POSITION
+            coord.coordinates.getEquatorialCartesianCoordinates(time.getTime(), view.body.pos);
+
+            if (engine.leveling) {
+                // No velocity, we just stop Euler angle motions
+                if (engine.yawv != 0) {
+                    engine.yawp = -Math.signum(engine.yawv) * MathUtilsd.clamp(Math.abs(engine.yawv), 0, 1);
+                }
+                if (engine.pitchv != 0) {
+                    engine.pitchp = -Math.signum(engine.pitchv) * MathUtilsd.clamp(Math.abs(engine.pitchv), 0, 1);
+                }
+                if (engine.rollv != 0) {
+                    engine.rollp = -Math.signum(engine.rollv) * MathUtilsd.clamp(Math.abs(engine.rollv), 0, 1);
+                }
+                if (Math.abs(engine.yawv) < 1e-3 && Math.abs(engine.pitchv) < 1e-3 && Math.abs(engine.rollv) < 1e-3) {
+                    engine.setYawPower(0);
+                    engine.setPitchPower(0);
+                    engine.setRollPower(0);
+
+                    engine.yawv = 0;
+                    engine.pitchv = 0;
+                    engine.rollv = 0;
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
+                }
+            }
+
+            double rollDiff = view.computeDirectionUp(dt, engine.dirup);
+
+            double len = engine.direction.len();
+            engine.pitch = Math.asin(engine.direction.y / len);
+            engine.yaw = Math.atan2(engine.direction.z, engine.direction.x);
+            engine.roll += rollDiff;
+
+            engine.pitch = Math.toDegrees(engine.pitch);
+            engine.yaw = Math.toDegrees(engine.yaw);
+        }
+        // Update float vectors
+        Vector3b camPos = B31.set(view.body.pos).add(camera.getInversePos());
+        camPos.put(engine.posf);
+        engine.direction.put(engine.directionf);
+        engine.up.put(engine.upf);
     }
 
 }

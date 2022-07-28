@@ -1,6 +1,8 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Quaternion;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -282,5 +284,28 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
         up.rotate(direction, -rollDiff);
 
         return rollDiff;
+    }
+
+    public void pollKeys(double dt) {
+        double powerStep = dt / engine.fullPowerTime;
+        if (Gdx.input.isKeyPressed(Keys.W))
+            setCurrentEnginePower(engine.currentEnginePower + powerStep);
+        if (Gdx.input.isKeyPressed(Keys.S))
+            setCurrentEnginePower(engine.currentEnginePower - powerStep);
+
+        if (Gdx.input.isKeyPressed(Keys.A))
+            setRollPower(engine.rollp + powerStep);
+        if (Gdx.input.isKeyPressed(Keys.D))
+            setRollPower(engine.rollp - powerStep);
+
+        if (Gdx.input.isKeyPressed(Keys.DOWN))
+            setPitchPower(engine.pitchp + powerStep);
+        if (Gdx.input.isKeyPressed(Keys.UP))
+            setPitchPower(engine.pitchp - powerStep);
+
+        if (Gdx.input.isKeyPressed(Keys.LEFT))
+            setYawPower(engine.yawp + powerStep);
+        if (Gdx.input.isKeyPressed(Keys.RIGHT))
+            setYawPower(engine.yawp - powerStep);
     }
 }

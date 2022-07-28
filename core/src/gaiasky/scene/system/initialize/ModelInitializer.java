@@ -23,6 +23,7 @@ import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Planet;
@@ -98,7 +99,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         // First init spacecraft if needed
         if (isSpacecraft) {
-            initializeSpacecraft(entity, base, body, model, scaffolding, engine);
+            initializeSpacecraft(entity, base, body, graph, model, scaffolding, engine);
         }
 
         // Initialize model body
@@ -181,8 +182,12 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    private void initializeSpacecraft(Entity entity, Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
+    private void initializeSpacecraft(Entity entity, Base base, Body body, GraphNode graph, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
+        // Model renderer.
         model.renderConsumer = ModelEntityRenderSystem::renderSpacecraft;
+
+        // Updater.
+        graph.positionUpdaterConsumer = GraphUpdater::updateSpacecraft;
 
         base.ct = new ComponentTypes(ComponentType.Satellites);
         engine.rotationMatrix = new Matrix4();

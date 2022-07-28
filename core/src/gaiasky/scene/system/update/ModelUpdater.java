@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.AffineTransformations;
 import gaiasky.scene.component.Body;
@@ -37,7 +39,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
     private ICamera camera;
     private Vector3 F31;
-    private Vector3d  D32;
+    private Vector3d D32;
     private Matrix4d MD4;
     private Quaternion QF;
     private Quaterniond QD;
@@ -65,6 +67,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         var scaffolding = Mapper.modelScaffolding.get(entity);
         var atmosphere = Mapper.atmosphere.get(entity);
         var cloud = Mapper.cloud.get(entity);
+        var engine = Mapper.engine.get(entity);
 
         // Update light with global position
         if (model.model != null && body.distToCamera <= LIGHT_X1) {
@@ -101,6 +104,9 @@ public class ModelUpdater extends AbstractUpdateSystem {
         if (cloud != null && cloud.cloud != null) {
             cloud.cloud.update(graph.translation);
             setToLocalTransform(entity, body, graph, cloud.cloud.size, 1, cloud.cloud.localTransform, true);
+        }
+        if (engine != null && engine.render) {
+            EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(), engine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
         }
     }
 
