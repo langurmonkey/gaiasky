@@ -122,6 +122,17 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 // Billboards use quaternion orientation.
                 DecalUtils.setBillboardRotation(QF, body.pos.put(D32).nor(), new Vector3d(0, 1, 0));
                 graph.translation.setToTranslation(localTransform).scl(size).rotate(QF);
+            } else if (Mapper.engine.has(entity)) {
+                // Spacecraft.
+                var engine = Mapper.engine.get(entity);
+
+                // Spacecraft
+                localTransform.idt().setToLookAt(engine.posf, engine.directionf.add(engine.posf), engine.upf).inv();
+                localTransform.scale(size, size, size);
+
+                // Rotation for attitude indicator
+                engine.rotationMatrix.idt().setToLookAt(engine.directionf, engine.upf);
+                engine.rotationMatrix.getRotation(engine.qf);
             } else if (Mapper.attitude.has(entity)) {
                 // Satellites have attitude.
                 var attitude = Mapper.attitude.get(entity);

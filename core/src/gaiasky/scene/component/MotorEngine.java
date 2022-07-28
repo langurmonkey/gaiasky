@@ -1,6 +1,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -13,7 +14,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.stream.Stream;
 
-public class MotorEngine implements Component, ISpacecraft {
+public class MotorEngine implements Component, ISpacecraft, ICopy {
     /** Max speed in relativistic mode **/
     private static final double relativisticSpeedCap = Constants.C_US * 0.99999;
 
@@ -225,4 +226,48 @@ public class MotorEngine implements Component, ISpacecraft {
         return stopping;
     }
 
+    @Override
+    public Component getCopy(Engine engine) {
+        var copy = engine.createComponent(this.getClass());
+        copy.force = new Vector3d(this.force);
+        copy.accel = new Vector3d(this.accel);
+        copy.vel = new Vector3d(this.vel);
+
+        copy.fullPowerTime = this.fullPowerTime;
+
+        copy.posf = new Vector3(this.posf);
+        copy.direction = new Vector3d(this.direction);
+        copy.directionf = new Vector3(this.directionf);
+        copy.up = new Vector3d(this.up);
+        copy.upf = new Vector3(this.upf);
+        copy.thrust = new Vector3d(this.thrust);
+
+        copy.mass = this.mass;
+
+        copy.rotationMatrix = new Matrix4(this.rotationMatrix);
+
+        copy.thrustFactorIndex = this.thrustFactorIndex;
+
+        copy.currentEnginePower = this.currentEnginePower;
+
+        copy.yawp = this.yawp;
+        copy.yawf = this.yawf;
+        copy.yawa = this.yawa;
+        copy.yawv = this.yawv;
+
+        copy.pitchp = this.pitchp;
+        copy.pitchf = this.pitchf;
+        copy.pitcha = this.pitcha;
+        copy.pitchv = this.pitchv;
+
+        copy.rollp = this.rollp;
+        copy.rollf = this.rollf;
+        copy.rolla = this.rolla;
+        copy.rollv = this.rollv;
+
+        copy.leveling = this.leveling;
+        copy.stopping = this.stopping;
+
+        return copy;
+    }
 }

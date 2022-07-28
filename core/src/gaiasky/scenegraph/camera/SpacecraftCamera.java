@@ -19,6 +19,8 @@ import gaiasky.event.IObserver;
 import gaiasky.input.MainGamepadListener;
 import gaiasky.input.SpacecraftGamepadListener;
 import gaiasky.input.SpacecraftMouseKbdListener;
+import gaiasky.scene.view.FocusView;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -43,7 +45,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     public Vector3d direction, up;
     public Vector3b relpos;
 
-    private Spacecraft sc;
+    private Entity sc;
+    private SpacecraftView view;
 
     /**
      * The input inputListener attached to this camera
@@ -101,6 +104,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         dirup = new Pair<>(scdir, scup);
 
+        view = new SpacecraftView();
+
         // init camera
         camera = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = (float) CAM_NEAR;
@@ -132,8 +137,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.SPACECRAFT_LOADED, Event.SPACECRAFT_MACHINE_SELECTION_INFO);
     }
 
-    public Spacecraft getSpacecraft() {
+    public Entity getSpacecraft() {
         return this.sc;
+    }
+    public SpacecraftView getSpacecraftView() {
+        return this.view;
     }
 
     @Override
@@ -185,15 +193,15 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // We use the simulation time for the integration
         //double sdt = time.getDt() * Constants.H_TO_S;
 
-        scthrust.set(sc.thrust);
-        scforce.set(sc.force);
-        scaccel.set(sc.accel);
-        scvel.set(sc.vel);
-        scpos.set(sc.pos);
-        scpos = ((SpacecraftCoordinates) sc.getCoordinates()).computePosition(dt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
-        scdir.set(sc.direction);
-        scup.set(sc.up);
-        sc.computeDirectionUp(dt, dirup);
+        scthrust.set(view.thrust());
+        scforce.set(view.force());
+        scaccel.set(view.accel());
+        scvel.set(view.vel());
+        scpos.set(view.pos());
+        scpos = ((SpacecraftCoordinates) view.getCoordinates()).computePosition(dt, secondClosest, view.currentEnginePower(), scthrust, view.direction(), scforce, scaccel, scvel, scpos);
+        scdir.set(view.direction());
+        scup.set(view.up());
+        view.computeDirectionUp(dt, dirup);
 
         /* ACTUAL UPDATE */
         updateHard(dt);
@@ -238,7 +246,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             aux1b.set(scup).nor().scl(tDistOverFov * 0.125d);
             desired.add(aux1b);
             todesired.set(desired).sub(relpos);
-            todesired.scl(dt * sc.getResponsiveness()).scl(3e-6d);
+            todesired.scl(dt * view.getResponsiveness()).scl(3e-6d);
             relpos.add(todesired);
             pos.set(scpos).add(relpos);
 
@@ -251,7 +259,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             // UP
             desired.set(scup);
             todesired.set(desired).sub(up);
-            todesired.scl(dt * sc.getResponsiveness()).scl(1e-8d);
+            todesired.scl(dt * view.getResponsiveness()).scl(1e-8d);
             up.add(todesired).nor();
         }
     }
@@ -284,30 +292,31 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     addGamepadListener();
 
                     Controllers.clearListeners();
-                    sc.stopAllMovement();
+                    view.stopAllMovement();
 
                     // Put spacecraft at location of previous camera
-                    sc.pos.set(previousCam.getPos());
-                    sc.direction.set(previousCam.getDirection());
-                    sc.up.set(sc.pos).crs(sc.direction);
+                    view.pos().set(previousCam.getPos());
+                    view.direction().set(previousCam.getDirection());
+                    view.up().set(view.pos()).crs(view.direction());
 
-                    pos.set(sc.pos);
-                    direction.set(sc.direction);
-                    up.set(sc.up);
+                    pos.set(view.pos());
+                    direction.set(view.direction());
+                    up.set(view.up());
 
                     updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 });
             } else {
                 // Exit SC mode
-                if (sc != null)
+                if (view != null && view.getEntity() != null) {
                     GaiaSky.postRunnable(() -> {
                         // Remove mouse+keyboard input listener.
                         im.removeProcessor(spacecraftMouseKbdListener);
                         // Remove gamepad listener.
                         removeGamepadListener();
                         // Stop spacecraft.
-                        sc.stopAllMovement();
+                        view.stopAllMovement();
                     });
+                }
             }
         }
     }
@@ -351,7 +360,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case SPACECRAFT_LOADED:
-            this.sc = (Spacecraft) data[0];
+            sc = (Entity) data[0];
+            view.setEntity(sc);
             updateTargetDistance();
             break;
         case SPACECRAFT_MACHINE_SELECTION_INFO:
@@ -363,7 +373,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     private void updateTargetDistance() {
-        this.targetDistance = sc.size * 3.5;
+        this.targetDistance = view.size() * 3.5;
     }
 
     @Override
@@ -373,9 +383,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     @Override
     public void checkClosestBody(IFocus cb) {
         super.checkClosestBody(cb);
-        if (sc != null)
-            if (secondClosest == null || (cb != sc && cb.getDistToCamera() < secondClosest.getDistToCamera())) //-V6007
+        if (sc != null && cb instanceof FocusView) {
+            FocusView fv = (FocusView) cb;
+            if (secondClosest == null || (fv.getEntity() != sc && cb.getDistToCamera() < secondClosest.getDistToCamera())) {
                 secondClosest = cb;
+            }
+        }
     }
 
     @Override

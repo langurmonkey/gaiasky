@@ -8,6 +8,7 @@ import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Model;
 import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scene.component.MotorEngine;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
@@ -19,34 +20,36 @@ import gaiasky.util.math.MathUtilsd;
  * Picks up spacecraft events and relays them to the entity.
  */
 public class SpacecraftRadio extends EntityRadio {
-    private static final Log logger = Logger.getLogger(SpacecraftRadio.class);
+
+    private SpacecraftView view;
 
     public SpacecraftRadio(Entity entity) {
         super(entity);
+        this.view = new SpacecraftView();
     }
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        var engine = entity.getComponent(MotorEngine.class);
+        view.setEntity(entity);
         switch (event) {
         case CAMERA_MODE_CMD:
             CameraMode mode = (CameraMode) data[0];
-            engine.render = mode == CameraMode.SPACECRAFT_MODE;
+            view.engine.render = mode == CameraMode.SPACECRAFT_MODE;
             break;
         case SPACECRAFT_STABILISE_CMD:
-            engine.leveling = (Boolean) data[0];
+            view.engine.leveling = (Boolean) data[0];
             break;
         case SPACECRAFT_STOP_CMD:
-            engine.stopping = (Boolean) data[0];
+            view.engine.stopping = (Boolean) data[0];
             break;
         case SPACECRAFT_THRUST_DECREASE_CMD:
-            decreaseThrustFactorIndex(engine, true);
+            view.decreaseThrustFactorIndex(true);
             break;
         case SPACECRAFT_THRUST_INCREASE_CMD:
-            increaseThrustFactorIndex(engine, true);
+            view.increaseThrustFactorIndex(true);
             break;
         case SPACECRAFT_THRUST_SET_CMD:
-            setThrustFactorIndex(engine, (Integer) data[0], false);
+            view.setThrustFactorIndex((Integer) data[0], false);
             break;
         case SPACECRAFT_MACHINE_SELECTION_CMD:
             int newMachineIndex = (Integer) data[0];
@@ -55,11 +58,10 @@ public class SpacecraftRadio extends EntityRadio {
                 setToMachine(entity.getComponent(Body.class),
                         entity.getComponent(Model.class),
                         entity.getComponent(ModelScaffolding.class),
-                        engine,
-                        engine.machines[newMachineIndex], true);
-                engine.currentMachine = newMachineIndex;
-                // TODO activate
-                //EventManager.publish(Event.SPACECRAFT_MACHINE_SELECTION_INFO, this, engine.machines[newMachineIndex]);
+                        view.engine,
+                        view.engine.machines[newMachineIndex], true);
+                view.engine.currentMachine = newMachineIndex;
+                EventManager.publish(Event.SPACECRAFT_MACHINE_SELECTION_INFO, this, view.engine.machines[newMachineIndex]);
             });
             break;
         default:
@@ -92,33 +94,4 @@ public class SpacecraftRadio extends EntityRadio {
         }
     }
 
-    public void increaseThrustFactorIndex(MotorEngine engine, boolean broadcast) {
-        engine.thrustFactorIndex = (engine.thrustFactorIndex + 1) % engine.thrustFactor.length;
-        logger.info("Thrust factor: " + engine.thrustFactor[engine.thrustFactorIndex]);
-        if (broadcast) {
-            // TODO activate
-            //EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
-        }
-    }
-
-    public void decreaseThrustFactorIndex(MotorEngine engine, boolean broadcast) {
-        engine.thrustFactorIndex = engine.thrustFactorIndex - 1;
-        if (engine.thrustFactorIndex < 0)
-            engine.thrustFactorIndex = engine.thrustFactor.length - 1;
-        logger.info("Thrust factor: " + engine.thrustFactor[engine.thrustFactorIndex]);
-        if (broadcast) {
-            // TODO activate
-            //EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
-        }
-    }
-
-    public void setThrustFactorIndex(MotorEngine engine, int i, boolean broadcast) {
-        assert i >= 0 && i < engine.thrustFactor.length : "Index " + i + " out of range of thrustFactor vector: [0.." + (engine.thrustFactor.length - 1);
-        engine.thrustFactorIndex = i;
-        logger.info("Thrust factor: " + engine.thrustFactor[engine.thrustFactorIndex]);
-        if (broadcast) {
-            // TODO activate
-            //EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, engine.thrustFactorIndex);
-        }
-    }
 }

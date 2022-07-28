@@ -33,6 +33,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsd;
@@ -45,6 +46,9 @@ import gaiasky.util.math.Vector3d;
  * BillboardGalaxy.
  */
 public class ModelInitializer extends AbstractInitSystem {
+
+    /** Reference to the spacecraft radio. **/
+    private SpacecraftRadio radio;
 
     public ModelInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -94,7 +98,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         // First init spacecraft if needed
         if (isSpacecraft) {
-            initializeSpacecraft(base, body, model, scaffolding, engine);
+            initializeSpacecraft(entity, base, body, model, scaffolding, engine);
         }
 
         // Initialize model body
@@ -156,11 +160,12 @@ public class ModelInitializer extends AbstractInitSystem {
             }
         }
         if (engine != null) {
-            // Spacecraft.
-            // Broadcast me
-            // TODO activate
-            //EventManager.publish(Event.SPACECRAFT_LOADED, this, this);
-
+            // Spacecraft radio.
+            EventManager.publish(Event.SPACECRAFT_LOADED, this, entity);
+            if (this.radio != null) {
+                EventManager.instance.unsubscribe(this.radio, Event.CAMERA_MODE_CMD);
+                this.radio = null;
+            }
             EventManager.instance.subscribe(new SpacecraftRadio(entity), Event.CAMERA_MODE_CMD, Event.SPACECRAFT_STABILISE_CMD, Event.SPACECRAFT_STOP_CMD, Event.SPACECRAFT_THRUST_DECREASE_CMD, Event.SPACECRAFT_THRUST_INCREASE_CMD, Event.SPACECRAFT_THRUST_SET_CMD, Event.SPACECRAFT_MACHINE_SELECTION_CMD);
         }
         if (fade != null) {
@@ -176,11 +181,14 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    private void initializeSpacecraft(Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
+    private void initializeSpacecraft(Entity entity, Base base, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
         model.renderConsumer = ModelEntityRenderSystem::renderSpacecraft;
 
         base.ct = new ComponentTypes(ComponentType.Satellites);
         engine.rotationMatrix = new Matrix4();
+
+        this.radio = new SpacecraftRadio(entity);
+        EventManager.instance.subscribe(this.radio, Event.CAMERA_MODE_CMD);
 
         // position attributes
         engine.force = new Vector3d();
@@ -209,6 +217,16 @@ public class ModelInitializer extends AbstractInitSystem {
 
         // Use first model
         setToMachine(engine.machines[engine.currentMachine], false, body, model, scaffolding, engine);
+
+        // Coordinates
+        SpacecraftCoordinates scc = new SpacecraftCoordinates();
+        scc.setSpacecraft(engine);
+
+        var coord = Mapper.coordinates.get(entity);
+        coord.coordinates = scc;
+
+        var label = Mapper.label.get(entity);
+        label.labelFactor = 0;
     }
 
     private void initializeModel(Base base, Body body, Model model, Celestial celestial, Billboard bb, SolidAngle sa, Label label, ModelScaffolding scaffolding, GraphNode graph, Focus focus, boolean isBillboardGal) {

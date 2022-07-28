@@ -1,9 +1,11 @@
 package gaiasky.input;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.input.GestureDetector;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.SpacecraftCamera;
 import gaiasky.util.Settings;
@@ -22,48 +24,48 @@ public class SpacecraftMouseKbdListener extends AbstractMouseKbdListener {
 
     @Override
     public boolean keyDown(int keycode) {
-        Spacecraft sc = cam.getSpacecraft();
+        SpacecraftView sc = cam.getSpacecraftView();
         if (sc != null && Settings.settings.runtime.inputEnabled) {
             double step = 0.01;
             switch (keycode) {
             case Keys.W:
                 // power 1
-                sc.setCurrentEnginePower(sc.currentEnginePower + step);
+                sc.setCurrentEnginePower(sc.currentEnginePower() + step);
                 EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
                 break;
             case Keys.S:
                 // power -1
-                sc.setCurrentEnginePower(sc.currentEnginePower - step);
+                sc.setCurrentEnginePower(sc.currentEnginePower() - step);
                 EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
                 break;
             case Keys.A:
                 // roll 1
-                sc.setRollPower(sc.rollp + step);
+                sc.setRollPower(sc.getRollPower() + step);
                 EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
                 break;
             case Keys.D:
                 // roll -1
-                sc.setRollPower(sc.rollp - step);
+                sc.setRollPower(sc.getRollPower() - step);
                 EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                 break;
             case Keys.DOWN:
                 // pitch 1
-                sc.setPitchPower(sc.pitchp + step);
+                sc.setPitchPower(sc.getPitchPower() + step);
                 EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                 break;
             case Keys.UP:
                 // pitch -1
-                sc.setPitchPower(sc.pitchp - step);
+                sc.setPitchPower(sc.getPitchPower() - step);
                 EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                 break;
             case Keys.LEFT:
                 // yaw 1
-                sc.setYawPower(sc.yawp + step);
+                sc.setYawPower(sc.getYawPower() + step);
                 EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                 break;
             case Keys.RIGHT:
                 // yaw -1
-                sc.setYawPower(sc.yawp - step);
+                sc.setYawPower(sc.getYawPower() - step);
                 EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                 break;
             default:
@@ -76,8 +78,8 @@ public class SpacecraftMouseKbdListener extends AbstractMouseKbdListener {
 
     @Override
     public boolean keyUp(int keycode) {
-        Spacecraft sc = cam.getSpacecraft();
-        if (sc != null && Settings.settings.runtime.inputEnabled) {
+        SpacecraftView sc = cam.getSpacecraftView();
+        if (sc != null && sc.getEntity() != null && Settings.settings.runtime.inputEnabled) {
             switch (keycode) {
             case Keys.W:
             case Keys.S:

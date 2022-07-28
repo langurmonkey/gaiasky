@@ -5,9 +5,11 @@
 
 package gaiasky.input;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.controllers.Controller;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.SpacecraftCamera;
@@ -37,7 +39,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
             double thrustBwd = lastController.getAxis(mappings.getAxisLT());
 
             if (Math.abs(thrust) < 0.05 && Math.abs(thrustFwd) < 0.05 && Math.abs(thrustBwd) < 0.05) {
-                cam.getSpacecraft().setCurrentEnginePower(0);
+                cam.getSpacecraftView().setCurrentEnginePower(0);
             }
         }
     }
@@ -50,7 +52,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
 
         addPressedKey(buttonCode);
 
-        Spacecraft sc = cam.getSpacecraft();
+        SpacecraftView sc = cam.getSpacecraftView();
         if (buttonCode == mappings.getButtonRB()) {
             sc.setRollPower(-1);
             EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
@@ -65,7 +67,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
     @Override
     public boolean buttonUp(Controller controller, final int buttonCode) {
         logger.debug("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
-        Spacecraft sc = cam.getSpacecraft();
+        SpacecraftView sc = cam.getSpacecraftView();
 
         if (buttonCode == mappings.getButtonX()) {
             // stop spaceship
@@ -108,7 +110,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
     public boolean axisMoved(Controller controller, int axisCode, float value) {
         logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
 
-        Spacecraft sc = cam.getSpacecraft();
+        SpacecraftView sc = cam.getSpacecraftView();
         boolean treated = false;
 
         // Zero point

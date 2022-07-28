@@ -181,9 +181,9 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
         super.doneLoading(manager);
 
         // Broadcast me
-        EventManager.publish(Event.SPACECRAFT_LOADED, this, this);
+        //EventManager.publish(Event.SPACECRAFT_LOADED, this, this);
 
-        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.SPACECRAFT_STABILISE_CMD, Event.SPACECRAFT_STOP_CMD, Event.SPACECRAFT_THRUST_DECREASE_CMD, Event.SPACECRAFT_THRUST_INCREASE_CMD, Event.SPACECRAFT_THRUST_SET_CMD, Event.SPACECRAFT_MACHINE_SELECTION_CMD);
+        //EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.SPACECRAFT_STABILISE_CMD, Event.SPACECRAFT_STOP_CMD, Event.SPACECRAFT_THRUST_DECREASE_CMD, Event.SPACECRAFT_THRUST_INCREASE_CMD, Event.SPACECRAFT_THRUST_SET_CMD, Event.SPACECRAFT_MACHINE_SELECTION_CMD);
     }
 
     /**
@@ -238,7 +238,7 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
             GaiaSky.postRunnable(() -> {
                 this.setToMachine(machines[newMachineIndex], true);
                 this.currentMachine = newMachineIndex;
-                EventManager.publish(Event.SPACECRAFT_MACHINE_SELECTION_INFO, this, machines[newMachineIndex]);
+                //EventManager.publish(Event.SPACECRAFT_MACHINE_SELECTION_INFO, this, machines[newMachineIndex]);
             });
             break;
         default:
@@ -252,7 +252,7 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
         super.updateLocal(time, camera);
 
         if (render) {
-            EventManager.publish(Event.SPACECRAFT_INFO, this, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], currentEnginePower, yawp, pitchp, rollp);
+            //EventManager.publish(Event.SPACECRAFT_INFO, this, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], currentEnginePower, yawp, pitchp, rollp);
         }
     }
 
@@ -349,7 +349,7 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
                     yawv = 0;
                     pitchv = 0;
                     rollv = 0;
-                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
+                    //EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                 }
             }
 
@@ -446,8 +446,8 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
     public void increaseThrustFactorIndex(boolean broadcast) {
         thrustFactorIndex = (thrustFactorIndex + 1) % thrustFactor.length;
         logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
-        if (broadcast)
-            EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
+        //if (broadcast)
+            //EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
     }
 
     public void decreaseThrustFactorIndex(boolean broadcast) {
@@ -455,16 +455,16 @@ public class Spacecraft extends GenericSpacecraft implements ISpacecraft, ILineR
         if (thrustFactorIndex < 0)
             thrustFactorIndex = thrustFactor.length - 1;
         logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
-        if (broadcast)
-            EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
+        //if (broadcast)
+            //EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
     }
 
     public void setThrustFactorIndex(int i, boolean broadcast) {
         assert i >= 0 && i < thrustFactor.length : "Index " + i + " out of range of thrustFactor vector: [0.." + (thrustFactor.length - 1);
         thrustFactorIndex = i;
         logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
-        if (broadcast)
-            EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
+        //if (broadcast)
+            //EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
     }
 
     /**

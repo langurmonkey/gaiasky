@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
@@ -31,6 +32,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -67,7 +69,8 @@ public class SpacecraftGui extends AbstractGui {
     private SelectBox<MachineDefinition> machineSelector;
 
     // The spacecraft object
-    private Spacecraft sc;
+    private Entity sc;
+    private SpacecraftView view;
 
     // Number format
     private final DecimalFormat nf;
@@ -107,6 +110,7 @@ public class SpacecraftGui extends AbstractGui {
         this.skin = skin;
         aux3f1 = new Vector3();
         aux3f2 = new Vector3();
+        view = new SpacecraftView();
 
         nf = new DecimalFormat("##0.##");
         sf = new DecimalFormat("#0.###E0");
@@ -193,7 +197,7 @@ public class SpacecraftGui extends AbstractGui {
         stabilise.setProgrammaticChangeEvents(false);
         stabilise.setName("stabilise");
         if (sc != null)
-            stabilise.setChecked(sc.isStabilising());
+            stabilise.setChecked(view.isStabilising());
         stabilise.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(gaiasky.event.Event.SPACECRAFT_STABILISE_CMD, stabilise, stabilise.isChecked());
@@ -207,7 +211,7 @@ public class SpacecraftGui extends AbstractGui {
         stop.setProgrammaticChangeEvents(false);
         stop.setName("stop spacecraft");
         if (sc != null)
-            stop.setChecked(sc.isStopping());
+            stop.setChecked(view.isStopping());
         stop.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(gaiasky.event.Event.SPACECRAFT_STOP_CMD, stop, stop.isChecked());
@@ -305,8 +309,8 @@ public class SpacecraftGui extends AbstractGui {
 
         // Spaceship selector
         machineSelector = new OwnSelectBox<>(skin);
-        machineSelector.setItems(sc.getMachines());
-        machineSelector.setSelected(sc.getMachines()[sc.getCurrentMachine()]);
+        machineSelector.setItems(view.getMachines());
+        machineSelector.setSelected(view.getMachines()[view.getCurrentMachine()]);
         machineSelector.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 int machineIndex = machineSelector.getSelectedIndex();
@@ -604,9 +608,10 @@ public class SpacecraftGui extends AbstractGui {
     public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
         switch (event) {
         case SPACECRAFT_LOADED:
-            this.sc = (Spacecraft) data[0];
-            this.qf = sc.getRotationQuaternion();
-            this.vel = sc.vel;
+            this.sc = (Entity) data[0];
+            this.view.setEntity(this.sc);
+            this.qf = view.getRotationQuaternion();
+            this.vel = view.vel();
             break;
         case SPACECRAFT_STABILISE_CMD:
             Boolean state = (Boolean) data[0];

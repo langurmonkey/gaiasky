@@ -759,7 +759,7 @@ public class GuiRegistry implements IObserver {
             globalResources.updateSkin();
             GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
-            EventManager.publish(Event.SPACECRAFT_LOADED, this, GaiaSky.instance.sceneGraph.getNode("Spacecraft"));
+            EventManager.publish(Event.SPACECRAFT_LOADED, this, scene.getEntity("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();
             // Time init
             EventManager.publish(Event.TIME_CHANGE_INFO, this, GaiaSky.instance.time.getTime());
