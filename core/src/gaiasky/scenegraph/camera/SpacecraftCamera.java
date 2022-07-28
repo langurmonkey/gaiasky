@@ -398,7 +398,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         super.checkClosestBody(cb);
         if (sc != null && cb != null) {
             auxView.setEntity(cb);
-            if (cb != sc && auxView.getDistToCamera() < secondClosest.getDistToCamera()) {
+            if (secondClosest.isEmpty() || (cb != sc && auxView.getDistToCamera() < secondClosest.getDistToCamera())) {
                 secondClosest.setEntity(cb);
             }
         }

@@ -251,6 +251,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void load(Matrix4 localTransform) {
+        if (manager == null) {
+            manager = AssetBean.manager();
+        }
         if (manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
             this.doneLoading(manager, localTransform, null);
             this.modelLoading = false;

@@ -92,6 +92,8 @@ public class ModelInitializer extends AbstractInitSystem {
         if (!Mapper.tagQuatOrientation.has(entity)) {
             // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
             body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
+        } else if (engine != null) {
+            body.size = (float) (body.size * Constants.KM_TO_U);
         } else {
             // Billboards, just double it.
             body.size = body.size * 2f;
@@ -360,7 +362,7 @@ public class ModelInitializer extends AbstractInitSystem {
         engine.drag = machine.getDrag();
         engine.responsiveness = MathUtilsd.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         engine.machineName = machine.getName();
-        body.setSize(machine.getSize());
+        body.setSize(machine.getSize() * Constants.KM_TO_U);
 
         if (initialize) {
             // Neither loading nor initialized
