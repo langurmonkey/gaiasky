@@ -15,6 +15,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
@@ -64,8 +65,8 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     final static double baseWidthAngle = Math.toRadians(.13);
     final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
 
-    public LineQuadstripRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public LineQuadstripRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         doublePool = new DoubleArrayPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
         provisionalLines = new Array<>();
         provLines = new Array<>();

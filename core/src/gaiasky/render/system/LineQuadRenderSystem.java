@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Pool;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -62,8 +63,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     final static double baseWidthAngle = Math.toRadians(.13);
     final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
 
-    public LineQuadRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public LineQuadRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         doublePool = new DoubleArrayPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
         provisionalLines = new Array<>();
         provLines = new Array<>();

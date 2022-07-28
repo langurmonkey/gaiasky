@@ -17,6 +17,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.api.IGPUVertsRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
@@ -34,8 +35,8 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     protected boolean lines;
     protected int coordOffset;
 
-    public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
-        super(rg, alphas, shaders);
+    public VertGPURenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
+        super(sceneRenderer, rg, alphas, shaders);
         this.lines = lines;
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_VERTS_OBJECT);
     }

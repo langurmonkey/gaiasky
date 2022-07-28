@@ -17,6 +17,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -41,8 +42,8 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
     private final Random rand;
     private final Colormap cmap;
 
-    public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public ParticleGroupRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         rand = new Random(123);
         aux1 = new Vector3();
         cmap = new Colormap();

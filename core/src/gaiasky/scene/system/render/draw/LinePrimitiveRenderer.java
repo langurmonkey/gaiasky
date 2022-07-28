@@ -18,6 +18,7 @@ import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.view.LineView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -40,8 +41,8 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
 
     private ExtShaderProgram shaderProgram;
 
-    public LinePrimitiveRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public LinePrimitiveRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         view = new LineView();
         aux2 = new Vector3();
     }

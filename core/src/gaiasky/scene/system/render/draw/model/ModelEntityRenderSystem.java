@@ -16,7 +16,6 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
-import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
@@ -34,8 +33,10 @@ import java.util.Objects;
 public class ModelEntityRenderSystem {
 
     private final ParticleUtils utils;
+    private final SceneRenderer sceneRenderer;
 
-    public ModelEntityRenderSystem() {
+    public ModelEntityRenderSystem(SceneRenderer sr) {
+        this.sceneRenderer = sr;
         this.utils = new ParticleUtils();
     }
 
@@ -288,8 +289,8 @@ public class ModelEntityRenderSystem {
         var cc = body.color;
 
         float opacity = (float) MathUtilsd.lint(body.distToCamera, dist.distance / 50f, dist.distance, 1f, 0f);
-        ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(cc[0], cc[1], cc[2], 1f);
-        ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
+        ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(cc[0], cc[1], cc[2], 1f);
+        ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
         mc.update(alpha * opacity, relativistic);
         // Local transform
         graph.translation.setToTranslation(mc.instance.transform).scl((float) (extra.radius * 2d));
@@ -355,10 +356,10 @@ public class ModelEntityRenderSystem {
         var cloud = Mapper.cloud.get(entity);
         if (renderGroup == RenderGroup.MODEL_ATM) {
             // Atmosphere
-            renderAtmosphere(entity, body, model, scaffolding, batch, atmosphere, GaiaSky.instance.sgr.alphas[ComponentType.Atmospheres.ordinal()], rc);
+            renderAtmosphere(entity, body, model, scaffolding, batch, atmosphere, sceneRenderer.alphas[ComponentType.Atmospheres.ordinal()], rc);
         } else if (renderGroup == RenderGroup.MODEL_CLOUD) {
             // Clouds
-            renderClouds(entity, base, model, cloud, batch, GaiaSky.instance.sgr.alphas[ComponentType.Clouds.ordinal()], t);
+            renderClouds(entity, base, model, cloud, batch, sceneRenderer.alphas[ComponentType.Clouds.ordinal()], t);
         } else {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
@@ -424,7 +425,6 @@ public class ModelEntityRenderSystem {
     protected void prepareShadowEnvironment(Entity entity, Model model, ModelScaffolding scaffolding) {
         if (Settings.settings.scene.renderer.shadow.active) {
             Environment env = model.model.env;
-            SceneRenderer sceneRenderer = GaiaSky.instance.sceneRenderer;
             if (scaffolding.shadow > 0 && sceneRenderer.smTexMap.containsKey(entity)) {
                 Matrix4 combined = sceneRenderer.smCombinedMap.get(entity);
                 Texture tex = sceneRenderer.smTexMap.get(entity);

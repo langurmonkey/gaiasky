@@ -20,6 +20,7 @@ import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -53,8 +54,8 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
 
     private Texture starTex;
 
-    public VariableSetPointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public VariableSetPointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.alphaSizeBrRc = new float[4];
         this.opacityLimitsHl = new float[] { 2, 4 };

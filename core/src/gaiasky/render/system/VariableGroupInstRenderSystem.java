@@ -18,6 +18,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -46,8 +47,8 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
 
     private StarGroupTriComponent triComponent;
 
-    public VariableGroupInstRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public VariableGroupInstRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         this.aux1 = new Vector3();
         cmap = new Colormap();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());

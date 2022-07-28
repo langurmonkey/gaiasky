@@ -22,6 +22,7 @@ import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -50,8 +51,8 @@ public class VariableSetInstancedRenderer extends InstancedRenderSystem implemen
     private StarSetQuadComponent triComponent;
     private final ParticleUtils utils;
 
-    public VariableSetInstancedRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public VariableSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
         cmap = new Colormap();
 

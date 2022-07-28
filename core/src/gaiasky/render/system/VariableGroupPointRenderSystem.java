@@ -16,6 +16,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -49,8 +50,8 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
 
     private Texture starTex;
 
-    public VariableGroupPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public VariableGroupPointRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.alphaSizeBrRc = new float[4];
         this.opacityLimitsHl = new float[] { 2, 4 };

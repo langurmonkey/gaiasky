@@ -21,6 +21,7 @@ import gaiasky.render.system.InstancedRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
@@ -47,8 +48,8 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
 
     private final ParticleUtils utils;
 
-    public ParticleSetInstancedRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public ParticleSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
         comp = new DistToCameraComparator<>();
 

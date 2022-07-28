@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.IModelRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;
@@ -23,8 +24,8 @@ public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
      * @param alphas The alphas list.
      * @param batch  The model batch.
      */
-    public ModelBatchTessellationRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch) {
-        super(rg, alphas, null);
+    public ModelBatchTessellationRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, IntModelBatch batch) {
+        super(sceneRenderer, rg, alphas, null);
         this.batch = batch;
     }
 

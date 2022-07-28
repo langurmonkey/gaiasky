@@ -21,6 +21,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.RenderView;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -56,8 +57,8 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
 
     boolean initializing;
 
-    public SinglePointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
-        super(rg, alphas, shaders);
+    public SinglePointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
+        super(sceneRenderer, rg, alphas, shaders);
 
         this.view = new RenderView();
         this.ct = ct;

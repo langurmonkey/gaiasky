@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.IShapeRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
@@ -24,8 +25,8 @@ public class ShapeRenderSystem extends AbstractRenderSystem {
      */
     private final ShapeRenderer shapeRenderer;
 
-    public ShapeRenderSystem(final RenderGroup rg, final float[] alphas, final ShaderProgram spriteShader) {
-        super(rg, alphas, null);
+    public ShapeRenderSystem(SceneRenderer sceneRenderer, final RenderGroup rg, final float[] alphas, final ShaderProgram spriteShader) {
+        super(sceneRenderer, rg, alphas, null);
         this.shapeRenderer = new ShapeRenderer(5000, spriteShader);
 
     }

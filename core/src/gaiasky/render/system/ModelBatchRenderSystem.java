@@ -11,6 +11,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IModelRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
 
@@ -28,8 +29,8 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
      * @param alphas The alphas list.
      * @param batch  The model batch.
      */
-    public ModelBatchRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch) {
-        super(rg, alphas, null);
+    public ModelBatchRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, IntModelBatch batch) {
+        super(sceneRenderer, rg, alphas, null);
         this.batch = batch;
     }
 

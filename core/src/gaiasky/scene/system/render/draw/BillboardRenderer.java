@@ -20,6 +20,7 @@ import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.view.BillboardView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -47,8 +48,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
 
     // Render metadata
 
-    public BillboardRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
-        super(rg, alphas, programs);
+    public BillboardRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
+        super(sceneRenderer, rg, alphas, programs);
         this.componentType = componentType;
         init(texturePath, w, h, starTextureListener);
 
@@ -66,8 +67,8 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
      * @param componentType       The component type.
      * @param starTextureListener Whether to listen for star texture setting changes.
      */
-    public BillboardRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
-        this(rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
+    public BillboardRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
+        this(sceneRenderer, rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
     }
 
     private void init(String tex0, float w, float h, boolean starTextureListener) {

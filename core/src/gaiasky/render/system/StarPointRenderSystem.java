@@ -17,6 +17,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -47,8 +48,8 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
     boolean initializing;
 
-    public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
-        super(rg, alphas, shaders);
+    public StarPointRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
+        super(sceneRenderer, rg, alphas, shaders);
         EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
         this.ct = ct;
         this.alphaSizeBrRc = new float[4];

@@ -149,7 +149,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.globalResources = globalResources;
         this.rendering = new AtomicBoolean(false);
         this.renderAssets = new RenderAssets(globalResources);
-        this.shadowModelRenderer = new ModelEntityRenderSystem();
+        this.shadowModelRenderer = new ModelEntityRenderSystem(this);
     }
 
     @Override
@@ -253,129 +253,129 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
 
         // SINGLE STAR POINTS
-        AbstractRenderSystem singlePointProc = new SinglePointRenderer(POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
+        AbstractRenderSystem singlePointProc = new SinglePointRenderer(this, POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
         singlePointProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // SKYBOX - (MW panorama, CMWB)
-        AbstractRenderSystem skyboxProc = new ModelRenderer(SKYBOX, alphas, renderAssets.mbSkybox);
+        AbstractRenderSystem skyboxProc = new ModelRenderer(this, SKYBOX, alphas, renderAssets.mbSkybox);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
-        AbstractRenderSystem modelBackgroundProc = new ModelRenderer(MODEL_BG, alphas, renderAssets.mbVertexDiffuse);
+        AbstractRenderSystem modelBackgroundProc = new ModelRenderer(this, MODEL_BG, alphas, renderAssets.mbVertexDiffuse);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
-        AbstractRenderSystem modelGridsProc = new ModelRenderer(MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
+        AbstractRenderSystem modelGridsProc = new ModelRenderer(this, MODEL_VERT_GRID, alphas, renderAssets.mbVertexLightingGrid);
         modelGridsProc.addPostRunnables(clearDepthR);
 
         // RECURSIVE GRID
-        AbstractRenderSystem modelRecGridProc = new ModelRenderer(MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
+        AbstractRenderSystem modelRecGridProc = new ModelRenderer(this, MODEL_VERT_RECGRID, alphas, renderAssets.mbVertexLightingRecGrid);
         modelRecGridProc.addPreRunnables(regularBlendR, depthTestR);
 
         // ANNOTATIONS - (grids)
-        AbstractRenderSystem annotationsProc = new TextRenderer(FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
+        AbstractRenderSystem annotationsProc = new TextRenderer(this, FONT_ANNOTATION, alphas, renderAssets.spriteBatch, null, null, renderAssets.font2d, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardRenderer(BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
+        billboardStarsProc = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);
 
         // BILLBOARD GALAXIES
-        AbstractRenderSystem billboardGalaxiesProc = new BillboardRenderer(BILLBOARD_GAL, alphas, renderAssets.galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies, false);
+        AbstractRenderSystem billboardGalaxiesProc = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies, false);
         billboardGalaxiesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // BILLBOARD SPRITES
-        AbstractRenderSystem billboardSpritesProc = new BillboardRenderer(BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null, ComponentType.Clusters, false);
+        AbstractRenderSystem billboardSpritesProc = new BillboardRenderer(this, BILLBOARD_SPRITE, alphas, renderAssets.spriteShaders, null, ComponentType.Clusters, false);
         billboardSpritesProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
 
         // LINES CPU
         AbstractRenderSystem lineProc = getLineRenderSystem();
 
         // LINES GPU
-        AbstractRenderSystem lineGpuProc = new PrimitiveVertexRenderSystem<>(LINE_GPU, alphas, renderAssets.lineGpuShaders, true);
+        AbstractRenderSystem lineGpuProc = new PrimitiveVertexRenderSystem<>(this, LINE_GPU, alphas, renderAssets.lineGpuShaders, true);
         lineGpuProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // POINTS CPU
-        AbstractRenderSystem pointProc = new PointPrimitiveRenderSystem(POINT, alphas, renderAssets.pointShaders);
+        AbstractRenderSystem pointProc = new PointPrimitiveRenderSystem(this, POINT, alphas, renderAssets.pointShaders);
 
         // POINTS GPU
-        AbstractRenderSystem pointGpuProc = new PrimitiveVertexRenderSystem<>(POINT_GPU, alphas, renderAssets.lineGpuShaders, false);
+        AbstractRenderSystem pointGpuProc = new PrimitiveVertexRenderSystem<>(this, POINT_GPU, alphas, renderAssets.lineGpuShaders, false);
         pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODELS DUST AND MESH
-        AbstractRenderSystem modelMeshOpaqueProc = new ModelRenderer(MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
-        AbstractRenderSystem modelMeshAdditiveProc = new ModelRenderer(MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
+        AbstractRenderSystem modelMeshOpaqueProc = new ModelRenderer(this, MODEL_PIX_DUST, alphas, renderAssets.mbPixelLightingDust);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelRenderer(this, MODEL_VERT_ADDITIVE, alphas, renderAssets.mbVertexLightingAdditive);
         // MODEL PER-PIXEL-LIGHTING EARLY
-        AbstractRenderSystem modelPerPixelLightingEarly = new ModelRenderer(MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
+        AbstractRenderSystem modelPerPixelLightingEarly = new ModelRenderer(this, MODEL_PIX_EARLY, alphas, renderAssets.mbPixelLighting);
         // MODEL PER-VERTEX-LIGHTING EARLY
-        AbstractRenderSystem modelPerVertexLightingEarly = new ModelRenderer(MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
+        AbstractRenderSystem modelPerVertexLightingEarly = new ModelRenderer(this, MODEL_VERT_EARLY, alphas, renderAssets.mbVertexLighting);
 
         // MODEL DIFFUSE
-        AbstractRenderSystem modelMeshDiffuse = new ModelRenderer(MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
+        AbstractRenderSystem modelMeshDiffuse = new ModelRenderer(this, MODEL_DIFFUSE, alphas, renderAssets.mbVertexDiffuse);
 
         // MODEL PER-PIXEL-LIGHTING
-        AbstractRenderSystem modelPerPixelLighting = new ModelRenderer(MODEL_PIX, alphas, renderAssets.mbPixelLighting);
+        AbstractRenderSystem modelPerPixelLighting = new ModelRenderer(this, MODEL_PIX, alphas, renderAssets.mbPixelLighting);
 
         // MODEL PER-PIXEL-LIGHTING-TESSELLATION
-        AbstractRenderSystem modelPerPixelLightingTess = new TessellationRenderer(MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
+        AbstractRenderSystem modelPerPixelLightingTess = new TessellationRenderer(this, MODEL_PIX_TESS, alphas, renderAssets.mbPixelLightingTessellation);
         modelPerPixelLightingTess.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL BEAM
-        AbstractRenderSystem modelBeamProc = new ModelRenderer(MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
+        AbstractRenderSystem modelBeamProc = new ModelRenderer(this, MODEL_VERT_BEAM, alphas, renderAssets.mbVertexLightingBeam);
 
         // GALAXY
-        AbstractRenderSystem billboardSetProc = new BillboardSetRenderer(BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
+        AbstractRenderSystem billboardSetProc = new BillboardSetRenderer(this, BILLBOARD_GROUP, alphas, renderAssets.billboardGroupShaders);
 
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = switch (pcm) {
-            case TRIANGLES -> new ParticleSetRenderer(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
-            case TRIANGLES_INSTANCED -> new ParticleSetInstancedRenderer(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
-            case POINTS -> new ParticleSetPointRenderer(PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case TRIANGLES -> new ParticleSetRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case TRIANGLES_INSTANCED -> new ParticleSetInstancedRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
+            case POINTS -> new ParticleSetPointRenderer(this, PARTICLE_GROUP, alphas, renderAssets.particleGroupShaders);
         };
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP
         AbstractRenderSystem starGroupProc = switch (pcm) {
-            case TRIANGLES -> new StarSetRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
-            case TRIANGLES_INSTANCED -> new StarSetInstancedRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
-            case POINTS -> new StarSetPointRenderer(STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES -> new StarSetRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case TRIANGLES_INSTANCED -> new StarSetInstancedRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
+            case POINTS -> new StarSetPointRenderer(this, STAR_GROUP, alphas, renderAssets.starGroupShaders);
         };
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // VARIABLE GROUP
         AbstractRenderSystem variableGroupProc = switch (pcm) {
-            case TRIANGLES -> new VariableSetRenderer(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-            case TRIANGLES_INSTANCED -> new VariableSetInstancedRenderer(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
-            case POINTS -> new VariableSetPointRenderer(VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case TRIANGLES -> new VariableSetRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case TRIANGLES_INSTANCED -> new VariableSetInstancedRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
+            case POINTS -> new VariableSetPointRenderer(this, VARIABLE_GROUP, alphas, renderAssets.variableGroupShaders);
         };
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // ORBITAL ELEMENTS PARTICLES
-        AbstractRenderSystem elementsProc = new ElementsRenderer(ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
+        AbstractRenderSystem elementsProc = new ElementsRenderer(this, ORBITAL_ELEMENTS_PARTICLE, alphas, renderAssets.orbitElemShaders);
         elementsProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         elementsProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // ORBITAL ELEMENTS GROUP
-        AbstractRenderSystem elementsSetProc = new ElementsSetRenderer(ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
+        AbstractRenderSystem elementsSetProc = new ElementsSetRenderer(this, ORBITAL_ELEMENTS_GROUP, alphas, renderAssets.orbitElemShaders);
         elementsSetProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         elementsSetProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // MODEL STARS
-        AbstractRenderSystem modelStarsProc = new ModelRenderer(MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
+        AbstractRenderSystem modelStarsProc = new ModelRenderer(this, MODEL_VERT_STAR, alphas, renderAssets.mbVertexLightingStarSurface);
 
         // LABELS
-        AbstractRenderSystem labelsProc = new TextRenderer(FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
+        AbstractRenderSystem labelsProc = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
 
         // BILLBOARD SSO
-        AbstractRenderSystem billboardSSOProc = new BillboardRenderer(BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders, "data/tex/base/sso.png", null, false);
+        AbstractRenderSystem billboardSSOProc = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders, "data/tex/base/sso.png", null, false);
         billboardSSOProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
 
         // MODEL ATMOSPHERE
-        AbstractRenderSystem modelAtmProc = new ModelRenderer(MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
+        AbstractRenderSystem modelAtmProc = new ModelRenderer(this, MODEL_ATM, alphas, renderAssets.mbAtmosphere) {
             @Override
             public float getAlpha(IRenderable s) {
                 return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
@@ -388,15 +388,15 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         };
 
         // MODEL CLOUDS
-        AbstractRenderSystem modelCloudProc = new ModelRenderer(MODEL_CLOUD, alphas, renderAssets.mbCloud);
+        AbstractRenderSystem modelCloudProc = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
 
         // PARTICLE EFFECTS
-        AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderer(null, alphas, renderAssets.particleEffectShaders);
+        AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderer(this, null, alphas, renderAssets.particleEffectShaders);
         particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         particleEffectsProc.addPostRunnables(regularBlendR);
 
         // SHAPES
-        AbstractRenderSystem shapeProc = new ShapeRenderer(SHAPE, alphas, globalResources.getShapeShader());
+        AbstractRenderSystem shapeProc = new ShapeRenderer(this, SHAPE, alphas, globalResources.getShapeShader());
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
 
@@ -1162,11 +1162,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem sys;
         if (Settings.settings.scene.renderer.isNormalLineRenderer()) {
             // Normal
-            sys = new LinePrimitiveRenderer(LINE, alphas, renderAssets.lineShaders);
+            sys = new LinePrimitiveRenderer(this, LINE, alphas, renderAssets.lineShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         } else {
             // Quad
-            sys = new LineQuadstripRenderer(LINE, alphas, renderAssets.lineQuadShaders);
+            sys = new LineQuadstripRenderer(this, LINE, alphas, renderAssets.lineQuadShaders);
             sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
         return sys;

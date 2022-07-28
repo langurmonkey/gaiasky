@@ -23,6 +23,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.PointCloudTriRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.OrbitalElementsGroup;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -55,8 +56,8 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     private int sizeOffset;
     private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.025)), Math.tan(Math.toRadians(0.9)) };
 
-    public ElementsSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public ElementsSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         aux1 = new Vector3();
         aux = new Matrix4();
         refSysTransformF = new Matrix4();

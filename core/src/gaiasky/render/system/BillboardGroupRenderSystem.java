@@ -24,6 +24,7 @@ import gaiasky.render.api.IFadeObject;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.IStatusObject;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.BillboardDataset;
 import gaiasky.scenegraph.particle.BillboardDataset.ParticleType;
@@ -64,8 +65,8 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
 
     private ColorGenerator starColorGenerator, dustColorGenerator;
 
-    public BillboardGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
-        super(rg, alphas, starShaders);
+    public BillboardGroupRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
+        super(sceneRenderer, rg, alphas, starShaders);
         aux3f1 = new Vector3();
 
         starColorGenerator = new StarColorGenerator();

@@ -11,6 +11,7 @@ import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.api.IAnnotationsRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
@@ -21,17 +22,17 @@ public class FontRenderSystem extends AbstractRenderSystem {
     private ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
 
-    protected FontRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
-        super(rg, alphas, programs);
+    protected FontRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+        super(sceneRenderer, rg, alphas, programs);
     }
 
-    public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
-        super(rg, alphas, new ExtShaderProgram[] { program });
+    public FontRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
+        super(sceneRenderer, rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
     }
 
-    public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
-        this(rg, alphas, batch, program);
+    public FontRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
+        this(sceneRenderer, rg, alphas, batch, program);
 
         this.font2d = font2d;
         this.fontTitles = fontTitles;

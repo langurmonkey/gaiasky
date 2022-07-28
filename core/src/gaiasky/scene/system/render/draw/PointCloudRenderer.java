@@ -11,6 +11,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -22,8 +23,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
  */
 public abstract class PointCloudRenderer extends ImmediateModeRenderSystem implements IObserver {
 
-    public PointCloudRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public PointCloudRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
     }
 
     @Override

@@ -20,6 +20,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
@@ -44,8 +45,8 @@ public class ParticleSetRenderer extends PointCloudQuadRenderer implements IObse
     private final Colormap cmap;
     private final ParticleUtils utils;
 
-    public ParticleSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public ParticleSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         cmap = new Colormap();
         utils = new ParticleUtils();
 

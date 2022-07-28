@@ -19,6 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
@@ -50,8 +51,8 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
     private boolean forceAdd = false;
     private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
 
-    public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public OrbitalElementsParticlesRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
         refSysTransformF = new Matrix4();

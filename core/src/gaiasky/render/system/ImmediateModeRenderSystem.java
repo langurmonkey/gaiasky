@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -132,12 +133,12 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         }
     }
 
-    protected ImmediateModeRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
-        this(rg, alphas, programs, -1);
+    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+        this(sceneRenderer, rg, alphas, programs, -1);
     }
 
-    protected ImmediateModeRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
-        super(rg, alphas, programs);
+    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
+        super(sceneRenderer, rg, alphas, programs);
         initShaderProgram();
         initVertices();
         meshIdx = 0;

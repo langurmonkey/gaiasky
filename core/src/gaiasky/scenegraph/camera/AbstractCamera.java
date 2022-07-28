@@ -329,7 +329,7 @@ public abstract class AbstractCamera implements ICamera {
         // A copy can never be the closest
         var base = Mapper.base.get(cb);
         if (!base.copy)
-            if (closestBody.getEntity() == null) {
+            if (closestBody.isEmpty()) {
                 closestBody.setEntity(cb);
             } else {
                 double distMinusRadius = closestBody.getDistToCamera() - closestBody.getRadius();
@@ -337,7 +337,7 @@ public abstract class AbstractCamera implements ICamera {
 
                 // Change and test.
                 closestBody.setEntity(cb);
-                if (distMinusRadius >= closestBody.getDistToCamera() - closestBody.getRadius()) {
+                if (distMinusRadius < closestBody.getDistToCamera() - closestBody.getRadius()) {
                     closestBody.setEntity(prev);
                 }
             }

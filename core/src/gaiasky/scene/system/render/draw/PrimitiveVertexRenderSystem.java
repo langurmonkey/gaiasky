@@ -21,6 +21,7 @@ import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.component.Verts;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.VertsView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
@@ -43,8 +44,8 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
     protected int coordOffset;
     protected VertsView vertsView;
 
-    public PrimitiveVertexRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
-        super(rg, alphas, shaders);
+    public PrimitiveVertexRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
+        super(sceneRenderer, rg, alphas, shaders);
         this.lines = lines;
         this.vertsView = new VertsView();
         EventManager.instance.subscribe(this, Event.GPU_DISPOSE_VERTS_OBJECT);

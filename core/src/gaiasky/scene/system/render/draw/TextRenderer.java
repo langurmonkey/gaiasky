@@ -12,6 +12,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.text.AnnotationsEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
@@ -31,16 +32,17 @@ public class TextRenderer extends FontRenderSystem {
     private final AnnotationsEntityRenderSystem girdRenderer;
 
     private final LabelView view;
-    public TextRenderer(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
-        super(rg, alphas, new ExtShaderProgram[] { program });
+
+    public TextRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
+        super(sceneRenderer, rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
 
         this.girdRenderer = new AnnotationsEntityRenderSystem();
         this.view = new LabelView();
     }
 
-    public TextRenderer(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
-        this(rg, alphas, batch, program);
+    public TextRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
+        this(sceneRenderer, rg, alphas, batch, program);
 
         this.font2d = font2d;
         this.fontTitles = fontTitles;

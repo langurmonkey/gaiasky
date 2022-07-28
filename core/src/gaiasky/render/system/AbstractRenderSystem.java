@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.SysUtils;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.IRenderable;
@@ -42,8 +43,11 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     protected Array<RenderSystemRunnable> preRunnables, postRunnables;
 
-    protected AbstractRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+    protected final SceneRenderer sceneRenderer;
+
+    protected AbstractRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super();
+        this.sceneRenderer = sceneRenderer;
         this.settings = Settings.settings;
         this.group = rg;
         this.alphas = alphas;

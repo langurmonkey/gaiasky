@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -32,8 +33,8 @@ public class LineRenderSystem extends ImmediateModeRenderSystem {
 
     private ExtShaderProgram shaderProgram;
 
-    public LineRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders, -1);
+    public LineRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders, -1);
         aux2 = new Vector3();
     }
 

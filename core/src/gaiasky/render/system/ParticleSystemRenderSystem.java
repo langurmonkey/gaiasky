@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderingContext;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 
@@ -24,8 +25,8 @@ public class ParticleSystemRenderSystem extends AbstractRenderSystem {
     private ModelBatch modelBatch;
     private Matrix4 trf;
 
-    public ParticleSystemRenderSystem() {
-        super(null, null, null);
+    public ParticleSystemRenderSystem(SceneRenderer sceneRenderer) {
+        super(sceneRenderer, null, null, null);
         modelBatch = new ModelBatch();
         particleSystem = new ParticleSystem();
         // Since our particle effects are PointSprites, we create a PointSpriteParticleBatch

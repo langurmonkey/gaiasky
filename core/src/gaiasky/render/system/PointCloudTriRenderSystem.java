@@ -7,6 +7,7 @@ package gaiasky.render.system;
 
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Pair;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -22,8 +23,8 @@ public abstract class PointCloudTriRenderSystem extends PointCloudRenderSystem i
     // UV coordinates per vertex index (0,1,2,4)
     protected Pair<Float, Float>[] vertUV;
 
-    public PointCloudTriRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public PointCloudTriRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
 
         vertPos = new Pair[4];
         vertPos[0] = new Pair<>(1f, 1f);

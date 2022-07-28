@@ -21,6 +21,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
@@ -42,8 +43,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     private boolean stereoHalfWidth;
     private final ParticleUtils utils;
 
-    public ParticleSetPointRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public ParticleSetPointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
         cmap = new Colormap();
 

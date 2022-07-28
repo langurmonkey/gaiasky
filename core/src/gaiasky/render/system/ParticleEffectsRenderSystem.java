@@ -17,6 +17,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -43,8 +44,8 @@ public class ParticleEffectsRenderSystem extends ImmediateModeRenderSystem {
     private final Vector3d[] camPositions;
     private final long baseTime;
 
-    public ParticleEffectsRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
-        super(rg, alphas, programs);
+    public ParticleEffectsRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+        super(sceneRenderer, rg, alphas, programs);
         aux1f = new Vector3();
         aux1 = new Vector3d();
         aux2 = new Vector3d();

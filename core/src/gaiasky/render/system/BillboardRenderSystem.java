@@ -15,6 +15,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IBillboardRenderable;
 import gaiasky.render.api.IRenderable;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.DistToCameraComparator;
@@ -32,8 +33,8 @@ public class BillboardRenderSystem extends AbstractRenderSystem implements IObse
     private Texture billboardTexture;
     private final ComponentType componentType;
 
-    public BillboardRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
-        super(rg, alphas, programs);
+    public BillboardRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String texturePath, ComponentType componentType, float w, float h, boolean starTextureListener) {
+        super(sceneRenderer, rg, alphas, programs);
         this.componentType = componentType;
         init(texturePath, w, h, starTextureListener);
     }
@@ -48,8 +49,8 @@ public class BillboardRenderSystem extends AbstractRenderSystem implements IObse
      * @param componentType       The component type.
      * @param starTextureListener Whether to listen for star texture setting changes.
      */
-    public BillboardRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
-        this(rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
+    public BillboardRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaderPrograms, String texturePath, ComponentType componentType, boolean starTextureListener) {
+        this(sceneRenderer, rg, alphas, shaderPrograms, texturePath, componentType, 2, 2, starTextureListener);
     }
 
     private void init(String tex0, float w, float h, boolean starTextureListener) {

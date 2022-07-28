@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.IPointRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -37,8 +38,8 @@ public class PointRenderSystem extends ImmediateModeRenderSystem {
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
-    public PointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders, -1);
+    public PointRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders, -1);
         glType = GL20.GL_POINTS;
     }
 

@@ -22,6 +22,7 @@ import gaiasky.render.system.PointCloudTriRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -50,8 +51,8 @@ public class VariableSetRenderer extends PointCloudTriRenderSystem implements IO
 
     private StarSetQuadComponent triComponent;
 
-    public VariableSetRenderer(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders);
+    public VariableSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(sceneRenderer, rg, alphas, shaders);
         this.aux1 = new Vector3();
         this.utils = new ParticleUtils();
         cmap = new Colormap();
