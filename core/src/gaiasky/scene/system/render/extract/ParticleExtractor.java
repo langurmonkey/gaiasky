@@ -7,6 +7,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
@@ -16,9 +17,11 @@ import gaiasky.util.Settings;
  */
 public class ParticleExtractor extends AbstractExtractSystem {
 
+    private final FocusView view;
 
     public ParticleExtractor(Family family, int priority) {
         super(family, priority);
+        view = new FocusView();
     }
 
 
@@ -28,8 +31,9 @@ public class ParticleExtractor extends AbstractExtractSystem {
     }
 
     private void addToRenderLists(Entity entity, ICamera camera) {
+        view.setEntity(entity);
         var base = Mapper.base.get(entity);
-        //camera.checkClosestParticle(this);
+        camera.checkClosestParticle(view);
 
         if (this.shouldRender(base)) {
             var body = Mapper.body.get(entity);
@@ -69,7 +73,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
             if (body.solidAngleApparent >= Settings.settings.scene.star.threshold.point) {
                 addToRender(render, RenderGroup.BILLBOARD_STAR);
                 if (body.distToCamera < Mapper.distance.get(entity).distance) {
-                    //camera.checkClosestBody(this);
+                    camera.checkClosestBody(entity);
                     addToRender(render, RenderGroup.MODEL_VERT_STAR);
                 }
             }

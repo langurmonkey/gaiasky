@@ -284,7 +284,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
-            camera.checkClosestBody(this);
+            //camera.checkClosestBody(this);
 
             addToRender(this, RenderGroup.POINT_STAR);
             if (!(camera.getCurrent() instanceof FovCamera)) {

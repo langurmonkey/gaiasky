@@ -38,7 +38,8 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.SceneGraph;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.*;
@@ -563,7 +564,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case GAME_MODE:
             synchronized (updateLock) {
-                if (gravity && (closestBody != null) && closestBody instanceof Planet && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
+                if (gravity && (closestBody.getEntity() != null) && Mapper.atmosphere.has(closestBody.getEntity()) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                     // Add gravity to force, pulling to the closest body
                     final Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
                     final double dist = camObj.lend();
@@ -981,7 +982,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private void posDistanceCheck() {
         // Check terrain collision
-        if (closestBody != null) {
+        if (!closestBody.isEmpty()) {
             // New position
             closestBody.getPredictedPosition(aux5b, GaiaSky.instance.time, this, false);
 
@@ -1255,6 +1256,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case SCENE_LOADED:
             this.scene = (Scene) data[0];
             this.focus.setScene(this.scene);
+            this.closestBody.setScene(this.scene);
             break;
         case FOCUS_CHANGE_CMD:
             setTrackingObject(null, null);

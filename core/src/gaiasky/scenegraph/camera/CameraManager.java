@@ -357,22 +357,25 @@ public class CameraManager implements ICamera, IObserver {
 
         // Work out and broadcast the closest objects
         IFocus closestBody = getClosestBody();
-        if (closestBody != null && closestBody.getOctant() != null && !closestBody.getOctant().observed)
-            closestBody = null;
+        if (!closestBody.isEmpty() && closestBody.getOctant() != null && !closestBody.getOctant().observed) {
+            ((FocusView) closestBody).clearEntity();
+        }
 
         IFocus closestParticle = getClosestParticle();
-        if (closestParticle != null && closestParticle.getOctant() != null && !closestParticle.getOctant().observed)
+        if (closestParticle != null && closestParticle.getOctant() != null && !closestParticle.getOctant().observed) {
             closestParticle = null;
+        }
 
-        if (closestBody != null || closestParticle != null) {
-            if (closestBody == null)
+        if (!closestBody.isEmpty() || closestParticle != null) {
+            if (closestBody.isEmpty()) {
                 setClosest(closestParticle);
-            else if (closestParticle == null)
+            } else if (closestParticle == null) {
                 setClosest(closestBody);
-            else {
+            } else {
                 setClosest(closestBody.getDistToCamera() < closestParticle.getClosestDistToCamera() ? closestBody : closestParticle);
             }
         }
+
         IFocus newClosest = getClosest();
         EventManager.publish(Event.CAMERA_CLOSEST_INFO, this, newClosest, getClosestBody(), getClosestParticle());
 
@@ -520,6 +523,11 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public void checkClosestBody(IFocus focus) {
         current.checkClosestBody(focus);
+    }
+
+    @Override
+    public void checkClosestBody(Entity entity) {
+        current.checkClosestBody(entity);
     }
 
     @Override

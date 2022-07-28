@@ -47,11 +47,10 @@ public class ModelExtractor extends AbstractExtractSystem {
             var cloud = Mapper.cloud.get(entity);
             var render = Mapper.render.get(entity);
 
-            // TODO restore
-            // camera.checkClosestBody(this);
+            camera.checkClosestBody(entity);
 
             if (Mapper.tagBillboardGalaxy.has(entity)) {
-                // Billboard galaxies
+                // Billboard galaxies.
                 double thPoint = (BBGAL_TH * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
                 if (body.solidAngleApparent >= thPoint) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
@@ -63,13 +62,13 @@ public class ModelExtractor extends AbstractExtractSystem {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
             } else if (Mapper.tagQuatOrientation.has(entity)) {
-                // Simple billboards
+                // Simple billboards.
                 if (body.solidAngleApparent >= sa.thresholdNone) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
             } else {
-                // Rest of models
+                // Rest of models.
                 double thPoint = (sa.thresholdPoint * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
                 if (body.solidAngleApparent >= thPoint) {
                     double thQuad2 = sa.thresholdQuad * camera.getFovFactor() * 2 / scaffolding.sizeScaleFactor;

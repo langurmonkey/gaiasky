@@ -5,9 +5,12 @@
 
 package gaiasky.scenegraph.camera;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.util.Constants;
@@ -58,7 +61,6 @@ public abstract class AbstractCamera implements ICamera {
      **/
     protected CameraManager parent;
 
-
     /**
      * The main camera
      **/
@@ -82,12 +84,13 @@ public abstract class AbstractCamera implements ICamera {
     /**
      * Closest non-star body to the camera
      **/
-    protected IFocus closestBody;
+    protected FocusView closestBody;
 
     /**
      * The closest particle to the camera
      */
     protected IFocus closestStar;
+    protected FocusView closestStarView;
     protected Proximity proximity;
 
     protected Matrix4 prevCombined;
@@ -129,6 +132,9 @@ public abstract class AbstractCamera implements ICamera {
         view = new Matrix4d();
         combined = new Matrix4d();
         frustumd = new Frustumd();
+
+        closestBody = new FocusView();
+        closestStarView = new FocusView();
 
         proximity = new Proximity(Constants.N_DIR_LIGHTS);
     }
@@ -180,7 +186,6 @@ public abstract class AbstractCamera implements ICamera {
         this.prevpos.set(prevpos);
     }
 
-
     @Override
     public Vector3b getInversePos() {
         return posinv;
@@ -228,6 +233,7 @@ public abstract class AbstractCamera implements ICamera {
      *
      * @param cb      The body.
      * @param fCamera The FovCamera.
+     *
      * @return True if the body is observed. False otherwise.
      */
     protected boolean computeVisibleFovs(CelestialBody cb, FovCamera fCamera) {
@@ -304,13 +310,35 @@ public abstract class AbstractCamera implements ICamera {
 
     @Override
     public void checkClosestBody(IFocus cb) {
+        if (cb instanceof FocusView) {
+            FocusView candidate = (FocusView) cb;
+            // A copy can never be the closest
+            if (!cb.isCopy()) {
+                if (closestBody.getEntity() == null) {
+                    closestBody.setEntity(candidate.getEntity());
+                } else {
+                    if (closestBody.getDistToCamera() - closestBody.getRadius() > cb.getDistToCamera() - cb.getRadius()) {
+                        closestBody.setEntity(candidate.getEntity());
+                    }
+                }
+            }
+        }
+    }
+
+    public void checkClosestBody(Entity cb) {
         // A copy can never be the closest
-        if (!cb.isCopy())
-            if (closestBody == null) {
-                closestBody = cb;
+        var base = Mapper.base.get(cb);
+        if (!base.copy)
+            if (closestBody.getEntity() == null) {
+                closestBody.setEntity(cb);
             } else {
-                if (closestBody.getDistToCamera() - closestBody.getRadius() > cb.getDistToCamera() - cb.getRadius()) {
-                    closestBody = cb;
+                double distMinusRadius = closestBody.getDistToCamera() - closestBody.getRadius();
+                Entity prev = closestBody.getEntity();
+
+                // Change and test.
+                closestBody.setEntity(cb);
+                if (distMinusRadius >= closestBody.getDistToCamera() - closestBody.getRadius()) {
+                    closestBody.setEntity(prev);
                 }
             }
     }
@@ -329,7 +357,7 @@ public abstract class AbstractCamera implements ICamera {
         return closestStar;
     }
 
-    public IFocus getCloseLightSource(int i){
+    public IFocus getCloseLightSource(int i) {
         assert proximity != null : "Proximity is null";
         assert i < proximity.effective.length : "Index out of bounds: i=" + i + ", length=" + proximity.effective.length;
         return proximity.effective[i];
@@ -342,12 +370,17 @@ public abstract class AbstractCamera implements ICamera {
             proximity.update(star, this);
         }
 
-        if (closestStar == null || closestStar.getClosestDistToCamera() > star.getClosestDistToCamera()) {
-            closestStar = star;
+        if (closestStar == null || !closestStar.isEmpty() && closestStar.getClosestDistToCamera() > star.getClosestDistToCamera()) {
+            if (star instanceof FocusView) {
+                closestStarView.setEntity(((FocusView) star).getEntity());
+                closestStar = closestStarView;
+            } else {
+                closestStar = star;
+            }
         }
     }
 
-    public void swapBuffers(){
+    public void swapBuffers() {
         proximity.swapBuffers();
     }
 

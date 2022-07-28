@@ -133,7 +133,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         Vector3b pos = posb.put(B34);
         // Check collision!
         IFocus me = GaiaSky.instance.getICamera().getClosestBody();
-        if (closest != null && closest != this) {
+        if (closest != null && !closest.isEmpty() && closest != spacecraft) {
             double twoRadii = closest.getRadius() + me.getRadius();
             // d1 is the new distance to the centre of the object
             if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(D31), newPosition.put(D32), closest.getPos().put(D33)) < twoRadii) {

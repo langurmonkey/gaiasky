@@ -227,7 +227,7 @@ public class Star extends Particle {
                 if (viewAngleApparent >= thpointTimesFovfactor) {
                     addToRender(this, RenderGroup.BILLBOARD_STAR);
                     if (distToCamera < modelDistance) {
-                        camera.checkClosestBody(this);
+                        //camera.checkClosestBody(this);
                         addToRender(this, RenderGroup.MODEL_VERT_STAR);
                     }
                 }

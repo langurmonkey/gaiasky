@@ -410,13 +410,12 @@ public class ModelEntityRenderSystem {
      * Renders the cloud layer of a planet.
      */
     public void renderClouds(Entity entity, Base base, Model model, Cloud cloud, IntModelBatch batch, float alpha, double t) {
-        CloudComponent clc = cloud.cloud;
-        clc.touch();
+        cloud.cloud.touch();
         ICamera cam = GaiaSky.instance.getICamera();
-        clc.mc.updateRelativisticEffects(cam);
-        clc.mc.updateVelocityBufferUniforms(cam);
-        clc.mc.setTransparency(alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
-        batch.render(clc.mc.instance, model.model.env);
+        cloud.cloud.mc.updateRelativisticEffects(cam);
+        cloud.cloud.mc.updateVelocityBufferUniforms(cam);
+        cloud.cloud.mc.setTransparency(alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
+        batch.render(cloud.cloud.mc.instance, model.model.env);
     }
 
     /**

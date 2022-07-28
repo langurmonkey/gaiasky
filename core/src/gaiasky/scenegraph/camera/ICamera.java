@@ -159,6 +159,14 @@ public interface ICamera {
      */
     void checkClosestBody(IFocus focus);
 
+    /**
+     * Called after updating the body's distance to the cam, it updates the
+     * closest body in the camera to figure out the camera near
+     *
+     * @param entity The body to check.
+     */
+    void checkClosestBody(Entity entity);
+
     IFocus getClosestBody();
 
     IFocus getSecondClosestBody();

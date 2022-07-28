@@ -209,7 +209,7 @@ public abstract class ModelBody extends CelestialBody {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender() && this.isValidPosition() && parent.isValidPosition()) {
-            camera.checkClosestBody(this);
+            //camera.checkClosestBody(this);
             double thPoint = (thresholdPoint * camera.getFovFactor()) / sizeScaleFactor;
             if (viewAngleApparent >= thPoint) {
                 double thQuad2 = thresholdQuad * camera.getFovFactor() * 2 / sizeScaleFactor;

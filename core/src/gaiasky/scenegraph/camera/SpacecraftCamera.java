@@ -16,13 +16,11 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.input.MainGamepadListener;
 import gaiasky.input.SpacecraftGamepadListener;
 import gaiasky.input.SpacecraftMouseKbdListener;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
@@ -65,7 +63,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     /**
      * Closest body apart from the spacecraft (second closest)
      **/
-    private IFocus secondClosest;
+    private FocusView secondClosest;
+    private FocusView auxView;
 
     private final Vector3d aux1, aux2;
     private final Vector3b aux1b;
@@ -105,6 +104,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         dirup = new Pair<>(scdir, scup);
 
         view = new SpacecraftView();
+        secondClosest = new FocusView();
+        auxView = new FocusView();
 
         // init camera
         camera = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -140,6 +141,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     public Entity getSpacecraft() {
         return this.sc;
     }
+
     public SpacecraftView getSpacecraftView() {
         return this.view;
     }
@@ -385,8 +387,19 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         super.checkClosestBody(cb);
         if (sc != null && cb instanceof FocusView) {
             FocusView fv = (FocusView) cb;
-            if (secondClosest == null || (fv.getEntity() != sc && cb.getDistToCamera() < secondClosest.getDistToCamera())) {
-                secondClosest = cb;
+            if (fv.getEntity() != sc && cb.getDistToCamera() < secondClosest.getDistToCamera()) {
+                secondClosest.setEntity(fv.getEntity());
+            }
+        }
+    }
+
+    @Override
+    public void checkClosestBody(Entity cb) {
+        super.checkClosestBody(cb);
+        if (sc != null && cb != null) {
+            auxView.setEntity(cb);
+            if (cb != sc && auxView.getDistToCamera() < secondClosest.getDistToCamera()) {
+                secondClosest.setEntity(cb);
             }
         }
     }
