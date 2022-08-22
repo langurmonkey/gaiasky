@@ -7,6 +7,10 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
+/**
+ * An abstract initialization system, providing some common utilities useful for concrete
+ * initializers.
+ */
 public abstract class AbstractInitSystem extends IteratingSystem implements EntityInitializer {
     protected Log logger;
 

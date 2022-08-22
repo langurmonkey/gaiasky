@@ -154,8 +154,8 @@ public class LineEntityRenderSystem {
         Vector3d crs = D31.set(p1).sub(p0).crs(cp);
 
         double d = p0.len();
-        double caplen = FastMath.tan(va) * d;
-        crs.setLength(caplen);
+        double lengthCap = FastMath.tan(va) * d;
+        crs.setLength(lengthCap);
         Vector3d aux0 = D32.set(p0).add(crs);
         Vector3d aux1 = D33.set(p0).sub(crs);
         renderer.addLine(lineView, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, body.color[0], body.color[1], body.color[2], alpha);
