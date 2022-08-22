@@ -459,7 +459,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     }
 
     /**
-     * Line rendering.
+     * Line rendering. Renders focus projection lines.
      *
      * @param renderer The line renderer.
      * @param camera   The camera.
@@ -467,9 +467,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        // Here, we must have a focus and be in refsys mode
+        // A focus object is required to render the projection lines.
         if (camera.hasFocus()) {
-            IFocus focus = camera.getFocus();
             // Line in ZX
             renderer.addLine(this, a.x, a.y, a.z, b.x, b.y, b.z, ccL[0], ccL[1], ccL[2], ccL[3] * alpha * opacity);
             // Line in Y

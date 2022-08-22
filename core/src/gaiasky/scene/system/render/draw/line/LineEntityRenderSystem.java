@@ -130,17 +130,20 @@ public class LineEntityRenderSystem {
         }
     }
 
+    /**
+     * Renders the ruler line with caps.
+     */
     public void renderRuler(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var body = lineView.body;
         var ruler = Mapper.ruler.get(entity);
 
         double va = 0.01 * camera.getFovFactor();
 
-        // Main line
+        // Main line.
         renderer.addLine(lineView, ruler.p0.x, ruler.p0.y, ruler.p0.z, ruler.p1.x, ruler.p1.y, ruler.p1.z, body.color[0], body.color[1], body.color[2], body.color[3] * alpha);
-        // Cap 1
+        // Cap 1.
         addCap(body, ruler.p0, ruler.p1, va, renderer, alpha);
-        // Cap 1
+        // Cap 2.
         addCap(body, ruler.p1, ruler.p0, va, renderer, alpha);
     }
 
@@ -158,16 +161,19 @@ public class LineEntityRenderSystem {
         renderer.addLine(lineView, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, body.color[0], body.color[1], body.color[2], alpha);
     }
 
+    /**
+     * Renders focus projection lines on the recursive grid.
+     */
     public void renderGridRec(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var base = lineView.base;
         var gr = Mapper.gridRec.get(entity);
 
-        // Here, we must have a focus and be in refsys mode.
+        // A focus object is needed in order to render the projection lines.
         if (camera.hasFocus()) {
             IFocus focus = camera.getFocus();
-            // Line in ZX
+            // Line in ZX.
             renderer.addLine(lineView, gr.a.x, gr.a.y, gr.a.z, gr.b.x, gr.b.y, gr.b.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
-            // Line in Y
+            // Line in Y.
             renderer.addLine(lineView, gr.c.x, gr.c.y, gr.c.z, gr.d.x, gr.d.y, gr.d.z, gr.ccL[0], gr.ccL[1], gr.ccL[2], gr.ccL[3] * alpha * base.opacity);
         }
     }
