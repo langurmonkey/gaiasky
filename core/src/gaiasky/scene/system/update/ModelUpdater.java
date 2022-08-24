@@ -133,7 +133,12 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 var engine = Mapper.engine.get(entity);
 
                 // Spacecraft
-                localTransform.idt().setToLookAt(engine.posf, engine.directionf.add(engine.posf), engine.upf).inv();
+                localTransform.idt().setToLookAt(engine.posf, engine.directionf.add(engine.posf), engine.upf);
+                try {
+                    localTransform.inv();
+                } catch(RuntimeException e) {
+                    // Non-invertible matrix
+                }
                 localTransform.scale(size, size, size);
 
                 // Rotation for attitude indicator
