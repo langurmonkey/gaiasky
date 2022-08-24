@@ -388,8 +388,9 @@ void main() {
 
         specularColor += specular * min(1.0, pow(NH, 40.0));
         shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
-        diffuseColor += (col * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
+        diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
     }
+    diffuseColor *= diffuse.rgb;
     #endif // directionalLightsFlag
 
     // Final color equation
