@@ -456,7 +456,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         GL30.glClampColor(GL30.GL_CLAMP_VERTEX_COLOR, GL30.GL_FALSE);
         GL30.glClampColor(GL30.GL_CLAMP_FRAGMENT_COLOR, GL30.GL_FALSE);
 
-        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_SCATTERING_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
 
     }
 
@@ -998,7 +998,7 @@ public class SceneGraphRenderer implements ISceneRenderer, IObserver {
         case REBUILD_SHADOW_MAP_DATA_CMD:
             buildShadowMapData();
             break;
-        case LIGHT_SCATTERING_CMD:
+        case LIGHT_GLOW_CMD:
             boolean glow = (Boolean) data[0];
             if (glow) {
                 buildGlowData();

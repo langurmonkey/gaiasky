@@ -511,7 +511,7 @@ public class ControllerGui extends AbstractGui {
         starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
         starGlowButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LIGHT_SCATTERING_CMD, starGlowButton, starGlowButton.isChecked());
+                EventManager.publish(Event.LIGHT_GLOW_CMD, starGlowButton, starGlowButton.isChecked());
                 return true;
             }
             return false;

@@ -426,7 +426,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lightGlow.setChecked(settings.postprocess.lightGlow.active);
         lightGlow.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LIGHT_SCATTERING_CMD, lightGlow, lightGlow.isChecked());
+                EventManager.publish(Event.LIGHT_GLOW_CMD, lightGlow, lightGlow.isChecked());
                 return true;
             }
             return false;
@@ -2341,7 +2341,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.SATURATION_CMD, this, saturationBak);
         EventManager.publish(Event.GAMMA_CMD, this, gammaBak);
         EventManager.publish(Event.LENS_FLARE_CMD, this, lensflareBak);
-        EventManager.publish(Event.LIGHT_SCATTERING_CMD, this, lightGlowBak);
+        EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlowBak);
         EventManager.publish(Event.BLOOM_CMD, this, bloomBak);
         EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMaskBak);
         EventManager.publish(Event.EXPOSURE_CMD, this, exposureBak);

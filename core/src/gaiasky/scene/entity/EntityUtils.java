@@ -32,20 +32,22 @@ public class EntityUtils {
      *
      * @return The vector with the position.
      */
-    public static Vector3b getAbsolutePosition(Entity entity, Vector3b out) {
-        synchronized (entity) {
-            var body = Mapper.body.get(entity);
-            out.set(body.pos);
+    public static Vector3b getAbsolutePosition(final Entity entity, Vector3b out) {
+        if(entity != null) {
+            synchronized (entity) {
+                var body = Mapper.body.get(entity);
+                out.set(body.pos);
 
-            var e = entity;
-            var graph = Mapper.graph.get(e);
-            while (graph.parent != null) {
-                e = graph.parent;
-                graph = Mapper.graph.get(e);
-                out.add(Mapper.body.get(e).pos);
+                var e = entity;
+                var graph = Mapper.graph.get(e);
+                while (graph.parent != null) {
+                    e = graph.parent;
+                    graph = Mapper.graph.get(e);
+                    out.add(Mapper.body.get(e).pos);
+                }
             }
-            return out;
         }
+        return out;
     }
 
     /**

@@ -65,8 +65,34 @@ public class ModelEntityRenderSystem {
     }
 
     /**
+     * Model opaque rendering for the light glow pass.
+     *
+     * @param entity     The entity.
+     * @param modelBatch The model batch.
+     * @param alpha      The alpha value.
+     * @param shadow     Shadow environment.
+     */
+    public void renderOpaque(Entity entity, IntModelBatch modelBatch, float alpha, boolean shadow) {
+        var scaffolding = Mapper.modelScaffolding.get(entity);
+        var model = Mapper.model.get(entity);
+
+        ModelComponent mc = model.model;
+        if (mc != null && mc.isModelInitialised()) {
+            if (scaffolding != null) {
+                if(shadow) {
+                    prepareShadowEnvironment(entity, model, scaffolding);
+                }
+
+                mc.update(alpha * scaffolding.fadeOpacity);
+                modelBatch.render(mc.instance, mc.env);
+            }
+        }
+    }
+
+    /**
      * Renders a generic model.
      *
+     * @param entity       The entity.
      * @param model        The model component.
      * @param batch        The batch.
      * @param alpha        The alpha value.
@@ -250,12 +276,7 @@ public class ModelEntityRenderSystem {
                     ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
                     // Local transform
                     double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
-                    mc.instance.transform.idt()
-                            .translate(
-                                    (float) set.proximity.updating[0].pos.x,
-                                    (float) set.proximity.updating[0].pos.y,
-                                    (float) set.proximity.updating[0].pos.z)
-                            .scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
+                    mc.instance.transform.idt().translate((float) set.proximity.updating[0].pos.x, (float) set.proximity.updating[0].pos.y, (float) set.proximity.updating[0].pos.z).scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
                     if (relativistic) {
                         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
                     }
@@ -384,15 +405,7 @@ public class ModelEntityRenderSystem {
     /**
      * Renders the atmosphere of a planet.
      */
-    public void renderAtmosphere(
-            Entity entity,
-            Body body,
-            Model model,
-            ModelScaffolding scaffolding,
-            IntModelBatch batch,
-            Atmosphere atmosphere,
-            float alpha,
-            RenderingContext rc) {
+    public void renderAtmosphere(Entity entity, Body body, Model model, ModelScaffolding scaffolding, IntModelBatch batch, Atmosphere atmosphere, float alpha, RenderingContext rc) {
 
         // Atmosphere fades in between 1 and 2 degrees of view angle apparent
         ICamera cam = GaiaSky.instance.getICamera();

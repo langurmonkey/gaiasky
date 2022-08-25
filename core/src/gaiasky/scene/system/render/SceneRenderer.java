@@ -22,8 +22,11 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.*;
+import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderAssets;
+import gaiasky.render.RenderGroup;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.IRenderable;
@@ -36,8 +39,6 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.draw.*;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.scenegraph.ModelBody;
-import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -47,6 +48,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.PointCloudMode;
+import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
@@ -472,7 +474,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         GL30.glClampColor(GL30.GL_CLAMP_VERTEX_COLOR, GL30.GL_FALSE);
         GL30.glClampColor(GL30.GL_CLAMP_FRAGMENT_COLOR, GL30.GL_FALSE);
 
-        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_SCATTERING_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
 
     }
 
@@ -514,6 +516,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     Array<VRDeviceModel> controllers = new Array<>();
+    ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
+
+    private void renderModel(IRenderable r, IntModelBatch batch, float alpha, boolean shadow) {
+        if (r instanceof Render) {
+            Render render = (Render) r;
+            if (Mapper.model.has(render.entity)) {
+                renderObject.renderOpaque(render.entity, batch, alpha, shadow);
+            }
+        }
+
+    }
 
     public void renderGlowPass(ICamera camera, FrameBuffer frameBuffer) {
         if (frameBuffer == null) {
@@ -525,8 +538,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             stars.clear();
             for (IRenderable st : billboardStars) {
-                if (st instanceof Star) {
-                    stars.add(st);
+                if (st instanceof Render) {
+                    if (Mapper.hip.has(((Render) st).getEntity())) {
+                        stars.add(st);
+                    }
                 }
             }
 
@@ -549,17 +564,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            //if (!Settings.settings.program.CUBEMAP360_MODE) {
             // Render billboard stars
             billboardStarsProc.render(stars, camera, 0, null);
 
             // Render models
             renderAssets.mbPixelLightingOpaque.begin(camera.getCamera());
             for (IRenderable model : models) {
-                if (model instanceof ModelBody) {
-                    ModelBody mb = (ModelBody) model;
-                    mb.render(renderAssets.mbPixelLightingOpaque, RenderGroup.MODEL_PIX, 1, 0, false);
-                }
+                renderModel(model, renderAssets.mbPixelLightingOpaque, 1, false);
             }
             renderAssets.mbPixelLightingOpaque.end();
 
@@ -567,10 +578,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             if (modelsTess.size > 0) {
                 renderAssets.mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
                 for (IRenderable model : modelsTess) {
-                    if (model instanceof ModelBody) {
-                        ModelBody mb = (ModelBody) model;
-                        mb.render(renderAssets.mbPixelLightingOpaqueTessellation, RenderGroup.MODEL_PIX, 1, 0, false);
-                    }
+                    renderModel(model, renderAssets.mbPixelLightingOpaqueTessellation, 1, false);
                 }
                 renderAssets.mbPixelLightingOpaqueTessellation.end();
             }
@@ -918,7 +926,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if a given component type is on
      *
      * @param comp The component
-     *
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -929,7 +936,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if the component types are all on
      *
      * @param comp The components
-     *
      * @return Whether the components are all on
      */
     public boolean allOn(ComponentTypes comp) {
@@ -1022,7 +1028,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         case REBUILD_SHADOW_MAP_DATA_CMD:
             buildShadowMapData();
             break;
-        case LIGHT_SCATTERING_CMD:
+        case LIGHT_GLOW_CMD:
             boolean glow = (Boolean) data[0];
             if (glow) {
                 buildGlowData();
@@ -1038,7 +1044,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      *
      * @param type The component type.
      * @param t    The current time in seconds.
-     *
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type, double t) {

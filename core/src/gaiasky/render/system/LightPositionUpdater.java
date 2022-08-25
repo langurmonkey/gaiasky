@@ -15,6 +15,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Render;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalResources;
@@ -84,41 +86,48 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
         synchronized (lock) {
             int size = renderables.size;
+            Settings settings = Settings.settings;
             if (GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) {
-                Settings settings = Settings.settings;
                 // Compute light positions for light scattering or light
                 // glow
                 int lightIndex = 0;
                 float angleEdgeDeg = camera.getAngleEdge() * MathUtils.radDeg;
                 for (int i = size - 1; i >= 0; i--) {
                     IRenderable s = renderables.get(i);
-                    if (s instanceof Star) {
-                        Star p = (Star) s;
-                        double angle = GaiaSky.instance.cameraManager.getDirection().angle(p.translation);
-                        if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openVr || angle < angleEdgeDeg)) {
-                            Vector3d pos3d = p.translation.put(auxD);
+                    if (s instanceof Render) {
+                        Render p = (Render) s;
+                        var entity = p.getEntity();
 
-                            // Aberration
-                            GlobalResources.applyRelativisticAberration(pos3d, camera);
-                            // GravWaves
-                            RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
-                            Vector3 pos3 = pos3d.put(auxV);
+                        if (Mapper.hip.has(entity)) {
+                            // Is star.
+                            var graph = Mapper.graph.get(entity);
+                            double angle = GaiaSky.instance.cameraManager.getDirection().angle(graph.translation);
+                            if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openVr || angle < angleEdgeDeg)) {
+                                Vector3d pos3d = graph.translation.put(auxD);
 
-                            float w = settings.graphics.resolution[0];
-                            float h = settings.graphics.resolution[1];
+                                // Apply relativistic effects.
+                                GlobalResources.applyRelativisticAberration(pos3d, camera);
+                                RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
 
-                            camera.getCamera().project(pos3, 0, 0, w, h);
-                            // Here we **need** to use
-                            // Gdx.graphics.getWidth/Height() because we use
-                            // camera.project() which uses screen
-                            // coordinates only
-                            positions[lightIndex * 2] = auxV.x / w;
-                            positions[lightIndex * 2 + 1] = auxV.y / h;
-                            viewAngles[lightIndex] = (float) p.viewAngleApparent;
-                            colors[lightIndex * 3] = p.cc[0];
-                            colors[lightIndex * 3 + 1] = p.cc[1];
-                            colors[lightIndex * 3 + 2] = p.cc[2];
-                            lightIndex++;
+                                Vector3 pos3 = pos3d.put(auxV);
+
+                                float w = settings.graphics.resolution[0];
+                                float h = settings.graphics.resolution[1];
+
+                                camera.getCamera().project(pos3, 0, 0, w, h);
+                                // Here we **need** to use
+                                // Gdx.graphics.getWidth/Height() because we use
+                                // camera.project() which uses screen
+                                // coordinates only
+                                var body = Mapper.body.get(entity);
+                                positions[lightIndex * 2] = auxV.x / w;
+                                positions[lightIndex * 2 + 1] = auxV.y / h;
+                                viewAngles[lightIndex] = (float) body.solidAngleApparent;
+                                colors[lightIndex * 3] = body.color[0];
+                                colors[lightIndex * 3 + 1] = body.color[1];
+                                colors[lightIndex * 3 + 2] = body.color[2];
+                                lightIndex++;
+                            }
                         }
                     }
                 }

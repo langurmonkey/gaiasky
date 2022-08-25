@@ -601,7 +601,7 @@ public enum Event {
     /**
      * Activate/deactivate the light scattering. Contains boolean with state.
      **/
-    LIGHT_SCATTERING_CMD,
+    LIGHT_GLOW_CMD,
 
     /**
      * Issues the command to update the line render system. Contains no

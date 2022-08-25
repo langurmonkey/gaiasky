@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.NewStarClusterLoader;
-import gaiasky.data.cluster.StarClusterLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
@@ -2442,7 +2441,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStarGlow(boolean state) {
-        postRunnable(() -> em.post(Event.LIGHT_SCATTERING_CMD, this, state));
+        postRunnable(() -> em.post(Event.LIGHT_GLOW_CMD, this, state));
     }
 
     @Override
