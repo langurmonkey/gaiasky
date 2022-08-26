@@ -1010,12 +1010,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-
             break;
         default:
             break;
         }
-
     }
 
     private Antialiasing getAA(PostProcessBean ppb) {

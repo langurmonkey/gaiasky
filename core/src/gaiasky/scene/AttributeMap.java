@@ -2,6 +2,7 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.scene.component.*;
+import gaiasky.scenegraph.Invisible;
 import gaiasky.util.Logger;
 
 import java.util.HashMap;
@@ -133,6 +134,9 @@ public class AttributeMap {
 
         // Mesh
         putAll(Mesh.class, "shading", "additiveblending");
+
+        // Invisible
+        putAll(Raymarching.class, "shader");
 
         return attributeMap;
     }

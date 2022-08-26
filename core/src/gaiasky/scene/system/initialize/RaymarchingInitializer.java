@@ -37,6 +37,9 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         }
         if (body.size == 0) {
             body.setSizeM(500.0);
+        } else {
+            // Size is given as a radius in km.
+            body.setRadiusKm((double) body.size);
         }
         if(base.ct == null || base.ct.allSetLike(new ComponentTypes(ComponentType.Others))) {
             base.ct = new ComponentTypes(ComponentType.Invisible);
