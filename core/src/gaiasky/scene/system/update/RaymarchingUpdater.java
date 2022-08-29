@@ -2,6 +2,7 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -38,6 +39,7 @@ public class RaymarchingUpdater extends AbstractUpdateSystem {
                     rm.isOn = false;
                 }
             }
+            GaiaSky.instance.getCameraManager().checkClosestBody(entity);
         }
     }
 }
