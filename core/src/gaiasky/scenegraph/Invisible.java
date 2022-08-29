@@ -64,7 +64,6 @@ public class Invisible extends CelestialBody {
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
     }
 
-
     @Override
     public float getInnerRad() {
         return 0;
@@ -102,7 +101,9 @@ public class Invisible extends CelestialBody {
         if (time.getHdiff() != 0) {
             Vector3d aux3 = D31.get();
             // Load the equatorial cartesian coordinates of the object into pos
-            coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
+            if (coordinates != null) {
+                coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
+            }
 
             // Convert to cartesian coordinates and put them in aux3 vector
             Coordinates.cartesianToSpherical(pos, aux3);
