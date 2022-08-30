@@ -27,7 +27,6 @@ import gaiasky.event.IObserver;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
-import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gaia.Satellite;
 import gaiasky.util.math.Frustumd;
 import gaiasky.util.math.Matrix4d;

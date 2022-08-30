@@ -11,7 +11,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger;

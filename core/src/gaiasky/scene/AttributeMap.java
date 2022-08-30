@@ -2,7 +2,6 @@ package gaiasky.scene;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.scene.component.*;
-import gaiasky.scenegraph.Invisible;
 import gaiasky.util.Logger;
 
 import java.util.HashMap;

@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.util.Settings;
 
 public class TitleExtractor extends AbstractExtractSystem{
     public TitleExtractor(Family family, int priority) {

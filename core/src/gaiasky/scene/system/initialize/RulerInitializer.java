@@ -4,17 +4,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.RenderingContext;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.RulerRadio;
-import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class RulerInitializer extends AbstractInitSystem {
     public RulerInitializer(boolean setUp, Family family, int priority) {

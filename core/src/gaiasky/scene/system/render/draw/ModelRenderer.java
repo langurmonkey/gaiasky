@@ -6,11 +6,11 @@
 package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.utils.Array;
-import gaiasky.render.*;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.*;
+import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;

@@ -2,13 +2,8 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
-import gaiasky.GaiaSky;
-import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
-import gaiasky.scene.entity.EntityUtils;
-import gaiasky.scene.system.initialize.TrajectoryInitializer;
-import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -17,9 +12,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
-
-import java.time.Instant;
-import java.util.Date;
 
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);

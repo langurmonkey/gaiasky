@@ -3,11 +3,9 @@ package gaiasky.scene.system.update;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.util.math.Vector3d;
-import net.jafama.FastMath;
 
 import java.util.Locale;
 

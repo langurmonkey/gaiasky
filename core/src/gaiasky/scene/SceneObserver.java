@@ -5,7 +5,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 

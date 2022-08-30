@@ -6,9 +6,9 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.Consumers.*;
+import gaiasky.util.Consumers.Consumer6;
+import gaiasky.util.Consumers.Consumer9;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.math.Vector3d;
 

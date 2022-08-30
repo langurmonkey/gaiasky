@@ -8,8 +8,6 @@ import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.scene.system.initialize.TrajectoryInitializer;
-import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;

@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.scene.Index;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Octant;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.tree.OctreeNode;
 

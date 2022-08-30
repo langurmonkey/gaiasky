@@ -11,8 +11,8 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.RenderingContext;
+import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 

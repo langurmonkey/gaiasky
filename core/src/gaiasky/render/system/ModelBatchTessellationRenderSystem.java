@@ -6,9 +6,9 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IModelRenderable;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.RenderGroup;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;

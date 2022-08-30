@@ -15,8 +15,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.api.IRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.api.IRenderable;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.camera.CameraManager;
@@ -30,8 +30,6 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StarPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(StarPointRenderSystem.class);

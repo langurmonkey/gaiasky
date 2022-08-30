@@ -5,7 +5,6 @@
 
 package gaiasky.desktop;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
@@ -20,8 +19,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
-import gaiasky.util.Logger.LoggerLevel;
-import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -31,6 +28,7 @@ import gaiasky.render.ScreenModeCmd;
 import gaiasky.rest.RESTServer;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.CamRecorder;
 import gaiasky.util.i18n.I18n;

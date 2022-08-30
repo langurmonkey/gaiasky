@@ -4,8 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.Body;
 import gaiasky.scene.component.ParticleExtra;
 import gaiasky.scene.component.StarSet;
 

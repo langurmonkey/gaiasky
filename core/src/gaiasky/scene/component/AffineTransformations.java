@@ -2,7 +2,6 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.component.ITransform;
 import gaiasky.scenegraph.component.RotateTransform;

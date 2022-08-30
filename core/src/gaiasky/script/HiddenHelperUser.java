@@ -14,8 +14,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.CelestialBody;
-import gaiasky.scenegraph.IFocus;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

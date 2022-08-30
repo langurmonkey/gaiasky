@@ -5,13 +5,10 @@
 
 package gaiasky.input;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.controllers.Controller;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.view.SpacecraftView;
-import gaiasky.scenegraph.Spacecraft;
-import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.SpacecraftCamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

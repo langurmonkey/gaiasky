@@ -10,7 +10,6 @@ import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Octree;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;

@@ -1,8 +1,6 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
@@ -10,7 +8,9 @@ import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.IGPUVertsRenderable;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.*;
+import gaiasky.scene.component.GraphNode;
+import gaiasky.scene.component.Trajectory;
+import gaiasky.scene.component.Verts;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.math.Vector3d;

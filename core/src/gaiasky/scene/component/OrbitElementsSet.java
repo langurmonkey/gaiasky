@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scenegraph.SceneGraphNode;
 
 public class OrbitElementsSet implements Component {
     public Array<Entity> alwaysUpdate;

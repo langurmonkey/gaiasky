@@ -2,7 +2,6 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -17,20 +16,15 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
-import gaiasky.scene.Mapper;
-import gaiasky.scene.component.*;
-import gaiasky.scene.entity.ParticleUtils;
+import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.view.BillboardView;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.DistanceEntityComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Vector3d;
 
 /**
  * Renders billboards (camera-oriented quads), optionally with a global texture. If a texture is not provided,

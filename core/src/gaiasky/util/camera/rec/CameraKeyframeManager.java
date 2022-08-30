@@ -6,12 +6,12 @@
 package gaiasky.util.camera.rec;
 
 import com.badlogic.gdx.utils.Array;
-import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
 import gaiasky.util.math.CatmullRomSplined;
 import gaiasky.util.math.Lineard;
 import gaiasky.util.math.Pathd;

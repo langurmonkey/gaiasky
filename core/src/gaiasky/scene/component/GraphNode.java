@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.util.Consumers.Consumer3;
-import gaiasky.util.Functions.Function2;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;

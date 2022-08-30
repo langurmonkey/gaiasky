@@ -5,11 +5,11 @@
 
 package gaiasky.gui;
 
-import gaiasky.util.properties.SortedProperties;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.parse.Parser;
+import gaiasky.util.properties.SortedProperties;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.InputStream;

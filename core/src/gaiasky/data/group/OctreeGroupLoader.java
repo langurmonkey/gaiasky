@@ -9,8 +9,6 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.GaiaSky;
 import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.octreegen.MetadataBinaryIO;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;

@@ -6,7 +6,6 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagNoProcess;
-import gaiasky.scenegraph.VertsObject;
 import gaiasky.util.math.Vector3b;
 
 public class KeyframeUtils {

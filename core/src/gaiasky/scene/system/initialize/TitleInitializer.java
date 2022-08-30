@@ -6,15 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.RenderingContext;
-import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.TitleRadio;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.gdx.g2d.ExtSpriteBatch;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class TitleInitializer extends AbstractInitSystem {
     public TitleInitializer(boolean setUp, Family family, int priority) {

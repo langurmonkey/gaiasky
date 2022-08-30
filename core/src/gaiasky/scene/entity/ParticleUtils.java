@@ -31,8 +31,6 @@ import gaiasky.util.math.Vector3d;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.json.XMLTokener.entity;
-
 /**
  * Contains utilities common to particle and star objects and sets.
  */

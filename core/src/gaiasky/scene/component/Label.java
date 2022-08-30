@@ -1,7 +1,6 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
@@ -9,8 +8,6 @@ import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Consumers.Consumer7;
-import gaiasky.util.Functions.Function2;
-import gaiasky.util.Functions.Function3;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;

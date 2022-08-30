@@ -5,9 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-
-import java.util.List;
-
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FilterView;
@@ -22,6 +19,8 @@ import gaiasky.util.Settings;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+
+import java.util.List;
 
 /**
  * This class contains the methods that implement {@link IFocus#addHitRay(Vector3d, Vector3d, NaturalCamera, Array)}

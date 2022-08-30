@@ -16,7 +16,6 @@ import gaiasky.scene.Archetype;
 import gaiasky.scene.AttributeMap;
 import gaiasky.scene.component.Base;
 import gaiasky.util.Functions.Function3;
-import gaiasky.util.Functions.Function6;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;

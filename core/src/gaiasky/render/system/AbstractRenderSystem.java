@@ -6,19 +6,18 @@
 package gaiasky.render.system;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.RenderGroup;
+import gaiasky.render.RenderingContext;
+import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.util.SysUtils;
-import gaiasky.render.ComponentTypes;
-import gaiasky.render.api.IRenderable;
-import gaiasky.render.RenderingContext;
-import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;

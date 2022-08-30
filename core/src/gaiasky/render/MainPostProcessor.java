@@ -17,16 +17,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.render.api.IPostProcessor;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.BaseView;
-import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
-import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
-import gaiasky.util.SysUtils;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.scenegraph.BackgroundModel;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.component.MaterialComponent;
@@ -35,6 +32,8 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.Antialias;
 import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
+import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.Settings.ToneMapping;
 import gaiasky.util.coord.StaticCoordinates;
@@ -122,11 +121,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         manager.load(lensDirtName, Texture.class);
         manager.load(lensColorName, Texture.class);
         manager.load(lensStarburstName, Texture.class);
-
-        // Raymarching objects
-        // [0:shader{string}, 1:enabled {bool}, 2:position{vector3d}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]]
-        //raymarchingDef.put("Black Hole", new Object[] { "raymarching/blackhole", true, new Vector3b(300 * Constants.PC_TO_U, 300 * Constants.PC_TO_U, 0), new float[] { 1f, 0f, 0f, 0f }, Settings.settings.assetsFileStr("img/static.jpg") });
-        //raymarchingDef.put("Torus", new Object[] { "raymarching/torus", true, new Vector3b(1 * Constants.AU_TO_U, 0, 0), new float[] { 1f, 0f, 0f, 0f }, Settings.settings.assetsFileStr("img/static.jpg") });
     }
 
     public void doneLoading(AssetManager manager) {
@@ -231,13 +225,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
-        /**
+        /*
          TODO
          This is a pretty brutal patch for macOS. For some obscure reason,
          the sucker will welcome you with a nice cozy blank screen if
          the activation of the light glow effect is
          not delayed. No time or willpower to get to the bottom of this.
-         **/
+         */
         if (SysUtils.isMac() && glowSettings.active) {
             Task enableLG = new Task() {
                 @Override
@@ -353,16 +347,16 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             var graph = Mapper.graph.get(entity);
             graph.setParent(Scene.ROOT_NAME);
 
-            var coord = Mapper.coordinates.get(entity);
+            var coordinates = Mapper.coordinates.get(entity);
             StaticCoordinates sc = new StaticCoordinates();
             sc.setPosition(new double[] { 0, 0, 0 });
-            coord.coordinates = sc;
+            coordinates.coordinates = sc;
 
             var model = Mapper.model.get(entity);
             ModelComponent mc = new ModelComponent(true);
             mc.setType("sphere");
             Map<String, Object> params = new HashMap<>();
-            params.put("quality", 50l);
+            params.put("quality", 50L);
             params.put("diameter", 1.0d);
             params.put("flip", true);
             mc.setParams(params);

@@ -1,14 +1,9 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
-import gaiasky.GaiaSky;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.StarSetUtils;
-import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.tree.IOctreeObject;
 
 /** A view that implements {@link gaiasky.util.tree.IOctreeObject} methods for entities. **/

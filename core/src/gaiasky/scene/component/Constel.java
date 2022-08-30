@@ -1,10 +1,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.Constellation;
-import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
 

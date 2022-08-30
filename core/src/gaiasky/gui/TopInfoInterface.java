@@ -15,7 +15,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;

@@ -3,9 +3,6 @@ package gaiasky.scene.view;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
-import org.apache.commons.math3.analysis.function.Abs;
 
 /**
  * An abstract view that holds a reference to the current entity.

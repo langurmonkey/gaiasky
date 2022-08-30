@@ -2,30 +2,9 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.data.util.PointCloudData;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
-import gaiasky.render.ComponentTypes;
-import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.RenderGroup;
-import gaiasky.scene.Archetype;
-import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.view.VertsView;
-import gaiasky.scenegraph.Invisible;
-import gaiasky.scenegraph.Polyline;
-import gaiasky.scenegraph.VertsObject;
-import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.Constants;
-import gaiasky.util.Settings;
-import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.camera.rec.Keyframe;
-import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.Vector3d;
 
 public class Keyframes implements Component {
 

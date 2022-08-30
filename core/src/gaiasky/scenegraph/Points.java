@@ -6,8 +6,8 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
-import gaiasky.render.api.IPointRenderable;
 import gaiasky.render.RenderGroup;
+import gaiasky.render.api.IPointRenderable;
 import gaiasky.render.system.PointRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3d;

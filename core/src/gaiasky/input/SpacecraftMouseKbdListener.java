@@ -1,12 +1,9 @@
 package gaiasky.input;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.input.GestureDetector;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.view.SpacecraftView;
-import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.SpacecraftCamera;
 import gaiasky.util.Settings;
 

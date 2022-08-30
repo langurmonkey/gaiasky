@@ -11,15 +11,9 @@ import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.component.MaterialComponent;
-import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Renders billboard galaxies with no texture, just blobs

@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.GraphNode;
-import gaiasky.util.time.ITimeFrameProvider;
 
 /**
  * Defines the interface for all entity update systems.

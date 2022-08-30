@@ -6,14 +6,10 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
-import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.OrbitElementsSet;
 import gaiasky.scene.component.tag.TagSetElement;
 import gaiasky.scene.entity.ElementsSetRadio;
-import gaiasky.util.CatalogInfo;
-import gaiasky.util.CatalogInfo.CatalogInfoSource;
 
 public class ElementsSetInitializer extends AbstractInitSystem {
     public ElementsSetInitializer(boolean setUp, Family family, int priority) {

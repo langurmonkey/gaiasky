@@ -2,8 +2,11 @@ package gaiasky.scenegraph.particle;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.NumberUtils;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.ObjectDoubleMap.Keys;
+import gaiasky.util.TLV3D;
+import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;

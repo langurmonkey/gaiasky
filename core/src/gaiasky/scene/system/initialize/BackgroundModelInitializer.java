@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.data.AssetBean;
 import gaiasky.render.RenderGroup;
-import gaiasky.render.RenderingContext;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
@@ -18,7 +17,6 @@ import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.math.Matrix4d;
 

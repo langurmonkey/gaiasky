@@ -3,18 +3,12 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
-import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 /**
  * Initializes location mark entities.

@@ -7,16 +7,13 @@ package gaiasky.util;
 
 import org.apache.commons.imaging.*;
 import org.apache.commons.imaging.ImageInfo.ColorType;
-import org.apache.commons.imaging.formats.png.PngConstants;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class ImageUtils {
 

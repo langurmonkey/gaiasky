@@ -6,7 +6,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.DatasetDescription;
-import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;

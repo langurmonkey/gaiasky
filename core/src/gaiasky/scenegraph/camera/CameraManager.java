@@ -11,7 +11,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -19,7 +18,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.Planet;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.Coordinates;
@@ -726,10 +724,8 @@ public class CameraManager implements ICamera, IObserver {
      *
      * @param cam            The perspective camera
      * @param frustumCorners The matrix to fill
-     *
-     * @return The same matrix
      */
-    public static Matrix4 getFrustumCornersEye(PerspectiveCamera cam, Matrix4 frustumCorners) {
+    public static void getFrustumCornersEye(PerspectiveCamera cam, Matrix4 frustumCorners) {
         float camFov = cam.fieldOfView;
         float camAspect = cam.viewportWidth / cam.viewportHeight;
 
@@ -768,6 +764,5 @@ public class CameraManager implements ICamera, IObserver {
         frustumCorners.val[Matrix4.M03] = bottomLeft.x;
         frustumCorners.val[Matrix4.M13] = bottomLeft.y;
         frustumCorners.val[Matrix4.M23] = bottomLeft.z;
-        return frustumCorners;
     }
 }

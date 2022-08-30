@@ -8,11 +8,9 @@ import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.*;
+import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.entity.TrajectoryUtils;
-import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.scenegraph.camera.ICamera;
 import org.lwjgl.opengl.GL20;
 
 /**

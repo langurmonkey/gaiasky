@@ -1,11 +1,11 @@
 package gaiasky.gui;
 
-import gaiasky.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
+import gaiasky.util.SysUtils;
 
 import java.io.IOException;
 import java.nio.file.*;
