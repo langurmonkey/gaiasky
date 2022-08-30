@@ -6,7 +6,7 @@
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 [![Docs](https://img.shields.io/badge/docs-master-3245a9)](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)
-[![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/gaiasky/gaiasky/issues)
+[![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://codeberg.org/gaiasky/gaiasky/issues)
 [![Stats](https://img.shields.io/badge/stats-gaiasky-%234d7)](https://gaia.ari.uni-heidelberg.de/gaiasky/stats)
 
 [**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://sci.esa.int/gaia) to chart more than 1 billion stars.
@@ -18,7 +18,7 @@ To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
 *  Read the [**official documentation**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)
-*  Submit a [**bug** or a **feature request**](https://gitlab.com/gaiasky/gaiasky/issues)
+*  Submit a [**bug** or a **feature request**](https://codeberg.org/gaiasky/gaiasky/issues)
 *  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
 
 This file contains the following sections:
@@ -56,10 +56,10 @@ In order to compile and run Gaia Sky from source, you need the following install
 - `JDK15+`
 - `git`
 
-First, clone the [Gaia Sky repository](https://gitlab.com/gaiasky/gaiasky):
+First, clone the [Gaia Sky repository](https://codeberg.org/gaiasky/gaiasky):
 
 ```console
-git clone https://gitlab.com/gaiasky/gaiasky.git
+git clone https://codeberg.org/gaiasky/gaiasky.git
 ```
 
 Then, run Gaia Sky (Linux, macOS) with the provided script:

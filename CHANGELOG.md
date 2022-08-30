@@ -1,14 +1,14 @@
 <a name="unreleased"></a>
-## [Unreleased](https://gitlab.com/gaiasky/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.2.1...HEAD)
+## [Unreleased](https://codeberg.org/gaiasky/gaiasky/tree/master)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.1...HEAD)
 
 
 <a name="3.2.1"></a>
-## [3.2.1](https://gitlab.com/gaiasky/gaiasky/tree/3.2.0) (2022-06-21)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.2.0...3.2.1)
+## [3.2.1](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0) (2022-06-21)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0...3.2.1)
 
 ### Bug Fixes
-- translate strings of filters, shapes, datasets and minimap. Fixes [#403](https://gitlab.com/gaiasky/gaiasky/issues/403). [#403](https://gitlab.com/gaiasky/gaiasky/issues/403) 
+- translate strings of filters, shapes, datasets and minimap. Fixes [#403](https://codeberg.org/gaiasky/gaiasky/issues/403). [#403](https://codeberg.org/gaiasky/gaiasky/issues/403) 
 - filters crash with instanced star renderers. 
 - moon orbits are recomputed more often. 
 - modal windows made not collapsible by default. 
@@ -21,7 +21,7 @@
 - break link in dataset manager if too long. 
 
 ### Build System
-- move namespace from 'gitlab.com/langurmonkey' to 'gitlab.com/gaiasky'. 
+- move namespace from 'codeberg.org/langurmonkey' to 'codeberg.org/gaiasky'. 
 - docs project no longer a submodule. 
 
 ### Features
@@ -30,19 +30,19 @@
 
 
 <a name="3.2.0"></a>
-## [3.2.0](https://gitlab.com/gaiasky/gaiasky/tree/3.1.6) (2022-06-07)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.1.6...3.2.0)
+## [3.2.0](https://codeberg.org/gaiasky/gaiasky/tree/3.1.6) (2022-06-07)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.6...3.2.0)
 
 ### Bug Fixes
 - make sure direction and up vectors are orthogonal in camera transition call. 
 - increase size star point buffer when needed. 
-- null-check satellite attitude before getting quaternion. Fixes [#402](https://gitlab.com/gaiasky/gaiasky/issues/402). [#402](https://gitlab.com/gaiasky/gaiasky/issues/402) 
+- null-check satellite attitude before getting quaternion. Fixes [#402](https://codeberg.org/gaiasky/gaiasky/issues/402). [#402](https://codeberg.org/gaiasky/gaiasky/issues/402) 
 - empty tips may crash Gaia Sky at startup. 
-- 'add scene graph object' event missing source object. Fixes [#400](https://gitlab.com/gaiasky/gaiasky/issues/400). [#400](https://gitlab.com/gaiasky/gaiasky/issues/400) 
+- 'add scene graph object' event missing source object. Fixes [#400](https://codeberg.org/gaiasky/gaiasky/issues/400). [#400](https://codeberg.org/gaiasky/gaiasky/issues/400) 
 - remove phase of pi radians in default-model orbital elements. 
 - regression with libgdx 1.11.0 that caused vertical tooltips. 
 - null-check settings in crash reporter. 
-- workaround for libgdx backslash bug in asset manager. Fixes [#398](https://gitlab.com/gaiasky/gaiasky/issues/398). [#398](https://gitlab.com/gaiasky/gaiasky/issues/398) 
+- workaround for libgdx backslash bug in asset manager. Fixes [#398](https://codeberg.org/gaiasky/gaiasky/issues/398). [#398](https://codeberg.org/gaiasky/gaiasky/issues/398) 
 - hide system cursor correctly with GLFW until libgdx 1.10.1 is released. 
 - use minimum width for debug interface to prevent dynamic resizing depending on content. 
 - correctly update label text when setting `SliderPlus` values. 
@@ -55,12 +55,12 @@
 - big refactor that fixes the runtime activation and deactivation of both motion blur and ssr. Lots of little fixes and improvements to the render system. 
 - add VR offset to reflection view direction. 
 - VR controller info positioning, settings crash. 
-- add null-checks for some OpenVR properties (required by Oculus 2). Add VR information in crash reporter. Fixes [#393](https://gitlab.com/gaiasky/gaiasky/issues/393) (again). [#393](https://gitlab.com/gaiasky/gaiasky/issues/393) 
+- add null-checks for some OpenVR properties (required by Oculus 2). Add VR information in crash reporter. Fixes [#393](https://codeberg.org/gaiasky/gaiasky/issues/393) (again). [#393](https://codeberg.org/gaiasky/gaiasky/issues/393) 
 - wrong scale factor in orbital elements-based orbits in VR 
-- update `VRControllerRole` values from `ETrackedControllerRole` from SteamVR spec. Fixes [#393](https://gitlab.com/gaiasky/gaiasky/issues/393). [#393](https://gitlab.com/gaiasky/gaiasky/issues/393) 
-- broken `setObjectVisibility()` API call. Fixes [#391](https://gitlab.com/gaiasky/gaiasky/issues/391). [#391](https://gitlab.com/gaiasky/gaiasky/issues/391) 
-- escape path before sending SAMP metadata. Fixes [#392](https://gitlab.com/gaiasky/gaiasky/issues/392). [#392](https://gitlab.com/gaiasky/gaiasky/issues/392) 
-- regression adding bookmarks. Fixes [#390](https://gitlab.com/gaiasky/gaiasky/issues/390). [#390](https://gitlab.com/gaiasky/gaiasky/issues/390) 
+- update `VRControllerRole` values from `ETrackedControllerRole` from SteamVR spec. Fixes [#393](https://codeberg.org/gaiasky/gaiasky/issues/393). [#393](https://codeberg.org/gaiasky/gaiasky/issues/393) 
+- broken `setObjectVisibility()` API call. Fixes [#391](https://codeberg.org/gaiasky/gaiasky/issues/391). [#391](https://codeberg.org/gaiasky/gaiasky/issues/391) 
+- escape path before sending SAMP metadata. Fixes [#392](https://codeberg.org/gaiasky/gaiasky/issues/392). [#392](https://codeberg.org/gaiasky/gaiasky/issues/392) 
+- regression adding bookmarks. Fixes [#390](https://codeberg.org/gaiasky/gaiasky/issues/390). [#390](https://codeberg.org/gaiasky/gaiasky/issues/390) 
 - directional lights from stars still applied when stars are made invisible 
 - restrict the rendering of pointer guides and cross-hairs in stereo and cubemap modes. 
 - improve check box layout in preferences dialog 
@@ -81,7 +81,7 @@
 - effective temperature array initialization bug in STIL loader 
 - regression in apparent magnitude resource bundle key 
 - effective temperature array initialization bug in STIL loader 
-- add notice whenever a `default-data` update is available. [#384](https://gitlab.com/gaiasky/gaiasky/issues/384) 
+- add notice whenever a `default-data` update is available. [#384](https://codeberg.org/gaiasky/gaiasky/issues/384) 
 - crosshair in cubemap, planetarium, stereo and VR modes 
 - remove usage of deprecated Java APIs 
 - do not add objects that already exist (have same names and same type) to scene graph 
@@ -100,7 +100,7 @@
 - rename old configuration files after conversion to new format 
 - time offset (6711 yr) in Moon's position lookup 
 - fix star clusters fade between model and billboard 
-- color picker listener stops working after first click [#379](https://gitlab.com/gaiasky/gaiasky/issues/379) 
+- color picker listener stops working after first click [#379](https://codeberg.org/gaiasky/gaiasky/issues/379) 
 
 ### Build System
 - force safe graphics mode on M1 macOS. 
@@ -227,10 +227,10 @@
 - add variable stars as a new dataset type 
 - add provider parameters to data providers 
 - improve CA,DE,ES translations 
-- improve bookmarks, add missing i18n keys Fixes [#380](https://gitlab.com/gaiasky/gaiasky/issues/380) [#380](https://gitlab.com/gaiasky/gaiasky/issues/380) 
-- shapes (spheres, cones, cylinders, etc.) of arbitrary sizes can now be added around any object, with the possibility of tracking the object's size. This is an extension of [#378](https://gitlab.com/gaiasky/gaiasky/issues/378) which includes many more options plus an API entry point 
-- add shapes around objects Fixes [#378](https://gitlab.com/gaiasky/gaiasky/issues/378) [#378](https://gitlab.com/gaiasky/gaiasky/issues/378) 
-- add setting to select preferred units (ly/pc) [#377](https://gitlab.com/gaiasky/gaiasky/issues/377) 
+- improve bookmarks, add missing i18n keys Fixes [#380](https://codeberg.org/gaiasky/gaiasky/issues/380) [#380](https://codeberg.org/gaiasky/gaiasky/issues/380) 
+- shapes (spheres, cones, cylinders, etc.) of arbitrary sizes can now be added around any object, with the possibility of tracking the object's size. This is an extension of [#378](https://codeberg.org/gaiasky/gaiasky/issues/378) which includes many more options plus an API entry point 
+- add shapes around objects Fixes [#378](https://codeberg.org/gaiasky/gaiasky/issues/378) [#378](https://codeberg.org/gaiasky/gaiasky/issues/378) 
+- add setting to select preferred units (ly/pc) [#377](https://codeberg.org/gaiasky/gaiasky/issues/377) 
 - add the possibility to track objects 
 
 ### Performance Improvements
@@ -248,15 +248,15 @@
 
 
 <a name="3.1.6"></a>
-## [3.1.6](https://gitlab.com/gaiasky/gaiasky/tree/3.1.5) (2021-09-22)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.1.5...3.1.6)
+## [3.1.6](https://codeberg.org/gaiasky/gaiasky/tree/3.1.5) (2021-09-22)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.5...3.1.6)
 
 ### Bug Fixes
 - VR GUI object initialization -- consolidate init() signature 
 
 <a name="3.1.5"></a>
-## [3.1.5](https://gitlab.com/gaiasky/gaiasky/tree/3.1.4) (2021-09-22)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.1.4...3.1.5)
+## [3.1.5](https://codeberg.org/gaiasky/gaiasky/tree/3.1.4) (2021-09-22)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.4...3.1.5)
 
 ### Bug Fixes
 - pointer guides use wrong shader program and render incorrectly 
@@ -268,7 +268,7 @@
 - preferences dialog catalog selection tab 
 - manipulate visibility of stars with proper names 
 - bug in `goToObject()` camera direction 
-- star offset in star groups [#375](https://gitlab.com/gaiasky/gaiasky/issues/375) 
+- star offset in star groups [#375](https://codeberg.org/gaiasky/gaiasky/issues/375) 
 - some tweaks to VR mode, fix crashes 
 
 ### Build System
@@ -295,18 +295,18 @@
 
 
 <a name="3.1.4"></a>
-## [3.1.4](https://gitlab.com/gaiasky/gaiasky/tree/3.1.3) (2021-07-02)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.1.3...3.1.4)
+## [3.1.4](https://codeberg.org/gaiasky/gaiasky/tree/3.1.3) (2021-07-02)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.3...3.1.4)
 
 ### Bug Fixes
-- tone mapping persistence issue [#374](https://gitlab.com/gaiasky/gaiasky/issues/374) 
+- tone mapping persistence issue [#374](https://codeberg.org/gaiasky/gaiasky/issues/374) 
 - unify internal delta time across all modules 
-- regression in `getObjectPosition()` since `3.1.0` [#372](https://gitlab.com/gaiasky/gaiasky/issues/372) 
+- regression in `getObjectPosition()` since `3.1.0` [#372](https://codeberg.org/gaiasky/gaiasky/issues/372) 
 - camera direction precision issue in focus mode 
 
 ### Build System
 - update AUR JRE dependency 
-- use externally built JDK for appimage [#361](https://gitlab.com/gaiasky/gaiasky/issues/361) 
+- use externally built JDK for appimage [#361](https://codeberg.org/gaiasky/gaiasky/issues/361) 
 - remove JSAMP, add as dependency 
 - remove gson dependency 
 - update dependency versions 
@@ -322,13 +322,13 @@
 
 
 <a name="3.1.3"></a>
-## [3.1.3](https://gitlab.com/gaiasky/gaiasky/tree/3.1.2) (2021-06-22)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.1.2...3.1.3)
+## [3.1.3](https://codeberg.org/gaiasky/gaiasky/tree/3.1.2) (2021-06-22)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.2...3.1.3)
 
 ### Bug Fixes
-- constellation update thread broken [#371](https://gitlab.com/gaiasky/gaiasky/issues/371) 
+- constellation update thread broken [#371](https://codeberg.org/gaiasky/gaiasky/issues/371) 
 - remove atmosphere softening hack for close by objects 
-- focus with no star ancestor [#370](https://gitlab.com/gaiasky/gaiasky/issues/370) 
+- focus with no star ancestor [#370](https://codeberg.org/gaiasky/gaiasky/issues/370) 
 
 ### Code Refactoring
 - render types reorganized and improved 
@@ -340,33 +340,33 @@
 - performance improvements in arbitrary precision vector distance method 
 
 <a name="3.1.2"></a>
-## [3.1.2](https://gitlab.com/gaiasky/gaiasky/tree/3.1.1) (2021-06-16)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.1.1...3.1.2)
+## [3.1.2](https://codeberg.org/gaiasky/gaiasky/tree/3.1.1) (2021-06-16)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.1...3.1.2)
 
 ### Bug Fixes
-- broken visibility of datasets (star/particle groups) [#369](https://gitlab.com/gaiasky/gaiasky/issues/369) 
+- broken visibility of datasets (star/particle groups) [#369](https://codeberg.org/gaiasky/gaiasky/issues/369) 
 - enable more than one light glow effect at a time 
-- set logging level of STIL and JSAMP to WARN [#367](https://gitlab.com/gaiasky/gaiasky/issues/367) 
+- set logging level of STIL and JSAMP to WARN [#367](https://codeberg.org/gaiasky/gaiasky/issues/367) 
 
 ### Build System
 - fix `git-chglog` configuration so that merge requests are correctly captured 
 
 ### Features
-- add apparent magnitude from camera [#368](https://gitlab.com/gaiasky/gaiasky/issues/368) 
+- add apparent magnitude from camera [#368](https://codeberg.org/gaiasky/gaiasky/issues/368) 
 
 <a name="3.1.1"></a>
-## [3.1.1](https://gitlab.com/gaiasky/gaiasky/tree/3.1.0) (2021-06-11)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.1.0...3.1.1)
+## [3.1.1](https://codeberg.org/gaiasky/gaiasky/tree/3.1.0) (2021-06-11)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.0...3.1.1)
 
 ### Bug Fixes
-- crash when window is minimized (Windows) [#366](https://gitlab.com/gaiasky/gaiasky/issues/366) 
+- crash when window is minimized (Windows) [#366](https://codeberg.org/gaiasky/gaiasky/issues/366) 
 
 ### Build System
 - change developer_name to be consistent with FlatHub metadata (max 60 chars) 
 
 <a name="3.1.0"></a>
-## [3.1.0](https://gitlab.com/gaiasky/gaiasky/tree/3.0.3) (2021-06-10)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.0.3...3.1.0)
+## [3.1.0](https://codeberg.org/gaiasky/gaiasky/tree/3.0.3) (2021-06-10)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.3...3.1.0)
 
 ### Features
 - add first implementation of new component: location log
@@ -397,13 +397,13 @@
 - move visibility property from fade nodes to scene graph nodes
 
 ### Merge requests
-- Bulgarian translation, contributed by [Georgi Georgiev](https://gitlab.com/RacerBG)
+- Bulgarian translation, contributed by [Georgi Georgiev](https://codeberg.org/RacerBG)
 
 ### Bug Fixes
 - update list of JRE modules for Appimage
-- untranslatable strings, fixes [#356](https://gitlab.com/gaiasky/gaiasky/issues/356) [#356](https://gitlab.com/gaiasky/gaiasky/issues/356)
-- music module omitted if initialization fails, fixes [#360](https://gitlab.com/gaiasky/gaiasky/issues/360), [#362](https://gitlab.com/gaiasky/gaiasky/issues/362) [#360](https://gitlab.com/gaiasky/gaiasky/issues/360)
-- Appimage not using bundled JRE. Fixes [#361](https://gitlab.com/gaiasky/gaiasky/issues/361) [#361](https://gitlab.com/gaiasky/gaiasky/issues/361)
+- untranslatable strings, fixes [#356](https://codeberg.org/gaiasky/gaiasky/issues/356) [#356](https://codeberg.org/gaiasky/gaiasky/issues/356)
+- music module omitted if initialization fails, fixes [#360](https://codeberg.org/gaiasky/gaiasky/issues/360), [#362](https://codeberg.org/gaiasky/gaiasky/issues/362) [#360](https://codeberg.org/gaiasky/gaiasky/issues/360)
+- Appimage not using bundled JRE. Fixes [#361](https://codeberg.org/gaiasky/gaiasky/issues/361) [#361](https://codeberg.org/gaiasky/gaiasky/issues/361)
 - README docs URL
 - attitude navigator ball UI scaling
 - free camera stops when very close to stars
@@ -444,12 +444,12 @@
 - some shader formatting
 
 <a name="3.0.3"></a>
-## [3.0.3](https://gitlab.com/gaiasky/gaiasky/tree/3.0.2) (2021-02-25)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.0.2...3.0.3)
+## [3.0.3](https://codeberg.org/gaiasky/gaiasky/tree/3.0.2) (2021-02-25)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.2...3.0.3)
 
 ### Features
 - improvements to catalog generation (hashmap to treemap, rename params, accept multiple string ids per column, etc.) 
-- add search suggestions to search dialog - fixes [#351](https://gitlab.com/gaiasky/gaiasky/issues/351) [#351](https://gitlab.com/gaiasky/gaiasky/issues/351) 
+- add search suggestions to search dialog - fixes [#351](https://codeberg.org/gaiasky/gaiasky/issues/351) [#351](https://codeberg.org/gaiasky/gaiasky/issues/351) 
 - remember 'show hidden' preference in file chooser 
 
 ### Bug Fixes
@@ -461,9 +461,9 @@
 - post-process bugs (sorting, etc.) 
 - check the wrong catalog type 'catalog-lod' 
 - use local descriptors when server descriptor fails to recognize a catalog 
-- button sizes adapt to content (fixes [#353](https://gitlab.com/gaiasky/gaiasky/issues/353)) [#353](https://gitlab.com/gaiasky/gaiasky/issues/353) 
-- bug introduced in 40b99a2 - star cores not applied alpha - fixes [#352](https://gitlab.com/gaiasky/gaiasky/issues/352) [#352](https://gitlab.com/gaiasky/gaiasky/issues/352) 
-- move temp folder into data folder - partially fixes [#350](https://gitlab.com/gaiasky/gaiasky/issues/350) [#350](https://gitlab.com/gaiasky/gaiasky/issues/350) 
+- button sizes adapt to content (fixes [#353](https://codeberg.org/gaiasky/gaiasky/issues/353)) [#353](https://codeberg.org/gaiasky/gaiasky/issues/353) 
+- bug introduced in 40b99a2 - star cores not applied alpha - fixes [#352](https://codeberg.org/gaiasky/gaiasky/issues/352) [#352](https://codeberg.org/gaiasky/gaiasky/issues/352) 
+- move temp folder into data folder - partially fixes [#350](https://codeberg.org/gaiasky/gaiasky/issues/350) [#350](https://codeberg.org/gaiasky/gaiasky/issues/350) 
 - local catalog numbers work when no internet connection available 
 - update jamepad and gdx-controllers versions due to macOS crash 
 
@@ -489,8 +489,8 @@
 
 
 <a name="3.0.2"></a>
-## [3.0.2](https://gitlab.com/gaiasky/gaiasky/tree/3.0.1) (2021-01-21)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.0.1...3.0.2)
+## [3.0.2](https://codeberg.org/gaiasky/gaiasky/tree/3.0.1) (2021-01-21)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.1...3.0.2)
 
 ### Features
 - add warning when selecting more than one star catalog 
@@ -519,9 +519,9 @@
 - default proper motion factor and length values 
 - 'App not responding' message on win10 - fix by upgrading to gdx-controllers 2.0.0, plus some other goodies 
 - remove useless network checker thread, fix thumbnail URL crash on win10 
-- minimizing screen crashes Gaia Sky on Win10. Fixes [#333](https://gitlab.com/gaiasky/gaiasky/issues/333), [#345](https://gitlab.com/gaiasky/gaiasky/issues/345) [#333](https://gitlab.com/gaiasky/gaiasky/issues/333) 
+- minimizing screen crashes Gaia Sky on Win10. Fixes [#333](https://codeberg.org/gaiasky/gaiasky/issues/333), [#345](https://codeberg.org/gaiasky/gaiasky/issues/345) [#333](https://codeberg.org/gaiasky/gaiasky/issues/333) 
 - VR init failure actually prompts right error message 
-- properties files' encodings set to UTF-8. Fixes [#344](https://gitlab.com/gaiasky/gaiasky/issues/344) [#344](https://gitlab.com/gaiasky/gaiasky/issues/344) 
+- properties files' encodings set to UTF-8. Fixes [#344](https://codeberg.org/gaiasky/gaiasky/issues/344) [#344](https://codeberg.org/gaiasky/gaiasky/issues/344) 
 - VR mode now accepts any window resize, backbuffer size used for everything internally 
 - BREAKING CHANGE API landOnObjectLocation() -> landAtObjectLocation() 
 - octreegen additional split accepts now coma and spaces 
@@ -568,8 +568,8 @@
 - update thread names, fix monitor objects, increase sg update time interval 
 
 <a name="3.0.1"></a>
-## [3.0.1](https://gitlab.com/gaiasky/gaiasky/tree/3.0.0) (2020-12-10)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/3.0.0...3.0.1)
+## [3.0.1](https://codeberg.org/gaiasky/gaiasky/tree/3.0.0) (2020-12-10)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.0.0...3.0.1)
 
 ### Features
 - saner error reporting with new dialog 
@@ -602,8 +602,8 @@
 - update pointers to documentation 
 
 <a name="3.0.0"></a>
-## [3.0.0](https://gitlab.com/gaiasky/gaiasky/tree/2.3.1) (2020-12-02)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.3.1...3.0.0)
+## [3.0.0](https://codeberg.org/gaiasky/gaiasky/tree/2.3.1) (2020-12-02)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.3.1...3.0.0)
 
 ### Features
 - add number of objects to download manager 
@@ -642,7 +642,7 @@
 - apply scale factor to milky way 
 - camera group bottom buttons aligned to center 
 - emulate 64-bit float with two 32-bit floats in shader to be able to extend time beyond +-5 Myr 
-- controller mappings not found on first startup. Fixes [#341](https://gitlab.com/gaiasky/gaiasky/issues/341). [#341](https://gitlab.com/gaiasky/gaiasky/issues/341) 
+- controller mappings not found on first startup. Fixes [#341](https://codeberg.org/gaiasky/gaiasky/issues/341). [#341](https://codeberg.org/gaiasky/gaiasky/issues/341) 
 - use Java2D instead of Toolkit to determine initial screen size 
 - data description update 
 - controller mappings looking for assets location if not found 
@@ -700,8 +700,8 @@
 - move RenderGroup to render package for consistency 
 
 <a name="2.3.1"></a>
-## [2.3.1](https://gitlab.com/gaiasky/gaiasky/tree/2.3.0) (2020-07-08)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.3.0...2.3.1)
+## [2.3.1](https://codeberg.org/gaiasky/gaiasky/tree/2.3.0) (2020-07-08)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.3.0...2.3.1)
 
 ### Bug Fixes
 - shader lint function 
@@ -714,8 +714,8 @@
 - hot reload of galaxy models 
     
 <a name="2.3.0"></a>
-## [2.3.0](https://gitlab.com/gaiasky/gaiasky/tree/2.2.6) (2020-07-07)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.2.6...2.3.0)
+## [2.3.0](https://codeberg.org/gaiasky/gaiasky/tree/2.2.6) (2020-07-07)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.6...2.3.0)
 
 ### Bug Fixes
 - update name and source version number 
@@ -772,21 +772,21 @@
 
 
 <a name="2.2.6"></a>
-## [2.2.6](https://gitlab.com/gaiasky/gaiasky/tree/2.2.5) (2020-05-15)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.2.5...2.2.6)
+## [2.2.6](https://codeberg.org/gaiasky/gaiasky/tree/2.2.5) (2020-05-15)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.5...2.2.6)
 
 ### Bug Fixes
 - camera turn depends on fov 
-- stars with negative parallaxes use default [#329](https://gitlab.com/gaiasky/gaiasky/issues/329) 
-- load VO table crash on Windows [#329](https://gitlab.com/gaiasky/gaiasky/issues/329) 
-- program crash when minimizing in windows [#333](https://gitlab.com/gaiasky/gaiasky/issues/333) 
+- stars with negative parallaxes use default [#329](https://codeberg.org/gaiasky/gaiasky/issues/329) 
+- load VO table crash on Windows [#329](https://codeberg.org/gaiasky/gaiasky/issues/329) 
+- program crash when minimizing in windows [#333](https://codeberg.org/gaiasky/gaiasky/issues/333) 
 - do not assume default location for hip, pass as agrument 
 - file count value when max number of files is specified 
 - safecheck to prevent window sizes of 0x0 on resize events with AMD graphics on windows 
 - transition from point to billboard in star shading 
 - remove rounding in generic dialog positioning for smooth rendering 
 - adjust brightness scalings, remove unused variables and parameters 
-- wrong synchronize location in streaming octree loader [#332](https://gitlab.com/gaiasky/gaiasky/issues/332) 
+- wrong synchronize location in streaming octree loader [#332](https://codeberg.org/gaiasky/gaiasky/issues/332) 
 - camera mode change in SAMP select row call 
 - goToObject() skip fix 
 - SAMP local icon to work with dev version and releases 
@@ -883,8 +883,8 @@
 
 
 <a name="2.2.5"></a>
-## [2.2.5](https://gitlab.com/gaiasky/gaiasky/tree/2.2.4) (2020-03-04)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.2.4...2.2.5)
+## [2.2.5](https://codeberg.org/gaiasky/gaiasky/tree/2.2.4) (2020-03-04)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.4...2.2.5)
 
 ### Bug Fixes
 - some API calls crash when using double[] 
@@ -894,8 +894,8 @@
 - add flush frames to postRunnable() actions in scripting implementation 
 - proper extension checking for ATI vram info 
 - proper fix for VMemInfo crash on arcolinux+ATI graphics 
-- VRAM profiling crash for AMDGPUs [#326](https://gitlab.com/gaiasky/gaiasky/issues/326) 
-- adapt star brightness in cubemap modes [#318](https://gitlab.com/gaiasky/gaiasky/issues/318) 
+- VRAM profiling crash for AMDGPUs [#326](https://codeberg.org/gaiasky/gaiasky/issues/326) 
+- adapt star brightness in cubemap modes [#318](https://codeberg.org/gaiasky/gaiasky/issues/318) 
 - reload default configuration file crash 
 - build script typo 
 - ambient light slider 
@@ -922,7 +922,7 @@
 - proper implementation of FXAA 
 - load datasets as particles or stars 
 - add script to test color map highlighting 
-- implement planetarium deviation angle in shader [#328](https://gitlab.com/gaiasky/gaiasky/issues/328) 
+- implement planetarium deviation angle in shader [#328](https://codeberg.org/gaiasky/gaiasky/issues/328) 
 - update controller list live in preferences window, fix connection/disconnection events 
 - add extra attributes, colormaps for highlighting 
 - load all attributes from VOTables 
@@ -937,8 +937,8 @@ pixels instead of a normalized value between 0 and 100.
 
 
 <a name="2.2.4"></a>
-## [2.2.4](https://gitlab.com/gaiasky/gaiasky/tree/2.2.3) (2020-01-22)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.2.3...2.2.4)
+## [2.2.4](https://codeberg.org/gaiasky/gaiasky/tree/2.2.3) (2020-01-22)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.3...2.2.4)
 
 ### Bug Fixes
 - adjust brightness of sun glow, add empty release instructions file 
@@ -946,8 +946,8 @@ pixels instead of a normalized value between 0 and 100.
 - libgdx scene2d ui Window snaps to integer pixel positions resulting in text rendering artifacts 
 - assets location when running from source and no properties found 
 - dataset highlighting API calls improved, add test scripts for a few use cases 
-- screenshot/frame advanced mode messes viewport. Fixes [#319](https://gitlab.com/gaiasky/gaiasky/issues/319) [#319](https://gitlab.com/gaiasky/gaiasky/issues/319) 
-- properties file version not found. Fixes [#317](https://gitlab.com/gaiasky/gaiasky/issues/317) [#317](https://gitlab.com/gaiasky/gaiasky/issues/317) 
+- screenshot/frame advanced mode messes viewport. Fixes [#319](https://codeberg.org/gaiasky/gaiasky/issues/319) [#319](https://codeberg.org/gaiasky/gaiasky/issues/319) 
+- properties file version not found. Fixes [#317](https://codeberg.org/gaiasky/gaiasky/issues/317) [#317](https://codeberg.org/gaiasky/gaiasky/issues/317) 
 - fullscreen mode before initialization, cursor in slaves 
 - stop the rest server the right way 
 - correct perspective of labels in cubemap modes 
@@ -956,7 +956,7 @@ pixels instead of a normalized value between 0 and 100.
 - do not replace backslaches with forward slashes 
 - use fixed keyword for scene graph loader, improve internal catalog path handling 
 - typo - geenden -> beenden 
-- do not apply fog to normal shaders [#312](https://gitlab.com/gaiasky/gaiasky/issues/312) 
+- do not apply fog to normal shaders [#312](https://codeberg.org/gaiasky/gaiasky/issues/312) 
 - default constructor for NBG 
 - milky way adapts to fov changes 
 - toggle buttons for dome, cubemap and stereo 
@@ -1016,13 +1016,13 @@ pixels instead of a normalized value between 0 and 100.
 - improve performance of api call method/parameter matching 
 
 <a name="2.2.3"></a>
-## [2.2.3](https://gitlab.com/gaiasky/gaiasky/tree/2.2.2) (2019-11-05)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.2.2...2.2.3)
+## [2.2.3](https://codeberg.org/gaiasky/gaiasky/tree/2.2.2) (2019-11-05)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.2...2.2.3)
 
 ### Bug Fixes
 - last-minute fix 
 - improve user notification if wrong java version is used 
-- windows data loading crash -> [#308](https://gitlab.com/gaiasky/gaiasky/issues/308) 
+- windows data loading crash -> [#308](https://codeberg.org/gaiasky/gaiasky/issues/308) 
 
 ### Build System
 - add some extra translations for Catalan, German and Spanish 
@@ -1034,12 +1034,12 @@ pixels instead of a normalized value between 0 and 100.
 - add support for release notes in download manager 
 
 <a name="2.2.2"></a>
-## [2.2.2](https://gitlab.com/gaiasky/gaiasky/tree/2.2.1) (2019-10-31)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.2.1...2.2.2)
+## [2.2.2](https://codeberg.org/gaiasky/gaiasky/tree/2.2.1) (2019-10-31)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.1...2.2.2)
 
 ### Bug Fixes
 
-- crash loading scene graph on windows [#306](https://gitlab.com/gaiasky/gaiasky/issues/306) 
+- crash loading scene graph on windows [#306](https://codeberg.org/gaiasky/gaiasky/issues/306) 
 - add default controller rendermodel in case no suitable model is found 
 - controller identifier in SteamVR - controllers work again when using SteamVR 
 - block motion blur if vr mode is on 
@@ -1059,10 +1059,10 @@ pixels instead of a normalized value between 0 and 100.
 - billboard positioning 
 - orientation lock for quaternion-based objects 
 - dataset color cycling 
-- closest body being null in first frame [#303](https://gitlab.com/gaiasky/gaiasky/issues/303) 
+- closest body being null in first frame [#303](https://codeberg.org/gaiasky/gaiasky/issues/303) 
 - crash resizing window when loading scene graph 
 - add screen size check before persist 
-- java version string without minor or revision [#302](https://gitlab.com/gaiasky/gaiasky/issues/302) 
+- java version string without minor or revision [#302](https://codeberg.org/gaiasky/gaiasky/issues/302) 
 
 ### Build System
 
@@ -1111,8 +1111,8 @@ pixels instead of a normalized value between 0 and 100.
 - new velocity-based camera blur 
 
 <a name="2.2.1"></a>
-## [2.2.1](https://gitlab.com/gaiasky/gaiasky/tree/2.2.0) (2019-09-10)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.2.0...2.2.1)
+## [2.2.1](https://codeberg.org/gaiasky/gaiasky/tree/2.2.0) (2019-09-10)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.2.0...2.2.1)
 
 ### Bug Fixes
 
@@ -1133,8 +1133,8 @@ pixels instead of a normalized value between 0 and 100.
 - scripts Sol -> Sun 
 - controller mappings format error in loading 
 - cmd windows launch script actually works 
-- report scene graph loading errors ([#293](https://gitlab.com/gaiasky/gaiasky/issues/293)) 
-- deb dependency, issue [#291](https://gitlab.com/gaiasky/gaiasky/issues/291) 
+- report scene graph loading errors ([#293](https://codeberg.org/gaiasky/gaiasky/issues/293)) 
+- deb dependency, issue [#291](https://codeberg.org/gaiasky/gaiasky/issues/291) 
 
 ### Build System
 
@@ -1171,8 +1171,8 @@ pixels instead of a normalized value between 0 and 100.
 
 
 <a name="2.2.0"></a>
-## [2.2.0](https://gitlab.com/gaiasky/gaiasky/tree/2.1.7-vr) (2019-08-01)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.7-vr...2.2.0)
+## [2.2.0](https://codeberg.org/gaiasky/gaiasky/tree/2.1.7-vr) (2019-08-01)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.7-vr...2.2.0)
 
 ### Bug Fixes
 
@@ -1183,7 +1183,7 @@ pixels instead of a normalized value between 0 and 100.
 - scripting parameter check 
 - cameraTransition() 
 - more glsl leftovers 
-- shader errors on macOS [#288](https://gitlab.com/gaiasky/gaiasky/issues/288) [#288](https://gitlab.com/gaiasky/gaiasky/issues/288) 
+- shader errors on macOS [#288](https://codeberg.org/gaiasky/gaiasky/issues/288) [#288](https://codeberg.org/gaiasky/gaiasky/issues/288) 
 - show notice with high/ultra quality 
 - tangent and binormal vectors on UV spheres 
 - ui inconsistencies 
@@ -1277,8 +1277,8 @@ pixels instead of a normalized value between 0 and 100.
 - add optional arrowheads to velocity vectors 
 
 <a name="2.1.7"></a>
-## [2.1.7](https://gitlab.com/gaiasky/gaiasky/tree/2.1.6) (2019-01-11)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.6...2.1.7)
+## [2.1.7](https://codeberg.org/gaiasky/gaiasky/tree/2.1.6) (2019-01-11)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.6...2.1.7)
 
 ### Bug Fixes
 
@@ -1308,8 +1308,8 @@ pixels instead of a normalized value between 0 and 100.
 - add RUWE to octree generator 
 
 <a name="2.1.6"></a>
-## [2.1.6](https://gitlab.com/gaiasky/gaiasky/tree/2.1.5) (2018-12-18)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.5...2.1.6)
+## [2.1.6](https://codeberg.org/gaiasky/gaiasky/tree/2.1.5) (2018-12-18)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.5...2.1.6)
 
 ### Bug Fixes
 
@@ -1356,12 +1356,12 @@ pixels instead of a normalized value between 0 and 100.
 - nbg loader to manage distances better 
 
 <a name="2.1.5"></a>
-## [2.1.5](https://gitlab.com/gaiasky/gaiasky/tree/2.1.4) (2018-12-03)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.4...2.1.5)
+## [2.1.5](https://codeberg.org/gaiasky/gaiasky/tree/2.1.4) (2018-12-03)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.4...2.1.5)
 
 ### Bug Fixes
 
-- null pointer when unloading stars [#322](https://gitlab.com/gaiasky/gaiasky/issues/322) 
+- null pointer when unloading stars [#322](https://codeberg.org/gaiasky/gaiasky/issues/322) 
 ### Build System
 
 - remove rpm deps as they depend on distro 
@@ -1375,14 +1375,14 @@ pixels instead of a normalized value between 0 and 100.
 ### Documentation
 
 - update changelog 
-- update rpm install command [#317](https://gitlab.com/gaiasky/gaiasky/issues/317) 
+- update rpm install command [#317](https://codeberg.org/gaiasky/gaiasky/issues/317) 
 ### Features
 
 - LMC, SMC, datasets can require min gs version 
 - add support for nebulae 
 - non-jsonloader autoload files 
 - billboard galaxies 
-- passive update notifier [#321](https://gitlab.com/gaiasky/gaiasky/issues/321) 
+- passive update notifier [#321](https://codeberg.org/gaiasky/gaiasky/issues/321) 
 - add download speed and progress in downloaded/total to download manager 
 - add progress MB data to downloader 
 ### Style
@@ -1390,18 +1390,18 @@ pixels instead of a normalized value between 0 and 100.
 - fix info message 
 
 <a name="2.1.4"></a>
-## [2.1.4](https://gitlab.com/gaiasky/gaiasky/tree/2.1.3) (2018-11-23)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.3...2.1.4)
+## [2.1.4](https://codeberg.org/gaiasky/gaiasky/tree/2.1.3) (2018-11-23)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.3...2.1.4)
 
 ### Bug Fixes
 
 - locale index overflow 
-- german translation and locale initialisation [#320](https://gitlab.com/gaiasky/gaiasky/issues/320) 
+- german translation and locale initialisation [#320](https://codeberg.org/gaiasky/gaiasky/issues/320) 
 - do not preselect default dataset, only base data 
 - sizing of download manager window 
 - data download url log message 
 - null pointer when updating scroll focus, slash at end 
-- multiple scroll focus objects [#319](https://gitlab.com/gaiasky/gaiasky/issues/319) 
+- multiple scroll focus objects [#319](https://codeberg.org/gaiasky/gaiasky/issues/319) 
 - octree generator 
 - emission shader code 
 ### Build System
@@ -1411,7 +1411,7 @@ pixels instead of a normalized value between 0 and 100.
 
 - improve usability of download manager 
 - ensure correct java version before building 
-- dataset versioning [#318](https://gitlab.com/gaiasky/gaiasky/issues/318) [#316](https://gitlab.com/gaiasky/gaiasky/issues/316) 
+- dataset versioning [#318](https://codeberg.org/gaiasky/gaiasky/issues/318) [#316](https://codeberg.org/gaiasky/gaiasky/issues/316) 
 - STIL provider adds HIP indices 
 - name support and more for STIL loader 
 - script to query HIP names in simbad 
@@ -1422,15 +1422,15 @@ pixels instead of a normalized value between 0 and 100.
 - wee reformatting 
 
 <a name="2.1.3"></a>
-## [2.1.3](https://gitlab.com/gaiasky/gaiasky/tree/2.1.2-vr) (2018-10-31)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.2-vr...2.1.3)
+## [2.1.3](https://codeberg.org/gaiasky/gaiasky/tree/2.1.2-vr) (2018-10-31)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.2-vr...2.1.3)
 
 ### Bug Fixes
 
 - octree rendering muted 
 - minimap window 
-- accents and umlauts in user folder path (win) [#314](https://gitlab.com/gaiasky/gaiasky/issues/314) 
-- start button status update [#313](https://gitlab.com/gaiasky/gaiasky/issues/313) 
+- accents and umlauts in user folder path (win) [#314](https://codeberg.org/gaiasky/gaiasky/issues/314) 
+- start button status update [#313](https://codeberg.org/gaiasky/gaiasky/issues/313) 
 ### Code Refactoring
 
 - startup log 
@@ -1443,15 +1443,15 @@ pixels instead of a normalized value between 0 and 100.
 - new shader init & various improvements 
 - add proper motions to stil data provider 
 - initial support for proper motions over SAMP 
-- individual constellation selectors [#275](https://gitlab.com/gaiasky/gaiasky/issues/275) 
+- individual constellation selectors [#275](https://codeberg.org/gaiasky/gaiasky/issues/275) 
 ### Style
 
 - GaiaSky.java to use LF instead of CRLF 
 - remove leftover variables in full gui 
 
 <a name="2.1.2-vr"></a>
-## [2.1.2-vr](https://gitlab.com/gaiasky/gaiasky/tree/2.1.2) (2018-09-28)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.2...2.1.2-vr)
+## [2.1.2-vr](https://codeberg.org/gaiasky/gaiasky/tree/2.1.2) (2018-09-28)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.2...2.1.2-vr)
 
 ### Bug Fixes
 
@@ -1460,8 +1460,8 @@ pixels instead of a normalized value between 0 and 100.
 - heap sizes in build script 
 - macOS -XstartOnFirstThread flag 
 - macos builds tweaks 
-- global key bindings affect invisible GUIs [#311](https://gitlab.com/gaiasky/gaiasky/issues/311) 
-- fix `p` double-mapping [#310](https://gitlab.com/gaiasky/gaiasky/issues/310) 
+- global key bindings affect invisible GUIs [#311](https://codeberg.org/gaiasky/gaiasky/issues/311) 
+- fix `p` double-mapping [#310](https://codeberg.org/gaiasky/gaiasky/issues/310) 
 ### Build System
 
 - installer detects and removes previous versions 
@@ -1481,8 +1481,8 @@ pixels instead of a normalized value between 0 and 100.
 ### Features
 
 - update to lwjgl3 backend 
-- cosmic ruler [#296](https://gitlab.com/gaiasky/gaiasky/issues/296) 
-- API calls to disable and enable the GUI [#312](https://gitlab.com/gaiasky/gaiasky/issues/312) 
+- cosmic ruler [#296](https://codeberg.org/gaiasky/gaiasky/issues/296) 
+- API calls to disable and enable the GUI [#312](https://codeberg.org/gaiasky/gaiasky/issues/312) 
 ### Style
 
 - fix issues with merge to bring it back to a working state 
@@ -1491,12 +1491,12 @@ pixels instead of a normalized value between 0 and 100.
 - minor style issues 
 
 <a name="2.1.2"></a>
-## [2.1.2](https://gitlab.com/gaiasky/gaiasky/tree/2.1.1) (2018-09-18)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.1...2.1.2)
+## [2.1.2](https://codeberg.org/gaiasky/gaiasky/tree/2.1.1) (2018-09-18)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.1...2.1.2)
 
 ### Bug Fixes
 
-- fix for windows paths [#309](https://gitlab.com/gaiasky/gaiasky/issues/309) 
+- fix for windows paths [#309](https://codeberg.org/gaiasky/gaiasky/issues/309) 
 - fix run script and play camera windows 
 - update changelog 
 ### Features
@@ -1505,12 +1505,12 @@ pixels instead of a normalized value between 0 and 100.
 - add new key bindings for simple actions 
 
 <a name="2.1.1"></a>
-## [2.1.1](https://gitlab.com/gaiasky/gaiasky/tree/2.1.0) (2018-09-14)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.1.0...2.1.1)
+## [2.1.1](https://codeberg.org/gaiasky/gaiasky/tree/2.1.0) (2018-09-14)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.1.0...2.1.1)
 
 ### Bug Fixes
 
-- crash if no internet connection present [#308](https://gitlab.com/gaiasky/gaiasky/issues/308) 
+- crash if no internet connection present [#308](https://codeberg.org/gaiasky/gaiasky/issues/308) 
 - fix description of very large catalog 
 ### Documentation
 
@@ -1518,13 +1518,13 @@ pixels instead of a normalized value between 0 and 100.
 - mended submodule init and update 
 
 <a name="2.1.0"></a>
-## [2.1.0](https://gitlab.com/gaiasky/gaiasky/tree/2.0.3) (2018-09-11)
-[Full changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.0.3...2.1.0)
+## [2.1.0](https://codeberg.org/gaiasky/gaiasky/tree/2.0.3) (2018-09-11)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.3...2.1.0)
 
 ### Bug Fixes
 
-- fix previous fix of search dialog [#307](https://gitlab.com/gaiasky/gaiasky/issues/307) 
-- search dialog crash if starts with number [#307](https://gitlab.com/gaiasky/gaiasky/issues/307) 
+- fix previous fix of search dialog [#307](https://codeberg.org/gaiasky/gaiasky/issues/307) 
+- search dialog crash if starts with number [#307](https://codeberg.org/gaiasky/gaiasky/issues/307) 
 - fix error loading lens dirt hi res texture 
 ### Build System
 
@@ -1538,475 +1538,475 @@ pixels instead of a normalized value between 0 and 100.
 - Fix download helper docs 
 ### Features
 
-- add download manager and infrastructure [#291](https://gitlab.com/gaiasky/gaiasky/issues/291) [#303](https://gitlab.com/gaiasky/gaiasky/issues/303) 
+- add download manager and infrastructure [#291](https://codeberg.org/gaiasky/gaiasky/issues/291) [#303](https://codeberg.org/gaiasky/gaiasky/issues/303) 
 ### Style
 
 - fix style of contributing once and for all 
 - fix style in contributing.md 
 
-## [2.0.3](https://gitlab.com/gaiasky/gaiasky/tree/2.0.3) (2018-08-28)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.0.2-vr...2.0.3)
+## [2.0.3](https://codeberg.org/gaiasky/gaiasky/tree/2.0.3) (2018-08-28)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.2-vr...2.0.3)
 
 **Implemented enhancements:**
 
-- Clean up logging code [#299](https://gitlab.com/gaiasky/gaiasky/issues/299)
-- Improve debug info [#298](https://gitlab.com/gaiasky/gaiasky/issues/298)
-- Handle vertex data more efficiently [#297](https://gitlab.com/gaiasky/gaiasky/issues/297)
-- API: Provide a way to hook into main loop thread [#294](https://gitlab.com/gaiasky/gaiasky/issues/294)
-- Add support for different line widths [#293](https://gitlab.com/gaiasky/gaiasky/issues/293)
-- API call: lines between arbitrary positions [#292](https://gitlab.com/gaiasky/gaiasky/issues/292)
-- Add Top/Bottom to the mode profiles for 3DTV [#268](https://gitlab.com/gaiasky/gaiasky/issues/268)
+- Clean up logging code [#299](https://codeberg.org/gaiasky/gaiasky/issues/299)
+- Improve debug info [#298](https://codeberg.org/gaiasky/gaiasky/issues/298)
+- Handle vertex data more efficiently [#297](https://codeberg.org/gaiasky/gaiasky/issues/297)
+- API: Provide a way to hook into main loop thread [#294](https://codeberg.org/gaiasky/gaiasky/issues/294)
+- Add support for different line widths [#293](https://codeberg.org/gaiasky/gaiasky/issues/293)
+- API call: lines between arbitrary positions [#292](https://codeberg.org/gaiasky/gaiasky/issues/292)
+- Add Top/Bottom to the mode profiles for 3DTV [#268](https://codeberg.org/gaiasky/gaiasky/issues/268)
 
 **Merged pull requests:**
 
-- REST server static files use assets.location [#300](https://gitlab.com/gaiasky/gaiasky/pull/300) ([vga101](https://github.com/vga101))
-- Re-introduce REST API [#281](https://gitlab.com/gaiasky/gaiasky/pull/281) ([vga101](https://github.com/vga101))
+- REST server static files use assets.location [#300](https://codeberg.org/gaiasky/gaiasky/pull/300) ([vga101](https://github.com/vga101))
+- Re-introduce REST API [#281](https://codeberg.org/gaiasky/gaiasky/pull/281) ([vga101](https://github.com/vga101))
 
-## [2.0.2-vr](https://gitlab.com/gaiasky/gaiasky/tree/2.0.2-vr) (2018-07-25)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.0.2...2.0.2-vr)
+## [2.0.2-vr](https://codeberg.org/gaiasky/gaiasky/tree/2.0.2-vr) (2018-07-25)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.2...2.0.2-vr)
 
-## [2.0.2](https://gitlab.com/gaiasky/gaiasky/tree/2.0.2) (2018-07-06)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.0.1...2.0.2)
+## [2.0.2](https://codeberg.org/gaiasky/gaiasky/tree/2.0.2) (2018-07-06)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.1...2.0.2)
 
 **Implemented enhancements:**
 
-- Add controls to manage datasets [#290](https://gitlab.com/gaiasky/gaiasky/issues/290)
-- Separate base texture from clouds texture [#289](https://gitlab.com/gaiasky/gaiasky/issues/289)
-- Add gamma correction [#288](https://gitlab.com/gaiasky/gaiasky/issues/288)
-- Add label size control [#287](https://gitlab.com/gaiasky/gaiasky/issues/287)
-- Rearrange graphical settings into preferences dialog [#286](https://gitlab.com/gaiasky/gaiasky/issues/286)
+- Add controls to manage datasets [#290](https://codeberg.org/gaiasky/gaiasky/issues/290)
+- Separate base texture from clouds texture [#289](https://codeberg.org/gaiasky/gaiasky/issues/289)
+- Add gamma correction [#288](https://codeberg.org/gaiasky/gaiasky/issues/288)
+- Add label size control [#287](https://codeberg.org/gaiasky/gaiasky/issues/287)
+- Rearrange graphical settings into preferences dialog [#286](https://codeberg.org/gaiasky/gaiasky/issues/286)
 
 **Fixed bugs:**
 
-- Fix objects pane minimize button disappearing [#285](https://gitlab.com/gaiasky/gaiasky/issues/285)
+- Fix objects pane minimize button disappearing [#285](https://codeberg.org/gaiasky/gaiasky/issues/285)
 
 **Merged pull requests:**
 
-- Fix broken link to DR2 default catalog [#280](https://gitlab.com/gaiasky/gaiasky/pull/280) ([vga101](https://github.com/vga101))
+- Fix broken link to DR2 default catalog [#280](https://codeberg.org/gaiasky/gaiasky/pull/280) ([vga101](https://github.com/vga101))
 
-## [2.0.1](https://gitlab.com/gaiasky/gaiasky/tree/2.0.1) (2018-06-14)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.0.0-vr...2.0.1)
-
-**Implemented enhancements:**
-
-- Lazy mesh initialization [#284](https://gitlab.com/gaiasky/gaiasky/issues/284)
-- Improve DR2 catalogs [#283](https://gitlab.com/gaiasky/gaiasky/issues/283)
-- Add support for new galaxy meshes [#282](https://gitlab.com/gaiasky/gaiasky/issues/282)
-- Fix Gaia Sky logo resolution [#279](https://gitlab.com/gaiasky/gaiasky/issues/279)
-- Add utility to see logs [#278](https://gitlab.com/gaiasky/gaiasky/issues/278)
-- Improve grid rendering [#277](https://gitlab.com/gaiasky/gaiasky/issues/277)
-- Add maximum FPS option [#273](https://gitlab.com/gaiasky/gaiasky/issues/273)
-- Create contributing.md files with guidelines as to how to contribute [#272](https://gitlab.com/gaiasky/gaiasky/issues/272)
-- Only Xbox 360 controls, no XBone [#199](https://gitlab.com/gaiasky/gaiasky/issues/199)
-
-**Fixed bugs:**
-
-- Fix Windows 32-bit build [#274](https://gitlab.com/gaiasky/gaiasky/issues/274)
-
-**Closed issues:**
-
-- Maximum time reached [#271](https://gitlab.com/gaiasky/gaiasky/issues/271)
-
-## [2.0.0-vr](https://gitlab.com/gaiasky/gaiasky/tree/2.0.0-vr) (2018-05-09)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/2.0.0...2.0.0-vr)
+## [2.0.1](https://codeberg.org/gaiasky/gaiasky/tree/2.0.1) (2018-06-14)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.0-vr...2.0.1)
 
 **Implemented enhancements:**
 
-- Add night theme [#270](https://gitlab.com/gaiasky/gaiasky/issues/270)
+- Lazy mesh initialization [#284](https://codeberg.org/gaiasky/gaiasky/issues/284)
+- Improve DR2 catalogs [#283](https://codeberg.org/gaiasky/gaiasky/issues/283)
+- Add support for new galaxy meshes [#282](https://codeberg.org/gaiasky/gaiasky/issues/282)
+- Fix Gaia Sky logo resolution [#279](https://codeberg.org/gaiasky/gaiasky/issues/279)
+- Add utility to see logs [#278](https://codeberg.org/gaiasky/gaiasky/issues/278)
+- Improve grid rendering [#277](https://codeberg.org/gaiasky/gaiasky/issues/277)
+- Add maximum FPS option [#273](https://codeberg.org/gaiasky/gaiasky/issues/273)
+- Create contributing.md files with guidelines as to how to contribute [#272](https://codeberg.org/gaiasky/gaiasky/issues/272)
+- Only Xbox 360 controls, no XBone [#199](https://codeberg.org/gaiasky/gaiasky/issues/199)
 
 **Fixed bugs:**
 
-- Fix SAMP issues when loading [#266](https://gitlab.com/gaiasky/gaiasky/issues/266)
-- Fix constellation name flickering when planets are turned off [#264](https://gitlab.com/gaiasky/gaiasky/issues/264)
+- Fix Windows 32-bit build [#274](https://codeberg.org/gaiasky/gaiasky/issues/274)
 
 **Closed issues:**
 
-- Is it possible to extend the size of the user interface [#269](https://gitlab.com/gaiasky/gaiasky/issues/269)
+- Maximum time reached [#271](https://codeberg.org/gaiasky/gaiasky/issues/271)
 
-## [2.0.0](https://gitlab.com/gaiasky/gaiasky/tree/2.0.0) (2018-04-24)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/1.5.0...2.0.0)
+## [2.0.0-vr](https://codeberg.org/gaiasky/gaiasky/tree/2.0.0-vr) (2018-05-09)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/2.0.0...2.0.0-vr)
 
 **Implemented enhancements:**
 
-- Add hue and saturation to levels [#263](https://gitlab.com/gaiasky/gaiasky/issues/263)
-- Add support for asteroind positions additionally to orbits [#262](https://gitlab.com/gaiasky/gaiasky/issues/262)
-- Add Hammer-Aitoff and cylindrical projections to cubemap mode [#260](https://gitlab.com/gaiasky/gaiasky/issues/260)
-- Expose dataset chooser to prefs window [#259](https://gitlab.com/gaiasky/gaiasky/issues/259)
-- Add projection minimaps [#255](https://gitlab.com/gaiasky/gaiasky/issues/255)
-- Add image format and quality for screenshots and frames to config [#253](https://gitlab.com/gaiasky/gaiasky/issues/253)
-- Add reset time hotkey [#252](https://gitlab.com/gaiasky/gaiasky/issues/252)
-- Apply graphics quality without restart [#251](https://gitlab.com/gaiasky/gaiasky/issues/251)
-- Add gravitational wave model [#249](https://gitlab.com/gaiasky/gaiasky/issues/249)
-- Add CMB [#248](https://gitlab.com/gaiasky/gaiasky/issues/248)
-- Add SAMP support [#246](https://gitlab.com/gaiasky/gaiasky/issues/246)
-- Use memory mapped files for speed-critical read operations [#245](https://gitlab.com/gaiasky/gaiasky/issues/245)
-- Remove android/html/desktop infrastructure [#244](https://gitlab.com/gaiasky/gaiasky/issues/244)
-- Add relativistic aberration [#242](https://gitlab.com/gaiasky/gaiasky/issues/242)
-- Add flag to enable dataset chooser dialog at startup [#240](https://gitlab.com/gaiasky/gaiasky/issues/240)
-- Improve occlusion test in light glow algorithm [#239](https://gitlab.com/gaiasky/gaiasky/issues/239)
-- Add pure GPU line renderer for orbits [#232](https://gitlab.com/gaiasky/gaiasky/issues/232)
-- Add star opacity setter to API [#231](https://gitlab.com/gaiasky/gaiasky/issues/231)
-- Add visual effects controls to API [#230](https://gitlab.com/gaiasky/gaiasky/issues/230)
-- Add stereo and 360 modes to API [#229](https://gitlab.com/gaiasky/gaiasky/issues/229)
-- Add star size setter to API [#228](https://gitlab.com/gaiasky/gaiasky/issues/228)
-- Add 'stop time' to scripting API [#226](https://gitlab.com/gaiasky/gaiasky/issues/226)
-- Add `setPlanetariumMode()` API call [#225](https://gitlab.com/gaiasky/gaiasky/issues/225)
-- Add API call to control brightness and contrast [#221](https://gitlab.com/gaiasky/gaiasky/issues/221)
-- Add a reload default settings button [#220](https://gitlab.com/gaiasky/gaiasky/issues/220)
-- Add `getSimulationTime()` to scripting [#219](https://gitlab.com/gaiasky/gaiasky/issues/219)
-- Add frame output state indicator [#218](https://gitlab.com/gaiasky/gaiasky/issues/218)
-- Set crosshair visibility API call [#215](https://gitlab.com/gaiasky/gaiasky/issues/215)
-- Add setSimulationTime with comprehensive params to scripting [#214](https://gitlab.com/gaiasky/gaiasky/issues/214)
-- Add 'Back to Earth' key mapping [#209](https://gitlab.com/gaiasky/gaiasky/issues/209)
-- Add pointer coordinates toggle in preferences [#208](https://gitlab.com/gaiasky/gaiasky/issues/208)
-- Constellations with proper motions [#203](https://gitlab.com/gaiasky/gaiasky/issues/203)
-- Add controller debug mode to help create mappings [#202](https://gitlab.com/gaiasky/gaiasky/issues/202)
-- Add support for emissive colors and textures [#201](https://gitlab.com/gaiasky/gaiasky/issues/201)
-- Upgrade to Libgdx 1.9.7 [#200](https://gitlab.com/gaiasky/gaiasky/issues/200)
-- Adapt normal lighting shader to accept no directional lights [#197](https://gitlab.com/gaiasky/gaiasky/issues/197)
-- Update Jython to 2.7.0 [#194](https://gitlab.com/gaiasky/gaiasky/issues/194)
-- Feature request - scripting functions [#192](https://gitlab.com/gaiasky/gaiasky/issues/192)
-- Add distance to Sol in focus info interface [#191](https://gitlab.com/gaiasky/gaiasky/issues/191)
-- Look for ways to prevent time overflow [#190](https://gitlab.com/gaiasky/gaiasky/issues/190)
-- Add star clusters [#188](https://gitlab.com/gaiasky/gaiasky/issues/188)
-- Enable proper motions [#185](https://gitlab.com/gaiasky/gaiasky/issues/185)
-- Allow arbitrary meshes in json data files [#184](https://gitlab.com/gaiasky/gaiasky/issues/184)
-- Add 'pause background loading' action [#181](https://gitlab.com/gaiasky/gaiasky/issues/181)
-- Fix action buttons (stop script, stop camera path) [#180](https://gitlab.com/gaiasky/gaiasky/issues/180)
-- Add titles to data with i18n [#179](https://gitlab.com/gaiasky/gaiasky/issues/179)
-- Crosshair when in free camera + target mode [#178](https://gitlab.com/gaiasky/gaiasky/issues/178)
-- Crosshair to point to focus direction when off-screen [#177](https://gitlab.com/gaiasky/gaiasky/issues/177)
-- Problem loading many asteroid orbits [#98](https://gitlab.com/gaiasky/gaiasky/issues/98)
-- Shadow mapping [#60](https://gitlab.com/gaiasky/gaiasky/issues/60)
+- Add night theme [#270](https://codeberg.org/gaiasky/gaiasky/issues/270)
 
 **Fixed bugs:**
 
-- Fix position discrepancy of stars in stereo mode (points vs billboards) [#258](https://gitlab.com/gaiasky/gaiasky/issues/258)
-- Screenshot and frame mode switch from simple to advanced produces null pointer [#257](https://gitlab.com/gaiasky/gaiasky/issues/257)
-- Refactor time [#256](https://gitlab.com/gaiasky/gaiasky/issues/256)
-- Streaming catalog loader never attempts previously discarded pages [#241](https://gitlab.com/gaiasky/gaiasky/issues/241)
-- Fix returning from panorama mode through stereo mode [#238](https://gitlab.com/gaiasky/gaiasky/issues/238)
-- Add object scaling to scripting API [#227](https://gitlab.com/gaiasky/gaiasky/issues/227)
-- Fix atmosphere flickering due to z fighting [#224](https://gitlab.com/gaiasky/gaiasky/issues/224)
-- Fix Gaia FoV detection and projection [#223](https://gitlab.com/gaiasky/gaiasky/issues/223)
-- Fixed errors not logging correctly during init [#222](https://gitlab.com/gaiasky/gaiasky/issues/222)
-- Remove wrong \[h/sec\] units in time warp label [#217](https://gitlab.com/gaiasky/gaiasky/issues/217)
-- Star label positioning does not react to FoV setting [#216](https://gitlab.com/gaiasky/gaiasky/issues/216)
-- Fix focus issue using shift in objects component input [#213](https://gitlab.com/gaiasky/gaiasky/issues/213)
-- Fix NUMPAD4/5/6 to access FOV camera modes [#212](https://gitlab.com/gaiasky/gaiasky/issues/212)
-- Fix star min opacity initialization [#207](https://gitlab.com/gaiasky/gaiasky/issues/207)
-- Crash when selecting NBG galaxy with the time on [#206](https://gitlab.com/gaiasky/gaiasky/issues/206)
-- goToObject(name, angle) not zooming out if current angle is larger than target [#195](https://gitlab.com/gaiasky/gaiasky/issues/195)
-- NullPointerException in DesktopNetworkChecker [#193](https://gitlab.com/gaiasky/gaiasky/issues/193)
-- Look for ways to prevent time overflow [#190](https://gitlab.com/gaiasky/gaiasky/issues/190)
-- Fix visibility of date/time and time warp factor [#189](https://gitlab.com/gaiasky/gaiasky/issues/189)
-- Fix `facingFocus` state issue [#187](https://gitlab.com/gaiasky/gaiasky/issues/187)
-- Fix MAS\_TO\_DEG conversion in AstroUtils [#186](https://gitlab.com/gaiasky/gaiasky/issues/186)
-- Fix 'run script' window handling of scripts with same name [#182](https://gitlab.com/gaiasky/gaiasky/issues/182)
-- Motion blur causes problems with 360 mode [#87](https://gitlab.com/gaiasky/gaiasky/issues/87)
+- Fix SAMP issues when loading [#266](https://codeberg.org/gaiasky/gaiasky/issues/266)
+- Fix constellation name flickering when planets are turned off [#264](https://codeberg.org/gaiasky/gaiasky/issues/264)
 
 **Closed issues:**
 
-- Is this update also coming? [#261](https://gitlab.com/gaiasky/gaiasky/issues/261)
-- Enable particle effects [#254](https://gitlab.com/gaiasky/gaiasky/issues/254)
-- Add-ons [#250](https://gitlab.com/gaiasky/gaiasky/issues/250)
-- Crash with TGAS GPU dataset [#236](https://gitlab.com/gaiasky/gaiasky/issues/236)
-- Preferences window shows wrong version number [#234](https://gitlab.com/gaiasky/gaiasky/issues/234)
-- Cannot build desktop:dist [#233](https://gitlab.com/gaiasky/gaiasky/issues/233)
-- Feature request: galactic cartesian coordinates [#211](https://gitlab.com/gaiasky/gaiasky/issues/211)
-- Adding meshes [#205](https://gitlab.com/gaiasky/gaiasky/issues/205)
-- On Windows, install fails with "Could not determine java version from '9.0.1' [#204](https://gitlab.com/gaiasky/gaiasky/issues/204)
-- Docs don't mention where record data appears [#198](https://gitlab.com/gaiasky/gaiasky/issues/198)
-- So....I...uhh...broke it in the most beautiful way I could think...ever. [#196](https://gitlab.com/gaiasky/gaiasky/issues/196)
-- Javadocs no longer available [#183](https://gitlab.com/gaiasky/gaiasky/issues/183)
-- Not truly compatible with Oculus Rift [#44](https://gitlab.com/gaiasky/gaiasky/issues/44)
+- Is it possible to extend the size of the user interface [#269](https://codeberg.org/gaiasky/gaiasky/issues/269)
+
+## [2.0.0](https://codeberg.org/gaiasky/gaiasky/tree/2.0.0) (2018-04-24)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.5.0...2.0.0)
+
+**Implemented enhancements:**
+
+- Add hue and saturation to levels [#263](https://codeberg.org/gaiasky/gaiasky/issues/263)
+- Add support for asteroind positions additionally to orbits [#262](https://codeberg.org/gaiasky/gaiasky/issues/262)
+- Add Hammer-Aitoff and cylindrical projections to cubemap mode [#260](https://codeberg.org/gaiasky/gaiasky/issues/260)
+- Expose dataset chooser to prefs window [#259](https://codeberg.org/gaiasky/gaiasky/issues/259)
+- Add projection minimaps [#255](https://codeberg.org/gaiasky/gaiasky/issues/255)
+- Add image format and quality for screenshots and frames to config [#253](https://codeberg.org/gaiasky/gaiasky/issues/253)
+- Add reset time hotkey [#252](https://codeberg.org/gaiasky/gaiasky/issues/252)
+- Apply graphics quality without restart [#251](https://codeberg.org/gaiasky/gaiasky/issues/251)
+- Add gravitational wave model [#249](https://codeberg.org/gaiasky/gaiasky/issues/249)
+- Add CMB [#248](https://codeberg.org/gaiasky/gaiasky/issues/248)
+- Add SAMP support [#246](https://codeberg.org/gaiasky/gaiasky/issues/246)
+- Use memory mapped files for speed-critical read operations [#245](https://codeberg.org/gaiasky/gaiasky/issues/245)
+- Remove android/html/desktop infrastructure [#244](https://codeberg.org/gaiasky/gaiasky/issues/244)
+- Add relativistic aberration [#242](https://codeberg.org/gaiasky/gaiasky/issues/242)
+- Add flag to enable dataset chooser dialog at startup [#240](https://codeberg.org/gaiasky/gaiasky/issues/240)
+- Improve occlusion test in light glow algorithm [#239](https://codeberg.org/gaiasky/gaiasky/issues/239)
+- Add pure GPU line renderer for orbits [#232](https://codeberg.org/gaiasky/gaiasky/issues/232)
+- Add star opacity setter to API [#231](https://codeberg.org/gaiasky/gaiasky/issues/231)
+- Add visual effects controls to API [#230](https://codeberg.org/gaiasky/gaiasky/issues/230)
+- Add stereo and 360 modes to API [#229](https://codeberg.org/gaiasky/gaiasky/issues/229)
+- Add star size setter to API [#228](https://codeberg.org/gaiasky/gaiasky/issues/228)
+- Add 'stop time' to scripting API [#226](https://codeberg.org/gaiasky/gaiasky/issues/226)
+- Add `setPlanetariumMode()` API call [#225](https://codeberg.org/gaiasky/gaiasky/issues/225)
+- Add API call to control brightness and contrast [#221](https://codeberg.org/gaiasky/gaiasky/issues/221)
+- Add a reload default settings button [#220](https://codeberg.org/gaiasky/gaiasky/issues/220)
+- Add `getSimulationTime()` to scripting [#219](https://codeberg.org/gaiasky/gaiasky/issues/219)
+- Add frame output state indicator [#218](https://codeberg.org/gaiasky/gaiasky/issues/218)
+- Set crosshair visibility API call [#215](https://codeberg.org/gaiasky/gaiasky/issues/215)
+- Add setSimulationTime with comprehensive params to scripting [#214](https://codeberg.org/gaiasky/gaiasky/issues/214)
+- Add 'Back to Earth' key mapping [#209](https://codeberg.org/gaiasky/gaiasky/issues/209)
+- Add pointer coordinates toggle in preferences [#208](https://codeberg.org/gaiasky/gaiasky/issues/208)
+- Constellations with proper motions [#203](https://codeberg.org/gaiasky/gaiasky/issues/203)
+- Add controller debug mode to help create mappings [#202](https://codeberg.org/gaiasky/gaiasky/issues/202)
+- Add support for emissive colors and textures [#201](https://codeberg.org/gaiasky/gaiasky/issues/201)
+- Upgrade to Libgdx 1.9.7 [#200](https://codeberg.org/gaiasky/gaiasky/issues/200)
+- Adapt normal lighting shader to accept no directional lights [#197](https://codeberg.org/gaiasky/gaiasky/issues/197)
+- Update Jython to 2.7.0 [#194](https://codeberg.org/gaiasky/gaiasky/issues/194)
+- Feature request - scripting functions [#192](https://codeberg.org/gaiasky/gaiasky/issues/192)
+- Add distance to Sol in focus info interface [#191](https://codeberg.org/gaiasky/gaiasky/issues/191)
+- Look for ways to prevent time overflow [#190](https://codeberg.org/gaiasky/gaiasky/issues/190)
+- Add star clusters [#188](https://codeberg.org/gaiasky/gaiasky/issues/188)
+- Enable proper motions [#185](https://codeberg.org/gaiasky/gaiasky/issues/185)
+- Allow arbitrary meshes in json data files [#184](https://codeberg.org/gaiasky/gaiasky/issues/184)
+- Add 'pause background loading' action [#181](https://codeberg.org/gaiasky/gaiasky/issues/181)
+- Fix action buttons (stop script, stop camera path) [#180](https://codeberg.org/gaiasky/gaiasky/issues/180)
+- Add titles to data with i18n [#179](https://codeberg.org/gaiasky/gaiasky/issues/179)
+- Crosshair when in free camera + target mode [#178](https://codeberg.org/gaiasky/gaiasky/issues/178)
+- Crosshair to point to focus direction when off-screen [#177](https://codeberg.org/gaiasky/gaiasky/issues/177)
+- Problem loading many asteroid orbits [#98](https://codeberg.org/gaiasky/gaiasky/issues/98)
+- Shadow mapping [#60](https://codeberg.org/gaiasky/gaiasky/issues/60)
+
+**Fixed bugs:**
+
+- Fix position discrepancy of stars in stereo mode (points vs billboards) [#258](https://codeberg.org/gaiasky/gaiasky/issues/258)
+- Screenshot and frame mode switch from simple to advanced produces null pointer [#257](https://codeberg.org/gaiasky/gaiasky/issues/257)
+- Refactor time [#256](https://codeberg.org/gaiasky/gaiasky/issues/256)
+- Streaming catalog loader never attempts previously discarded pages [#241](https://codeberg.org/gaiasky/gaiasky/issues/241)
+- Fix returning from panorama mode through stereo mode [#238](https://codeberg.org/gaiasky/gaiasky/issues/238)
+- Add object scaling to scripting API [#227](https://codeberg.org/gaiasky/gaiasky/issues/227)
+- Fix atmosphere flickering due to z fighting [#224](https://codeberg.org/gaiasky/gaiasky/issues/224)
+- Fix Gaia FoV detection and projection [#223](https://codeberg.org/gaiasky/gaiasky/issues/223)
+- Fixed errors not logging correctly during init [#222](https://codeberg.org/gaiasky/gaiasky/issues/222)
+- Remove wrong \[h/sec\] units in time warp label [#217](https://codeberg.org/gaiasky/gaiasky/issues/217)
+- Star label positioning does not react to FoV setting [#216](https://codeberg.org/gaiasky/gaiasky/issues/216)
+- Fix focus issue using shift in objects component input [#213](https://codeberg.org/gaiasky/gaiasky/issues/213)
+- Fix NUMPAD4/5/6 to access FOV camera modes [#212](https://codeberg.org/gaiasky/gaiasky/issues/212)
+- Fix star min opacity initialization [#207](https://codeberg.org/gaiasky/gaiasky/issues/207)
+- Crash when selecting NBG galaxy with the time on [#206](https://codeberg.org/gaiasky/gaiasky/issues/206)
+- goToObject(name, angle) not zooming out if current angle is larger than target [#195](https://codeberg.org/gaiasky/gaiasky/issues/195)
+- NullPointerException in DesktopNetworkChecker [#193](https://codeberg.org/gaiasky/gaiasky/issues/193)
+- Look for ways to prevent time overflow [#190](https://codeberg.org/gaiasky/gaiasky/issues/190)
+- Fix visibility of date/time and time warp factor [#189](https://codeberg.org/gaiasky/gaiasky/issues/189)
+- Fix `facingFocus` state issue [#187](https://codeberg.org/gaiasky/gaiasky/issues/187)
+- Fix MAS\_TO\_DEG conversion in AstroUtils [#186](https://codeberg.org/gaiasky/gaiasky/issues/186)
+- Fix 'run script' window handling of scripts with same name [#182](https://codeberg.org/gaiasky/gaiasky/issues/182)
+- Motion blur causes problems with 360 mode [#87](https://codeberg.org/gaiasky/gaiasky/issues/87)
+
+**Closed issues:**
+
+- Is this update also coming? [#261](https://codeberg.org/gaiasky/gaiasky/issues/261)
+- Enable particle effects [#254](https://codeberg.org/gaiasky/gaiasky/issues/254)
+- Add-ons [#250](https://codeberg.org/gaiasky/gaiasky/issues/250)
+- Crash with TGAS GPU dataset [#236](https://codeberg.org/gaiasky/gaiasky/issues/236)
+- Preferences window shows wrong version number [#234](https://codeberg.org/gaiasky/gaiasky/issues/234)
+- Cannot build desktop:dist [#233](https://codeberg.org/gaiasky/gaiasky/issues/233)
+- Feature request: galactic cartesian coordinates [#211](https://codeberg.org/gaiasky/gaiasky/issues/211)
+- Adding meshes [#205](https://codeberg.org/gaiasky/gaiasky/issues/205)
+- On Windows, install fails with "Could not determine java version from '9.0.1' [#204](https://codeberg.org/gaiasky/gaiasky/issues/204)
+- Docs don't mention where record data appears [#198](https://codeberg.org/gaiasky/gaiasky/issues/198)
+- So....I...uhh...broke it in the most beautiful way I could think...ever. [#196](https://codeberg.org/gaiasky/gaiasky/issues/196)
+- Javadocs no longer available [#183](https://codeberg.org/gaiasky/gaiasky/issues/183)
+- Not truly compatible with Oculus Rift [#44](https://codeberg.org/gaiasky/gaiasky/issues/44)
 
 **Merged pull requests:**
 
-- Add REST API for remote control [#237](https://gitlab.com/gaiasky/gaiasky/pull/237) ([vga101](https://github.com/vga101))
-- DE translation and minor formatting update [#235](https://gitlab.com/gaiasky/gaiasky/pull/235) ([vga101](https://github.com/vga101))
+- Add REST API for remote control [#237](https://codeberg.org/gaiasky/gaiasky/pull/237) ([vga101](https://github.com/vga101))
+- DE translation and minor formatting update [#235](https://codeberg.org/gaiasky/gaiasky/pull/235) ([vga101](https://github.com/vga101))
 
-## [1.5.0](https://gitlab.com/gaiasky/gaiasky/tree/1.5.0) (2017-08-02)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/1.0.4...1.5.0)
+## [1.5.0](https://codeberg.org/gaiasky/gaiasky/tree/1.5.0) (2017-08-02)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.4...1.5.0)
 
 **Implemented enhancements:**
 
-- Integrate particle groups with levels of detail [#170](https://gitlab.com/gaiasky/gaiasky/issues/170)
-- Set up renderer using asset manager [#167](https://gitlab.com/gaiasky/gaiasky/issues/167)
-- Set up post processor through the asset manager [#166](https://gitlab.com/gaiasky/gaiasky/issues/166)
-- Scale point primitives by ratio to default [#163](https://gitlab.com/gaiasky/gaiasky/issues/163)
-- Implement GPU-based implementation for star catalogs [#162](https://gitlab.com/gaiasky/gaiasky/issues/162)
-- Additive blending [#160](https://gitlab.com/gaiasky/gaiasky/issues/160)
-- Enable star particle groups [#159](https://gitlab.com/gaiasky/gaiasky/issues/159)
-- Expose high accuracy positions setting in the GUI [#157](https://gitlab.com/gaiasky/gaiasky/issues/157)
-- Allow high accuracy in VSOP87 model [#156](https://gitlab.com/gaiasky/gaiasky/issues/156)
-- Front end to manage game controller mappings [#155](https://gitlab.com/gaiasky/gaiasky/issues/155)
-- Add nearby galaxies, NBG [#154](https://gitlab.com/gaiasky/gaiasky/issues/154)
-- Add Oort cloud [#152](https://gitlab.com/gaiasky/gaiasky/issues/152)
-- Add Pluto [#151](https://gitlab.com/gaiasky/gaiasky/issues/151)
-- Abstract controller mappings, use files to define them [#150](https://gitlab.com/gaiasky/gaiasky/issues/150)
-- Add target mode in free camera [#148](https://gitlab.com/gaiasky/gaiasky/issues/148)
-- Add 'land on object' function [#147](https://gitlab.com/gaiasky/gaiasky/issues/147)
-- On-demand catalog loading from disk [#146](https://gitlab.com/gaiasky/gaiasky/issues/146)
-- French translation [#145](https://gitlab.com/gaiasky/gaiasky/issues/145)
-- Allow for controller look y-axis to be inverted [#143](https://gitlab.com/gaiasky/gaiasky/issues/143)
-- Support lazy texture initialisation for faster startup [#140](https://gitlab.com/gaiasky/gaiasky/issues/140)
-- Add Saturn moons [#139](https://gitlab.com/gaiasky/gaiasky/issues/139)
-- Revamp debug info [#138](https://gitlab.com/gaiasky/gaiasky/issues/138)
-- Add non cinematic camera mode [#135](https://gitlab.com/gaiasky/gaiasky/issues/135)
-- Discard current star shader based on noise and use texture instead [#134](https://gitlab.com/gaiasky/gaiasky/issues/134)
-- Apply screen mode without restart [#128](https://gitlab.com/gaiasky/gaiasky/issues/128)
-- Make network checker (Simbad, wiki) asynchronous [#127](https://gitlab.com/gaiasky/gaiasky/issues/127)
-- Deprecate current swing-based preferences [#125](https://gitlab.com/gaiasky/gaiasky/issues/125)
-- Apply skin change without restarting [#124](https://gitlab.com/gaiasky/gaiasky/issues/124)
-- Colour code proper motion vectors with direction/magnitude [#123](https://gitlab.com/gaiasky/gaiasky/issues/123)
-- Fix layout of controls window [#121](https://gitlab.com/gaiasky/gaiasky/issues/121)
-- Add context menu with some options [#120](https://gitlab.com/gaiasky/gaiasky/issues/120)
-- Rearrange UI, fix HiDPI themes [#119](https://gitlab.com/gaiasky/gaiasky/issues/119)
-- Add button to stop current camera play session [#117](https://gitlab.com/gaiasky/gaiasky/issues/117)
-- UI animations [#116](https://gitlab.com/gaiasky/gaiasky/issues/116)
-- Add Slovene language [#109](https://gitlab.com/gaiasky/gaiasky/issues/109)
-- Add new Parallel View stereoscopic profile [#105](https://gitlab.com/gaiasky/gaiasky/issues/105)
-- Upgrade to LWJGL 3 [#103](https://gitlab.com/gaiasky/gaiasky/issues/103)
+- Integrate particle groups with levels of detail [#170](https://codeberg.org/gaiasky/gaiasky/issues/170)
+- Set up renderer using asset manager [#167](https://codeberg.org/gaiasky/gaiasky/issues/167)
+- Set up post processor through the asset manager [#166](https://codeberg.org/gaiasky/gaiasky/issues/166)
+- Scale point primitives by ratio to default [#163](https://codeberg.org/gaiasky/gaiasky/issues/163)
+- Implement GPU-based implementation for star catalogs [#162](https://codeberg.org/gaiasky/gaiasky/issues/162)
+- Additive blending [#160](https://codeberg.org/gaiasky/gaiasky/issues/160)
+- Enable star particle groups [#159](https://codeberg.org/gaiasky/gaiasky/issues/159)
+- Expose high accuracy positions setting in the GUI [#157](https://codeberg.org/gaiasky/gaiasky/issues/157)
+- Allow high accuracy in VSOP87 model [#156](https://codeberg.org/gaiasky/gaiasky/issues/156)
+- Front end to manage game controller mappings [#155](https://codeberg.org/gaiasky/gaiasky/issues/155)
+- Add nearby galaxies, NBG [#154](https://codeberg.org/gaiasky/gaiasky/issues/154)
+- Add Oort cloud [#152](https://codeberg.org/gaiasky/gaiasky/issues/152)
+- Add Pluto [#151](https://codeberg.org/gaiasky/gaiasky/issues/151)
+- Abstract controller mappings, use files to define them [#150](https://codeberg.org/gaiasky/gaiasky/issues/150)
+- Add target mode in free camera [#148](https://codeberg.org/gaiasky/gaiasky/issues/148)
+- Add 'land on object' function [#147](https://codeberg.org/gaiasky/gaiasky/issues/147)
+- On-demand catalog loading from disk [#146](https://codeberg.org/gaiasky/gaiasky/issues/146)
+- French translation [#145](https://codeberg.org/gaiasky/gaiasky/issues/145)
+- Allow for controller look y-axis to be inverted [#143](https://codeberg.org/gaiasky/gaiasky/issues/143)
+- Support lazy texture initialisation for faster startup [#140](https://codeberg.org/gaiasky/gaiasky/issues/140)
+- Add Saturn moons [#139](https://codeberg.org/gaiasky/gaiasky/issues/139)
+- Revamp debug info [#138](https://codeberg.org/gaiasky/gaiasky/issues/138)
+- Add non cinematic camera mode [#135](https://codeberg.org/gaiasky/gaiasky/issues/135)
+- Discard current star shader based on noise and use texture instead [#134](https://codeberg.org/gaiasky/gaiasky/issues/134)
+- Apply screen mode without restart [#128](https://codeberg.org/gaiasky/gaiasky/issues/128)
+- Make network checker (Simbad, wiki) asynchronous [#127](https://codeberg.org/gaiasky/gaiasky/issues/127)
+- Deprecate current swing-based preferences [#125](https://codeberg.org/gaiasky/gaiasky/issues/125)
+- Apply skin change without restarting [#124](https://codeberg.org/gaiasky/gaiasky/issues/124)
+- Colour code proper motion vectors with direction/magnitude [#123](https://codeberg.org/gaiasky/gaiasky/issues/123)
+- Fix layout of controls window [#121](https://codeberg.org/gaiasky/gaiasky/issues/121)
+- Add context menu with some options [#120](https://codeberg.org/gaiasky/gaiasky/issues/120)
+- Rearrange UI, fix HiDPI themes [#119](https://codeberg.org/gaiasky/gaiasky/issues/119)
+- Add button to stop current camera play session [#117](https://codeberg.org/gaiasky/gaiasky/issues/117)
+- UI animations [#116](https://codeberg.org/gaiasky/gaiasky/issues/116)
+- Add Slovene language [#109](https://codeberg.org/gaiasky/gaiasky/issues/109)
+- Add new Parallel View stereoscopic profile [#105](https://codeberg.org/gaiasky/gaiasky/issues/105)
+- Upgrade to LWJGL 3 [#103](https://codeberg.org/gaiasky/gaiasky/issues/103)
 
 **Fixed bugs:**
 
-- Fix eye separation in spacecraft+stereoscopic modes [#168](https://gitlab.com/gaiasky/gaiasky/issues/168)
-- Random crash at startup [#165](https://gitlab.com/gaiasky/gaiasky/issues/165)
-- Fix post-processing frame buffer resize issue [#164](https://gitlab.com/gaiasky/gaiasky/issues/164)
-- Scale point primitives by ratio to default [#163](https://gitlab.com/gaiasky/gaiasky/issues/163)
-- Milky Way texture off when rotated [#158](https://gitlab.com/gaiasky/gaiasky/issues/158)
-- Fix controller input in non-cinematic mode [#142](https://gitlab.com/gaiasky/gaiasky/issues/142)
-- Fix smooth transitions in multithread mode [#141](https://gitlab.com/gaiasky/gaiasky/issues/141)
-- Fixe Quad line renderer artifacts [#137](https://gitlab.com/gaiasky/gaiasky/issues/137)
-- Make network checker (Simbad, wiki) asynchronous [#127](https://gitlab.com/gaiasky/gaiasky/issues/127)
-- Fix cast error when multithreading is on [#126](https://gitlab.com/gaiasky/gaiasky/issues/126)
-- Label flickering when star is perfectly aligned with camera direction [#122](https://gitlab.com/gaiasky/gaiasky/issues/122)
-- Fix main controls window alignments [#118](https://gitlab.com/gaiasky/gaiasky/issues/118)
-- Fix Gaia scan mode [#114](https://gitlab.com/gaiasky/gaiasky/issues/114)
-- Add timeout to version check [#112](https://gitlab.com/gaiasky/gaiasky/issues/112)
-- Fix configuration file lookup crash when running from source [#111](https://gitlab.com/gaiasky/gaiasky/issues/111)
-- Fix focus issue with objects text field [#106](https://gitlab.com/gaiasky/gaiasky/issues/106)
-- Fix stereoscopic mode for large distances/eye separations [#89](https://gitlab.com/gaiasky/gaiasky/issues/89)
-- Gaia Sky crashes on Windows 10 32bit - JRE 8u102 [#77](https://gitlab.com/gaiasky/gaiasky/issues/77)
-- Fix octant detection in very low FoV angles [#70](https://gitlab.com/gaiasky/gaiasky/issues/70)
+- Fix eye separation in spacecraft+stereoscopic modes [#168](https://codeberg.org/gaiasky/gaiasky/issues/168)
+- Random crash at startup [#165](https://codeberg.org/gaiasky/gaiasky/issues/165)
+- Fix post-processing frame buffer resize issue [#164](https://codeberg.org/gaiasky/gaiasky/issues/164)
+- Scale point primitives by ratio to default [#163](https://codeberg.org/gaiasky/gaiasky/issues/163)
+- Milky Way texture off when rotated [#158](https://codeberg.org/gaiasky/gaiasky/issues/158)
+- Fix controller input in non-cinematic mode [#142](https://codeberg.org/gaiasky/gaiasky/issues/142)
+- Fix smooth transitions in multithread mode [#141](https://codeberg.org/gaiasky/gaiasky/issues/141)
+- Fixe Quad line renderer artifacts [#137](https://codeberg.org/gaiasky/gaiasky/issues/137)
+- Make network checker (Simbad, wiki) asynchronous [#127](https://codeberg.org/gaiasky/gaiasky/issues/127)
+- Fix cast error when multithreading is on [#126](https://codeberg.org/gaiasky/gaiasky/issues/126)
+- Label flickering when star is perfectly aligned with camera direction [#122](https://codeberg.org/gaiasky/gaiasky/issues/122)
+- Fix main controls window alignments [#118](https://codeberg.org/gaiasky/gaiasky/issues/118)
+- Fix Gaia scan mode [#114](https://codeberg.org/gaiasky/gaiasky/issues/114)
+- Add timeout to version check [#112](https://codeberg.org/gaiasky/gaiasky/issues/112)
+- Fix configuration file lookup crash when running from source [#111](https://codeberg.org/gaiasky/gaiasky/issues/111)
+- Fix focus issue with objects text field [#106](https://codeberg.org/gaiasky/gaiasky/issues/106)
+- Fix stereoscopic mode for large distances/eye separations [#89](https://codeberg.org/gaiasky/gaiasky/issues/89)
+- Gaia Sky crashes on Windows 10 32bit - JRE 8u102 [#77](https://codeberg.org/gaiasky/gaiasky/issues/77)
+- Fix octant detection in very low FoV angles [#70](https://codeberg.org/gaiasky/gaiasky/issues/70)
 
 **Closed issues:**
 
-- Incorrect size of "Sol" via scripting interface [#174](https://gitlab.com/gaiasky/gaiasky/issues/174)
-- Parsing of version string breaks when custom git tags are used [#173](https://gitlab.com/gaiasky/gaiasky/issues/173)
-- Test script `getobject-test.py` crashes [#172](https://gitlab.com/gaiasky/gaiasky/issues/172)
-- Constellation "Antlia" misspelled as "Antila" [#153](https://gitlab.com/gaiasky/gaiasky/issues/153)
-- Closest object and camera speed in scripting interface [#149](https://gitlab.com/gaiasky/gaiasky/issues/149)
-- Cinematic camera setting not saved [#144](https://gitlab.com/gaiasky/gaiasky/issues/144)
-- Running Gaia Sky in Oculus Rift [#136](https://gitlab.com/gaiasky/gaiasky/issues/136)
-- Scripting interface: asynchronous mode? [#133](https://gitlab.com/gaiasky/gaiasky/issues/133)
-- Scripting interface: issues with setCameraPostion method [#132](https://gitlab.com/gaiasky/gaiasky/issues/132)
-- Scripting interface: calling `setStarBrightness()` seems to change the ambient light [#131](https://gitlab.com/gaiasky/gaiasky/issues/131)
-- Scripting interface: calling `setVisibility()` toggles independent of parameter [#130](https://gitlab.com/gaiasky/gaiasky/issues/130)
-- Scripting interface: calling `setCameraLock()` causes Exception in thread "LWJGL Application" [#129](https://gitlab.com/gaiasky/gaiasky/issues/129)
-- Translation [#107](https://gitlab.com/gaiasky/gaiasky/issues/107)
+- Incorrect size of "Sol" via scripting interface [#174](https://codeberg.org/gaiasky/gaiasky/issues/174)
+- Parsing of version string breaks when custom git tags are used [#173](https://codeberg.org/gaiasky/gaiasky/issues/173)
+- Test script `getobject-test.py` crashes [#172](https://codeberg.org/gaiasky/gaiasky/issues/172)
+- Constellation "Antlia" misspelled as "Antila" [#153](https://codeberg.org/gaiasky/gaiasky/issues/153)
+- Closest object and camera speed in scripting interface [#149](https://codeberg.org/gaiasky/gaiasky/issues/149)
+- Cinematic camera setting not saved [#144](https://codeberg.org/gaiasky/gaiasky/issues/144)
+- Running Gaia Sky in Oculus Rift [#136](https://codeberg.org/gaiasky/gaiasky/issues/136)
+- Scripting interface: asynchronous mode? [#133](https://codeberg.org/gaiasky/gaiasky/issues/133)
+- Scripting interface: issues with setCameraPostion method [#132](https://codeberg.org/gaiasky/gaiasky/issues/132)
+- Scripting interface: calling `setStarBrightness()` seems to change the ambient light [#131](https://codeberg.org/gaiasky/gaiasky/issues/131)
+- Scripting interface: calling `setVisibility()` toggles independent of parameter [#130](https://codeberg.org/gaiasky/gaiasky/issues/130)
+- Scripting interface: calling `setCameraLock()` causes Exception in thread "LWJGL Application" [#129](https://codeberg.org/gaiasky/gaiasky/issues/129)
+- Translation [#107](https://codeberg.org/gaiasky/gaiasky/issues/107)
 
 **Merged pull requests:**
 
-- Fix ARI URL [#176](https://gitlab.com/gaiasky/gaiasky/pull/176) ([vga101](https://github.com/vga101))
-- Fix method comment for displayTextObject [#175](https://gitlab.com/gaiasky/gaiasky/pull/175) ([vga101](https://github.com/vga101))
-- Fix customobjects-test.py [#171](https://gitlab.com/gaiasky/gaiasky/pull/171) ([vga101](https://github.com/vga101))
-- Suggested improvements for German translation [#169](https://gitlab.com/gaiasky/gaiasky/pull/169) ([vga101](https://github.com/vga101))
-- Fix URL to home page [#161](https://gitlab.com/gaiasky/gaiasky/pull/161) ([vga101](https://github.com/vga101))
-- Fix README rendering [#115](https://gitlab.com/gaiasky/gaiasky/pull/115) ([rogersachan](https://github.com/rogersachan))
-- Fix links to scripting documentation [#113](https://gitlab.com/gaiasky/gaiasky/pull/113) ([vga101](https://github.com/vga101))
-- Fix TGAS extraction path in running instructions [#110](https://gitlab.com/gaiasky/gaiasky/pull/110) ([vga101](https://github.com/vga101))
-- Slovene translation [#108](https://gitlab.com/gaiasky/gaiasky/pull/108) ([kcotar](https://github.com/kcotar))
+- Fix ARI URL [#176](https://codeberg.org/gaiasky/gaiasky/pull/176) ([vga101](https://github.com/vga101))
+- Fix method comment for displayTextObject [#175](https://codeberg.org/gaiasky/gaiasky/pull/175) ([vga101](https://github.com/vga101))
+- Fix customobjects-test.py [#171](https://codeberg.org/gaiasky/gaiasky/pull/171) ([vga101](https://github.com/vga101))
+- Suggested improvements for German translation [#169](https://codeberg.org/gaiasky/gaiasky/pull/169) ([vga101](https://github.com/vga101))
+- Fix URL to home page [#161](https://codeberg.org/gaiasky/gaiasky/pull/161) ([vga101](https://github.com/vga101))
+- Fix README rendering [#115](https://codeberg.org/gaiasky/gaiasky/pull/115) ([rogersachan](https://github.com/rogersachan))
+- Fix links to scripting documentation [#113](https://codeberg.org/gaiasky/gaiasky/pull/113) ([vga101](https://github.com/vga101))
+- Fix TGAS extraction path in running instructions [#110](https://codeberg.org/gaiasky/gaiasky/pull/110) ([vga101](https://github.com/vga101))
+- Slovene translation [#108](https://codeberg.org/gaiasky/gaiasky/pull/108) ([kcotar](https://github.com/kcotar))
 
-## [1.0.4](https://gitlab.com/gaiasky/gaiasky/tree/1.0.4) (2016-12-07)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/1.0.3...1.0.4)
+## [1.0.4](https://codeberg.org/gaiasky/gaiasky/tree/1.0.4) (2016-12-07)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.3...1.0.4)
 
 **Implemented enhancements:**
 
-- Improve loading times [#102](https://gitlab.com/gaiasky/gaiasky/issues/102)
-- Config window HiDPI mode [#101](https://gitlab.com/gaiasky/gaiasky/issues/101)
-- Dependent visibility for orbits [#100](https://gitlab.com/gaiasky/gaiasky/issues/100)
-- Map and calibrate Milky Way panorama [#94](https://gitlab.com/gaiasky/gaiasky/issues/94)
-- Add option to capture frames while camera path is playing [#71](https://gitlab.com/gaiasky/gaiasky/issues/71)
+- Improve loading times [#102](https://codeberg.org/gaiasky/gaiasky/issues/102)
+- Config window HiDPI mode [#101](https://codeberg.org/gaiasky/gaiasky/issues/101)
+- Dependent visibility for orbits [#100](https://codeberg.org/gaiasky/gaiasky/issues/100)
+- Map and calibrate Milky Way panorama [#94](https://codeberg.org/gaiasky/gaiasky/issues/94)
+- Add option to capture frames while camera path is playing [#71](https://codeberg.org/gaiasky/gaiasky/issues/71)
 
 **Fixed bugs:**
 
-- Fix crosshair issues when resizing [#104](https://gitlab.com/gaiasky/gaiasky/issues/104)
-- Dependent visibility for orbits [#100](https://gitlab.com/gaiasky/gaiasky/issues/100)
-- Stars disappear for a while when camera approaches [#97](https://gitlab.com/gaiasky/gaiasky/issues/97)
-- Version `1.0.3` fills memory with frame output [#96](https://gitlab.com/gaiasky/gaiasky/issues/96)
-- Light glow sampling spiral should adapt to fov angle [#95](https://gitlab.com/gaiasky/gaiasky/issues/95)
-- Debug and spacecraft GUIs do not resize correctly [#93](https://gitlab.com/gaiasky/gaiasky/issues/93)
-- Resizing during loading screen causes buffer size problems [#40](https://gitlab.com/gaiasky/gaiasky/issues/40)
+- Fix crosshair issues when resizing [#104](https://codeberg.org/gaiasky/gaiasky/issues/104)
+- Dependent visibility for orbits [#100](https://codeberg.org/gaiasky/gaiasky/issues/100)
+- Stars disappear for a while when camera approaches [#97](https://codeberg.org/gaiasky/gaiasky/issues/97)
+- Version `1.0.3` fills memory with frame output [#96](https://codeberg.org/gaiasky/gaiasky/issues/96)
+- Light glow sampling spiral should adapt to fov angle [#95](https://codeberg.org/gaiasky/gaiasky/issues/95)
+- Debug and spacecraft GUIs do not resize correctly [#93](https://codeberg.org/gaiasky/gaiasky/issues/93)
+- Resizing during loading screen causes buffer size problems [#40](https://codeberg.org/gaiasky/gaiasky/issues/40)
 
 **Merged pull requests:**
 
-- Fixed broken download links in README.md [#99](https://gitlab.com/gaiasky/gaiasky/pull/99) ([adamkewley](https://github.com/adamkewley))
+- Fixed broken download links in README.md [#99](https://codeberg.org/gaiasky/gaiasky/pull/99) ([adamkewley](https://github.com/adamkewley))
 
-## [1.0.3](https://gitlab.com/gaiasky/gaiasky/tree/1.0.3) (2016-11-15)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/1.0.2...1.0.3)
+## [1.0.3](https://codeberg.org/gaiasky/gaiasky/tree/1.0.3) (2016-11-15)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.2...1.0.3)
 
 **Fixed bugs:**
 
-- Fix FoV modes [#92](https://gitlab.com/gaiasky/gaiasky/issues/92)
-- Run tutorial runs pointer [#91](https://gitlab.com/gaiasky/gaiasky/issues/91)
+- Fix FoV modes [#92](https://codeberg.org/gaiasky/gaiasky/issues/92)
+- Run tutorial runs pointer [#91](https://codeberg.org/gaiasky/gaiasky/issues/91)
 
-## [1.0.2](https://gitlab.com/gaiasky/gaiasky/tree/1.0.2) (2016-11-14)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/1.0.1...1.0.2)
+## [1.0.2](https://codeberg.org/gaiasky/gaiasky/tree/1.0.2) (2016-11-14)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.1...1.0.2)
 
-## [1.0.1](https://gitlab.com/gaiasky/gaiasky/tree/1.0.1) (2016-11-11)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/1.0.0...1.0.1)
+## [1.0.1](https://codeberg.org/gaiasky/gaiasky/tree/1.0.1) (2016-11-11)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/1.0.0...1.0.1)
 
 **Implemented enhancements:**
 
-- Add brightness and contrast controls [#88](https://gitlab.com/gaiasky/gaiasky/issues/88)
-- Improve search functionality [#85](https://gitlab.com/gaiasky/gaiasky/issues/85)
-- Spacecraft camera mode - Game on! [#84](https://gitlab.com/gaiasky/gaiasky/issues/84)
-- Update planets and moons textures [#82](https://gitlab.com/gaiasky/gaiasky/issues/82)
-- Add an optional crosshair in focus mode [#81](https://gitlab.com/gaiasky/gaiasky/issues/81)
-- Implement 360 deg mode for 360 VR videos [#80](https://gitlab.com/gaiasky/gaiasky/issues/80)
+- Add brightness and contrast controls [#88](https://codeberg.org/gaiasky/gaiasky/issues/88)
+- Improve search functionality [#85](https://codeberg.org/gaiasky/gaiasky/issues/85)
+- Spacecraft camera mode - Game on! [#84](https://codeberg.org/gaiasky/gaiasky/issues/84)
+- Update planets and moons textures [#82](https://codeberg.org/gaiasky/gaiasky/issues/82)
+- Add an optional crosshair in focus mode [#81](https://codeberg.org/gaiasky/gaiasky/issues/81)
+- Implement 360 deg mode for 360 VR videos [#80](https://codeberg.org/gaiasky/gaiasky/issues/80)
 
 **Fixed bugs:**
 
-- Configuration dialog should appear at the center of focused screen [#90](https://gitlab.com/gaiasky/gaiasky/issues/90)
-- Fix resizing and full screen toggle [#86](https://gitlab.com/gaiasky/gaiasky/issues/86)
-- Crash - Vector pool null pointer when multi-threading is on [#83](https://gitlab.com/gaiasky/gaiasky/issues/83)
-- Fix connection to archive for DR1 sources [#78](https://gitlab.com/gaiasky/gaiasky/issues/78)
-- error 1114 [#76](https://gitlab.com/gaiasky/gaiasky/issues/76)
-- New Version 1.0.0 doesn't work on OSX 10.10.5 [#75](https://gitlab.com/gaiasky/gaiasky/issues/75)
+- Configuration dialog should appear at the center of focused screen [#90](https://codeberg.org/gaiasky/gaiasky/issues/90)
+- Fix resizing and full screen toggle [#86](https://codeberg.org/gaiasky/gaiasky/issues/86)
+- Crash - Vector pool null pointer when multi-threading is on [#83](https://codeberg.org/gaiasky/gaiasky/issues/83)
+- Fix connection to archive for DR1 sources [#78](https://codeberg.org/gaiasky/gaiasky/issues/78)
+- error 1114 [#76](https://codeberg.org/gaiasky/gaiasky/issues/76)
+- New Version 1.0.0 doesn't work on OSX 10.10.5 [#75](https://codeberg.org/gaiasky/gaiasky/issues/75)
 
 **Closed issues:**
 
-- Gaia Sky crashes on Windows 10, Java 1.8.0\_101 [#79](https://gitlab.com/gaiasky/gaiasky/issues/79)
+- Gaia Sky crashes on Windows 10, Java 1.8.0\_101 [#79](https://codeberg.org/gaiasky/gaiasky/issues/79)
 
-## [1.0.0](https://gitlab.com/gaiasky/gaiasky/tree/1.0.0) (2016-09-13)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/0.800b...1.0.0)
-
-**Implemented enhancements:**
-
-- Add orientation lock [#74](https://gitlab.com/gaiasky/gaiasky/issues/74)
-- Fix frame rate when recording camera [#73](https://gitlab.com/gaiasky/gaiasky/issues/73)
-- Add planetarium mode [#72](https://gitlab.com/gaiasky/gaiasky/issues/72)
-- Add sliders for star point size and minimum opacity [#68](https://gitlab.com/gaiasky/gaiasky/issues/68)
-- Add LOD sliders [#67](https://gitlab.com/gaiasky/gaiasky/issues/67)
-- Implement anaglyphic 3D [#65](https://gitlab.com/gaiasky/gaiasky/issues/65)
-- Add distortion to VR\_HEADSET stereoscopic mode [#64](https://gitlab.com/gaiasky/gaiasky/issues/64)
-- Add data source selection to Preferences [#63](https://gitlab.com/gaiasky/gaiasky/issues/63)
-- Add support for proper motion vectors [#62](https://gitlab.com/gaiasky/gaiasky/issues/62)
-- Add interface to data loaders in config dialog [#15](https://gitlab.com/gaiasky/gaiasky/issues/15)
-
-**Fixed bugs:**
-
-- Add ambient light to persisted properties [#69](https://gitlab.com/gaiasky/gaiasky/issues/69)
-- GUI should be hidden when stereoscopic is on at startup [#66](https://gitlab.com/gaiasky/gaiasky/issues/66)
-- Fix mouse input in stereoscopic mode [#61](https://gitlab.com/gaiasky/gaiasky/issues/61)
-- app won't start [#13](https://gitlab.com/gaiasky/gaiasky/issues/13)
-
-## [0.800b](https://gitlab.com/gaiasky/gaiasky/tree/0.800b) (2016-04-28)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/0.707b...0.800b)
+## [1.0.0](https://codeberg.org/gaiasky/gaiasky/tree/1.0.0) (2016-09-13)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.800b...1.0.0)
 
 **Implemented enhancements:**
 
-- Add playback music system [#59](https://gitlab.com/gaiasky/gaiasky/issues/59)
-- Improve render time, use points for all stars [#52](https://gitlab.com/gaiasky/gaiasky/issues/52)
-- Add smooth transitions between levels of detail [#51](https://gitlab.com/gaiasky/gaiasky/issues/51)
-- Use view angle as priority for click-selections [#50](https://gitlab.com/gaiasky/gaiasky/issues/50)
-- Get the Gaia Sanbox ready for proper motions [#48](https://gitlab.com/gaiasky/gaiasky/issues/48)
+- Add orientation lock [#74](https://codeberg.org/gaiasky/gaiasky/issues/74)
+- Fix frame rate when recording camera [#73](https://codeberg.org/gaiasky/gaiasky/issues/73)
+- Add planetarium mode [#72](https://codeberg.org/gaiasky/gaiasky/issues/72)
+- Add sliders for star point size and minimum opacity [#68](https://codeberg.org/gaiasky/gaiasky/issues/68)
+- Add LOD sliders [#67](https://codeberg.org/gaiasky/gaiasky/issues/67)
+- Implement anaglyphic 3D [#65](https://codeberg.org/gaiasky/gaiasky/issues/65)
+- Add distortion to VR\_HEADSET stereoscopic mode [#64](https://codeberg.org/gaiasky/gaiasky/issues/64)
+- Add data source selection to Preferences [#63](https://codeberg.org/gaiasky/gaiasky/issues/63)
+- Add support for proper motion vectors [#62](https://codeberg.org/gaiasky/gaiasky/issues/62)
+- Add interface to data loaders in config dialog [#15](https://codeberg.org/gaiasky/gaiasky/issues/15)
 
 **Fixed bugs:**
 
-- Fix scritping interface timing with frame output system [#55](https://gitlab.com/gaiasky/gaiasky/issues/55)
-- Fix Gaia scan code [#49](https://gitlab.com/gaiasky/gaiasky/issues/49)
+- Add ambient light to persisted properties [#69](https://codeberg.org/gaiasky/gaiasky/issues/69)
+- GUI should be hidden when stereoscopic is on at startup [#66](https://codeberg.org/gaiasky/gaiasky/issues/66)
+- Fix mouse input in stereoscopic mode [#61](https://codeberg.org/gaiasky/gaiasky/issues/61)
+- app won't start [#13](https://codeberg.org/gaiasky/gaiasky/issues/13)
+
+## [0.800b](https://codeberg.org/gaiasky/gaiasky/tree/0.800b) (2016-04-28)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.707b...0.800b)
+
+**Implemented enhancements:**
+
+- Add playback music system [#59](https://codeberg.org/gaiasky/gaiasky/issues/59)
+- Improve render time, use points for all stars [#52](https://codeberg.org/gaiasky/gaiasky/issues/52)
+- Add smooth transitions between levels of detail [#51](https://codeberg.org/gaiasky/gaiasky/issues/51)
+- Use view angle as priority for click-selections [#50](https://codeberg.org/gaiasky/gaiasky/issues/50)
+- Get the Gaia Sanbox ready for proper motions [#48](https://codeberg.org/gaiasky/gaiasky/issues/48)
+
+**Fixed bugs:**
+
+- Fix scritping interface timing with frame output system [#55](https://codeberg.org/gaiasky/gaiasky/issues/55)
+- Fix Gaia scan code [#49](https://codeberg.org/gaiasky/gaiasky/issues/49)
 
 **Closed issues:**
 
-- Set time pace to a factor of real time [#58](https://gitlab.com/gaiasky/gaiasky/issues/58)
-- Add graphics mode selector [#57](https://gitlab.com/gaiasky/gaiasky/issues/57)
-- Fix the looks for HiDPI screens [#56](https://gitlab.com/gaiasky/gaiasky/issues/56)
-- App fails to start OS X [#54](https://gitlab.com/gaiasky/gaiasky/issues/54)
+- Set time pace to a factor of real time [#58](https://codeberg.org/gaiasky/gaiasky/issues/58)
+- Add graphics mode selector [#57](https://codeberg.org/gaiasky/gaiasky/issues/57)
+- Fix the looks for HiDPI screens [#56](https://codeberg.org/gaiasky/gaiasky/issues/56)
+- App fails to start OS X [#54](https://codeberg.org/gaiasky/gaiasky/issues/54)
 
-## [0.707b](https://gitlab.com/gaiasky/gaiasky/tree/0.707b) (2015-09-14)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/0.706b...0.707b)
-
-**Implemented enhancements:**
-
-- Simplify loading mechanism of data files [#46](https://gitlab.com/gaiasky/gaiasky/issues/46)
-- Add sample image when choosing theme [#38](https://gitlab.com/gaiasky/gaiasky/issues/38)
-- Drop old manual lo-res/hi-res texture loading and implement mipmapping [#35](https://gitlab.com/gaiasky/gaiasky/issues/35)
-- Update project to libgdx 1.6.0 [#34](https://gitlab.com/gaiasky/gaiasky/issues/34)
-- Add simple screenshot mode [#32](https://gitlab.com/gaiasky/gaiasky/issues/32)
-- Move default location of screenshots to `$HOME/.gaiasandbox/screenshots` [#31](https://gitlab.com/gaiasky/gaiasky/issues/31)
-- Add new Ceres texture from Dawn spacecraft [#30](https://gitlab.com/gaiasky/gaiasky/issues/30)
-- New command to travel to focus object instantly [#29](https://gitlab.com/gaiasky/gaiasky/issues/29)
-- Support for location info [#28](https://gitlab.com/gaiasky/gaiasky/issues/28)
-- Migrate build system to gradle [#2](https://gitlab.com/gaiasky/gaiasky/issues/2)
-
-**Fixed bugs:**
-
-- Linux launcher not working if spaces in path [#47](https://gitlab.com/gaiasky/gaiasky/issues/47)
-- Fix labels in Gaia Fov mode [#45](https://gitlab.com/gaiasky/gaiasky/issues/45)
-- Last update date is sensible to running locale [#43](https://gitlab.com/gaiasky/gaiasky/issues/43)
-- RA and DEC are wrong in binary version of HYG catalog [#42](https://gitlab.com/gaiasky/gaiasky/issues/42)
-- Keyboard focus stays in input texts [#41](https://gitlab.com/gaiasky/gaiasky/issues/41)
-- Fix new line rendering for perspective lines [#37](https://gitlab.com/gaiasky/gaiasky/issues/37)
-- Motion blur not working with FXAA or NFAA [#36](https://gitlab.com/gaiasky/gaiasky/issues/36)
-- Fix night/day blending in shader  [#33](https://gitlab.com/gaiasky/gaiasky/issues/33)
-- Screenshot action (F5) not working well with motion blur [#27](https://gitlab.com/gaiasky/gaiasky/issues/27)
-
-## [0.706b](https://gitlab.com/gaiasky/gaiasky/tree/0.706b) (2015-05-05)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/0.705b...0.706b)
+## [0.707b](https://codeberg.org/gaiasky/gaiasky/tree/0.707b) (2015-09-14)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.706b...0.707b)
 
 **Implemented enhancements:**
 
-- General code style clean-up  [#25](https://gitlab.com/gaiasky/gaiasky/issues/25)
-- Big performance improvement in star rendering [#23](https://gitlab.com/gaiasky/gaiasky/issues/23)
-- New pixel renderer [#22](https://gitlab.com/gaiasky/gaiasky/issues/22)
-- Add controller support [#21](https://gitlab.com/gaiasky/gaiasky/issues/21)
-- Motion blur effect [#20](https://gitlab.com/gaiasky/gaiasky/issues/20)
-- Interface overhaul [#19](https://gitlab.com/gaiasky/gaiasky/issues/19)
-- Better looking lines [#18](https://gitlab.com/gaiasky/gaiasky/issues/18)
+- Simplify loading mechanism of data files [#46](https://codeberg.org/gaiasky/gaiasky/issues/46)
+- Add sample image when choosing theme [#38](https://codeberg.org/gaiasky/gaiasky/issues/38)
+- Drop old manual lo-res/hi-res texture loading and implement mipmapping [#35](https://codeberg.org/gaiasky/gaiasky/issues/35)
+- Update project to libgdx 1.6.0 [#34](https://codeberg.org/gaiasky/gaiasky/issues/34)
+- Add simple screenshot mode [#32](https://codeberg.org/gaiasky/gaiasky/issues/32)
+- Move default location of screenshots to `$HOME/.gaiasandbox/screenshots` [#31](https://codeberg.org/gaiasky/gaiasky/issues/31)
+- Add new Ceres texture from Dawn spacecraft [#30](https://codeberg.org/gaiasky/gaiasky/issues/30)
+- New command to travel to focus object instantly [#29](https://codeberg.org/gaiasky/gaiasky/issues/29)
+- Support for location info [#28](https://codeberg.org/gaiasky/gaiasky/issues/28)
+- Migrate build system to gradle [#2](https://codeberg.org/gaiasky/gaiasky/issues/2)
 
 **Fixed bugs:**
 
-- Handle outdated properties files in $HOME/.gaiasandbox folder [#26](https://gitlab.com/gaiasky/gaiasky/issues/26)
-- Scripting implementation should reset the colour [#24](https://gitlab.com/gaiasky/gaiasky/issues/24)
+- Linux launcher not working if spaces in path [#47](https://codeberg.org/gaiasky/gaiasky/issues/47)
+- Fix labels in Gaia Fov mode [#45](https://codeberg.org/gaiasky/gaiasky/issues/45)
+- Last update date is sensible to running locale [#43](https://codeberg.org/gaiasky/gaiasky/issues/43)
+- RA and DEC are wrong in binary version of HYG catalog [#42](https://codeberg.org/gaiasky/gaiasky/issues/42)
+- Keyboard focus stays in input texts [#41](https://codeberg.org/gaiasky/gaiasky/issues/41)
+- Fix new line rendering for perspective lines [#37](https://codeberg.org/gaiasky/gaiasky/issues/37)
+- Motion blur not working with FXAA or NFAA [#36](https://codeberg.org/gaiasky/gaiasky/issues/36)
+- Fix night/day blending in shader  [#33](https://codeberg.org/gaiasky/gaiasky/issues/33)
+- Screenshot action (F5) not working well with motion blur [#27](https://codeberg.org/gaiasky/gaiasky/issues/27)
+
+## [0.706b](https://codeberg.org/gaiasky/gaiasky/tree/0.706b) (2015-05-05)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.705b...0.706b)
+
+**Implemented enhancements:**
+
+- General code style clean-up  [#25](https://codeberg.org/gaiasky/gaiasky/issues/25)
+- Big performance improvement in star rendering [#23](https://codeberg.org/gaiasky/gaiasky/issues/23)
+- New pixel renderer [#22](https://codeberg.org/gaiasky/gaiasky/issues/22)
+- Add controller support [#21](https://codeberg.org/gaiasky/gaiasky/issues/21)
+- Motion blur effect [#20](https://codeberg.org/gaiasky/gaiasky/issues/20)
+- Interface overhaul [#19](https://codeberg.org/gaiasky/gaiasky/issues/19)
+- Better looking lines [#18](https://codeberg.org/gaiasky/gaiasky/issues/18)
+
+**Fixed bugs:**
+
+- Handle outdated properties files in $HOME/.gaiasandbox folder [#26](https://codeberg.org/gaiasky/gaiasky/issues/26)
+- Scripting implementation should reset the colour [#24](https://codeberg.org/gaiasky/gaiasky/issues/24)
 
 **Closed issues:**
 
-- deprecated [#17](https://gitlab.com/gaiasky/gaiasky/issues/17)
+- deprecated [#17](https://codeberg.org/gaiasky/gaiasky/issues/17)
 
-## [0.705b](https://gitlab.com/gaiasky/gaiasky/tree/0.705b) (2015-04-16)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/0.704b...0.705b)
+## [0.705b](https://codeberg.org/gaiasky/gaiasky/tree/0.705b) (2015-04-16)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.704b...0.705b)
 
 **Fixed bugs:**
 
-- Gaia sandbox current releases do not work on windows [#16](https://gitlab.com/gaiasky/gaiasky/issues/16)
-- Post-processing causes display output to disappear in frame output mode [#14](https://gitlab.com/gaiasky/gaiasky/issues/14)
-- Make new PixelBloomRenderSystem work for frame output and screenshots [#7](https://gitlab.com/gaiasky/gaiasky/issues/7)
-- Make new PixelBloomRenderSystem work in stereoscopic mode [#6](https://gitlab.com/gaiasky/gaiasky/issues/6)
+- Gaia sandbox current releases do not work on windows [#16](https://codeberg.org/gaiasky/gaiasky/issues/16)
+- Post-processing causes display output to disappear in frame output mode [#14](https://codeberg.org/gaiasky/gaiasky/issues/14)
+- Make new PixelBloomRenderSystem work for frame output and screenshots [#7](https://codeberg.org/gaiasky/gaiasky/issues/7)
+- Make new PixelBloomRenderSystem work in stereoscopic mode [#6](https://codeberg.org/gaiasky/gaiasky/issues/6)
 
-## [0.704b](https://gitlab.com/gaiasky/gaiasky/tree/0.704b) (2015-03-27)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/0.703b...0.704b)
+## [0.704b](https://codeberg.org/gaiasky/gaiasky/tree/0.704b) (2015-03-27)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.703b...0.704b)
 
 **Implemented enhancements:**
 
-- Remove synchronized render lists [#12](https://gitlab.com/gaiasky/gaiasky/issues/12)
-- Support top speeds in GUI [#11](https://gitlab.com/gaiasky/gaiasky/issues/11)
-- Show camera info in free mode [#10](https://gitlab.com/gaiasky/gaiasky/issues/10)
-- Time selector [#9](https://gitlab.com/gaiasky/gaiasky/issues/9)
-- Add interface tab to configuration [#8](https://gitlab.com/gaiasky/gaiasky/issues/8)
-- Internationalize the application [#5](https://gitlab.com/gaiasky/gaiasky/issues/5)
-- Move node data format to JSON [#1](https://gitlab.com/gaiasky/gaiasky/issues/1)
+- Remove synchronized render lists [#12](https://codeberg.org/gaiasky/gaiasky/issues/12)
+- Support top speeds in GUI [#11](https://codeberg.org/gaiasky/gaiasky/issues/11)
+- Show camera info in free mode [#10](https://codeberg.org/gaiasky/gaiasky/issues/10)
+- Time selector [#9](https://codeberg.org/gaiasky/gaiasky/issues/9)
+- Add interface tab to configuration [#8](https://codeberg.org/gaiasky/gaiasky/issues/8)
+- Internationalize the application [#5](https://codeberg.org/gaiasky/gaiasky/issues/5)
+- Move node data format to JSON [#1](https://codeberg.org/gaiasky/gaiasky/issues/1)
 
 **Fixed bugs:**
 
-- Investigate VM crash [#4](https://gitlab.com/gaiasky/gaiasky/issues/4)
-- Decide fate of desktop/doc/gaiasandbox\_manual.tex [#3](https://gitlab.com/gaiasky/gaiasky/issues/3)
+- Investigate VM crash [#4](https://codeberg.org/gaiasky/gaiasky/issues/4)
+- Decide fate of desktop/doc/gaiasandbox\_manual.tex [#3](https://codeberg.org/gaiasky/gaiasky/issues/3)
 
-## [0.703b](https://gitlab.com/gaiasky/gaiasky/tree/0.703b) (2014-12-17)
-[Full Changelog](https://gitlab.com/gaiasky/gaiasky/compare/0.700b...0.703b)
+## [0.703b](https://codeberg.org/gaiasky/gaiasky/tree/0.703b) (2014-12-17)
+[Full Changelog](https://codeberg.org/gaiasky/gaiasky/compare/0.700b...0.703b)
 
-## [0.700b](https://gitlab.com/gaiasky/gaiasky/tree/0.700b) (2014-12-11)
+## [0.700b](https://codeberg.org/gaiasky/gaiasky/tree/0.700b) (2014-12-11)
 
 \* *This Change Log was automatically generated with [git-chglog](https://github.com/git-chglog/git-chglog) (versions 2.1.0 and newer) and [github-changelog-generator](https://github.com/skywinder/Github-Changelog-Generator) (up to version 2.0.3)*
