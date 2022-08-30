@@ -39,7 +39,6 @@ public class RaymarchingUpdater extends AbstractUpdateSystem {
                     rm.isOn = false;
                 }
             }
-            GaiaSky.instance.getCameraManager().checkClosestBody(entity);
         }
     }
 }

@@ -338,7 +338,8 @@ public class Scene {
             addExtractor(newExtractor(KeyframeExtractor.class, families.keyframes, priority++, sceneRenderer));
             addExtractor(newExtractor(ShapeExtractor.class, families.shapes, priority++, sceneRenderer));
             addExtractor(newExtractor(LocExtractor.class, families.locations, priority++, sceneRenderer));
-            addExtractor(newExtractor(PerimeterExtractor.class, families.perimeters, priority, sceneRenderer));
+            addExtractor(newExtractor(PerimeterExtractor.class, families.perimeters, priority++, sceneRenderer));
+            addExtractor(newExtractor(RaymarchingExtractor.class, families.raymarchings, priority, sceneRenderer));
 
             // Remove all remaining systems.
             engine.removeAllSystems();
