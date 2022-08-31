@@ -300,7 +300,7 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
      *
      * @param size The diameter of the entity
      */
-    public void setSize(Float size) {
+    public void setSize(Double size) {
         this.size = (float) (size * Constants.KM_TO_U);
     }
 
