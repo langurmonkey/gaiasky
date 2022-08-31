@@ -151,7 +151,7 @@ public class SearchDialog extends GenericDialog {
                                         if (!matching.isEmpty()) {
                                             cIdx = -1;
                                             candidates.clear();
-                                            matching.stream().forEach(match -> {
+                                            matching.forEach(match -> {
                                                 OwnLabel m = new OwnLabel(match, skin);
                                                 m.addListener((evt) -> {
                                                     if (evt instanceof InputEvent) {
@@ -271,52 +271,10 @@ public class SearchDialog extends GenericDialog {
         }
     }
 
-    private void matchingNodes(String text, ISceneGraph sg) {
-        matching.clear();
-        matchingLabels.clear();
-        sg.matchingFocusableNodes(text, matching, 10, null);
-    }
     private void matchingNodes(String text, Scene scene) {
         matching.clear();
         matchingLabels.clear();
         scene.matchingFocusableNodes(text, matching, 10, null);
-    }
-
-    private boolean checkStringSceneGraph(String text, ISceneGraph sg) {
-        try {
-            if (sg.containsNode(text)) {
-                SceneGraphNode node = sg.getNode(text);
-                if (node instanceof IFocus) {
-                    IFocus focus = ((IFocus) node).getFocus(text);
-                    boolean timeOverflow = focus.isCoordinatesTimeOverflow();
-                    boolean canSelect = !(focus instanceof ParticleGroup) || ((ParticleGroup) focus).canSelect();
-                    boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                    Optional<CatalogInfo> ci = GaiaSky.instance.getCatalogInfoFromObject(node);
-                    boolean datasetVisible = ci.isEmpty() || ci.get().isVisible(true);
-                    if (!timeOverflow && canSelect && ctOn && datasetVisible) {
-                        GaiaSky.postRunnable(() -> {
-                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, true);
-                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
-                        });
-                        info(null);
-                    } else if (timeOverflow) {
-                        info(I18n.msg("gui.objects.search.timerange", text));
-                    } else if (!canSelect) {
-                        info(I18n.msg("gui.objects.search.filter", text));
-                    } else if (!datasetVisible) {
-                        info(I18n.msg("gui.objects.search.dataset.invisible", text, ci.get().name));
-                    } else {
-                        info(I18n.msg("gui.objects.search.invisible", text, focus.getCt().toString()));
-                    }
-                    return true;
-                }
-            } else {
-                info(null);
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        }
-        return false;
     }
 
     private boolean checkString(String text, Scene scene) {
