@@ -40,9 +40,9 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
     protected static final Log logger = Logger.getLogger(PrimitiveVertexRenderSystem.class);
 
     protected ICamera camera;
-    protected boolean lines;
+    protected final boolean lines;
     protected int coordOffset;
-    protected VertsView vertsView;
+    protected final VertsView vertsView;
 
     public PrimitiveVertexRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -118,11 +118,11 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             /*
              * ADD LINES
              */
-            if (!inGpu(renderable)) {
+            if (!inGpu(render)) {
                 // Remove previous line data if present.
-                if (getOffset(renderable) >= 0) {
-                    clearMeshData(getOffset(renderable));
-                    setOffset(renderable, -1);
+                if (getOffset(render) >= 0) {
+                    clearMeshData(getOffset(render));
+                    setOffset(render, -1);
                 }
 
                 // Actually add data.
@@ -130,16 +130,16 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                 int nPoints = od.getNumPoints();
 
                 // Initialize or fetch mesh data.
-                if (getOffset(renderable) < 0) {
-                    setOffset(renderable, addMeshData(nPoints));
+                if (getOffset(render) < 0) {
+                    setOffset(render, addMeshData(nPoints));
                 } else {
-                    curr = meshes.get(getOffset(renderable));
+                    curr = meshes.get(getOffset(render));
                     // Check we still have capacity, otherwise, reinitialize.
                     if (curr.numVertices != od.getNumPoints()) {
                         curr.clear();
                         curr.mesh.dispose();
-                        meshes.set(getOffset(renderable), null);
-                        setOffset(renderable, addMeshData(nPoints));
+                        meshes.set(getOffset(render), null);
+                        setOffset(render, addMeshData(nPoints));
                     }
                 }
                 // Coord maps time.
@@ -165,13 +165,13 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                 }
 
                 int count = nPoints * curr.vertexSize;
-                setCount(renderable, count);
+                setCount(render, count);
                 curr.mesh.setVertices(curr.vertices, 0, count);
                 curr.vertices = null;
 
                 setInGpu(renderable, true);
             }
-            curr = meshes.get(getOffset(renderable));
+            curr = meshes.get(getOffset(render));
 
             /*
              * RENDER
