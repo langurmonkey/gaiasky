@@ -121,37 +121,43 @@ public class ModelCache {
                 vt00 = new VertexInfo();
                 vt00.setPos(-diameter2, -diameter2, 0);
                 vt00.setNor(0, 1, 0);
-                vt00.setUV(1, 0);
+                vt00.setUV(1, 1);
+
                 vt01 = new VertexInfo();
                 vt01.setPos(-diameter2, diameter2, 0);
                 vt01.setNor(0, 1, 0);
-                vt01.setUV(1, 1);
+                vt01.setUV(1, 0);
+
                 vt11 = new VertexInfo();
                 vt11.setPos(diameter2, diameter2, 0);
                 vt11.setNor(0, 1, 0);
-                vt11.setUV(0, 1);
+                vt11.setUV(0, 0);
+
                 vt10 = new VertexInfo();
                 vt10.setPos(diameter2, -diameter2, 0);
                 vt10.setNor(0, 1, 0);
-                vt10.setUV(0, 0);
+                vt10.setUV(0, 1);
 
                 // BOTTOM VERTICES
                 vb00 = new VertexInfo();
                 vb00.setPos(-diameter2, -diameter2, 0);
                 vb00.setNor(0, 1, 0);
-                vb00.setUV(1, 0);
+                vb00.setUV(1, 1);
+
                 vb01 = new VertexInfo();
                 vb01.setPos(-diameter2, diameter2, 0);
                 vb01.setNor(0, 1, 0);
-                vb01.setUV(1, 1);
+                vb01.setUV(1, 0);
+
                 vb11 = new VertexInfo();
                 vb11.setPos(diameter2, diameter2, 0);
                 vb11.setNor(0, 1, 0);
-                vb11.setUV(0, 1);
+                vb11.setUV(0, 0);
+
                 vb10 = new VertexInfo();
                 vb10.setPos(diameter2, -diameter2, 0);
                 vb10.setNor(0, 1, 0);
-                vb10.setUV(0, 0);
+                vb10.setUV(0, 1);
 
                 mb.begin();
                 mb.part("up", primitiveType, attributes, mat).rect(vt00, vt01, vt11, vt10);
