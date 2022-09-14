@@ -376,13 +376,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // BLOOM
         OwnLabel bloomLabel = new OwnLabel(I18n.msg("gui.bloom"), skin, "default");
-        Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, Constants.SLIDER_STEP, skin);
+        Slider bloomEffect = new OwnSlider(Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
         bloomEffect.setName("bloom effect");
         bloomEffect.setWidth(sliderWidth);
         bloomEffect.setValue(settings.postprocess.bloom.intensity * 10f);
         bloomEffect.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.BLOOM_CMD, bloomEffect, bloomEffect.getValue() / 10f);
+                EventManager.publish(Event.BLOOM_CMD, bloomEffect, bloomEffect.getValue());
                 return true;
             }
             return false;

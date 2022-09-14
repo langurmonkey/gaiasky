@@ -279,6 +279,9 @@ public class Constants {
     public static final float MIN_EXPOSURE = 0.0f;
     public static final float MAX_EXPOSURE = 10.0f;
 
+    public static final float MIN_BLOOM = 0.0f;
+    public static final float MAX_BLOOM = 2.0f;
+
     public static final float MIN_LABEL_SIZE = 0.5f;
     public static final float MAX_LABEL_SIZE = 2.3f;
 
