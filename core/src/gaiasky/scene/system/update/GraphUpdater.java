@@ -135,7 +135,14 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
             // Update opacity
             if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
-                base.opacity = opacity;
+                // If the bottom part of our fade in is mapped to a value
+                // greater than zero, we do not use the parent opacity; the
+                // children's fadeInMap attribute takes precedence.
+                if(fade.fadeInMap == null || fade.fadeInMap.x <= 0) {
+                    base.opacity = opacity;
+                } else {
+                    base.opacity = 1;
+                }
                 updateFadeDistance(body, fade);
                 updateFadeOpacity(base, fade);
             } else {
