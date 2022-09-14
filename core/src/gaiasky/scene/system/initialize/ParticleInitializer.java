@@ -135,6 +135,8 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         label.textScale = 0.1f;
         label.labelFactor = 1.3e-1f;
         label.labelMax = 0.005f;
+        label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
+        label.renderFunction = LabelView::renderTextParticle;
 
         // Actual initialization.
         setDerivedAttributes(body, celestial, mag, extra, false);

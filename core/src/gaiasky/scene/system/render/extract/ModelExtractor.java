@@ -58,7 +58,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                     addToRender(render, RenderGroup.BILLBOARD_GAL);
                 }
 
-                if (base.forceLabel) {
+                if (renderText(base, body, sa)) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
             } else if (Mapper.tagQuatOrientation.has(entity)) {
