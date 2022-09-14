@@ -164,9 +164,9 @@ public class LabelView extends RenderView implements I3DTextRenderable {
 
     @Override
     public float textScale() {
-        if (set != null) {
-            // Star sets
-            return .5f / Settings.settings.scene.label.size;
+        if (starSet != null || particleSet != null) {
+            // Star and particle sets
+            return label.textScale / Settings.settings.scene.label.size;
         } else if (constel != null) {
             return .2f / Settings.settings.scene.label.size;
         } else if (loc != null) {

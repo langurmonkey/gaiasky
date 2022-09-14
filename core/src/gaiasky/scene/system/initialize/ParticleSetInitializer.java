@@ -128,6 +128,15 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         computeMeanPosition(entity, set);
         setLabelPosition(entity);
 
+
+        // Labels.
+        var label = Mapper.label.get(entity);
+        label.label = true;
+        label.textScale = 0.5f;
+        label.labelMax = 1;
+        label.labelFactor = 1e-3f;
+        label.renderConsumer = LabelEntityRenderSystem::renderParticleSet;
+        label.renderFunction = LabelView::renderTextBase;
     }
 
     /**
@@ -177,6 +186,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Labels.
         var label = Mapper.label.get(entity);
         label.label = true;
+        label.textScale = 0.5f;
         label.renderConsumer = LabelEntityRenderSystem::renderStarSet;
         label.renderFunction = LabelView::renderTextBase;
 

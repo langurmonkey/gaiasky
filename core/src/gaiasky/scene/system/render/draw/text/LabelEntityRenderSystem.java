@@ -61,7 +61,7 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAngle", base.forceLabel ? 2f : (float) (body.solidAngleApparent * scaffolding.locVaMultiplier * Constants.U_TO_KM));
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", base.forceLabel ? 1f : scaffolding.locThresholdLabel / (float) Constants.DISTANCE_SCALE_FACTOR);
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(),  base.forceLabel);
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), base.forceLabel);
     }
 
     public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
@@ -218,7 +218,7 @@ public class LabelEntityRenderSystem {
     }
 
     public void renderBillboardSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        Vector3d pos = D31;
+        var pos = D31;
         view.textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
@@ -226,8 +226,63 @@ public class LabelEntityRenderSystem {
         render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, view.body.distToCamera, view.textScale(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.base.forceLabel);
     }
 
+    public void renderParticleSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        // Dataset label
+        var pos = D31;
+        pos.set(view.label.labelPosition).add(camera.getInversePos());
+        shader.setUniformf("u_viewAngle", 90f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 1f);
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, pos.len(), view.textScale() * 2f * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.base.forceLabel);
+
+        // Particle labels
+        var active = view.particleSet.active;
+        if (active != null) {
+            float thresholdLabel = 1e-15f;
+            var pointData = view.particleSet.pointData;
+            for (int i = 0; i < Math.min(50, pointData.size()); i++) {
+                IParticleRecord pb = pointData.get(active[i]);
+                if (pb.names() != null) {
+                    Vector3d camPos = fetchPosition(pb, view.particleSet.cPosD, D31, 0);
+                    float distToCamera = (float) camPos.len();
+                    float viewAngle = 1e-4f / camera.getFovFactor();
+
+                    textPosition(camera, camPos.put(D31), distToCamera, 0);
+
+                    shader.setUniformf("u_viewAngle", viewAngle);
+                    shader.setUniformf("u_viewAnglePow", 1f);
+                    shader.setUniformf("u_thLabel", thresholdLabel * camera.getFovFactor());
+                    float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
+                    float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+                    textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, pb.names()[0], camPos.put(D31), distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), view.getRadius(), view.base.forceLabel);
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetches the real position of the particle. It will apply the necessary
+     * integrations (i.e. proper motion).
+     *
+     * @param pb          The particle bean
+     * @param campos      The position of the camera. If null, the camera position is
+     *                    not subtracted so that the coordinates are given in the global
+     *                    reference system instead of the camera reference system.
+     * @param destination The destination factor
+     * @param deltaYears  The delta years
+     *
+     * @return The vector for chaining
+     */
+    private Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
+        if (campos != null)
+            return destination.set(pb.x(), pb.y(), pb.z()).sub(campos);
+        else
+            return destination.set(pb.x(), pb.y(), pb.z());
+    }
+
     public void renderStarSet(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        var set = view.set;
+        var set = view.starSet;
 
         float thresholdLabel = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
 

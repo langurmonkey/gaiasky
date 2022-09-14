@@ -5,6 +5,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.ParticleExtra;
+import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 
 import java.util.Locale;
@@ -16,8 +17,10 @@ public class RenderView extends BaseView implements IRenderable {
 
     /** Particle component, maybe. **/
     public ParticleExtra extra;
+    /** Particle set component **/
+    public ParticleSet particleSet;
     /** Star set component **/
-    public StarSet set;
+    public StarSet starSet;
 
     public RenderView() {
     }
@@ -30,13 +33,15 @@ public class RenderView extends BaseView implements IRenderable {
     protected void entityChanged() {
         super.entityChanged();
         this.extra = Mapper.extra.get(entity);
-        this.set = Mapper.starSet.get(entity);
+        this.particleSet = Mapper.particleSet.get(entity);
+        this.starSet = Mapper.starSet.get(entity);
     }
 
     @Override
     protected void entityCleared() {
         this.extra = null;
-        this.set = null;
+        this.particleSet = null;
+        this.starSet = null;
     }
 
     @Override
@@ -65,12 +70,12 @@ public class RenderView extends BaseView implements IRenderable {
 
     /** Text color for the star with the given name in a star set. **/
     public float[] textColour(String name) {
-        assert set != null : "Called the wrong method!";
+        assert starSet != null : "Called the wrong method!";
         name = name.toLowerCase(Locale.ROOT).trim();
-        if (set.index.containsKey(name)) {
-            int idx = set.index.get(name);
-            if (set.labelColors.containsKey(idx)) {
-                return set.labelColors.get(idx);
+        if (starSet.index.containsKey(name)) {
+            int idx = starSet.index.get(name);
+            if (starSet.labelColors.containsKey(idx)) {
+                return starSet.labelColors.get(idx);
             }
         }
         return body.labelColor;
