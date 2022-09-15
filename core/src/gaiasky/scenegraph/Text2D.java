@@ -182,17 +182,13 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        switch (event) {
-        case UI_THEME_RELOAD_INFO:
+        if (event == Event.UI_THEME_RELOAD_INFO) {
             Skin skin = (Skin) data[0];
             // Get new theme color and put it in the label colour
             LabelStyle headerStyle = skin.get("header", LabelStyle.class);
             labelcolor[0] = headerStyle.fontColor.r;
             labelcolor[1] = headerStyle.fontColor.g;
             labelcolor[2] = headerStyle.fontColor.b;
-            break;
-        default:
-            break;
         }
 
     }

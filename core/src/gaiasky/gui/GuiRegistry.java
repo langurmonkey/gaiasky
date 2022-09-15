@@ -23,6 +23,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -47,7 +49,6 @@ import java.util.ArrayList;
  */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
-
 
     private Skin skin;
 
@@ -117,7 +118,7 @@ public class GuiRegistry implements IObserver {
     /**
      * Create new GUI registry object.
      */
-    public GuiRegistry(final Skin skin, final ISceneGraph sceneGraph, final Scene scene,  final CatalogManager catalogManager) {
+    public GuiRegistry(final Skin skin, final ISceneGraph sceneGraph, final Scene scene, final CatalogManager catalogManager) {
         super();
         this.skin = skin;
         this.sceneGraph = sceneGraph;
@@ -748,6 +749,7 @@ public class GuiRegistry implements IObserver {
 
     /**
      * This method updates the default skin and reloads the full UI.
+     *
      * @param globalResources The global resources object to update.
      */
     private void reloadUI(GlobalResources globalResources) {
@@ -761,9 +763,11 @@ public class GuiRegistry implements IObserver {
             GaiaSky.instance.reinitialiseGUI2();
             // Time init
             EventManager.publish(Event.TIME_CHANGE_INFO, this, GaiaSky.instance.time.getTime());
-            if (GaiaSky.instance.cameraManager.mode == CameraManager.CameraMode.FOCUS_MODE)
+            if (GaiaSky.instance.cameraManager.mode == CameraManager.CameraMode.FOCUS_MODE) {
                 // Refocus
-                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, GaiaSky.instance.cameraManager.getFocus());
+                FocusView focus = (FocusView) GaiaSky.instance.cameraManager.getFocus();
+                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus.getEntity());
+            }
             // UI theme reload broadcast
             EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));
