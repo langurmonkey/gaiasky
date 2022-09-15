@@ -19,6 +19,7 @@ import gaiasky.scenegraph.component.ITransform;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
+import gaiasky.util.Nature;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -121,6 +122,21 @@ public class ModelUpdater extends AbstractUpdateSystem {
     public void setToLocalTransform(Entity entity, Body body, GraphNode graph, float size, float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
         // Update translation, orientation and local transform.
         ITimeFrameProvider time = GaiaSky.instance.time;
+
+        // Heliotropic satellites need this chunk before the actual update is carried out.
+        var attitude = Mapper.attitude.get(entity);
+        if (attitude != null && (time.getHdiff() != 0 || forceUpdate)) {
+            if (Mapper.tagHeliotropic.has(entity) && attitude.nonRotatedPos != null) {
+                attitude.nonRotatedPos.set(body.pos);
+                // Undo rotation.
+                attitude.nonRotatedPos.mul(Coordinates.eqToEcl()).rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
+                // Update attitude from server if needed.
+                if (attitude.attitudeServer != null) {
+                    attitude.attitude = attitude.attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli()));
+                }
+            }
+        }
+
         if (sizeFactor != 1 || forceUpdate) {
             var rotation = Mapper.rotation.get(entity);
             var scaffolding = Mapper.modelScaffolding.get(entity);
@@ -136,7 +152,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 localTransform.idt().setToLookAt(engine.posf, engine.directionf.add(engine.posf), engine.upf);
                 try {
                     localTransform.inv();
-                } catch(RuntimeException e) {
+                } catch (RuntimeException e) {
                     // Non-invertible matrix
                 }
                 localTransform.scale(size, size, size);
@@ -144,22 +160,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
                 // Rotation for attitude indicator
                 engine.rotationMatrix.idt().setToLookAt(engine.directionf, engine.upf);
                 engine.rotationMatrix.getRotation(engine.qf);
-            } else if (Mapper.attitude.has(entity)) {
+            } else if (attitude != null) {
                 // Satellites have attitude.
-                var attitude = Mapper.attitude.get(entity);
-
-                // Update attitude for current time if needed.
-                if (time.getHdiff() != 0) {
-                    if (Mapper.tagHeliotropic.has(entity)) {
-                        attitude.nonRotatedPos.set(body.pos);
-                        // Undo rotation.
-                        attitude.nonRotatedPos.mul(Coordinates.eqToEcl()).rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
-                        // Update attitude from server if needed.
-                        if (attitude.attitudeServer != null) {
-                            attitude.attitude = attitude.attitudeServer.getAttitude(new Date(time.getTime().toEpochMilli()));
-                        }
-                    }
-                }
 
                 graph.translation.setToTranslation(localTransform).scl(size * sizeFactor);
                 if (attitude.attitude != null) {
@@ -177,6 +179,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
                 MD4.set(localTransform).mul(graph.orientation);
                 MD4.putIn(localTransform);
+
             } else if (rotation.rc != null) {
                 // Planets and moons have rotation components
                 RotationComponent rc = rotation.rc;

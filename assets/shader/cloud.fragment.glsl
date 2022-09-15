@@ -69,7 +69,6 @@ void main() {
 
     vec4 cloud = fetchCloudColor(g_texCoord0, vec4(0.0, 0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
-    float ambient_val = (ambient.r + ambient.g + ambient.b) / 3.0;
 
     // Normal in pixel space
     vec3 N = vec3(0.0, 0.0, 1.0);
@@ -77,7 +76,7 @@ void main() {
     float NL = clamp(dot(N, L) + 0.25, 0.0, 1.0);
 
     vec3 cloudColor = clamp(v_lightCol * cloud.rgb, 0.0, 1.0);
-    float opacity = v_opacity * clamp(NL + ambient_val, 0.0, 1.0);
+    float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0);
     fragColor = vec4(cloudColor, cloud.a) * opacity;
 
     fragColor = clamp(fragColor, 0.0, 1.0);
