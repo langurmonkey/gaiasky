@@ -676,7 +676,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     @Override
     public float getAbsmag() {
-        if (starSet != null) {
+        if (starSet != null && starSet.focus != null) {
             return starSet.focus.absmag();
         } else if (particleSet != null) {
             return 0;

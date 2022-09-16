@@ -24,10 +24,10 @@ name = "hip-script"
 assets = gs.getAssetsLocation()
 gs.loadDataset(name, assets + "/scripts/tests/hip-subset.vot")
 
-cmaps = ["reds", "greens", "blues", "rainbow18", "rainbow", "seismic", "carnation", "hotmeal", "cool"]
+cmaps = ["reds", "greens", "blues", "rainbow18", "rainbow", "seismic", "carnation", "hotmetal", "cool"]
 cmapi = 0
 
-gs.setCameraFocus("HIP 2548")
+gs.setCameraFocus("2548")
 for i in range(8):
     gs.highlightDataset(name, "RA", cmaps[cmapi], 0.0, 15.0, True)
     cmapi = (cmapi + 1) % len(cmaps)

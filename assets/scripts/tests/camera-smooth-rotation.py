@@ -17,9 +17,9 @@ gs.setRotationCameraSpeed(3.0)
 gs.setCameraFocus("Earth")
 gs.sleep(1)
 
-for dxy in np.arange(0.0, 0.1, 0.01):
+for dxy in np.arange(0.0, 0.3, 0.01):
     gs.cameraRotate(dxy, dxy)
-    gs.sleep(0.5)
+    gs.sleep(0.4)
 
 
 

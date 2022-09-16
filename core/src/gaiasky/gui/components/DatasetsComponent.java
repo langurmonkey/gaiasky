@@ -243,7 +243,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 var hl = Mapper.highlight.get(ci.entity);
                 if (hl != null) {
                     float pointScaling;
-                    if (Mapper.octree.has(graph.parent)) {
+                    if (graph.parent != null && Mapper.octree.has(graph.parent)) {
                         pointScaling = Mapper.highlight.get(graph.parent).pointscaling * hl.pointscaling;
                     } else {
                         pointScaling = hl.pointscaling;

@@ -611,7 +611,7 @@ public class Scene {
      */
     public Entity findFocus(String name) {
         Entity entity = getEntity(name);
-        if (Mapper.focus.has(entity))
+        if (entity != null && Mapper.focus.has(entity))
             return entity;
         else
             return null;

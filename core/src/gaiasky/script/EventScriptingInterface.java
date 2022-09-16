@@ -230,7 +230,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraFocus(final String focusName, final float waitTimeSeconds) {
-        if (checkString(focusName, "focusName")) {
+        if (checkString(focusName, "focusName") && checkFocusName(focusName)) {
             Entity entity = getObject(focusName);
             if (Mapper.focus.has(entity)) {
                 synchronized (focusView) {
@@ -689,7 +689,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         }
 
-        postRunnable(() -> em.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, nameLc, visible));
+        postRunnable(() -> EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, nameLc, visible));
         return true;
     }
 
@@ -772,17 +772,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        postRunnable(() -> em.publish(Event.PM_NUM_FACTOR_CMD, this, MathUtilsd.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR)));
+        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this, MathUtilsd.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR)));
     }
 
     @Override
     public void setProperMotionsColorMode(int mode) {
-        postRunnable(() -> em.publish(Event.PM_COLOR_MODE_CMD, this, mode % 6));
+        postRunnable(() -> EventManager.publish(Event.PM_COLOR_MODE_CMD, this, mode % 6));
     }
 
     @Override
     public void setProperMotionsArrowheads(boolean arrowheadsEnabled) {
-        postRunnable(() -> em.publish(Event.PM_ARROWHEADS_CMD, this, arrowheadsEnabled));
+        postRunnable(() -> EventManager.publish(Event.PM_ARROWHEADS_CMD, this, arrowheadsEnabled));
     }
 
     public void setProperMotionsNumberFactor(int factor) {
@@ -795,7 +795,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsLengthFactor(float factor) {
-        postRunnable(() -> em.publish(Event.PM_LEN_FACTOR_CMD, this, factor));
+        postRunnable(() -> EventManager.publish(Event.PM_LEN_FACTOR_CMD, this, factor));
     }
 
     public void setProperMotionsLengthFactor(int factor) {
@@ -980,7 +980,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarMinOpacity(float minOpacity) {
         if (checkNum(minOpacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
-            em.publish(Event.STAR_MIN_OPACITY_CMD, this, minOpacity);
+            EventManager.publish(Event.STAR_MIN_OPACITY_CMD, this, minOpacity);
     }
 
     public void setMinStarOpacity(float minOpacity) {
@@ -990,26 +990,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarTextureIndex(int index) {
         if (checkNum(index, 1, 4, "index")) {
-            em.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, index);
+            EventManager.publish(Event.BILLBOARD_TEXTURE_IDX_CMD, this, index);
         }
     }
 
     @Override
     public void setStarGroupNearestNumber(int n) {
         if (checkNum(n, 1, 1000000, "nNearest")) {
-            em.publish(Event.STAR_GROUP_NEAREST_CMD, this, n);
+            EventManager.publish(Event.STAR_GROUP_NEAREST_CMD, this, n);
         }
     }
 
     @Override
     public void setStarGroupBillboard(boolean flag) {
-        em.publish(Event.STAR_GROUP_BILLBOARD_CMD, this, flag);
+        EventManager.publish(Event.STAR_GROUP_BILLBOARD_CMD, this, flag);
     }
 
     @Override
     public void setOrbitSolidAngleThreshold(float angleDeg) {
         if (checkNum(angleDeg, 0.0f, 180f, "solid-angle")) {
-            postRunnable(() -> em.publish(Event.ORBIT_SOLID_ANGLE_TH_CMD, this, (double) angleDeg));
+            postRunnable(() -> EventManager.publish(Event.ORBIT_SOLID_ANGLE_TH_CMD, this, (double) angleDeg));
         }
     }
 
@@ -1534,7 +1534,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 body.setSizeM(500.0);
                 var graph = Mapper.graph.get(invisible);
                 graph.setParent(Scene.ROOT_NAME);
-                em.publish(Event.SCENE_ADD_OBJECT_CMD, this, invisible, true);
+                EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, invisible, true);
             }
             Entity invisible = scene.getEntity(nameStub);
 
@@ -1623,7 +1623,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 landOnObject(focusView.getEntity(), stop);
             }
 
-            em.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, invisible, true);
+            EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, invisible, true);
         }
     }
 
@@ -2882,17 +2882,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions datasetOptions) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(datasetOptions);
+        String catalogName = datasetOptions != null && datasetOptions.catalogName != null ? datasetOptions.catalogName : ds.getName();
         return provider.loadData(ds, 1.0f, () -> {
             // Create
-            em.publish(Event.UPDATE_LOAD_PROGRESS, this, datasetOptions.catalogName, 0.01f);
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, catalogName, 0.01f);
         }, (current, count) -> {
-            em.publish(Event.UPDATE_LOAD_PROGRESS, this, datasetOptions.catalogName, (float) current / (float) count);
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, catalogName, (float) current / (float) count);
             if (current % 250000 == 0) {
                 logger.info(current + " objects loaded...");
             }
         }, () -> {
             // Force remove
-            em.publish(Event.UPDATE_LOAD_PROGRESS, this, datasetOptions.catalogName, 2f);
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, catalogName, 2f);
         });
     }
 
@@ -2912,11 +2913,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
-                            em.publish(Event.CATALOG_ADD, this, ci, true);
+                            EventManager.publish(Event.CATALOG_ADD, this, ci, true);
 
                             String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.msg("gui.dsload.stars.name") : I18n.msg("gui.dsload.variablestars.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
-                            em.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || Mapper.graph.get(starGroup.get()).parent != null)) {
@@ -2933,11 +2934,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
-                            em.publish(Event.CATALOG_ADD, this, ci, true);
+                            EventManager.publish(Event.CATALOG_ADD, this, ci, true);
 
                             String typeStr = I18n.msg("gui.dsload.objects.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
-                            em.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (particleGroup.get() == null || Mapper.graph.get(particleGroup.get()).parent != null)) {
@@ -2996,7 +2997,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                         String typeStr = I18n.msg("gui.dsload.clusters.name");
                         logger.info(I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
-                        em.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
                     });
                     // Sync waiting until the node is in the scene graph
                     while (sync && graph.parent == null) {
@@ -3030,7 +3031,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists)
-                postRunnable(() -> em.publish(Event.CATALOG_REMOVE, this, dsName));
+                postRunnable(() -> EventManager.publish(Event.CATALOG_REMOVE, this, dsName));
             else
                 logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
@@ -3043,7 +3044,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
-                postRunnable(() -> em.publish(Event.CATALOG_VISIBLE, this, dsName, false));
+                postRunnable(() -> EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, false));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -3057,7 +3058,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
-                postRunnable(() -> em.publish(Event.CATALOG_VISIBLE, this, dsName, true));
+                postRunnable(() -> EventManager.publish(Event.CATALOG_VISIBLE, this, dsName, true));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -3072,7 +3073,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
                 CatalogInfo ci = this.catalogManager.get(dsName);
-                postRunnable(() -> em.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
+                postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -3098,7 +3099,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 ci.hlColor[1] = g;
                 ci.hlColor[2] = b;
                 ci.hlColor[3] = a;
-                postRunnable(() -> em.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
+                postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -3121,7 +3122,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     ci.hlCmapMin = minMap;
                     ci.hlCmapMax = maxMap;
                     ci.hlCmapAttribute = attribute;
-                    postRunnable(() -> em.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
+                    postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
                 } else {
                     if (attribute == null)
                         logger.error("Could not find attribute with name '" + attributeName + "'");
@@ -3257,7 +3258,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     shapeObj.doneLoading(GaiaSky.instance.assetManager);
 
-                    em.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, shapeObj, false);
+                    EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, shapeObj, false);
                 }
 
                 // NEW
@@ -3312,7 +3313,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     scene.setUpEntity(newShape);
 
                     // Add to scene.
-                    em.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, newShape, false);
+                    EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, newShape, false);
                 }
             });
         }
@@ -3599,6 +3600,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private boolean checkFocusName(String name) {
         Entity entity = getFocus(name);
+        if(entity == null) {
+            logger.error(name + ": entity does not exist");
+        }
         return entity != null;
     }
 
