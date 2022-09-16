@@ -27,10 +27,11 @@ absmag = body.getAbsmag()
 appmag = body.getAppmag()
 radec = body.getPosSph()
 
+print("Absmag: %f, appmag: %f, RA: %f, DEC: %f" % (absmag, appmag, radec.x(), radec.y()))
 gs.print("Absmag: %f, appmag: %f, RA: %f, DEC: %f" % (absmag, appmag, radec.x(), radec.y()))
 
 
-# Now stop at a certain distance of earth
+# Now stop at a certain distance of Earth
 dist = 15000 #Km
 earthrad = gs.getObjectRadius("Earth")
 anglerad = math.acos((earthrad * 2)/dist)

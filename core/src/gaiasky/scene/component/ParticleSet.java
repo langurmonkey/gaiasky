@@ -350,7 +350,7 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     public void setFocusIndex(String name) {
-        candidateFocusIndex = index.getOrDefault(name, -1);
+        candidateFocusIndex = index.getOrDefault(name.toLowerCase().trim(), -1);
     }
 
     public IParticleRecord getCandidateBean() {
@@ -452,6 +452,7 @@ public class ParticleSet implements Component, IDisposable {
 
     /** Returns the position of the particle with the given name, if any, in the out vector. **/
     public Vector3b getAbsolutePosition(String name, Vector3b out) {
+        name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
             IParticleRecord pb = pointData.get(idx);

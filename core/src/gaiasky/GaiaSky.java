@@ -1708,7 +1708,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 final IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
                 String name = (String) data[1];
                 boolean state = (boolean) data[2];
-                vs.setVisible(state, name.toLowerCase());
+                vs.setVisible(state, name.toLowerCase().trim());
                 logger.info(I18n.msg("notif.visibility.object.set", vs.getName(), I18n.msg("gui." + state)));
             }
             break;

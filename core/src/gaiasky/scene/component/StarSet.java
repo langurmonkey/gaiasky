@@ -189,6 +189,7 @@ public class StarSet extends ParticleSet {
     }
 
     public void setForceLabel(Boolean forceLabel, String name) {
+        name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
             if (forceLabelStars.contains(idx)) {
@@ -204,6 +205,7 @@ public class StarSet extends ParticleSet {
     }
 
     public boolean isForceLabel(String name) {
+        name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
             return forceLabelStars.contains(idx);
@@ -212,6 +214,7 @@ public class StarSet extends ParticleSet {
     }
 
     public void setLabelColor(float[] color, String name) {
+        name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
             labelColors.put(idx, color);

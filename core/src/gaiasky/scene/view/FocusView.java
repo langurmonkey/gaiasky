@@ -916,7 +916,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             Entity child = graph.children.get(i);
             if (child != null) {
                 var base = Mapper.base.get(child);
-                if (base.getName().equalsIgnoreCase(name) && archetype.matches(child)) {
+                if (base.getName().equalsIgnoreCase(name.toLowerCase().trim()) && archetype.matches(child)) {
                     return child;
                 }
             }

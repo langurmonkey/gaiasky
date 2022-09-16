@@ -7,6 +7,7 @@ package gaiasky.script;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
@@ -1209,11 +1210,10 @@ public interface IScriptingInterface {
      *
      * @param name The name or id (HIP, TYC, Gaia SourceId) of the object.
      *
-     * @return The object as a
-     * {@link gaiasky.scenegraph.SceneGraphNode}, or null
+     * @return The object as a {@link gaiasky.scene.view.FocusView}, or null
      * if it does not exist.
      */
-    Entity getObject(String name);
+    FocusView getObject(String name);
 
     /**
      * Gets an object by <code>name</code> or id (HIP, TYC, Gaia SourceID), optionally waiting
@@ -1226,7 +1226,7 @@ public interface IScriptingInterface {
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      * the timeout has passed.
      */
-    Entity getObject(String name, double timeOutSeconds);
+    FocusView getObject(String name, double timeOutSeconds);
 
     /**
      * Sets the given size scaling factor to the object identified by
