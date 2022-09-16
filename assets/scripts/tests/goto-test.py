@@ -1,4 +1,4 @@
-# This script tests the go-to commands. To be run asynchronously.
+# This script tests the go-to API calls.
 # Created by Toni Sagrista
 
 from py4j.clientserver import ClientServer, JavaParameters
