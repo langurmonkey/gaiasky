@@ -532,7 +532,7 @@ public class Scene {
                 throw new RuntimeException(I18n.msg("error.parent.notfound", base.getName(), graph.parentName));
             }
         }
-        try{
+        try {
             engine.addEntity(entity);
         } catch (IllegalArgumentException e) {
             logger.debug("Entity " + base.getName() + " already in engine.");
@@ -547,7 +547,7 @@ public class Scene {
      * @param removeFromIndex Whether to remove it from the index too.
      */
     public void remove(Entity entity, boolean removeFromIndex) {
-        if (entity != null && Mapper.graph.get(entity).parent != null) {
+        if (entity != null && Mapper.graph.has(entity) && Mapper.graph.get(entity).parent != null) {
             var graph = Mapper.graph.get(entity);
             var parentGraph = Mapper.graph.get(graph.parent);
             parentGraph.removeChild(entity, true);
@@ -567,7 +567,7 @@ public class Scene {
         // Dispose components.
         var components = entity.getComponents();
         for (var component : components) {
-            if(component instanceof IDisposable) {
+            if (component instanceof IDisposable) {
                 ((IDisposable) component).dispose(entity);
             }
         }

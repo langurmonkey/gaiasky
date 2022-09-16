@@ -102,8 +102,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
     }
 
-    private long last = -1;
-
     private void updateSorter(ITimeFrameProvider time, ICamera camera) {
         // Prepare metadata to sort
         updateMetadata(time, camera);
@@ -137,7 +135,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
      * @param camera The camera.
      */
     private void updateMetadata(ITimeFrameProvider time, ICamera camera) {
-        if(starSet != null) {
+        if (starSet != null) {
             // Stars, propagate proper motion, weigh with size.
             Vector3d camPos = camera.getPos().tov3d(D34);
             double deltaYears = AstroUtils.getMsSince(time.getTime(), starSet.epochJd) * Nature.MS_TO_Y;
@@ -176,7 +174,7 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
     public void notify(Event event, Object source, Object... data) {
         var base = Mapper.base.get(entity);
         switch (event) {
-        case FOCUS_CHANGED:
+        case FOCUS_CHANGED -> {
             if (data[0] instanceof String) {
                 particleSet.focusIndex = data[0].equals(base.getName()) ? particleSet.focusIndex : -1;
             } else {
@@ -184,20 +182,24 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
                 particleSet.focusIndex = (view.getSet() == particleSet) ? particleSet.focusIndex : -1;
             }
             utils.updateFocusDataPos(particleSet);
-            break;
-        case CAMERA_MOTION_UPDATE:
+        }
+        case CAMERA_MOTION_UPDATE -> {
             // Check that the particles have names
             var pointData = particleSet.pointData;
-            if (particleSet.updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
+            if (pointData != null && particleSet.updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
                 final Vector3b currentCameraPos = (Vector3b) data[0];
                 long t = TimeUtils.millis() - particleSet.lastSortTime;
                 if (!particleSet.updating && base.opacity > 0 && (t > UPDATE_INTERVAL_MS_2 || (particleSet.lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
                     particleSet.updating = GaiaSky.instance.getExecutorService().execute(this);
                 }
             }
-            break;
-        default:
-            break;
         }
+        default -> {
+        }
+        }
+    }
+
+    public void dispose() {
+        EventManager.instance.removeAllSubscriptions(this);
     }
 }

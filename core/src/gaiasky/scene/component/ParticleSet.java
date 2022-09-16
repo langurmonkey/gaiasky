@@ -97,11 +97,6 @@ public class ParticleSet implements Component, IDisposable {
     public double maxDistance, minDistance;
 
     /**
-     * Geometric centre at epoch, for render sorting
-     */
-    public static Vector3d geomCentre;
-
-    /**
      * Reference to the current focus.
      */
     public IParticleRecord focus;
@@ -572,6 +567,10 @@ public class ParticleSet implements Component, IDisposable {
 
     @Override
     public void dispose(Entity entity) {
+        if (updaterTask != null) {
+            updaterTask.dispose();
+        }
+
         this.disposed = true;
         markForUpdate(Mapper.render.get(entity));
         // Data to be gc'd

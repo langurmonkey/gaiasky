@@ -49,6 +49,7 @@ public class StarSet extends ParticleSet {
     }
 
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
+        name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
             IParticleRecord sb = pointData.get(idx);

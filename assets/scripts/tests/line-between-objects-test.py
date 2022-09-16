@@ -18,7 +18,7 @@ gs.stopSimulationTime()
 
 gs.setCameraFocusInstantAndGo("Earth")
 
-gs.print("We will now add lines between Earth-Moon, Earth-Sun, Earth-Mercury and Arcturus-Achernar")
+gs.print("We will now add lines between the positions of Earth-Moon, Earth-Sun, Earth-Mercury and Arcturus-Achernar")
 gs.print("You will have 30 seconds to observe and explore the system before we remove the lines and end the script")
 
 gs.sleep(2)

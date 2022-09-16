@@ -2676,8 +2676,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeModelObject(String name) {
-        if (checkString(name, "name"))
+        if (checkString(name, "name")) {
             em.post(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, name, true);
+            em.post(Event.SCENE_REMOVE_OBJECT_CMD, this, name, true);
+        }
     }
 
     @Override

@@ -1394,7 +1394,7 @@ public interface IScriptingInterface {
      *
      * @param name   The name to identify the polyline, to possibly remove it later.
      * @param points The points of the polyline. It is an array containing all the
-     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
      * @param color  The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
     void addPolyline(String name, double[] points, double[] color);

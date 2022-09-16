@@ -23,7 +23,7 @@ lookat = gs.equatorialToInternalCartesian(0.0, 0.0, 1.0)
 gs.setCameraDirection(lookat)
 
 # Let's load the data
-name = "hip-script"
+name = "hip-particles-script"
 # Modify this path to your own file!
 assets = gs.getAssetsLocation()
 gs.loadParticleDataset(name, assets + "/scripts/tests/hip-subset.vot", 3.0, [0.3, 1.0, 0.4, 0.2], 0.2, [0.3, 1.0, 0.4, 1.0], 14.0, "Stars", [0.0, 0.0], [500000.0, 500000.0], True)

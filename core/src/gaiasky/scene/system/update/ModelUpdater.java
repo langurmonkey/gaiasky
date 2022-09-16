@@ -159,7 +159,9 @@ public class ModelUpdater extends AbstractUpdateSystem {
 
                 // Rotation for attitude indicator
                 engine.rotationMatrix.idt().setToLookAt(engine.directionf, engine.upf);
-                engine.rotationMatrix.getRotation(engine.qf);
+                if (engine.qf != null) {
+                    engine.rotationMatrix.getRotation(engine.qf);
+                }
             } else if (attitude != null) {
                 // Satellites have attitude.
 
