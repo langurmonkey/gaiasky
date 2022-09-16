@@ -6,6 +6,7 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IGPUVertsRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
@@ -118,6 +119,10 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
         return verts.glPrimitive;
     }
 
+    public void setGlPrimitive(int glPrimitive) {
+        verts.glPrimitive = glPrimitive;
+    }
+
     @Override
     public void setPrimitiveSize(float size) {
         verts.primitiveSize = size;
@@ -188,7 +193,10 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
             verts.pointCloudData.addPoint(point);
             markForUpdate();
         }
+    }
 
+    public void setRenderGroup(RenderGroup renderGroup) {
+        verts.renderGroup = renderGroup;
     }
 
     public boolean isEmpty() {

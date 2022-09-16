@@ -5,6 +5,7 @@
 
 package gaiasky.scene.system.render.draw;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
@@ -143,8 +144,9 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                     }
                 }
                 // Coord maps time.
-                long t0 = od.getDate(0).getEpochSecond();
-                long t1 = od.getDate(od.getNumPoints() - 1).getEpochSecond();
+                boolean hasTime = od.hasTime();
+                long t0 = hasTime ? od.getDate(0).getEpochSecond() : 0;
+                long t1 = hasTime ? od.getDate(od.getNumPoints() - 1).getEpochSecond() : 0;
                 long t01 = t1 - t0;
 
                 // Ensure vertices capacity.
@@ -152,7 +154,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                 curr.vertices = tempVerts;
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < nPoints; point_i++) {
-                    coord((float) ((double) (od.getDate(point_i).getEpochSecond() - t0) / (double) t01));
+                    coord(!hasTime ? 1f : (float) ((double) (od.getDate(point_i).getEpochSecond() - t0) / (double) t01));
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) od.getX(point_i), (float) od.getY(point_i), (float) od.getZ(point_i));
                 }
@@ -169,7 +171,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                 curr.mesh.setVertices(curr.vertices, 0, count);
                 curr.vertices = null;
 
-                setInGpu(renderable, true);
+                setInGpu(render, true);
             }
             curr = meshes.get(getOffset(render));
 
@@ -191,15 +193,16 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
+            shaderProgram.setUniformf("u_coordEnabled", vertsView.getPointCloud().hasTime() ? 1f : -1f);
             shaderProgram.setUniformf("u_coordPos", trajectory != null ? (float) trajectory.coord : 1f);
             shaderProgram.setUniformf("u_period", trajectory != null && trajectory.oc != null ? (float) trajectory.oc.period : 0f);
-            if (renderable.getParent() != null) {
-                Vector3d urp = renderable.getParent().getUnrotatedPos();
+            Entity parent  = renderable.getParentEntity();
+            if (parent != null) {
+                Vector3d urp = Mapper.attitude.has(parent) ? Mapper.attitude.get(parent).nonRotatedPos : null;
                 if (urp != null)
                     shaderProgram.setUniformf("u_parentPos", (float) urp.x, (float) urp.y, (float) urp.z);
                 else
                     shaderProgram.setUniformf("u_parentPos", 0, 0, 0);
-
             }
 
             // Rel, grav, z-buffer.

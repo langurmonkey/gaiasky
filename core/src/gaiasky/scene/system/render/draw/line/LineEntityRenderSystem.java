@@ -61,7 +61,6 @@ public class LineEntityRenderSystem {
         alpha *= cc[3];
         var verts = lineView.verts;
         if (verts.pointCloudData != null && verts.pointCloudData.getNumPoints() > 1) {
-            var render = Mapper.render.get(entity);
             var graph = Mapper.graph.get(entity);
 
             Vector3d prev = D31;

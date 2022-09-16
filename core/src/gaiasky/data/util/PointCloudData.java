@@ -59,6 +59,10 @@ public class PointCloudData {
         return x.isEmpty() && y.isEmpty() && z.isEmpty();
     }
 
+    public boolean hasTime() {
+        return time != null && !time.isEmpty();
+    }
+
     /**
      * Adds the given vector to the current points. The vector
      * is of the form [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].

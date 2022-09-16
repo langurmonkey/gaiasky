@@ -30,6 +30,7 @@ import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.RenderGroup;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -2579,6 +2580,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     vertsView.setEntity(entity);
                     vertsView.setPrimitiveSize((float) lineWidth);
                     vertsView.setPoints(points);
+                    vertsView.setRenderGroup(arrowCaps? RenderGroup.LINE : RenderGroup.LINE_GPU);
+                    vertsView.setClosedLoop(false);
+                    vertsView.setGlPrimitive(GL20.GL_LINE_STRIP);
                 }
 
                 var graph = Mapper.graph.get(entity);

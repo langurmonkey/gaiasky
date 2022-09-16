@@ -11,11 +11,11 @@ gs.cameraStop()
 gs.minimizeInterfaceWindow()
 
 gs.setCinematicCamera(True)
-gs.setRotationCameraSpeed(50.)
-gs.setCameraSpeed(15.)
+gs.setRotationCameraSpeed(30.)
+gs.setCameraSpeed(100.)
 
 gs.setCameraFocusInstantAndGo("Sun")
-gs.goToObject("Sun", 1e-8)
+gs.goToObject("Sun", 1e-7)
 
 gs.sleep(3)
 

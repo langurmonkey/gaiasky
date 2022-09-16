@@ -303,6 +303,7 @@ public class Scene {
             addUpdater(new ParticleSetUpdater(families.particleSets, priority++));
             addUpdater(new ModelUpdater(families.models, priority++));
             addUpdater(new TrajectoryUpdater(families.orbits, priority++));
+            addUpdater(new VertsUpdater(families.verts, priority++));
             addUpdater(new BackgroundUpdater(families.backgroundModels, priority++));
             addUpdater(new ClusterUpdater(families.clusters, priority++));
             addUpdater(new RaymarchingUpdater(families.raymarchings, priority++));
@@ -325,6 +326,7 @@ public class Scene {
             addExtractor(newExtractor(ParticleExtractor.class, families.particles, priority++, sceneRenderer));
             addExtractor(newExtractor(ModelExtractor.class, families.models, priority++, sceneRenderer));
             addExtractor(newExtractor(TrajectoryExtractor.class, families.orbits, priority++, sceneRenderer));
+            addExtractor(newExtractor(VertsExtractor.class, families.verts, priority++, sceneRenderer));
             addExtractor(newExtractor(BackgroundExtractor.class, families.backgroundModels, priority++, sceneRenderer));
             addExtractor(newExtractor(ClusterExtractor.class, families.clusters, priority++, sceneRenderer));
             addExtractor(newExtractor(BillboardSetExtractor.class, families.billboardSets, priority++, sceneRenderer));
