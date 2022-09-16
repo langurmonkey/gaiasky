@@ -403,9 +403,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             String focusLowerCase = focus.toLowerCase();
             String otherLowerCase = other.toLowerCase();
-            if (sceneGraph.containsNode(focusLowerCase) && sceneGraph.containsNode(otherLowerCase)) {
-                IFocus focusObj = sceneGraph.findFocus(focusLowerCase);
-                IFocus otherObj = sceneGraph.findFocus(otherLowerCase);
+            if (scene.index().containsEntity(focusLowerCase) && scene.index().containsEntity(otherLowerCase)) {
+                Entity focusObj = scene.findFocus(focusLowerCase);
+                Entity otherObj = scene.findFocus(otherLowerCase);
                 setCameraPositionAndFocus(focusObj, otherObj, rotation, viewAngle);
             }
         }
@@ -424,39 +424,45 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         pointAtSkyCoordinate((double) ra, (double) dec);
     }
 
-    private void setCameraPositionAndFocus(IFocus focus, IFocus other, double rotation, double viewAngle) {
+    private void setCameraPositionAndFocus(Entity focus, Entity other, double rotation, double viewAngle) {
         if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             em.post(Event.FOCUS_CHANGE_CMD, this, focus);
 
-            double radius = focus.getRadius();
-            double dist = radius / Math.tan(Math.toRadians(viewAngle / 2)) + radius;
+            synchronized (focusView) {
+                focusView.setEntity(focus);
+                double radius = focusView.getRadius();
+                double dist = radius / Math.tan(Math.toRadians(viewAngle / 2)) + radius;
 
-            // Up to ecliptic north pole
-            Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
+                // Up to ecliptic north pole
+                Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
 
-            Vector3b focusPos = aux3b1;
-            focus.getAbsolutePosition(focusPos);
-            Vector3b otherPos = aux3b2;
-            other.getAbsolutePosition(otherPos);
+                Vector3b focusPos = aux3b1;
+                focusView.getAbsolutePosition(focusPos);
 
-            Vector3b otherToFocus = aux3b3;
-            otherToFocus.set(focusPos).sub(otherPos).nor();
-            Vector3d focusToOther = aux3d4.set(otherToFocus);
-            focusToOther.scl(-dist).rotate(up, rotation);
+                focusView.setEntity(other);
+                Vector3b otherPos = aux3b2;
+                focusView.getAbsolutePosition(otherPos);
+                focusView.clearEntity();
 
-            // New camera position
-            Vector3d newCamPos = aux3d5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
+                Vector3b otherToFocus = aux3b3;
+                otherToFocus.set(focusPos).sub(otherPos).nor();
+                Vector3d focusToOther = aux3d4.set(otherToFocus);
+                focusToOther.scl(-dist).rotate(up, rotation);
 
-            // New camera direction
-            Vector3d newCamDir = aux3d6.set(focusToOther);
-            newCamDir.scl(-1).nor();
+                // New camera position
+                Vector3d newCamPos = aux3d5.set(focusToOther).add(focusPos).scl(Constants.U_TO_KM);
 
-            // Finally, set values
-            setCameraPosition(newCamPos.values());
-            setCameraDirection(newCamDir.values());
-            setCameraUp(up.values());
+                // New camera direction
+                Vector3d newCamDir = aux3d6.set(focusToOther);
+                newCamDir.scl(-1).nor();
+
+                // Finally, set values
+                setCameraPosition(newCamPos.values());
+                setCameraDirection(newCamDir.values());
+                setCameraUp(up.values());
+            }
         }
     }
 
@@ -525,7 +531,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (objectName == null) {
             removeCameraTrackingObject();
         } else if (checkFocusName(objectName)) {
-            synchronized(focusView) {
+            synchronized (focusView) {
                 Entity trackingObject = getFocus(objectName);
                 em.post(Event.CAMERA_TRACKING_OBJECT_CMD, this, trackingObject, objectName);
             }
@@ -737,7 +743,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
 
         boolean ret;
-        synchronized(focusView) {
+        synchronized (focusView) {
             focusView.setEntity(obj);
             ret = focusView.isForceLabel(nameLc);
         }
@@ -2580,7 +2586,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     vertsView.setEntity(entity);
                     vertsView.setPrimitiveSize((float) lineWidth);
                     vertsView.setPoints(points);
-                    vertsView.setRenderGroup(arrowCaps? RenderGroup.LINE : RenderGroup.LINE_GPU);
+                    vertsView.setRenderGroup(arrowCaps ? RenderGroup.LINE : RenderGroup.LINE_GPU);
                     vertsView.setClosedLoop(false);
                     vertsView.setGlPrimitive(GL20.GL_LINE_STRIP);
                 }
