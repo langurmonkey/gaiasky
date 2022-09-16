@@ -441,7 +441,7 @@ public class ParticleSet implements Component, IDisposable {
 
     public void markForUpdate(Render render) {
         if (render != null) {
-            EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, render);
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, render));
         }
     }
 

@@ -164,7 +164,6 @@ public class StarSet extends ParticleSet {
         return this.proximity.updating[0].distToCamera;
     }
 
-
     public double getClosestSize() {
         return this.proximity.updating[0].size;
     }
@@ -183,9 +182,9 @@ public class StarSet extends ParticleSet {
 
     public void markForUpdate(Render render) {
         if (variableStars) {
-            EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, render);
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, render));
         } else {
-            EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, render);
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, render));
         }
     }
 
@@ -211,7 +210,6 @@ public class StarSet extends ParticleSet {
         }
         return false;
     }
-
 
     public void setLabelColor(float[] color, String name) {
         if (index.containsKey(name)) {
