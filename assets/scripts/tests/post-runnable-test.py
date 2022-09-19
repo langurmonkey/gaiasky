@@ -41,7 +41,7 @@ gs.postRunnable(PrintRunnable())
 # of frames every 30 of them
 gs.parkRunnable("frame_counter", FrameCounterRunnable())
 
-gs.sleep(15.0)
+gs.sleep(5.0)
 
 # We unpark the frame counter
 gs.unparkRunnable("frame_counter")

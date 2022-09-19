@@ -310,7 +310,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Runnables
      */
-    private final List<Runnable> parkedRunnables;
+    private final Array<Runnable> parkedRunnables;
     private final Map<String, Runnable> parkedRunnablesMap;
 
     /**
@@ -343,7 +343,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.debugMode = debugMode;
 
         this.parkedRunnablesMap = new HashMap<>();
-        this.parkedRunnables = new ArrayList<>();
+        this.parkedRunnables = new Array<>(10);
 
         this.updateRenderProcess = runnableInitialGui;
     }
@@ -1195,7 +1195,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
                 // Run parked runnables
                 synchronized (parkedRunnables) {
-                    if (parkedRunnables.size() > 0) {
+                    if (parkedRunnables.size > 0) {
                         Iterator<Runnable> it = parkedRunnables.iterator();
                         while (it.hasNext()) {
                             Runnable r = it.next();
@@ -1713,7 +1713,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case FORCE_OBJECT_LABEL_CMD:
-            if(data[0] instanceof SceneGraphNode) {
+            if (data[0] instanceof SceneGraphNode) {
                 final SceneGraphNode forceLabelObject = (SceneGraphNode) data[0];
                 String name = (String) data[1];
                 boolean state = (boolean) data[2];
@@ -1722,7 +1722,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case LABEL_COLOR_CMD:
-            if(data[0] instanceof SceneGraphNode) {
+            if (data[0] instanceof SceneGraphNode) {
                 final SceneGraphNode labelColorObject = (SceneGraphNode) data[0];
                 String name = (String) data[1];
                 float[] labelColor = (float[]) data[2];
@@ -1730,17 +1730,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case PARK_RUNNABLE:
-            synchronized (parkedRunnables) {
-                final String key = (String) data[0];
-                final Runnable runnable = (Runnable) data[1];
-                parkRunnable(key, runnable);
-            }
+            String key = (String) data[0];
+            final Runnable runnable = (Runnable) data[1];
+            parkRunnable(key, runnable);
             break;
         case UNPARK_RUNNABLE:
-            synchronized (parkedRunnables) {
-                final String key = (String) data[0];
-                removeRunnable(key);
-            }
+            key = (String) data[0];
+            removeRunnable(key);
             break;
         case REINITIALIZE_POSTPROCESSOR:
             if (postProcessor != null) {
@@ -1805,7 +1801,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         synchronized (parkedRunnables) {
             final Runnable r = parkedRunnablesMap.get(key);
             if (r != null) {
-                parkedRunnables.remove(r);
+                parkedRunnables.removeValue(r, true);
                 parkedRunnablesMap.remove(key);
             }
         }

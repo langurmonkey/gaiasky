@@ -11,9 +11,11 @@ gs.cameraStop()
 gs.minimizeInterfaceWindow()
 
 radEarth = gs.getObjectRadius("Earth")
+print("The radius of the Earth is %f Km" % radEarth)
 gs.print("The radius of the Earth is %f Km" % radEarth)
 
 radMoon = gs.getObjectRadius("Moon")
+print("The radius of the Moon is %f Km" % radMoon)
 gs.print("The radius of the Moon is %f Km" % radMoon)
 
 gs.enableInput()

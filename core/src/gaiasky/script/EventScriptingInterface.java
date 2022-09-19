@@ -706,7 +706,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         }
 
-        return ((IVisibilitySwitch) obj).isVisible(true);
+        boolean visible;
+        synchronized(focusView) {
+            focusView.setEntity(obj);
+            visible = focusView.isVisible(true);
+        }
+        return visible;
     }
 
     @Override
@@ -2240,7 +2245,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void changeFocus(FocusView object, NaturalCamera cam, double waitTimeSeconds) {
         // Post focus change and wait, if needed
         FocusView currentFocus = (FocusView) cam.getFocus();
-        if (Mapper.particleSet.has(currentFocus.getEntity()) || currentFocus.getEntity() != object.getEntity()) {
+        if (currentFocus == null ||
+                Mapper.particleSet.has(currentFocus.getEntity()) ||
+                currentFocus.getEntity() != object.getEntity()) {
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             em.post(Event.FOCUS_CHANGE_CMD, this, object.getEntity());
 
