@@ -2942,11 +2942,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         // STAR GROUP
                         AtomicReference<Entity> starGroup = new AtomicReference<>();
                         postRunnable(() -> {
-                            starGroup.set(EntityUtils.getStarSet(scene, dsName, data, datasetOptions));
+                            if (datasetOptions != null)
+                                datasetOptions.initializeCatalogInfo = false;
+                            starGroup.set(EntityUtils.getStarSet(scene, dsName, ds.getName(), data, datasetOptions, false));
 
-                            // Catalog info
+                            // Catalog info.
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
-                            EventManager.publish(Event.CATALOG_ADD, this, ci, true);
+                            // Add to scene.
+                            EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, starGroup.get(), true);
+                            // Add to catalog manager -> setUp.
+                            scene.setUpEntity(starGroup.get());
 
                             String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.msg("gui.dsload.stars.name") : I18n.msg("gui.dsload.variablestars.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));
@@ -2963,11 +2968,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     if (data != null && !data.isEmpty()) {
                         AtomicReference<Entity> particleGroup = new AtomicReference<>();
                         postRunnable(() -> {
-                            particleGroup.set(EntityUtils.getParticleSet(scene, dsName, data, datasetOptions));
+                            datasetOptions.initializeCatalogInfo = false;
+                            particleGroup.set(EntityUtils.getParticleSet(scene, dsName, ds.getName(), data, datasetOptions, false));
 
                             // Catalog info
-                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
-                            EventManager.publish(Event.CATALOG_ADD, this, ci, true);
+                            CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), ds.getURL().toString(), type, 1.5f, particleGroup.get());
+                            // Add to scene.
+                            EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
+                            // Add to catalog manager -> setUp
+                            scene.setUpEntity(particleGroup.get());
 
                             String typeStr = I18n.msg("gui.dsload.objects.name");
                             logger.info(I18n.msg("notif.catalog.loaded", data.size(), typeStr));

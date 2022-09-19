@@ -21,6 +21,11 @@ public class PositionView extends AbstractView implements IPosition {
     }
 
     @Override
+    protected boolean componentsCheck(Entity entity) {
+        return entity != null && Mapper.body.get(entity) == body;
+    }
+
+    @Override
     protected void entityCheck(Entity entity) {
         if (!Mapper.body.has(entity)) {
             throw new RuntimeException("The given entity does not have a " + Body.class.getSimpleName() + " component: Can't be a " + this.getClass().getSimpleName() + ".");

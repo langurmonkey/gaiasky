@@ -91,4 +91,6 @@ public class DatasetOptions {
     public double[] labelColor;
     public double[] fadeIn;
     public double[] fadeOut;
+
+    public boolean initializeCatalogInfo = true;
 }

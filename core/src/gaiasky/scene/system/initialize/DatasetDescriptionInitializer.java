@@ -19,7 +19,7 @@ import java.nio.file.Path;
  */
 public class DatasetDescriptionInitializer extends AbstractInitSystem {
 
-    private FocusView view;
+    private final FocusView view;
 
     public DatasetDescriptionInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -51,7 +51,10 @@ public class DatasetDescriptionInitializer extends AbstractInitSystem {
             }
 
             if (dd.catalogInfo.sizeBytes <= 0 && dataFile != null && !dataFile.isBlank()) {
-                Path df = Path.of(Settings.settings.data.dataFile(dataFile));
+                Path df = Path.of(dataFile);
+                if(!Files.isRegularFile(df) || !Files.exists(df)) {
+                    df = Path.of(Settings.settings.data.dataFile(dataFile));
+                }
                 dd.catalogInfo.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
             }
 

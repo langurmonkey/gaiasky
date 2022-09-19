@@ -21,8 +21,14 @@ public class BaseView extends AbstractView {
 
     public BaseView() {
     }
+
     public BaseView(Entity entity) {
         super(entity);
+    }
+
+    @Override
+    protected boolean componentsCheck(Entity entity) {
+        return entity != null && Mapper.base.get(entity) == base && Mapper.body.get(entity) == body;
     }
 
     @Override
@@ -48,7 +54,7 @@ public class BaseView extends AbstractView {
     }
 
     public <T extends Component> T getComponent(Class<T> c) {
-       return entity.getComponent(c) ;
+        return entity.getComponent(c);
     }
 
     public float getOpacity() {

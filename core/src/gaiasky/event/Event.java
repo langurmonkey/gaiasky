@@ -208,10 +208,10 @@ public enum Event {
     CAMERA_UP_CMD,
     /**
      * Sets or unsets the tracking object of the camera.
-     * <ul>
-     * <li>[0] - The new tracking object, or null to disable tracking mode</li>
-     * <li>[1] - The name of the tracking object, or null to disable tracking mode</li>
-     * </ul>
+     * <ol start='0'>
+     * <li>the new tracking object, or null to disable tracking mode</li>
+     * <li>the name of the tracking object, or null to disable tracking mode</li>
+     * </ol>
      */
     CAMERA_TRACKING_OBJECT_CMD,
     /**
@@ -226,7 +226,11 @@ public enum Event {
     LIMIT_FPS_CMD,
 
     /**
-     * A new catalog has been loaded. Contains the new catalog info object, a boolean indicating whether to add the object to the scene graph, and an optional boolean telling whether to use a postRunnable.
+     * Add the new catalog object to the catalog manager. Contains:
+     * <ul>
+     *     <li>[0] - CatalogInfo, the new catalog info object.</li>
+     *     <li>[1] - boolean, add object to scene graph.</li>
+     * </ul>
      **/
     CATALOG_ADD,
     /**
@@ -341,7 +345,6 @@ public enum Event {
      */
     DISPLAY_VR_GUI_CMD,
 
-
     /**
      * Dispose all resources, app is shutting down.
      **/
@@ -407,24 +410,31 @@ public enum Event {
     /**
      * Informs that the focus has somehow changed and the GUI must be updated.
      * <ol start='0'>
-     * <li>The new focus object.</li>
-     * <li>Center focus (bool). If true, the focus is centered on the view.</li>
+     * <li>the new focus object.</li>
+     * <li>boolean, Center focus. If true, the focus is centered on the view.</li>
      * </ol>
      **/
     FOCUS_CHANGED,
 
     /**
      * FOCUS_MODE change command.
-     * <ul>
-     * <li>[0] - The new focus object.</li>
-     * </ul>
+     * <ol start='0'>
+     * <li>the new focus object.</li>
+     * </ol>
      **/
     FOCUS_CHANGE_CMD,
 
     /**
-     * Contains the distance to the camera [0], the viewing angle [1], right
-     * ascension in deg [2], declination in deg [3], the distance to Sol [4]
-     * and the absolute magnitude from the camera [5] (and from earth [6], optional)
+     * Updates focus information.
+     * <ol start='0'>
+     *     <li>distance to camera.</li>
+     *     <li>solid angle.</li>
+     *     <li>right ascension [deg].</li>
+     *     <li>declination [deg].</li>
+     *     <li>distance to the Sun.</li>
+     *     <li>absolute magnitude from camera.</li>
+     *     <li>absolute magnitude from Earth.</li>
+     * </ol>
      **/
     FOCUS_INFO_UPDATED,
 
@@ -1434,12 +1444,12 @@ public enum Event {
     /**
      * Informs that the download has finished.
      * Contains the dataset key (String) and the status:
-     * <ul>
-     *     <li>0 - ok</li>
-     *     <li>1 - error</li>
-     *     <li>2 - cancelled</li>
-     *     <li>3 - not found</li>
-     * </ul>
+     * <ol start='0'>
+     *     <li>ok.</li>
+     *     <li>error.</li>
+     *     <li>cancelled.</li>
+     *     <li>not found.</li>
+     * </ol>
      */
     DATASET_DOWNLOAD_FINISH_INFO;
 

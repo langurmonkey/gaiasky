@@ -68,10 +68,7 @@ public class CatalogInfo {
 
     public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, Entity entity) {
         this(name, description, source, type, hlSizeFactor, (FadeNode) null);
-        this.entity = entity;
-        if (Mapper.datasetDescription.has(entity)) {
-            Mapper.datasetDescription.get(entity).setCatalogInfo(this);
-        }
+        setEntity(entity);
     }
 
     public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, FadeNode object) {
@@ -91,6 +88,16 @@ public class CatalogInfo {
 
         if (this.object != null)
             this.object.setCatalogInfo(this);
+    }
+
+    public void setEntity(Entity entity) {
+        if (entity != null) {
+            this.entity = entity;
+            this.view.setEntity(this.entity);
+            if (Mapper.datasetDescription.has(entity)) {
+                Mapper.datasetDescription.get(entity).setCatalogInfo(this);
+            }
+        }
     }
 
     public void setVisibility(boolean visibility) {

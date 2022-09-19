@@ -217,7 +217,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
     public int getNumParticles() {
         var set = getSet();
-        if (set != null) {
+        if (set != null && set.data() != null) {
             // Particles in set.
             return set.data().size();
         } else if (Mapper.octree.has(entity)) {

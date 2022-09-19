@@ -33,13 +33,20 @@ public abstract class AbstractView {
      * @param entity The new entity.
      */
     public void setEntity(Entity entity) {
-        if (this.entity != entity) {
+        if (entity != null && (this.entity != entity || !componentsCheck(entity))) {
             clearEntity();
             entityCheck(entity);
             this.entity = entity;
             entityChanged();
         }
     }
+
+    /**
+     * Check whether the current components are the same as the components of the given entity.
+     * @param entity The entity to check.
+     * @return True if the components are the same, false otherwise.
+     */
+    protected abstract boolean componentsCheck(Entity entity);
 
     /**
      * Removes the entity (if any) of this view and sets
