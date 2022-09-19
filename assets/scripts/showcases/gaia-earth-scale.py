@@ -33,7 +33,7 @@ gs.setSimulationTime(2017, 12, 1, 10, 5, 0, 0)
 gs.setObjectSizeScaling("Earth", 500000.0)
 gs.setOrbitCoordinatesScaling("EarthVSOP87", 500.0)
 gs.setObjectSizeScaling("Gaia", 500000000000.0)
-gs.setOrbitCoordinatesScaling("GaiaCoordinates", 7000.0)
+gs.setOrbitCoordinatesScaling("HeliotropicOrbitCoordinates:Gaia", 7000.0)
 
 gs.refreshAllOrbits()
 
@@ -65,7 +65,7 @@ gs.stopSimulationTime()
 gs.setObjectSizeScaling("Earth", 1.0)
 gs.setOrbitCoordinatesScaling("EarthVSOP87", 1.0)
 gs.setObjectSizeScaling("Gaia", 1.0)
-gs.setOrbitCoordinatesScaling("GaiaCoordinates", 1.0)
+gs.setOrbitCoordinatesScaling("HeliotropicOrbitCoordinates:Gaia", 1.0)
 
 gs.refreshAllOrbits()
 

@@ -8,6 +8,7 @@ package gaiasky.script;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.scene.view.FocusView;
+import gaiasky.scene.view.VertsView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
@@ -1221,13 +1222,35 @@ public interface IScriptingInterface {
      * until the object is available, with a timeout.
      *
      * @param name           The name or id (HIP, TYC, Gaia SourceId) of the object.
-     * @param timeOutSeconds The timeout in seconds to wait until returning.
+     * @param timeoutSeconds The timeout in seconds to wait until returning.
      *                       If negative, it waits indefinitely.
      *
      * @return The object if it exists, or null if it does not and block is false, or if block is true and
      * the timeout has passed.
      */
-    FocusView getObject(String name, double timeOutSeconds);
+    FocusView getObject(String name, double timeoutSeconds);
+
+    /**
+     * Gets a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
+     *
+     * @param name The name of the line object.
+     *
+     * @return The line object as a {@link gaiasky.scene.view.VertsView}, or null
+     * if it does not exist.
+     */
+    VertsView getLineObject(String name);
+
+    /**
+     * Gets a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
+     *
+     * @param name The name of the line object.
+     * @param timeoutSeconds The timeout in seconds to wait until returning.
+     *                       If negative, it waits indefinitely.
+     *
+     * @return The line object as a {@link gaiasky.scene.view.VertsView}, or null
+     * if it does not exist.
+     */
+    VertsView getLineObject(String name, double timeoutSeconds);
 
     /**
      * Sets the given size scaling factor to the object identified by
@@ -1254,7 +1277,9 @@ public interface IScriptingInterface {
      * back to 1.0 at the end of your script.
      * </p>
      *
-     * @param name          The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87, UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates, GaiaCoordinates, MoonAACoordinates).
+     * @param name          The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87, UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates, HeliotropicOribtCoordinates, MoonAACoordinates).
+     *                      Optionally, you can append ':objectName' to select a single object. For instance, both Gaia and JWST have
+     *                      heliotropic orbit coordinates. To only select the Gaia orbit provider, use "HeliotropicOrbitCoordinates:Gaia".
      * @param scalingFactor The scaling factor.
      */
     void setOrbitCoordinatesScaling(String name, double scalingFactor);

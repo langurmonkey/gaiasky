@@ -3,7 +3,8 @@
 # This script animates a TSP path visiting all stars of a given .tsp
 # file containing the id and the equatorial cartesian position
 # (see http://www.math.uwaterloo.ca/tsp/stardata/). 
-# The script does not load the stars and needs the *.tsp file to work
+# The script does not load the stars and needs the *.tsp file to work, which
+# are not provided in this repository.
 #
 # Created by Toni Sagrista
 
@@ -24,10 +25,10 @@ dt = 0.01
 # Increase to make the tour appear faster
 batch_size = 10
 
-# The file containing [idx, X, Y, Z]
-positions_file = "/home/tsagrista/Downloads/tsp/gaia100.tsp"
+# The file containing the TSP positions in [idx, X, Y, Z]
+positions_file = "gaia100.tsp"
 # The file containing a list of integer indices corresponding to the index of the position that goes at the position of the index
-indices_file = "/home/tsagrista/Downloads/tsp/gaia100.tour.txt"
+indices_file = "gaia100.tour.txt"
 
 # Whether to write the sorted positions list
 write_sorted_pos = False
@@ -164,7 +165,7 @@ if write_sorted_pos:
 
 # Create line object
 gs.addPolyline("tsp-tour", [], [.5, .5, .1, .5], 0.5)
-tsp_path = gs.getObject("tsp-tour", 10.0)
+tsp_path = gs.getLineObject("tsp-tour", 10.0)
 
 # park the line updater
 gs.parkRunnable("line-updater", LineUpdaterRunnable(tsp_path, sorted_positions))

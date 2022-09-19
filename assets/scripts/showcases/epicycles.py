@@ -81,7 +81,7 @@ earthp = gs.getObjectPosition("Earth")
 marsp = gs.getObjectPosition("Mars")
 
 gs.addPolyline("line-em", [], [ 1., .2, .2, .8 ], 1 )
-line = gs.getObject("line-em", 10.0)
+line = gs.getLineObject("line-em", 10.0)
 
 gs.sleep(0.5)
 

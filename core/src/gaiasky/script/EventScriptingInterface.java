@@ -707,7 +707,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
 
         boolean visible;
-        synchronized(focusView) {
+        synchronized (focusView) {
             focusView.setEntity(obj);
             visible = focusView.isVisible(true);
         }
@@ -1061,10 +1061,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setLimitFps(double limitFps) {
-        if (checkNum(limitFps, Constants.MIN_FPS, Constants.MAX_FPS, "limitFps")) {
+        if (checkNum(limitFps, -Double.MAX_VALUE, Constants.MAX_FPS, "limitFps")) {
             em.post(Event.LIMIT_FPS_CMD, this, limitFps);
         }
-
     }
 
     @Override
@@ -1165,9 +1164,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public FocusView getObject(String name, double timeOutSeconds) {
-        Entity object = getEntity(name, timeOutSeconds);
+    public FocusView getObject(String name, double timeoutSeconds) {
+        Entity object = getEntity(name, timeoutSeconds);
         return new FocusView(object);
+    }
+
+    @Override
+    public VertsView getLineObject(String name) {
+        return getLineObject(name, 0);
+    }
+
+    @Override
+    public VertsView getLineObject(String name, double timeoutSeconds) {
+        Entity object = getEntity(name, timeoutSeconds);
+        if (Mapper.verts.has(object)) {
+            return new VertsView(object);
+        } else {
+            logger.error(name + " is not a verts object.");
+            return null;
+        }
     }
 
     public Entity getEntity(String name) {
@@ -1225,14 +1240,30 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setOrbitCoordinatesScaling(String name, double scalingFactor) {
         int modified = 0;
+        String className, objectName;
+        if (name.contains(":")) {
+            int idx = name.indexOf(":");
+            className = name.substring(0, idx);
+            objectName = name.substring(idx + 1, name.length());
+        } else {
+            className = name;
+            objectName = null;
+        }
         List<AbstractOrbitCoordinates> aocs = AbstractOrbitCoordinates.getInstances();
         for (AbstractOrbitCoordinates aoc : aocs) {
-            if (aoc.getClass().getSimpleName().equalsIgnoreCase(name)) {
-                aoc.setScaling(scalingFactor);
-                modified++;
+            if (aoc.getClass().getSimpleName().equalsIgnoreCase(className)) {
+                if (objectName != null) {
+                    if (aoc.getOrbitName() != null && aoc.getOrbitName().contains(objectName)) {
+                        aoc.setScaling(scalingFactor);
+                        modified++;
+                    }
+                } else {
+                    aoc.setScaling(scalingFactor);
+                    modified++;
+                }
             }
         }
-        logger.info("Modified scaling of " + modified + " orbits");
+        logger.info(name + ": modified scaling of " + modified + " orbits");
     }
 
     private void initializeTrajectoryUtils() {
@@ -2631,7 +2662,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     vertsView.setPoints(points);
                     vertsView.setRenderGroup(arrowCaps ? RenderGroup.LINE : RenderGroup.LINE_GPU);
                     vertsView.setClosedLoop(false);
-                    vertsView.setGlPrimitive(GL20.GL_LINE_STRIP);
+                    vertsView.setGlPrimitive(primitive);
                 }
 
                 var graph = Mapper.graph.get(entity);

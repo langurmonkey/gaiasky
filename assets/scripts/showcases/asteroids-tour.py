@@ -35,9 +35,6 @@ gs.setVisibility("element.titles", False)
 
 gs.setCrosshairVisibility(False)
 
-# Parallel view
-gs.configureFrameOutput(1920, 1080, 30, "~/.local/share/gaiasky/frames/3d-asteroids_tour/", "gs")
-
 stdwait = 5.0
 stdwaitlong = 10.0
 

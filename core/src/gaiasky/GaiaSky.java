@@ -308,10 +308,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private SAMPClient sampClient;
 
     /**
-     * Runnables
+     * Parked runnables.
      */
-    private final Array<Runnable> parkedRunnables;
-    private final Map<String, Runnable> parkedRunnablesMap;
+    private final Array<Runnable> parkedRunnables = new Array<>(10);
+    private final Map<String, Runnable> parkedRunnablesMap = new HashMap<>();
 
     /**
      * Creates an instance of Gaia Sky.
@@ -331,6 +331,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public GaiaSky(final boolean skipWelcome, final boolean vr, final boolean externalView, final boolean headless, final boolean noScriptingServer, final boolean debugMode) {
         super();
+
         instance = this;
         this.settings = Settings.settings;
 
@@ -341,9 +342,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.headless = headless;
         this.noScripting = noScriptingServer;
         this.debugMode = debugMode;
-
-        this.parkedRunnablesMap = new HashMap<>();
-        this.parkedRunnables = new Array<>(10);
 
         this.updateRenderProcess = runnableInitialGui;
     }
@@ -1032,6 +1030,25 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
              */
             update(graphics.getDeltaTime());
 
+            // Run parked runnables
+            if (parkedRunnables != null) {
+                synchronized (parkedRunnables) {
+                    if (parkedRunnables.size > 0) {
+                        Iterator<Runnable> it = parkedRunnables.iterator();
+                        while (it.hasNext()) {
+                            Runnable r = it.next();
+                            try {
+                                r.run();
+                            } catch (Exception e) {
+                                logger.error(e);
+                                // If it crashed, remove it
+                                it.remove();
+                            }
+                        }
+                    }
+                }
+            }
+
             /*
              * FRAME OUTPUT
              */
@@ -1193,22 +1210,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 // Run the render process
                 updateRenderProcess.run();
 
-                // Run parked runnables
-                synchronized (parkedRunnables) {
-                    if (parkedRunnables.size > 0) {
-                        Iterator<Runnable> it = parkedRunnables.iterator();
-                        while (it.hasNext()) {
-                            Runnable r = it.next();
-                            try {
-                                r.run();
-                            } catch (Exception e) {
-                                logger.error(e);
-                                // If it crashed, remove it
-                                it.remove();
-                            }
-                        }
-                    }
-                }
             } else if (crashGui != null) {
                 // Crash information
                 renderGui(crashGui);

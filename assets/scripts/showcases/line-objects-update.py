@@ -24,7 +24,7 @@ class LineUpdaterRunnable(object):
         pl.setX(1, moonp[0])
         pl.setY(1, moonp[1])
         pl.setZ(1, moonp[2])
-
+        
         self.polyline.markForUpdate()
 
     def toString():
@@ -44,7 +44,7 @@ gs.setVisibility("element.orbits", True)
 gs.setCameraLock(True)
 gs.setCameraOrientationLock(False)
 
-gs.setFov(49)
+gs.setFov(55.0)
 
 gs.goToObject("Earth", 91.38e-2)
 
@@ -58,7 +58,7 @@ gs.addPolyline("line-em", [earthp[0], earthp[1], earthp[2], moonp[0], moonp[1], 
 gs.sleep(0.5)
 
 # create line
-line_em = gs.getObject("line-em")
+line_em = gs.getLineObject("line-em")
 
 # park the line updater
 gs.parkRunnable("line-updater", LineUpdaterRunnable(line_em))

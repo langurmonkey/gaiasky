@@ -54,7 +54,7 @@ class FrameCounter(object):
 
     def setVisibility(self, element, state):
             gs.setVisibility(element, state)
-            elemname = element[element.index(".") + len(element):]
+            elemname = element[element.index(".") + 1:]
             print("%s visibility %s : frame %d, second %f" % (elemname, state, self.frames, self.seconds))
 
 

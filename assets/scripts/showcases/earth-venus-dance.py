@@ -75,8 +75,8 @@ gs.addPolyline("line-hist", [], [ .7, .7, .1, .7 ], 1, 1)
 gs.sleep(0.5)
 
 # Get polyline objects
-line_curr = gs.getObject("line-current")
-line_hist = gs.getObject("line-hist")
+line_curr = gs.getLineObject("line-current")
+line_hist = gs.getLineObject("line-hist")
 
 # park the line updater
 gs.parkRunnable("line-updater", LineUpdaterRunnable(line_curr, line_hist))

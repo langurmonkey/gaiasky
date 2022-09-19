@@ -32,7 +32,7 @@ gs.setMotionBlur(False)
 
 gs.setSaturationLevel(1.0)
 gs.setVisibility("element.clusters", False)
-gs.setVisibility("element.propermotions", False)
+gs.setVisibility("element.velocityvectors", False)
 
 gs.setRotationCameraSpeed(40)
 gs.setTurningCameraSpeed(30)
@@ -73,7 +73,7 @@ gs.sleep(7)
 gs.setVisibility('element.planets',False)
 
 
-gs.setCameraFocus("78The2Tau")
+gs.setCameraFocus("78 tau")
 gs.sleep(3)
 gs.setVisibility('element.constellations',False)
 gs.setCameraSpeed(0.5)
@@ -81,7 +81,7 @@ gs.setCameraSpeed(0.5)
 gs.sleep(5)
 gs.setVisibility("element.clusters", False)
 
-gs.goToObject("78The2Tau", 0.000007778, 25)
+gs.goToObject("78 tau", 0.000007778, 25)
 gs.setSaturationLevel(1.7)
 gs.setCameraLock(True)
 gs.sleep(7)

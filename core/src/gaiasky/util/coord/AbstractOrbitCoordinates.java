@@ -62,8 +62,16 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         }
     }
 
-    public void setOrbitname(String orbitname) {
-        this.orbitname = orbitname;
+    public String getOrbitName() {
+        return orbitname;
+    }
+
+    public void setOrbitname(String orbitName) {
+        setOrbitName(orbitName);
+    }
+
+    public void setOrbitName(String orbitName) {
+        this.orbitname = orbitName;
     }
 
     @Override
