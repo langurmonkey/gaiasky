@@ -20,8 +20,11 @@ gs.setVisibility("element.labels", False)
 
 # Around 5 AU in north ecliptic pole
 eclpos = gs.eclipticToInternalCartesian(0.0, 90.0, 7.5e8)
+# To km
+u_to_km = 1.0e6
+poskm = [eclpos[0] * u_to_km, eclpos[1] * u_to_km, eclpos[2] * u_to_km]
 
-gs.setCameraPosition(eclpos)
+gs.setCameraPosition(poskm)
 gs.setCameraFocus("Sun", -1)
 
 

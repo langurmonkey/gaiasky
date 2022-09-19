@@ -9,9 +9,9 @@ gs = gateway.entry_point
 gs.sleep(3)
 
 gs.print("360 mode")
-gs.set360Mode(True)
+gs.setPanoramaMode(True)
 gs.sleep(3)
-gs.set360Mode(False)
+gs.setPanoramaMode(False)
 gs.sleep(3)
 
 gs.print("Planetarium mode")
@@ -26,7 +26,7 @@ gs.sleep(3)
 
 for i in range(5):
     gs.setStereoscopicProfile(i)
-    gs.sleep(3)
+    gs.sleep(1)
 
 gs.setStereoscopicMode(False)
 

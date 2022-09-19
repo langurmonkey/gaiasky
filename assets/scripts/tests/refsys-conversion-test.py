@@ -17,15 +17,21 @@ gs.setCameraSpeed(30)
 gs.setCameraFocus("Sun")
 
 au_to_km = 149597900.0
+u_to_km = 1000000.0
 text_x = 0.2
 text_y = 0.2
-# Text size scaling (HiDPI)
-text_size = 22 * gateway.jvm.gaiasky.util.GlobalConf.SCALE_FACTOR
+
+# Request UI scale factor and apply it to the text size
+ui_scale = gs.getGuiScaleFactor()
+text_size = 22 * ui_scale
 
 # Disable all grids
 gs.setVisibility("element.equatorial", False)
 gs.setVisibility("element.ecliptic", False)
 gs.setVisibility("element.galactic", False)
+
+def to_internal(xyz):
+    return [xyz[0] * u_to_km, xyz[1] * u_to_km, xyz[2] * u_to_km]
 
 #
 # EQUATORIAL COORDINATES
@@ -36,25 +42,25 @@ gs.setVisibility("element.equatorial", True)
 gs.sleep(1.5)
 
 # Go to north equatorial pole, looking down on the Sun
-eqxyz = gs.equatorialToInternalCartesian(0.0, 90.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.equatorialToInternalCartesian(0.1, 90.1, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 # Go to south equatorial pole
-eqxyz = gs.equatorialToInternalCartesian(0.0, -90.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.equatorialToInternalCartesian(0.1, -90.1, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 # Equatorial plane
-eqxyz = gs.equatorialToInternalCartesian(90.0, 0.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.equatorialToInternalCartesian(90.1, 0.1, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 gs.removeObject(0)
 # Disable equatorial grid
@@ -70,25 +76,25 @@ gs.setVisibility("element.ecliptic", True)
 gs.sleep(1.5)
 
 # Go to north equatorial pole, looking down on the Sun
-eqxyz = gs.eclipticToInternalCartesian(0.0, 90.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.eclipticToInternalCartesian(0.1, 90.1, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 # Go to south equatorial pole
-eqxyz = gs.eclipticToInternalCartesian(0.0, -90.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.eclipticToInternalCartesian(0.1, -90.1, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 # Equatorial plane
-eqxyz = gs.eclipticToInternalCartesian(90.0, 0.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.eclipticToInternalCartesian(90.1, 0.1, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 gs.removeObject(0)
 # Disable equatorial grid
@@ -105,25 +111,25 @@ gs.setVisibility("element.galactic", True)
 gs.sleep(1.5)
 
 # Go to north equatorial pole, looking down on the Sun
-eqxyz = gs.galacticToInternalCartesian(0.0, 90.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.galacticToInternalCartesian(0.0, 90.0, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 # Go to south equatorial pole
-eqxyz = gs.galacticToInternalCartesian(0.0, -90.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.galacticToInternalCartesian(0.0, -90.0, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 # Equatorial plane
-eqxyz = gs.galacticToInternalCartesian(90.0, 0.0, 8.0 * au_to_km)
-gs.setCameraPosition(eqxyz)
+coordxyz = gs.galacticToInternalCartesian(90.0, 0.0, 8.0 * au_to_km)
+gs.setCameraPosition(to_internal(coordxyz))
 
 # Sleep
-gs.sleep(3.0)
+gs.sleep(1.0)
 
 gs.removeObject(0)
 # Disable equatorial grid

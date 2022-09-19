@@ -9,7 +9,7 @@ gs = gateway.entry_point
 
 gs.cameraStop()
 gs.setStarBrightness(40)
-gs.setStarSize(25.0)
+gs.setStarSize(11.0)
 gs.setStarMinOpacity(0.35)
 
 ntextures = 4
@@ -21,8 +21,8 @@ for i in range(ntextures):
     gs.sleep(2.0)
 
 gs.setStarTextureIndex(4)
-gs.setStarBrightness(32)
-gs.setStarSize(11.0)
+gs.setStarBrightness(21.0)
+gs.setStarSize(8.2)
 
 
 # close connection

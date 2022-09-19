@@ -8,15 +8,15 @@ gs = gateway.entry_point
 
 gs.maximizeInterfaceWindow()
 
-gs.setMinStarOpacity(100.0)
+gs.setMinStarOpacity(0.95)
 gs.sleep(2)
-gs.setMinStarOpacity(70.0)
+gs.setMinStarOpacity(0.8)
 gs.sleep(2)
-gs.setMinStarOpacity(50.0)
+gs.setMinStarOpacity(0.6)
 gs.sleep(2)
-gs.setMinStarOpacity(30.0)
+gs.setMinStarOpacity(0.4)
 gs.sleep(2)
-gs.setMinStarOpacity(12.0)
+gs.setMinStarOpacity(0.2)
 gs.sleep(2)
 gs.setMinStarOpacity(0.0)
 

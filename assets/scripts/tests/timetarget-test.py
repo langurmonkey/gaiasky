@@ -10,10 +10,11 @@ gs = gateway.entry_point
 gs.disableInput()
 gs.cameraStop()
 
+gs.setVisibility("element.orbits", False)
 # Set free camera
 gs.setCameraFree()
 # Starting time
-gs.setSimulationTime(2017, 12, 1, 10, 5, 0, 0)
+gs.setSimulationTime(2019, 12, 1, 10, 5, 0, 0)
 
 gs.sleep(2)
 
@@ -33,7 +34,7 @@ gs.print("%s - Time should be: 1/1/50000 10:05:00.000" % datetime.now().time())
 gs.sleep(2)
 
 # Back to 2017
-gs.setTargetTime(2017, 12, 1, 10, 5, 0, 0)
+gs.setTargetTime(2019, 12, 1, 10, 5, 0, 0)
 # Backwards now!
 gs.setSimulationPace(-2.7e11)
 # Start!
@@ -47,6 +48,7 @@ gs.sleep(2)
 
 # Never forget to unset the target time, otherwise Gaia Sky will always stop at that time bookmark!
 gs.unsetTargetTime()
+gs.setVisibility("element.orbits", True)
 
 gs.enableInput()
 

@@ -11,6 +11,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.util.List;
@@ -1502,6 +1503,12 @@ public interface IScriptingInterface {
      * to no longer be rendered or updated.
      */
     void disableGui();
+
+    /**
+     * Gets the current scale factor applied to the UI.
+     * @return The scale factor.
+     */
+    float getGuiScaleFactor();
 
     /**
      * Maximizes the interface window.
