@@ -443,7 +443,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case FOCUS_CHANGED:
+        case FOCUS_CHANGED -> {
             // Update focus selection in focus list
             FocusView focus = null;
             if (data[0] instanceof String) {
@@ -456,18 +456,15 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
             if (focus != null) {
                 selectBookmark(focus.getName(), false);
             }
-            break;
-        case BOOKMARKS_ADD:
+        }
+        case BOOKMARKS_ADD -> {
             String name = (String) data[0];
             reloadBookmarksTree();
             selectBookmark(name, false);
-            break;
-        case BOOKMARKS_REMOVE:
-        case BOOKMARKS_REMOVE_ALL:
-            reloadBookmarksTree();
-            break;
-        default:
-            break;
+        }
+        case BOOKMARKS_REMOVE, BOOKMARKS_REMOVE_ALL -> reloadBookmarksTree();
+        default -> {
+        }
         }
 
     }

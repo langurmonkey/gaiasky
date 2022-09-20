@@ -81,8 +81,6 @@ public class GuiRegistry implements IObserver {
     /* Slave config window */
     private SlaveConfigWindow slaveConfigWindow;
 
-    /** Scene graph reference. **/
-    protected final ISceneGraph sceneGraph;
     /** Scene reference. **/
     protected final Scene scene;
 
@@ -118,10 +116,9 @@ public class GuiRegistry implements IObserver {
     /**
      * Create new GUI registry object.
      */
-    public GuiRegistry(final Skin skin, final ISceneGraph sceneGraph, final Scene scene, final CatalogManager catalogManager) {
+    public GuiRegistry(final Skin skin, final Scene scene, final CatalogManager catalogManager) {
         super();
         this.skin = skin;
-        this.sceneGraph = sceneGraph;
         this.scene = scene;
         this.guis = new Array<>(true, 2);
         this.catalogManager = catalogManager;
@@ -327,7 +324,7 @@ public class GuiRegistry implements IObserver {
             switch (event) {
             case SHOW_SEARCH_ACTION:
                 if (searchDialog == null) {
-                    searchDialog = new SearchDialog(skin, ui, sceneGraph, scene, true);
+                    searchDialog = new SearchDialog(skin, ui, scene, true);
                 } else {
                     searchDialog.clearText();
                 }
@@ -387,7 +384,7 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_PER_OBJECT_VISIBILITY_ACTION:
                 if (indVisWindow == null) {
-                    indVisWindow = new IndividualVisibilityWindow(scene, sceneGraph, ui, skin);
+                    indVisWindow = new IndividualVisibilityWindow(scene, ui, skin);
                 }
                 if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
                     indVisWindow.show(ui);

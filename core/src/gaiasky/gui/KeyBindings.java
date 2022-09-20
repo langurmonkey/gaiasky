@@ -460,22 +460,6 @@ public class KeyBindings {
                     logger.warn(I18n.msg("notif.kbd.mappings.action.notfound", key));
                 }
             }
-
-            // Special mapping to switch the renderer at runtime.
-            // TODO remove this when old OOP is removed
-            ProgramAction switchRenderer = new ProgramAction("switch-renderer", () -> {
-                GaiaSky.instance.ri = (GaiaSky.instance.ri + 1) % 2;
-                String msg = switch (GaiaSky.instance.ri) {
-                    case 0 -> "old renderer";
-                    case 1 -> "new renderer";
-                    case 2 -> "both renderers";
-                    default -> "undefined renderer!!#!#";
-                };
-                logger.info("Switched to " + msg);
-            }
-            );
-            addMapping(switchRenderer, new int[] { GSKeys.EQUALS });
-
         } catch (Exception e) {
             logger.error(e, I18n.msg("notif.kbd.mappings.error", customMappings));
         }

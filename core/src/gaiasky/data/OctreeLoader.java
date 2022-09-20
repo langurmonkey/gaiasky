@@ -558,15 +558,15 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                         int unloaded = 0;
                         var octree = Mapper.octree.get(octreeWrapper);
                         for (IOctreeObject octreeObject : objects) {
-                            SceneGraphNode object = (SceneGraphNode) octreeObject;
+                            OctreeObjectView object = (OctreeObjectView) octreeObject;
                             int count = object.getStarCount();
                             object.dispose();
-                            object.octant = null;
+                            object.setOctant(null);
 
-                            octree.removeParenthood(object);
+                            octree.removeParenthood(object.getEntity());
                             // Aux info
-                            if (GaiaSky.instance != null && GaiaSky.instance.sceneGraph != null)
-                                GaiaSky.instance.sceneGraph.removeNodeAuxiliaryInfo(object);
+                            if (GaiaSky.instance != null && GaiaSky.instance.scene != null)
+                                GaiaSky.instance.scene.index().remove(object.getEntity());
 
                             nLoadedStars -= count;
                             unloaded += count;
@@ -639,7 +639,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                         }
 
                     // Update constellations :S
-                    GaiaSky.postRunnable(() -> EventManager.publish(Event.CONSTELLATION_UPDATE_CMD, this, GaiaSky.instance.scene, GaiaSky.instance.sceneGraph));
+                    GaiaSky.postRunnable(() -> EventManager.publish(Event.CONSTELLATION_UPDATE_CMD, this, GaiaSky.instance.scene));
 
                 }
                 this.abort.set(false);

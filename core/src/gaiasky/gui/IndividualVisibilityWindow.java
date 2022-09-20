@@ -14,6 +14,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.TextUtils;
@@ -31,17 +32,15 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     protected float space8, space4, space2;
 
     protected final Scene scene;
-    protected ISceneGraph sg;
     protected Cell<?> elementsCell;
     // Component type currently selected
     protected String currentComponentType = null;
     protected ComponentType currentCt = null;
     protected Map<String, CheckBox> cbMap;
 
-    public IndividualVisibilityWindow(Scene scene, ISceneGraph sg, Stage stage, Skin skin) {
+    public IndividualVisibilityWindow(Scene scene, Stage stage, Skin skin) {
         super(I18n.msg("gui.visibility.individual"), skin, stage);
 
-        this.sg = sg;
         this.scene = scene;
 
         space8 = 12.8f;
@@ -145,17 +144,19 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     private void addObjects(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
         objectsGroup.clear();
         checkBoxes.clear();
-        Array<SceneGraphNode> objects = new Array<>();
-        sg.getRoot().getChildrenByComponentType(ct, objects);
+        Array<Entity> objects = new Array<>();
+        scene.findEntitiesByComponentType(ct, objects);
         Array<String> names = new Array<>(false, objects.size);
         Map<String, IVisibilitySwitch> objMap = new HashMap<>();
         cbMap.clear();
 
-        for (SceneGraphNode object : objects) {
+        for (Entity object : objects) {
             // Omit stars with no proper names and particle groups
-            if (object.getName() != null && !GlobalResources.isNumeric(object.getName()) && !exception(ct, object) && filter(object.getNames(), filter)) {
-                names.add(object.getName());
-                objMap.put(object.getName(), object);
+            var base = Mapper.base.get(object);
+            var name = base.getName();
+            if (name != null && !GlobalResources.isNumeric(name) && !exception(ct, object) && filter(base.names, filter)) {
+                names.add(name);
+                objMap.put(name, new FocusView(object));
             }
         }
         names.sort();
@@ -288,8 +289,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
      *
      * @return Whether this object is an exception (should not be listed) or not
      */
-    private boolean exception(ComponentType ct, SceneGraphNode object) {
-        return ct == ComponentType.Planets && object instanceof Orbit || object instanceof ParticleGroup || object.hasName("asteroids hook");
+    private boolean exception(ComponentType ct, Entity object) {
+        return ct == ComponentType.Planets && Mapper.trajectory.has(object) || Mapper.particleSet.has(object) || Mapper.starSet.has(object) || Mapper.base.get(object).hasName("asteroids hook");
     }
 
     @Override
@@ -346,17 +347,6 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         } else if (event == Event.CATALOG_VISIBLE) {
             String name = (String) data[0];
             boolean checked = (Boolean) data[1];
-
-            // Old model
-            IVisibilitySwitch obj = sg.getNode(name);
-            if (obj instanceof MeshObject && currentCt != null && obj.hasCt(currentCt)) {
-                CheckBox cb = cbMap.get(name);
-                if (cb != null && source != cb) {
-                    cb.setProgrammaticChangeEvents(false);
-                    cb.setChecked(checked);
-                    cb.setProgrammaticChangeEvents(true);
-                }
-            }
 
             // New model
             var entity = scene.getEntity(name);

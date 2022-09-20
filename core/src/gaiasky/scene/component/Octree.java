@@ -30,7 +30,9 @@ public class Octree implements Component {
         this.parenthood = new HashMap<>();
     }
 
-    public void removeParenthood(SceneGraphNode child) {
-        parenthood.remove(child);
+    public void removeParenthood(Entity child) {
+        if(child != null) {
+            parenthood.remove(child);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
@@ -21,6 +22,9 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
@@ -63,7 +67,7 @@ public class ControllerGui extends AbstractGui {
     private final List<ScrollPane> tabContents;
 
     private Actor[][] currentModel;
-    private ISceneGraph sg;
+    private Scene scene;
 
     private final EventManager em;
     private final GUIControllerListener guiControllerListener;
@@ -72,6 +76,7 @@ public class ControllerGui extends AbstractGui {
     private final float pad20;
     private final float pad30;
     private String currentInputText = "";
+    private FocusView view;
 
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
@@ -90,6 +95,7 @@ public class ControllerGui extends AbstractGui {
         pad10 = 16f;
         pad20 = 32f;
         pad30 = 48;
+        view = new FocusView();
     }
 
     @Override
@@ -133,13 +139,13 @@ public class ControllerGui extends AbstractGui {
                     // Process only if text changed
                     currentInputText = searchField.getText();
                     String name = currentInputText.toLowerCase().trim();
-                    if (!checkString(name, sg)) {
+                    if (!checkString(name, scene)) {
                         if (name.matches("[0-9]+")) {
                             // Check with 'HIP '
-                            checkString("hip " + name, sg);
+                            checkString("hip " + name, scene);
                         } else if (name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")) {
                             // Check without 'HIP '
-                            checkString(name.substring(4), sg);
+                            checkString(name.substring(4), scene);
                         }
                     }
                 }
@@ -422,46 +428,44 @@ public class ControllerGui extends AbstractGui {
         ComponentType[] visibilityEntities = ComponentType.values();
         boolean[] visible = new boolean[visibilityEntities.length];
         for (int i = 0; i < visibilityEntities.length; i++)
-            visible[i] = GaiaSky.instance.sgr.visible.get(visibilityEntities[i].ordinal());
+            visible[i] = GaiaSky.instance.sceneRenderer.visible.get(visibilityEntities[i].ordinal());
 
-        if (visibilityEntities != null) {
-            int di = 0, dj = 0;
-            for (int i = 0; i < visibilityEntities.length; i++) {
-                final ComponentType ct = visibilityEntities[i];
-                final String name = ct.getName();
-                if (name != null) {
-                    Button button;
-                    if (ct.style != null) {
-                        Image icon = new Image(skin.getDrawable(ct.style));
-                        button = new OwnTextIconButton("", icon, skin, "toggle");
-                    } else {
-                        button = new OwnTextButton(name, skin, "toggle");
-                    }
-                    // Name is the key
-                    button.setName(ct.key);
-                    typesModel[di][dj] = button;
-
-                    button.setChecked(visible[i]);
-                    button.addListener(event -> {
-                        if (event instanceof ChangeEvent) {
-                            EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, button, ct.key, button.isChecked());
-                            return true;
-                        }
-                        return false;
-                    });
-                    Cell c = typesT.add(button).padBottom(buttonPadVert).left();
-
-                    if ((i + 1) % visTableCols == 0) {
-                        typesT.row();
-                        di = 0;
-                        dj++;
-                    } else {
-                        c.padRight(buttonPadHor);
-                        di++;
-
-                    }
-                    buttons.add(button);
+        int di = 0, dj = 0;
+        for (int i = 0; i < visibilityEntities.length; i++) {
+            final ComponentType ct = visibilityEntities[i];
+            final String name = ct.getName();
+            if (name != null) {
+                Button button;
+                if (ct.style != null) {
+                    Image icon = new Image(skin.getDrawable(ct.style));
+                    button = new OwnTextIconButton("", icon, skin, "toggle");
+                } else {
+                    button = new OwnTextButton(name, skin, "toggle");
                 }
+                // Name is the key
+                button.setName(ct.key);
+                typesModel[di][dj] = button;
+
+                button.setChecked(visible[i]);
+                button.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, button, ct.key, button.isChecked());
+                        return true;
+                    }
+                    return false;
+                });
+                Cell c = typesT.add(button).padBottom(buttonPadVert).left();
+
+                if ((i + 1) % visTableCols == 0) {
+                    typesT.row();
+                    di = 0;
+                    dj++;
+                } else {
+                    c.padRight(buttonPadHor);
+                    di++;
+
+                }
+                buttons.add(button);
             }
         }
 
@@ -666,8 +670,8 @@ public class ControllerGui extends AbstractGui {
         updateTabs();
         updateFocused(true);
 
-        if (sg == null)
-            sg = GaiaSky.instance.sceneGraph;
+        if (scene == null)
+            scene = GaiaSky.instance.scene;
     }
 
     private void addTextKey(String text, Actor[][] m, int i, int j, boolean nl) {
@@ -705,12 +709,13 @@ public class ControllerGui extends AbstractGui {
             c.colspan(colspan);
     }
 
-    public boolean checkString(String text, ISceneGraph sg) {
+    public boolean checkString(String text, Scene scene) {
         try {
-            if (sg.containsNode(text)) {
-                SceneGraphNode node = sg.getNode(text);
-                if (node instanceof IFocus) {
-                    IFocus focus = ((IFocus) node).getFocus(text);
+            if (scene.index().containsEntity(text)) {
+                Entity node = scene.index().getEntity(text);
+                if (Mapper.focus.has(node)) {
+                    view.setEntity(node);
+                    IFocus focus = view.getFocus(text);
                     boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                     boolean canSelect = !(focus instanceof ParticleGroup) || ((ParticleGroup) focus).canSelect();
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
@@ -764,7 +769,7 @@ public class ControllerGui extends AbstractGui {
         ui = new Stage(vp, sb);
 
         // Comment to hide this whole dialog and functionality
-        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED);
     }
 
     @Override
@@ -820,6 +825,7 @@ public class ControllerGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whehter scan right or left
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -845,6 +851,7 @@ public class ControllerGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1024,8 +1031,8 @@ public class ControllerGui extends AbstractGui {
 
             timeStartStop.setProgrammaticChangeEvents(true);
             break;
-        case SCENE_GRAPH_LOADED:
-            this.sg = (ISceneGraph) data[0];
+        case SCENE_LOADED:
+            this.scene = (Scene) data[0];
             break;
         default:
             break;

@@ -246,7 +246,6 @@ public class OctreeWrapper extends FadeNode {
 
     @Override
     public void dispose() {
-        GaiaSky.instance.sceneGraph.remove(this, true);
         root.dispose();
         parenthood.clear();
         roulette.clear();

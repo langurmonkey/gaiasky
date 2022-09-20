@@ -202,7 +202,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        velocityVectorsEnabled(GaiaSky.instance.sgr.isOn(ComponentType.VelocityVectors));
+        velocityVectorsEnabled(GaiaSky.instance.sceneRenderer.isOn(ComponentType.VelocityVectors));
 
         // INDIVIDUAL VISIBILITY
         OwnTextIconButton individualVisibility = new OwnTextIconButton(I18n.msg("gui.visibility.individual"), skin, "eye");

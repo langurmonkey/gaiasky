@@ -5,12 +5,15 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger;
@@ -81,6 +84,7 @@ public class ConsoleLogger implements IObserver {
      *
      * @param date  The date
      * @param level The logging level
+     *
      * @return The tag
      */
     private String tag(Instant date, LoggerLevel level) {
@@ -136,13 +140,12 @@ public class ConsoleLogger implements IObserver {
             break;
         case FOCUS_CHANGED:
             if (data[0] != null) {
-                IFocus sgn;
                 if (data[0] instanceof String) {
-                    sgn = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
+                    addMessage(I18n.msg("notif.camerafocus", data[0]));
                 } else {
-                    sgn = (IFocus) data[0];
+                    var focus = (FocusView) data[0];
+                    addMessage(I18n.msg("notif.camerafocus", focus.getName()));
                 }
-                addMessage(I18n.msg("notif.camerafocus", sgn.getName()));
             }
             break;
         case TIME_STATE_CMD:

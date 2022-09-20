@@ -15,7 +15,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import gaiasky.GaiaSky;
-import gaiasky.scenegraph.Planet;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
@@ -26,7 +26,7 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
     private final float[] venp;
     private final float[] earp;
     private final float[] marp;
-    private Planet mer, ven, ear, mar;
+    private FocusView mer, ven, ear, mar;
     private final Color merc;
     private final Color venc;
     private final Color marc;
@@ -43,23 +43,31 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
         venc = new Color(1f, 0.6f, 0.1f, 1f);
         earc = new Color(0.4f, 0.4f, 1f, 1f);
         marc = new Color(0.8f, 0.2f, 0.2f, 1f);
+
+        mer = new FocusView();
+        ven = new FocusView();
+        ear = new FocusView();
+        mar = new FocusView();
     }
 
     @Override
     public void updateLocal() {
-        if (mer == null) {
-            mer = (Planet) GaiaSky.instance.sceneGraph.getNode("Mercury");
-            ven = (Planet) GaiaSky.instance.sceneGraph.getNode("Venus");
-            ear = (Planet) GaiaSky.instance.sceneGraph.getNode("Earth");
-            mar = (Planet) GaiaSky.instance.sceneGraph.getNode("Mars");
-        }
-        if (mer != null)
+        if (mer.isEmpty())
+            mer.setEntity(GaiaSky.instance.scene.index().getEntity("Mercury"));
+        if (ven.isEmpty())
+            ven.setEntity(GaiaSky.instance.scene.index().getEntity("Venus"));
+        if (ear.isEmpty())
+            ear.setEntity(GaiaSky.instance.scene.index().getEntity("Earth"));
+        if (mar.isEmpty())
+            mar.setEntity(GaiaSky.instance.scene.index().getEntity("Mars"));
+
+        if (!mer.isEmpty())
             position(mer.getAbsolutePosition(aux3b1).tov3d(aux3d1), merp);
-        if (ven != null)
+        if (!ven.isEmpty())
             position(ven.getAbsolutePosition(aux3b1).tov3d(aux3d1), venp);
-        if (ear != null)
+        if (!ear.isEmpty())
             position(ear.getAbsolutePosition(aux3b1).tov3d(aux3d1), earp);
-        if (mar != null)
+        if (!mar.isEmpty())
             position(mar.getAbsolutePosition(aux3b1).tov3d(aux3d1), marp);
     }
 

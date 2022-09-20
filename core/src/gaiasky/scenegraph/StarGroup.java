@@ -290,7 +290,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             if (Settings.settings.scene.star.group.billboard) {
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
             }
-            if (GaiaSky.instance.sgr.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
+            if (GaiaSky.instance.sceneRenderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
                 addToRender(this, RenderGroup.LINE);
             }
             if (renderText()) {
@@ -414,7 +414,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        alpha *= GaiaSky.instance.sgr.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
+        alpha *= GaiaSky.instance.sceneRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
         int n = (int) getMaxProperMotionLines();
         for (int i = n - 1; i >= 0; i--) {
@@ -841,9 +841,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void dispose() {
         this.disposed = true;
-        if (GaiaSky.instance.sceneGraph != null) {
-            GaiaSky.instance.sceneGraph.remove(this, true);
-        }
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Data to be gc'd

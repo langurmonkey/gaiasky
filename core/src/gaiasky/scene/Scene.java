@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
@@ -669,6 +670,15 @@ public class Scene {
 
     public ImmutableArray<Entity> findEntitiesByFamily(Family family) {
         return engine.getEntitiesFor(family);
+    }
+
+    public Array<Entity> findEntitiesByComponentType(gaiasky.render.ComponentTypes.ComponentType componentType, Array<Entity> list) {
+        engine.getEntities().forEach((entity) -> {
+            var base = Mapper.base.get(entity);
+            if (base.ct != null && base.ct.isEnabled(componentType))
+                list.add(entity);
+        });
+        return list;
     }
 
     /**

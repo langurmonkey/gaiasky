@@ -64,10 +64,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * @return True if it was inserted, false otherwise
      */
     public static boolean insert(SceneGraphNode node, boolean addToIndex) {
-        if (GaiaSky.instance.sceneGraph != null) {
-            GaiaSky.instance.sceneGraph.insert(node, addToIndex);
-            return true;
-        }
         return false;
     }
 
@@ -254,8 +250,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     public void doneLoading(AssetManager manager) {
-        if (coordinates != null)
-            coordinates.doneLoading(GaiaSky.instance.sceneGraph, this);
     }
 
     /**
@@ -855,7 +849,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         try {
-            GaiaSky.instance.sgr.renderListsBack().get(rg.ordinal()).add(renderable);
             return true;
         } catch (Exception e) {
             return false;
@@ -871,17 +864,15 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * @return True if removed, false otherwise.
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {
-        return GaiaSky.instance.sgr.renderListsBack().get(rg.ordinal()).removeValue(renderable, true);
+        return false;
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup rg) {
-        return GaiaSky.instance.sgr.renderListsBack().get(rg.ordinal()).contains(renderable, true);
+        return false;
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup... rgs) {
         boolean is = false;
-        for (RenderGroup rg : rgs)
-            is = is || GaiaSky.instance.sgr.renderListsBack().get(rg.ordinal()).contains(renderable, true);
         return is;
     }
 

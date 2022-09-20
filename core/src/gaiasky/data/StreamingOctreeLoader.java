@@ -18,7 +18,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
 import uk.ac.starlink.util.DataSource;
@@ -302,108 +301,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         daemon.abort();
     }
 
-    /**
-     * Loads all the levels of detail until the given one.
-     *
-     * @param lod           The level of detail to load.
-     * @param octreeWrapper The octree wrapper.
-     *
-     * @throws IOException When any of the level's files fails to load.
-     */
-    public void loadLod(final Integer lod, final OctreeWrapper octreeWrapper) throws IOException {
-        loadOctant(octreeWrapper.root, octreeWrapper, lod);
-    }
 
-    /**
-     * Loads the data of the given octant and its children down to the given
-     * level.
-     *
-     * @param octant        The octant to load.
-     * @param octreeWrapper The octree wrapper.
-     * @param level         The depth to load.
-     *
-     * @throws IOException When the octant's file fails to load.
-     */
-    public void loadOctant(final OctreeNode octant, final OctreeWrapper octreeWrapper, Integer level) throws IOException {
-        if (level >= 0) {
-            loadOctant(octant, octreeWrapper, false);
-            if (octant.children != null) {
-                for (OctreeNode child : octant.children) {
-                    if (child != null && child.numObjectsRec > 0)
-                        loadOctant(child, octreeWrapper, level - 1);
-                }
-            }
-        }
-    }
-
-    /**
-     * Loads the objects of the given octants.
-     *
-     * @param octants       The list holding the octants to load.
-     * @param octreeWrapper The octree wrapper.
-     * @param abort         State variable that will be set to true if an abort is called.
-     *
-     * @return The actual number of loaded octants.
-     *
-     * @throws IOException When any of the octants' files fail to load.
-     */
-    public int loadOctants(final Array<OctreeNode> octants, final OctreeWrapper octreeWrapper, final AtomicBoolean abort) throws IOException {
-        int loaded = 0;
-        if (octants.size > 0) {
-            int i = 0;
-            OctreeNode octant = octants.get(0);
-            while (i < octants.size && !abort.get()) {
-                if (loadOctant(octant, octreeWrapper, true))
-                    loaded++;
-                i += 1;
-                octant = octants.get(i);
-            }
-            flushLoadedIds();
-
-            if (abort.get()) {
-                // We aborted, roll back status of rest of octants
-                for (int j = i; j < octants.size; j++) {
-                    octants.get(j).setStatus(LoadStatus.NOT_LOADED);
-                }
-            }
-        }
-        return loaded;
-    }
-
-    /**
-     * Unloads the given octant.
-     */
-    public void unloadOctant(OctreeNode octant, final OctreeWrapper octreeWrapper) {
-        List<IOctreeObject> objects = octant.objects;
-        if (objects != null) {
-            GaiaSky.postRunnable(() -> {
-                synchronized (octant) {
-                    try {
-                        int unloaded = 0;
-                        for (IOctreeObject octreeObject : objects) {
-                            SceneGraphNode object = (SceneGraphNode) octreeObject;
-                            int count = object.getStarCount();
-                            object.dispose();
-                            object.octant = null;
-                            octreeWrapper.removeParenthood(object);
-                            // Aux info
-                            if (GaiaSky.instance != null && GaiaSky.instance.sceneGraph != null)
-                                GaiaSky.instance.sceneGraph.removeNodeAuxiliaryInfo(object);
-
-                            nLoadedStars -= count;
-                            unloaded += count;
-                        }
-                        objects.clear();
-                        octant.setStatus(LoadStatus.NOT_LOADED);
-                        octant.touch(unloaded);
-                    } catch (Exception e) {
-                        logger.error("Error disposing octant's objects " + octant.pageId, e);
-                        logger.info(Settings.APPLICATION_NAME + " will attempt to continue");
-                    }
-                }
-            });
-        }
-    }
 
     /**
      * Loads the data of the given octant.
@@ -448,12 +346,12 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
                     // Load octants, if any.
                     if (toLoad.size > 0) {
-                        try {
-                            loader.loadOctants(toLoad, octreeWrapper, abort);
-                        } catch (Exception e) {
-                            // This will happen when the queue has been cleared during processing.
-                            logger.debug(I18n.msg("notif.loadingoctants.queue.clear"));
-                        }
+                        //try {
+                        //    loader.loadOctants(toLoad, octreeWrapper, abort);
+                        //} catch (Exception e) {
+                        //    // This will happen when the queue has been cleared during processing.
+                        //    logger.debug(I18n.msg("notif.loadingoctants.queue.clear"));
+                        //}
                     }
 
                     // Release resources if needed.
@@ -465,7 +363,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                             // and release it.
                             OctreeNode octant = loader.toUnloadQueue.poll();
                             if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
-                                loader.unloadOctant(octant, octreeWrapper);
+                                //loader.unloadOctant(octant, octreeWrapper);
                             }
                             if (octant != null && octant.objects != null && octant.objects.size() > 0) {
                                 SceneGraphNode sg = (SceneGraphNode) octant.objects.get(0);
@@ -477,7 +375,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                         }
 
                     // Update constellations :S
-                    GaiaSky.postRunnable(() -> EventManager.publish(Event.CONSTELLATION_UPDATE_CMD, this, GaiaSky.instance.scene, GaiaSky.instance.sceneGraph));
+                    GaiaSky.postRunnable(() -> EventManager.publish(Event.CONSTELLATION_UPDATE_CMD, this, GaiaSky.instance.scene));
 
                 }
                 this.abort.set(false);

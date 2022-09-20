@@ -136,9 +136,9 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(textbc);
-        font.draw(sb, "10,000 AU", side2, u2Px(19000, side2));
-        font.draw(sb, "50,000 AU", side2, u2Px(60000, side2));
-        font.draw(sb, "100,000 AU", side2, u2Px(95000, side2));
+        font.draw(sb, "10,000 " + I18n.msg("gui.unit.au"), side2, u2Px(19000, side2));
+        font.draw(sb, "50,000 " + I18n.msg("gui.unit.au"), side2, u2Px(60000, side2));
+        font.draw(sb, "100,000 " + I18n.msg("gui.unit.au"), side2, u2Px(95000, side2));
 
         font.setColor(occ);
         font.draw(sb, I18n.obj("oort_cloud"),  side2 + px(15),  u2Px(-60000, side2) + px(8));

@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import gaiasky.GaiaSky;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.Planet;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.Coordinates;
@@ -26,7 +27,7 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
     private final float[] uraf;
     private final float[] nepf;
     private final float[] jupf;
-    private Planet sat, ura, nep, jup;
+    private FocusView sat, ura, nep, jup;
     private final Color jupc;
     private final Color satc;
     private final Color nepc;
@@ -34,33 +35,42 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
     public OuterSolarSystemMinimapScale() {
         super();
+        jupf = new float[4];
         satf = new float[4];
         uraf = new float[4];
         nepf = new float[4];
-        jupf = new float[4];
 
         jupc = new Color(0.4f, 0.8f, 1f, 1f);
         satc = new Color(1f, 1f, 0.4f, 1f);
         urac = new Color(0.3f, 0.4f, 1f, 1f);
         nepc = new Color(0.8f, 0.2f, 1f, 1f);
+
+        jup = new FocusView();
+        sat = new FocusView();
+        ura = new FocusView();
+        nep = new FocusView();
     }
 
     @Override
     public void updateLocal() {
-        if (sat == null) {
-            sat = (Planet) GaiaSky.instance.sceneGraph.getNode("Saturn");
-            ura = (Planet) GaiaSky.instance.sceneGraph.getNode("Uranus");
-            nep = (Planet) GaiaSky.instance.sceneGraph.getNode("Neptune");
-            jup = (Planet) GaiaSky.instance.sceneGraph.getNode("Jupiter");
-        }
-        if (sat != null)
-            position(sat.getAbsolutePosition(aux3b1).tov3d(aux3d1), satf);
-        if (ura != null)
-            position(ura.getAbsolutePosition(aux3b1).tov3d(aux3d1), uraf);
-        if (nep != null)
-            position(nep.getAbsolutePosition(aux3b1).tov3d(aux3d1), nepf);
-        if (jup != null)
+        if (jup.isEmpty())
+            jup.setEntity(GaiaSky.instance.scene.index().getEntity("Jupiter"));
+        if (sat.isEmpty())
+            sat.setEntity(GaiaSky.instance.scene.index().getEntity("Saturn"));
+        if (ura.isEmpty())
+            ura.setEntity(GaiaSky.instance.scene.index().getEntity("Uranus"));
+        if (nep.isEmpty())
+            nep.setEntity(GaiaSky.instance.scene.index().getEntity("Neptune"));
+
+        if (!jup.isEmpty())
             position(jup.getAbsolutePosition(aux3b1).tov3d(aux3d1), jupf);
+        if (!sat.isEmpty())
+            position(sat.getAbsolutePosition(aux3b1).tov3d(aux3d1), satf);
+        if (!ura.isEmpty())
+            position(ura.getAbsolutePosition(aux3b1).tov3d(aux3d1), uraf);
+        if (!nep.isEmpty())
+            position(nep.getAbsolutePosition(aux3b1).tov3d(aux3d1), nepf);
+
         position(GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1), camp);
     }
 

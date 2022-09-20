@@ -143,10 +143,10 @@ public class Planet extends ModelBody implements ILineRenderable {
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         if (group == RenderGroup.MODEL_ATM) {
             // Atmosphere
-            renderAtmosphere(modelBatch, GaiaSky.instance.sgr.alphas[ComponentType.Atmospheres.ordinal()], rc);
+            renderAtmosphere(modelBatch, GaiaSky.instance.sceneRenderer.alphas[ComponentType.Atmospheres.ordinal()], rc);
         } else if (group == RenderGroup.MODEL_CLOUD) {
             // Clouds
-            renderClouds(modelBatch, GaiaSky.instance.sgr.alphas[ComponentType.Clouds.ordinal()], t);
+            renderClouds(modelBatch, GaiaSky.instance.sceneRenderer.alphas[ComponentType.Clouds.ordinal()], t);
         } else {
             // If atmosphere ground params are present, set them
             if (ac != null) {

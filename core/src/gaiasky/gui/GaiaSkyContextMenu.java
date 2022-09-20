@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.data.stars.UncertaintiesHandler;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
@@ -63,8 +62,6 @@ public class GaiaSkyContextMenu extends ContextMenu {
     private final ISceneGraph sceneGraph;
     private final Scene scene;
 
-    // Uncertainties disabled by default
-    private final boolean uncertainties = false;
     // Rel effects off
     private final boolean relativisticEffects = false;
 
@@ -267,40 +264,6 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 });
                 addItem(proceduralSurface);
 
-            }
-
-            if (candidate instanceof IStarFocus && uncertainties) {
-                boolean sep = false;
-                if (UncertaintiesHandler.getInstance().containsStar(candidate.getCandidateId())) {
-                    addSeparator();
-                    sep = true;
-
-                    MenuItem showUncertainties = new MenuItem(I18n.msg("context.showuncertainties"), skin, "default");
-                    showUncertainties.addListener(event -> {
-                        if (event instanceof ChangeEvent) {
-                            EventManager.publish(Event.SHOW_UNCERTAINTIES, showUncertainties, candidate);
-                            return true;
-                        }
-                        return false;
-                    });
-                    addItem(showUncertainties);
-                }
-
-                if (UncertaintiesHandler.getInstance().containsUncertainties()) {
-                    if (!sep)
-                        addSeparator();
-
-                    MenuItem hideUncertainties = new MenuItem(I18n.msg("context.hideuncertainties"), skin, "default");
-                    hideUncertainties.addListener(event -> {
-                        if (event instanceof ChangeEvent) {
-                            EventManager.publish(Event.HIDE_UNCERTAINTIES, hideUncertainties, candidate);
-                            return true;
-                        }
-                        return false;
-                    });
-                    addItem(hideUncertainties);
-
-                }
             }
 
             addSeparator();

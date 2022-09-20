@@ -115,8 +115,8 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         // Update positions
-        rulerOk = (GaiaSky.instance.sceneGraph.getObjectPosition(name0, pos0) != null);
-        rulerOk = rulerOk && (GaiaSky.instance.sceneGraph.getObjectPosition(name1, pos1) != null);
+        rulerOk = (GaiaSky.instance.scene.getObjectPosition(name0, pos0) != null);
+        rulerOk = rulerOk && (GaiaSky.instance.scene.getObjectPosition(name1, pos1) != null);
 
         if (rulerOk) {
             p0.set(pos0).add(translation);

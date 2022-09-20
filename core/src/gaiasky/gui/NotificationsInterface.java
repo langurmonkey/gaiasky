@@ -16,6 +16,7 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger.LoggerLevel;
@@ -60,7 +61,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param lock       The lock object.
      * @param multiple   Allow multiple messages?
      * @param writeDates Write dates with messages?
-     * @param bg       Apply background
+     * @param bg         Apply background
      */
     public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean bg) {
         this(skin, lock, multiple, bg);
@@ -75,7 +76,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param multiple      Allow multiple messages?
      * @param writeDates    Write dates with messages?
      * @param historicalLog Save logs to historical list
-     * @param bg       Apply background
+     * @param bg            Apply background
      */
     public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean historicalLog, boolean bg) {
         this(skin, lock, multiple, writeDates, bg);
@@ -223,13 +224,12 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 break;
             case FOCUS_CHANGED:
                 if (data[0] != null) {
-                    IFocus sgn = null;
                     if (data[0] instanceof String) {
-                        sgn = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
+                        addMessage(I18n.msg("notif.camerafocus", data[0]));
                     } else {
-                        sgn = (IFocus) data[0];
+                        var focus = (FocusView) data[0];
+                        addMessage(I18n.msg("notif.camerafocus", focus.getName()));
                     }
-                    addMessage(I18n.msg("notif.camerafocus", sgn.getName()));
                 }
                 break;
             case TIME_STATE_CMD:
@@ -318,7 +318,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 break;
             case MODE_POPUP_CMD:
                 ModePopupInfo mpi = (ModePopupInfo) data[0];
-                if(mpi != null) {
+                if (mpi != null) {
                     addMessage(mpi.title);
                     addMessage(mpi.header);
                     for (Pair<String[], String> p : mpi.mappings) {

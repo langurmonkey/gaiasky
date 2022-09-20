@@ -17,6 +17,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.ShadowMapImpl;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ITransform;
@@ -476,22 +477,22 @@ public abstract class ModelBody extends CelestialBody {
      */
     protected void prepareShadowEnvironment() {
         if (Settings.settings.scene.renderer.shadow.active) {
-            Environment env = mc.env;
-            SceneGraphRenderer sgr = GaiaSky.instance.sgr;
-            if (shadow > 0 && sgr.smTexMap.containsKey(this)) {
-                Matrix4 combined = sgr.smCombinedMap.get(this);
-                Texture tex = sgr.smTexMap.get(this);
-                if (env.shadowMap == null) {
+            var environment = mc.env;
+            var sceneRenderer = GaiaSky.instance.sceneRenderer;
+            if (shadow > 0 && sceneRenderer.smTexMap.containsKey(this)) {
+                Matrix4 combined = sceneRenderer.smCombinedMap.get(this);
+                Texture tex = sceneRenderer.smTexMap.get(this);
+                if (environment.shadowMap == null) {
                     if (shadowMap == null)
                         shadowMap = new ShadowMapImpl(combined, tex);
-                    env.shadowMap = shadowMap;
+                    environment.shadowMap = shadowMap;
                 }
                 shadowMap.setProjViewTrans(combined);
                 shadowMap.setDepthMap(tex);
 
                 shadow--;
             } else {
-                env.shadowMap = null;
+                environment.shadowMap = null;
             }
         } else {
             mc.env.shadowMap = null;

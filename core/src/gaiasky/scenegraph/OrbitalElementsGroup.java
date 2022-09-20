@@ -124,7 +124,6 @@ public class OrbitalElementsGroup extends GenericCatalog implements IRenderable,
 
     @Override
     public void dispose(){
-        GaiaSky.instance.sceneGraph.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         EventManager.publish(Event.GPU_DISPOSE_ORBITAL_ELEMENTS, this);

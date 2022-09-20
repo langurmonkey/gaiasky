@@ -99,9 +99,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
-    /** Renderer index. 0 for old, 1 for new, 2 for all. **/
-    public int ri = 1;
-
     /**
      * Singleton instance.
      **/
@@ -158,8 +155,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     private final String sceneGraphName = "SceneGraphData";
     private final String sceneName = "SceneData";
-    public ISceneGraph sceneGraph;
-    public SceneGraphRenderer sgr;
 
     public Scene scene;
     public SceneRenderer sceneRenderer;
@@ -401,7 +396,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         assetManager = new AssetManager(internalResolver);
         assetManager.setLoader(com.badlogic.gdx.graphics.Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
-        assetManager.setLoader(ISceneGraph.class, new SGLoader(dataResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         assetManager.setLoader(IAttitudeServer.class, new AttitudeLoader(dataResolver));
@@ -469,10 +463,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Post-processor
         postProcessor = new MainPostProcessor(null);
-
-        // Scene graph renderer
-        sgr = new SceneGraphRenderer(vrContext, globalResources);
-        sgr.initialize(assetManager);
 
         // Scene renderer
         sceneRenderer = new SceneRenderer(vrContext, globalResources);
@@ -619,17 +609,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         postProcessor.doneLoading(assetManager);
 
-
-        /*
-         * GET SCENE GRAPH
-         */
-        if (assetManager.isLoaded(sceneGraphName)) {
-            sceneGraph = assetManager.get(sceneGraphName);
-        } else {
-            throw new RuntimeException("Error loading scene graph from data load string: " + sceneGraphName + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
-        }
-
-
         /*
          * GET SCENE
          */
@@ -644,21 +623,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          * SCENE GRAPH UPDATER
          */
         updateProcess = () -> {
-            // Update scene graph.
-            sceneGraph.update(time, cameraManager);
-
             // Update scene.
             scene.update(time);
 
             // Swap proximity buffers.
             cameraManager.swapBuffers();
         };
-
-        /*
-         * SCENE GRAPH RENDERER
-         */
-        sgr.doneLoading(assetManager);
-        sgr.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
 
         /*
          * SCENE RENDERER
@@ -671,14 +641,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Prepare scene for update
         scene.prepareUpdateSystems(sceneRenderer);
 
-        // First time, set assets
-        final Array<SceneGraphNode> nodes = sceneGraph.getNodes();
-        for (SceneGraphNode sgn : nodes) {
-            sgn.doneLoading(assetManager);
-        }
-
         // Initialize input multiplexer to handle various input processors.
-        guiRegistry = new GuiRegistry(this.globalResources.getSkin(), this.sceneGraph, this.scene, this.catalogManager);
+        guiRegistry = new GuiRegistry(this.globalResources.getSkin(), this.scene, this.catalogManager);
         inputMultiplexer = new InputMultiplexer();
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -690,13 +654,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         reinitialiseGUI2();
 
         // Publish visibility.
-        EventManager.publish(Event.VISIBILITY_OF_COMPONENTS, this, sgr.visible);
+        EventManager.publish(Event.VISIBILITY_OF_COMPONENTS, this, sceneRenderer.visible);
 
         // Key bindings.
         inputMultiplexer.addProcessor(new KeyboardInputController(Gdx.input));
 
         // Broadcast scene.
-        EventManager.publish(Event.SCENE_GRAPH_LOADED, this, sceneGraph);
         EventManager.publish(Event.SCENE_LOADED, this, scene);
 
         touchSceneGraph();
@@ -799,7 +762,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialized.
         EventManager.publish(Event.INITIALIZED_INFO, this);
-        sgr.setRendering(true);
         sceneRenderer.setRendering(true);
         initialized = true;
     }
@@ -813,9 +775,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         time.update(1e-7);
         // Update whole scene graph
         scene.update(time);
-        sceneGraph.update(time, cameraManager);
         // Clear render lists
-        sgr.swapRenderLists();
         sceneRenderer.swapRenderLists();
         // Time back to zero
         time.update(0);
@@ -898,16 +858,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Reinitialise registry to listen to relevant events
         if (guiRegistry != null)
             guiRegistry.dispose();
-        guiRegistry = new GuiRegistry(globalResources.getSkin(), sceneGraph, scene, catalogManager);
+        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, catalogManager);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
 
         // Unregister all current GUIs
         guiRegistry.unregisterAll();
 
         // Set scene to main gui.
-        ((FullGui) mainGui).setSceneGraph(sceneGraph);
         ((FullGui) mainGui).setScene(scene);
-        mainGui.setVisibilityToggles(ComponentType.values(), sgr.visible);
+        mainGui.setVisibilityToggles(ComponentType.values(), sceneRenderer.visible);
 
         for (IGui gui : guis)
             gui.doneLoading(assetManager);
@@ -968,9 +927,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 gui.dispose();
 
         EventManager.publish(Event.DISPOSE, this);
-        if (sceneGraph != null) {
-            sceneGraph.dispose();
-        }
         ModelCache.cache.dispose();
 
         // Shutdown asset manager
@@ -987,10 +943,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         ScriptingServer.dispose();
 
         // Renderer
-        if (sgr != null) {
-            sgr.dispose();
-        }
-
         if (sceneRenderer != null) {
             sceneRenderer.dispose();
         }
@@ -1092,7 +1044,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
         }
         // Clean lists
-        sgr.swapRenderLists();
         sceneRenderer.swapRenderLists();
         // Number of frames
         frames++;
@@ -1126,7 +1077,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public FrameBuffer getBackRenderBuffer() {
-        return sgr.getRenderProcess().getResultBuffer();
+        return sceneRenderer.getRenderProcess().getResultBuffer();
     }
 
     /**
@@ -1318,12 +1269,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public void renderSgr(final ICamera camera, final double t, final int width, final int height, final int tw, final int th, final FrameBuffer frameBuffer, final PostProcessBean ppb) {
-        if (ri != 1) {
-            sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
-        }
-        if (ri != 0) {
-            sceneRenderer.render(camera, t, width, height, tw, th, frameBuffer, ppb);
-        }
+        sceneRenderer.render(camera, t, width, height, tw, th, frameBuffer, ppb);
     }
 
     private long lastResizeTime = Long.MAX_VALUE;
@@ -1374,7 +1320,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     for (IGui gui : guis)
                         gui.resizeImmediate(width, height);
 
-                sgr.resize(width, height, renderWidth, renderHeight, resizeRenderSys);
+                sceneRenderer.resize(width, height, renderWidth, renderHeight, resizeRenderSys);
 
                 if (resizeScreenConf)
                     settings.graphics.resize(width, height);
@@ -1498,22 +1444,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             this.updateRenderProcess = runnableLoadingGui;
 
-            // Load scene graph
-            if (sceneGraph == null) {
-                if (settings.data.dataFiles == null) {
-                    throw new RuntimeException("Please set the data::dataFiles property in your configuration file, as it is null!");
-                }
-                final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
-                int i = 0;
-                // Add data files
-                // Our resolver in the SGLoader itself will resolve their full paths
-                for (String dataFile : settings.data.dataFiles) {
-                    dataFilesToLoad[i] = dataFile;
-                    i++;
-                }
-                assetManager.load(sceneGraphName, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad));
-            }
-
             // Load scene
             if (scene == null) {
                 final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
@@ -1593,22 +1523,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             //clearFrameBufferMap();
             //});
             break;
-        case SCENE_GRAPH_ADD_OBJECT_CMD:
-            final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
-            boolean addToIndex = data.length == 1 || (Boolean) data[1];
-            if (sceneGraph != null) {
-                postRunnable(() -> {
-                    try {
-                        sceneGraph.insert(nodeToAdd, addToIndex);
-                    } catch (Exception e) {
-                        logger.error(e);
-                    }
-                });
-            }
-            break;
         case SCENE_ADD_OBJECT_CMD:
             final Entity toAdd = (Entity) data[0];
-            addToIndex = data.length == 1 || (Boolean) data[1];
+            boolean addToIndex = data.length == 1 || (Boolean) data[1];
             if (scene != null) {
                 postRunnable(() -> {
                     try {
@@ -1619,41 +1536,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 });
             }
             break;
-        case SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD:
-            final SceneGraphNode nodeToAddp = (SceneGraphNode) data[0];
-            boolean addToIndexp = data.length == 1 || (Boolean) data[1];
-            if (sceneGraph != null) {
-                try {
-                    sceneGraph.insert(nodeToAddp, addToIndexp);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            }
-            break;
         case SCENE_ADD_OBJECT_NO_POST_CMD:
             final Entity toAddPost = (Entity) data[0];
-            addToIndexp = data.length == 1 || (Boolean) data[1];
+            boolean addToIndexp = data.length == 1 || (Boolean) data[1];
             if (scene != null) {
                 try {
                     scene.insert(toAddPost, addToIndexp);
                 } catch (Exception e) {
                     logger.error(e);
                 }
-            }
-            break;
-        case SCENE_GRAPH_REMOVE_OBJECT_CMD:
-            SceneGraphNode aux;
-            if (data[0] instanceof String) {
-                aux = sceneGraph.getNode((String) data[0]);
-                if (aux == null)
-                    return;
-            } else {
-                aux = (SceneGraphNode) data[0];
-            }
-            final SceneGraphNode nodeToRemove = aux;
-            boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
-            if (sceneGraph != null) {
-                postRunnable(() -> sceneGraph.remove(nodeToRemove, removeFromIndex));
             }
             break;
         case SCENE_REMOVE_OBJECT_CMD:
@@ -1666,7 +1557,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 toRemove = (Entity) data[0];
             }
             Entity entityToRemove = toRemove;
-            removeFromIndex = data.length == 1 || (Boolean) data[1];
+            boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
             if (scene != null) {
                 postRunnable(() -> scene.remove(entityToRemove, removeFromIndex));
             }
@@ -1684,9 +1575,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (scene != null) {
                 scene.remove(entityToRemove, removeFromIndex);
             }
-            break;
-        case SCENE_GRAPH_RELOAD_NAMES_CMD:
-            postRunnable(() -> sceneGraph.getRoot().updateLocalizedNameRecursive());
             break;
         case SCENE_RELOAD_NAMES_CMD:
             postRunnable(() -> {
@@ -1751,15 +1639,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             postProcessor.doneLoading(assetManager);
             break;
         case REINITIALIZE_RENDERER:
-            sgr.setRendering(false);
+            sceneRenderer.setRendering(false);
             logger.info("Re-initializing main renderer");
-            if (sgr != null) {
-                sgr.dispose();
+            if (sceneRenderer != null) {
+                sceneRenderer.dispose();
             }
             // Initialize and load
-            sgr.doneLoading(assetManager);
-            sgr.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
-            sgr.setRendering(true);
+            sceneRenderer.doneLoading(assetManager);
+            sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
+            sceneRenderer.setRendering(true);
             break;
         default:
             break;

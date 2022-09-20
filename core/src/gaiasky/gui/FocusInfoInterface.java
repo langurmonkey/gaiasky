@@ -375,7 +375,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         final Settings s = Settings.settings;
         switch (event) {
         case FOCUS_CHANGED -> {
-            IFocus focus;
             if (data[0] instanceof String) {
                 var entity = GaiaSky.instance.scene.getEntity((String) data[0]);
                 view.setEntity(entity);

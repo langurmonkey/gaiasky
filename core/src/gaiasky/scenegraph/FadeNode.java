@@ -142,9 +142,6 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        if (fadeObjectName != null) {
-            this.fadeObject = GaiaSky.instance.sceneGraph.getNode(fadeObjectName);
-        }
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {

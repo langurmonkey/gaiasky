@@ -56,7 +56,6 @@ public class SearchDialog extends GenericDialog {
     private String currentInputText = "";
     private Cell<?> infoCell;
     private OwnLabel infoMessage;
-    private final ISceneGraph sg;
     private final Scene scene;
     // Matching nodes
     private final SortedSet<String> matching;
@@ -70,9 +69,8 @@ public class SearchDialog extends GenericDialog {
 
     private final Array<Task> tasks;
 
-    public SearchDialog(Skin skin, Stage ui, final ISceneGraph sg, final Scene scene, boolean suggestions) {
+    public SearchDialog(Skin skin, Stage ui, final Scene scene, boolean suggestions) {
         super(I18n.msg("gui.objects.search"), skin, ui);
-        this.sg = sg;
         this.scene = scene;
         this.aux = new Vector2();
         this.matching = new TreeSet<>();

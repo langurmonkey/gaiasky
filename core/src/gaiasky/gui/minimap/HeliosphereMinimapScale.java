@@ -48,6 +48,7 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
 
         ortho.setToOrtho(true, side, sideshort);
         sr.setProjectionMatrix(ortho.combined);
+        sb.setProjectionMatrix(ortho.combined);
         fb.begin();
         // Clear
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
@@ -84,6 +85,7 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
         font.draw(sb, I18n.msg("gui.minimap.interstellar"), px(10),  px(90));
         font.setColor(sunc);
         font.draw(sb, I18n.obj("sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
+
         sb.end();
 
         fb.end();
@@ -133,7 +135,7 @@ public class HeliosphereMinimapScale extends AbstractMinimapScale {
         font.setColor(helc);
         font.draw(sb, I18n.msg("gui.minimap.heliosphere"),  side2 + px(15),  u2Px(0, side2) + px(8));
         font.setColor(helpc);
-        font.draw(sb, I18n.msg("gui.minimap.heliopause"), side2 - px(80),  side2 - px(10));
+        font.draw(sb, I18n.msg("gui.minimap.heliopause"), side2 - px(80),  side2 - px(40));
         font.setColor(intc);
         font.draw(sb, I18n.msg("gui.minimap.interstellar"), px(60),  px(30));
         font.setColor(sunc);

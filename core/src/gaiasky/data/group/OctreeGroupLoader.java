@@ -87,13 +87,9 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             /*
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
              */
-            try {
-                int depthLevel = Math.min(OctreeNode.maxDepth, PRELOAD_DEPTH);
-                loadLod(depthLevel, octreeWrapper);
-                flushLoadedIds();
-            } catch (IOException e) {
-                logger.error(e);
-            }
+            int depthLevel = Math.min(OctreeNode.maxDepth, PRELOAD_DEPTH);
+            //loadLod(depthLevel, octreeWrapper);
+            flushLoadedIds();
 
             return octreeWrapper;
         } else {
@@ -117,8 +113,8 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             // Add objects to octree wrapper node.
             octreeWrapper.add(sg, octant);
             // Add to index and HIP map.
-            if (GaiaSky.instance != null && GaiaSky.instance.sceneGraph != null)
-                GaiaSky.instance.sceneGraph.addNodeAuxiliaryInfo(sg);
+            //if (GaiaSky.instance != null && GaiaSky.instance.scene != null)
+            //    GaiaSky.instance.scene.addNodeAuxiliaryInfo(sg);
 
             nLoadedStars += sg.size();
             octant.add(sg);
