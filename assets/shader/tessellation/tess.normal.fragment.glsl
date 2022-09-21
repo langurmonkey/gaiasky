@@ -326,7 +326,7 @@ void main() {
     #endif
 
     // Reflection
-    vec3 metallicColor = vec3(0.0);
+    vec3 reflectionColor = vec3(0.0);
     // Reflection mask
     #ifdef ssrFlag
         reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
@@ -394,7 +394,7 @@ void main() {
     #endif // directionalLightsFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + metallicColor, texAlpha * o_data.opacity);
+    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
     fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround

@@ -11,6 +11,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -44,10 +45,10 @@ public class Index {
 
         // String-to-node map. The number of objects is a first approximation, as
         // some nodes actually contain multiple objects.
-        index = Collections.synchronizedMap(new HashMap<>((int) (numberEntities * 1.25)));
+        index = new ConcurrentHashMap<>((int) (numberEntities * 1.25));
 
         // HIP map with 121k * 1.25
-        hipMap = Collections.synchronizedMap(new HashMap<>(151250));
+        hipMap = new ConcurrentHashMap<>(151250);
     }
 
     /**
