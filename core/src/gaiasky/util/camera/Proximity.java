@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.camera.ICamera;
@@ -159,7 +161,7 @@ public class Proximity {
     }
 
     private byte getType(IFocus f) {
-        if (f instanceof Star) {
+        if (f instanceof FocusView && Mapper.hip.has(((FocusView)f).getEntity())) {
             return TYPE_STAR;
         } else {
             return TYPE_OTHER;

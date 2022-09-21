@@ -81,6 +81,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
                         if (nr.isStar() || nr.isStarGroup()) {
                             float[] col = nr.getColor();
                             double closestDist = nr.getClosestDistToCamera();
+                            // Dim light with distance.
                             float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
                             model.model.directional(i).direction.sub(nr.pos.put(F31));
                             model.model.directional(i).color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
