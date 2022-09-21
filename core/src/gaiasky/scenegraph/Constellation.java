@@ -99,28 +99,6 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
 
     }
 
-    @Override
-    public void setUp(ISceneGraph sceneGraph) {
-        if (!allLoaded) {
-            int nPairs = ids.size;
-            if (lines == null) {
-                lines = new IPosition[nPairs][];
-            }
-            Map<Integer, IPosition> hipMap = sceneGraph.getStarMap();
-            allLoaded = true;
-            for (int i = 0; i < nPairs; i++) {
-                int[] pair = ids.get(i);
-                IPosition s1, s2;
-                s1 = hipMap.get(pair[0]);
-                s2 = hipMap.get(pair[1]);
-                if (lines[i] == null && s1 != null && s2 != null) {
-                    lines[i] = new IPosition[] { s1, s2 };
-                } else {
-                    allLoaded = false;
-                }
-            }
-        }
-    }
 
     /**
      * Line rendering.
@@ -260,9 +238,5 @@ public class Constellation extends SceneGraphNode implements ILineRenderable, I3
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if (event == Event.CONSTELLATION_UPDATE_CMD) {
-            SceneGraph sg = (SceneGraph) data[1];
-            setUp(sg);
-        }
     }
 }

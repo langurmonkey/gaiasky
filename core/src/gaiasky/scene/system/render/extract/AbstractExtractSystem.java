@@ -1,5 +1,6 @@
 package gaiasky.scene.system.render.extract;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Array;
@@ -25,6 +26,10 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
         super(family, priority);
         this.camera = GaiaSky.instance.cameraManager;
         this.view = new LabelView();
+    }
+
+    public void extract(Entity entity) {
+        processEntity(entity, 0f);
     }
 
     public void setRenderer(ISceneRenderer renderer) {

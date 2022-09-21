@@ -35,4 +35,21 @@ public class Ruler implements Component {
     public boolean rulerOk() {
         return rulerOk;
     }
+
+    /**
+     * Returns true if the ruler is attached to at least one object.
+     *
+     * @return Ture if the ruler is attached.
+     */
+    public boolean hasAttached() {
+        return name0 != null || name1 != null;
+    }
+
+    public boolean hasObject0() {
+        return name0 != null && !name0.isEmpty();
+    }
+
+    public boolean hasObject1() {
+        return name1 != null && !name1.isEmpty();
+    }
 }

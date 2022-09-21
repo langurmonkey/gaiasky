@@ -59,13 +59,12 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
     private final CatalogManager catalogManager;
 
-    private final ISceneGraph sceneGraph;
     private final Scene scene;
 
     // Rel effects off
     private final boolean relativisticEffects = false;
 
-    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final FocusView candidate, final CatalogManager catalogManager, final ISceneGraph sceneGraph, final Scene scene) {
+    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final FocusView candidate, final CatalogManager catalogManager, final Scene scene) {
         super(skin, styleName);
         this.skin = skin;
         this.screenX = (int) (screenX / Settings.settings.program.ui.scale);
@@ -74,7 +73,6 @@ public class GaiaSkyContextMenu extends ContextMenu {
         this.catalogManager = catalogManager;
         this.pad = 8f;
         this.scene = scene;
-        this.sceneGraph = sceneGraph;
         if (candidate != null) {
             this.candidateName = candidate.getCandidateName();
             this.candidateNameShort = TextUtils.capString(this.candidateName, 10);
@@ -158,21 +156,6 @@ public class GaiaSkyContextMenu extends ContextMenu {
             removeShapesObj.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     GaiaSky.postRunnable(() -> {
-                        Array<SceneGraphNode> l = new Array<>();
-                        sceneGraph.getRoot().getChildrenByType(ShapeObject.class, l);
-                        for (SceneGraphNode n : l) {
-                            ShapeObject shapeObject = (ShapeObject) n;
-                            IFocus tr = shapeObject.getTrack();
-                            String trName = shapeObject.getTrackName();
-                            if (tr != null && tr == candidate) {
-                                EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, removeShapesObj, candidate, false);
-                            } else if (trName != null && trName.equalsIgnoreCase(candidateName)) {
-                                EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, removeShapesObj, candidate, false);
-                            }
-                        }
-                    });
-
-                    GaiaSky.postRunnable(() -> {
                         ImmutableArray<Entity> shapes = scene.engine.getEntitiesFor(scene.getFamilies().shapes);
                         for (Entity entity : shapes) {
                             var shape = Mapper.shape.get(entity);
@@ -191,14 +174,6 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem removeShapesAll = new MenuItem(I18n.msg("context.shape.remove.all"), skin, skin.getDrawable("iconic-delete"));
             removeShapesAll.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    GaiaSky.postRunnable(() -> {
-                        Array<SceneGraphNode> l = new Array<>();
-                        sceneGraph.getRoot().getChildrenByType(ShapeObject.class, l);
-                        for (SceneGraphNode n : l) {
-                            EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, removeShapesAll, n, false);
-                        }
-                    });
-
                     GaiaSky.postRunnable(() -> {
                         ImmutableArray<Entity> shapes = scene.engine.getEntitiesFor(scene.getFamilies().shapes);
                         for (Entity shape : shapes) {
@@ -269,81 +244,81 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addSeparator();
 
             // Cosmic ruler
-            CosmicRuler cr = (CosmicRuler) sceneGraph.getNode("Cosmicruler");
-            if (cr == null) {
-                sceneGraph.insert((cr = new CosmicRuler()), true);
+            Entity cr = scene.getEntity("Cosmicruler");
+            if (cr != null) {
+                var ruler = Mapper.ruler.get(cr);
+                MenuItem rulerAttach0 = null, rulerAttach1 = null;
+                if (!ruler.hasObject0() && !ruler.hasObject1()) {
+                    // No objects attached
+                    rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
+                    final MenuItem ra = rulerAttach0;
+                    rulerAttach0.addListener((ev) -> {
+                        if (ev instanceof ChangeEvent) {
+                            EventManager.publish(Event.RULER_ATTACH_0, ra, candidateName);
+                            return true;
+                        }
+                        return false;
+                    });
+                } else if (ruler.hasObject0() && !ruler.hasObject1()) {
+                    // Only 0 is attached
+                    rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
+                    final MenuItem ra = rulerAttach1;
+                    rulerAttach1.addListener((ev) -> {
+                        if (ev instanceof ChangeEvent) {
+                            EventManager.publish(Event.RULER_ATTACH_1, ra, candidateName);
+                            return true;
+                        }
+                        return false;
+                    });
+                } else {
+                    // All attached, show both
+                    rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
+                    final MenuItem ra0 = rulerAttach0;
+                    rulerAttach0.addListener((ev) -> {
+                        if (ev instanceof ChangeEvent) {
+                            GaiaSky.postRunnable(() -> {
+                                EventManager.publish(Event.RULER_ATTACH_0, ra0, candidateName);
+                            });
+                            return true;
+                        }
+                        return false;
+                    });
+                    rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
+                    final MenuItem ra1 = rulerAttach1;
+                    rulerAttach1.addListener((ev) -> {
+                        if (ev instanceof ChangeEvent) {
+                            GaiaSky.postRunnable(() -> {
+                                EventManager.publish(Event.RULER_ATTACH_1, ra1, candidateName);
+                            });
+                            return true;
+                        }
+                        return false;
+                    });
+                }
+                if (rulerAttach0 != null)
+                    addItem(rulerAttach0);
+                if (rulerAttach1 != null)
+                    addItem(rulerAttach1);
             }
-            MenuItem rulerAttach0 = null, rulerAttach1 = null;
-            if (!cr.hasObject0() && !cr.hasObject1()) {
-                // No objects attached
-                rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
-                final MenuItem ra = rulerAttach0;
-                rulerAttach0.addListener((ev) -> {
-                    if (ev instanceof ChangeEvent) {
-                        EventManager.publish(Event.RULER_ATTACH_0, ra, candidateName);
-                        return true;
-                    }
-                    return false;
-                });
-            } else if (cr.hasObject0() && !cr.hasObject1()) {
-                // Only 0 is attached
-                rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
-                final MenuItem ra = rulerAttach1;
-                rulerAttach1.addListener((ev) -> {
-                    if (ev instanceof ChangeEvent) {
-                        EventManager.publish(Event.RULER_ATTACH_1, ra, candidateName);
-                        return true;
-                    }
-                    return false;
-                });
-            } else {
-                // All attached, show both
-                rulerAttach0 = new MenuItem(I18n.msg("context.ruler.attach", "0", candidateNameShort), skin, rulerDwb);
-                final MenuItem ra0 = rulerAttach0;
-                rulerAttach0.addListener((ev) -> {
-                    if (ev instanceof ChangeEvent) {
-                        GaiaSky.postRunnable(() -> {
-                            EventManager.publish(Event.RULER_ATTACH_0, ra0, candidateName);
-                        });
-                        return true;
-                    }
-                    return false;
-                });
-                rulerAttach1 = new MenuItem(I18n.msg("context.ruler.attach", "1", candidateNameShort), skin, rulerDwb);
-                final MenuItem ra1 = rulerAttach1;
-                rulerAttach1.addListener((ev) -> {
-                    if (ev instanceof ChangeEvent) {
-                        GaiaSky.postRunnable(() -> {
-                            EventManager.publish(Event.RULER_ATTACH_1, ra1, candidateName);
-                        });
-                        return true;
-                    }
-                    return false;
-                });
-            }
-            if (rulerAttach0 != null)
-                addItem(rulerAttach0);
-            if (rulerAttach1 != null)
-                addItem(rulerAttach1);
         }
 
         // Clear ruler
-        CosmicRuler cr = (CosmicRuler) sceneGraph.getNode("Cosmicruler");
-        if (cr == null) {
-            sceneGraph.insert((cr = new CosmicRuler()), true);
-        }
-        if (cr.rulerOk() || cr.hasAttached()) {
-            MenuItem clearRuler = new MenuItem(I18n.msg("context.ruler.clear"), skin, rulerDwb);
-            clearRuler.addListener((evt) -> {
-                if (evt instanceof ChangeEvent) {
-                    GaiaSky.postRunnable(() -> {
-                        EventManager.publish(Event.RULER_CLEAR, clearRuler);
-                    });
-                    return true;
-                }
-                return false;
-            });
-            addItem(clearRuler);
+        Entity cr = scene.getEntity("Cosmicruler");
+        if (cr != null) {
+            var ruler = Mapper.ruler.get(cr);
+            if (ruler.rulerOk() || ruler.hasAttached()) {
+                MenuItem clearRuler = new MenuItem(I18n.msg("context.ruler.clear"), skin, rulerDwb);
+                clearRuler.addListener((evt) -> {
+                    if (evt instanceof ChangeEvent) {
+                        GaiaSky.postRunnable(() -> {
+                            EventManager.publish(Event.RULER_CLEAR, clearRuler);
+                        });
+                        return true;
+                    }
+                    return false;
+                });
+                addItem(clearRuler);
+            }
         }
 
         // Load

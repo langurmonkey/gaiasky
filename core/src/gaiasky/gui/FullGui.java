@@ -30,7 +30,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.CelestialBody;
-import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.IStarFocus;
 import gaiasky.scenegraph.Planet;
 import gaiasky.util.*;
@@ -79,7 +78,6 @@ public class FullGui extends AbstractGui {
 
     protected float pad, pad5;
 
-    protected ISceneGraph sceneGraph;
     protected Scene scene;
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
@@ -517,7 +515,7 @@ public class FullGui extends AbstractGui {
             int screenY = Gdx.input.getY();
 
             view.setEntity(candidate);
-            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, view, catalogManager, sceneGraph, scene);
+            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, view, catalogManager, scene);
 
             int h = (int) getGuiStage().getHeight();
 
@@ -547,9 +545,6 @@ public class FullGui extends AbstractGui {
         }
     }
 
-    public void setSceneGraph(ISceneGraph sg) {
-        this.sceneGraph = sg;
-    }
     public void setScene(Scene scene) {
         this.scene = scene;
     }
@@ -572,7 +567,6 @@ public class FullGui extends AbstractGui {
 
     public void addControlsWindow() {
         controlsWindow = new ControlsWindow(Settings.settings.getSuperShortApplicationName(), skin, ui, catalogManager);
-        controlsWindow.setSceneGraph(sceneGraph);
         controlsWindow.setScene(scene);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();

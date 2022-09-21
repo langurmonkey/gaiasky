@@ -5,6 +5,7 @@
 
 package gaiasky.gui.components;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -25,11 +26,10 @@ import gaiasky.event.IObserver;
 import gaiasky.gui.BookmarksManager.BookmarkNode;
 import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.NewBookmarkFolderDialog;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Settings;
@@ -43,7 +43,6 @@ import java.util.Set;
 public class BookmarksComponent extends GuiComponent implements IObserver {
     static private final Vector2 tmpCoords = new Vector2();
 
-    protected ISceneGraph sg;
     protected Scene scene;
 
     protected FocusView view;
@@ -84,10 +83,11 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                 InputEvent ie = (InputEvent) event;
                 if (ie.getType() == Type.keyUp && !searchBox.getText().isEmpty()) {
                     String text = searchBox.getText().toLowerCase().trim();
-                    if (sg.containsNode(text)) {
-                        SceneGraphNode node = sg.getNode(text);
-                        if (node instanceof IFocus) {
-                            IFocus focus = (IFocus) node;
+                    if (scene.index().containsEntity(text)) {
+                        Entity node = scene.getEntity(text);
+                        if (Mapper.focus.has(node)) {
+                            view.setEntity(node);
+                            IFocus focus = view;
                             boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                             boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                             if (!timeOverflow && ctOn) {
@@ -145,10 +145,11 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                     TreeNode selected = (TreeNode) ((Tree) actor).getSelectedNode();
                     if (selected != null && !selected.hasChildren()) {
                         String name = selected.getValue();
-                        if (sg.containsNode(name)) {
-                            SceneGraphNode node = sg.getNode(name);
-                            if (node instanceof IFocus) {
-                                IFocus focus = (IFocus) node;
+                        if (scene.index().containsEntity(name)) {
+                            Entity node = scene.getEntity(name);
+                            if (Mapper.focus.has(node)) {
+                                view.setEntity(node);
+                                IFocus focus = view;
                                 boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                                 boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                                 if (!timeOverflow && ctOn) {
@@ -406,10 +407,6 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                 break;
         }
         return yPos;
-    }
-
-    public void setSceneGraph(ISceneGraph sg) {
-        this.sg = sg;
     }
 
     public void setScene(Scene scene) {

@@ -457,14 +457,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
                 EntityUtils.getAbsolutePosition(copy, out);
 
-                // Return all to pool.
-                var currentEntity = copy;
-                do {
-                    var graph = Mapper.graph.get(currentEntity);
-                    var parent = graph.parent;
-                    ((Poolable) currentEntity).reset();
-                    currentEntity = parent;
-                } while (currentEntity != null);
+                // Return to pool.
+                scene.returnCopyObject(copy);
 
                 return out;
             }

@@ -1,10 +1,14 @@
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -26,9 +30,9 @@ public class OpenVRListener implements VRDeviceListener {
     /** The natural camera **/
     private final NaturalCamera cam;
     /** Focus comparator **/
-    private final Comparator<IFocus> comp;
+    private final Comparator<Entity> comp;
     /** Map from VR device to model object **/
-    private HashMap<VRDevice, VRDeviceModel> vrDeviceToModel;
+    private HashMap<VRDevice, Entity> vrDeviceToModel;
     /** Aux vectors **/
     private final Vector3d p0;
     private final Vector3d p1;
@@ -47,12 +51,15 @@ public class OpenVRListener implements VRDeviceListener {
 
     private final Set<Integer> pressedButtons;
 
+    private final FocusView focusView;
+
     public OpenVRListener(NaturalCamera cam) {
         this.cam = cam;
         this.comp = new ViewAngleComparator<>();
         this.p0 = new Vector3d();
         this.p1 = new Vector3d();
         pressedButtons = new HashSet<>();
+        this.focusView = new FocusView();
     }
 
     private void lazyInit() {
@@ -72,9 +79,6 @@ public class OpenVRListener implements VRDeviceListener {
 
     /**
      * True if only the given button is pressed
-     *
-     * @param button
-     * @return
      */
     private boolean isPressed(int button) {
         return pressedButtons.contains(button);
@@ -182,15 +186,16 @@ public class OpenVRListener implements VRDeviceListener {
     /**
      * Selects the object pointed by the given device.
      *
-     * @param device
+     * @param device The VR device.
      */
     private void select(VRDevice device) {
         // Selection
-        VRDeviceModel sm = vrDeviceToModel.get(device);
-        if (sm != null) {
-            p0.set(sm.getBeamP0());
-            p1.set(sm.getBeamP1());
-            IFocus hit = getBestHit(p0, p1);
+        Entity sm = vrDeviceToModel.get(device);
+        if (sm != null && Mapper.vr.has(sm)) {
+            var vr = Mapper.vr.get(sm);
+            p0.set(vr.beamP0);
+            p1.set(vr.beamP1);
+            Entity hit = getBestHit(p0, p1);
             if (hit != null) {
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
@@ -200,23 +205,21 @@ public class OpenVRListener implements VRDeviceListener {
         }
     }
 
-    private Array<IFocus> getHits(Vector3d p0, Vector3d p1) {
-        Array<IFocus> l = cam.getSceneGraph().getFocusableObjects();
+    private Array<Entity> getHits(Vector3d p0, Vector3d p1) {
+        Array<Entity> l = cam.getScene().findFocusableEntities();
+        Array<Entity> hits = new Array<>();
 
-        Array<IFocus> hits = new Array<>();
-
-        Iterator<IFocus> it = l.iterator();
         // Add all hits
-        while (it.hasNext()) {
-            IFocus s = it.next();
-            s.addHitRay(p0, p1, cam, hits);
+        for (Entity s : l) {
+            focusView.setEntity(s);
+            focusView.addEntityHitRay(p0, p1, cam, hits);
         }
 
         return hits;
     }
 
-    private IFocus getBestHit(Vector3d p0, Vector3d p1) {
-        Array<IFocus> hits = getHits(p0, p1);
+    private Entity getBestHit(Vector3d p0, Vector3d p1) {
+        Array<Entity> hits = getHits(p0, p1);
         if (hits.size != 0) {
             // Sort using distance
             hits.sort(comp);
@@ -247,7 +250,7 @@ public class OpenVRListener implements VRDeviceListener {
 
         lazyInit();
 
-        VRDeviceModel sm;
+        Entity sm;
         switch (axis) {
         case VRControllerAxes.Axis1:
             // Forward
@@ -268,15 +271,16 @@ public class OpenVRListener implements VRDeviceListener {
         case VRControllerAxes.Axis0:
             // Joystick for forward/backward movement
             sm = vrDeviceToModel.get(device);
-            if (sm != null) {
+            if (sm != null && Mapper.vr.has(sm)) {
+                var vr = Mapper.vr.get(sm);
                 if (cam.getMode().isFocus()) {
                     if (pressedButtons.contains(VRControllerButtons.Axis2)) {
                         cam.addRotateMovement(valueX * 0.1, valueY * 0.1, false, false);
                     } else {
-                        cam.setVelocityVR(sm.getBeamP0(), sm.getBeamP1(), valueX, valueY);
+                        cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
                     }
                 } else {
-                    cam.setVelocityVR(sm.getBeamP0(), sm.getBeamP1(), valueX, valueY);
+                    cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
                 }
             }
             lastAxisMovedFrame = GaiaSky.instance.frames;

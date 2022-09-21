@@ -3,6 +3,7 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool.Poolable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -329,7 +330,8 @@ public class Scene {
             addUpdater(new PerimeterUpdater(families.perimeters, priority++));
 
             // Extract systems.
-            extractors = new Array<>(18);
+            extractors = new Array<>(23);
+            addExtractor(newExtractor(VRDeviceExtractor.class, families.vrdevices, priority++, sceneRenderer));
             addExtractor(newExtractor(OctreeExtractor.class, families.octrees, priority++, sceneRenderer));
             addExtractor(newExtractor(ElementsSetExtractor.class, families.orbitalElementSets, priority++, sceneRenderer));
             addExtractor(newExtractor(ParticleSetExtractor.class, families.particleSets, priority++, sceneRenderer));
@@ -407,6 +409,22 @@ public class Scene {
             for (AbstractUpdateSystem system : updaters) {
                 if (system.getFamily().matches(entity)) {
                     system.updateEntity(entity, deltaTime);
+                }
+            }
+        }
+    }
+
+    /**
+     * Runs the matching extract systems on the given entity. The systems
+     * are matched using their families.
+     *
+     * @param entity The entity to update.
+     */
+    public void extractEntity(Entity entity, float deltaTime) {
+        if (extractors != null) {
+            for (AbstractExtractSystem system : extractors) {
+                if (system.getFamily().matches(entity)) {
+                    system.extract(entity);
                 }
             }
         }
@@ -754,6 +772,17 @@ public class Scene {
             }
         }
         return copy;
+    }
+
+    public void returnCopyObject(Entity copy) {
+        // Return all to pool.
+        var currentEntity = copy;
+        do {
+            var graph = Mapper.graph.get(currentEntity);
+            var parent = graph.parent;
+            ((Poolable) currentEntity).reset();
+            currentEntity = parent;
+        } while (currentEntity != null);
     }
 
     public void reportDebugObjects() {

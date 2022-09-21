@@ -246,7 +246,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         sgrList[SGR_STEREO_IDX] = new RenderModeStereoscopic(globalResources.getSpriteBatch());
         sgrList[SGR_FOV_IDX] = new RenderModeFov();
         sgrList[SGR_CUBEMAP_IDX] = new RenderModeCubemapProjections();
-        sgrList[SGR_OPENVR_IDX] = new RenderModeOpenVR(vrContext, globalResources.getSpriteBatchVR());
+        sgrList[SGR_OPENVR_IDX] = new RenderModeOpenVR(GaiaSky.instance.scene, vrContext, globalResources.getSpriteBatchVR());
         renderMode = null;
 
         /*
@@ -515,7 +515,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    Array<VRDeviceModel> controllers = new Array<>();
+    Array<Entity> controllers = new Array<>();
     ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
 
     private void renderModel(IRenderable r, IntModelBatch batch, float alpha, boolean shadow) {
@@ -553,8 +553,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             if (Settings.settings.runtime.openVr) {
                 RenderModeOpenVR sgrVR = (RenderModeOpenVR) sgrList[SGR_OPENVR_IDX];
                 if (vrContext != null) {
-                    for (VRDeviceModel m : sgrVR.controllerObjects) {
-                        if (!models.contains(m, true))
+                    for (Entity m : sgrVR.controllerObjects) {
+                        var render = Mapper.render.get(m);
+                        if (!models.contains(render, true))
                             controllers.add(m);
                     }
                 }

@@ -718,8 +718,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         }
     }
 
-    public void setUp(ISceneGraph sceneGraph) {
-    }
 
     public void setCt(String ct) {
         this.ct = new ComponentTypes();

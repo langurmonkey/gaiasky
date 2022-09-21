@@ -23,7 +23,6 @@ import gaiasky.event.IObserver;
 import gaiasky.gui.components.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
-import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.MusicManager;
 import gaiasky.util.Settings;
@@ -58,10 +57,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null, playStop = null;
     protected OwnTextIconButton map = null;
     protected TiledDrawable separator;
-    /**
-     * The scene graph
-     */
-    private ISceneGraph sg;
 
     /**
      * The scene.
@@ -226,7 +221,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /* ----BOOKMARKS---- */
         BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, ui);
-        bookmarksComponent.setSceneGraph(sg);
         bookmarksComponent.setScene(scene);
         bookmarksComponent.initialize();
 
@@ -410,10 +404,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         // Restore position
         setY(topy - getHeight());
-    }
-
-    public void setSceneGraph(ISceneGraph sg) {
-        this.sg = sg;
     }
 
     public void setScene(Scene scene) {

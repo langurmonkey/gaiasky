@@ -34,12 +34,12 @@ public class ElementsSetExtractor extends AbstractExtractSystem {
             var set = Mapper.orbitElementsSet.get(entity);
             for (int i = 0; i < set.alwaysUpdate.size; i++) {
                 Entity child = set.alwaysUpdate.get(i);
-                extract(child);
+                extractSingle(child);
             }
         }
     }
 
-    private void extract(Entity entity) {
+    private void extractSingle(Entity entity) {
         if (Mapper.trajectory.has(entity)) {
             trajectoryExtractor.extractEntity(entity);
         }

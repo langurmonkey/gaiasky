@@ -99,7 +99,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private final FocusView focusView;
     private final VertsView vertsView;
 
-    private SceneGraph sceneGraph;
     private Scene scene;
 
     public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
@@ -3571,9 +3570,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             break;
         case SCENE_LOADED:
             this.scene = (Scene) data[0];
-            break;
-        case SCENE_GRAPH_LOADED:
-            this.sceneGraph = (SceneGraph) data[0];
             break;
         default:
             break;

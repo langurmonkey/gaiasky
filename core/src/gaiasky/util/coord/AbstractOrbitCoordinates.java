@@ -9,7 +9,8 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -44,10 +45,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
             logger.error(new RuntimeException("No parameters found, can't initialize coordinates from orbit: " + orbitname));
         } else {
             if (orbitname != null && !orbitname.isEmpty()) {
-                if (params[0] instanceof SceneGraph) {
-                    SceneGraphNode sgn = ((ISceneGraph) params[0]).getNode(orbitname);
-                    orbit = (Orbit) sgn;
-                } else if (params[0] instanceof Scene) {
+                if (params[0] instanceof Scene) {
                     entity = ((Scene) params[0]).index().getEntity(orbitname);
                 }
                 if (params[1] instanceof CelestialBody) {

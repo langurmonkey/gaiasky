@@ -1,5 +1,6 @@
 package gaiasky.render.process;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -23,9 +24,12 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.ISceneRenderer;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -50,6 +54,7 @@ import java.util.Map;
 public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode, IObserver {
     private static final Log logger = Logger.getLogger(RenderModeOpenVR.class);
 
+    private final Scene scene;
     private final VRContext vrContext;
 
     /**
@@ -67,8 +72,8 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
     public final Matrix4 eyeSpace = new Matrix4();
     public final Matrix4 invEyeSpace = new Matrix4();
 
-    public Array<VRDeviceModel> controllerObjects;
-    private Map<VRDevice, VRDeviceModel> vrDeviceToModel;
+    public Array<Entity> controllerObjects;
+    private Map<VRDevice, Entity> vrDeviceToModel;
     private Environment controllersEnv;
 
     // GUI
@@ -82,8 +87,9 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
 
     private Vector2 lastSize;
 
-    public RenderModeOpenVR(final VRContext vrContext, final SpriteBatch spriteBatch) {
+    public RenderModeOpenVR(final Scene scene, final VRContext vrContext, final SpriteBatch spriteBatch) {
         super();
+        this.scene = scene;
         // VR Context
         this.vrContext = vrContext;
 
@@ -190,16 +196,19 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             try {
                 vrContext.pollEvents();
             } catch (Exception e) {
-                // Should never happen
+                // Should never happen.
             }
 
-            // Add controllers
-            for (VRDeviceModel controller : controllerObjects) {
-                Vector3 devicePos = controller.getDevice().getPosition(Space.Tracker);
+            // Add controller objects to render lists.
+            for (Entity controller : controllerObjects) {
+                var vr = Mapper.vr.get(controller);
+                var model = Mapper.model.get(controller);
+
+                Vector3 devicePos = vr.device.getPosition(Space.Tracker);
                 // Length from headset to controller
                 auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
-                if (controller.instance != null) {
-                    controller.addToRenderLists(RenderGroup.MODEL_PIX);
+                if (model.model.instance != null) {
+                    scene.extractEntity(controller, 0f);
                 }
             }
 
@@ -335,18 +344,31 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
         }
     }
 
+    private Entity newVRDeviceModelEntity(VRDevice device, Environment environment) {
+        var archetype = scene.archetypes().get("gaiasky.scenegraph.VRDeviceModel");
+        var entity = archetype.createEntity();
+        var vr = Mapper.vr.get(entity);
+        vr.device = device;
+        var model = Mapper.model.get(entity);
+        model.model = new ModelComponent();
+        model.model.env = environment;
+        scene.initializeEntity(entity);
+        scene.setUpEntity(entity);
+        return entity;
+    }
+
     private void addVRController(VRDevice device) {
         if (!vrDeviceToModel.containsKey(device)) {
-            VRDeviceModel sm = new VRDeviceModel(device, controllersEnv);
-            controllerObjects.add(sm);
-            vrDeviceToModel.put(device, sm);
+            Entity entity = newVRDeviceModelEntity(device, controllersEnv);
+            controllerObjects.add(entity);
+            vrDeviceToModel.put(device, entity);
         }
     }
 
     private void removeVRController(VRDevice device) {
         if (vrDeviceToModel.containsKey(device)) {
-            VRDeviceModel sm = vrDeviceToModel.get(device);
-            controllerObjects.removeValue(sm, true);
+            Entity entity = vrDeviceToModel.get(device);
+            controllerObjects.removeValue(entity, true);
             vrDeviceToModel.remove(device);
         }
     }

@@ -204,6 +204,9 @@ public class Archetypes {
             // KeyframesPathObject
             addArchetype(modelName("KeyframesPathObject"), modelName("VertsObject"), Keyframes.class, Label.class);
 
+            // VRDeviceModel
+            addArchetype(modelName("VRDeviceModel"), modelName("SceneGraphNode"), VRDevice.class, Model.class, Line.class);
+
             return archetypes;
         } else {
             throw new RuntimeException("Can't create archetypes: the engine is null!");

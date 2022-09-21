@@ -40,7 +40,6 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.SceneGraph;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.*;
@@ -265,9 +264,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private Sprite spriteFocus, spriteClosest, spriteHome;
     private Texture crosshairArrow, gravWaveCrosshair;
 
-    /** A reference to the main scene graph. **/
-    private SceneGraph sceneGraph;
-
     /** A reference to the main scene. **/
     private Scene scene;
 
@@ -403,7 +399,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Event.SCENE_GRAPH_LOADED, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD,
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD,
                 Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN,
                 Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD,
                 Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO,
@@ -1251,13 +1247,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case SCENE_GRAPH_LOADED:
-            this.sceneGraph = (SceneGraph) data[0];
-            break;
         case SCENE_LOADED:
             this.scene = (Scene) data[0];
             this.focus.setScene(this.scene);
             this.closestBody.setScene(this.scene);
+            this.closestStarView.setScene(this.scene);
             break;
         case FOCUS_CHANGE_CMD:
             setTrackingObject(null, null);
@@ -1725,8 +1719,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
         // Mark home in ORANGE
         if (Settings.settings.scene.crosshair.home) {
-            if (home == null && sceneGraph != null)
-                home = sceneGraph.findFocus(Settings.settings.scene.homeObject);
+            if (home == null && scene != null) {
+                var homeEntity = scene.findFocus(Settings.settings.scene.homeObject);
+                home = new FocusView(homeEntity);
+            }
             if (home != null) {
                 drawCrosshair(spriteBatch, home, decal, false, spriteHome, crosshairArrow, chScale, rw, rh, 1f, 0.7f, 0.1f, 1f);
             }
@@ -1925,10 +1921,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         this.trackingObject.setEntity(trackingObject);
         this.trackingName = trackingName;
         EventManager.publish(Event.CAMERA_TRACKING_OBJECT_UPDATE, this, trackingObject, trackingName);
-    }
-
-    public SceneGraph getSceneGraph() {
-        return sceneGraph;
     }
 
     public Scene getScene() {

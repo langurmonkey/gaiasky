@@ -2,9 +2,11 @@ package gaiasky.scene.system.render.draw.line;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Constel;
@@ -53,6 +55,16 @@ public class LineEntityRenderSystem {
 
     public LineEntityRenderSystem(LineView view) {
         this.lineView = view;
+    }
+
+    public void renderVRDevice(Entity entity, LineRenderSystem renderer, ICamera camera, float alpha) {
+        var model = Mapper.model.get(entity);
+        var vr = Mapper.vr.get(entity);
+
+        Matrix4 transform = model.model.instance.transform;
+        vr.beamP0.set(0, -0.01f, 0).mul(transform);
+        vr.beamP1.set(0, (float) -(Constants.MPC_TO_U - Constants.PC_TO_U), (float) -Constants.MPC_TO_U).mul(transform);
+        renderer.addLine(lineView, vr.beamP0.x, vr.beamP0.y, vr.beamP0.z, vr.beamP1.x, vr.beamP1.y - 0.1f, vr.beamP1.z, 1f, 0, 0, 1f);
     }
 
     public void renderPolyline(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {

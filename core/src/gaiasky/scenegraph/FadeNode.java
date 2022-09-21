@@ -346,12 +346,6 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     }
 
     @Override
-    public void setUp(ISceneGraph sceneGraph) {
-        super.setUp(sceneGraph);
-        inSceneGraph = true;
-    }
-
-    @Override
     public void setSize(Long size) {
         this.size = (long) (size * Constants.DISTANCE_SCALE_FACTOR);
     }

@@ -24,6 +24,8 @@ import gaiasky.data.attitude.IAttitudeServer;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
@@ -57,7 +59,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     private PerspectiveCamera camera2;
     private Frustumd frustum2;
 
-    private HeliotropicSatellite gaia;
+    private Entity gaia;
     private IAttitudeServer attitudeServer;
 
     Vector3d dirMiddle, up;
@@ -73,6 +75,8 @@ public class FovCamera extends AbstractCamera implements IObserver {
     private final Vector3d dir1;
     private final Vector3d dir2;
     private final Matrix4d matrix;
+
+    private Scene scene;
 
     private Stage[] fpStages;
 
@@ -136,7 +140,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         fpStages[1] = fov2;
         fpStages[2] = fov12;
 
-        EventManager.instance.subscribe(this, Event.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED);
     }
 
     public void update(double dt, ITimeFrameProvider time) {
@@ -145,11 +149,17 @@ public class FovCamera extends AbstractCamera implements IObserver {
         up.set(0, 1, 0);
 
         /* POSITION */
-        SceneGraphNode fccopy = gaia.getLineCopy();
-        fccopy.getRoot().translation.setZero();
-        fccopy.getRoot().update(time, null, this);
+        var copy = scene.getLineCopy(gaia);
+        // Get root of line copy.
+        var copyGraph = Mapper.graph.get(copy);
+        var root = copyGraph.getRoot(copy);
+        // This updates the graph node for all entities in the line.
+        scene.updateEntity(root, (float) time.getHdiff());
 
-        fccopy.translation.put(this.pos);
+        // This updates the rest of components of our entity.
+        scene.updateEntity(copy, (float) time.getHdiff());
+
+        copyGraph.translation.put(this.pos);
         // Raise the camera 1 metre
         dirMiddle.set(0, 1.5f * Constants.M_TO_U, 0).mul(matrix);
         this.pos.add(dirMiddle);
@@ -168,12 +178,8 @@ public class FovCamera extends AbstractCamera implements IObserver {
         // Dir middle
         dirMiddle.set(0, 0, 1).mul(trf);
 
-        // Return to pool
-        SceneGraphNode ape = fccopy;
-        do {
-            ape.returnToPool();
-            ape = ape.parent;
-        } while (ape != null);
+        // Return to pool.
+        scene.returnCopyObject(copy);
 
     }
 
@@ -269,10 +275,16 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event == Event.SCENE_GRAPH_LOADED) {
-            ISceneGraph sg = (ISceneGraph) data[0];
-            this.gaia = (HeliotropicSatellite) sg.getNode("Gaia");
-            this.attitudeServer = gaia.getAttitudeServer();
+        if (event == Event.SCENE_LOADED) {
+            this.scene = (Scene) data[0];
+            this.gaia = scene.getEntity("Gaia");
+            this.closestBody.setScene(scene);
+            this.closestStarView.setScene(this.scene);
+
+            if(gaia != null && Mapper.attitude.has(gaia)) {
+                var att = Mapper.attitude.get(this.gaia);
+                this.attitudeServer = att.attitudeServer;
+            }
         }
     }
 

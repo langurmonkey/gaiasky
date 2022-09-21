@@ -145,7 +145,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Maps the VR devices to model objects.
      */
-    private HashMap<VRDevice, VRDeviceModel> vrDeviceToModel;
+    private HashMap<VRDevice, Entity> vrDeviceToModel;
 
     /**
      * The asset manager.
@@ -531,7 +531,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     // Do not resize the screen!
                     settings.graphics.backBufferResolution[1] = vrContext.getHeight();
                     settings.graphics.backBufferResolution[0] = vrContext.getWidth();
-                    //this.resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, true, true);
                 }
                 settings.graphics.vsync = false;
 
@@ -1364,7 +1363,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return 31 * h + w;
     }
 
-    public HashMap<VRDevice, VRDeviceModel> getVRDeviceToModel() {
+    public HashMap<VRDevice, Entity> getVRDeviceToModel() {
         return vrDeviceToModel;
     }
 
