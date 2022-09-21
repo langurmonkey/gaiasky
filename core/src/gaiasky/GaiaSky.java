@@ -25,8 +25,10 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
 import gaiasky.data.OctreeLoader;
 import gaiasky.data.attitude.IAttitudeServer;
-import gaiasky.data.util.*;
-import gaiasky.data.util.SGLoader.SGLoaderParameter;
+import gaiasky.data.util.AttitudeLoader;
+import gaiasky.data.util.OrbitDataLoader;
+import gaiasky.data.util.PointCloudData;
+import gaiasky.data.util.SceneLoader;
 import gaiasky.data.util.SceneLoader.SceneLoaderParameters;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -35,7 +37,6 @@ import gaiasky.gui.*;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.MainPostProcessor;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.api.IMainRenderer;
 import gaiasky.render.api.IPostProcessor;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
@@ -43,7 +44,10 @@ import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.FadeNode;
+import gaiasky.scenegraph.IVisibilitySwitch;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -1538,10 +1542,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case SCENE_ADD_OBJECT_NO_POST_CMD:
             final Entity toAddPost = (Entity) data[0];
-            boolean addToIndexp = data.length == 1 || (Boolean) data[1];
+            addToIndex = data.length == 1 || (Boolean) data[1];
             if (scene != null) {
                 try {
-                    scene.insert(toAddPost, addToIndexp);
+                    scene.insert(toAddPost, addToIndex);
                 } catch (Exception e) {
                     logger.error(e);
                 }

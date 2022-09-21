@@ -22,39 +22,32 @@ public class Index {
     private static final Logger.Log logger = Logger.getLogger(Index.class);
 
     /** Quick lookup map. Name to node. **/
-    protected Map<String, Entity> index;
+    protected final Map<String, Entity> index;
 
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations.
      **/
-    protected Map<Integer, IPosition> hipMap;
+    protected final Map<Integer, IPosition> hipMap;
 
     /** The archetypes container. **/
     protected Archetypes archetypes;
 
     /**
-     * Creates a new index with the given archetypes.
+     * Creates a new index with the given archetypes and initial number of entities.
      *
-     * @param archetypes The archetypes.
-     */
-    public Index(Archetypes archetypes) {
-        this.archetypes = archetypes;
-    }
-
-    /**
-     * Initializes the index data structures.
-     *
+     * @param archetypes     The archetypes.
      * @param numberEntities The initial number of entities in the index.
      */
-    public void initialize(int numberEntities) {
+    public Index(Archetypes archetypes, int numberEntities) {
+        this.archetypes = archetypes;
 
         // String-to-node map. The number of objects is a first approximation, as
         // some nodes actually contain multiple objects.
-        index = new HashMap<>((int) (numberEntities * 1.25));
+        index = Collections.synchronizedMap(new HashMap<>((int) (numberEntities * 1.25)));
 
         // HIP map with 121k * 1.25
-        hipMap = new HashMap<>(151250);
+        hipMap = Collections.synchronizedMap(new HashMap<>(151250));
     }
 
     /**
@@ -66,11 +59,8 @@ public class Index {
      * @return The entity, or null if it does not exist.
      */
     public Entity getEntity(String name) {
-        synchronized (index) {
-            name = name.toLowerCase().strip();
-            Entity entity = index.get(name);
-            return entity;
-        }
+        name = name.toLowerCase().strip();
+        return index.get(name);
     }
 
     /**
@@ -81,9 +71,7 @@ public class Index {
      * @return True if the index contains an entity with the given name. False otherwise.
      */
     public boolean containsEntity(String name) {
-        synchronized (index) {
-            return index.containsKey(name.toLowerCase().trim());
-        }
+        return index.containsKey(name.toLowerCase().trim());
     }
 
     /**
@@ -98,60 +86,58 @@ public class Index {
         boolean ok = true;
         Base base;
         if ((base = Mapper.base.get(entity)) != null) {
-            synchronized (index) {
-                if (base.names != null) {
-                    if (mustAddToIndex(entity)) {
-                        for (String name : base.names) {
-                            String nameLowerCase = name.toLowerCase().trim();
-                            if (!index.containsKey(nameLowerCase)) {
-                                index.put(nameLowerCase, entity);
-                            } else if (!nameLowerCase.isEmpty()) {
-                                Entity conflict = index.get(nameLowerCase);
-                                var conflictBase = Mapper.base.get(conflict);
-                                var entityArchetype = conflictBase.archetype;
-                                var conflictArchetype = Mapper.base.get(conflict).archetype;
-                                logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName().toLowerCase() + ")", conflictBase.getName() + " (" + conflictArchetype.getName().toLowerCase() + ")"));
-                                String[] names1 = base.names;
-                                String[] names2 = conflictBase.names;
-                                boolean same = names1.length == names2.length;
-                                if (same) {
-                                    for (int i = 0; i < names1.length; i++) {
-                                        same = same && names1[i].equals(names2[i]);
-                                    }
+            if (base.names != null) {
+                if (mustAddToIndex(entity)) {
+                    for (String name : base.names) {
+                        String nameLowerCase = name.toLowerCase().trim();
+                        if (!index.containsKey(nameLowerCase)) {
+                            index.put(nameLowerCase, entity);
+                        } else if (!nameLowerCase.isEmpty()) {
+                            Entity conflict = index.get(nameLowerCase);
+                            var conflictBase = Mapper.base.get(conflict);
+                            var entityArchetype = conflictBase.archetype;
+                            var conflictArchetype = Mapper.base.get(conflict).archetype;
+                            logger.debug(I18n.msg("error.name.conflict", name + " (" + entityArchetype.getName().toLowerCase() + ")", conflictBase.getName() + " (" + conflictArchetype.getName().toLowerCase() + ")"));
+                            String[] names1 = base.names;
+                            String[] names2 = conflictBase.names;
+                            boolean same = names1.length == names2.length;
+                            if (same) {
+                                for (int i = 0; i < names1.length; i++) {
+                                    same = same && names1[i].equals(names2[i]);
                                 }
-                                if (same) {
-                                    same = entityArchetype == conflictArchetype;
-                                }
-                                ok = !same;
                             }
-                        }
-
-                        // Id
-                        Id id = Mapper.id.get(entity);
-                        if (id != null && id.id > 0) {
-                            String idString = String.valueOf(id.id);
-                            index.put(idString, entity);
+                            if (same) {
+                                same = entityArchetype == conflictArchetype;
+                            }
+                            ok = !same;
                         }
                     }
 
-                    // Special cases
-
-                    // HIP stars add "HIP + hipID"
-                    Archetype starArchetype = archetypes.get(Star.class.getName());
-                    if (starArchetype.matches(entity)) {
-                        // Hip
-                        Hip hip = Mapper.hip.get(entity);
-                        if (hip.hip > 0) {
-                            String hipid = "hip " + hip.hip;
-                            index.put(hipid, entity);
-                        }
+                    // Id
+                    Id id = Mapper.id.get(entity);
+                    if (id != null && id.id > 0) {
+                        String idString = String.valueOf(id.id);
+                        index.put(idString, entity);
                     }
-
-                    // Particle/star sets add names of each contained particle.
-                    addParticleSet(entity, Mapper.particleSet.get(entity));
-                    addParticleSet(entity, Mapper.starSet.get(entity));
-
                 }
+
+                // Special cases
+
+                // HIP stars add "HIP + hipID"
+                Archetype starArchetype = archetypes.get(Star.class.getName());
+                if (starArchetype.matches(entity)) {
+                    // Hip
+                    Hip hip = Mapper.hip.get(entity);
+                    if (hip.hip > 0) {
+                        String hipid = "hip " + hip.hip;
+                        index.put(hipid, entity);
+                    }
+                }
+
+                // Particle/star sets add names of each contained particle.
+                addParticleSet(entity, Mapper.particleSet.get(entity));
+                addParticleSet(entity, Mapper.starSet.get(entity));
+
             }
         }
         if (!ok) {
@@ -182,24 +168,22 @@ public class Index {
             for (Entity e : set)
                 addToHipMap(e);
         } else {
-            synchronized (hipMap) {
-                Archetype starArchetype = archetypes.get(Star.class);
-                if (starArchetype.matches(entity)) {
-                    Hip hip = Mapper.hip.get(entity);
-                    if (hip.hip > 0) {
-                        if (hipMap.containsKey(hip.hip)) {
-                            logger.debug(I18n.msg("error.id.hip.duplicate", hip.hip));
-                        } else {
-                            hipMap.put(hip.hip, new PositionView(entity));
-                        }
+            Archetype starArchetype = archetypes.get(Star.class);
+            if (starArchetype.matches(entity)) {
+                Hip hip = Mapper.hip.get(entity);
+                if (hip.hip > 0) {
+                    if (hipMap.containsKey(hip.hip)) {
+                        logger.debug(I18n.msg("error.id.hip.duplicate", hip.hip));
+                    } else {
+                        hipMap.put(hip.hip, new PositionView(entity));
                     }
-                } else if (Mapper.starSet.has(entity)) {
-                    StarSet starSet = Mapper.starSet.get(entity);
-                    List<IParticleRecord> stars = starSet.data();
-                    for (IParticleRecord pb : stars) {
-                        if (pb.hip() > 0) {
-                            hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(), pb.pmx(), pb.pmy(), pb.pmz()));
-                        }
+                }
+            } else if (Mapper.starSet.has(entity)) {
+                StarSet starSet = Mapper.starSet.get(entity);
+                List<IParticleRecord> stars = starSet.data();
+                for (IParticleRecord pb : stars) {
+                    if (pb.hip() > 0) {
+                        hipMap.put(pb.hip(), new Position(pb.x(), pb.y(), pb.z(), pb.pmx(), pb.pmy(), pb.pmz()));
                     }
                 }
             }

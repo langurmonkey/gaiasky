@@ -13,7 +13,7 @@ import gaiasky.util.tree.OctreeNode;
 public class IndexInitializer extends AbstractInitSystem {
 
     /** The index reference. **/
-    private Index index;
+    private final Index index;
 
     public IndexInitializer(Index index, Family family, int priority) {
         super(false, family, priority);

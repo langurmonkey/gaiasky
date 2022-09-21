@@ -2,6 +2,7 @@ package gaiasky.data;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.scene.Archetype;
@@ -23,7 +24,8 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
     private static final Logger.Log logger = Logger.getLogger(NewGeoJsonLoader.class);
 
     @Override
-    public void loadData() throws FileNotFoundException {
+    public Array<Entity> loadData() throws FileNotFoundException {
+        Array<Entity> loadedEntities = new Array<>();
         try {
             JsonReader json = new JsonReader();
             for (String filePath : filePaths) {
@@ -34,7 +36,10 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
                 while (child != null) {
                     size++;
 
-                    loadJsonObject(child);
+                    Entity loadedEntity = loadJsonObject(child);
+                    if(loadedEntity != null) {
+                        loadedEntities.add(loadedEntity);
+                    }
 
                     child = child.next;
                 }
@@ -44,9 +49,10 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
+        return loadedEntities;
     }
 
-    private void loadJsonObject(JsonValue json) {
+    private Entity loadJsonObject(JsonValue json) {
         Class clazz = Area.class;
         String className = clazz.getName();
         if (!scene.archetypes().contains(className)) {
@@ -91,9 +97,9 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
             // Set to component
             perimeter.setPerimeter(convertToDoubleArray(firstelem, size, d));
 
-            // Add to engine
-            scene.engine.addEntity(entity);
+            return entity;
         }
+        return null;
     }
 
     public double[][][] convertToDoubleArray(JsonValue json, int size, int d) {

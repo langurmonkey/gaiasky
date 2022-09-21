@@ -79,7 +79,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
     }
 
     @Override
-    public void loadData() {
+    public Array<Entity> loadData() {
         clusters = new Array<>();
         // The cluster archetype
         archetype = scene.archetypes().get(StarCluster.class);
@@ -112,6 +112,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
         }
 
         logger.info(I18n.msg("notif.catalog.init", numLoaded));
+        return clusters;
     }
 
     public Array<Entity> getClusters() {
@@ -256,7 +257,6 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
         cluster.numStars = nstars;
         cluster.dist = posSph.z;
 
-        scene.engine.addEntity(entity);
         list.add(entity);
 
         numLoaded += 1;

@@ -317,12 +317,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     }
 
     @Override
-    public void loadData() {
+    public Array<Entity> loadData() {
+        Array<Entity> loadedEntities = new Array<>();
         Entity octreeWrapper = loadOctreeData();
         if (octreeWrapper != null) {
-            // Add to engine
-            scene.engine.addEntity(octreeWrapper);
-
             // Initialize daemon loader thread.
             daemon = new OctreeLoaderThread(octreeWrapper, this);
             daemon.setDaemon(true);
@@ -347,7 +345,10 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             var root = Mapper.octant.get(octreeWrapper);
 
             logger.info(I18n.msg("notif.catalog.init", root.octant.countObjects()));
+
+            loadedEntities.add(octreeWrapper);
         }
+        return loadedEntities;
     }
 
     protected void addLoadedInfo(long id, int nobjects) {

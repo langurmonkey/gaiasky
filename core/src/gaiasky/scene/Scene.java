@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
@@ -57,6 +56,7 @@ public class Scene {
 
     /** Holds all initialization systems. **/
     private Array<AbstractInitSystem> initializers;
+    private IndexInitializer indexInitializer;
     /** Holds all update systems. **/
     private Array<AbstractUpdateSystem> updaters;
     /** Holds all extract systems. **/
@@ -243,7 +243,7 @@ public class Scene {
             addInitializer(new PerimeterInitializer(setUp, families.perimeters, priority++));
             addInitializer(new DatasetDescriptionInitializer(setUp, families.catalogInfos, priority));
 
-            // Run once
+            // Run once.
             runOnce(initializers);
         }
     }
@@ -255,14 +255,23 @@ public class Scene {
         if (engine != null) {
             int numEntities = engine.getEntities().size();
 
-            index = new Index(archetypes);
-            index.initialize(numEntities);
+            index = new Index(archetypes, numEntities);
 
             // Prepare system.
-            EntitySystem indexSystem = new IndexInitializer(index, Family.all(Base.class).get(), 0);
+            indexInitializer = new IndexInitializer(index, Family.all(Base.class).get(), 0);
 
             // Run once.
-            runOnce(indexSystem);
+            runOnce(indexInitializer);
+        }
+    }
+
+    /**
+     * Inserts the given entity into the index by running the index initializer system on it.
+     * @param entity The entity.
+     */
+    public void addToIndex(Entity entity) {
+        if (Mapper.base.has(entity)) {
+           indexInitializer.initializeEntity(entity);
         }
     }
 

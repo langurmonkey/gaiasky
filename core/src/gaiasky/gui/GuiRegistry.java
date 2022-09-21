@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
@@ -16,7 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
-import gaiasky.data.SceneGraphJsonLoader;
+import gaiasky.data.SceneJsonLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -24,8 +25,6 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager;
@@ -417,8 +416,8 @@ public class GuiRegistry implements IObserver {
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
-                fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().matches("^catalog-[\\w-]+.json$"));
+                fc.setAcceptedFiles("*.vot, *.csv, *.fits, catalog-*.json");
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.exists(result) && Files.exists(result)) {
@@ -430,27 +429,30 @@ public class GuiRegistry implements IObserver {
                                     GaiaSky.instance.getExecutorService().execute(() -> {
                                         try {
                                             logger.info(I18n.msg("notif.catalog.loading", fileName));
-                                            final Array<SceneGraphNode> objects = SceneGraphJsonLoader.loadJsonFile(Gdx.files.absolute(result.toAbsolutePath().toString()));
+                                            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(Gdx.files.absolute(result.toAbsolutePath().toString()), scene);
+                                            int i = 0;
+                                            for (Entity e : objects) {
+                                                if (e == null) {
+                                                    logger.error("Entity is null: " + i);
+                                                }
+                                                i++;
+                                            }
                                             logger.info(I18n.msg("notif.catalog.loaded", objects.size, I18n.msg("gui.objects")));
                                             GaiaSky.postRunnable(() -> {
                                                 // THIS WILL BLOCK
-                                                for (SceneGraphNode node : objects) {
-                                                    node.initialize();
-                                                }
-                                                for (SceneGraphNode node : objects) {
-                                                    EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, node, true);
-                                                }
+                                                objects.forEach(scene::initializeEntity);
+                                                objects.forEach(scene::addToIndex);
                                                 while (!GaiaSky.instance.assetManager.isFinished()) {
-                                                    // Busy wait
+                                                    // Active wait
                                                     try {
                                                         Thread.sleep(100);
                                                     } catch (InterruptedException e) {
                                                         logger.error(e);
                                                     }
                                                 }
-                                                for (SceneGraphNode node : objects) {
-                                                    node.doneLoading(GaiaSky.instance.assetManager);
-                                                }
+                                                objects.forEach(scene::setUpEntity);
+                                                objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
+
                                                 GaiaSky.postRunnable(GaiaSky.instance::touchSceneGraph);
                                             });
                                         } catch (Exception e) {

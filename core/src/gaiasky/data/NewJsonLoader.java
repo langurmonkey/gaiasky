@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scene.Archetype;
 import gaiasky.scene.AttributeMap;
 import gaiasky.scene.component.Base;
 import gaiasky.util.Functions.Function3;
@@ -50,7 +49,8 @@ public class NewJsonLoader extends AbstractSceneLoader {
 
 
     @Override
-    public void loadData() throws FileNotFoundException {
+    public Array<Entity> loadData() throws FileNotFoundException {
+        Array<Entity> loadedEntities = new Array<>();
         Array<String> filePaths = new Array<>(this.filePaths);
 
         // Actually load the files.
@@ -80,11 +80,11 @@ public class NewJsonLoader extends AbstractSceneLoader {
                         } else {
                             loaded++;
                             // Create entity and fill it up
-                            Archetype archetype = scene.archetypes().get(clazzName);
-                            Entity entity = archetype.createEntity();
+                            var archetype = scene.archetypes().get(clazzName);
+                            var entity = archetype.createEntity();
                             fillEntity(child, entity, clazz.getSimpleName());
-                            // Add to engine
-                            scene.engine.addEntity(entity);
+                            // Add to return list
+                            loadedEntities.add(entity);
                         }
 
                         child = child.next;
@@ -97,6 +97,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                 logger.error(e);
             }
         }
+        return loadedEntities;
     }
 
     /**
@@ -123,23 +124,23 @@ public class NewJsonLoader extends AbstractSceneLoader {
                 } else if (attribute.isArray()) {
                     // We suppose our children are of the same type
                     switch (attribute.child.type()) {
-                    case stringValue:
+                    case stringValue -> {
                         valueClass = String[].class;
                         value = attribute.asStringArray();
-                        break;
-                    case doubleValue:
+                    }
+                    case doubleValue -> {
                         valueClass = double[].class;
                         value = attribute.asDoubleArray();
-                        break;
-                    case booleanValue:
+                    }
+                    case booleanValue -> {
                         valueClass = boolean[].class;
                         value = attribute.asBooleanArray();
-                        break;
-                    case longValue:
+                    }
+                    case longValue -> {
                         valueClass = int[].class;
                         value = attribute.asIntArray();
-                        break;
-                    case object:
+                    }
+                    case object -> {
                         valueClass = Object[].class;
                         value = new Object[attribute.size];
                         JsonValue vectorattrib = attribute.child;
@@ -151,15 +152,15 @@ public class NewJsonLoader extends AbstractSceneLoader {
                             i++;
                             vectorattrib = vectorattrib.next;
                         }
-                        break;
-                    case array:
+                    }
+                    case array -> {
                         // Multi-dim array
                         Pair<Object, Class> p = toMultidimDoubleArray(attribute);
                         value = p.getFirst();
                         valueClass = p.getSecond();
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                     }
 
                 } else if (attribute.isObject()) {

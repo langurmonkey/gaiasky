@@ -1,6 +1,8 @@
 package gaiasky.data;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -38,10 +40,13 @@ public class SceneJsonLoader {
             }
         }
 
-        // Load files
+        final Array<Entity> loadedEntities = new Array<>();
+        // Load files.
         for (FileHandle jsonFile : jsonFiles) {
-            loadJsonFile(jsonFile, scene);
+            loadedEntities.addAll(loadJsonFile(jsonFile, scene));
         }
+        // Add entities to engine.
+        loadedEntities.forEach(scene.engine::addEntity);
 
         // Initialize nodes, look for octrees and star groups.
         scene.initializeEntities();
@@ -54,12 +59,12 @@ public class SceneJsonLoader {
 
     }
 
-    public synchronized static void loadJsonFile(FileHandle jsonFile, Scene scene) throws ReflectionException, FileNotFoundException {
-
+    public synchronized static Array<Entity> loadJsonFile(FileHandle jsonFile, Scene scene) throws ReflectionException, FileNotFoundException {
+        Array<Entity> loadedEntities = new Array<>();
         JsonReader jsonReader = new JsonReader();
         JsonValue model = jsonReader.parse(jsonFile.read());
 
-        // Must have a 'data' element
+        // Must have a 'data' element.
         if (model.has("data")) {
             String name = model.get("name") != null ? model.get("name").asString() : null;
             String desc = model.get("description") != null ? model.get("description").asString() : null;
@@ -81,14 +86,11 @@ public class SceneJsonLoader {
                 }
 
                 // Loader mappings.
-                if (clazzName.equals("gaiasky.data.JsonLoader")) {
-                    clazzName = "gaiasky.data.NewJsonLoader";
-                } else if (clazzName.equals("gaiasky.data.GeoJsonLoader")) {
-                    clazzName = "gaiasky.data.NewGeoJsonLoader";
-                } else if (clazzName.equals("gaiasky.data.group.OctreeGroupLoader")) {
-                    clazzName = "gaiasky.data.OctreeLoader";
-                } else if(clazzName.equals("gaiasky.data.cluster.StarClusterLoader")) {
-                    clazzName = "gaiasky.data.NewStarClusterLoader";
+                switch (clazzName) {
+                case "gaiasky.data.JsonLoader" -> clazzName = "gaiasky.data.NewJsonLoader";
+                case "gaiasky.data.GeoJsonLoader" -> clazzName = "gaiasky.data.NewGeoJsonLoader";
+                case "gaiasky.data.group.OctreeGroupLoader" -> clazzName = "gaiasky.data.OctreeLoader";
+                case "gaiasky.data.cluster.StarClusterLoader" -> clazzName = "gaiasky.data.NewStarClusterLoader";
                 }
 
                 @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
@@ -104,10 +106,10 @@ public class SceneJsonLoader {
                         loader.setName(name);
                     if (desc != null)
                         loader.setDescription(desc);
-                    if (params != null && params.size() > 0)
+                    if (params.size() > 0)
                         loader.setParams(params);
 
-                    // Init loader
+                    // Init loader.
                     loader.initialize(files, scene);
 
                     JsonValue curr = filesJson;
@@ -136,19 +138,24 @@ public class SceneJsonLoader {
                         }
                     }
 
-                    // Load data
-                    loader.loadData();
+                    // Load data.
+                    var data = loader.loadData();
+                    // Add to list.
+                    loadedEntities.addAll(data);
                 }
 
                 child = child.next;
             }
         } else {
-            // Use regular JsonLoader
+            // Use regular JsonLoader.
             NewJsonLoader loader = new NewJsonLoader();
             loader.initialize(new String[] { jsonFile.file().getAbsolutePath() }, scene);
-            // Load data
-            loader.loadData();
+            // Load data.
+            var data = loader.loadData();
+            // Add to list.
+            loadedEntities.addAll(data);
         }
+        return loadedEntities;
     }
 
     /**

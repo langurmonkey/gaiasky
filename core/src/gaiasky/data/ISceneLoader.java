@@ -5,6 +5,9 @@
 
 package gaiasky.data;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Scene;
 import uk.ac.starlink.util.DataSource;
 
@@ -21,7 +24,11 @@ public interface ISceneLoader {
 
     void initialize(DataSource ds, Scene scene);
 
-    void loadData() throws FileNotFoundException;
+    /**
+     * Performs the loading and returns an array with the entities loaded.
+     * @return The loaded entities.
+     */
+    Array<Entity> loadData() throws FileNotFoundException;
 
     void setName(String name);
 

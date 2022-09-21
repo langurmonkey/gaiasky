@@ -369,7 +369,7 @@ public class FileChooser extends GenericDialog {
             }
         });
 
-        fileNameInput = new TextField("", skin);
+        fileNameInput = new OwnTextField("", skin);
         Label fileNameLabel = new Label(I18n.msg("gui.fc.filename") + ":", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
