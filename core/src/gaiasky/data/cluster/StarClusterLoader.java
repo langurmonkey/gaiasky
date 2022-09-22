@@ -9,7 +9,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.ISceneGraphLoader;
-import gaiasky.data.stars.AbstractCatalogLoader;
 import gaiasky.scenegraph.StarCluster;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -55,9 +54,45 @@ import java.util.Map;
  * <li>nstars: {@link gaiasky.util.ucd.UCDParser#nstarscolnames}</li>
  * </ul>
  */
-public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
+public class StarClusterLoader implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(StarClusterLoader.class);
     boolean active = true;
+
+    public String[] files;
+
+    public DataSource dataSource;
+
+    protected String name;
+    protected String description;
+    // Parameters (size, nobjets, etc.).
+    protected Map<String, Object> params;
+
+    // Default parent name.
+    protected String parentName;
+
+    public void initialize(String[] files) {
+        this.files = files;
+    }
+
+    public void initialize(DataSource ds) {
+        this.dataSource = ds;
+    }
+
+    public void setParentName(String parentName){
+        this.parentName = parentName;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
+    }
 
     private enum ClusterProperties {
         NAME, RA, DEC, DIST, PLLX, PMRA, PMDE, RV, RADIUS, NSTARS
