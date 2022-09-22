@@ -11,10 +11,6 @@ import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.FadeNode;
-import gaiasky.scenegraph.OrbitalElementsGroup;
-import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.Filter;
@@ -59,25 +55,21 @@ public class CatalogInfo {
     // Catalog type
     public CatalogInfoSource type;
 
-    // Reference to scene graph object
-    public FadeNode object;
-
     // Reference to the entity
     public Entity entity;
     private final FocusView view;
 
     public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, Entity entity) {
-        this(name, description, source, type, hlSizeFactor, (FadeNode) null);
+        this(name, description, source, type, hlSizeFactor);
         setEntity(entity);
     }
 
-    public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, FadeNode object) {
+    public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor) {
         super();
         this.name = name;
         this.description = description;
         this.source = source;
         this.type = type;
-        this.object = object;
         this.loadDateUTC = Instant.now();
         this.plainColor = true;
         this.hlColor = new float[4];
@@ -85,9 +77,6 @@ public class CatalogInfo {
         this.hlAllVisible = true;
         this.view = new FocusView();
         System.arraycopy(ColorUtils.getColorFromIndex(colorIndexSequence++), 0, this.hlColor, 0, 4);
-
-        if (this.object != null)
-            this.object.setCatalogInfo(this);
     }
 
     public void setEntity(Entity entity) {
@@ -101,9 +90,7 @@ public class CatalogInfo {
     }
 
     public void setVisibility(boolean visibility) {
-        if (this.object != null) {
-            this.object.setVisibleGroup(visibility);
-        } else if (this.entity != null) {
+        if (this.entity != null) {
             synchronized (view) {
                 view.setEntity(this.entity);
                 view.setVisibleGroup(visibility);
@@ -116,9 +103,7 @@ public class CatalogInfo {
     }
 
     public boolean isVisible(boolean attributeValue) {
-        if (this.object != null) {
-            return this.object.isVisibleGroup(attributeValue);
-        } else if (this.entity != null) {
+        if (this.entity != null) {
             boolean ret;
             synchronized (view) {
                 view.setEntity(this.entity);
@@ -169,13 +154,7 @@ public class CatalogInfo {
      * Unloads and removes the catalog described by this catalog info
      */
     public void removeCatalog() {
-        if (this.object != null) {
-            EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, this.object, true);
-            this.object.dispose();
-            logger.info(I18n.msg("gui.dataset.remove.info", name));
-
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.dataset.remove.info", name));
-        } else if (this.entity != null) {
+        if (this.entity != null) {
             EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, this, this.entity, true);
             logger.info(I18n.msg("gui.dataset.remove.info", name));
 
@@ -191,13 +170,7 @@ public class CatalogInfo {
      */
     public void highlight(boolean hl) {
         this.highlighted = hl;
-        if (object != null) {
-            if (plainColor) {
-                object.highlight(hl, hlColor, hlAllVisible);
-            } else {
-                object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
-            }
-        } else if (entity != null) {
+        if (entity != null) {
             synchronized (view) {
                 view.setEntity(entity);
                 if (plainColor) {
@@ -214,9 +187,7 @@ public class CatalogInfo {
      * @return True if this is a highlightable catalog, false otherwise.
      */
     public boolean isHighlightable() {
-        if (this.object != null) {
-            return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper || this.object instanceof OrbitalElementsGroup;
-        } else if (this.entity != null) {
+        if (this.entity != null) {
             return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity) || Mapper.orbitElementsSet.has(entity);
         }
         return false;
@@ -226,9 +197,7 @@ public class CatalogInfo {
      * @return True if this catalog's particles have attributes (they are stars), false otherwise.
      */
     public boolean hasParticleAttributes() {
-        if (this.object != null) {
-            return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper;
-        } else if (this.entity != null) {
+        if (this.entity != null) {
             return Mapper.particleSet.has(entity) || Mapper.starSet.has(entity) || Mapper.octree.has(entity);
         }
         return false;
@@ -240,9 +209,7 @@ public class CatalogInfo {
      * @return The component type.
      */
     public ComponentTypes getCt() {
-        if (object != null) {
-            return object.ct;
-        } else if (entity != null) {
+        if (entity != null) {
             return Mapper.base.get(entity).ct;
         }
         return null;

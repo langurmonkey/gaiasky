@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
@@ -127,11 +126,6 @@ public class StaticCoordinates implements IBodyCoordinates {
         double dist = Constants.PC_TO_U * equatorial[2];
         this.position = new Vector3b();
         Coordinates.sphericalToCartesian(ra, dec, new Apfloat(dist), this.position);
-    }
-
-    @Override
-    public Orbit getOrbitObject() {
-        return null;
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
@@ -38,7 +39,7 @@ import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -123,7 +124,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         aux3b3 = new Vector3b();
         aux2d1 = new Vector2d();
 
-        em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE, Event.SCENE_LOADED, Event.SCENE_GRAPH_LOADED);
+        em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE, Event.SCENE_LOADED);
     }
 
     private void initializeTextures() {
@@ -1556,7 +1557,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (Mapper.atmosphere.has(object)) {
                 synchronized (focusView) {
                     focusView.setEntity(object);
-                    Entity loc = focusView.getChildByNameAndArchetype(locationName, scene.archetypes().get(Loc.class));
+                    Entity loc = focusView.getChildByNameAndArchetype(locationName, scene.archetypes().get("gaiasky.scenegraph.Loc"));
                     if (loc != null) {
                         var locMark = Mapper.loc.get(loc);
                         landAtObjectLocation(object, locMark.location.x, locMark.location.y, stop);
@@ -1590,15 +1591,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 String nameStub = focusView.getCandidateName() + " [loc]";
 
                 if (!scene.index().containsEntity(nameStub)) {
-                    var archetype = scene.archetypes().get(Invisible.class);
+                    var archetype = scene.archetypes().get("gaiasky.scenegraph.Invisible");
                     Entity invisible = archetype.createEntity();
                     var base = Mapper.base.get(invisible);
                     base.setName(nameStub);
+                    base.setCt("Others");
                     var body = Mapper.body.get(invisible);
                     body.setSizeM(500.0);
                     var graph = Mapper.graph.get(invisible);
+                    graph.translation = new Vector3b();
                     graph.setParent(Scene.ROOT_NAME);
-                    EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, invisible, true);
+                    scene.initializeEntity(invisible);
+                    scene.setUpEntity(invisible);
+                    EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, invisible, true);
                 }
                 Entity invisible = scene.getEntity(nameStub);
 
@@ -1686,7 +1691,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     // Land
                     landOnObject(focusView.getEntity(), stop);
                 }
-                EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, invisible, true);
+                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, this, invisible, true);
             }
         }
     }
@@ -2621,20 +2626,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
         if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth") && checkNum(primitive, 1, 3, "primitive")) {
-            // Old
-            {
-                Polyline pl = new Polyline(arrowCaps, primitive);
-                pl.setCt("Others");
-                pl.setColor(color);
-                pl.setName(name);
-                pl.setPoints(points);
-                pl.setPrimitiveSize((float) lineWidth);
-                pl.setParent(SceneGraphNode.ROOT_NAME);
-                pl.initialize();
-
-                em.post(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, pl, true);
-            }
-
             // New
             {
                 var archetype = scene.archetypes().get(Polyline.class);
@@ -2719,7 +2710,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void removeModelObject(String name) {
         if (checkString(name, "name")) {
-            em.post(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, name, true);
             em.post(Event.SCENE_REMOVE_OBJECT_CMD, this, name, true);
         }
     }
@@ -3031,7 +3021,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (datasetOptions.type == DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
-                    var archetype = scene.archetypes().get(GenericCatalog.class);
+                    var archetype = scene.archetypes().get("gaiasky.scenegraph.GenericCatalog");
                     var entity = archetype.createEntity();
 
                     var base = Mapper.base.get(entity);
@@ -3238,25 +3228,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             // Try extra attributes
 
-            // Old
-            {
-                if (ci.object instanceof ParticleGroup) {
-                    ParticleGroup pg = (ParticleGroup) ci.object;
-                    ObjectDoubleMap.Keys<UCD> ucds = pg.get(0).extraKeys();
-                    for (UCD ucd : ucds)
-                        if (ucd.colname.equalsIgnoreCase(name))
-                            return new AttributeUCD(ucd);
-                }
-            }
-
             // New
             {
-                if (ci.entity != null && Mapper.particleSet.has(ci.entity)) {
-                    ParticleGroup pg = (ParticleGroup) ci.object;
-                    ObjectDoubleMap.Keys<UCD> ucds = pg.get(0).extraKeys();
-                    for (UCD ucd : ucds)
-                        if (ucd.colname.equalsIgnoreCase(name))
-                            return new AttributeUCD(ucd);
+                if (ci.entity != null) {
+                    var entity = ci.entity;
+                    synchronized(focusView) {
+                        focusView.setEntity(entity);
+                        if(focusView.isSet()) {
+                            ObjectDoubleMap.Keys<UCD> ucds = focusView.getSet().data().get(0).extraKeys();
+                            for (UCD ucd : ucds)
+                                if (ucd.colname.equalsIgnoreCase(name))
+                                    return new AttributeUCD(ucd);
+                        }
+                    }
                 }
             }
         }
@@ -3312,46 +3296,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(shapeName, "shapeName") && checkStringEnum(shapeType, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
             final var shapeLc = shapeType.toLowerCase();
             postRunnable(() -> {
-                // OLD
-                {
-                    IFocus trackingObject = new FocusView(getFocus(objectName));
-                    float[] color = new float[] { r, g, b, a };
-                    int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
-                    final ShapeObject shapeObj;
-                    if (trackObject) {
-                        shapeObj = new ShapeObject(new String[] { shapeName.trim() }, SceneGraphNode.ROOT_NAME, trackingObject, objectName, showLabel, color);
-                    } else {
-                        shapeObj = new ShapeObject(new String[] { shapeName.trim() }, SceneGraphNode.ROOT_NAME, trackingObject.getAbsolutePosition(objectName, new Vector3b()), objectName, showLabel, color);
-                    }
-                    shapeObj.setLabelcolor(new float[] { r, g, b, a });
-                    shapeObj.ct = new ComponentTypes(ComponentType.Others.ordinal());
-                    shapeObj.size = (float) (size * Constants.KM_TO_U);
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("quality", 25L);
-                    params.put("divisions", shapeLc.equalsIgnoreCase(Shape.OCTAHEDRONSPHERE.toString()) ? 3L : 15L);
-                    params.put("recursion", 3L);
-                    params.put("diameter", 1.0);
-                    params.put("width", 1.0);
-                    params.put("height", 1.0);
-                    params.put("depth", 1.0);
-                    params.put("innerradius", 0.6);
-                    params.put("outerradius", 1.0);
-                    params.put("sphere-in-ring", false);
-                    params.put("flip", false);
-                    shapeObj.setModel(shapeLc, primitiveInt, params);
-
-                    shapeObj.doneLoading(GaiaSky.instance.assetManager);
-
-                    EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, shapeObj, false);
-                }
-
                 // NEW
                 {
                     Entity trackingObject = getFocusEntity(objectName);
                     float[] color = new float[] { r, g, b, a };
                     int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
                     // Create shape
-                    Archetype at = scene.archetypes().get(ShapeObject.class.getName());
+                    Archetype at = scene.archetypes().get("gaiasky.scenegraph.ShapeObject");
                     Entity newShape = at.createEntity();
 
                     var base = Mapper.base.get(newShape);

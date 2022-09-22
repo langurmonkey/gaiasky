@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
@@ -14,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scene.Mapper;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
@@ -24,13 +25,13 @@ import gaiasky.util.validator.FloatValidator;
 
 public class LandAtWindow extends GenericDialog {
 
-    private final CelestialBody target;
+    private final Entity target;
     private CheckBox latlonCb, locationCb;
 
     private OwnTextField location, latitude, longitude;
 
-    public LandAtWindow(CelestialBody target, Stage stage, Skin skin) {
-        super(I18n.msg("context.landatcoord", target.getName()), skin, stage);
+    public LandAtWindow(Entity target, Stage stage, Skin skin) {
+        super(I18n.msg("context.landatcoord", Mapper.base.get(target).getName()), skin, stage);
         this.target = target;
 
         setAcceptText(I18n.msg("gui.ok"));
@@ -112,9 +113,6 @@ public class LandAtWindow extends GenericDialog {
 
     /**
      * Sets the enabled property on the given components
-     * 
-     * @param enabled
-     * @param components
      */
     protected void enableComponents(boolean enabled, Disableable... components) {
         for (Disableable c : components) {

@@ -2,11 +2,9 @@ package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
 import gaiasky.render.api.IPointRenderable;
-import gaiasky.render.system.PointRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.entity.EntityUtils;
-import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * An entity view that implements the {@link IPointRenderable} methods.
@@ -18,11 +16,6 @@ public class PointView extends RenderView implements IPointRenderable {
 
     /** Creates an empty line view. **/
     public PointView() {
-    }
-
-    @Override
-    public void render(PointRenderSystem renderer, ICamera camera, float alpha) {
-        /** This is implemented in {@link gaiasky.scene.system.render.draw.PointPrimitiveRenderSystem}. **/
     }
 
     @Override

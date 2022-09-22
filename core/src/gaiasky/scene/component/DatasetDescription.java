@@ -1,7 +1,6 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import gaiasky.scenegraph.FadeNode;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.parse.Parser;
 
@@ -41,7 +40,7 @@ public class DatasetDescription implements Component {
         if (nParticles <= 0) {
             nParticles = getLong(map, "nobjects", -1);
         }
-        this.catalogInfo = new CatalogInfo(name, desc, source, type, size, (FadeNode) null);
+        this.catalogInfo = new CatalogInfo(name, desc, source, type, size);
         this.catalogInfo.sizeBytes = sizeBytes;
         this.catalogInfo.nParticles = nParticles;
 

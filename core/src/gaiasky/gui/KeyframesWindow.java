@@ -24,11 +24,10 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Keyframes;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.KeyframesView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.Invisible;
-import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -246,7 +245,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         buildSuper();
 
         // Add path object to model
-        var entity = scene.archetypes().get(KeyframesPathObject.class).createEntity();
+        var entity = scene.archetypes().get("gaiasky.scenegraph.KeyframesPathObject").createEntity();
 
         var base = Mapper.base.get(entity);
         base.setName("keyframed.camera.path");
@@ -1025,7 +1024,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private void clean(boolean cleanKeyframesList, boolean cleanModel) {
         // Clean camera
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
-        if (focus instanceof Invisible && focus.getName().startsWith("Keyframe")) {
+        if (Mapper.tagInvisible.has(((FocusView) focus).getEntity()) && focus.getName().startsWith("Keyframe")) {
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, Settings.settings.scene.homeObject);
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
         }

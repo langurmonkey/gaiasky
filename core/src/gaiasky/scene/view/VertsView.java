@@ -13,7 +13,6 @@ import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.entity.EntityUtils;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.math.Vector3d;
 
 /**
@@ -82,11 +81,6 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
     @Override
     public Matrix4 getLocalTransform() {
         return graph.localTransform;
-    }
-
-    @Override
-    public SceneGraphNode getParent() {
-        return null;
     }
 
     @Override

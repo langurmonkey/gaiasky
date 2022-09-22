@@ -21,8 +21,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
 import gaiasky.scene.Mapper;
-import gaiasky.scenegraph.IVisibilitySwitch;
-import gaiasky.scenegraph.MeshObject;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
@@ -77,16 +76,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     private void setDatasetVisibility(CatalogInfo ci, OwnImageButton eye, boolean visible, Actor source) {
-        if (ci.object != null) {
-            if (source != eye) {
-                eye.setCheckedNoFire(!visible);
-            }
-            EventManager.publish(Event.CATALOG_VISIBLE, this, ci.name, visible);
-            if (ci.object instanceof MeshObject) {
-                EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, ci.object, ci.object.getName(), visible);
-            }
-        }
-
         if (ci.entity != null) {
             if (source != eye) {
                 eye.setCheckedNoFire(!visible);
@@ -96,17 +85,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 var base = Mapper.base.get(ci.entity);
                 EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, ci.entity, base.getName(), visible);
             }
-
         }
     }
 
     private void setDatasetHighlight(CatalogInfo ci, OwnImageButton mark, boolean highlight, Actor source) {
-        if (ci.object != null) {
-            if (source != mark) {
-                mark.setCheckedNoFire(highlight);
-            }
-            EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight);
-        }
         if (ci.entity != null) {
             if (source != mark) {
                 mark.setCheckedNoFire(highlight);
@@ -236,9 +218,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         if (ci.isHighlightable()) {
             OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.msg("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
             sizeScaling.setWidth(320f);
-            if (ci.object != null) {
-                sizeScaling.setMappedValue(ci.object.getPointscaling());
-            } else if (ci.entity != null) {
+            if (ci.entity != null) {
                 var graph = Mapper.graph.get(ci.entity);
                 var hl = Mapper.highlight.get(ci.entity);
                 if (hl != null) {
@@ -406,10 +386,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         case PER_OBJECT_VISIBILITY_CMD:
             ui = source == this;
             if (!ui) {
-                IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
+                FocusView obj = (FocusView) data[0];
                 String name = (String) data[1];
                 boolean checked = (Boolean) data[2];
-                if (obj instanceof MeshObject) {
+                if (Mapper.mesh.has(obj.getEntity())) {
                     OwnImageButton eye = imageMap.get(name)[0];
                     eye.setCheckedNoFire(!checked);
                 }

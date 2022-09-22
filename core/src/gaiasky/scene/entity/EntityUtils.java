@@ -3,6 +3,7 @@ package gaiasky.scene.entity;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
@@ -11,10 +12,7 @@ import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
-import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.CatalogInfo;
 import gaiasky.util.math.Vector3b;
 
 import java.util.List;
@@ -137,7 +135,7 @@ public class EntityUtils {
         double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
         String ct = datasetOptions == null || datasetOptions.ct == null ? ComponentType.Galaxies.toString() : datasetOptions.ct.toString();
 
-        var archetype = scene.archetypes().get(ParticleGroup.class);
+        var archetype = scene.archetypes().get("gaiasky.scenegraph.ParticleGroup");
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);
@@ -177,7 +175,7 @@ public class EntityUtils {
         double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
 
-        var archetype = scene.archetypes().get(StarGroup.class);
+        var archetype = scene.archetypes().get("gaiasky.scenegraph.StarGroup");
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);
@@ -210,5 +208,9 @@ public class EntityUtils {
         }
 
         return entity;
+    }
+
+    public static boolean isVisibilityOn(Entity entity) {
+        return GaiaSky.instance.isOn(Mapper.base.get(entity).ct);
     }
 }

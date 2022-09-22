@@ -29,9 +29,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IStarFocus;
-import gaiasky.scenegraph.Planet;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
@@ -370,7 +368,7 @@ public class FullGui extends AbstractGui {
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case SHOW_PROCEDURAL_GEN_ACTION:
-            Planet planet = (Planet) data[0];
+            FocusView planet = (FocusView) data[0];
             Actor w = findActor("procedural-window");
             // Only one instance
             if (w != null && w.hasParent()) {
@@ -383,8 +381,8 @@ public class FullGui extends AbstractGui {
             }
             break;
         case SHOW_LAND_AT_LOCATION_ACTION:
-            CelestialBody target = (CelestialBody) data[0];
-            LandAtWindow landAtLocation = new LandAtWindow(target, ui, skin);
+            var target = (FocusView) data[0];
+            LandAtWindow landAtLocation = new LandAtWindow(target.getEntity(), ui, skin);
             landAtLocation.show(ui);
             break;
         case SHOW_PLAYCAMERA_ACTION:

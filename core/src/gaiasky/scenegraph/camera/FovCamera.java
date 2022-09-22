@@ -343,7 +343,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public boolean isVisible(CelestialBody cb) {
+    public boolean isVisible(Entity cb) {
         return switch (parent.mode) {
             case GAIA_FOV1_MODE, GAIA_FOV2_MODE -> super.isVisible(cb);
             case GAIA_FOVS_MODE -> computeVisibleFovs(cb, this);

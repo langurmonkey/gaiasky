@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -214,8 +213,10 @@ public abstract class AbstractCamera implements ICamera {
     private static final double VIEW_ANGLE = Math.toRadians(0.05);
 
     @Override
-    public boolean isVisible(CelestialBody cb) {
-        return isVisible(cb.viewAngle, cb.translation, cb.distToCamera);
+    public boolean isVisible(Entity cb) {
+        var body = Mapper.body.get(cb);
+        var graph = Mapper.graph.get(cb);
+        return isVisible(body.solidAngle, graph.translation, body.distToCamera);
     }
 
     @Override
@@ -229,17 +230,20 @@ public abstract class AbstractCamera implements ICamera {
 
     /**
      * Returns true if a body with the given position is observed in any of the
-     * given directions using the given cone angle
+     * given directions using the given cone angle.
      *
      * @param cb      The body.
      * @param fCamera The FovCamera.
      *
      * @return True if the body is observed. False otherwise.
      */
-    protected boolean computeVisibleFovs(CelestialBody cb, FovCamera fCamera) {
+    protected boolean computeVisibleFovs(Entity cb, FovCamera fCamera) {
+        var body = Mapper.body.get(cb);
+        var graph = Mapper.graph.get(cb);
         Vector3d[] dirs;
         dirs = fCamera.directions;
-        return GlobalResources.isInView(cb.translation, cb.distToCamera, fCamera.angleEdgeRad, dirs[0]) || GlobalResources.isInView(cb.translation, cb.distToCamera, fCamera.angleEdgeRad, dirs[1]);
+        return GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[0])
+                || GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[1]);
     }
 
     public double getDistance() {

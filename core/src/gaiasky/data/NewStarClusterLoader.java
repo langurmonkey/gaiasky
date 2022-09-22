@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
-import gaiasky.scenegraph.StarCluster;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -82,7 +81,7 @@ public class NewStarClusterLoader extends AbstractSceneLoader {
     public Array<Entity> loadData() {
         clusters = new Array<>();
         // The cluster archetype
-        archetype = scene.archetypes().get(StarCluster.class);
+        archetype = scene.archetypes().get("gaiasky.scenegraph.StarCluster");
         if (active) {
             numLoaded = 0;
             if (filePaths != null) {

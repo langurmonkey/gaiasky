@@ -29,7 +29,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 
@@ -51,7 +50,6 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     public ParticleSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
         utils = new ParticleUtils();
-        comp = new DistToCameraComparator<>();
 
         rand = new Random(123);
         aux1 = new Vector3();

@@ -16,8 +16,8 @@ public class KeyframeUtils {
         this.scene = scene;
     }
 
-    public Entity newVerts(Scene scene, String name, ComponentTypes ct, Class<?> clazz, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean arrowCaps) {
-        var entity = scene.archetypes().get(clazz.getName()).createEntity();
+    public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean arrowCaps) {
+        var entity = scene.archetypes().get(className).createEntity();
 
         var base = Mapper.base.get(entity);
         base.setName(name);
@@ -46,12 +46,12 @@ public class KeyframeUtils {
 
         return entity;
     }
-    public Entity newVerts(Scene scene, String name, ComponentTypes ct, Class<?> clazz, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize) {
-        return newVerts(scene, name, ct, clazz, color, rg, closedLoop, primitiveSize, false);
+    public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize) {
+        return newVerts(scene, name, ct, className, color, rg, closedLoop, primitiveSize, false);
     }
 
-    public Entity newVerts(Scene scene, String name, ComponentTypes ct, Class<?> clazz, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean blend, boolean depth) {
-        var entity = newVerts(scene, name, ct, clazz, color, rg, closedLoop, primitiveSize);
+    public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize, boolean blend, boolean depth) {
+        var entity = newVerts(scene, name, ct, className, color, rg, closedLoop, primitiveSize);
 
         var verts = Mapper.verts.get(entity);
         verts.blend = blend;

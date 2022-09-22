@@ -16,7 +16,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
@@ -539,7 +538,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public boolean isVisible(CelestialBody cb) {
+    public boolean isVisible(Entity cb) {
         return current.isVisible(cb);
     }
 

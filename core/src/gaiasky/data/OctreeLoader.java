@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.BinaryDataProvider;
-import gaiasky.data.octreegen.MetadataBinaryIO;
+import gaiasky.data.group.MetadataBinaryIO;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -24,8 +24,6 @@ import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scene.system.initialize.SceneGraphBuilderSystem;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
@@ -207,7 +205,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
              * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default
              * parallel, so we never use OctreeWrapperConcurrent
              */
-            Archetype archetype = scene.archetypes().get(OctreeWrapper.class.getName());
+            Archetype archetype = scene.archetypes().get("gaiasky.scenegraph.octreewrapper.OctreeWrapper");
             Entity entity = archetype.createEntity();
 
             // Catalog info
@@ -631,8 +629,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                                 loader.unloadOctant(octant, octreeWrapper);
                             }
                             if (octant != null && octant.objects != null && octant.objects.size() > 0) {
-                                SceneGraphNode sg = (SceneGraphNode) octant.objects.get(0);
-                                nUnloaded += sg.getStarCount();
+                                nUnloaded += octant.objects.get(0).getStarCount();
                                 if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
                                     break;
                                 }

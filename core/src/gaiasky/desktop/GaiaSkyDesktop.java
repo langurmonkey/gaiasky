@@ -263,7 +263,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     public GaiaSkyDesktop() {
         super();
-        EventManager.instance.subscribe(this, Event.SCENE_GRAPH_LOADED, Event.DISPOSE);
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.DISPOSE);
     }
 
     private void init() {
@@ -503,7 +503,7 @@ public class GaiaSkyDesktop implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case SCENE_GRAPH_LOADED:
+        case SCENE_LOADED:
             if (REST_ENABLED) {
                 /*
                  * Notify REST server that GUI is loaded and everything should be in a

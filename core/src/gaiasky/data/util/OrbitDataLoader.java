@@ -15,7 +15,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import gaiasky.data.orbit.IOrbitDataProvider;
-import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Logger;
 
@@ -67,7 +66,6 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         public int numSamples;
         public String name;
         public OrbitComponent orbitalParamaters;
-        public Orbit orbit;
         public Entity entity;
 
         public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass) {

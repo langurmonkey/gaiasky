@@ -9,8 +9,6 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scenegraph.CelestialBody;
-import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -26,7 +24,6 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
 
     protected String orbitname;
     protected Vector3d center;
-    protected Orbit orbit;
     protected Entity entity;
     protected double scaling = 1d;
 
@@ -48,9 +45,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
                 if (params[0] instanceof Scene) {
                     entity = ((Scene) params[0]).index().getEntity(orbitname);
                 }
-                if (params[1] instanceof CelestialBody) {
-                    orbit.setBody((CelestialBody) params[1]);
-                } else if (params[1] instanceof Entity) {
+                if (params[1] instanceof Entity) {
                     var trajectory = Mapper.trajectory.get(entity);
                     var orbitObject = (Entity) params[1];
                     var body = Mapper.body.get(orbitObject);
@@ -72,18 +67,13 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         this.orbitname = orbitName;
     }
 
-    @Override
-    public Orbit getOrbitObject() {
-        return orbit;
-    }
-
     public void setScaling(double scaling) {
         this.scaling = scaling;
     }
 
     @Override
     public String toString() {
-        return "{" + "name='" + orbitname + '\'' + ", orbit=" + orbit + ", scaling=" + scaling + '}';
+        return "{" + "name='" + orbitname + '\'' + ", orbit=" + entity + ", scaling=" + scaling + '}';
     }
 
     public void setCentre(double[] center) {
@@ -103,9 +93,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     }
 
     protected PointCloudData getData() {
-        if (orbit != null) {
-            return orbit.getPointCloud();
-        } else if (entity != null) {
+        if (entity != null) {
             return Mapper.verts.get(entity).pointCloudData;
         }
         return null;

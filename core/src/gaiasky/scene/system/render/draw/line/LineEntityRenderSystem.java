@@ -271,7 +271,7 @@ public class LineEntityRenderSystem {
             if (orbitTrail) {
                 float top = alpha;
                 // For large periods, fade orbit to 0 a bit before.
-                float bottom = trajectory.params != null && (trajectory.params.orbitalPeriod > 40000 || base.ct.isEnabled(ComponentType.Moons)) ? -0.2f : -0.1f;
+                float bottom = trajectory.params != null && (trajectory.params.orbitalPeriod > 40000 || base.ct.isEnabled(ComponentType.Moons)) ? -0.2f : trajectory.trailMap;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = verts.pointCloudData.getWrapTimeMs(currentTime);
@@ -314,12 +314,14 @@ public class LineEntityRenderSystem {
                     curr.mul(localTransformD);
 
                     cAlpha = MathUtils.clamp(alpha, 0f, 1f);
-                    if (orbitTrail && !reverse && n == nPoints - 2) {
-                        renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
-                    } else if (orbitTrail && reverse && n == 0) {
-                        renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                    if(cAlpha > 0) {
+                        if (orbitTrail && !reverse && n == nPoints - 2) {
+                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                        } else if (orbitTrail && reverse && n == 0) {
+                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                        }
+                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
                     }
-                    renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
 
                     alpha -= dAlpha;
 

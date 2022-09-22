@@ -173,4 +173,18 @@ public class GraphNode implements Component, ICopy {
         }
         return copy;
     }
+
+    public Entity getChildByName(String name) {
+        int size = children.size;
+        for (int i = 0; i < size; i++) {
+            Entity child = children.get(i);
+            if(child != null) {
+                var base = Mapper.base.get(child);
+                if (base.getName().equalsIgnoreCase(name)) {
+                    return child;
+                }
+            }
+        }
+        return null;
+    }
 }

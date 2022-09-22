@@ -19,7 +19,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.IVisibilitySwitch;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
@@ -677,15 +676,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
         case FORCE_OBJECT_LABEL_CMD -> {
             if (source != labelVisibility) {
-                if (data[0] instanceof SceneGraphNode) {
-                    SceneGraphNode sgn = (SceneGraphNode) data[0];
-                    String name = (String) data[1];
-                    if (sgn == currentFocus && currentFocus.hasName(name)) {
-                        boolean forceLabel = (boolean) data[2];
-                        labelVisibility.setCheckedNoFire(forceLabel);
-                    }
-                }
-
                 if (data[0] instanceof Entity) {
                     var entity = (Entity) data[0];
                     String name = (String) data[1];

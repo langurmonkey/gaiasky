@@ -13,8 +13,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.entity.KeyframeUtils;
-import gaiasky.scenegraph.Invisible;
-import gaiasky.scenegraph.Polyline;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -277,8 +275,8 @@ public class KeyframesView extends BaseView {
     }
 
     private void addKnotOrientation(int idx, double px, double py, double pz, double dx, double dy, double dz, double ux, double uy, double uz) {
-        Entity dir = utils.newVerts(scene, "Keyframes.dir", base.ct, Polyline.class, ColorUtils.gRed, RenderGroup.LINE, false, 0.6f * kf.ss);
-        Entity up = utils.newVerts(scene, "Keyframes.up", base.ct, Polyline.class, ColorUtils.gBlue, RenderGroup.LINE, false, 0.6f * kf.ss);
+        Entity dir = utils.newVerts(scene, "Keyframes.dir", base.ct, "gaiasky.scenegraph.Polyline", ColorUtils.gRed, RenderGroup.LINE, false, 0.6f * kf.ss);
+        Entity up = utils.newVerts(scene, "Keyframes.up", base.ct, "gaiasky.scenegraph.Polyline", ColorUtils.gBlue, RenderGroup.LINE, false, 0.6f * kf.ss);
 
         synchronized (verts) {
             verts.setEntity(dir);
@@ -410,7 +408,7 @@ public class KeyframesView extends BaseView {
 
     private void initFocus() {
         if (kf.focus == null || Mapper.graph.get(kf.focus).parent == null) {
-            Entity focus = scene.archetypes().get(Invisible.class.getName()).createEntity();
+            Entity focus = scene.archetypes().get("gaiasky.scenegraph.Invisible").createEntity();
             var base = Mapper.base.get(focus);
             base.setName("");
             base.setCt("Invisible");

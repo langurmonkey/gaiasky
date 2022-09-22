@@ -26,7 +26,6 @@ import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
 import gaiasky.scenegraph.MachineDefinition;
-import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -47,6 +46,8 @@ import gaiasky.util.math.Vector3d;
  * BillboardGalaxy.
  */
 public class ModelInitializer extends AbstractInitSystem {
+    private static final Logger.Log logger = Logger.getLogger(ModelInitializer.class.getSimpleName());
+
 
     /** Reference to the spacecraft radio. **/
     private SpacecraftRadio radio;
@@ -268,9 +269,9 @@ public class ModelInitializer extends AbstractInitSystem {
             model.model = new ModelComponent(true);
             model.model.randomizeAll(scaffolding.getSeed("model"), body.size);
             if (Settings.settings.program.debugInfo) {
-                Logger.getLogger(Planet.class).debug("::" + base.getName() + "::");
-                Logger.getLogger(Planet.class).debug("============MODEL===========");
-                model.model.print(Logger.getLogger(Planet.class));
+                logger.debug("::" + base.getName() + "::");
+                logger.debug("============MODEL===========");
+                model.model.print(logger);
             }
         }
         if (model.model != null) {
@@ -305,15 +306,15 @@ public class ModelInitializer extends AbstractInitSystem {
             // Ignore current cloud component (if any) and create a random one
             cloud.cloud = new CloudComponent();
             cloud.cloud.randomizeAll(scaffolding.getSeed("cloud"), body.size);
-            Logger.getLogger(Planet.class).debug("============CLOUD===========");
-            cloud.cloud.print(Logger.getLogger(Planet.class));
+            logger.debug("============CLOUD===========");
+            cloud.cloud.print(logger);
         }
         if (isRandomizeAtmosphere(scaffolding)) {
             // Ignore current atmosphere component (if any) and create a random one
             atmosphere.atmosphere = new AtmosphereComponent();
             atmosphere.atmosphere.randomizeAll(scaffolding.getSeed("atmosphere"), body.size);
-            Logger.getLogger(Planet.class).debug("============ATM===========");
-            atmosphere.atmosphere.print(Logger.getLogger(Planet.class));
+            logger.debug("============ATM===========");
+            atmosphere.atmosphere.print(logger);
         }
         if (cloud.cloud != null) {
             cloud.cloud.initialize(base.getName(), false);

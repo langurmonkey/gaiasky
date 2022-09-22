@@ -8,7 +8,6 @@ package gaiasky.scenegraph.camera;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.math.Vector3b;
@@ -171,7 +170,7 @@ public interface ICamera {
 
     IFocus getSecondClosestBody();
 
-    boolean isVisible(CelestialBody cb);
+    boolean isVisible(Entity cb);
 
     boolean isVisible(double viewAngle, Vector3d pos, double distToCamera);
 

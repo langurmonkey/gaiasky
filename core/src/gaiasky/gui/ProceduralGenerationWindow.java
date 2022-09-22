@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,7 +22,8 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.scenegraph.Planet;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.component.*;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -45,7 +47,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     // Selected tab persists across windows
     private static int lastTabSelected = 0;
 
-    private final Planet target;
+    private final Entity target;
+    private final FocusView view;
     private Random rand;
     private MaterialComponent initMtc, mtc;
     private CloudComponent initClc, clc;
@@ -59,12 +62,13 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     private int genCloudNum = 0, genSurfaceNum = 0;
 
-    public ProceduralGenerationWindow(Planet target, Stage stage, Skin skin) {
+    public ProceduralGenerationWindow(FocusView target, Stage stage, Skin skin) {
         super(I18n.msg("gui.procedural.title", target.getName()), skin, stage);
-        this.target = target;
-        this.initMtc = target.getMaterialComponent();
-        this.initClc = target.getCloudComponent();
-        this.initAc = target.getAtmosphereComponent();
+        this.target = target.getEntity();
+        this.view = new FocusView(target.getEntity());
+        this.initMtc = Mapper.model.get(this.target).model.mtc;
+        this.initClc = Mapper.cloud.get(this.target).cloud;
+        this.initAc = Mapper.atmosphere.get(this.target).atmosphere;
         this.rand = new Random(1884L);
         this.setModal(false);
 
@@ -476,12 +480,12 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     }
 
     private void buildContentSurface(Table content) {
-        ModelComponent mc = target.getModelComponent();
+        ModelComponent mc = Mapper.model.get(target).model;
         if (mc != null) {
             mtc = new MaterialComponent();
             if (initMtc == null) {
                 // Generate random material
-                mtc.randomizeAll(rand.nextLong(), target.getSize());
+                mtc.randomizeAll(rand.nextLong(), view.getSize());
             } else {
                 // Copy existing
                 mtc.copyFrom(initMtc);
@@ -570,7 +574,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
         } else {
             // Error!
-            OwnLabel l = new OwnLabel(I18n.msg("gui.procedural.nomodel", target.getName()), skin);
+            OwnLabel l = new OwnLabel(I18n.msg("gui.procedural.nomodel", view.getName()), skin);
             content.add(l).pad(pad20).center();
         }
     }
@@ -579,7 +583,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         clc = new CloudComponent();
         if (initClc == null) {
             // Generate random
-            clc.randomizeAll(rand.nextLong(), target.getSize());
+            clc.randomizeAll(rand.nextLong(), view.getSize());
         } else {
             // Copy existing
             clc.copyFrom(initClc);
@@ -614,7 +618,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         ac = new AtmosphereComponent();
         if (initAc == null) {
             // Generate random
-            ac.randomizeAll(rand.nextLong(), target.getSize());
+            ac.randomizeAll(rand.nextLong(), view.getSize());
         } else {
             // Copy existing
             ac.copyFrom(initAc);
@@ -747,7 +751,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeSurface(Boolean rebuild) {
         this.initMtc = new MaterialComponent();
-        this.initMtc.randomizeAll(rand.nextLong(), target.size);
+        this.initMtc.randomizeAll(rand.nextLong(), view.getSize());
 
         if (rebuild) {
             // Others are the same
@@ -762,7 +766,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeClouds(Boolean rebuild) {
         this.initClc = new CloudComponent();
-        this.initClc.randomizeAll(rand.nextLong(), target.size);
+        this.initClc.randomizeAll(rand.nextLong(), view.getSize());
 
         if (rebuild) {
             // Others are the same
@@ -777,7 +781,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected Boolean randomizeAtmosphere(Boolean rebuild) {
         this.initAc = new AtmosphereComponent();
-        this.initAc.randomizeAll(rand.nextLong(), target.size);
+        this.initAc.randomizeAll(rand.nextLong(), view.getSize());
 
         if (rebuild) {
             // Others are the same
@@ -804,12 +808,13 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected void generateSurfaceDirect() {
         if (genSurfaceNum == 0) {
-            MaterialComponent materialComponent = target.getMaterialComponent();
+            var model = Mapper.model.get(target);
+            var materialComponent = model.model.mtc;
             if (materialComponent != null) {
                 materialComponent.disposeTextures(GaiaSky.instance.assetManager);
             }
-            mtc.initialize(target.getName());
-            target.getModelComponent().setMaterial(mtc);
+            mtc.initialize(view.getName());
+            model.model.setMaterial(mtc);
         } else {
             logger.info(I18n.msg("gui.procedural.error.gen", I18n.msg("gui.procedural.surface")));
         }
@@ -822,13 +827,14 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     protected void generateCloudsDirect() {
         if (genCloudNum == 0) {
-            CloudComponent cloudComponent = target.getCloudComponent();
+            var cloud = Mapper.cloud.get(target);
+            CloudComponent cloudComponent = cloud.cloud;
             if (cloudComponent != null) {
                 cloudComponent.disposeTextures(GaiaSky.instance.assetManager);
             }
-            clc.initialize(target.getName(), false);
-            target.setCloud(clc);
-            target.initializeClouds(GaiaSky.instance.assetManager);
+            clc.initialize(view.getName(), false);
+            cloud.cloud = clc;
+            cloud.cloud.doneLoading(GaiaSky.instance.assetManager);
         } else {
             logger.info(I18n.msg("gui.procedural.error.gen", I18n.msg("gui.procedural.cloud")));
         }
@@ -840,8 +846,10 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     }
 
     protected void generateAtmosphereDirect() {
-        target.setAtmosphere(ac);
-        target.initializeAtmosphere(GaiaSky.instance.assetManager);
+        var atm = Mapper.atmosphere.get(target);
+        var model = Mapper.model.get(target);
+        atm.atmosphere = ac;
+        atm.atmosphere.doneLoading(model.model.instance.materials.first(), (float) view.getSize());
     }
 
     protected void generateAll() {

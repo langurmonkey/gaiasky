@@ -833,6 +833,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return starSet;
     }
 
+
+    /**
+     * Checks whether the entity is a particle or star set.
+     *
+     * @return True if the entity is a particle or star set.
+     */
+    public boolean isSet() {
+        return particleSet != null || starSet != null;
+    }
+
     public ParticleSet getSet() {
         return particleSet != null ? particleSet : starSet;
     }
@@ -1016,6 +1026,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public boolean isHighlighted() {
         initHighlight();
         return hl.highlighted;
+    }
+
+    public boolean isOctree() {
+        return entity != null && Mapper.octree.has(entity);
     }
 
     public Array<Entity> getOctreeObjects(Array<Entity> list) {

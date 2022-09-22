@@ -7,7 +7,6 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;

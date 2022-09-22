@@ -29,16 +29,10 @@ public class Trajectory implements Component {
         }
     }
 
-    /**
-     * Special overlap factor
-     */
-    public static final float SHADER_MODEL_OVERLAP_FACTOR = 20f;
-
     public Entity body;
-    public Vector3d prev, curr;
+    public Vector3d curr;
     public double alpha;
     public Matrix4d localTransformD = new Matrix4d();
-    public Matrix4d auxMat;
     public String provider;
     public Double multiplier = 1.0d;
     public Class<? extends IOrbitDataProvider> providerClass;
@@ -72,6 +66,12 @@ public class Trajectory implements Component {
      * Whether to show the orbit as a trail or not
      */
     public boolean orbitTrail;
+    /**
+     * The map for the trail fade. 0 gives a full orbit mapped from 1 at the first point, to 0 at the final point.
+     * Set to negative (i.e. up to -10) to make the trail shorter and shorter.
+     */
+    public float trailMap = -0.1f;
+
     public OrbitDataLoaderParameters params;
 
     /**
@@ -134,6 +134,10 @@ public class Trajectory implements Component {
 
     public void setTrail(Boolean trail) {
         this.orbitTrail = trail;
+    }
+
+    public void setTrailMap(Double trailMap) {
+        this.trailMap = trailMap.floatValue();
     }
 
     public void setOrbittrail(Boolean trail) {

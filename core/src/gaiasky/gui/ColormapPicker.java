@@ -5,6 +5,7 @@
 
 package gaiasky.gui;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
@@ -19,10 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.gui.beans.ComboBoxBean;
-import gaiasky.scenegraph.FadeNode;
-import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
+import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.ObjectDoubleMap;
@@ -54,6 +54,8 @@ public class ColormapPicker extends ColorPickerAbstract {
     private int cmapIndex;
     private IAttribute cmapAttrib;
     private double cmapMin, cmapMax;
+
+    private final FocusView view;
 
     public static Array<Pair<String, Integer>> cmapList;
 
@@ -90,6 +92,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         this.catalogInfo = ci;
         this.drawableColor = skin.getDrawable("white");
         this.drawableColormap = skin.getDrawable("iconic-star");
+        this.view = new FocusView();
         initialize();
     }
 
@@ -221,7 +224,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         private Image newColorImage;
         private boolean changeEvents = true;
         private final ColorPickerColormapDialog cpd;
-        private final Array<ParticleGroup> pgarray;
+        private final Array<Entity> pgarray;
         private final Array<IOctreeObject> apearray;
 
         public ColorPickerColormapDialog(String elementName, float[] color, Stage stage, Skin skin) {
@@ -328,8 +331,9 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             // Attribute
             container.add(new OwnLabel(I18n.msg("gui.colorpicker.attribute"), skin)).left().padRight(pad10).padBottom(pad5);
-            FadeNode catalog = catalogInfo.object;
-            boolean stars = catalog instanceof StarGroup || catalog instanceof OctreeWrapper;
+            var catalog = catalogInfo.entity;
+            view.setEntity(catalog);
+            boolean stars = view.getStarSet() != null || view.isOctree();
             Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 12 : 7);
             // Add particle attributes (dist, alpha, delta)
             attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
@@ -352,10 +356,10 @@ public class ColormapPicker extends ColorPickerAbstract {
             attrs.add(new AttributeComboBoxBean(new AttributeColorGreen()));
             attrs.add(new AttributeComboBoxBean(new AttributeColorBlue()));
             // Extra attributes
-            if (catalog instanceof ParticleGroup) {
-                ParticleGroup pg = (ParticleGroup) catalog;
-                if (pg.size() > 0) {
-                    IParticleRecord first = pg.get(0);
+            if (view.isSet()) {
+                var set = view.getSet();
+                if (set.data().size() > 0) {
+                    IParticleRecord first = set.data().get(0);
                     if (first.hasExtra()) {
                         ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
                         for (UCD ucd : ucds)
@@ -474,6 +478,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
         private void recomputeAttributeMinMax(CatalogInfo ci, IAttribute attrib, boolean force) {
             String key = key(ci, attrib);
+            view.setEntity(ci.entity);
             if (!force && minMaxMap.containsKey(key)) {
                 double[] minmax = minMaxMap.get(key);
                 // Set to fields
@@ -481,22 +486,22 @@ public class ColormapPicker extends ColorPickerAbstract {
                 maxMap.setText(Double.toString(minmax[1]));
                 cmapMin = minmax[0];
                 cmapMax = minmax[1];
-            } else if (ci.object instanceof ParticleGroup || ci.object instanceof OctreeWrapper) {
+            } else if (view.isSet() || view.isOctree()) {
                 pgarray.clear();
                 apearray.clear();
-                if (ci.object instanceof OctreeWrapper) {
-                    OctreeWrapper ow = (OctreeWrapper) ci.object;
-                    ow.root.addParticlesTo(apearray);
+                if (view.isOctree()) {
+                    var octant = view.getOctant();
+                    octant.addParticlesTo(apearray);
                     for (IOctreeObject ape : apearray) {
-                        if (ape instanceof ParticleGroup)
-                            pgarray.add((ParticleGroup) ape);
+                        pgarray.add(((OctreeObjectView) ape).getEntity());
                     }
                 } else {
-                    pgarray.add((ParticleGroup) ci.object);
+                    pgarray.add(ci.entity);
                 }
                 double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
-                for (ParticleGroup pg : pgarray) {
-                    for (IParticleRecord pb : pg.data()) {
+                for (Entity pg : pgarray) {
+                    var set = Mapper.particleSet.has(pg) ? Mapper.particleSet.get(pg) : Mapper.starSet.get(pg);
+                    for (IParticleRecord pb : set.data()) {
                         double val = attrib.get(pb);
                         if (!Double.isNaN(val) && !Double.isInfinite(val)) {
                             if (val < min)

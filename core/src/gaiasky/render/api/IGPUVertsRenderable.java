@@ -8,7 +8,6 @@ package gaiasky.render.api;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.scenegraph.SceneGraphNode;
 
 /**
  * Defines the interface that all objects composed by a collection of vertices
@@ -26,7 +25,6 @@ public interface IGPUVertsRenderable extends IRenderable {
 
     Matrix4 getLocalTransform();
 
-    SceneGraphNode getParent();
     Entity getParentEntity();
 
     boolean isClosedLoop();

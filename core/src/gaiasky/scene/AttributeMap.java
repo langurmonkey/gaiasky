@@ -81,7 +81,7 @@ public class AttributeMap {
         putAll(MotorEngine.class, "machines");
 
         // Trajectory
-        putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "pointcolor", "pointsize", "trail", "orbittrail", "newmethod", "onlybody", "numSamples");
+        putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "pointcolor", "pointsize", "trail", "orbittrail", "orbitTrail", "trailMap", "newmethod", "newMethod", "onlybody", "onlyBody", "numSamples");
 
         // RefSysTransform
         putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues");

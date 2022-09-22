@@ -15,9 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.gui.beans.AttributeComboBoxBean;
-import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.scene.Mapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.filter.Filter;
@@ -125,7 +123,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
         // Fade in
         fadeIn = new OwnCheckBox(I18n.msg("gui.dsload.fade.in"), skin, pad5);
-        Vector2d fi = ci.object != null ? ci.object.getFadeIn() : null;
+        Vector2d fi = ci.entity != null ? Mapper.fade.get(ci.entity).fadeIn : null;
         container.add(fadeIn).left().padRight(pad10).padBottom(pad5);
 
         HorizontalGroup fadeInGroup = new HorizontalGroup();
@@ -162,7 +160,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
         // Fade out
         fadeOut = new OwnCheckBox(I18n.msg("gui.dsload.fade.out"), skin, pad5);
-        Vector2d fo = ci.object != null ? ci.object.getFadeOut() : null;
+        Vector2d fo = ci.entity != null ? Mapper.fade.get(ci.entity).fadeOut : null;
         container.add(fadeOut).left().padRight(pad10).padBottom(pad5);
 
         HorizontalGroup fadeOutGroup = new HorizontalGroup();
@@ -242,7 +240,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 OwnLabel unit = new OwnLabel(rule.getAttribute().getUnit(), skin);
 
                 // ATTRIBUTE
-                boolean stars = ci.object instanceof StarGroup || ci.object instanceof OctreeWrapper;
+                boolean stars = Mapper.starSet.has(ci.entity) || Mapper.octree.has(ci.entity);
                 Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 12 : 7);
                 // Add particle attributes (dist, alpha, delta)
                 attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
@@ -265,10 +263,10 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 attrs.add(new AttributeComboBoxBean(new AttributeColorGreen()));
                 attrs.add(new AttributeComboBoxBean(new AttributeColorBlue()));
                 // Extra attributes
-                if (ci.object instanceof ParticleGroup) {
-                    ParticleGroup pg = (ParticleGroup) ci.object;
-                    if (pg.size() > 0) {
-                        IParticleRecord first = pg.get(0);
+                if (Mapper.particleSet.has(ci.entity) || Mapper.starSet.has(ci.entity)) {
+                    var set = Mapper.particleSet.has(ci.entity) ? Mapper.particleSet.get(ci.entity) : Mapper.starSet.get(ci.entity);
+                    if (set.data().size() > 0) {
+                        IParticleRecord first = set.data().get(0);
                         if (first.hasExtra()) {
                             ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
                             for (UCD ucd : ucds)
@@ -429,16 +427,17 @@ public class DatasetPreferencesWindow extends GenericDialog {
             ci.setHlAllVisible(vis);
         }
         // Fade in/out
-        if (ci.object != null) {
+        if (ci.entity != null) {
+            var fade = Mapper.fade.get(ci.entity);
             if (fadeIn.isChecked()) {
-                ci.object.setFadein(new double[] { fadeInMin.getDoubleValue(0), fadeInMax.getDoubleValue(1e1) });
+                fade.setFadein(new double[] { fadeInMin.getDoubleValue(0), fadeInMax.getDoubleValue(1e1) });
             } else {
-                ci.object.setFadein(null);
+                fade.setFadein(null);
             }
             if (fadeOut.isChecked()) {
-                ci.object.setFadeout(new double[] { fadeOutMin.getDoubleValue(1e5), fadeOutMax.getDoubleValue(1e6) });
+                fade.setFadeout(new double[] { fadeOutMin.getDoubleValue(1e5), fadeOutMax.getDoubleValue(1e6) });
             } else {
-                ci.object.setFadeout(null);
+                fade.setFadeout(null);
             }
         }
         // Filter

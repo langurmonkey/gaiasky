@@ -33,10 +33,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         } else {
             super.doneLoading(params);
             transf = new Matrix4d();
-            if (orbit != null) {
-                orbitalParams = orbit.oc;
-                data = orbit.getPointCloud();
-            } else if (entity != null) {
+            if (entity != null) {
                 Trajectory trajectory = Mapper.trajectory.get(entity);
                 Verts verts = Mapper.verts.get(entity);
                 if (trajectory == null) {
@@ -102,9 +99,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             transf.rotate(0, 0, 1, orbitalParams.i);
             transf.rotate(0, 1, 0, orbitalParams.ascendingnode);
         } else {
-            if (orbit != null && orbit.model.isExtrasolar()) {
-                transf.rotate(0, 1, 0, 90);
-            } else if(entity != null && Mapper.trajectory.get(entity).model.isExtrasolar()) {
+            if(entity != null && Mapper.trajectory.get(entity).model.isExtrasolar()) {
                 transf.rotate(0, 1, 0, 90);
             }
         }
@@ -118,27 +113,21 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     }
 
     protected boolean isNewMethod() {
-        if(orbit != null) {
-            return orbit.newMethod;
-        } else if(entity != null){
+        if(entity != null){
             return Mapper.trajectory.get(entity).newMethod;
         }
         return false;
     }
 
     protected Matrix4d getTransformFunction() {
-        if (orbit != null) {
-            return orbit.transformFunction;
-        } else if (entity != null) {
+        if (entity != null) {
             return Mapper.transform.get(entity).matrix;
         }
         return null;
     }
 
     protected Matrix4d getParentOrientation() {
-        if (orbit != null) {
-            return orbit.parent.orientation;
-        } else if (entity != null) {
+        if (entity != null) {
             return Mapper.graph.get(Mapper.graph.get(entity).parent).orientation;
         }
         return null;

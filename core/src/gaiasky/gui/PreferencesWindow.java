@@ -2349,7 +2349,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private void reloadLanguage() {
-        EventManager.publish(Event.SCENE_GRAPH_RELOAD_NAMES_CMD, this);
         EventManager.publish(Event.SCENE_RELOAD_NAMES_CMD, this);
     }
 

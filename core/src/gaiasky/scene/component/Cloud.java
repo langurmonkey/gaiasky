@@ -6,4 +6,6 @@ import gaiasky.scenegraph.component.CloudComponent;
 public class Cloud implements Component {
 
     public CloudComponent cloud;
+
+
 }

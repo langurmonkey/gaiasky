@@ -5,7 +5,6 @@
 
 package gaiasky.util.coord;
 
-import gaiasky.scenegraph.Orbit;
 import gaiasky.util.math.Vector3b;
 
 import java.time.Instant;
@@ -54,12 +53,5 @@ public interface IBodyCoordinates {
      * in case of non-elliptical orbits such as Gaia.
      */
     Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out);
-
-    /**
-     * Gets the orbit object of these coordinates, if any.
-     *
-     * @return The orbit object.
-     */
-    Orbit getOrbitObject();
 
 }

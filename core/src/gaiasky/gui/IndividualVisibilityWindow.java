@@ -179,7 +179,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                             EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, cb, obj, obj.getName(), cb.isChecked());
                             // Meshes are single objects but also catalogs!
                             // Connect to catalog visibility
-                            if (obj instanceof MeshObject) {
+                            if (Mapper.mesh.has(((FocusView) obj).getEntity())) {
                                 EventManager.publish(Event.CATALOG_VISIBLE, cb, obj.getName(), cb.isChecked());
                             }
                         });

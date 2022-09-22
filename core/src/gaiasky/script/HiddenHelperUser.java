@@ -94,6 +94,9 @@ public class HiddenHelperUser implements IObserver {
                 var entity = scene.findFocus((String) data[0]);
                 view.setEntity(entity);
                 body = view;
+            } else if (data[0] instanceof Entity) {
+                view.setEntity((Entity) data[0]);
+                body = view;
             } else {
                 body = ((FocusView) data[0]);
             }

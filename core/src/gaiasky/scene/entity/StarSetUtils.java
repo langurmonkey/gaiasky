@@ -13,7 +13,6 @@ import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
-import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -46,7 +45,7 @@ public class StarSetUtils {
      * @return A new star group with sane parameters
      */
     public Entity getDefaultStarSet(String name, List<IParticleRecord> data, BaseInitializer baseInitializer, ParticleSetInitializer starSetInitializer, boolean fullInit) {
-        Archetype archetype = scene.archetypes().get(StarGroup.class);
+        Archetype archetype = scene.archetypes().get("gaiasky.scenegraph.StarGroup");
         Entity entity = archetype.createEntity();
 
         var base = Mapper.base.get(entity);

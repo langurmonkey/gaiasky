@@ -162,7 +162,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                             if (shape.track != null && shape.track == candidate) {
                                 EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesObj, candidate, false);
                             } else if (shape.trackName != null && shape.trackName.equalsIgnoreCase(candidateName)) {
-                                EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, removeShapesObj, candidate, false);
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, removeShapesObj, candidate, false);
                             }
                         }
                     });

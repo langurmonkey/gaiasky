@@ -3,7 +3,7 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.data.octreegen;
+package gaiasky.data.group;
 
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;

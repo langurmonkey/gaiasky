@@ -6,7 +6,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.ISpacecraft;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -157,11 +156,6 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         }
 
         return posb;
-    }
-
-    @Override
-    public Orbit getOrbitObject() {
-        return null;
     }
 
 }

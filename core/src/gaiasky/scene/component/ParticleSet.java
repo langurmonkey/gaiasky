@@ -319,6 +319,20 @@ public class ParticleSet implements Component, IDisposable {
         return pointData.get(index);
     }
 
+    /**
+     * Gets the name of a random particle in this group
+     *
+     * @return The name of a random particle
+     */
+    public String getRandomParticleName() {
+        if (pointData != null)
+            for (IParticleRecord pb : pointData) {
+                if (pb.names() != null && pb.names().length > 0)
+                    return pb.names()[0];
+            }
+        return null;
+    }
+
     // FOCUS_MODE size
     public double getSize() {
         return focusSize;

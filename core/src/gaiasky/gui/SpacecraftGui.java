@@ -32,9 +32,9 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
+import gaiasky.scene.component.MotorEngine;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scenegraph.MachineDefinition;
-import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.gdx.IntModelBatch;
@@ -285,7 +285,7 @@ public class SpacecraftGui extends AbstractGui {
         engineControls.add(engineMinus);
 
         // Power slider - The value of the slider is the index of the thrustFactor array 
-        enginePower = new OwnSlider(0, Spacecraft.thrustFactor.length - 1, 1, true, skin, "sc-engine");
+        enginePower = new OwnSlider(0, MotorEngine.thrustFactor.length - 1, 1, true, skin, "sc-engine");
         enginePower.setName("engine power slider");
         enginePower.setValue(0);
         enginePower.setHeight(enginePowerH);

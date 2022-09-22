@@ -10,8 +10,6 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
-import gaiasky.scenegraph.FadeNode;
-import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.OctreeNode;
 
@@ -56,24 +54,6 @@ public class CatalogManager implements IObserver {
         return null;
     }
 
-    public Optional<CatalogInfo> getByObject(FadeNode node) {
-        OctreeNode octant = null;
-        if (node.octant != null) {
-            octant = node.octant.getRoot();
-        }
-        for (CatalogInfo ci : cis) {
-            if (octant != null) {
-                // Octree branch
-                if (ci.object instanceof OctreeWrapper && ((OctreeWrapper) ci.object).root == octant)
-                    return Optional.of(ci);
-            } else {
-                if (ci.object == node)
-                    return Optional.of(ci);
-            }
-        }
-        return Optional.empty();
-    }
-
     public Optional<CatalogInfo> getByEntity(Entity entity) {
         OctreeNode octant = null;
         if (Mapper.octant.has(entity)) {
@@ -103,9 +83,6 @@ public class CatalogManager implements IObserver {
             boolean addToSg = (Boolean) data[1];
             if (addToSg) {
                 // Insert object into scene graph
-                if (ci.object != null) {
-                    EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, ci.object, true);
-                }
                 if (ci.entity != null) {
                     EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, ci.entity, true);
                 }
@@ -163,9 +140,7 @@ public class CatalogManager implements IObserver {
             double scaling = (Double) data[1];
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
-                if (ci.object != null) {
-                    ci.object.setPointscaling((float) scaling);
-                } else if (ci.entity != null) {
+                if (ci.entity != null) {
                     var hl = Mapper.highlight.get(ci.entity);
                     hl.pointscaling = (float) scaling;
                 }

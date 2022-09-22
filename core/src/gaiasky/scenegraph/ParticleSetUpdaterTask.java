@@ -30,9 +30,6 @@ import java.util.Comparator;
  */
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
-    /** Reference to old OOP model object. **/
-    private final ParticleGroup pg;
-
     /** Reference to the entity. **/
     private final Entity entity;
 
@@ -69,17 +66,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
     }
 
-    public ParticleSetUpdaterTask(ParticleGroup pg) {
-        this.pg = pg;
-
-        this.entity = null;
-        this.particleSet = null;
-        this.starSet = null;
-        this.datasetDescription = null;
-        this.utils = null;
-        this.comp = null;
-    }
-
     public ParticleSetUpdaterTask(Entity entity, ParticleSet particleSet, StarSet starSet) {
         this.entity = entity;
         this.particleSet = particleSet;
@@ -88,16 +74,12 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         this.utils = new ParticleUtils();
         this.comp = new ParticleSetComparator(this.particleSet);
 
-        this.pg = null;
-
         EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.CAMERA_MOTION_UPDATE);
     }
 
     @Override
     public void run() {
-        if (pg != null) {
-            pg.updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
-        } else if (particleSet != null) {
+        if (particleSet != null) {
             updateSorter(GaiaSky.instance.time, GaiaSky.instance.getICamera());
         }
     }

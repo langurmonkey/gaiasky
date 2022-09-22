@@ -24,9 +24,8 @@ import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -74,7 +73,8 @@ public class ControllerGui extends AbstractGui {
     private final float pad20;
     private final float pad30;
     private String currentInputText = "";
-    private FocusView view;
+    private final FocusView view;
+    private final FilterView filterView;
 
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
@@ -94,6 +94,7 @@ public class ControllerGui extends AbstractGui {
         pad20 = 32f;
         pad30 = 48;
         view = new FocusView();
+        filterView = new FilterView();
     }
 
     @Override
@@ -713,14 +714,15 @@ public class ControllerGui extends AbstractGui {
                 Entity node = scene.index().getEntity(text);
                 if (Mapper.focus.has(node)) {
                     view.setEntity(node);
-                    IFocus focus = view.getFocus(text);
-                    boolean timeOverflow = focus.isCoordinatesTimeOverflow();
-                    boolean canSelect = !(focus instanceof ParticleGroup) || ((ParticleGroup) focus).canSelect();
-                    boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                    view.getFocus(text);
+                    filterView.setEntity(node);
+                    boolean timeOverflow = view.isCoordinatesTimeOverflow();
+                    boolean canSelect = !view.isSet() || view.getSet().canSelect(filterView);
+                    boolean ctOn = GaiaSky.instance.isOn(view.getCt());
                     if (!timeOverflow && canSelect && ctOn) {
                         GaiaSky.postRunnable(() -> {
                             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, true);
-                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, node, true);
                         });
                         info(null);
                     } else if (timeOverflow) {
@@ -728,7 +730,7 @@ public class ControllerGui extends AbstractGui {
                     } else if (!canSelect) {
                         info(I18n.msg("gui.objects.search.filter", text));
                     } else {
-                        info(I18n.msg("gui.objects.search.invisible", text, focus.getCt().toString()));
+                        info(I18n.msg("gui.objects.search.invisible", text, view.getCt().toString()));
                     }
                     return true;
                 }

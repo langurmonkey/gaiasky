@@ -24,9 +24,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
@@ -112,6 +111,8 @@ public class GuiRegistry implements IObserver {
      */
     private final CatalogManager catalogManager;
 
+    private final FocusView view;
+
     /**
      * Create new GUI registry object.
      */
@@ -121,6 +122,7 @@ public class GuiRegistry implements IObserver {
         this.scene = scene;
         this.guis = new Array<>(true, 2);
         this.catalogManager = catalogManager;
+        this.view = new FocusView();
         // Windows which are visible from any GUI
         EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION);
     }
@@ -469,16 +471,17 @@ public class GuiRegistry implements IObserver {
                                             GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI, datasetOptions, true);
                                             // Select first
                                             CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
-                                            if (datasetOptions.type.isSelectable() && ci != null && ci.object != null) {
-                                                if (ci.object instanceof ParticleGroup) {
-                                                    ParticleGroup pg = (ParticleGroup) ci.object;
-                                                    if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
+                                            if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
+                                                view.setEntity(ci.entity);
+                                                if (view.isSet()) {
+                                                    var set = view.getSet();
+                                                    if (set.data() != null && !set.data().isEmpty() && EntityUtils.isVisibilityOn(ci.entity)) {
                                                         EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg.getRandomParticleName());
+                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, set.getRandomParticleName());
                                                     }
-                                                } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
+                                                } else if (view.getGraph().children != null && !view.getGraph().children.isEmpty() && EntityUtils.isVisibilityOn(view.getGraph().children.get(0))) {
                                                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, ci.object.children.get(0));
+                                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
                                                 }
                                                 // Open UI datasets
                                                 GaiaSky.instance.scripting().maximizeInterfaceWindow();

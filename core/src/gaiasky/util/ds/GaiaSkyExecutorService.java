@@ -5,7 +5,6 @@
 
 package gaiasky.util.ds;
 
-import gaiasky.scenegraph.StarGroup;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 
@@ -74,7 +73,7 @@ public class GaiaSkyExecutorService {
                     logger.debug("Timeout elapsed while waiting for the pool to shut down");
                 }
             } catch (Exception e) {
-                Logger.getLogger(StarGroup.class.getSimpleName()).error(e);
+                logger.error(e);
             }
         }
         if (workQueue != null)

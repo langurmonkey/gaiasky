@@ -4,13 +4,15 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.view.PositionView;
 import gaiasky.scenegraph.Position;
-import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -126,7 +128,7 @@ public class Index {
                     // Special cases
 
                     // HIP stars add "HIP + hipID"
-                    Archetype starArchetype = archetypes.get(Star.class.getName());
+                    Archetype starArchetype = archetypes.get("gaiasky.scenegraph.Star");
                     if (starArchetype.matches(entity)) {
                         // Hip
                         Hip hip = Mapper.hip.get(entity);
@@ -171,7 +173,7 @@ public class Index {
             for (Entity e : set)
                 addToHipMap(e);
         } else {
-            Archetype starArchetype = archetypes.get(Star.class);
+            Archetype starArchetype = archetypes.get("gaiasky.scenegraph.Star");
             if (starArchetype.matches(entity)) {
                 Hip hip = Mapper.hip.get(entity);
                 if (hip.hip > 0) {

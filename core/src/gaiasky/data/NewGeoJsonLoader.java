@@ -9,7 +9,6 @@ import gaiasky.scene.Archetype;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Perimeter;
-import gaiasky.scenegraph.Area;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
@@ -53,12 +52,11 @@ public class NewGeoJsonLoader extends AbstractSceneLoader {
     }
 
     private Entity loadJsonObject(JsonValue json) {
-        Class clazz = Area.class;
-        String className = clazz.getName();
+        String className = "gaiasky.scenegraph.Area";
         if (!scene.archetypes().contains(className)) {
             // Do not know what to do
             if (!loggedArchetypes.contains(className)) {
-                logger.warn("Skipping " + clazz.getSimpleName() + ": no suitable archetype found.");
+                logger.warn("Skipping " + className + ": no suitable archetype found.");
                 loggedArchetypes.add(className);
             }
         } else {

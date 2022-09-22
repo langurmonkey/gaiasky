@@ -5,20 +5,25 @@
 
 package gaiasky.util.validator;
 
-import gaiasky.scenegraph.Loc;
-import gaiasky.scenegraph.SceneGraphNode;
+import com.badlogic.ashley.core.Entity;
+import gaiasky.scene.Mapper;
 
 public class ExistingLocationValidator extends CallbackValidator {
 
-    SceneGraphNode parent;
+    Entity parent;
 
-    public ExistingLocationValidator(SceneGraphNode parent) {
+    public ExistingLocationValidator(Entity parent) {
         this.parent = parent;
     }
 
     @Override
     protected boolean validateLocal(String value) {
-        return value != null && !value.isEmpty() && parent.getChildByNameAndType(value, Loc.class) != null;
-    }
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
 
+        var graph = Mapper.graph.get(parent);
+        var child = graph.getChildByName(value);
+        return child != null && Mapper.loc.has(child);
+    }
 }

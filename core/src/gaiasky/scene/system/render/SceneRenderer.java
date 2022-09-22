@@ -39,7 +39,6 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.system.render.draw.*;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
@@ -1156,7 +1155,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
         }
         final int idx = renderSystems.indexOf(current, true);
-        if (current != null && ((current instanceof LineQuadRenderSystem && Settings.settings.scene.renderer.isNormalLineRenderer()) || (!(current instanceof LineQuadRenderSystem) && !Settings.settings.scene.renderer.isNormalLineRenderer()))) {
+        if (current != null && ((current instanceof LineQuadstripRenderer && Settings.settings.scene.renderer.isNormalLineRenderer()) || (!(current instanceof LineQuadstripRenderer) && !Settings.settings.scene.renderer.isNormalLineRenderer()))) {
             renderSystems.removeIndex(idx);
             AbstractRenderSystem lineSys = getLineRenderSystem();
             renderSystems.insert(idx, lineSys);

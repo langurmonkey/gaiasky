@@ -14,7 +14,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scene.component.Rotation;
-import gaiasky.scenegraph.Planet;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger.Log;
@@ -147,19 +146,6 @@ public class AtmosphereComponent extends NamedComponent {
 
     public void removeAtmosphericScattering(Material mat) {
         mat.remove(AtmosphereAttribute.CameraHeight);
-    }
-
-    /**
-     * Updates the atmospheric scattering shader parameters.
-     *
-     * @param mat      The material to update.
-     * @param alpha    The opacity value.
-     * @param ground   Whether it is the ground shader or the atmosphere.
-     * @param planet   The planet itself, holder of this atmosphere.
-     * @param vrOffset The VR offset vector.
-     */
-    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vrOffset) {
-        updateAtmosphericScatteringParams(mat, alpha, ground, planet.translation, planet.rc, planet.inverseRefPlaneTransform, planet.parent.translation, vrOffset);
     }
 
     /**

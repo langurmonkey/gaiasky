@@ -10,6 +10,7 @@ import com.badlogic.gdx.Net.HttpMethods;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter.Particle;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -20,6 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.*;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -183,22 +186,23 @@ public class ExternalInformationUpdater {
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
             String url = Constants.URL_WIKIPEDIA;
-            if (focus instanceof Star) {
+            var view = (FocusView) focus;
+            if (Mapper.hip.has(view.getEntity())) {
                 urlCheck(url, wikiname, suffixes_star, listener);
-            } else if (focus instanceof Particle) {
+            } else if (view.isParticle()) {
                 urlCheck(url, wikiname, suffixes_gal, listener);
-            } else if (focus instanceof BillboardGalaxy) {
+            } else if (Mapper.tagBillboardGalaxy.has(view.getEntity())) {
                 urlCheck(url, wikiname, suffixes_gal, listener);
-            } else if (focus instanceof CelestialBody) {
-                CelestialBody f = (CelestialBody) focus;
-                if (f.wikiname != null) {
-                    listener.ok(url + f.wikiname.replace(' ', '_'));
+            } else if (Mapper.celestial.has(view.getEntity())) {
+                var celestial = Mapper.celestial.get(view.getEntity());
+                if (celestial.wikiname != null) {
+                    listener.ok(url + celestial.wikiname.replace(' ', '_'));
                 } else {
                     urlCheck(url, wikiname, suffixes_model, listener);
                 }
-            } else if (focus instanceof StarCluster) {
+            } else if (view.isCluster()) {
                 urlCheck(url, wikiname, suffixes_cluster, listener);
-            } else if (focus instanceof IStarFocus) {
+            } else if (Mapper.starSet.has(view.getEntity())) {
                 urlCheck(url, wikiname, suffixes_star, listener);
             } else {
                 urlCheck(url, wikiname, suffixes, listener);

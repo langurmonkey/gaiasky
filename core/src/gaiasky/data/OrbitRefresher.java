@@ -17,7 +17,6 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.scene.view.VertsView;
-import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.concurrent.ServiceThread;
@@ -62,9 +61,7 @@ public class OrbitRefresher implements IObserver {
         if (!loadingPaused && toLoadQueue.size() < LOAD_QUEUE_MAX_SIZE - 1) {
             toLoadQueue.remove(params);
             toLoadQueue.add(params);
-            if (params.orbit != null) {
-                params.orbit.refreshing = true;
-            } else if(params.entity != null) {
+            if(params.entity != null) {
                 Mapper.trajectory.get(params.entity).refreshing = true;
             }
             daemon.wakeUp();
@@ -104,21 +101,7 @@ public class OrbitRefresher implements IObserver {
                     if (toLoad.size > 0) {
                         try {
                             for (OrbitDataLoaderParameters params : toLoad) {
-                                Orbit orbit = params.orbit;
-                                if (orbit != null) {
-                                    // Generate data
-                                    provider.load(null, params);
-                                    final PointCloudData pcd = provider.getData();
-                                    // Post new data to object
-                                    GaiaSky.postRunnable(() -> {
-                                        // Update orbit object
-                                        orbit.setPointCloudData(pcd);
-                                        orbit.initOrbitMetadata();
-                                        orbit.markForUpdate();
-
-                                        orbit.refreshing = false;
-                                    });
-                                } else if (params.entity != null) {
+                                if (params.entity != null) {
                                     Entity entity = params.entity;
                                     // Generate data
                                     provider.load(null, params);

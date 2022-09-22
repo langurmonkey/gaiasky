@@ -44,10 +44,6 @@ import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.scenegraph.FadeNode;
-import gaiasky.scenegraph.IVisibilitySwitch;
-import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.VRDeviceModel;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -671,7 +667,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_RELOAD_NAMES_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR);
+        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD,
+                Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE,
+                Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
+                Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
+                Event.UI_SCALE_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR);
 
         // Re-enable input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -1411,13 +1411,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return this.sceneRenderer.allOn(cts);
     }
 
-    public Optional<CatalogInfo> getCatalogInfoFromObject(SceneGraphNode node) {
-        if (node instanceof FadeNode) {
-            return catalogManager.getByObject((FadeNode) node);
-        }
-        return Optional.empty();
-    }
-
     public Optional<CatalogInfo> getCatalogInfoFromEntity(Entity entity) {
         if (Mapper.datasetDescription.has(entity)) {
             return catalogManager.getByEntity(entity);
@@ -1594,32 +1587,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case HOME_CMD:
             goHome();
-            break;
-        case PER_OBJECT_VISIBILITY_CMD:
-            if (data[0] instanceof IVisibilitySwitch) {
-                final IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-                String name = (String) data[1];
-                boolean state = (boolean) data[2];
-                vs.setVisible(state, name.toLowerCase().trim());
-                logger.info(I18n.msg("notif.visibility.object.set", vs.getName(), I18n.msg("gui." + state)));
-            }
-            break;
-        case FORCE_OBJECT_LABEL_CMD:
-            if (data[0] instanceof SceneGraphNode) {
-                final SceneGraphNode forceLabelObject = (SceneGraphNode) data[0];
-                String name = (String) data[1];
-                boolean state = (boolean) data[2];
-                forceLabelObject.setForceLabel(state, name.toLowerCase());
-                logger.info(I18n.msg("notif.object.flag", "forceLabel", forceLabelObject.getName(), I18n.msg("gui." + state)));
-            }
-            break;
-        case LABEL_COLOR_CMD:
-            if (data[0] instanceof SceneGraphNode) {
-                final SceneGraphNode labelColorObject = (SceneGraphNode) data[0];
-                String name = (String) data[1];
-                float[] labelColor = (float[]) data[2];
-                labelColorObject.setLabelcolor(labelColor, name);
-            }
             break;
         case PARK_RUNNABLE:
             String key = (String) data[0];

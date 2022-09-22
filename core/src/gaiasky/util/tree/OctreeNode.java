@@ -12,7 +12,8 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
-import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
@@ -248,7 +249,16 @@ public class OctreeNode implements ILineRenderable {
         if (objects == null)
             objects = new ArrayList<>(1);
         objects.add(e);
-        numObjects = e instanceof ParticleGroup ? objects.size() - 1 + ((ParticleGroup) e).size() : objects.size();
+
+        numObjects = objects.size();
+        if (e instanceof OctreeObjectView) {
+            var entity = ((OctreeObjectView) e).getEntity();
+            if (Mapper.starSet.has(entity)) {
+                numObjects = objects.size() - 1 + Mapper.starSet.get(entity).data().size();
+            } else if (Mapper.particleSet.has(entity)) {
+                numObjects = objects.size() - 1 + Mapper.particleSet.get(entity).data().size();
+            }
+        }
         return true;
     }
 

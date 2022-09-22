@@ -30,6 +30,7 @@ public class SysUtils {
         try {
             Files.createDirectories(getDataDir());
             Files.createDirectories(getConfigDir());
+            Files.createDirectories(getCacheDir());
             // Bottom level.
             Files.createDirectories(getDefaultCameraDir());
             Files.createDirectories(getDefaultMusicDir());

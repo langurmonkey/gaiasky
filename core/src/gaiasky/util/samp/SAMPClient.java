@@ -5,6 +5,7 @@
 
 package gaiasky.util.samp;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
@@ -13,10 +14,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.DatasetLoadDialog;
-import gaiasky.scenegraph.FadeNode;
-import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.scenegraph.StarCluster;
+import gaiasky.scene.Mapper;
+import gaiasky.scene.component.ParticleSet;
+import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.script.EventScriptingInterface;
@@ -45,7 +46,7 @@ public class SAMPClient implements IObserver {
     private static final Log logger = Logger.getLogger(SAMPClient.class);
 
     private HubConnector conn;
-    private TwoWayHashmap<String, FadeNode> idToNode;
+    private TwoWayHashmap<String, Entity> idToNode;
     private Map<String, String> idToUrl;
     private boolean preventProgrammaticEvents = false;
     private final CatalogManager catalogManager;
@@ -114,19 +115,20 @@ public class SAMPClient implements IObserver {
                     logger.info("Select row " + row + " of " + id);
 
                     if (idToNode.containsKey(id)) {
-                        if (idToNode.getForward(id) instanceof ParticleGroup) {
+                        Entity node = idToNode.getForward(id);
+                        if (Mapper.particleSet.has(node) || Mapper.starSet.has(node)) {
                             // Stars or particles
-                            ParticleGroup pg = (ParticleGroup) idToNode.getForward(id);
+                            ParticleSet pg = Mapper.particleSet.has(node) ? Mapper.particleSet.get(node) : Mapper.starSet.get(node);
                             pg.setFocusIndex((int) row);
                             preventProgrammaticEvents = true;
                             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
                             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg);
                             preventProgrammaticEvents = false;
-                        } else if (idToNode.getForward(id) != null) {
-                            // Star cluster
-                            FadeNode fn = idToNode.getForward(id);
-                            if (fn.children != null && fn.children.size > (int) row) {
-                                SceneGraphNode sgn = fn.children.get((int) row);
+                        } else {
+                            // Star cluster?
+                            var graph = Mapper.graph.get(node);
+                            if (graph.children != null && graph.children.size > (int) row) {
+                                Entity sgn = graph.children.get((int) row);
                                 preventProgrammaticEvents = true;
                                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
                                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, sgn);
@@ -157,9 +159,10 @@ public class SAMPClient implements IObserver {
                     // We use the first one, as multiple selections are not supported in Gaia Sky
                     int row = Integer.parseInt(rows.get(0));
                     if (idToNode.containsKey(id)) {
-                        FadeNode fn = idToNode.getForward(id);
-                        if (fn instanceof ParticleGroup) {
-                            ParticleGroup pg = (ParticleGroup) fn;
+                        Entity node = idToNode.getForward(id);
+                        if (Mapper.particleSet.has(node) || Mapper.starSet.has(node)) {
+                            // Stars or particles
+                            ParticleSet pg = Mapper.particleSet.has(node) ? Mapper.particleSet.get(node) : Mapper.starSet.get(node);
                             pg.setFocusIndex(row);
                             preventProgrammaticEvents = true;
                             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
@@ -237,21 +240,24 @@ public class SAMPClient implements IObserver {
                     if (loaded) {
                         // Select first
                         CatalogInfo ci = catalogManager.get(id);
-                        if (ci.object != null) {
-                            if (ci.object instanceof ParticleGroup) {
-                                ParticleGroup pg = (ParticleGroup) ci.object;
-                                if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
+                        if (ci.entity != null) {
+                            Entity node = ci.entity;
+                            var graph = Mapper.graph.get(node);
+                            if (Mapper.particleSet.has(node) || Mapper.starSet.has(node)) {
+                                // Stars or particles
+                                ParticleSet pg = Mapper.particleSet.has(node) ? Mapper.particleSet.get(node) : Mapper.starSet.get(node);
+                                if (pg.data() != null && !pg.data().isEmpty() && EntityUtils.isVisibilityOn(node)) {
                                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
                                     EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg.getRandomParticleName());
                                 }
-                            } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
+                            } else if (graph.children != null && !graph.children.isEmpty() && EntityUtils.isVisibilityOn(graph.children.get(0))) {
                                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
-                                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, ci.object.children.get(0));
+                                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, graph.children.get(0));
                             }
                             // Open UI datasets
                             GaiaSky.instance.scripting().maximizeInterfaceWindow();
                             GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
-                            idToNode.add(id, ci.object);
+                            idToNode.add(id, node);
                             idToUrl.put(id, url);
                         }
                     }
@@ -278,33 +284,15 @@ public class SAMPClient implements IObserver {
         case FOCUS_CHANGED:
             if (!preventProgrammaticEvents) {
                 if (conn != null && conn.isConnected()) {
-                    if (data[0] instanceof ParticleGroup) {
-                        ParticleGroup pg = (ParticleGroup) data[0];
-                        if (idToNode.containsValue(pg)) {
-                            String id = idToNode.getBackward(pg);
-                            String url = idToUrl.get(id);
-                            int row = pg.getCandidateIndex();
-
-                            Message msg = new Message("table.highlight.row");
-                            msg.addParam("row", Integer.toString(row));
-                            msg.addParam("table-id", id);
-                            msg.addParam("url", url);
-
-                            try {
-                                conn.getConnection().notifyAll(msg);
-                            } catch (SampException e) {
-                                logger.error(e);
-                            }
-                        }
-                    } else if (data[0] instanceof StarCluster) {
-                        StarCluster sc = (StarCluster) data[0];
-                        if (sc.parent instanceof FadeNode) {
-                            // Comes from a catalog
-                            FadeNode parent = (FadeNode) sc.parent;
-                            if (idToNode.containsValue(parent)) {
-                                String id = idToNode.getBackward(parent);
+                    if (data[0] instanceof FocusView) {
+                        var focus = (FocusView) data[0];
+                        var entity = focus.getEntity();
+                        if (focus.getParticleSet() != null || focus.getStarSet() != null) {
+                            var pg = focus.getParticleSet() != null ? focus.getParticleSet() : focus.getStarSet();
+                            if (idToNode.containsValue(entity)) {
+                                String id = idToNode.getBackward(entity);
                                 String url = idToUrl.get(id);
-                                int row = parent.children.indexOf(sc, true);
+                                int row = pg.candidateFocusIndex;
 
                                 Message msg = new Message("table.highlight.row");
                                 msg.addParam("row", Integer.toString(row));
@@ -316,6 +304,30 @@ public class SAMPClient implements IObserver {
                                 } catch (SampException e) {
                                     logger.error(e);
                                 }
+                            }
+                        } else if (Mapper.cluster.has(entity)) {
+                            var graph = Mapper.graph.get(entity);
+                            var cluster = Mapper.cluster.get(entity);
+                            if (graph.parent != null && Mapper.fade.has(graph.parent)) {
+                                // Comes from a catalog
+                                if (idToNode.containsValue(graph.parent)) {
+                                    String id = idToNode.getBackward(graph.parent);
+                                    String url = idToUrl.get(id);
+                                    var parentGraph = Mapper.graph.get(graph.parent);
+                                    int row = parentGraph.children.indexOf(entity, true);
+
+                                    Message msg = new Message("table.highlight.row");
+                                    msg.addParam("row", Integer.toString(row));
+                                    msg.addParam("table-id", id);
+                                    msg.addParam("url", url);
+
+                                    try {
+                                        conn.getConnection().notifyAll(msg);
+                                    } catch (SampException e) {
+                                        logger.error(e);
+                                    }
+                                }
+
                             }
 
                         }

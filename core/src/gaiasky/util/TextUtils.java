@@ -714,8 +714,16 @@ public class TextUtils {
         return newstr.toString();
     }
 
-    private static final void die(String foa) {
+    private static void die(String foa) {
         throw new IllegalArgumentException(foa);
+    }
+
+    public static String classSimpleName(String className) {
+        if(className.contains(".")) {
+           return className.substring(className.lastIndexOf(".") + 1);
+        } else {
+            return className;
+        }
     }
 
 }

@@ -67,22 +67,21 @@ public class NewJsonLoader extends AbstractSceneLoader {
                     int loaded = 0;
                     while (child != null) {
                         processed++;
-                        String clazzName = child.getString("impl");
-                        clazzName = clazzName.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                        String className = child.getString("impl");
+                        className = className.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
-                        @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
-                        if (!scene.archetypes().contains(clazzName)) {
+                        if (!scene.archetypes().contains(className)) {
                             // Do not know what to do
-                            if (!loggedArchetypes.contains(clazzName)) {
-                                logger.warn("Skipping " + clazz.getSimpleName() + ": no suitable archetype found.");
-                                loggedArchetypes.add(clazzName);
+                            if (!loggedArchetypes.contains(className)) {
+                                logger.warn("Skipping " + TextUtils.classSimpleName(className) + ": no suitable archetype found.");
+                                loggedArchetypes.add(className);
                             }
                         } else {
                             loaded++;
                             // Create entity and fill it up
-                            var archetype = scene.archetypes().get(clazzName);
+                            var archetype = scene.archetypes().get(className);
                             var entity = archetype.createEntity();
-                            fillEntity(child, entity, clazz.getSimpleName());
+                            fillEntity(child, entity, TextUtils.classSimpleName(className));
                             // Add to return list
                             loadedEntities.add(entity);
                         }
