@@ -106,7 +106,7 @@ public class Archetypes {
             addArchetype(modelName("Particle"), modelName("CelestialBody"), ProperMotion.class, RenderType.class, ParticleExtra.class);
 
             // Star
-            addArchetype(modelName("Star"), modelName("Particle"), Hip.class, Distance.class, Model.class);
+            addArchetype(modelName("Star"), modelName("Particle"), Hip.class, Distance.class, Model.class, ModelScaffolding.class);
 
             // Satellite
             addArchetype(modelName("Satellite"), modelName("ModelBody"), ParentOrientation.class);

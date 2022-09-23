@@ -437,6 +437,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelPerPixelLighting);
         addRenderSystem(modelPerPixelLightingTess);
         addRenderSystem(modelBeamProc);
+        addRenderSystem(modelStarsProc);
 
         // Labels
         addRenderSystem(labelsProc);
@@ -458,7 +459,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(billboardSSOProc);
 
         // Special models
-        addRenderSystem(modelStarsProc);
         addRenderSystem(modelAtmProc);
         addRenderSystem(modelCloudProc);
 
@@ -961,7 +961,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     @Override
     public void notify(Event event, Object source, final Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
+        case TOGGLE_VISIBILITY_CMD -> {
             ComponentType ct = ComponentType.getFromKey((String) data[0]);
             if (ct != null) {
                 int idx = ct.ordinal();
@@ -983,11 +983,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                 }
             }
-            break;
-        case LINE_RENDERER_UPDATE:
-            GaiaSky.postRunnable(this::updateLineRenderSystem);
-            break;
-        case STEREOSCOPIC_CMD:
+        }
+        case LINE_RENDERER_UPDATE -> GaiaSky.postRunnable(this::updateLineRenderSystem);
+        case STEREOSCOPIC_CMD -> {
             boolean stereo = (Boolean) data[0];
             if (stereo)
                 renderMode = sgrList[SGR_STEREO_IDX];
@@ -997,8 +995,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 else
                     renderMode = sgrList[SGR_DEFAULT_IDX];
             }
-            break;
-        case CUBEMAP_CMD:
+        }
+        case CUBEMAP_CMD -> {
             boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openVr;
             if (cubemap) {
                 renderMode = sgrList[SGR_CUBEMAP_IDX];
@@ -1008,8 +1006,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 else
                     renderMode = sgrList[SGR_DEFAULT_IDX];
             }
-            break;
-        case CAMERA_MODE_CMD:
+        }
+        case CAMERA_MODE_CMD -> {
             CameraMode cm = (CameraMode) data[0];
             if (cm.isGaiaFov())
                 renderMode = sgrList[SGR_FOV_IDX];
@@ -1024,18 +1022,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     renderMode = sgrList[SGR_DEFAULT_IDX];
 
             }
-            break;
-        case REBUILD_SHADOW_MAP_DATA_CMD:
-            buildShadowMapData();
-            break;
-        case LIGHT_GLOW_CMD:
+        }
+        case REBUILD_SHADOW_MAP_DATA_CMD -> buildShadowMapData();
+        case LIGHT_GLOW_CMD -> {
             boolean glow = (Boolean) data[0];
             if (glow) {
                 buildGlowData();
             }
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
     }
 

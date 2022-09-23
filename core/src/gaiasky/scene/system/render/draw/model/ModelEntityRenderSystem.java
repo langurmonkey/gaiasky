@@ -337,16 +337,19 @@ public class ModelEntityRenderSystem {
         var graph = Mapper.graph.get(entity);
         var extra = Mapper.extra.get(entity);
         var dist = Mapper.distance.get(entity);
+        var scaffolding = Mapper.modelScaffolding.get(entity);
 
         ModelComponent mc = model.model;
         var cc = body.color;
 
-        float opacity = (float) MathUtilsd.lint(body.distToCamera, dist.distance / 50f, dist.distance, 1f, 0f);
+        double thresholdDistance = dist.distance * scaffolding.sizeScaleFactor;
+        float opacity = (float) MathUtilsd.lint(body.distToCamera, thresholdDistance / 50f, thresholdDistance, 1f, 0f);
         ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(cc[0], cc[1], cc[2], 1f);
         ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
+        mc.setDepthTest(GL20.GL_LEQUAL, true);
         mc.update(alpha * opacity, relativistic);
         // Local transform
-        graph.translation.setToTranslation(mc.instance.transform).scl((float) (extra.radius * 2d));
+        graph.translation.setToTranslation(mc.instance.transform).scl((float) (extra.radius * 2d) * scaffolding.sizeScaleFactor);
         batch.render(mc.instance, mc.env);
     }
 

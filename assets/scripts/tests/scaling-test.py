@@ -34,7 +34,6 @@ gs.setCameraFree()
 gs.setSimulationTime(2017, 12, 1, 10, 5, 0, 0)
 
 
-
 # Scale objects
 gs.setObjectSizeScaling("Mercury", 3000.0)
 gs.setObjectSizeScaling("Venus", 3000.0)
