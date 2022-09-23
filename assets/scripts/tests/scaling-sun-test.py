@@ -10,6 +10,6 @@ def current_time_ms():
 gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True))
 gs = gateway.entry_point
 
-gs.setObjectSizeScaling("Sun", 1.0)
+gs.setObjectSizeScaling("Sun", 50.0)
 
 gateway.shutdown()
