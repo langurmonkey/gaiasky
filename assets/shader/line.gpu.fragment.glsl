@@ -6,6 +6,7 @@ uniform float u_alpha;
 uniform float u_zfar;
 uniform float u_k;
 uniform float u_coordEnabled;
+uniform float u_trailMap;
 uniform float u_coordPos;
 uniform float u_period;
 
@@ -35,6 +36,7 @@ void main() {
     } else {
         trail = 1.0;
     }
+    trail = clamp((1.0 / (1.0 - u_trailMap)) * (trail - u_trailMap), 0.0, 1.0);
     fragColor = vec4(v_col.rgb * u_alpha * trail, 1.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 

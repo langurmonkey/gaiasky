@@ -37,7 +37,7 @@ import gaiasky.util.math.Matrix4d;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Renders single isolated orbits defined with orbital elements.
+ * Renders single isolated particles defined with orbital elements.
  */
 public class ElementsRenderer extends PointCloudTriRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ElementsRenderer.class);

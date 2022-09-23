@@ -2,6 +2,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.MathUtils;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.scenegraph.component.OrbitComponent;
@@ -63,14 +64,19 @@ public class Trajectory implements Component {
      */
     public boolean mustRefresh;
     /**
-     * Whether to show the orbit as a trail or not
+     * Whether to show the orbit as a trail or not.
+     * A trail fades the orbit line as it gets further away from the object.
      */
     public boolean orbitTrail;
     /**
-     * The map for the trail fade. 0 gives a full orbit mapped from 1 at the first point, to 0 at the final point.
-     * Set to negative (i.e. up to -10) to make the trail shorter and shorter.
+     * The bottom mapping position for the trail. The orbit trail assigns
+     * an opacity value to each point of the orbit, where 1 is the location of
+     * the object and 0 is the other end. This mapping parameter defines the location
+     * in the orbit (in [0,1]) where we map the opacity value of 0.
+     * Set to 0 to have a full trail. Set to 0.5 to have a trail that spans half the orbit.
+     * Set to 1 to have no orbit at all.
      */
-    public float trailMap = -0.1f;
+    public float trailMap = 0.0f;
 
     public OrbitDataLoaderParameters params;
 
@@ -137,7 +143,7 @@ public class Trajectory implements Component {
     }
 
     public void setTrailMap(Double trailMap) {
-        this.trailMap = trailMap.floatValue();
+        this.trailMap = MathUtils.clamp(trailMap.floatValue(), 0f, 1f);
     }
 
     public void setOrbittrail(Boolean trail) {

@@ -255,12 +255,13 @@ public class LineEntityRenderSystem {
             var cc = body.color;
             var pointCloudData = verts.pointCloudData;
 
-            alpha *= trajectory.alpha * base.opacity;
+            float baseOpacity = (float) (alpha * trajectory.alpha * base.opacity);
 
             Vector3d parentPos;
             parentPos = Mapper.attitude.has(graph.parent) ? Mapper.attitude.get(graph.parent).nonRotatedPos : null;
             int last = parentPos != null ? 2 : 1;
 
+            float topAlpha = 1;
             float dAlpha = 0f;
             int stIdx = 0;
             int nPoints = verts.pointCloudData.getNumPoints();
@@ -269,10 +270,9 @@ public class LineEntityRenderSystem {
 
             Vector3d bodyPos = D31.setZero();
             if (orbitTrail) {
-                float top = alpha;
                 // For large periods, fade orbit to 0 a bit before.
-                float bottom = trajectory.params != null && (trajectory.params.orbitalPeriod > 40000 || base.ct.isEnabled(ComponentType.Moons)) ? -0.2f : trajectory.trailMap;
-                dAlpha = (top - bottom) / nPoints;
+                float bottomAlpha = trajectory.params != null && (trajectory.params.orbitalPeriod > 40000 || base.ct.isEnabled(ComponentType.Moons)) ? -0.2f : -0.1f;
+                dAlpha = (topAlpha - bottomAlpha) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = verts.pointCloudData.getWrapTimeMs(currentTime);
                 stIdx = verts.pointCloudData.getIndex(wrapTime);
@@ -285,7 +285,7 @@ public class LineEntityRenderSystem {
                 }
 
                 if (!reverse) {
-                    alpha = bottom;
+                    topAlpha = bottomAlpha;
                     dAlpha = -dAlpha;
                 }
             }
@@ -313,17 +313,22 @@ public class LineEntityRenderSystem {
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
 
-                    cAlpha = MathUtils.clamp(alpha, 0f, 1f);
-                    if(cAlpha > 0) {
-                        if (orbitTrail && !reverse && n == nPoints - 2) {
-                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
-                        } else if (orbitTrail && reverse && n == 0) {
-                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
-                        }
-                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                    cAlpha = MathUtils.clamp(topAlpha, 0f, 1f);
+                    if(trajectory.trailMap > 0) {
+                        cAlpha = (1f / (1f - trajectory.trailMap)) * (cAlpha - trajectory.trailMap);
                     }
 
-                    alpha -= dAlpha;
+                    // Only render visible chunks.
+                    if(cAlpha > 0.001) {
+                        if (orbitTrail && !reverse && n == nPoints - 2) {
+                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3] * baseOpacity);
+                        } else if (orbitTrail && reverse && n == 0) {
+                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3] * baseOpacity);
+                        }
+                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3] * baseOpacity);
+                    }
+
+                    topAlpha -= dAlpha;
 
                     // advance
                     i = wrap(i + 1, nPoints);
@@ -358,7 +363,7 @@ public class LineEntityRenderSystem {
                     }
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
-                    renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
+                    renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3] * baseOpacity);
                 }
             }
         }

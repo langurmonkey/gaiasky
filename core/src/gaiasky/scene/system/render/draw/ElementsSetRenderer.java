@@ -39,7 +39,7 @@ import gaiasky.util.math.Matrix4d;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Renders orbital elements groups as a whole.
+ * Renders the particles of orbital elements groups as a whole. Does not render the orbit trails!
  */
 public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(ElementsSetRenderer.class);
