@@ -98,7 +98,7 @@ public class Scene {
         engine.addEntity(root);
 
         // Create scene observer
-        new SceneObserver(this);
+        new SceneObserver();
     }
 
     /**

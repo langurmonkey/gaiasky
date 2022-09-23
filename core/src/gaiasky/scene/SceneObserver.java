@@ -16,11 +16,9 @@ import java.util.Locale;
 public class SceneObserver implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(SceneObserver.class);
 
-    private final Scene scene;
     private final FocusView view;
 
-    public SceneObserver(Scene scene) {
-        this.scene = scene;
+    public SceneObserver() {
         this.view = new FocusView();
 
         EventManager.instance.subscribe(this, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD);
