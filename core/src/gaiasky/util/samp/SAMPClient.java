@@ -71,7 +71,7 @@ public class SAMPClient implements IObserver {
         // Configure it with metadata about this application
         Metadata meta = new Metadata();
         meta.setName(Settings.APPLICATION_NAME);
-        meta.setDescriptionText("3D Universe application focused on ESA's Gaia satellite");
+        meta.setDescriptionText("Open source 3D universe simulator for desktop and VR with support for more than a billion objects.");
         meta.setDocumentationUrl(Settings.DOCUMENTATION);
         meta.setIconUrl(Settings.ICON_URL.replaceAll("[^\\x00-\\x7F]", "?"));
         meta.put("author.name", Settings.AUTHOR_NAME_PLAIN);
@@ -122,7 +122,7 @@ public class SAMPClient implements IObserver {
                             pg.setFocusIndex((int) row);
                             preventProgrammaticEvents = true;
                             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
-                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg);
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, node);
                             preventProgrammaticEvents = false;
                         } else {
                             // Star cluster?
@@ -240,8 +240,8 @@ public class SAMPClient implements IObserver {
                     if (loaded) {
                         // Select first
                         CatalogInfo ci = catalogManager.get(id);
-                        if (ci.entity != null) {
-                            Entity node = ci.entity;
+                        var node = ci.entity;
+                        if (node != null) {
                             var graph = Mapper.graph.get(node);
                             if (Mapper.particleSet.has(node) || Mapper.starSet.has(node)) {
                                 // Stars or particles
@@ -287,8 +287,8 @@ public class SAMPClient implements IObserver {
                     if (data[0] instanceof FocusView) {
                         var focus = (FocusView) data[0];
                         var entity = focus.getEntity();
-                        if (focus.getParticleSet() != null || focus.getStarSet() != null) {
-                            var pg = focus.getParticleSet() != null ? focus.getParticleSet() : focus.getStarSet();
+                        if (focus.isSet()) {
+                            var pg = focus.getSet();
                             if (idToNode.containsValue(entity)) {
                                 String id = idToNode.getBackward(entity);
                                 String url = idToUrl.get(id);

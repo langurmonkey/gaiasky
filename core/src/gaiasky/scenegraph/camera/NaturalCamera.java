@@ -1183,12 +1183,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         gamepadListener.deactivate();
     }
 
-    public void setFocus(Entity newFocus) {
+    public void setFocus(String focusName, Entity newFocus) {
         if (newFocus != null && GaiaSky.instance.isOn(Mapper.base.get(newFocus).ct)) {
-            this.focus.setEntity(newFocus);
-            this.focus.makeFocus();
+            focus.setEntity(newFocus);
+            focus.getFocus(focusName != null ? focusName : focus.getCandidateName());
+            focus.makeFocus();
             // Reset facing focus.
-            this.facingFocus = false;
+            facingFocus = false;
             // Create event to notify focus change.
             EventManager.publish(Event.FOCUS_CHANGED, this, focus);
         }
@@ -1263,17 +1264,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (data.length > 1)
                 centerFocus = (Boolean) data[1];
 
+            String focusName = null;
             if (data[0] instanceof String) {
-                String focusName = (String) data[0];
-
+                focusName = (String) data[0];
                 newFocus = scene.getEntity(focusName);
                 diverted = !centerFocus;
-
             } else if (data[0] instanceof Entity) {
                 newFocus = (Entity) data[0];
                 diverted = !centerFocus;
             }
-            setFocus(newFocus);
+            setFocus(focusName, newFocus);
 
             checkFocus();
 
