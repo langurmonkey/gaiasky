@@ -49,6 +49,8 @@ public class AtmosphereComponent extends NamedComponent {
     public Vector3 fogColor;
     public float m_eSun = 10f;
 
+    public int samples = 11;
+
     // Model parameters
     public Map<String, Object> params;
 
@@ -106,7 +108,6 @@ public class AtmosphereComponent extends NamedComponent {
         float m_fScaleDepth = .20f;
         float m_fScale = 1.0f / (m_fAtmosphereHeight);
         float m_fScaleOverScaleDepth = m_fScale / m_fScaleDepth;
-        int m_nSamples = 11;
 
         double[] m_fWavelength = wavelengths;
         float[] m_fWavelength4 = new float[3];
@@ -131,7 +132,7 @@ public class AtmosphereComponent extends NamedComponent {
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.ScaleDepth, m_fScaleDepth));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.ScaleOverScaleDepth, m_fScaleOverScaleDepth));
 
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.nSamples, m_nSamples));
+        mat.set(new AtmosphereAttribute(AtmosphereAttribute.nSamples, samples));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.FogDensity, fogDensity));
         mat.set(new Vector3Attribute(Vector3Attribute.FogColor, fogColor));
@@ -247,6 +248,8 @@ public class AtmosphereComponent extends NamedComponent {
 
         // Alpha value
         ((AtmosphereAttribute) mat.get(AtmosphereAttribute.Alpha)).value = alpha;
+        // Number of samples
+        ((AtmosphereAttribute) mat.get(AtmosphereAttribute.nSamples)).value = samples;
     }
 
     public void setQuality(Long quality) {
@@ -271,6 +274,14 @@ public class AtmosphereComponent extends NamedComponent {
 
     public void setFogcolor(double[] fogColor) {
         this.fogColor.set((float) fogColor[0], (float) fogColor[1], (float) fogColor[2]);
+    }
+
+    public void setSamples(Long samples) {
+        this.samples = samples.intValue();
+    }
+
+    public void setNumSamples(Long samples) {
+        this.samples = samples.intValue();
     }
 
     public void setFogdensity(Double fogDensity) {
@@ -321,6 +332,8 @@ public class AtmosphereComponent extends NamedComponent {
         setFogdensity(gaussian(rand, 4.0, 1.0, 0.5));
         // Fog color
         setFogcolor(new double[] { 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5 });
+        // Samples
+        setSamples(rand.nextInt(48) + 2L);
         // Params
         setParams(createModelParameters(600L, 1.0, true));
     }
@@ -334,6 +347,7 @@ public class AtmosphereComponent extends NamedComponent {
         this.m_eSun = other.m_eSun;
         this.fogDensity = other.fogDensity;
         this.fogColor = new Vector3(other.fogColor);
+        this.samples = other.samples;
     }
 
     public void print(Log log) {
@@ -342,6 +356,7 @@ public class AtmosphereComponent extends NamedComponent {
         log.debug("eSun: " + m_eSun);
         log.debug("Fog density: " + fogDensity);
         log.debug("Fog color: " + fogColor);
+        log.debug("Samples: " + samples);
     }
 
     @Override

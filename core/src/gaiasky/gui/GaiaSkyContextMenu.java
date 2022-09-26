@@ -73,7 +73,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         this.catalogManager = catalogManager;
         this.pad = 8f;
         this.scene = scene;
-        if (candidate != null) {
+        if (candidate != null && !candidate.isEmpty()) {
             this.candidateName = candidate.getCandidateName();
             this.candidateNameShort = TextUtils.capString(this.candidateName, 10);
         }
@@ -87,7 +87,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
     private void build() {
         Drawable rulerDwb = skin.getDrawable("icon-elem-ruler");
-        if (candidate != null) {
+        if (candidate != null && !candidate.isEmpty()) {
             MenuItem select = new MenuItem(I18n.msg("context.select", candidateNameShort), skin, skin.getDrawable("highlight-off"));
             select.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -186,7 +186,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(removeShapesAll);
 
-            if (candidate instanceof FocusView && Mapper.atmosphere.has(((FocusView) candidate).getEntity())) {
+            if (Mapper.atmosphere.has(candidate.getEntity())) {
                 addSeparator();
 
                 MenuItem landOn = new MenuItem(I18n.msg("context.landon", candidateNameShort), skin, skin.getDrawable("land-on"));
@@ -200,7 +200,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 addItem(landOn);
 
                 double[] lonlat = new double[2];
-                FocusView view = (FocusView) candidate;
+                FocusView view = candidate;
                 boolean ok = CameraUtils.getLonLat(view, view.getEntity(), GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
                 if (ok) {
                     final Double pointerLon = lonlat[0];

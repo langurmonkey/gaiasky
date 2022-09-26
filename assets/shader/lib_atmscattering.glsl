@@ -56,7 +56,6 @@ void computeAtmosphericScatteringGround() {
     float fFar = length(v3Ray);
     v3Ray /= fFar;
 
-
     // Calculate the closest intersection of the ray with the outer atmosphere (which is the near point of the ray passing through the atmosphere)
     float fNear = getNearIntersection (v3CameraPos, v3Ray, fCameraHeight2, fOuterRadius2);
 
@@ -88,7 +87,7 @@ void computeAtmosphericScatteringGround() {
 
         v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
 
-        v3FrontColor += clamp(v3Attenuate * (fDepth * fScaledLength), 0.0, 1.0);
+        v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
         v3SamplePoint += v3SampleRay;
     }
 

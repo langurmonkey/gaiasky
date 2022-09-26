@@ -63,7 +63,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     private int genCloudNum = 0, genSurfaceNum = 0;
 
     public ProceduralGenerationWindow(FocusView target, Stage stage, Skin skin) {
-        super(I18n.msg("gui.procedural.title", target.getName()), skin, stage);
+        super(I18n.msg("gui.procedural.title", target.getLocalizedName()), skin, stage);
         this.target = target.getEntity();
         this.view = new FocusView(target.getEntity());
         this.initMtc = Mapper.model.get(this.target).model.mtc;
@@ -666,7 +666,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(wavelengthTooltip).left().padBottom(pad10).row();
 
         // eSun
-        OwnSliderPlus eSun = new OwnSliderPlus(I18n.msg("gui.procedural.esun"), -1.0f, 15.0f, 0.1f, skin);
+        OwnSliderPlus eSun = new OwnSliderPlus(I18n.msg("gui.procedural.esun"), -1.0f, 25.0f, 0.1f, skin);
         eSun.setWidth(fieldWidthAll);
         eSun.setValue(ac.m_eSun);
         eSun.addListener(new ChangeListener() {
@@ -728,6 +728,21 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(fogDensity).colspan(2).left().padBottom(pad10).padRight(pad5);
         content.add(fogDensityTooltip).left().padBottom(pad10).row();
 
+        // Num samples
+        OwnSliderPlus samples = new OwnSliderPlus(I18n.msg("gui.procedural.samples"), 2, 50, 1, skin);
+        samples.setWidth(fieldWidthAll);
+        samples.setValue(ac.samples);
+        samples.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ac.samples = (int) samples.getValue();
+            }
+        });
+        OwnImageButton samplesTooltip = new OwnImageButton(skin, "tooltip");
+        samplesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.procedural.info.samples"), skin));
+        content.add(samples).colspan(2).left().padBottom(pad10).padRight(pad5);
+        content.add(samplesTooltip).left().padBottom(pad10).row();
+
         // Fog color
         ColorPicker fogColor = new ColorPicker(new float[] { ac.fogColor.x, ac.fogColor.y, ac.fogColor.z, 1f }, stage, skin);
         fogColor.setSize(128f, 128f);
@@ -744,6 +759,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(fogColorLabel).left().padRight(pad10).padBottom(pad10);
         content.add(fogColor).left().expandX().padBottom(pad10).padRight(pad5);
         content.add(fogColorTooltip).left().padBottom(pad10).row();
+
 
         // Add button group
         addLocalButtons(content, "gui.procedural.atmosphere", this::randomizeAtmosphere, this::generateAtmosphere);
