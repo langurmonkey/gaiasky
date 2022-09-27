@@ -1,9 +1,5 @@
 #version 330
 
-#if defined(diffuseTextureFlag) || defined(specularTextureFlag)
-#define textureFlag
-#endif
-
 #if defined(specularTextureFlag) || defined(specularColorFlag)
 #define specularFlag
 #endif

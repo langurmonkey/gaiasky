@@ -42,7 +42,7 @@ public class AttributeMap {
         putAll(Base.class, "id", "name", "names", "altName", "altname", "opacity", "ct");
 
         // Body
-        putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm", "radiusPc", "diameter", "diameterKm", "color", "labelcolor");
+        putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm", "radiusPc", "diameter", "diameterKm", "color", "labelcolor", "labelColor");
 
         // GraphNode
         putAll(GraphNode.class, "parent");
@@ -96,7 +96,7 @@ public class AttributeMap {
         putAll(DatasetDescription.class, "catalogInfo", "cataloginfo", "description:MeshObject");
 
         // Label
-        putAll(Label.class, "label", "label2d", "labelposition", "labelFactor", "labelMax", "textScale");
+        putAll(Label.class, "label", "label2d", "labelposition", "labelPosition", "labelFactor", "labelMax", "textScale");
 
         // RenderType
         putAll(RenderType.class, "rendergroup", "billboardRenderGroup:Particle");

@@ -1,7 +1,5 @@
 #version 330 core
 
-#define TEXTURE_LOD_BIAS 0.0
-
 #if defined(colorFlag)
 in vec4 v_color;
 #endif
@@ -10,7 +8,7 @@ in vec4 v_color;
 in float v_opacity;
 #endif //blendedFlag
 
-#if defined(diffuseTextureFlag) || defined(specularTextureFlag)
+#if defined(diffuseTextureFlag) || defined(specularTextureFlag) || defined(diffuseCubemapFlag)
 #define textureFlag
 in vec2 v_texCoords0;
 #endif
@@ -21,6 +19,10 @@ uniform vec4 u_diffuseColor;
 
 #ifdef diffuseTextureFlag
 uniform sampler2D u_diffuseTexture;
+#endif
+
+#ifdef diffuseCubemapFlag
+uniform samplerCube u_diffuseCubemap;
 #endif
 
 #ifdef lightingFlag
@@ -54,23 +56,37 @@ layout (location = 0) out vec4 fragColor;
 #include shader/lib_velbuffer.frag.glsl
 #endif
 
+#ifdef cubemapFlag
+#include shader/lib_cubemap.glsl
+#endif // cubemapFlag
+
 void main() {
 	#if defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)
-		vec4 diffuse = texture(u_diffuseTexture, v_texCoords0, TEXTURE_LOD_BIAS) * u_diffuseColor * v_color;
+	vec4 diffuse = texture(u_diffuseTexture, v_texCoords0) * u_diffuseColor * v_color;
 	#elif defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-		vec4 diffuse = texture(u_diffuseTexture, v_texCoords0, TEXTURE_LOD_BIAS) * u_diffuseColor;
+	vec4 diffuse = texture(u_diffuseTexture, v_texCoords0) * u_diffuseColor;
 	#elif defined(diffuseTextureFlag) && defined(colorFlag)
-		vec4 diffuse = texture(u_diffuseTexture, v_texCoords0, TEXTURE_LOD_BIAS) * v_color;
+	vec4 diffuse = texture(u_diffuseTexture, v_texCoords0) * v_color;
 	#elif defined(diffuseTextureFlag)
-		vec4 diffuse = texture(u_diffuseTexture, v_texCoords0, TEXTURE_LOD_BIAS);
+	vec4 diffuse = texture(u_diffuseTexture, v_texCoords0);
+
+	#elif defined(diffuseCubemapFlag) && defined(diffuseColorFlag) && defined(colorFlag)
+	vec4 diffuse = texture(u_diffuseCubemap, UVtoXYZ(v_texCoords0)) * u_diffuseColor * v_color;
+	#elif defined(diffuseCubemapFlag) && defined(diffuseColorFlag)
+	vec4 diffuse = texture(u_diffuseCubemap, UVtoXYZ(v_texCoords0)) * u_diffuseColor;
+	#elif defined(diffuseCubemapFlag) && defined(colorFlag)
+	vec4 diffuse = texture(u_diffuseCubemap, UVtoXYZ(v_texCoords0)) * v_color;
+	#elif defined(diffuseCubemapFlag)
+	vec4 diffuse = texture(u_diffuseCubemap, UVtoXYZ(v_texCoords0));
+
 	#elif defined(diffuseColorFlag) && defined(colorFlag)
-		vec4 diffuse = u_diffuseColor * v_color;
+	vec4 diffuse = u_diffuseColor * v_color;
 	#elif defined(diffuseColorFlag)
-		vec4 diffuse = u_diffuseColor;
+	vec4 diffuse = u_diffuseColor;
 	#elif defined(colorFlag)
-		vec4 diffuse = v_color;
+	vec4 diffuse = v_color;
 	#else
-		vec4 diffuse = vec4(1.0);
+	vec4 diffuse = vec4(1.0);
 	#endif
 
 	fragColor = diffuse * v_opacity;

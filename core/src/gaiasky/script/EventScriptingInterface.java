@@ -42,6 +42,7 @@ import gaiasky.scene.view.VertsView;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
@@ -3339,9 +3340,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     params.put("flip", false);
 
                     var model = Mapper.model.get(newShape);
-                    shape.modelShape = shapeLc;
-                    shape.primitiveType = primitiveInt;
-                    shape.modelParams = params;
+                    model.model = new ModelComponent();
+                    model.model.type = shapeLc;
+                    model.model.setPrimitiveType(primitiveInt);
+                    model.model.setParams(params);
 
                     // Initialize shape.
                     scene.initializeEntity(newShape);

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.data.AssetBean;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
@@ -29,7 +30,10 @@ public class ShapeInitializer extends AbstractInitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
-
+        var base = Mapper.base.get(entity);
+        var modelComp = Mapper.model.get(entity);
+        var mc = modelComp.model;
+        mc.initialize(base.getLocalizedName());
     }
 
     @Override
@@ -40,7 +44,8 @@ public class ShapeInitializer extends AbstractInitSystem {
         label.label = true;
         label.textScale = 0.2f;
         label.labelMax = 1f;
-        label.labelFactor = (float) (0.5e-3f * Constants.DISTANCE_SCALE_FACTOR);
+        if (label.labelFactor == 0)
+            label.labelFactor = (float) (0.5e-3f * Constants.DISTANCE_SCALE_FACTOR);
         label.renderConsumer = LabelEntityRenderSystem::renderShape;
         label.renderFunction = LabelView::renderTextEssential;
 
@@ -56,25 +61,18 @@ public class ShapeInitializer extends AbstractInitSystem {
         var shape = Mapper.shape.get(entity);
 
         modelComp.renderConsumer = ModelEntityRenderSystem::renderShape;
-
-        graph.localTransform = new Matrix4();
-        Pair<IntModel, Map<String, Material>> m = ModelCache.cache.getModel(shape.modelShape, shape.modelParams, Bits.indexes(Usage.Position), shape.primitiveType);
-        IntModel model = m.getFirst();
-        for (Map.Entry<String, Material> material : m.getSecond().entrySet()) {
-            material.getValue().set(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE));
-            material.getValue().set(new ColorAttribute(ColorAttribute.Diffuse, body.color[0], body.color[1], body.color[2], body.color[3]));
-        }
-
-        modelComp.model = new ModelComponent(false);
         var mc = modelComp.model;
-        mc.initialize(null);
+        graph.localTransform = new Matrix4();
+        mc.doneLoading(AssetBean.manager(), graph.localTransform, body.color);
+        mc.setTransparency(1, GL20.GL_ONE, GL20.GL_ONE);
+
+
         DirectionalLight dLight = new DirectionalLight();
         dLight.set(1, 1, 1, 1, 1, 1);
         mc.env = new Environment();
         mc.env.add(dLight);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
         mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
-        mc.instance = new IntModelInstance(model, new Matrix4());
 
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)

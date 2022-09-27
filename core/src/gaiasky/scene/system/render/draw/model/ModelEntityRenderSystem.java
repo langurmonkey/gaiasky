@@ -176,7 +176,7 @@ public class ModelEntityRenderSystem {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
 
-        mc.update(null, alpha * base.opacity * body.color[3], GL20.GL_ONE, GL20.GL_ONE);
+        mc.update(graph.localTransform, alpha * base.opacity * body.color[3], GL20.GL_ONE, GL20.GL_ONE);
         // Depth reads, no depth writes
         mc.setDepthTest(GL20.GL_LEQUAL, false);
         Gdx.gl20.glLineWidth(1.5f);

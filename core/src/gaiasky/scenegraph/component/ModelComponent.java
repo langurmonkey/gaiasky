@@ -19,6 +19,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.*;
@@ -87,6 +88,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     private AssetManager manager;
     private float[] cc;
+    private int primitiveType = GL20.GL_TRIANGLES;
 
     /**
      * COMPONENTS
@@ -235,7 +237,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             if (params.containsKey("attributes")) {
                 attributes = Bits.indexes(((Long) params.get("attributes")).intValue());
             }
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, attributes, GL20.GL_TRIANGLES);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, attributes, primitiveType);
             model = pair.getFirst();
             materials = pair.getSecond();
         } else {
@@ -495,17 +497,26 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         this.modelFile = model;
     }
 
-    public void setStaticlight(String staticLight) {
+    public void setStaticLight(String staticLight) {
         setStaticlight(Boolean.valueOf(staticLight));
     }
-
-    public void setStaticlight(Boolean staticLight) {
-        this.staticLight = staticLight;
+    public void setStaticlight(String staticLight) {
+        setStaticLight(staticLight);
     }
 
-    public void setStaticlight(Double lightLevel) {
+    public void setStaticLight(Boolean staticLight) {
+        this.staticLight = staticLight;
+    }
+    public void setStaticlight(Boolean staticLight) {
+        setStaticLight(staticLight);
+    }
+
+    public void setStaticLight(Double lightLevel) {
         this.staticLight = true;
         this.staticLightLevel = lightLevel.floatValue();
+    }
+    public void setStaticlight(Double lightLevel) {
+        setStaticLight(lightLevel);
     }
 
     public void setParams(Map<String, Object> params) {
@@ -640,6 +651,14 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public boolean isModelLoading() {
         return modelLoading;
+    }
+
+    public void setPrimitiveType(int primitiveType) {
+        this.primitiveType = primitiveType;
+    }
+
+    public void setPrimitiveType(String primitiveType) {
+        this.primitiveType = Primitive.valueOf(primitiveType.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
     }
 
     public String toString() {

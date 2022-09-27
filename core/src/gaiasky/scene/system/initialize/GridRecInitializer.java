@@ -159,12 +159,12 @@ public class GridRecInitializer extends AbstractInitSystem {
         annotation(gr, 100000000d * Constants.PC_TO_U, "100 " + I18n.msg("gui.unit.mpc"));
         annotation(gr, 500000000d * Constants.PC_TO_U, "500 " + I18n.msg("gui.unit.mpc"));
 
-        annotation(gr, 1000000000d * Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.mpc"));
-        annotation(gr, 2500000000d * Constants.PC_TO_U, "2.5 " + I18n.msg("gui.unit.mpc"));
-        annotation(gr, 5000000000d * Constants.PC_TO_U, "5 " + I18n.msg("gui.unit.mpc"));
-        annotation(gr, 10000000000d * Constants.PC_TO_U, "10 " + I18n.msg("gui.unit.mpc"));
-        annotation(gr, 50000000000d * Constants.PC_TO_U, "50 " + I18n.msg("gui.unit.mpc"));
-        annotation(gr, 100000000000d * Constants.PC_TO_U, "100 " + I18n.msg("gui.unit.mpc"));
+        annotation(gr, 1000000000d * Constants.PC_TO_U, "1 " + I18n.msg("gui.unit.gpc"));
+        annotation(gr, 2500000000d * Constants.PC_TO_U, "2.5 " + I18n.msg("gui.unit.gpc"));
+        annotation(gr, 5000000000d * Constants.PC_TO_U, "5 " + I18n.msg("gui.unit.gpc"));
+        annotation(gr, 10000000000d * Constants.PC_TO_U, "10 " + I18n.msg("gui.unit.gpc"));
+        annotation(gr, 50000000000d * Constants.PC_TO_U, "50 " + I18n.msg("gui.unit.gpc"));
+        annotation(gr, 100000000000d * Constants.PC_TO_U, "100 " + I18n.msg("gui.unit.gpc"));
     }
 
     private void annotation(GridRecursive gr, double dist, String text) {

@@ -27,7 +27,7 @@ public class ModelCache {
     }
 
     public Pair<IntModel, Map<String, Material>> getModel(String shape, Map<String, Object> params, Bits attributes, int primitiveType) {
-        String key = getKey(shape, params, attributes);
+        String key = getKey(shape, params, attributes, primitiveType);
         IntModel model = null;
         Map<String, Material> materials = new HashMap<>();
         Material mat;
@@ -40,7 +40,7 @@ public class ModelCache {
             case "sphere":
                 int quality = ((Long) params.get("quality")).intValue();
                 float diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
-                Boolean flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                boolean flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
                 model = mb.createSphere(diameter, diameter, diameter, quality, quality, flip, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
@@ -228,8 +228,8 @@ public class ModelCache {
         return new Pair<>(model, materials);
     }
 
-    private String getKey(String shape, Map<String, Object> params, Bits attributes) {
-        StringBuilder key = new StringBuilder(shape + "-" + attributes);
+    private String getKey(String shape, Map<String, Object> params, Bits attributes, int primitiveType) {
+        StringBuilder key = new StringBuilder(shape + "-" + attributes + "-" + primitiveType);
         Set<String> keys = params.keySet();
         Object[] par = keys.toArray();
         for (Object o : par) {

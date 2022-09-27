@@ -47,7 +47,6 @@ public class NewJsonLoader extends AbstractSceneLoader {
         this.attributeMap.initialize();
     }
 
-
     @Override
     public Array<Entity> loadData() throws FileNotFoundException {
         Array<Entity> loadedEntities = new Array<>();
@@ -190,13 +189,18 @@ public class NewJsonLoader extends AbstractSceneLoader {
                 Class<? extends Component> componentClass = attributeMap.get(key);
                 Component comp = entity.getComponent(componentClass);
 
-                if (!set(attribute, comp, value, valueClass, componentClass)) {
-                    // Setter set did not work, try setting the attribute directly
-                    boolean succeed = set(comp, attribute.name, value);
-                    if (!succeed) {
-                        logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                if (comp != null) {
+                    if (!set(attribute, comp, value, valueClass, componentClass)) {
+                        // Setter set did not work, try setting the attribute directly
+                        boolean succeed = set(comp, attribute.name, value);
+                        if (!succeed) {
+                            logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                        }
+                        return succeed;
                     }
-                    return succeed;
+                } else {
+                    logger.error("Error, component of class " + componentClass + " is null: " + json.name);
+                    return false;
                 }
                 return true;
             } else {
@@ -246,7 +250,11 @@ public class NewJsonLoader extends AbstractSceneLoader {
         } catch (Exception e) {
             throw new RuntimeException("Unable to instantiate class: " + e.getMessage());
         }
-        processJson(json, (valueClass, value, attribute) -> set(attribute, instance, value, valueClass, clazz));
+        if (instance != null) {
+            processJson(json, (valueClass, value, attribute) -> set(attribute, instance, value, valueClass, clazz));
+        } else {
+            logger.error("Error, instance is null: " + json.name);
+        }
         return instance;
     }
 

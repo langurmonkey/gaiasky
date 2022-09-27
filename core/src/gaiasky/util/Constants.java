@@ -199,7 +199,7 @@ public class Constants {
     public static final double MAX_FPS = 1000d;
 
     /** Maximum camera speed **/
-    public static final float MAX_CAM_SPEED = 10f;
+    public static final float MAX_CAM_SPEED = 15f;
     /** Minimum camera speed **/
     public static final float MIN_CAM_SPEED = 0.1f;
 

@@ -29,10 +29,13 @@ public class ShapeUpdater extends AbstractUpdateSystem{
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var shape = Mapper.shape.get(entity);
+        var model = Mapper.model.get(entity);
 
         graph.translation.sub(body.pos);
         if (shape.track != null) {
             EntityUtils.getAbsolutePosition(shape.track.getEntity(), shape.trackName.toLowerCase(Locale.ROOT), body.pos);
+        } else {
+            body.pos.scl(0);
         }
         // Update pos, local transform
         graph.translation.add(body.pos);
