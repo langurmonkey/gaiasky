@@ -1287,6 +1287,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void forceUpdateScene() {
+        postRunnable(() -> em.post(Event.SCENE_FORCE_UPDATE, this));
+    }
+
+    public void refreshObjectOrbit(String name) {
+        String orbitName = name + " orbit";
+        if (checkObjectName(orbitName)) {
+            FocusView view = getObject(orbitName);
+            var trajectory = Mapper.trajectory.get(view.getEntity());
+            var verts = Mapper.verts.get(view.getEntity());
+            if (trajectory != null && verts != null) {
+                initializeTrajectoryUtils();
+                postRunnable(() -> {
+                    trajectoryUtils.refreshOrbit(trajectory, verts, true);
+                });
+            }
+        }
+    }
+
+    @Override
     public double getObjectRadius(String name) {
         Entity object = scene.findFocus(name);
         if (object == null)
@@ -3233,9 +3253,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             {
                 if (ci.entity != null) {
                     var entity = ci.entity;
-                    synchronized(focusView) {
+                    synchronized (focusView) {
                         focusView.setEntity(entity);
-                        if(focusView.isSet()) {
+                        if (focusView.isSet()) {
                             ObjectDoubleMap.Keys<UCD> ucds = focusView.getSet().data().get(0).extraKeys();
                             for (UCD ucd : ucds)
                                 if (ucd.colname.equalsIgnoreCase(name))

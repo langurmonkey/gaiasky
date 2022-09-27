@@ -1275,6 +1275,9 @@ public interface IScriptingInterface {
      * Also, <strong>use this with caution</strong>, as scaling coordinates
      * may have unintended side effects, and remember to set the scaling
      * back to 1.0 at the end of your script.
+     * Additionally, use either {@link IScriptingInterface#refreshAllOrbits()} or
+     * {@link IScriptingInterface#refreshObjectOrbit(String)} right after
+     * this call in order to immediately refresh the scaled orbits.
      * </p>
      *
      * @param name          The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87, UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates, HeliotropicOribtCoordinates, MoonAACoordinates).
@@ -1285,9 +1288,21 @@ public interface IScriptingInterface {
     void setOrbitCoordinatesScaling(String name, double scalingFactor);
 
     /**
+     * Forces the refresh of the orbit of the object identified by
+     * <code>name</code>. This should generally be called after a call to
+     * {@link IScriptingInterface#setOrbitCoordinatesScaling(String, double)}.
+     */
+    void refreshObjectOrbit(String name);
+    /**
      * Forces all orbits to refresh immediately.
      */
     void refreshAllOrbits();
+
+    /**
+     * Forcefully triggers an update of the scene and the positions of all
+     * the objects. Useful to call after operations that modify the position of objects.
+     */
+    void forceUpdateScene();
 
     /**
      * Gets the size of the object identified by <code>name</code>, in Km, by

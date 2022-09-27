@@ -45,6 +45,10 @@ gs.setObjectSizeScaling("Uranus", 3000.0)
 gs.setObjectSizeScaling("Neptune", 3000.0)
 gs.setObjectSizeScaling("Pluto", 100000.0)
 
+# Refresh orbit, update positions
+gs.refreshAllOrbits();
+gs.forceSceneUpdate();
+
 gs.sleep(3)
 
 # Fast pace
@@ -83,6 +87,10 @@ gs.setObjectSizeScaling("Saturn", 1.0)
 gs.setObjectSizeScaling("Uranus", 1.0)
 gs.setObjectSizeScaling("Neptune", 1.0)
 gs.setObjectSizeScaling("Pluto", 1.0)
+
+# Refresh orbit, update positions
+gs.refreshAllOrbits();
+gs.forceSceneUpdate();
 
 # Orbits and labels off
 gs.setVisibility("element.orbits", False)

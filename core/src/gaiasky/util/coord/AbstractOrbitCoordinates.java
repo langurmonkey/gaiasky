@@ -36,6 +36,22 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         return instances;
     }
 
+    public static <T extends AbstractOrbitCoordinates> T getInstance(Class<T> clazz) {
+        for (AbstractOrbitCoordinates o : instances) {
+            if(clazz.isInstance(o)) {
+                return (T) o;
+            }
+        }
+
+        T obj = null;
+        try {
+            obj = clazz.getDeclaredConstructor().newInstance();
+        }catch(Exception e){
+            logger.error(e);
+        }
+        return obj;
+    }
+
     @Override
     public void doneLoading(Object... params) {
         if (params.length == 0) {

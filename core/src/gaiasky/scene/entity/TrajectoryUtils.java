@@ -104,7 +104,7 @@ public class TrajectoryUtils {
         if ((force && trajectory.params != null) || (trajectory.mustRefresh && !EntityUtils.isCoordinatesTimeOverflow(trajectory.body))) {
             Instant currentTime = GaiaSky.instance.time.getTime();
             long currentMs = currentTime.toEpochMilli();
-            if (verts.pointCloudData == null || currentMs < trajectory.orbitStartMs || currentMs > trajectory.orbitEndMs) {
+            if (force || verts.pointCloudData == null || currentMs < trajectory.orbitStartMs || currentMs > trajectory.orbitEndMs) {
                 // Schedule for refresh
                 // Work out sample initial date
                 Date iniTime;

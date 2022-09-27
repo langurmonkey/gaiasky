@@ -671,7 +671,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE,
                 Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
-                Event.UI_SCALE_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR);
+                Event.UI_SCALE_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR, Event.SCENE_FORCE_UPDATE);
+
 
         // Re-enable input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -770,17 +771,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public void touchSceneGraph() {
-        // Update whole tree to initialize positions
+        // Update whole tree to initialize positions.
         settings.runtime.octreeLoadActive = false;
         boolean timeOnBak = settings.runtime.timeOn;
         settings.runtime.timeOn = true;
-        // Set non-zero time
-        time.update(1e-7);
-        // Update whole scene graph
+        // Set non-zero time to force update the positions.
+        time.update(1e-9);
+        // Update whole scene.
         scene.update(time);
-        // Clear render lists
+        // Clear render lists.
         sceneRenderer.swapRenderLists();
-        // Time back to zero
+        // Time back to zero.
         time.update(0);
         settings.runtime.timeOn = timeOnBak;
         settings.runtime.octreeLoadActive = true;
@@ -1618,6 +1619,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             sceneRenderer.doneLoading(assetManager);
             sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
             sceneRenderer.setRendering(true);
+            break;
+        case SCENE_FORCE_UPDATE:
+            touchSceneGraph();
             break;
         default:
             break;

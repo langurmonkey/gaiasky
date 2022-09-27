@@ -901,6 +901,11 @@ public enum Event {
     SATURATION_CMD,
 
     /**
+     * Forces a scene update.
+     */
+    SCENE_FORCE_UPDATE,
+
+    /**
      * Sends an object to be added to the scene. Contains the object and an optional Boolean indicating
      * whether to add the object to the scene index. Defaults to true.
      **/

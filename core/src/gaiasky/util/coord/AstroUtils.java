@@ -397,9 +397,9 @@ public class AstroUtils {
 
         switch (body) {
         case "Moon":
-            return new MoonAACoordinates().getEclipticSphericalCoordinates(instant, out);
+            return AbstractOrbitCoordinates.getInstance(MoonAACoordinates.class).getEclipticSphericalCoordinates(instant, out);
         case "Pluto":
-            return new PlutoCoordinates().getEclipticSphericalCoordinates(instant, out);
+            return AbstractOrbitCoordinates.getInstance(PlutoCoordinates.class).getEclipticSphericalCoordinates(instant, out);
         default:
             iVSOP87 coor = VSOP87.instance.getVOSP87(body);
             coor.setHighAccuracy(highAccuracy);
