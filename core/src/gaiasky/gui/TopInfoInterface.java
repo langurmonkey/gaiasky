@@ -22,17 +22,21 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.format.TextStyle;
 
 /**
  * The HUD UI at the top of the regular view
  */
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
+    private final ZoneId timeZone;
     /** Date format **/
     private final DateTimeFormatter dfDate;
+    private final DateTimeFormatter dfEra;
     private final DateTimeFormatter dfTime;
 
     private final int maxNameLen = 15;
@@ -58,8 +62,10 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         this.scene = scene;
         view = new FocusView();
 
-        dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
-        dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
+        timeZone = Settings.settings.program.timeZone.getTimeZone();
+        dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
+        dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
+        dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
 
         date = new OwnLabel(I18n.msg("gui.top.date.ut"), skin, "mono");
         date.setName("label date tii");
@@ -112,8 +118,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             // Update input time
             Instant datetime = (Instant) data[0];
             GaiaSky.postRunnable(() -> {
-                date.setText(dfDate.format(datetime));
-                time.setText(dfTime.format(datetime) + " UTC");
+                date.setText(dfDate.format(datetime) + " " + dfEra.format(datetime));
+                time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
                 pack();
             });
 

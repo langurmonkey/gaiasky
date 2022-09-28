@@ -56,6 +56,8 @@ public class Nature {
      */
     /** Seconds to milliseconds **/
     public static final double S_TO_MS = 1000;
+    /** Milliseconds to seconds **/
+    public static final double MS_TO_S = 1 / S_TO_MS;
     /** Hours to seconds **/
     public static final double H_TO_S = 3600;
     /** Seconds to hours **/

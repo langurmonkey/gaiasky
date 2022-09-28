@@ -758,6 +758,7 @@ public class Settings {
         public String locale;
         public UpdateSettings update;
         public UrlSettings url;
+        public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
 
         public ProgramSettings() {
             EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
@@ -781,6 +782,15 @@ public class Settings {
         @JsonIgnore
         public boolean isStereoOrCubemap() {
             return modeStereo.active || modeCubemap.active;
+        }
+
+        @JsonProperty("timeZone")
+        public void setTimeZone(String timeZone) {
+            if (timeZone == null || timeZone.isEmpty()) {
+                // Default
+                timeZone = "UTC";
+            }
+            this.timeZone = DefaultTimeZone.valueOf(timeZone.toUpperCase(Locale.ROOT));
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
@@ -1860,6 +1870,19 @@ public class Settings {
     public enum LineMode {
         GL_LINES,
         POLYLINE_QUADSTRIP,
+    }
+
+    public enum DefaultTimeZone {
+        UTC,
+        SYSTEM_DEFAULT;
+
+        public ZoneId getTimeZone() {
+            if(this.equals(UTC)) {
+                return ZoneId.of("UTC");
+            } else {
+                return ZoneOffset.systemDefault();
+            }
+        }
     }
 
     public enum DistanceUnits {

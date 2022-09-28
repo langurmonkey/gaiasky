@@ -265,6 +265,8 @@ scene:
 # Program configuration
 #
 program:
+  # The default time zone to use. One of [UTC|SYSTEM_DEFAULT]
+  timeZone: UTC
   # Enable safe mode, which disables advanced graphics features.
   # For instance, it disables float buffers and creates no velocity buffer (no motion blur)
   safeMode: false

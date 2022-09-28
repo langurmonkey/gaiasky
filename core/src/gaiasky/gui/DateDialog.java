@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
@@ -33,11 +35,13 @@ public class DateDialog extends CollapsibleWindow {
     private final OwnTextField day, year, hour, min, sec;
     private final SelectBox<String> month;
     private final Color defaultColor;
+    private final ZoneId timeZone;
 
     public DateDialog(Stage stage, Skin skin) {
         super(I18n.msg("gui.pickdate"), skin);
         this.me = this;
         this.stage = stage;
+        this.timeZone = Settings.settings.program.timeZone.getTimeZone();
 
         float inputWidth = 96f;
         float pad = 8f;
@@ -46,7 +50,7 @@ public class DateDialog extends CollapsibleWindow {
         OwnTextButton setNow = new OwnTextButton(I18n.msg("gui.pickdate.setcurrent"), skin);
         setNow.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                updateTime(Instant.now(), ZoneOffset.UTC);
+                updateTime(Instant.now(), timeZone);
                 return true;
             }
             return false;
@@ -77,13 +81,13 @@ public class DateDialog extends CollapsibleWindow {
         month.setWidth(inputWidth);
 
         year = new OwnTextField("", skin);
-        year.setMaxLength(5);
+        year.setMaxLength(8);
         year.setWidth(inputWidth);
         year.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
                 if (ie.getType() == Type.keyTyped) {
-                    checkField(year, -100000, 100000);
+                    checkField(year, (int) (Settings.settings.runtime.minTimeMs * Nature.MS_TO_S), (int) (Settings.settings.runtime.maxTimeMs * Nature.MS_TO_S));
                     return true;
                 }
             }
@@ -96,7 +100,7 @@ public class DateDialog extends CollapsibleWindow {
         dayGroup.addActor(new OwnLabel("/", skin));
         dayGroup.addActor(year);
 
-        add(new OwnLabel(I18n.msg("gui.time.date") + " (" + I18n.msg("gui.time.date.format") + ":", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.msg("gui.time.date") + " (" + I18n.msg("gui.time.date.format") + "):", skin)).pad(pad, pad, 0, pad * 2).right();
         add(dayGroup).pad(pad, 0, 0, pad);
         row();
 
@@ -151,7 +155,7 @@ public class DateDialog extends CollapsibleWindow {
         hourGroup.addActor(new OwnLabel(":", skin));
         hourGroup.addActor(sec);
 
-        add(new OwnLabel(I18n.msg("gui.time.time")+ " (" + I18n.msg("gui.time.time.format")+ ":", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.msg("gui.time.time") + " (" + I18n.msg("gui.time.time.format") + "):", skin)).pad(pad, pad, 0, pad * 2).right();
         add(hourGroup).pad(pad, 0, pad, pad);
         row();
 
@@ -174,7 +178,8 @@ public class DateDialog extends CollapsibleWindow {
                     LocalDateTime date = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()), Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
 
                     // Send time change command
-                    EventManager.publish(Event.TIME_CHANGE_CMD, ok, date.toInstant(ZoneOffset.UTC));
+                    ZoneOffset offset = LocalDateTime.now().atZone(timeZone).getOffset();
+                    EventManager.publish(Event.TIME_CHANGE_CMD, ok, date.toInstant(offset));
 
                     me.remove();
                 }
@@ -237,7 +242,7 @@ public class DateDialog extends CollapsibleWindow {
     /** Updates the time **/
     public void updateTime(Instant instant, ZoneId zid) {
         LocalDateTime date = LocalDateTime.ofInstant(instant, zid);
-        int year = date.get(ChronoField.YEAR_OF_ERA);
+        int year = date.get(ChronoField.YEAR);
         int month = date.getMonthValue();
         int day = date.getDayOfMonth();
 

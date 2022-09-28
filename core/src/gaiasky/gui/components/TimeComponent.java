@@ -19,19 +19,23 @@ import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.DateDialog;
 import gaiasky.gui.KeyBindings;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.format.TextStyle;
 
 public class TimeComponent extends GuiComponent implements IObserver {
 
+    private final ZoneId timeZone;
     /** Date format **/
     private final DateTimeFormatter dfDate;
+    private final DateTimeFormatter dfEra;
     private final DateTimeFormatter dfTime;
 
     protected OwnLabel date;
@@ -49,9 +53,10 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
     public TimeComponent(Skin skin, Stage stage) {
         super(skin, stage);
-
-        dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
-        dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
+        timeZone = Settings.settings.program.timeZone.getTimeZone();
+        dfDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
+        dfEra = DateTimeFormatter.ofPattern("G").withLocale(I18n.locale).withZone(timeZone);
+        dfTime = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(timeZone);
         EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
     }
 
@@ -62,12 +67,12 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         // Time
         date = new OwnLabel("date UT", skin);
+        date.setWidth(contentWidth - 50);
         date.setName("label date");
-        date.setWidth(170f);
 
         time = new OwnLabel("time UT", skin);
+        time.setWidth(contentWidth - 50);
         time.setName("label time");
-        time.setWidth(120f);
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
@@ -76,7 +81,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
                 if (dateDialog == null) {
                     dateDialog = new DateDialog(stage, skin);
                 }
-                dateDialog.updateTime(GaiaSky.instance.time.getTime(), ZoneOffset.UTC);
+                dateDialog.updateTime(GaiaSky.instance.time.getTime(), timeZone);
                 dateDialog.display();
             }
             return false;
@@ -143,8 +148,9 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         // Date time
         Table dateGroup = new Table(skin);
+        dateGroup.setWidth(contentWidth);
         Table datetimeGroup = new Table(skin);
-        datetimeGroup.add(date).left().padBottom(pad4).padRight(pad12);
+        datetimeGroup.add(date).left().padBottom(pad4).row();
         datetimeGroup.add(time).left().padBottom(pad4);
         dateGroup.add(datetimeGroup).left().padRight(pad12);
         dateGroup.add(dateEdit).right();
@@ -169,6 +175,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
      * Generate the time warp vector.
      *
      * @param steps The number of steps per side (positive and negative)
+     *
      * @return The vector
      */
     private double[] generateTimeWarpVector(int steps) {
@@ -221,8 +228,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
             // Update input time
             Instant datetime = (Instant) data[0];
             GaiaSky.postRunnable(() -> {
-                date.setText(dfDate.format(datetime));
-                time.setText(dfTime.format(datetime) + " UTC");
+                date.setText(dfDate.format(datetime) + " " + dfEra.format(datetime));
+                time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
             });
             break;
         case TIME_WARP_CHANGED_INFO:
