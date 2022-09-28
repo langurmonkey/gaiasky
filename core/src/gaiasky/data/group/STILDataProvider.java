@@ -61,12 +61,18 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     private long starId = 10000000;
     // Dataset options, may be null
     private DatasetOptions datasetOptions;
+    // Store already visited colname:attribute pairs.
+    private Map<String, Integer> stringAttributesMap;
+    // Store the last index for a given attribute.
+    private Map<String, Integer> lastIndexMap;
 
     // These names are not allowed
     private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
 
     public STILDataProvider() {
         super();
+        stringAttributesMap = new HashMap<>();
+        lastIndexMap = new HashMap<>();
         // Logging level to WARN
         try {
             java.util.logging.Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING);
@@ -627,7 +633,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 Object o = row[extra.index];
                 if (o instanceof Character) {
                     Character c = (Character) o;
-                    val = (double) c;
+                    val = getStringAttributeValue(extra, c.toString());
+                } else if (o instanceof String) {
+                    val = getStringAttributeValue(extra, o);
                 }
             }
             if (extraAttributes == null)
@@ -635,6 +643,30 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
             extraAttributes.put(extra, val);
         }
         return extraAttributes;
+    }
+
+    private double getStringAttributeValue(UCD extra, Object o) {
+        double val;
+        String value = (String) o;
+        if(value == null || value.isEmpty()) {
+            return -1;
+        }
+
+        String key = extra.colname + ":" + value;
+        int index = 0;
+        if (stringAttributesMap.containsKey(key)) {
+            index = stringAttributesMap.get(key);
+        } else if (lastIndexMap.containsKey(extra.colname)) {
+            index = lastIndexMap.get(extra.colname);
+        }
+
+        val = index;
+
+        if (!stringAttributesMap.containsKey(key)) {
+            stringAttributesMap.put(key, index);
+            lastIndexMap.put(extra.colname, index + 1);
+        }
+        return val;
     }
 
     @Override

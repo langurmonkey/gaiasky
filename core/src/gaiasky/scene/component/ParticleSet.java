@@ -59,11 +59,11 @@ public class ParticleSet implements Component, IDisposable {
     public float colorNoise = 0;
 
     /**
-     * Particle size limits
+     * Particle size limits. Applies to legacy point render (using GL_POINTS).
      */
     public double[] particleSizeLimitsPoint = new double[] { 2d, 50d };
     /**
-     * Particle size limits for the GL_TRIANGLES renderer. This will be multiplied by
+     * Particle size limits for the quad renderer (using quads as GL_TRIANGLES). This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
      */
     public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
