@@ -309,7 +309,7 @@ public class Constants {
     public static final float UI_SCALE_MAX = 3.0f;
 
     // Max time for VSOP87 algorithms
-    public static final long MAX_VSOP_TIME_MS = 20000l * (long) Nature.Y_TO_MS;
+    public static final long MAX_VSOP_TIME_MS = 20000L * (long) Nature.Y_TO_MS;
 
     // Min time for VSOP87 algorithms
     public static final long MIN_VSOP_TIME_MS = -MAX_VSOP_TIME_MS;
@@ -322,7 +322,7 @@ public class Constants {
     public static final double MIN_WARP = -MAX_WARP;
 
     // Max dataset highlight size factor
-    public static final float MAX_DATASET_SIZE_FACTOR = 25.0f;
+    public static final float MAX_DATASET_SIZE_FACTOR = 100.0f;
     // Min dataset highlight size factor
     public static final float MIN_DATASET_SIZE_FACTOR = 0.01f;
 

@@ -70,10 +70,10 @@ public class DatasetPreferencesWindow extends GenericDialog {
         content.add(new OwnLabel(ci.type.toString(), skin)).left().padRight(pad10).padBottom(pad10).row();
         // Added
         content.add(new OwnLabel(I18n.msg("gui.dataset.loaded"), skin, "hud-subheader")).right().padRight(pad10).padBottom(pad10);
-        content.add(new OwnLabel(ci.loadDateUTC.atZone(ZoneId.systemDefault()).toString(), skin)).left().padRight(pad10).padBottom(pad10).row();
+        content.add(new OwnLabel(ci.loadDateUTC.atZone(Settings.settings.program.timeZone.getTimeZone()).toString(), skin)).left().padRight(pad10).padBottom(pad10).row();
         // Desc
         content.add(new OwnLabel(I18n.msg("gui.dataset.description"), skin, "hud-subheader")).right().padRight(pad10).padBottom(pad10 * 2f);
-        content.add(new OwnLabel(TextUtils.capString(ci.description, 55), skin)).left().padRight(pad10).padBottom(pad10 * 2f).row();
+        content.add(new OwnLabel(TextUtils.capString(ci.description != null ? ci.description : ci.name, 55), skin)).left().padRight(pad10).padBottom(pad10 * 2f).row();
 
         // Highlight
         content.add(new OwnLabel(I18n.msg("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad10).row();

@@ -67,7 +67,7 @@ public class OwnSliderPlus extends Slider {
     }
 
     public void setUp(String title, float mapMin, float mapMax, String labelStyleName) {
-        setUp(title, mapMin, mapMax, new DecimalFormat("####0.##"), labelStyleName);
+        setUp(title, mapMin, mapMax, new DecimalFormat("####0.###"), labelStyleName);
     }
 
     public void setUp(String title, float mapMin, float mapMax, DecimalFormat nf, String labelStyleName) {

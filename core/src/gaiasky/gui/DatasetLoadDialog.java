@@ -15,6 +15,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.GuiUtils;
+import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.FloatValidator;
@@ -423,7 +424,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
-            datasetOptions.particleSize = particleSize.getValue();
+            datasetOptions.particleSize = particleSize.getValue()  * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? .2e-3 : 1.0);
             datasetOptions.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * datasetOptions.particleSize) };
         } else if (clusters.isChecked()) {
             datasetOptions.type = DatasetLoadType.CLUSTERS;
