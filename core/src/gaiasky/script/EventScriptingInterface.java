@@ -2649,7 +2649,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth") && checkNum(primitive, 1, 3, "primitive")) {
             // New
             {
-                var archetype = scene.archetypes().get(Polyline.class);
+                var archetype = scene.archetypes().get("gaiasky.scenegraph.Polyline");
                 var entity = archetype.createEntity();
 
                 var base = Mapper.base.get(entity);
