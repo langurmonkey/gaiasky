@@ -1920,7 +1920,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void setTrackingObject(final Entity trackingObject, final String trackingName) {
         this.trackingObject.setEntity(trackingObject);
         this.trackingName = trackingName;
-        EventManager.publish(Event.CAMERA_TRACKING_OBJECT_UPDATE, this, trackingObject, trackingName);
+        EventManager.publish(Event.CAMERA_TRACKING_OBJECT_UPDATE, this, new FocusView(trackingObject), trackingName);
     }
 
     public Scene getScene() {
