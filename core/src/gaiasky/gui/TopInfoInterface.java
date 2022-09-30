@@ -160,6 +160,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             Entity e;
             if (data[0] instanceof String) {
                 e = scene.getEntity((String) data[0]);
+            } else if (data[0] instanceof FocusView) {
+                e = ((FocusView) data[0]).getEntity();
             } else {
                 e = (Entity) data[0];
             }

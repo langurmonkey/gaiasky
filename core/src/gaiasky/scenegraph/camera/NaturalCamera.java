@@ -1268,6 +1268,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 focusName = (String) data[0];
                 newFocus = scene.getEntity(focusName);
                 diverted = !centerFocus;
+            } else if (data[0] instanceof FocusView) {
+                newFocus = ((FocusView) data[0]).getEntity();
+                diverted = !centerFocus;
             } else if (data[0] instanceof Entity) {
                 newFocus = (Entity) data[0];
                 diverted = !centerFocus;
