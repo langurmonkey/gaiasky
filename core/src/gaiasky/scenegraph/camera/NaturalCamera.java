@@ -508,10 +508,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                             }
 
                         }
-
                         // Add dx to camera position
                         pos.add(dx);
-
                     }
 
                     // aux4b <- foucs.abspos + dx
@@ -642,9 +640,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Updates the perspective camera float values from the computed double vectors
+     * Sets the perspective camera float values from the computed double vectors, and
+     * recalculates the camera matrices.
      */
-    protected void updatePerspectiveCamera() {
+    public void updatePerspectiveCamera() {
         camera.position.set(0f, 0f, 0f);
         camera.direction.set(direction.valuesf());
         camera.up.set(up.valuesf());

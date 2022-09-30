@@ -11,7 +11,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
@@ -339,17 +338,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraPosition(final double[] vec) {
-        if (vec.length != 3)
-            throw new RuntimeException("vec parameter must have three components");
-        postRunnable(() -> {
-            // Convert to km
-            vec[0] = vec[0] * Constants.KM_TO_U;
-            vec[1] = vec[1] * Constants.KM_TO_U;
-            vec[2] = vec[2] * Constants.KM_TO_U;
-            // Send event
-            em.post(Event.CAMERA_POS_CMD, this, (Object) vec);
-        });
+    public void setCameraPosition(final double[] position) {
+        setCameraPosition(position, false);
     }
 
     @Override
@@ -357,8 +347,37 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         setCameraPosition(new double[] { x, y, z });
     }
 
+    @Override
+    public void setCameraPosition(double x, double y, double z, boolean immediate) {
+        setCameraPosition(new double[] { x, y, z }, immediate);
+    }
+
     public void setCameraPosition(final List<?> vec) {
         setCameraPosition(dArray(vec));
+    }
+
+    public void setCameraPosition(final List<?> vec, boolean immediate) {
+        setCameraPosition(dArray(vec), immediate);
+    }
+
+    @Override
+    public void setCameraPosition(double[] position, boolean immediate) {
+        if (checkLength(position, 3, "position")) {
+            if (immediate) {
+                cameraPositionEvent(position);
+            } else {
+                postRunnable(() -> cameraPositionEvent(position));
+            }
+        }
+    }
+
+    private void cameraPositionEvent(double[] position) {
+        // Convert to km
+        position[0] = position[0] * Constants.KM_TO_U;
+        position[1] = position[1] * Constants.KM_TO_U;
+        position[2] = position[2] * Constants.KM_TO_U;
+        // Send event
+        em.post(Event.CAMERA_POS_CMD, this, (Object) position);
     }
 
     @Override
@@ -368,12 +387,31 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraDirection(final double[] dir) {
-        postRunnable(() -> em.post(Event.CAMERA_DIR_CMD, this, (Object) dir));
+    public void setCameraDirection(final double[] direction) {
+        setCameraDirection(direction, false);
     }
 
     public void setCameraDirection(final List<?> dir) {
         setCameraDirection(dArray(dir));
+    }
+
+    public void setCameraDirection(final List<?> dir, final boolean immediate) {
+        setCameraDirection(dArray(dir), immediate);
+    }
+
+    @Override
+    public void setCameraDirection(double[] direction, boolean immediate) {
+        if (checkLength(direction, 3, "direction")) {
+            if (immediate) {
+                cameraDirectionEvent(direction);
+            } else {
+                postRunnable(() -> cameraDirectionEvent(direction));
+            }
+        }
+    }
+
+    private void cameraDirectionEvent(final double[] direction) {
+        em.post(Event.CAMERA_DIR_CMD, this, (Object) direction);
     }
 
     @Override
@@ -384,12 +422,30 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraUp(final double[] up) {
-        postRunnable(() -> em.post(Event.CAMERA_UP_CMD, this, (Object) up));
-
+        setCameraUp(up, false);
     }
 
     public void setCameraUp(final List<?> up) {
         setCameraUp(dArray(up));
+    }
+
+    public void setCameraUp(final List<?> up, final boolean immediate) {
+        setCameraUp(dArray(up), immediate);
+    }
+
+    @Override
+    public void setCameraUp(final double[] up, final boolean immediate) {
+        if (checkLength(up, 3, "up")) {
+            if (immediate) {
+                cameraUpEvent(up);
+            } else {
+                postRunnable(() -> cameraUpEvent(up));
+            }
+        }
+    }
+
+    private void cameraUpEvent(final double[] up) {
+        em.post(Event.CAMERA_UP_CMD, this, (Object) up);
     }
 
     @Override
@@ -1780,6 +1836,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public double[] getObjectPredictedPosition(String name) {
+        Entity entity = getEntity(name);
+        if (Mapper.focus.has(entity)) {
+            focusView.setEntity(entity);
+            focusView.getFocus(name);
+            focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
+        }
+        return null;
+    }
+
+    @Override
     public void setGuiScrollPosition(final float pixelY) {
         postRunnable(() -> em.post(Event.GUI_SCROLL_POSITION_CMD, this, pixelY));
 
@@ -2742,8 +2810,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void parkRunnable(String id, Runnable runnable) {
-        if (checkString(id, "id"))
+        parkSceneRunnable(id, runnable);
+    }
+
+    @Override
+    public void parkSceneRunnable(String id, Runnable runnable) {
+        if (checkString(id, "id")) {
             em.post(Event.PARK_RUNNABLE, this, id, runnable);
+        }
+    }
+
+    @Override
+    public void parkCameraRunnable(String id, Runnable runnable) {
+        if (checkString(id, "id")) {
+            em.post(Event.PARK_CAMERA_RUNNABLE, this, id, runnable);
+        }
     }
 
     @Override
@@ -3543,6 +3624,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             break;
         case SCENE_LOADED:
             this.scene = (Scene) data[0];
+            this.focusView.setScene(this.scene);
             break;
         default:
             break;

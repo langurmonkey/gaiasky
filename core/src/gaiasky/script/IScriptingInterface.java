@@ -375,22 +375,37 @@ public interface IScriptingInterface {
     void setCameraPostion(double[] vec);
 
     /**
-     * Sets the camera position to the given coordinates, in Km, equatorial
-     * system.
+     * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link IScriptingInterface#setCameraPosition(double[], boolean)},
+     * with the boolean set to <code>true</code>.
      *
-     * @param vec Vector of three components in internal coordinates and Km.
+     * @param position Vector of three components in internal coordinates and Km.
      */
-    void setCameraPosition(double[] vec);
+    void setCameraPosition(double[] position);
 
     /**
-     * Sets the camera position to the given coordinates, in Km, equatorial
-     * system.
+     * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
      *
-     * @param x The x component.
-     * @param y The y component.
-     * @param z The z component.
+     * @param position  Vector of three components in internal coordinates and Km.
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void setCameraPosition(double[] position, boolean immediate);
+
+    /**
+     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[])}.
      */
     void setCameraPosition(double x, double y, double z);
+
+    /**
+     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], boolean)}.
+     */
+    void setCameraPosition(double x, double y, double z, boolean immediate);
 
     /**
      * Gets the current camera position, in km.
@@ -401,13 +416,29 @@ public interface IScriptingInterface {
     double[] getCameraPosition();
 
     /**
-     * Sets the camera direction vector to the given vector, in equatorial cartesian coordinates.
+     * Sets the camera direction vector to the given vector, in the internal reference system.
      * You can convert from spherical coordinates using {@link IScriptingInterface#equatorialCartesianToInternalCartesian(double[], double)},
      * {@link IScriptingInterface#galacticToInternalCartesian(double, double, double)} and {@link IScriptingInterface#eclipticToInternalCartesian(double, double, double)}.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link IScriptingInterface#setCameraDirection(double[], boolean)},
+     * with the boolean set to <code>true</code>.
      *
      * @param dir The direction vector in equatorial cartesian coordinates.
      */
     void setCameraDirection(double[] dir);
+
+    /**
+     * Sets the camera direction vector to the given vector, in the internal reference system.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
+     *
+     * @param direction The direction vector in the internal reference system.
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void setCameraDirection(double[] direction, boolean immediate);
 
     /**
      * Gets the current camera direction vector.
@@ -417,11 +448,27 @@ public interface IScriptingInterface {
     double[] getCameraDirection();
 
     /**
-     * Sets the camera up vector to the given vector, equatorial system.
+     * Sets the camera up vector to the given vector, in the internal reference system.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link IScriptingInterface#setCameraUp(double[], boolean)},
+     * with the boolean set to <code>true</code>.
      *
      * @param up The up vector in equatorial coordinates.
      */
     void setCameraUp(double[] up);
+
+    /**
+     * Sets the camera up vector to the given vector, in the internal reference system.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
+     *
+     * @param up        The up vector in equatorial coordinates.
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void setCameraUp(double[] up, boolean immediate);
 
     /**
      * Gets the current camera up vector.
@@ -1243,7 +1290,7 @@ public interface IScriptingInterface {
     /**
      * Gets a {@link gaiasky.scene.component.Verts} object from the scene by <code>name</code>.
      *
-     * @param name The name of the line object.
+     * @param name           The name of the line object.
      * @param timeoutSeconds The timeout in seconds to wait until returning.
      *                       If negative, it waits indefinitely.
      *
@@ -1293,6 +1340,7 @@ public interface IScriptingInterface {
      * {@link IScriptingInterface#setOrbitCoordinatesScaling(String, double)}.
      */
     void refreshObjectOrbit(String name);
+
     /**
      * Forces all orbits to refresh immediately.
      */
@@ -1363,8 +1411,7 @@ public interface IScriptingInterface {
     void goToObjectInstant(String name);
 
     /**
-     * Lands on the object with the given name, if it is an instance of
-     * {@link gaiasky.scenegraph.Planet}. The land location is
+     * Lands on the object with the given name, if it is a planet or moon. The land location is
      * determined by the line of sight from the current position of the camera
      * to the object.
      *
@@ -1373,8 +1420,8 @@ public interface IScriptingInterface {
     void landOnObject(String name);
 
     /**
-     * Lands on the object with the given <code>name</code>, if it is an
-     * instance of {@link gaiasky.scenegraph.Planet}, at the
+     * Lands on the object with the given <code>name</code>, if it is
+     * a planet or moon, at the
      * location with the given name, if it exists.
      *
      * @param name         The proper name of the object.
@@ -1383,8 +1430,8 @@ public interface IScriptingInterface {
     void landAtObjectLocation(String name, String locationName);
 
     /**
-     * Lands on the object with the given <code>name</code>, if it is an
-     * instance of {@link gaiasky.scenegraph.Planet}, at the
+     * Lands on the object with the given <code>name</code>, if it is a
+     * planet or moon, at the
      * location specified in by [latitude, longitude], in degrees.
      *
      * @param name      The proper name of the object.
@@ -1419,13 +1466,26 @@ public interface IScriptingInterface {
     /**
      * Gets the current position of the object identified by <code>name</code> in
      * the internal coordinate system and internal units. If the object does not exist,
-     * it returns null
+     * it returns null.
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      *
      * @return A 3-vector with the object's position in the internal reference system.
      */
     double[] getObjectPosition(String name);
+
+    /**
+     * Gets the predicted position of the object identified by <code>name</code> in
+     * the internal coordinate system and internal units. If the object does not exist,
+     * it returns null.
+     * The predicted position is the position of the object in the next update cycle, and
+     * may be useful to compute the camera state.
+     *
+     * @param name The name or id (HIP, TYC, sourceId) of the object.
+     *
+     * @return A 3-vector with the object's predicted position in the internal reference system.
+     */
+    double[] getObjectPredictedPosition(String name);
 
     /**
      * Adds a new polyline with the given name, points and color. The polyline will
@@ -1546,6 +1606,7 @@ public interface IScriptingInterface {
 
     /**
      * Gets the current scale factor applied to the UI.
+     *
      * @return The scale factor.
      */
     float getGuiScaleFactor();
@@ -2116,24 +2177,52 @@ public interface IScriptingInterface {
     String getLocalDataDir();
 
     /**
-     * Posts a {@link Runnable} to the main loop thread. The runnable runs only once.
-     * This will execute the runnable right after the current update-render cycle has finished.
+     * Posts a {@link Runnable} to the main loop thread that runs once after the update-scene stage, and
+     * before the render stage.
      *
      * @param runnable The runnable to run.
      */
     void postRunnable(Runnable runnable);
 
     /**
-     * Parks a {@link Runnable} to the main loop thread, and keeps it running every frame
+     * See {@link IScriptingInterface#parkSceneRunnable(String, Runnable)}.
+     */
+    void parkRunnable(String id, Runnable runnable);
+
+    /**
+     * <p>
+     * Parks an update {@link Runnable} to the main loop thread, and keeps it running every frame
      * until it finishes or it is unparked by {@link #unparkRunnable(String)}.
+     * This object runs after the update-scene stage and before the render stage,
+     * so it is intended for updating scene objects.
+     * </p>
+     * <p>
      * Be careful with this function, as it probably needs a cleanup before the script is finished. Otherwise,
      * all parked runnables will keep running until Gaia Sky is restarted, so make sure to
      * remove them with {@link #unparkRunnable(String)} if needed.
+     * </p>
      *
      * @param id       The string id to identify the runnable.
-     * @param runnable The runnable to park.
+     * @param runnable The scene update runnable to park.
      */
-    void parkRunnable(String id, Runnable runnable);
+    void parkSceneRunnable(String id, Runnable runnable);
+
+    /**
+     * <p>
+     * Parks a camera update {@link Runnable} to the main loop thread, and keeps it running every frame
+     * until it finishes or it is unparked by {@link #unparkRunnable(String)}.
+     * This object runs after the update-camera stage and before the update-scene, so it is intended for updating the camera only.
+     * </p>
+     * <p>
+     * Be careful with this function, as it probably needs a cleanup before the script is finished. Otherwise,
+     * all parked runnables will keep running until Gaia Sky is restarted, so make sure to
+     * remove them with {@link #unparkRunnable(String)} if needed.
+     * </p>
+     *
+     * @param id       The string id to identify the runnable.
+     * @param runnable The camera update runnable to park.
+     */
+    void parkCameraRunnable(String id, Runnable runnable);
 
     /**
      * Removes the runnable with the given id, if any.

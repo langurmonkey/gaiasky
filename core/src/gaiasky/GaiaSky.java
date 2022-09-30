@@ -47,6 +47,7 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
@@ -153,7 +154,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public CameraManager cameraManager;
 
-    private final String sceneGraphName = "SceneGraphData";
     private final String sceneName = "SceneData";
 
     public Scene scene;
@@ -303,10 +303,16 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private SAMPClient sampClient;
 
     /**
-     * Parked runnables.
+     * Parked update runnables. Run after the update-scene stage.
      */
-    private final Array<Runnable> parkedRunnables = new Array<>(10);
-    private final Map<String, Runnable> parkedRunnablesMap = new HashMap<>();
+    private final Array<Runnable> parkedUpdateRunnables = new Array<>(10);
+    private final Map<String, Runnable> parkedUpdateRunnablesMap = new HashMap<>();
+
+    /**
+     * Parked camera runnables. Run after the update-camera stage and before the update-scene stage.
+     */
+    private final Array<Runnable> parkedCameraRunnables = new Array<>(10);
+    private final Map<String, Runnable> parkedCameraRunnablesMap = new HashMap<>();
 
     /**
      * Creates an instance of Gaia Sky.
@@ -669,10 +675,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Subscribe to events
         EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD,
                 Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE,
-                Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
+                Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
                 Event.UI_SCALE_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR, Event.SCENE_FORCE_UPDATE);
-
 
         // Re-enable input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -982,28 +987,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 frameMonitor.notify();
             }
             /*
-             * UPDATE
+             * UPDATE SCENE
              */
             update(graphics.getDeltaTime());
 
-            // Run parked runnables
-            if (parkedRunnables != null) {
-                synchronized (parkedRunnables) {
-                    if (parkedRunnables.size > 0) {
-                        Iterator<Runnable> it = parkedRunnables.iterator();
-                        while (it.hasNext()) {
-                            Runnable r = it.next();
-                            try {
-                                r.run();
-                            } catch (Exception e) {
-                                logger.error(e);
-                                // If it crashed, remove it
-                                it.remove();
-                            }
-                        }
-                    }
-                }
-            }
 
             /*
              * FRAME OUTPUT
@@ -1247,18 +1234,28 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         this.t += dtGs;
 
-        // Update GUI
+        // Update GUI.
         guiRegistry.update(dtGs);
         EventManager.publish(Event.UPDATE_GUI, this, dtGs);
 
-        // Update clock
+        // Update clock.
         time.update(dtGs);
 
-        // Update events
+        // Update events.
         EventManager.instance.dispatchDelayedMessages();
 
-        // Update cameras
+        // Update cameras.
         cameraManager.update(dtGs, time);
+
+        // Run parked update-scene runnables.
+        runParkedProcesses(parkedCameraRunnables);
+        // If there were runnables, update the perspective camera.
+        if (parkedCameraRunnables != null && parkedCameraRunnables.size > 0) {
+            // Update camera.
+            if (cameraManager.current instanceof NaturalCamera) {
+                ((NaturalCamera) cameraManager.current).updatePerspectiveCamera();
+            }
+        }
 
         // Update GravWaves params
         RelativisticEffectsManager.getInstance().update(time, cameraManager.current);
@@ -1266,6 +1263,32 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Update scene graph in a thread (sync for now).
         updateProcess.run();
 
+        // Run parked update-scene runnables.
+        runParkedProcesses(parkedUpdateRunnables);
+
+    }
+
+    /**
+     * Runs the parked processes in the given list.
+     *
+     * @param processes The list of processes to run.
+     */
+    private void runParkedProcesses(final Array<Runnable> processes) {
+        if (processes != null && processes.size > 0) {
+            synchronized (processes) {
+                Iterator<Runnable> it = processes.iterator();
+                while (it.hasNext()) {
+                    Runnable r = it.next();
+                    try {
+                        r.run();
+                    } catch (Exception e) {
+                        logger.error(e);
+                        // If it crashed, remove it
+                        it.remove();
+                    }
+                }
+            }
+        }
     }
 
     public void preRenderScene() {
@@ -1591,8 +1614,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case PARK_RUNNABLE:
             String key = (String) data[0];
-            final Runnable runnable = (Runnable) data[1];
-            parkRunnable(key, runnable);
+            final Runnable updateRunnable = (Runnable) data[1];
+            parkUpdateRunnable(key, updateRunnable);
+            break;
+        case PARK_CAMERA_RUNNABLE:
+            key = (String) data[0];
+            final Runnable cameraRunnable = (Runnable) data[1];
+            parkCameraRunnable(key, cameraRunnable);
             break;
         case UNPARK_RUNNABLE:
             key = (String) data[0];
@@ -1642,30 +1670,59 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     /**
-     * Parks a runnable that will run every frame right the update() method (before render)
-     * until it is unparked.
+     * Parks an update runnable that runs after the update-scene stage until it is removed.
      *
      * @param key      The key to identify the runnable.
-     * @param runnable The runnable.
+     * @param runnable The runnable to park.
      */
-    public void parkRunnable(final String key, final Runnable runnable) {
-        synchronized (parkedRunnables) {
-            parkedRunnablesMap.put(key, runnable);
-            parkedRunnables.add(runnable);
+    public void parkUpdateRunnable(final String key, final Runnable runnable) {
+        parkRunnable(key, runnable, parkedUpdateRunnablesMap, parkedUpdateRunnables);
+    }
+
+    /**
+     * Parks a camera runnable that runs after the update-camera stage, and
+     * before the update-scene stage, until it is removed.
+     *
+     * @param key      The key to identify the runnable.
+     * @param runnable The runnable to park.
+     */
+    public void parkCameraRunnable(final String key, final Runnable runnable) {
+        parkRunnable(key, runnable, parkedCameraRunnablesMap, parkedCameraRunnables);
+    }
+
+    /**
+     * Parks a runnable to the given map and list.
+     *
+     * @param key       The key to identify the runnable.
+     * @param runnable  The runnable to park.
+     * @param map       The map to use.
+     * @param runnables The runnables list.
+     */
+    public void parkRunnable(final String key, final Runnable runnable, final Map<String, Runnable> map, final Array<Runnable> runnables) {
+        synchronized (runnables) {
+            map.put(key, runnable);
+            runnables.add(runnable);
         }
     }
 
     /**
-     * Removes a previously parked runnable.
+     * Removes a previously parked update runnable.
      *
      * @param key The key of the runnable to remove.
      */
     public void removeRunnable(final String key) {
-        synchronized (parkedRunnables) {
-            final Runnable r = parkedRunnablesMap.get(key);
-            if (r != null) {
-                parkedRunnables.removeValue(r, true);
-                parkedRunnablesMap.remove(key);
+        removeRunnable(key, parkedUpdateRunnablesMap, parkedUpdateRunnables);
+        removeRunnable(key, parkedCameraRunnablesMap, parkedCameraRunnables);
+    }
+
+    private void removeRunnable(final String key, final Map<String, Runnable> map, final Array<Runnable> runnables) {
+        if (map.containsKey(key)) {
+            synchronized (runnables) {
+                final Runnable r = map.get(key);
+                if (r != null) {
+                    runnables.removeValue(r, true);
+                    map.remove(key);
+                }
             }
         }
     }

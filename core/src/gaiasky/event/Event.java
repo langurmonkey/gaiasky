@@ -693,9 +693,15 @@ public enum Event {
      */
     ORIENTATION_LOCK_CMD,
     /**
-     * Posts a recurrent runnable. Contains an identifier (String) and the runnable object.
+     * Posts scene update runnable that runs after the update-scene stage and before the render stage.
+     * Contains an identifier (String) and the runnable object.
      **/
     PARK_RUNNABLE,
+    /**
+     * Posts camera update runnable that runs after the update-camera stage and before the
+     * update-scene stage. Contains an identifier (String) and the runnable object.
+     **/
+    PARK_CAMERA_RUNNABLE,
     /**
      * Pauses background data loading thread, if any.
      **/

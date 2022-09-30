@@ -30,7 +30,7 @@ class CameraUpdateRunnable(object):
         # Rotate the direction angle around up by rot_deg degrees
         self.direction = self.gs.rotate3([self.direction[0], self.direction[1], self.direction[2]], [0.0, 1.0, 0.0], rot_deg)
         # Set it
-        self.gs.setCameraDirection(self.direction)
+        self.gs.setCameraDirection(self.direction, True)
         # We do not need to set the up vector, since it never changes
 
 
