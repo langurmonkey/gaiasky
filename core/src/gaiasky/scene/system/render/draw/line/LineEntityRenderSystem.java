@@ -336,7 +336,6 @@ public class LineEntityRenderSystem {
                 }
             } else if (orbitTrail) {
                 // Non-periodic orbits with trail
-                alpha = (float) (trajectory.alpha * base.opacity);
                 dAlpha = 0.8f / (float) stIdx;
                 float currentAlpha = 0.4f;
                 for (int i = 1; i < stIdx; i++) {
@@ -348,10 +347,10 @@ public class LineEntityRenderSystem {
                     }
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
-                    renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * currentAlpha * cc[3]);
+                    renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], baseOpacity * currentAlpha * cc[3]);
                     currentAlpha = MathUtils.clamp(currentAlpha + dAlpha, 0f, 1f);
                 }
-                renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], alpha * currentAlpha * cc[3]);
+                renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], baseOpacity * currentAlpha * cc[3]);
             } else {
                 // Rest, the whole orbit
                 for (int i = 1; i < nPoints; i++) {
