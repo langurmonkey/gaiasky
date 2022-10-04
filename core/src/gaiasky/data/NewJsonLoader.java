@@ -17,6 +17,7 @@ import gaiasky.scene.AttributeMap;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.MachineDefinition;
+import gaiasky.scene.record.RotateTransform;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
@@ -42,6 +43,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
     static {
         REPLACE.put("gaiasky.scenegraph.MachineDefinition", MachineDefinition.class.getName());
         REPLACE.put("gaiasky.scenegraph.particle.BillboardDataset", BillboardDataset.class.getName());
+        REPLACE.put("gaiasky.scenegraph.component.RotateTransform", RotateTransform.class.getName());
     }
 
     /** Maps old attributes to components. **/
