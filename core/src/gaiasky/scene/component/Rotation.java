@@ -2,7 +2,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
-import gaiasky.scenegraph.component.RotationComponent;
+import gaiasky.scene.record.RotationComponent;
 
 public class Rotation implements Component, ICopy {
 

@@ -5,7 +5,7 @@
 
 package gaiasky.render.api;
 
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 

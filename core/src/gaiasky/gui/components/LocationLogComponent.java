@@ -9,7 +9,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.ControlsWindow;
-import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scene.camera.CameraManager;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.LocationLogManager;
 import gaiasky.util.LocationLogManager.LocationRecord;

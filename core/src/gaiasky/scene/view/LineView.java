@@ -10,7 +10,7 @@ import gaiasky.scene.component.Line;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 /**
  * An entity view that implements the {@link ILineRenderable} methods.

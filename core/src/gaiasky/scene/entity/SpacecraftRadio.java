@@ -9,8 +9,8 @@ import gaiasky.scene.component.Model;
 import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scene.component.MotorEngine;
 import gaiasky.scene.view.SpacecraftView;
-import gaiasky.scenegraph.MachineDefinition;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scene.record.MachineDefinition;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
 import gaiasky.util.math.MathUtilsd;
 

@@ -5,7 +5,7 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.math.Vector3d;
 
 /**

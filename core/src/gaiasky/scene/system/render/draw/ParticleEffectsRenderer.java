@@ -19,7 +19,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;

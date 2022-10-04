@@ -14,7 +14,7 @@ import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.shape.ShapeEntityRenderSystem;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 /**
  * System that renders shapes through a {@link com.badlogic.gdx.graphics.glutils.ShapeRenderer}

@@ -7,8 +7,8 @@ package gaiasky.input;
 
 import com.badlogic.gdx.controllers.Controller;
 import gaiasky.event.Event;
-import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scene.camera.CameraManager;
+import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;

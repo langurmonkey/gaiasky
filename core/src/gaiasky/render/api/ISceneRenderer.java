@@ -4,7 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.RenderingContext;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 /**
  * Defines the interface for scene renderers.

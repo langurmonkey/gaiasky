@@ -7,7 +7,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Octree;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.tree.OctreeNode;
 

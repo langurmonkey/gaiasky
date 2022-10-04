@@ -7,7 +7,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
 import net.jafama.FastMath;

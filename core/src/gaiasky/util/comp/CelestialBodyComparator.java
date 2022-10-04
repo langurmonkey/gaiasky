@@ -5,7 +5,7 @@
 
 package gaiasky.util.comp;
 
-import gaiasky.scenegraph.IFocus;
+import gaiasky.scene.api.IFocus;
 
 import java.util.Comparator;
 

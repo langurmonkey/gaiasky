@@ -17,7 +17,7 @@ import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.ModelCache;

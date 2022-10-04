@@ -10,10 +10,13 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.beust.jcommander.internal.Maps;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.AttributeMap;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.record.BillboardDataset;
+import gaiasky.scene.record.MachineDefinition;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.Logger;
 import gaiasky.util.Pair;
@@ -24,17 +27,22 @@ import gaiasky.util.i18n.I18n;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class NewJsonLoader extends AbstractSceneLoader {
     private static final Logger.Log logger = Logger.getLogger(NewJsonLoader.class);
 
-    private static final String COMPONENTS_PACKAGE = "gaiasky.scenegraph.component.";
-    // Params to skip in the normal processing
+    // Old components package. This was moved during the ECS refactor.
+    private static final String COMPONENTS_PACKAGE = "gaiasky.scene.record.";
+    // Params to skip in the normal processing.
     private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
+
+    private static final Map<String, String> REPLACE = new HashMap<>();
+
+    static {
+        REPLACE.put("gaiasky.scenegraph.MachineDefinition", MachineDefinition.class.getName());
+        REPLACE.put("gaiasky.scenegraph.particle.BillboardDataset", BillboardDataset.class.getName());
+    }
 
     /** Maps old attributes to components. **/
     private AttributeMap attributeMap;
@@ -145,6 +153,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                         int i = 0;
                         while (vectorattrib != null) {
                             String clazzName = vectorattrib.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                            clazzName = replace(clazzName);
                             @SuppressWarnings("unchecked") Class<Object> childclazz = (Class<Object>) ClassReflection.forName(clazzName);
                             ((Object[]) value)[i] = convertJsonToObject(vectorattrib, childclazz);
                             i++;
@@ -180,6 +189,13 @@ public class NewJsonLoader extends AbstractSceneLoader {
             }
             attribute = attribute.next;
         }
+    }
+
+    private static String replace(String key) {
+        if (REPLACE.containsKey(key)) {
+            return REPLACE.get(key);
+        }
+        return key;
     }
 
     public void fillEntity(final JsonValue json, final Entity entity, final String className) throws ReflectionException {

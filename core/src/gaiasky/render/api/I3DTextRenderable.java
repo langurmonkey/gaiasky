@@ -7,7 +7,7 @@ package gaiasky.render.api;
 
 import gaiasky.render.RenderingContext;
 import gaiasky.render.system.FontRenderSystem;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;

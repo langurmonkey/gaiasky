@@ -14,7 +14,7 @@ import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 
 public class ParticleSystemRenderSystem extends AbstractRenderSystem {

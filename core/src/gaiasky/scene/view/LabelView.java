@@ -13,7 +13,7 @@ import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.GlobalResources;

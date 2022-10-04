@@ -5,14 +5,13 @@
 
 package gaiasky.script;
 
-import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
-import gaiasky.scenegraph.IFocus;
+import gaiasky.scene.api.IFocus;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
 import java.util.List;
@@ -663,7 +662,7 @@ public interface IScriptingInterface {
 
     /**
      * Returns the closest object to the camera in this instant as a
-     * {@link gaiasky.scenegraph.IFocus}.
+     * {@link IFocus}.
      *
      * @return The closest object to the camera.
      */
@@ -728,7 +727,7 @@ public interface IScriptingInterface {
      * Sets the visibility of a particular object. Use this method to hide individual objects.
      * Changes to the individual object visibility are not persisted on restart.
      *
-     * @param name    The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
+     * @param name    The name of the object. Must be an instance of {@link IVisibilitySwitch}.
      * @param visible The visible status to set. Set to false in order to hide the object. True to make it visible.
      *
      * @return True if the visibility was set successfully, false if there were errors.
@@ -738,7 +737,7 @@ public interface IScriptingInterface {
     /**
      * Gets the visibility of a particular object.
      *
-     * @param name The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
+     * @param name The name of the object. Must be an instance of {@link IVisibilitySwitch}.
      *
      * @return The visibility status of the object, if it exists.
      */

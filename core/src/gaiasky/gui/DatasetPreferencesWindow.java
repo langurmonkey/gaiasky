@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.gui.beans.AttributeComboBoxBean;
 import gaiasky.scene.Mapper;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.FilterRule;
@@ -30,8 +30,6 @@ import gaiasky.util.ucd.UCD;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 import gaiasky.util.validator.TextFieldComparatorValidator;
-
-import java.time.ZoneId;
 
 public class DatasetPreferencesWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetPreferencesWindow.class);

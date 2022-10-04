@@ -5,7 +5,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.ISpacecraft;
-import gaiasky.scenegraph.IFocus;
+import gaiasky.scene.api.IFocus;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

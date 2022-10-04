@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IRenderable;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 /**
  * Defines the interface common to all render systems.

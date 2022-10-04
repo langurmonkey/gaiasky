@@ -6,7 +6,7 @@
 package gaiasky.util.filter;
 
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 
 /**
  * A filter on a dataset as a set of rules

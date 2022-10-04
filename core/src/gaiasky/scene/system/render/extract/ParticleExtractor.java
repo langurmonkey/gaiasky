@@ -8,8 +8,8 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.camera.FovCamera;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.FovCamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 
 /**

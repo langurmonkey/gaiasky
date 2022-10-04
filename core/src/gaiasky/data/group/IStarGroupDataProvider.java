@@ -6,7 +6,7 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 
 import java.io.InputStream;
 import java.util.List;

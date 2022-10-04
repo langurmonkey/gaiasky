@@ -9,7 +9,7 @@ import gaiasky.scene.component.RefSysTransform;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Trajectory.OrbitOrientationModel;
 import gaiasky.scene.entity.TrajectoryUtils;
-import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Matrix4d;

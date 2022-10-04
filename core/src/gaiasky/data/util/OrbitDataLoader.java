@@ -15,7 +15,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import gaiasky.data.orbit.IOrbitDataProvider;
-import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Logger;
 
 import java.util.Date;

@@ -5,17 +5,13 @@
 
 package gaiasky.gui;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Settings;

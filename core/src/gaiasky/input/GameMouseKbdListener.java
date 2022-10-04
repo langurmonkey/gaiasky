@@ -15,7 +15,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.ModePopupInfo;
-import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scene.camera.NaturalCamera;
 import org.lwjgl.glfw.GLFW;
 
 /**

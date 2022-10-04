@@ -10,7 +10,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagNoProcess;
 import gaiasky.scene.view.SpacecraftView;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;

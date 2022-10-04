@@ -6,8 +6,8 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.record.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

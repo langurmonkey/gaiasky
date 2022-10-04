@@ -43,7 +43,9 @@ public abstract class AbstractView {
 
     /**
      * Check whether the current components are the same as the components of the given entity.
+     *
      * @param entity The entity to check.
+     *
      * @return True if the components are the same, false otherwise.
      */
     protected abstract boolean componentsCheck(Entity entity);
@@ -63,7 +65,23 @@ public abstract class AbstractView {
     }
 
     /**
-     * Checks whether an entity is set in this view.
+     * Checks whether the entity is valid, i.e., it is not null
+     * and has at least one component. Removed entities, for instance,
+     * have no components.
+     *
+     * @return Whether the entity is valid.
+     */
+    public boolean isValid() {
+        if (!isEmpty()) {
+            return this.entity.getComponents().size() > 0;
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether an entity is set in this view. Note that an entity may be set, but the
+     * entity may have been removed from the engine. In that case, the entity is no longer
+     * valid. Use {@link AbstractView#isValid()}.
      *
      * @return True if an entity is not set. False otherwise.
      */

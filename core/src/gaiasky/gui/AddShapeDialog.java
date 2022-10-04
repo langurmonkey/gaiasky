@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.gui.beans.DistanceUnitComboBoxBean;
 import gaiasky.gui.beans.PrimitiveComboBoxBean;
 import gaiasky.gui.beans.ShapeComboBoxBean;
-import gaiasky.scenegraph.IFocus;
+import gaiasky.scene.api.IFocus;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;

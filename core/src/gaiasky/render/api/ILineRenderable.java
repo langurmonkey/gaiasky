@@ -6,7 +6,7 @@
 package gaiasky.render.api;
 
 import gaiasky.render.system.LineRenderSystem;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 /**
  * Interface to implement by all entities that are to be rendered as lines whose

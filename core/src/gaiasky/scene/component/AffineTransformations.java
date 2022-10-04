@@ -3,10 +3,10 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.component.ITransform;
-import gaiasky.scenegraph.component.RotateTransform;
-import gaiasky.scenegraph.component.ScaleTransform;
-import gaiasky.scenegraph.component.TranslateTransform;
+import gaiasky.scene.record.ITransform;
+import gaiasky.scene.record.RotateTransform;
+import gaiasky.scene.record.ScaleTransform;
+import gaiasky.scene.record.TranslateTransform;
 import gaiasky.util.math.Matrix4d;
 
 public class AffineTransformations implements Component {

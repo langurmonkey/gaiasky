@@ -29,7 +29,6 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IStarFocus;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
@@ -434,12 +433,12 @@ public class FullGui extends AbstractGui {
         case UPDATE_ARCHIVE_VIEW_ACTION:
             if (archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()) {
                 // Update
-                IStarFocus starFocus = (IStarFocus) data[0];
+                FocusView starFocus = (FocusView) data[0];
                 archiveViewWindow.update(starFocus);
             }
             break;
         case SHOW_ARCHIVE_VIEW_ACTION:
-            IStarFocus starFocus = (IStarFocus) data[0];
+            FocusView starFocus = (FocusView) data[0];
             if (archiveViewWindow == null) {
                 archiveViewWindow = new ArchiveViewWindow(ui, skin);
             }

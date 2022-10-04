@@ -26,7 +26,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scene.camera.CameraManager;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.i18n.I18n;

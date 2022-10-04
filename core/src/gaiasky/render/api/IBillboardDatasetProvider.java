@@ -1,6 +1,6 @@
 package gaiasky.render.api;
 
-import gaiasky.scenegraph.particle.BillboardDataset;
+import gaiasky.scene.record.BillboardDataset;
 
 public interface IBillboardDatasetProvider {
 

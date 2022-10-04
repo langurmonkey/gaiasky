@@ -12,7 +12,7 @@ import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.math.Vector3b;
 
 import java.util.List;
@@ -34,15 +34,17 @@ public class EntityUtils {
     public static Vector3b getAbsolutePosition(final Entity entity, Vector3b out) {
         if (entity != null) {
             synchronized (entity) {
-                var body = Mapper.body.get(entity);
-                out.set(body.pos);
+                if (Mapper.body.has(entity)) {
+                    var body = Mapper.body.get(entity);
+                    out.set(body.pos);
 
-                var e = entity;
-                var graph = Mapper.graph.get(e);
-                while (graph.parent != null) {
-                    e = graph.parent;
-                    graph = Mapper.graph.get(e);
-                    out.add(Mapper.body.get(e).pos);
+                    var e = entity;
+                    var graph = Mapper.graph.get(e);
+                    while (graph.parent != null) {
+                        e = graph.parent;
+                        graph = Mapper.graph.get(e);
+                        out.add(Mapper.body.get(e).pos);
+                    }
                 }
             }
         }

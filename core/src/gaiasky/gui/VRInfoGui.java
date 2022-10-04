@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnLabel;
 

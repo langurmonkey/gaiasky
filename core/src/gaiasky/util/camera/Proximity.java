@@ -6,11 +6,11 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.scenegraph.component.RotationComponent;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IFocus;
+import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.camera.NaturalCamera;
+import gaiasky.scene.record.RotationComponent;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -264,6 +264,11 @@ public class Proximity {
         @Override
         public boolean isEmpty() {
             return false;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
         }
 
         @Override

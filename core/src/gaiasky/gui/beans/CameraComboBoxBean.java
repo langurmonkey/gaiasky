@@ -5,7 +5,7 @@
 
 package gaiasky.gui.beans;
 
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 
 public class CameraComboBoxBean {
 

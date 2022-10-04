@@ -17,7 +17,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Render;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;

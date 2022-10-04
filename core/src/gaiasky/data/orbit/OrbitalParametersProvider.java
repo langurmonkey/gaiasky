@@ -9,7 +9,7 @@ import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.AstroUtils;

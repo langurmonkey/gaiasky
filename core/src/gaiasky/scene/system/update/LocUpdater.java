@@ -6,7 +6,7 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.LocationMark;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 public class LocUpdater extends AbstractUpdateSystem {
 

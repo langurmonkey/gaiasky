@@ -1,6 +1,6 @@
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.particle.ParticleRecord;
+import gaiasky.scene.record.ParticleRecord;
 import gaiasky.util.Constants;
 
 import java.io.DataInputStream;

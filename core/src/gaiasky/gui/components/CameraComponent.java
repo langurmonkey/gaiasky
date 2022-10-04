@@ -16,7 +16,7 @@ import gaiasky.event.IObserver;
 import gaiasky.gui.ControlsWindow;
 import gaiasky.gui.KeyBindings;
 import gaiasky.gui.beans.CameraComboBoxBean;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.SlaveManager;

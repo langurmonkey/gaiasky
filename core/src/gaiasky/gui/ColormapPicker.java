@@ -23,7 +23,7 @@ import gaiasky.gui.beans.ComboBoxBean;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.Pair;

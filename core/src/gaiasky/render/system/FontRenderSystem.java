@@ -12,7 +12,7 @@ import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.api.IAnnotationsRenderable;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;

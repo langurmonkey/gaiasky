@@ -10,7 +10,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.ISpacecraft;
 import gaiasky.scene.component.Coordinates;
 import gaiasky.scene.component.MotorEngine;
-import gaiasky.scenegraph.MachineDefinition;
+import gaiasky.scene.record.MachineDefinition;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;

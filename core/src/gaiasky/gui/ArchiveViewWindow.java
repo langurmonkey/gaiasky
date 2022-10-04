@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
-import gaiasky.scenegraph.IStarFocus;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -47,11 +47,10 @@ public class ArchiveViewWindow extends GenericDialog {
 
     private float pad;
 
-    private IStarFocus st;
+    private FocusView st;
     private boolean updating = false;
 
-
-    public ArchiveViewWindow(Stage stage, Skin skin){
+    public ArchiveViewWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.data.catalog", "Gaia", "?"), skin, stage);
 
         setAcceptText(I18n.msg("gui.close"));
@@ -62,11 +61,11 @@ public class ArchiveViewWindow extends GenericDialog {
 
     }
 
-    public boolean isUpdating(){
+    public boolean isUpdating() {
         return updating;
     }
 
-    public void update(IStarFocus st) {
+    public void update(FocusView st) {
         updating = true;
         this.st = st;
 
@@ -77,10 +76,10 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     @Override
-    protected void build(){
+    protected void build() {
         this.pad = 8f;
 
-        /** TABLE and SCROLL **/
+        /* TABLE and SCROLL */
         table = new Table(skin);
         table.pad(pad);
         scroll = new OwnScrollPane(table, skin, "minimalist-nobg");
@@ -111,18 +110,16 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     private void requestData(GaiaDataListener listener) {
-        if (st.getCatalogSource() > 0) {
-            if (st.getId() > 5000000) {
-                this.getTitleLabel().setText(I18n.msg("gui.data.catalog", "Gaia", st.getName()));
-                // Sourceid
-                getDataBySourceId(st.getId(), listener);
-                return;
-            } else if (st.getHip() > 0) {
-                this.getTitleLabel().setText(I18n.msg("gui.data.catalog", "Hipparcos", st.getName()));
-                // HIP
-                getDataByHipId(st.getHip(), listener);
-                return;
-            }
+        if (st.getId() > 5000000) {
+            this.getTitleLabel().setText(I18n.msg("gui.data.catalog", "Gaia", st.getName()));
+            // Gaia source ID
+            getDataBySourceId(st.getId(), listener);
+            return;
+        } else if (st.getHip() > 0) {
+            this.getTitleLabel().setText(I18n.msg("gui.data.catalog", "Hipparcos", st.getName()));
+            // HIP
+            getDataByHipId(st.getHip(), listener);
+            return;
         }
         listener.notFound();
     }
@@ -185,7 +182,7 @@ public class ArchiveViewWindow extends GenericDialog {
         final char[] buffer = new char[bufferSize];
         final StringBuilder out = new StringBuilder();
         try (Reader in = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            for (;;) {
+            for (; ; ) {
                 int rsz = in.read(buffer, 0, buffer.length);
                 if (rsz < 0)
                     break;
@@ -264,9 +261,9 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     private class GaiaDataListener {
-        private final IStarFocus st;
+        private final FocusView st;
 
-        public GaiaDataListener(IStarFocus st) {
+        public GaiaDataListener(FocusView st) {
             this.st = st;
         }
 

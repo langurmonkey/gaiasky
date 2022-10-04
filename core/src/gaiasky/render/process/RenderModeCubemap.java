@@ -18,7 +18,7 @@ import gaiasky.event.EventManager;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.ISceneRenderer;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.Mosaic;
 

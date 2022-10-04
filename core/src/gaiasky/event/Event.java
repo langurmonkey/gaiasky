@@ -6,6 +6,9 @@
 package gaiasky.event;
 
 import gaiasky.render.RenderGroup;
+import gaiasky.scene.api.IFocus;
+import gaiasky.scene.api.IStarFocus;
+import gaiasky.scene.api.IVisibilitySwitch;
 
 import static gaiasky.util.Settings.*;
 
@@ -128,7 +131,7 @@ public enum Event {
     CAMERA_CLOSEST_INFO,
     /**
      * This event is broadcast whenever the closest object to the camera
-     * changes. Contains the closest object as an {@link gaiasky.scenegraph.IFocus}.
+     * changes. Contains the closest object as an {@link IFocus}.
      */
     CAMERA_NEW_CLOSEST,
 
@@ -1033,7 +1036,7 @@ public enum Event {
 
     SHOW_PER_OBJECT_VISIBILITY_ACTION,
     /**
-     * Contains the object (instance of {@link gaiasky.scenegraph.IVisibilitySwitch}), the name of the object
+     * Contains the object (instance of {@link IVisibilitySwitch}), the name of the object
      * and a boolean with the new visibility state.
      */
     PER_OBJECT_VISIBILITY_CMD,
@@ -1066,7 +1069,7 @@ public enum Event {
     UPDATE_WIKI_INFO_ACTION,
     /**
      * Shows a window with the Gaia or Hipparcos archive info for the object in the data,
-     * which must be a {@link gaiasky.scenegraph.IStarFocus}.
+     * which must be a {@link IStarFocus}.
      */
     SHOW_ARCHIVE_VIEW_ACTION,
     /** Updates the archive view if it is open. **/

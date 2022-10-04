@@ -13,7 +13,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.component.Keyframes;
 import gaiasky.scene.entity.KeyframeUtils;
-import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.rec.CameraKeyframeManager;

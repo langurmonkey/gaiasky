@@ -9,9 +9,9 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.ISceneRenderer;
-import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.scenegraph.camera.FovCamera;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.CameraManager;
+import gaiasky.scene.camera.FovCamera;
+import gaiasky.scene.camera.ICamera;
 
 /**
  * Renders the Gaia Field of View camera mode. Positions two cameras inside

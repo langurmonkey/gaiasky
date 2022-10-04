@@ -11,7 +11,7 @@ import gaiasky.scene.component.Mesh;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.scene.record.ModelComponent;
 
 public class MeshInitializer extends AbstractInitSystem {
     public MeshInitializer(boolean setUp, Family family, int priority) {

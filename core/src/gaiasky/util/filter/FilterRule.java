@@ -5,7 +5,7 @@
 
 package gaiasky.util.filter;
 
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.filter.attrib.IAttribute;
 
 public class FilterRule {

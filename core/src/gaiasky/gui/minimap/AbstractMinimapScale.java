@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import gaiasky.GaiaSky;
 import gaiasky.gui.IMinimapScale;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;

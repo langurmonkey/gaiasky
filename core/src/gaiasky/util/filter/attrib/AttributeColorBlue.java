@@ -1,6 +1,6 @@
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.i18n.I18n;
 
 public class AttributeColorBlue extends AttributeAbstract implements IAttribute {

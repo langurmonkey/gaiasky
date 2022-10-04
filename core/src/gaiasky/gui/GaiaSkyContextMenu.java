@@ -14,15 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.*;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.Settings;
@@ -73,7 +71,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         this.catalogManager = catalogManager;
         this.pad = 8f;
         this.scene = scene;
-        if (candidate != null && !candidate.isEmpty()) {
+        if (candidate != null && candidate.isValid()) {
             this.candidateName = candidate.getCandidateName();
             this.candidateNameShort = TextUtils.capString(this.candidateName, 10);
         }
@@ -87,7 +85,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
     private void build() {
         Drawable rulerDwb = skin.getDrawable("icon-elem-ruler");
-        if (candidate != null && !candidate.isEmpty()) {
+        if (candidate != null && candidate.isValid()) {
             MenuItem select = new MenuItem(I18n.msg("context.select", candidateNameShort), skin, skin.getDrawable("highlight-off"));
             select.addListener(event -> {
                 if (event instanceof ChangeEvent) {

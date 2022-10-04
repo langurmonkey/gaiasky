@@ -8,8 +8,8 @@ import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
-import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 

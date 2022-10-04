@@ -6,7 +6,7 @@ import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.VertsView;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.math.Vector3d;
 
 public class KeyframeUpdater extends AbstractUpdateSystem {

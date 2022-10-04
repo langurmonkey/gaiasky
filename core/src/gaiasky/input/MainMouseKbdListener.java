@@ -21,8 +21,8 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.KeyframesView;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.ViewAngleComparator;
 

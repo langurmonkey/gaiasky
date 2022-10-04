@@ -14,7 +14,7 @@ import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;

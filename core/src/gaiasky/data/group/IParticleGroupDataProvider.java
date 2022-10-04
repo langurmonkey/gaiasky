@@ -5,7 +5,7 @@
 
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 
 import java.io.InputStream;
 import java.util.List;

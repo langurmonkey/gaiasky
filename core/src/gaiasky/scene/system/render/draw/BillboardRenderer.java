@@ -20,7 +20,7 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.view.BillboardView;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.DistanceEntityComparator;
 import gaiasky.util.gdx.mesh.IntMesh;

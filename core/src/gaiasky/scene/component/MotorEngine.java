@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.api.ISpacecraft;
-import gaiasky.scenegraph.MachineDefinition;
+import gaiasky.scene.record.MachineDefinition;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.math.MathUtilsd;

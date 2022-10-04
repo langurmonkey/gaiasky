@@ -13,9 +13,9 @@ import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
-import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.camera.CameraManager;
+import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
 
 import java.util.List;

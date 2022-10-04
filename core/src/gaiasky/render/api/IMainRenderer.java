@@ -7,8 +7,8 @@ package gaiasky.render.api;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
-import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.CameraManager;
+import gaiasky.scene.camera.ICamera;
 
 public interface IMainRenderer {
 

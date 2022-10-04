@@ -5,8 +5,8 @@
 
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.PointParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.record.PointParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;

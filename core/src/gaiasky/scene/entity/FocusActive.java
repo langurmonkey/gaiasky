@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
-import gaiasky.scenegraph.IFocus;
+import gaiasky.scene.api.IFocus;
 
 /**
  * This class contains the implementation of {@link IFocus#isFocusActive()}.

@@ -5,7 +5,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IShapeRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.view.RenderView;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 public class ShapeEntityRenderSystem extends RenderView implements IShapeRenderable {
 

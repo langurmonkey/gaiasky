@@ -7,7 +7,7 @@ package gaiasky.render.api;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import gaiasky.render.RenderingContext;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 public interface IShapeRenderable extends IRenderable {
 

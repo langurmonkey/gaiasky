@@ -14,8 +14,8 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.view.FocusView;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.scene.api.IFocus;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
@@ -23,7 +23,6 @@ import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;

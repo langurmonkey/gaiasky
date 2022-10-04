@@ -10,7 +10,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.view.LabelView;
-import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scene.camera.ICamera;
 
 /**
  * Contains some utils common to all extract systems.

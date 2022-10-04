@@ -24,7 +24,7 @@ import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
 import gaiasky.scene.system.initialize.SceneGraphBuilderSystem;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger;
