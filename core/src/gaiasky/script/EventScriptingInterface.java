@@ -1673,8 +1673,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     var base = Mapper.base.get(invisible);
                     base.setName(nameStub);
                     base.setCt("Others");
-                    var body = Mapper.body.get(invisible);
-                    body.setSizeM(500.0);
                     var graph = Mapper.graph.get(invisible);
                     graph.translation = new Vector3b();
                     graph.setParent(Scene.ROOT_NAME);
@@ -1699,7 +1697,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
 
                     // Go to object
-                    goToObject(focusView.getEntity(), 20, -1, stop);
+                    goToObject(focusView.getEntity(), 15, -1, stop);
 
                     // Save speed, set it to 50
                     double speed = Settings.settings.scene.camera.speed;
