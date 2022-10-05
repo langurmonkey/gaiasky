@@ -5,6 +5,7 @@
 
 package gaiasky.script;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.view.FocusView;
@@ -1485,6 +1486,36 @@ public interface IScriptingInterface {
      * @return A 3-vector with the object's predicted position in the internal reference system.
      */
     double[] getObjectPredictedPosition(String name);
+
+    /**
+     * Sets the internal position of the object identified by <code>name</code>. Note that
+     * depending on the object type, the position may be already calculated and set elsewhere
+     * in the update stage, so use with care.
+     *
+     * @param name   The name of the object.
+     * @param position The position in the internal reference system and internal units.
+     */
+    void setObjectPosition(String name, double[] position);
+
+    /**
+     * Sets the internal position of the given entity object. Note that
+     * depending on the object type, the position may be already calculated and set elsewhere
+     * in the update stage, so use with care.
+     *
+     * @param object  The object in a focus view wrapper.
+     * @param position The position in the internal reference system and internal units.
+     */
+    void setObjectPosition(FocusView object, double[] position);
+
+    /**
+     * Sets the internal position of the given entity object. Note that
+     * depending on the object type, the position may be already calculated and set elsewhere
+     * in the update stage, so use with care.
+     *
+     * @param object     The object entity.
+     * @param position The position in the internal reference system and internal units.
+     */
+    void setObjectPosition(Entity object, double[] position);
 
     /**
      * Adds a new trajectory object with the given name, points and color. The trajectory

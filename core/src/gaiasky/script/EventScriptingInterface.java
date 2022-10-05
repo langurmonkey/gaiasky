@@ -1216,24 +1216,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         em.post(Event.FRAME_OUTPUT_CMD, this, active);
     }
 
-    public void setObjectPosition(FocusView object, double[] position) {
-        setObjectPosition(object.getEntity(), position);
-    }
-    public void setObjectPosition(FocusView object, List<?> position) {
-        setObjectPosition(object, dArray(position));
-    }
-
-    public void setObjectPosition(Entity object, double[] position) {
-        if (checkNotNull(object, "object") && checkLength(position, 3, "position")) {
-            var body = Mapper.body.get(object);
-            body.pos.set(position);
-            body.positionSetInScript = true;
-        }
-    }
-    public void setObjectPosition(Entity object, List<?> position) {
-        setObjectPosition(object, dArray(position));
-    }
-
     @Override
     public FocusView getObject(String name) {
         return getObject(name, 0);
@@ -1862,6 +1844,39 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
         }
         return null;
+    }
+
+    @Override
+    public void setObjectPosition(String name, double[] position) {
+        if (checkObjectName(name)) {
+            setObjectPosition(getObject(name), position);
+        }
+    }
+
+    public void setObjectPosition(String name, List<?> position) {
+        setObjectPosition(name, dArray(position));
+    }
+
+    @Override
+    public void setObjectPosition(FocusView object, double[] position) {
+        setObjectPosition(object.getEntity(), position);
+    }
+
+    public void setObjectPosition(FocusView object, List<?> position) {
+        setObjectPosition(object, dArray(position));
+    }
+
+    @Override
+    public void setObjectPosition(Entity object, double[] position) {
+        if (checkNotNull(object, "object") && checkLength(position, 3, "position")) {
+            var body = Mapper.body.get(object);
+            body.pos.set(position);
+            body.positionSetInScript = true;
+        }
+    }
+
+    public void setObjectPosition(Entity object, List<?> position) {
+        setObjectPosition(object, dArray(position));
     }
 
     @Override

@@ -14,11 +14,11 @@
       "args" : [true],
       "staticLight": true,
       "type" : "sphere",
-      "primitiveType": "lines",
+      "primitiveType": "triangles",
       "params" : {
         "quality" : 20,
         "diameter" : 1.0,
-        "flip" : true
+        "flip" : false
       }
     }
   },
