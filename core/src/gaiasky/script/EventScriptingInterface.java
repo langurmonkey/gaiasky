@@ -2687,6 +2687,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void addTrajectoryLine(String name, double[] points, double[] color) {
+        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "gaiasky.scenegraph.Orbit");
+    }
+
+    public void addTrajectoryLine(String name, List<?> points, List<?> color) {
+        addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, -1, "gaiasky.scenegraph.Orbit");
+    }
+
+    @Override
+    public void addTrajectoryLine(String name, double[] points, double[] color, double trailMap) {
+        var entity = addLineObject(name, points, color, 1.5f, GL20.GL_LINE_STRIP, false, trailMap, "gaiasky.scenegraph.Orbit");
+    }
+
+    public void addTrajectoryLine(String name, List<?> points, List<?> color, double trailMap) {
+        addTrajectoryLine(name, dArray(points), dArray(color), trailMap);
+    }
+
+
+    @Override
     public void addPolyline(String name, double[] points, double[] color) {
         addPolyline(name, points, color, 1f);
     }
@@ -2712,46 +2731,59 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
+       addLineObject(name, points, color, lineWidth, primitive, arrowCaps, 0f, "gaiasky.scenegraph.Polyline");
+    }
+
+    public Entity addLineObject(String name, List<?> points, List<?> color, double lineWidth, int primitive, boolean arrowCaps, double trailMap, String archetypeName) {
+        return addLineObject(name, dArray(points), dArray(color), lineWidth, primitive, arrowCaps, trailMap, archetypeName);
+    }
+
+    public Entity addLineObject(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps, double trailMap, String archetypeName) {
         if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth") && checkNum(primitive, 1, 3, "primitive")) {
-            // New
-            {
-                var archetype = scene.archetypes().get("gaiasky.scenegraph.Polyline");
-                var entity = archetype.createEntity();
+            var archetype = scene.archetypes().get(archetypeName);
+            var entity = archetype.createEntity();
 
-                var base = Mapper.base.get(entity);
-                base.setName(name);
-                base.setComponentType(ComponentType.Others);
+            var base = Mapper.base.get(entity);
+            base.setName(name);
+            base.setComponentType(ComponentType.Others);
 
-                var body = Mapper.body.get(entity);
-                body.setColor(color);
-                body.setLabelColor(color);
+            var body = Mapper.body.get(entity);
+            body.setColor(color);
+            body.setLabelColor(color);
 
-                var line = Mapper.line.get(entity);
-                line.lineWidth = (float) lineWidth;
+            var line = Mapper.line.get(entity);
+            line.lineWidth = (float) lineWidth;
 
-                var arrow = Mapper.arrow.get(entity);
-                arrow.arrowCap = arrowCaps;
+            var arrow = Mapper.arrow.get(entity);
+            arrow.arrowCap = arrowCaps;
 
-                var verts = Mapper.verts.get(entity);
-                synchronized (vertsView) {
-                    vertsView.setEntity(entity);
-                    vertsView.setPrimitiveSize((float) lineWidth);
-                    vertsView.setPoints(points);
-                    vertsView.setRenderGroup(arrowCaps ? RenderGroup.LINE : RenderGroup.LINE_GPU);
-                    vertsView.setClosedLoop(false);
-                    vertsView.setGlPrimitive(primitive);
-                }
-
-                var graph = Mapper.graph.get(entity);
-                graph.setParent(Scene.ROOT_NAME);
-
-                scene.initializeEntity(entity);
-                scene.setUpEntity(entity);
-
-                em.post(Event.SCENE_ADD_OBJECT_CMD, this, entity, true);
+            var verts = Mapper.verts.get(entity);
+            synchronized (vertsView) {
+                vertsView.setEntity(entity);
+                vertsView.setPrimitiveSize((float) lineWidth);
+                vertsView.setPoints(points);
+                vertsView.setRenderGroup(arrowCaps ? RenderGroup.LINE : RenderGroup.LINE_GPU);
+                vertsView.setClosedLoop(false);
+                vertsView.setGlPrimitive(primitive);
             }
-        }
 
+            var trajectory = Mapper.trajectory.get(entity);
+            if(trajectory != null) {
+                trajectory.orbitTrail = trailMap >= 0 && trailMap <= 1;
+                trajectory.setTrailMap(trailMap);
+            }
+
+            var graph = Mapper.graph.get(entity);
+            graph.setParent(Scene.ROOT_NAME);
+
+            scene.initializeEntity(entity);
+            scene.setUpEntity(entity);
+
+            em.post(Event.SCENE_ADD_OBJECT_CMD, this, entity, true);
+
+            return entity;
+        }
+        return null;
     }
 
     public void addPolyline(String name, double[] points, double[] color, int lineWidth) {

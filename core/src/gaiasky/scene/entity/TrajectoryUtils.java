@@ -45,14 +45,12 @@ public class TrajectoryUtils {
     public void initOrbitMetadata(Body body, Trajectory trajectory, Verts verts) {
         PointCloudData pointCloudData = verts.pointCloudData;
         if (pointCloudData != null) {
-            trajectory.orbitStartMs = pointCloudData.getDate(0).toEpochMilli();
-            trajectory.orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
-            if (!trajectory.onlyBody) {
-                int last = pointCloudData.getNumPoints() - 1;
-                D31.set(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
-                body.size = (float) D31.len() * 5;
+            if(pointCloudData.hasTime()) {
+                trajectory.orbitStartMs = pointCloudData.getDate(0).toEpochMilli();
+                trajectory.orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
             }
         }
+        updateSize(body, trajectory, verts);
         trajectory.mustRefresh = trajectory.providerClass != null
                 && trajectory.providerClass.equals(OrbitFileDataProvider.class)
                 && trajectory.body != null
@@ -60,6 +58,17 @@ public class TrajectoryUtils {
                 && Mapper.atmosphere.has(trajectory.body)
                 && trajectory.oc.period > 0;
         trajectory.orbitTrail = trajectory.orbitTrail | trajectory.mustRefresh | (trajectory.providerClass != null && trajectory.providerClass.equals(OrbitalParametersProvider.class));
+    }
+
+    public void updateSize(Body body, Trajectory trajectory, Verts verts){
+        PointCloudData pointCloudData = verts.pointCloudData;
+        if (pointCloudData != null) {
+            if (!trajectory.onlyBody && pointCloudData.getNumPoints() > 0) {
+                int last = pointCloudData.getNumPoints() - 1;
+                D31.set(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
+                body.size = (float) D31.len() * 5;
+            }
+        }
     }
 
     public void initializeTransformMatrix(Trajectory trajectory, GraphNode graph, RefSysTransform transform) {

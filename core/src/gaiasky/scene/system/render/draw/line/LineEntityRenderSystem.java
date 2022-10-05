@@ -110,6 +110,7 @@ public class LineEntityRenderSystem {
             }
         }
     }
+
     public void renderPerimeter(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var perimeter = Mapper.perimeter.get(entity);
         var cc = lineView.body.color;
@@ -267,9 +268,10 @@ public class LineEntityRenderSystem {
             int nPoints = verts.pointCloudData.getNumPoints();
 
             boolean reverse = GaiaSky.instance.time.getWarpFactor() < 0;
+            boolean hasTime = verts.pointCloudData.hasTime();
 
             Vector3d bodyPos = D31.setZero();
-            if (orbitTrail) {
+            if (orbitTrail && hasTime) {
                 // For large periods, fade orbit to 0 a bit before.
                 float bottomAlpha = trajectory.params != null && (trajectory.params.orbitalPeriod > 40000 || base.ct.isEnabled(ComponentType.Moons)) ? -0.2f : -0.1f;
                 dAlpha = (topAlpha - bottomAlpha) / nPoints;
@@ -294,7 +296,7 @@ public class LineEntityRenderSystem {
 
             // This is so that the shape renderer does not mess up the z-buffer
             int n = 0;
-            if (oc.period > 0) {
+            if (oc != null && oc.period > 0) {
                 // Periodic orbits
                 int i = wrap(stIdx + 2, nPoints);
                 float cAlpha;
@@ -314,12 +316,12 @@ public class LineEntityRenderSystem {
                     curr.mul(localTransformD);
 
                     cAlpha = MathUtils.clamp(topAlpha, 0f, 1f);
-                    if(trajectory.trailMap > 0) {
+                    if (trajectory.trailMap > 0) {
                         cAlpha = (1f / (1f - trajectory.trailMap)) * (cAlpha - trajectory.trailMap);
                     }
 
                     // Only render visible chunks.
-                    if(cAlpha > 0.001) {
+                    if (cAlpha > 0.001) {
                         if (orbitTrail && !reverse && n == nPoints - 2) {
                             renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3] * baseOpacity);
                         } else if (orbitTrail && reverse && n == 0) {
@@ -335,22 +337,56 @@ public class LineEntityRenderSystem {
                     n++;
                 }
             } else if (orbitTrail) {
-                // Non-periodic orbits with trail
-                dAlpha = 0.8f / (float) stIdx;
-                float currentAlpha = 0.4f;
-                for (int i = 1; i < stIdx; i++) {
-                    pointCloudData.loadPoint(prev, i - 1);
-                    pointCloudData.loadPoint(curr, i);
-                    if (parentPos != null) {
-                        prev.sub(parentPos);
-                        curr.sub(parentPos);
+                if (hasTime) {
+                    // Non-periodic orbits with times and trail
+                    dAlpha = 1 / (float) stIdx * (1 - trajectory.trailMap);
+                    if(!reverse) {
+                        dAlpha = -dAlpha;
                     }
-                    prev.mul(localTransformD);
-                    curr.mul(localTransformD);
-                    renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], baseOpacity * currentAlpha * cc[3]);
-                    currentAlpha = MathUtils.clamp(currentAlpha + dAlpha, 0f, 1f);
+                    float cAlpha;
+                    for (int i = 1; i < stIdx; i++) {
+                        pointCloudData.loadPoint(prev, i - 1);
+                        pointCloudData.loadPoint(curr, i);
+                        if (parentPos != null) {
+                            prev.sub(parentPos);
+                            curr.sub(parentPos);
+                        }
+                        prev.mul(localTransformD);
+                        curr.mul(localTransformD);
+
+                        cAlpha = MathUtils.clamp(topAlpha, 0f, 1f);
+                        if (trajectory.trailMap > 0) {
+                            cAlpha = (1f / (1f - trajectory.trailMap)) * (cAlpha - trajectory.trailMap);
+                        }
+
+                        if (cAlpha > 0.0) {
+                            renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], baseOpacity * cAlpha * cc[3]);
+                        }
+                        topAlpha -= dAlpha;
+                    }
+                    renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], baseOpacity * topAlpha * cc[3]);
+                } else {
+                    // Trail, no time.
+                    dAlpha = 1 / ((nPoints - 1) * (1 - trajectory.trailMap));
+                    float cAlpha;
+                    for (int i = nPoints - 1; i > 0; i--) {
+                        pointCloudData.loadPoint(prev, i - 1);
+                        pointCloudData.loadPoint(curr, i);
+                        if (parentPos != null) {
+                            prev.sub(parentPos);
+                            curr.sub(parentPos);
+                        }
+                        prev.mul(localTransformD);
+                        curr.mul(localTransformD);
+
+                        cAlpha = MathUtils.clamp(topAlpha, 0f, 1f);
+
+                        if (cAlpha > 0.001) {
+                            renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3] * cAlpha * baseOpacity);
+                        }
+                        topAlpha -= dAlpha;
+                    }
                 }
-                renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], baseOpacity * currentAlpha * cc[3]);
             } else {
                 // Rest, the whole orbit
                 for (int i = 1; i < nPoints; i++) {

@@ -29,7 +29,6 @@ public class ShapeUpdater extends AbstractUpdateSystem{
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var shape = Mapper.shape.get(entity);
-        var model = Mapper.model.get(entity);
 
         graph.translation.sub(body.pos);
         if (shape.track != null) {

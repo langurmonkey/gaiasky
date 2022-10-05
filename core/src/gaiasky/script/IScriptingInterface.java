@@ -1487,6 +1487,39 @@ public interface IScriptingInterface {
     double[] getObjectPredictedPosition(String name);
 
     /**
+     * Adds a new trajectory object with the given name, points and color. The trajectory
+     * is rendered using the 'line renderer' setting in the preferences dialog.
+     * This is a very similar call to {@link IScriptingInterface#addPolyline(String, double[], double[])},
+     * but in this case the line can be rendered with higher quality
+     * polyline quadstrips.
+     *
+     * @param name   The name to identify the trajectory, to possibly remove it later.
+     * @param points The points of the trajectory. It is an array containing all the
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
+     * @param color  The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     */
+    void addTrajectoryLine(String name, double[] points, double[] color);
+
+    /**
+     * Adds a new trajectory object with the given name, points and color. The trajectory
+     * is rendered using the 'line renderer' setting in the preferences dialog.
+     * This is a very similar call to {@link IScriptingInterface#addPolyline(String, double[], double[])},
+     * but in this case the line can be rendered with higher quality
+     * polyline quadstrips.
+     *
+     * @param name   The name to identify the trajectory, to possibly remove it later.
+     * @param points The points of the trajectory. It is an array containing all the
+     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
+     * @param color  The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param trailMap The bottom mapping position for the trail. The orbit trail assigns an opacity value to
+     *                 each point of the orbit, where 1 is the location of the last point in the points list, and 0 is the first one.
+     *                 This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity
+     *                 value of 0. Set to 0 to have a full trail. Set to 0.5 to have a trail that spans half the orbit.
+     *                 Set to 1 to have no orbit at all. Set to negative to disable the trail.
+     */
+    void addTrajectoryLine(String name, double[] points, double[] color, double trailMap);
+
+    /**
      * Adds a new polyline with the given name, points and color. The polyline will
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it. The default primitive of GL_LINE_STRIP

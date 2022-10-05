@@ -13,6 +13,7 @@ import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.util.math.Vector3d;
 
 /**
@@ -28,12 +29,16 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
     /** The trajectory component (if any). **/
     private Trajectory trajectory;
 
+    private final TrajectoryUtils utils;
+
     public VertsView() {
         super();
+        this.utils = new TrajectoryUtils();
     }
 
     public VertsView(Entity entity) {
         super(entity);
+        this.utils = new TrajectoryUtils();
     }
 
     @Override
@@ -61,6 +66,9 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
     @Override
     public void markForUpdate() {
         EventManager.publish(Event.GPU_DISPOSE_VERTS_OBJECT, Mapper.render.get(entity), verts.renderGroup);
+        if (trajectory != null) {
+            utils.updateSize(body, trajectory, verts);
+        }
     }
 
     @Override

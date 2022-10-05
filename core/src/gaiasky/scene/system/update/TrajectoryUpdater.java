@@ -48,7 +48,7 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         }
 
         // Compute position percentage in the trajectory.
-        if (verts.pointCloudData != null) {
+        if (verts.pointCloudData != null && verts.pointCloudData.hasTime()) {
             long now = time.getTime().toEpochMilli();
             long t0 = verts.pointCloudData.time.get(0).toEpochMilli();
             long t1 = verts.pointCloudData.time.get(verts.pointCloudData.getNumPoints() - 1).toEpochMilli();
@@ -98,7 +98,7 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
             if(trajectory.model.isExtrasolar()) {
                localTransformD.rotate(0, 1, 0, 90);
             }
-        } else {
+        } else if (trajectory.oc != null) {
             OrbitComponent oc = trajectory.oc;
 
             if (transformFunction == null && parentGraph.orientation != null)

@@ -7,6 +7,7 @@ import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Line;
+import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
@@ -16,6 +17,7 @@ import gaiasky.scene.camera.ICamera;
  * An entity view that implements the {@link ILineRenderable} methods.
  */
 public class LineView extends BaseView implements ILineRenderable {
+    public Trajectory trajectory;
     public Verts verts;
     public Line line;
 
@@ -39,12 +41,14 @@ public class LineView extends BaseView implements ILineRenderable {
     @Override
     protected void entityChanged() {
         super.entityChanged();
+        this.trajectory = Mapper.trajectory.get(entity);
         this.verts = Mapper.verts.get(entity);
         this.line = Mapper.line.get(entity);
     }
 
     @Override
     protected void entityCleared() {
+        this.trajectory = null;
         this.verts = null;
         this.line = null;
     }

@@ -91,6 +91,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -306,13 +307,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Parked update runnables. Run after the update-scene stage.
      */
     private final Array<Runnable> parkedUpdateRunnables = new Array<>(10);
-    private final Map<String, Runnable> parkedUpdateRunnablesMap = new HashMap<>();
+    private final Map<String, Runnable> parkedUpdateRunnablesMap = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Parked camera runnables. Run after the update-camera stage and before the update-scene stage.
      */
     private final Array<Runnable> parkedCameraRunnables = new Array<>(10);
-    private final Map<String, Runnable> parkedCameraRunnablesMap = new HashMap<>();
+    private final Map<String, Runnable> parkedCameraRunnablesMap = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Creates an instance of Gaia Sky.
@@ -1250,7 +1251,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Run parked update-scene runnables.
         runParkedProcesses(parkedCameraRunnables);
         // If there were runnables, update the perspective camera.
-        if (parkedCameraRunnables != null && parkedCameraRunnables.size > 0) {
+        if (parkedCameraRunnables.size > 0) {
             // Update camera.
             if (cameraManager.current instanceof NaturalCamera) {
                 ((NaturalCamera) cameraManager.current).updatePerspectiveCamera();
@@ -1275,17 +1276,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     private void runParkedProcesses(final Array<Runnable> processes) {
         if (processes != null && processes.size > 0) {
-            synchronized (processes) {
-                Iterator<Runnable> it = processes.iterator();
-                while (it.hasNext()) {
-                    Runnable r = it.next();
-                    try {
-                        r.run();
-                    } catch (Exception e) {
-                        logger.error(e);
-                        // If it crashed, remove it
-                        it.remove();
-                    }
+            Iterator<Runnable> it = processes.iterator();
+            while (it.hasNext()) {
+                Runnable r = it.next();
+                try {
+                    r.run();
+                } catch (Exception e) {
+                    logger.error(e);
+                    // If it crashed, remove it
+                    it.remove();
                 }
             }
         }
@@ -1703,10 +1702,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param runnables The runnables list.
      */
     public void parkRunnable(final String key, final Runnable runnable, final Map<String, Runnable> map, final Array<Runnable> runnables) {
-        synchronized (runnables) {
-            map.put(key, runnable);
-            runnables.add(runnable);
-        }
+        map.put(key, runnable);
+        runnables.add(runnable);
     }
 
     /**
@@ -1721,12 +1718,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     private void removeRunnable(final String key, final Map<String, Runnable> map, final Array<Runnable> runnables) {
         if (map.containsKey(key)) {
-            synchronized (runnables) {
-                final Runnable r = map.get(key);
-                if (r != null) {
-                    runnables.removeValue(r, true);
-                    map.remove(key);
-                }
+            final Runnable r = map.get(key);
+            if (r != null) {
+                runnables.removeValue(r, true);
+                map.remove(key);
             }
         }
     }

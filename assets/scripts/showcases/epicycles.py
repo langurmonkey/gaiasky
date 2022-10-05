@@ -24,9 +24,9 @@ class LineUpdaterRunnable(object):
         # Scale up
         lpos = [lpos[0] * self.factor, lpos[1] * self.factor, lpos[2] * self.factor]
 
-        # Add line every .25 seconds
+        # Add line every .15 seconds
         currt = time.time()
-        if currt - self.lastt >= 0.25:
+        if currt - self.lastt >= 0.15:
             self.seq += 1
             if self.seq > 0:
                 pc = self.line.getPointCloud()
@@ -80,7 +80,7 @@ gs.setCameraPosition([650591440.987582, -1443344531.151316, -219531339.581399])
 earthp = gs.getObjectPosition("Earth")
 marsp = gs.getObjectPosition("Mars")
 
-gs.addPolyline("line-em", [], [ 1., .2, .2, .8 ], 1 )
+gs.addTrajectoryLine("line-em", [], [ 1., .2, .2, .8 ], 0.6 )
 line = gs.getLineObject("line-em", 10.0)
 
 gs.sleep(0.5)
@@ -90,6 +90,9 @@ lineUpdater = LineUpdaterRunnable(line)
 gs.parkRunnable("line-updater", lineUpdater)
 
 gs.setSimulationTime(2015, 11, 19, 0, 0, 0, 0)
+
+gs.sleep(5)
+
 gs.setSimulationPace(4e6)
 gs.startSimulationTime()
 
@@ -104,6 +107,7 @@ gs.unparkRunnable("line-updater")
 gs.removeModelObject("line-em")
 gs.cameraStop()
 # Finish flushing
+gs.setVisibility("element.orbits", True)
 gs.sleepFrames(4)
 
 gs.maximizeInterfaceWindow()

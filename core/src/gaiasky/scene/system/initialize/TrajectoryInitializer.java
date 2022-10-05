@@ -38,19 +38,21 @@ public class TrajectoryInitializer extends AbstractInitSystem {
         var line = Mapper.line.get(entity);
 
         if (!trajectory.onlyBody) {
-            try {
-                trajectory.providerClass = (Class<? extends IOrbitDataProvider>) ClassReflection.forName(trajectory.provider);
-                // Orbit data
-                IOrbitDataProvider provider;
+            if (trajectory.provider != null) {
                 try {
-                    provider = ClassReflection.newInstance(trajectory.providerClass);
-                    provider.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, trajectory.numSamples), trajectory.newMethod);
-                    verts.pointCloudData = provider.getData();
-                } catch (Exception e) {
+                    trajectory.providerClass = (Class<? extends IOrbitDataProvider>) ClassReflection.forName(trajectory.provider);
+                    // Orbit data
+                    IOrbitDataProvider provider;
+                    try {
+                        provider = ClassReflection.newInstance(trajectory.providerClass);
+                        provider.load(trajectory.oc.source, new OrbitDataLoaderParameters(base.names[0], trajectory.providerClass, trajectory.oc, trajectory.multiplier, trajectory.numSamples), trajectory.newMethod);
+                        verts.pointCloudData = provider.getData();
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+                } catch (ReflectionException e) {
                     logger.error(e);
                 }
-            } catch (ReflectionException e) {
-                logger.error(e);
             }
         }
         // All trajectories have the same primitive and render group.
@@ -59,7 +61,7 @@ public class TrajectoryInitializer extends AbstractInitSystem {
 
         line.renderConsumer = LineEntityRenderSystem::renderTrajectory;
 
-        // Initialize default colors if needed
+        // Initialize default colors if needed.
         if (body.color == null) {
             body.color = new float[] { 0.8f, 0.8f, 0.8f, 1f };
         }
