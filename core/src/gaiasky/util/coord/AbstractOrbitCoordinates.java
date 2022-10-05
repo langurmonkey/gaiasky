@@ -9,6 +9,7 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -64,8 +65,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
                 if (params[1] instanceof Entity) {
                     var trajectory = Mapper.trajectory.get(entity);
                     var orbitObject = (Entity) params[1];
-                    var body = Mapper.body.get(orbitObject);
-                    trajectory.setBody(orbitObject, body.size / 2);
+                    trajectory.setBody(orbitObject, EntityUtils.getRadius(entity));
                 }
             }
         }

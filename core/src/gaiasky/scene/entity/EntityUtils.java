@@ -13,6 +13,7 @@ import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.math.Vector3b;
 
 import java.util.List;
@@ -214,5 +215,30 @@ public class EntityUtils {
 
     public static boolean isVisibilityOn(Entity entity) {
         return GaiaSky.instance.isOn(Mapper.base.get(entity).ct);
+    }
+
+    /**
+     * Re-implementation of {@link FocusView#getRadius()} in a static context.
+     * @param entity The entity.
+     * @return The radius of the entity.
+     */
+    public static double getRadius(Entity entity) {
+        var set = getSet(entity);
+        if (set != null) {
+            return set.getRadius();
+        } else {
+            var extra = Mapper.extra.get(entity);
+            var body = Mapper.body.get(entity);
+            return extra != null ? extra.radius : body.size / 2.0;
+        }
+    }
+
+    private static ParticleSet getSet(Entity entity) {
+        if(Mapper.particleSet.has(entity)) {
+            return Mapper.particleSet.get(entity);
+        } else if(Mapper.starSet.has(entity)) {
+            return Mapper.starSet.get(entity);
+        }
+        return null;
     }
 }
