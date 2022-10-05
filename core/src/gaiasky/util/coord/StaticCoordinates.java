@@ -87,11 +87,14 @@ public class StaticCoordinates implements IBodyCoordinates {
     }
 
     public void setPosition(double[] position) {
-        setPositionkm(position);
+        setPositionKm(position);
     }
 
-    public void setPositionkm(double[] position) {
+    public void setPositionKm(double[] position) {
         this.position = new Vector3b(position[0] * Constants.KM_TO_U, position[1] * Constants.KM_TO_U, position[2] * Constants.KM_TO_U);
+    }
+    public void setPositionkm(double[] position) {
+        setPositionKm(position);
     }
 
     public void setPositionEquatorial(double[] position) {
@@ -111,8 +114,11 @@ public class StaticCoordinates implements IBodyCoordinates {
         this.position.mul(Coordinates.eclipticToEquatorial());
     }
 
-    public void setPositionpc(double[] position) {
+    public void setPositionPc(double[] position) {
         this.position = new Vector3b(position[0] * Constants.PC_TO_U, position[1] * Constants.PC_TO_U, position[2] * Constants.PC_TO_U);
+    }
+    public void setPositionpc(double[] position) {
+        setPositionPc(position);
     }
 
     /**

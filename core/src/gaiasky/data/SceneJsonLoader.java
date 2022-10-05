@@ -29,8 +29,6 @@ import java.util.Map;
 public class SceneJsonLoader {
     private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
 
-    private static List<String> supportedLoaders = Arrays.asList("gaiasky.data.JsonLoader", "gaiasky.data.GeoJsonLoader", "gaiasky.data.group.OctreeGroupLoader", "gaiasky.data.cluster.StarClusterLoader");
-
     public synchronized static void loadScene(FileHandle[] jsonFiles, Scene scene) throws FileNotFoundException, ReflectionException {
         logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
         for (FileHandle fh : jsonFiles) {
@@ -78,12 +76,6 @@ public class SceneJsonLoader {
             JsonValue child = model.get("data").child;
             while (child != null) {
                 String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
-
-                if (!supportedLoaders.contains(clazzName)) {
-                    logger.info("Skipping " + clazzName + ": unsupported");
-                    child = child.next;
-                    continue;
-                }
 
                 // Loader mappings.
                 switch (clazzName) {

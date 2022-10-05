@@ -99,7 +99,7 @@ public class AttributeMap {
         putAll(Label.class, "label", "label2d", "labelposition", "labelPosition", "labelFactor", "labelMax", "textScale");
 
         // RenderType
-        putAll(RenderType.class, "rendergroup", "billboardRenderGroup:Particle");
+        putAll(RenderType.class, "rendergroup", "renderGroup", "billboardRenderGroup:Particle");
 
         // BillboardDataset
         putAll(BillboardSet.class, "data:BillboardGroup");

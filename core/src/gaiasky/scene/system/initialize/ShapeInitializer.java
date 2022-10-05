@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.AssetBean;
+import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
@@ -50,14 +51,13 @@ public class ShapeInitializer extends AbstractInitSystem {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var modelComp = Mapper.model.get(entity);
-        var shape = Mapper.shape.get(entity);
+        var rt = Mapper.renderType.get(entity);
 
         modelComp.renderConsumer = ModelEntityRenderSystem::renderShape;
         var mc = modelComp.model;
         graph.localTransform = new Matrix4();
         mc.doneLoading(AssetBean.manager(), graph.localTransform, body.color);
         mc.setTransparency(1, GL20.GL_ONE, GL20.GL_ONE);
-
 
         DirectionalLight dLight = new DirectionalLight();
         dLight.set(1, 1, 1, 1, 1, 1);
@@ -72,5 +72,9 @@ public class ShapeInitializer extends AbstractInitSystem {
         // Gravitational waves
         if (Settings.settings.runtime.gravitationalWaves)
             mc.rec.setUpGravitationalWavesMaterial(mc.instance.materials);
+
+        if (rt.renderGroup == null) {
+            rt.renderGroup = RenderGroup.MODEL_BG;
+        }
     }
 }

@@ -46,6 +46,11 @@ public class Body implements Component, ICopy {
     public float[] color;
     public float[] labelColor = Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
 
+    /**
+     * Flag to control whether the position of this object has been set in a script.
+     */
+    public boolean positionSetInScript = false;
+
     public void setPos(double[] pos) {
         setPosition(pos);
     }

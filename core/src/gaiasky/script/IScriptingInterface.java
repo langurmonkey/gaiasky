@@ -1507,10 +1507,10 @@ public interface IScriptingInterface {
      * but in this case the line can be rendered with higher quality
      * polyline quadstrips.
      *
-     * @param name   The name to identify the trajectory, to possibly remove it later.
-     * @param points The points of the trajectory. It is an array containing all the
-     *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
-     * @param color  The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param name     The name to identify the trajectory, to possibly remove it later.
+     * @param points   The points of the trajectory. It is an array containing all the
+     *                 points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn] in the internal reference system.
+     * @param color    The color of the trajectory as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param trailMap The bottom mapping position for the trail. The orbit trail assigns an opacity value to
      *                 each point of the orbit, where 1 is the location of the last point in the points list, and 0 is the first one.
      *                 This mapping parameter defines the location in the orbit (in [0,1]) where we map the opacity
@@ -2274,7 +2274,7 @@ public interface IScriptingInterface {
     void unparkRunnable(String id);
 
     /**
-     * Loads a VOTable, FITS or CSV dataset file with the given name.
+     * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
      * In this version, the loading happens synchronously, so the catalog is available to Gaia Sky immediately after
      * this call returns.
      * The actual loading process is carried out
@@ -2291,7 +2291,7 @@ public interface IScriptingInterface {
     boolean loadDataset(String dsName, String path);
 
     /**
-     * Loads a VOTable, FITS or CSV dataset file with the given name.
+     * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
      * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
@@ -2312,7 +2312,7 @@ public interface IScriptingInterface {
     boolean loadDataset(final String dsName, final String path, final boolean sync);
 
     /**
-     * Loads a VOTable, FITS or CSV dataset file with the given name.
+     * Loads a VOTable, FITS, CSV or JSON dataset file with the given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
      * {@link IScriptingInterface#loadDataset(String, String, boolean)}.<br/>
@@ -2578,6 +2578,16 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadVariableStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
+
+    /**
+     * Loads a JSON catalog file. This call does not block.
+     *
+     * @param dsName The name of the dataset.
+     * @param path   The absolute path, or the path in the data directory, of the catalog file.
+     *
+     * @return False if the dataset could not be loaded. True otherwise.
+     */
+    boolean loadJsonCatalog(String dsName, String path);
 
     /**
      * Removes the dataset identified by the given name, if it exists.

@@ -148,9 +148,6 @@ public class GraphUpdater extends AbstractUpdateSystem {
             } else {
                 base.opacity = opacity;
             }
-            if(base.getName().equalsIgnoreCase("ocdr2-hook")) {
-                int abc = 0;
-            }
             base.opacity *= base.getVisibilityOpacityFactor();
 
             // Apply proper motion if needed

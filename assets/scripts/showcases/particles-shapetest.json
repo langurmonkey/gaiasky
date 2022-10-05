@@ -1,0 +1,25 @@
+{ "objects" : [
+  {
+    "name" : "Test Object",
+    "color" : [0.8, 0.4, 0.3, 1.0],
+    "sizeKm" : 10000.0,
+    "ct" : "Others",
+
+    "parent" : "Universe", 
+    "impl" : "gaiasky.scenegraph.ShapeObject",
+    "renderGroup" : "MODEL_VERT_ADDITIVE",
+    
+
+    "model"			: {
+      "args" : [true],
+      "staticLight": true,
+      "type" : "sphere",
+      "primitiveType": "lines",
+      "params" : {
+        "quality" : 20,
+        "diameter" : 1.0,
+        "flip" : true
+      }
+    }
+  },
+]}

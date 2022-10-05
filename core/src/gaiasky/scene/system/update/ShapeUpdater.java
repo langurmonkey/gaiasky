@@ -12,7 +12,6 @@ import java.util.Locale;
 public class ShapeUpdater extends AbstractUpdateSystem{
 
     private final Vector3 F31 = new Vector3();
-    private final Vector3d D31 = new Vector3d();
 
     public ShapeUpdater(Family family, int priority) {
         super(family, priority);
@@ -33,7 +32,7 @@ public class ShapeUpdater extends AbstractUpdateSystem{
         graph.translation.sub(body.pos);
         if (shape.track != null) {
             EntityUtils.getAbsolutePosition(shape.track.getEntity(), shape.trackName.toLowerCase(Locale.ROOT), body.pos);
-        } else {
+        } else if (!body.positionSetInScript){
             body.pos.scl(0);
         }
         // Update pos, local transform

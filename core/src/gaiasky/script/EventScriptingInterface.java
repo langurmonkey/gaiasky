@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.NewStarClusterLoader;
+import gaiasky.data.SceneJsonLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
@@ -1213,6 +1214,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setFrameOutput(boolean active) {
         em.post(Event.FRAME_OUTPUT_CMD, this, active);
+    }
+
+    public void setObjectPosition(FocusView object, double[] position) {
+        setObjectPosition(object.getEntity(), position);
+    }
+    public void setObjectPosition(FocusView object, List<?> position) {
+        setObjectPosition(object, dArray(position));
+    }
+
+    public void setObjectPosition(Entity object, double[] position) {
+        if (checkNotNull(object, "object") && checkLength(position, 3, "position")) {
+            var body = Mapper.body.get(object);
+            body.pos.set(position);
+            body.positionSetInScript = true;
+        }
+    }
+    public void setObjectPosition(Entity object, List<?> position) {
+        setObjectPosition(object, dArray(position));
     }
 
     @Override
@@ -2704,7 +2723,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         addTrajectoryLine(name, dArray(points), dArray(color), trailMap);
     }
 
-
     @Override
     public void addPolyline(String name, double[] points, double[] color) {
         addPolyline(name, points, color, 1f);
@@ -2731,7 +2749,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
-       addLineObject(name, points, color, lineWidth, primitive, arrowCaps, 0f, "gaiasky.scenegraph.Polyline");
+        addLineObject(name, points, color, lineWidth, primitive, arrowCaps, 0f, "gaiasky.scenegraph.Polyline");
     }
 
     public Entity addLineObject(String name, List<?> points, List<?> color, double lineWidth, int primitive, boolean arrowCaps, double trailMap, String archetypeName) {
@@ -2768,7 +2786,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             }
 
             var trajectory = Mapper.trajectory.get(entity);
-            if(trajectory != null) {
+            if (trajectory != null) {
                 trajectory.orbitTrail = trailMap >= 0 && trailMap <= 1;
                 trajectory.setTrailMap(trailMap);
             }
@@ -3094,13 +3112,59 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
+    public boolean loadJsonCatalog(String dsName, String path) {
+        return loadJsonCatalog(dsName, path, true);
+    }
+
+    public boolean loadJsonCatalog(String dsName, String path, boolean sync) {
+        // Load internal JSON catalog file.
+        try {
+            logger.info(I18n.msg("notif.catalog.loading", path));
+            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(Gdx.files.absolute(path), scene);
+            int i = 0;
+            for (Entity e : objects) {
+                if (e == null) {
+                    logger.error("Entity is null: " + i);
+                }
+                i++;
+            }
+            logger.info(I18n.msg("notif.catalog.loaded", objects.size, I18n.msg("gui.objects")));
+            if (objects.size > 0) {
+                GaiaSky.postRunnable(() -> {
+                    // THIS WILL BLOCK
+                    objects.forEach(scene::initializeEntity);
+                    objects.forEach(scene::addToIndex);
+                    while (!GaiaSky.instance.assetManager.isFinished()) {
+                        // Active wait
+                        sleepFrames(1);
+                    }
+                    objects.forEach(scene::setUpEntity);
+                    objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
+
+                    GaiaSky.postRunnable(GaiaSky.instance::touchSceneGraph);
+                });
+                // Sync waiting until the node is in the scene graph
+                while (sync && (objects.get(0) == null || Mapper.graph.get(objects.get(0)).parent != null)) {
+                    sleepFrames(1);
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error(I18n.msg("notif.error", path), e);
+            return false;
+        }
+        return true;
+    }
+
     private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         try {
             logger.info(I18n.msg("notif.catalog.loading", dsName));
 
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
-                if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
+                if (ds.toString().endsWith(".json")) {
+                    loadJsonCatalog(dsName, ds.toString(), sync);
+                } else if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
                     List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
                     if (data != null && !data.isEmpty()) {
                         // STAR GROUP

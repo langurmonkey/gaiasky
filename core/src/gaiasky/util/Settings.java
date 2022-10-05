@@ -20,6 +20,7 @@ import gaiasky.gui.KeyBindings;
 import gaiasky.gui.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.DataSettings.*;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
@@ -185,15 +186,20 @@ public class Settings {
         public Path dataPath(String path) {
             // Windows does not allow asterisks in paths
             String pth = path.replaceAll("\\*", Constants.STAR_SUBSTITUTE);
-            if (Path.of(pth).isAbsolute()) {
-                // Absolute path, just leave it
-                return Path.of(pth);
-            } else {
-                // Relative path, just remove leading 'data/' and prepend data location
-                if (pth.startsWith("data/")) {
-                    pth = pth.substring(5);
-                }
+
+            if (pth.startsWith("data/")) {
+                // Path is in data directory, just remove leading 'data/' and prepend data location
+                pth = pth.substring(5);
                 return Path.of(location).resolve(pth);
+            } else {
+                var p = Path.of(pth);
+                if(p.toFile().exists()) {
+                    // Relative to working dir, or absolute.
+                    return p;
+                } else {
+                    // In data directory.
+                    return Path.of(location).resolve(pth);
+                }
             }
         }
 

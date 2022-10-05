@@ -429,39 +429,8 @@ public class GuiRegistry implements IObserver {
                                 if (fileName.endsWith(".json")) {
                                     // Load internal JSON catalog file
                                     GaiaSky.instance.getExecutorService().execute(() -> {
-                                        try {
-                                            logger.info(I18n.msg("notif.catalog.loading", fileName));
-                                            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(Gdx.files.absolute(result.toAbsolutePath().toString()), scene);
-                                            int i = 0;
-                                            for (Entity e : objects) {
-                                                if (e == null) {
-                                                    logger.error("Entity is null: " + i);
-                                                }
-                                                i++;
-                                            }
-                                            logger.info(I18n.msg("notif.catalog.loaded", objects.size, I18n.msg("gui.objects")));
-                                            GaiaSky.postRunnable(() -> {
-                                                // THIS WILL BLOCK
-                                                objects.forEach(scene::initializeEntity);
-                                                objects.forEach(scene::addToIndex);
-                                                while (!GaiaSky.instance.assetManager.isFinished()) {
-                                                    // Active wait
-                                                    try {
-                                                        Thread.sleep(100);
-                                                    } catch (InterruptedException e) {
-                                                        logger.error(e);
-                                                    }
-                                                }
-                                                objects.forEach(scene::setUpEntity);
-                                                objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
-
-                                                GaiaSky.postRunnable(GaiaSky.instance::touchSceneGraph);
-                                            });
-                                        } catch (Exception e) {
-                                            logger.error(I18n.msg("notif.error", fileName), e);
-                                        }
+                                        GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
                                     });
-
                                 } else {
                                     final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
                                     Runnable doLoad = () -> {

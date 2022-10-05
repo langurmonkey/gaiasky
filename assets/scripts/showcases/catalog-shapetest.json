@@ -1,0 +1,17 @@
+{
+    "key" : "catalog-shape-test",
+    "name" : "Shape test",
+    "version" : 1,
+    "mingsversion" : 30300,
+    "type": "catalog-other",
+    "description" : "A test catalog with one object.",
+    "releasenotes": "- First release.",
+    "size" : 0,
+    "nobjects" : 1,
+    "data" : [
+        {
+            "loader": "gaiasky.data.NewJsonLoader",
+            "files": [ "./assets/scripts/showcases/particles-shapetest.json" ]
+        }
+    ]
+}
