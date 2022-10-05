@@ -954,6 +954,23 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return allOn;
     }
 
+    /**
+     * Computes the alpha of this component types by multiplying the alphas
+     * of all components
+     *
+     * @param comp The components
+     * @return The alpha value
+     */
+    public float alpha(ComponentTypes comp) {
+        float alpha = 1;
+
+            for (int i = comp.nextSetBit(0); i >= 0; i = comp.nextSetBit(i + 1)) {
+                // operate on index i here
+                alpha *= alphas[i];
+            }
+        return alpha;
+    }
+
     public boolean isOn(int ordinal) {
         return visible.get(ordinal) || alphas[ordinal] > 0;
     }

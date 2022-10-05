@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.tag.TagNoProcess;
 import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;

@@ -29,14 +29,16 @@ public class ClusterUpdater extends AbstractUpdateSystem {
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
-        var graph = Mapper.graph.get(entity);
-        var cluster = Mapper.cluster.get(entity);
+        if (base.opacity > 0) {
+            var body = Mapper.body.get(entity);
+            var graph = Mapper.graph.get(entity);
+            var cluster = Mapper.cluster.get(entity);
 
-        base.opacity *= 0.1f * base.getVisibilityOpacityFactor();
-        cluster.fadeAlpha = (float) MathUtilsd.lint(body.solidAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
-        body.labelColor[3] = 8.0f * cluster.fadeAlpha;
+            base.opacity *= 0.1f * base.getVisibilityOpacityFactor();
+            cluster.fadeAlpha = (float) MathUtilsd.lint(body.solidAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
+            body.labelColor[3] = 8.0f * cluster.fadeAlpha;
 
-        graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);
+            graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);
+        }
     }
 }

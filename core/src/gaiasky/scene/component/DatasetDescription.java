@@ -17,6 +17,12 @@ public class DatasetDescription implements Component {
      */
     public String description;
 
+    /**
+     * Internal attribute to keep track of previous opacity to know
+     * when to update children with {@link gaiasky.scene.component.tag.TagNoProcess}.
+     */
+    public float previousAlpha = 1f;
+
     public void setCatalogInfoBare(CatalogInfo info) {
         this.catalogInfo = info;
     }

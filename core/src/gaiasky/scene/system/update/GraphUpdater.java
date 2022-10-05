@@ -138,7 +138,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 // If the bottom part of our fade in is mapped to a value
                 // greater than zero, we do not use the parent opacity; the
                 // children's fadeInMap attribute takes precedence.
-                if(fade.fadeInMap == null || fade.fadeInMap.x <= 0) {
+                if (fade.fadeInMap == null || fade.fadeInMap.x <= 0) {
                     base.opacity = opacity;
                 } else {
                     base.opacity = 1;
@@ -147,6 +147,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 updateFadeOpacity(base, fade);
             } else {
                 base.opacity = opacity;
+            }
+            if(base.getName().equalsIgnoreCase("ocdr2-hook")) {
+                int abc = 0;
             }
             base.opacity *= base.getVisibilityOpacityFactor();
 
@@ -169,13 +172,13 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
             }
 
+            var ds = Mapper.datasetDescription.get(entity);
             // Some elements (sets, octrees) process their own children.
-            boolean processChildren = !Mapper.tagNoProcessChildren.has(entity);
-            if (processChildren && graph.children != null) {
+            boolean processChildren = !(Mapper.tagNoProcessChildren.has(entity) || (ds != null && !GaiaSky.instance.isOn(base.ct)));
+            if (processChildren && graph.children != null && opacity > 0) {
                 // Go down a level
                 for (int i = 0; i < graph.children.size; i++) {
                     Entity child = graph.children.get(i);
-                    // Update
                     update(child, time, graph.translation, getChildrenOpacity(entity, base, fade, opacity));
                 }
             }

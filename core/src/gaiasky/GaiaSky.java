@@ -798,7 +798,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private void goHome() {
         final Entity homeObject = scene.findFocus(settings.scene.homeObject);
         boolean isOn = true;
-        if (homeObject != null && (isOn = GaiaSky.instance.isOn(Mapper.base.get(homeObject).ct)) && !settings.program.net.slave.active) {
+        if (homeObject != null && (isOn = isOn(Mapper.base.get(homeObject).ct)) && !settings.program.net.slave.active) {
             // Set focus to Earth
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, homeObject, true);
@@ -1433,6 +1433,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public boolean isOn(final ComponentTypes cts) {
         return this.sceneRenderer.allOn(cts);
+    }
+
+    public float alpha(final ComponentTypes cts) {
+        return this.sceneRenderer.alpha(cts);
     }
 
     public Optional<CatalogInfo> getCatalogInfoFromEntity(Entity entity) {

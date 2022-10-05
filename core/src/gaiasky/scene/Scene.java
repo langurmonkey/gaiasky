@@ -310,6 +310,7 @@ public class Scene {
 
             // Regular update systems.
             addUpdater(new OctreeUpdater(this, families.octrees, priority++));
+            addUpdater(new DatasetDescriptionUpdater(families.datasets, priority++));
             addUpdater(new ElementsSetUpdater(families.orbitalElementSets, priority++));
             addUpdater(new ParticleSetUpdater(families.particleSets, priority++));
             addUpdater(new ModelUpdater(families.models, priority++));
