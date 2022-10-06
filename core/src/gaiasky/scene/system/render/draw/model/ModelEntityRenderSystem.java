@@ -152,7 +152,7 @@ public class ModelEntityRenderSystem {
                 alphaFactor = body.color[3] * base.opacity;
             }
 
-            mc.update(alpha * alphaFactor, relativistic);
+            mc.update(alpha * alphaFactor, relativistic, model.blendMode);
             batch.render(mc.instance, mc.env);
         }
     }
@@ -176,7 +176,7 @@ public class ModelEntityRenderSystem {
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
 
-        mc.update(graph.localTransform, alpha * base.opacity * body.color[3], GL20.GL_ONE, GL20.GL_ONE);
+        mc.update(graph.localTransform, alpha * base.opacity * body.color[3], model.blendMode);
         // Depth reads, no depth writes
         mc.setDepthTest(GL20.GL_LEQUAL, false);
         Gdx.gl20.glLineWidth(1.5f);
@@ -204,7 +204,7 @@ public class ModelEntityRenderSystem {
 
         ModelComponent mc = model.model;
 
-        mc.update(alpha * body.color[3] * base.opacity, relativistic);
+        mc.update(alpha * body.color[3] * base.opacity, relativistic, model.blendMode);
         if (gr.regime == 1)
             mc.setDepthTest(GL20.GL_LEQUAL, false);
         else
@@ -272,7 +272,7 @@ public class ModelEntityRenderSystem {
         var graph = Mapper.graph.get(entity);
         var cluster = Mapper.cluster.get(entity);
 
-        mc.update(relativistic, null, alpha * base.opacity * cluster.fadeAlpha, GL20.GL_ONE, GL20.GL_ONE);
+        mc.update(relativistic, null, alpha * base.opacity * cluster.fadeAlpha, model.blendMode);
         // Depth reads, no depth writes
         mc.setDepthTest(GL20.GL_LEQUAL, false);
         mc.instance.transform.set(graph.localTransform);
@@ -302,7 +302,7 @@ public class ModelEntityRenderSystem {
             if (set.proximity.updating[0] != null) {
                 float opacity = (float) MathUtilsd.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
                 if (alpha * opacity > 0) {
-                    mc.setTransparency(alpha * opacity);
+                    mc.setTransparency(alpha * opacity, model.blendMode);
                     float[] col = set.proximity.updating[0].col;
                     ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(col[0], col[1], col[2], 1f);
                     ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
@@ -347,7 +347,7 @@ public class ModelEntityRenderSystem {
         ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(cc[0], cc[1], cc[2], 1f);
         ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
         mc.setDepthTest(GL20.GL_LEQUAL, true);
-        mc.update(alpha * opacity, relativistic);
+        mc.update(alpha * opacity, relativistic, model.blendMode);
         // Local transform
         graph.translation.setToTranslation(mc.instance.transform).scl((float) (extra.radius * 2d) * scaffolding.sizeScaleFactor);
         batch.render(mc.instance, mc.env);
@@ -377,7 +377,7 @@ public class ModelEntityRenderSystem {
             if (shadow) {
                 prepareShadowEnvironment(entity, model, scaffolding);
             }
-            mc.setTransparency(alpha * scaffolding.fadeOpacity);
+            mc.setTransparency(alpha * scaffolding.fadeOpacity, model.blendMode);
             if (cam.getMode().isSpacecraft())
                 // In SPACECRAFT_MODE mode, we are not affected by relativistic aberration or Doppler shift
                 mc.updateRelativisticEffects(cam, 0);

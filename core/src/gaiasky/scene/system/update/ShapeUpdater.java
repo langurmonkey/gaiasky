@@ -24,7 +24,6 @@ public class ShapeUpdater extends AbstractUpdateSystem{
 
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
-        var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var shape = Mapper.shape.get(entity);
@@ -40,6 +39,5 @@ public class ShapeUpdater extends AbstractUpdateSystem{
 
         graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);
 
-        base.opacity *= 0.5f;
     }
 }

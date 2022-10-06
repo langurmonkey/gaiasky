@@ -20,6 +20,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
+import gaiasky.render.BlendMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.*;
@@ -121,7 +122,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * Returns the given directional light
      *
      * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}.
-     *
      * @return The directional light with index i
      */
     public DirectionalLight directional(int i) {
@@ -282,12 +282,28 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         update(true, localTransform, alpha, blendSrc, blendDst);
     }
 
+    public void update(Matrix4 localTransform, float alpha, BlendMode blendMode) {
+        update(true, localTransform, alpha, blendMode);
+    }
+
     public void update(boolean relativistic, Matrix4 localTransform, float alpha) {
-        update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        update(relativistic, localTransform, alpha, BlendMode.ALPHA);
+    }
+
+    public void update(boolean relativistic, Matrix4 localTransform, float alpha, BlendMode blendMode) {
+        switch (blendMode) {
+        case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE);
+        }
+
     }
 
     public void update(Matrix4 localTransform, float alpha) {
         update(true, localTransform, alpha);
+    }
+
+    public void update(float alpha, boolean relativistic, BlendMode blendMode) {
+        update(relativistic, null, alpha);
     }
 
     public void update(float alpha, boolean relativistic) {
@@ -437,6 +453,13 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    public void setTransparency(float alpha, BlendMode blendMode) {
+        switch (blendMode) {
+        case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE);
+        }
+    }
+
     public void setTransparencyColor(float alpha) {
         if (instance != null) {
             int n = instance.materials.size;
@@ -500,6 +523,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void setStaticLight(String staticLight) {
         setStaticlight(Boolean.valueOf(staticLight));
     }
+
     public void setStaticlight(String staticLight) {
         setStaticLight(staticLight);
     }
@@ -507,6 +531,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void setStaticLight(Boolean staticLight) {
         this.staticLight = staticLight;
     }
+
     public void setStaticlight(Boolean staticLight) {
         setStaticLight(staticLight);
     }
@@ -515,6 +540,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         this.staticLight = true;
         this.staticLightLevel = lightLevel.floatValue();
     }
+
     public void setStaticlight(Double lightLevel) {
         setStaticLight(lightLevel);
     }

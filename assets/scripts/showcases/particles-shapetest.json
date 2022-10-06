@@ -13,6 +13,7 @@
     "model"			: {
       "args" : [true],
       "staticLight": true,
+      "blendMode": "alpha",
       "type" : "sphere",
       "primitiveType": "triangles",
       "params" : {

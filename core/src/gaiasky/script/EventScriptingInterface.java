@@ -29,6 +29,7 @@ import gaiasky.gui.ColormapPicker;
 import gaiasky.gui.IGui;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.gui.beans.ShapeComboBoxBean.Shape;
+import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
@@ -3548,6 +3549,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     model.model.type = shapeLc;
                     model.model.setPrimitiveType(primitiveInt);
                     model.model.setParams(params);
+                    model.blendMode = BlendMode.ADDITIVE;
+
+                    var rt = Mapper.renderType.get(newShape);
+                    rt.renderGroup = RenderGroup.MODEL_VERT_ADDITIVE;
 
                     // Initialize shape.
                     scene.initializeEntity(newShape);

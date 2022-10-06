@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.render.BlendMode;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
@@ -102,6 +103,7 @@ public class ClusterInitializer extends AbstractInitSystem {
         // Model.
         model.renderConsumer = ModelEntityRenderSystem::renderStarClusterModel;
 
+        model.blendMode = BlendMode.ADDITIVE;
         model.model = new ModelComponent(false);
         model.model.initialize(null);
         DirectionalLight dLight = new DirectionalLight();

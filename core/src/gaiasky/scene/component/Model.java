@@ -2,6 +2,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
+import gaiasky.render.BlendMode;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
@@ -14,10 +15,19 @@ public class Model implements Component {
     /** The model. **/
     public ModelComponent model;
 
+    /** The blend mode **/
+    public BlendMode blendMode = BlendMode.ALPHA;
+
     /** The render consumer. **/
     public Consumer10<ModelEntityRenderSystem, Entity, Model, IntModelBatch, Float, Double, RenderingContext, RenderGroup, Boolean, Boolean> renderConsumer;
 
     public void setModel(ModelComponent model) {
         this.model = model;
+    }
+
+    public void setBlendMode(String blendModeString) {
+        if (blendModeString != null && !blendModeString.isBlank()) {
+            blendMode = BlendMode.valueOf(blendModeString.trim().toUpperCase());
+        }
     }
 }
