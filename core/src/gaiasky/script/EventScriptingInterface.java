@@ -1825,25 +1825,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getObjectPosition(String name) {
         Entity entity = getEntity(name);
-        if (Mapper.focus.has(entity)) {
-            focusView.setEntity(entity);
-            focusView.getFocus(name);
-            focusView.getAbsolutePosition(name, aux3b1);
-            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
-        }
-        return null;
+        focusView.setEntity(entity);
+        focusView.getFocus(name);
+        focusView.getAbsolutePosition(name, aux3b1);
+        return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
     }
 
     @Override
     public double[] getObjectPredictedPosition(String name) {
         Entity entity = getEntity(name);
-        if (Mapper.focus.has(entity)) {
-            focusView.setEntity(entity);
-            focusView.getFocus(name);
-            focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
-            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
-        }
-        return null;
+        focusView.setEntity(entity);
+        focusView.getFocus(name);
+        focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+        return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
     }
 
     @Override
