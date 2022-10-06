@@ -117,15 +117,6 @@ task runI18nFormatter(dependsOn: jar, type: JavaExec, description: "Formats i18n
     mainClass = "gaiasky.desktop.util.I18nFormatter"
 }
 
-task runParallelSystemTest(dependsOn: jar, type: JavaExec, description: "Runs the parallel system test.") {
-    systemProperties['assets.location'] = './assets/'
-    classpath = project.ext.sourceSets.main.runtimeClasspath
-    classpath += project.files(project.ext.assetsDir)
-    standardInput = System.in
-    workingDir = project.ext.workDir
-    mainClass = "gaiasky.test.ParallelSystemTest"
-}
-
 task createDistDir(description: "Creates the releases/dist folder") {
     doLast {
         File distDir = new File(project.distDir)

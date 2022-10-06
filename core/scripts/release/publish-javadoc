@@ -54,17 +54,17 @@ $JAVA_HOME/bin/javadoc -d "/tmp/javadoc/$VERSION" -sourcepath "$SRCDIR" -classpa
 
 
 # Copy to server
-echo "Copying directory /tmp/javadoc/$VERSION to tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/$VERSION"
+echo "Copying directory /tmp/javadoc/$VERSION to tsagrista@andromeda:/gaiasky/docs/javadoc/$VERSION"
     
-rsync -avh "/tmp/javadoc/$VERSION" "tsagrista@mintaka:/dataB/gaiasky/docs/javadoc/"
+rsync -avh "/tmp/javadoc/$VERSION" "tsagrista@andromeda:/gaiasky/docs/javadoc/"
 
 # Clean up
 #rm -rf /tmp/javadoc
 
 # Update listing
-COMMAND="~/bin/dir2html '/dataB/gaiasky/docs/javadoc/' '/javadoc' 'gaia.ari.uni-heidelberg.de/gaiasky' 'Gaia Sky javadoc'"
-echo "Running dir2html in javadoc folder in mintaka"
-ssh tsagrista@mintaka $COMMAND
+COMMAND="~/bin/dir2html '/gaiasky/docs/javadoc/' '/javadoc' 'gaia.ari.uni-heidelberg.de/gaiasky' 'Gaia Sky javadoc'"
+echo "Running dir2html in javadoc folder in andromeda"
+ssh tsagrista@andromeda $COMMAND
 
 # Restore
 git -C "$SRCDIR" checkout master

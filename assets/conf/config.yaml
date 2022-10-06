@@ -394,7 +394,7 @@ program:
     # Data repository location
     dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
     # Data descriptor file location
-    # This can also point to a local repository
+    # This can also point to a local repository description file (use file://)
     dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030200.json
 
 #
