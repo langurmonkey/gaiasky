@@ -3549,7 +3549,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     model.model.type = shapeLc;
                     model.model.setPrimitiveType(primitiveInt);
                     model.model.setParams(params);
-                    model.blendMode = BlendMode.ADDITIVE;
+                    model.model.setStaticLight(true);
+                    model.model.setBlendMode(BlendMode.ADDITIVE);
 
                     var rt = Mapper.renderType.get(newShape);
                     rt.renderGroup = RenderGroup.MODEL_VERT_ADDITIVE;

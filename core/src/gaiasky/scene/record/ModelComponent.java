@@ -87,6 +87,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     private boolean modelInitialised, modelLoading;
     private boolean useColor = true;
 
+    /** The blend mode **/
+    private BlendMode blendMode = BlendMode.ALPHA;
+
     private AssetManager manager;
     private float[] cc;
     private int primitiveType = GL20.GL_TRIANGLES;
@@ -122,6 +125,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * Returns the given directional light
      *
      * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}.
+     *
      * @return The directional light with index i
      */
     public DirectionalLight directional(int i) {
@@ -282,28 +286,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         update(true, localTransform, alpha, blendSrc, blendDst);
     }
 
-    public void update(Matrix4 localTransform, float alpha, BlendMode blendMode) {
-        update(true, localTransform, alpha, blendMode);
-    }
-
     public void update(boolean relativistic, Matrix4 localTransform, float alpha) {
-        update(relativistic, localTransform, alpha, BlendMode.ALPHA);
-    }
-
-    public void update(boolean relativistic, Matrix4 localTransform, float alpha, BlendMode blendMode) {
         switch (blendMode) {
         case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
         case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE);
         }
-
     }
 
     public void update(Matrix4 localTransform, float alpha) {
         update(true, localTransform, alpha);
-    }
-
-    public void update(float alpha, boolean relativistic, BlendMode blendMode) {
-        update(relativistic, null, alpha);
     }
 
     public void update(float alpha, boolean relativistic) {
@@ -414,21 +406,59 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void setTransparency(float alpha, int src, int dst) {
+    public void setTransparency(float alpha, int blendSrc, int blendDest) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
             BlendingAttribute ba;
             if (mat.has(BlendingAttribute.Type)) {
                 ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
-                ba.destFunction = dst;
-                ba.sourceFunction = src;
+                ba.destFunction = blendDest;
+                ba.sourceFunction = blendSrc;
             } else {
-                ba = new BlendingAttribute(src, dst);
+                ba = new BlendingAttribute(blendSrc, blendDest);
                 mat.set(ba);
             }
             ba.opacity = alpha;
         }
+    }
+
+    /**
+     * Sets the depth test of this model using the information in the {@link #blendMode}
+     * attribute like so:
+     * <ul>
+     *     <li>blendMode = alpha -> depth reads and writes</li>
+     *     <li>blendMode = additive -> depth reads but no writes</li>
+     * </ul>
+     */
+    public void updateDepthTest() {
+        switch (blendMode) {
+        // Read-write depth test.
+        case ALPHA, COLOR -> depthTestReadWrite();
+        // Read-only depth test.
+        case ADDITIVE -> depthTestReadOnly();
+        }
+    }
+
+    /**
+     * Sets the depth test of this model to read only.
+     */
+    public void depthTestReadOnly() {
+        setDepthTest(GL20.GL_LEQUAL, false);
+    }
+
+    /**
+     * Sets the depth test of this model to read and write.
+     */
+    public void depthTestReadWrite() {
+        setDepthTest(GL20.GL_LEQUAL, true);
+    }
+
+    /**
+     * Completely disables the depth test.
+     */
+    public void depthTestDisable() {
+        setDepthTest(GL20.GL_NONE, false);
     }
 
     public void setDepthTest(int func, boolean mask) {
@@ -450,12 +480,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void setTransparency(float alpha) {
-        setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    public void setTransparency(float alpha, BlendMode blendMode) {
         switch (blendMode) {
         case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
         case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE);
         }
     }
@@ -582,6 +609,18 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
+    public void setBlendMode(BlendMode blendMode) {
+        if (blendMode != null) {
+            this.blendMode = blendMode;
+        }
+    }
+
+    public void setBlendMode(String blendModeString) {
+        if (blendModeString != null && !blendModeString.isBlank()) {
+            blendMode = BlendMode.valueOf(blendModeString.trim().toUpperCase());
+        }
+    }
+
     public void updateVelocityBufferUniforms(ICamera camera) {
         for (Material mat : instance.materials) {
             updateVelocityBufferUniforms(mat, camera);
@@ -677,6 +716,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public boolean isModelLoading() {
         return modelLoading;
+    }
+
+    public boolean isStaticLight() {
+        return staticLight;
     }
 
     public void setPrimitiveType(int primitiveType) {

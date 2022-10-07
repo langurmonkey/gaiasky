@@ -66,7 +66,7 @@ public class AttributeMap {
         putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locVaMultiplier", "locthoverfactor", "locThresholdLabel", "shadowvalues");
 
         // Model
-        putAll(Model.class, "model", "blendMode");
+        putAll(Model.class, "model");
 
         // Atmosphere
         putAll(Atmosphere.class, "atmosphere");

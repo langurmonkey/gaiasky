@@ -15,9 +15,6 @@ public class Model implements Component {
     /** The model. **/
     public ModelComponent model;
 
-    /** The blend mode **/
-    public BlendMode blendMode = BlendMode.ALPHA;
-
     /** The render consumer. **/
     public Consumer10<ModelEntityRenderSystem, Entity, Model, IntModelBatch, Float, Double, RenderingContext, RenderGroup, Boolean, Boolean> renderConsumer;
 
@@ -25,9 +22,4 @@ public class Model implements Component {
         this.model = model;
     }
 
-    public void setBlendMode(String blendModeString) {
-        if (blendModeString != null && !blendModeString.isBlank()) {
-            blendMode = BlendMode.valueOf(blendModeString.trim().toUpperCase());
-        }
-    }
 }

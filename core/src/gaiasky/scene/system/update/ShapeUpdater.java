@@ -3,8 +3,10 @@ package gaiasky.scene.system.update;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.EntityUtils;
+import gaiasky.scene.entity.LightingUtils;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Locale;
@@ -27,6 +29,12 @@ public class ShapeUpdater extends AbstractUpdateSystem{
         var body = Mapper.body.get(entity);
         var graph = Mapper.graph.get(entity);
         var shape = Mapper.shape.get(entity);
+        var model = Mapper.model.get(entity);
+
+        if(!model.model.isStaticLight()) {
+            // Update light with global position
+            LightingUtils.updateLights(model, body, graph, GaiaSky.instance.cameraManager);
+        }
 
         graph.translation.sub(body.pos);
         if (shape.track != null) {

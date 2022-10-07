@@ -7,12 +7,12 @@
 
     "parent" : "Universe", 
     "impl" : "gaiasky.scenegraph.ShapeObject",
-    "renderGroup" : "MODEL_VERT_ADDITIVE",
+    "renderGroup" : "MODEL_PIX",
     
 
     "model"			: {
       "args" : [true],
-      "staticLight": true,
+      "staticLight": false,
       "blendMode": "alpha",
       "type" : "sphere",
       "primitiveType": "triangles",

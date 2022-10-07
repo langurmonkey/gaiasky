@@ -103,8 +103,8 @@ public class ClusterInitializer extends AbstractInitSystem {
         // Model.
         model.renderConsumer = ModelEntityRenderSystem::renderStarClusterModel;
 
-        model.blendMode = BlendMode.ADDITIVE;
         model.model = new ModelComponent(false);
+        model.model.setBlendMode(BlendMode.ADDITIVE);
         model.model.initialize(null);
         DirectionalLight dLight = new DirectionalLight();
         dLight.set(1, 1, 1, 1, 1, 1);

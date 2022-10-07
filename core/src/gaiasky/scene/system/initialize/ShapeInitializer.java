@@ -57,14 +57,14 @@ public class ShapeInitializer extends AbstractInitSystem {
         var mc = modelComp.model;
         graph.localTransform = new Matrix4();
         mc.doneLoading(AssetBean.manager(), graph.localTransform, body.color);
-        mc.setTransparency(1, GL20.GL_ONE, GL20.GL_ONE);
 
-        DirectionalLight dLight = new DirectionalLight();
-        dLight.set(1, 1, 1, 1, 1, 1);
-        mc.env = new Environment();
-        mc.env.add(dLight);
-        mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
-        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
+        if (mc.isStaticLight()) {
+            DirectionalLight dLight = new DirectionalLight();
+            dLight.set(1, 1, 1, 1, 1, 1);
+            mc.env = new Environment();
+            mc.env.add(dLight);
+            mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+        }
 
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)

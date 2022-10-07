@@ -51,6 +51,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.update.DatasetDescriptionUpdater;
+import gaiasky.scene.view.FocusView;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
 import gaiasky.script.IScriptingInterface;
@@ -1579,32 +1580,46 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case SCENE_REMOVE_OBJECT_CMD:
-            Entity toRemove;
+            Entity toRemove = null;
             if (data[0] instanceof String) {
                 toRemove = scene.getEntity((String) data[0]);
                 if (toRemove == null)
                     return;
-            } else {
+            } else if (data[0] instanceof Entity) {
                 toRemove = (Entity) data[0];
+            } else if (data[0] instanceof FocusView) {
+                toRemove = ((FocusView) data[0]).getEntity();
             }
-            Entity entityToRemove = toRemove;
-            boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
-            if (scene != null) {
-                postRunnable(() -> scene.remove(entityToRemove, removeFromIndex));
+            if (toRemove != null) {
+                boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
+                if (scene != null) {
+                    final Entity entityToRemove = toRemove;
+                    postRunnable(() -> {
+                        try {
+                            scene.remove(entityToRemove, removeFromIndex);
+                        } catch (Exception e) {
+                            logger.warn(e);
+                        }
+                    });
+                }
             }
             break;
         case SCENE_REMOVE_OBJECT_NO_POST_CMD:
+            toRemove = null;
             if (data[0] instanceof String) {
                 toRemove = scene.getEntity((String) data[0]);
                 if (toRemove == null)
                     return;
-            } else {
+            } else if (data[0] instanceof Entity) {
                 toRemove = (Entity) data[0];
+            } else if (data[0] instanceof FocusView) {
+                toRemove = ((FocusView) data[0]).getEntity();
             }
-            entityToRemove = toRemove;
-            removeFromIndex = data.length == 1 || (Boolean) data[1];
-            if (scene != null) {
-                scene.remove(entityToRemove, removeFromIndex);
+            if (toRemove != null) {
+                boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
+                if (scene != null) {
+                    scene.remove(toRemove, removeFromIndex);
+                }
             }
             break;
         case SCENE_RELOAD_NAMES_CMD:

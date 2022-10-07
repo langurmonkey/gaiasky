@@ -157,10 +157,10 @@ public class GaiaSkyContextMenu extends ContextMenu {
                         ImmutableArray<Entity> shapes = scene.engine.getEntitiesFor(scene.getFamilies().shapes);
                         for (Entity entity : shapes) {
                             var shape = Mapper.shape.get(entity);
-                            if (shape.track != null && shape.track == candidate) {
-                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesObj, candidate, false);
+                            if (shape.track != null && shape.track.getEntity() == candidate.getEntity()) {
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesObj, entity, false);
                             } else if (shape.trackName != null && shape.trackName.equalsIgnoreCase(candidateName)) {
-                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_CMD, removeShapesObj, candidate, false);
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesObj, entity, false);
                             }
                         }
                     });
@@ -174,8 +174,11 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 if (event instanceof ChangeEvent) {
                     GaiaSky.postRunnable(() -> {
                         ImmutableArray<Entity> shapes = scene.engine.getEntitiesFor(scene.getFamilies().shapes);
-                        for (Entity shape : shapes) {
-                            EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesAll, shape, false);
+                        for (Entity entity : shapes) {
+                            var shape = Mapper.shape.get(entity);
+                            if(shape.track != null || shape.trackName != null) {
+                                EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesAll, entity, false);
+                            }
                         }
                     });
 

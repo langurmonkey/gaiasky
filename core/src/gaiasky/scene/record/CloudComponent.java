@@ -20,6 +20,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.BlendMode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
@@ -78,6 +79,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
     public CloudComponent() {
         localTransform = new Matrix4();
         mc = new ModelComponent(false);
+        mc.setBlendMode(BlendMode.COLOR);
         mc.initialize(null);
         aux = new Vector3();
         aux3 = new Vector3d();
