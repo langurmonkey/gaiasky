@@ -8,6 +8,9 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.AssetBean;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.component.Focus;
+import gaiasky.scene.entity.FocusActive;
+import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
@@ -33,7 +36,9 @@ public class ShapeInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         var line = Mapper.line.get(entity);
         var label = Mapper.label.get(entity);
+        var shape = Mapper.shape.get(entity);
 
+        // Label.
         label.label = true;
         label.textScale = 0.2f;
         label.labelMax = 1f;
@@ -42,7 +47,26 @@ public class ShapeInitializer extends AbstractInitSystem {
         label.renderConsumer = LabelEntityRenderSystem::renderShape;
         label.renderFunction = LabelView::renderTextEssential;
 
+        // Line.
         line.lineWidth = 1.5f;
+
+        // Focusable.
+        if(shape.focusable) {
+            // Create focus component.
+            var focus = new Focus();
+            // Focus consumer.
+            focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateModel;
+            focus.hitRayConsumer = FocusHit::addHitRayModel;
+            focus.activeFunction = FocusActive::isFocusActiveTrue;
+            entity.add(focus);
+
+            // Solid angle.
+            var sa = Mapper.sa.get(entity);
+            double thPoint = sa.thresholdPoint;
+            sa.thresholdNone = thPoint / 1e6;
+            sa.thresholdPoint = thPoint / 3e4;
+            sa.thresholdQuad = thPoint / 2.0;
+        }
 
         initModel(entity);
     }

@@ -11,7 +11,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.Locale;
 
-public class ShapeUpdater extends AbstractUpdateSystem{
+public class ShapeUpdater extends AbstractUpdateSystem {
 
     private final Vector3 F31 = new Vector3();
 
@@ -30,16 +30,19 @@ public class ShapeUpdater extends AbstractUpdateSystem{
         var graph = Mapper.graph.get(entity);
         var shape = Mapper.shape.get(entity);
         var model = Mapper.model.get(entity);
+        var coord = Mapper.coordinates.get(entity);
 
-        if(!model.model.isStaticLight()) {
+        if (!model.model.isStaticLight()) {
             // Update light with global position
             LightingUtils.updateLights(model, body, graph, GaiaSky.instance.cameraManager);
         }
 
         graph.translation.sub(body.pos);
         if (shape.track != null) {
+            // Overwrite position if track object is set.
             EntityUtils.getAbsolutePosition(shape.track.getEntity(), shape.trackName.toLowerCase(Locale.ROOT), body.pos);
-        } else if (!body.positionSetInScript){
+        } else if ((coord == null || coord.coordinates == null) && !body.positionSetInScript) {
+            // Otherwise, set to zero if the position has not been set in a script, or it has coordinates.
             body.pos.scl(0);
         }
         // Update pos, local transform

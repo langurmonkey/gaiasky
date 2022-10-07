@@ -138,6 +138,9 @@ public class AttributeMap {
         // Mesh
         putAll(Mesh.class, "shading", "additiveblending");
 
+        // Shape
+        putAll(Shape.class, "focusable");
+
         // Invisible
         putAll(Raymarching.class, "shader");
 
