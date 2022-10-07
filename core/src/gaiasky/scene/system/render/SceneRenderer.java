@@ -1002,10 +1002,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     visible.flip(ct.ordinal());
                     times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                 }
-                if (visible.get(ct.ordinal())) {
-                    // We turned visibility on, trigger scene update.
-                    EventManager.publish(Event.SCENE_FORCE_UPDATE, this);
-                }
             }
         }
         case LINE_RENDERER_UPDATE -> GaiaSky.postRunnable(this::updateLineRenderSystem);

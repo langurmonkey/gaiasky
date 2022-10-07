@@ -3,6 +3,7 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
@@ -49,8 +50,12 @@ public class BaseInitializer extends AbstractInitSystem {
     public void setUpEntity(Entity entity) {
         if (Mapper.coordinates.has(entity)) {
             var coord = Mapper.coordinates.get(entity);
-            if (coord.coordinates != null)
+            if (coord.coordinates != null) {
+                var body = Mapper.body.get(entity);
                 coord.coordinates.doneLoading(scene, entity);
+                // Make sure the position is up-to-date.
+                coord.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), body.pos);
+            }
         }
     }
 }
