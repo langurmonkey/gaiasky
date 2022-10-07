@@ -1664,8 +1664,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // m - H = 5 * log10(r * D) + g
             // m: apparent magnitude
             // H: absolute magnitude
-            // r: dist to star [AU]
-            // D: dist to Earth [AU]
+            // r: dist from object to star [AU]
+            // D: dist from object to Earth [AU]
             // g: term for phase effects (~0)
             double distEarthAu = EntityUtils.getAbsolutePosition(earth, aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
             IFocus starAncestor = focus.getFirstStarAncestor(focusView);

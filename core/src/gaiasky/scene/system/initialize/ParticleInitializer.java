@@ -88,14 +88,14 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
             var mag = Mapper.magnitude.get(entity);
             var coordinates = Mapper.coordinates.get(entity);
-            if (!Float.isFinite(mag.absmag)) {
+            if (!Float.isFinite(mag.absMag)) {
                 double distPc;
                 if (coordinates.coordinates != null) {
                     distPc = coordinates.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31).lend() * Constants.U_TO_PC;
                 } else {
                     distPc = EntityUtils.getAbsolutePosition(entity, B31).lend() * Constants.U_TO_PC;
                 }
-                mag.absmag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, mag.appmag);
+                mag.absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, mag.appMag);
             }
         }
 
@@ -181,12 +181,12 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
     }
 
     private void setDerivedAttributes(Body body, Celestial celestial, Magnitude mag, ParticleExtra extra, boolean isStar) {
-        if (!Float.isFinite(mag.absmag)) {
+        if (!Float.isFinite(mag.absMag)) {
             // Default
-            mag.absmag = isStar ? 15.0f : -5.0f;
+            mag.absMag = isStar ? 15.0f : -5.0f;
         }
 
-        double flux = Math.pow(10, -mag.absmag / 2.5f);
+        double flux = Math.pow(10, -mag.absMag / 2.5f);
         setRGB(body, celestial);
 
         // Calculate size - This contains arbitrary boundary values to make
@@ -204,7 +204,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
      */
     private void setRGB(Body body, Celestial celestial) {
         if (body.color == null)
-            body.color = ColorUtils.BVtoRGB(celestial.colorbv);
+            body.color = ColorUtils.BVtoRGB(celestial.colorBv);
         EntityUtils.setColor2Data(body, celestial, 0.1f);
     }
 

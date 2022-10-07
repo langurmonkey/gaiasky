@@ -69,8 +69,9 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
 
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
-        // Find out index
-
+        if (data == null) {
+            return out;
+        }
         long dateWrap = data.getWrapTimeMs(date);
         int basei = data.getIndex(dateWrap);
 
@@ -99,7 +100,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             transf.rotate(0, 0, 1, orbitalParams.i);
             transf.rotate(0, 1, 0, orbitalParams.ascendingnode);
         } else {
-            if(entity != null && Mapper.trajectory.get(entity).model.isExtrasolar()) {
+            if (entity != null && Mapper.trajectory.get(entity).model.isExtrasolar()) {
                 transf.rotate(0, 1, 0, 90);
             }
         }
@@ -113,7 +114,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     }
 
     protected boolean isNewMethod() {
-        if(entity != null){
+        if (entity != null) {
             return Mapper.trajectory.get(entity).newMethod;
         }
         return false;

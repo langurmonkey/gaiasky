@@ -661,7 +661,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         } else if (particleSet != null) {
             return 0;
         } else if (mag != null) {
-            return mag.appmag;
+            return mag.appMag;
         } else {
             return 0;
         }
@@ -674,7 +674,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         } else if (particleSet != null) {
             return 0;
         } else if (mag != null) {
-            return mag.absmag;
+            return mag.absMag;
         } else {
             return 0;
         }

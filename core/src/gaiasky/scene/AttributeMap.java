@@ -21,7 +21,9 @@ public class AttributeMap {
 
     /**
      * Returns the component class to which the specified key is mapped.
+     *
      * @param key The key.
+     *
      * @return The component class.
      */
     public Class<? extends Component> get(String key) {
@@ -30,7 +32,9 @@ public class AttributeMap {
 
     /**
      * Checks whether the given key is in the attribute map.
+     *
      * @param key The key.
+     *
      * @return <code>true</code> if this map contains a mapping with the specified key.
      */
     public boolean containsKey(String key) {
@@ -54,10 +58,10 @@ public class AttributeMap {
         putAll(Rotation.class, "rotation");
 
         // Celestial
-        putAll(Celestial.class, "wikiname", "colorbv");
+        putAll(Celestial.class, "wikiname", "colorbv", "colorBv");
 
         // Magnitude
-        putAll(Magnitude.class, "appmag", "absmag");
+        putAll(Magnitude.class, "appmag", "appMag", "absmag", "absMag");
 
         // SolidAngleThresholds
         putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
