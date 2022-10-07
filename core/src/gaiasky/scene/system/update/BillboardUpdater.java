@@ -16,9 +16,6 @@ public class BillboardUpdater extends AbstractUpdateSystem {
 
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
-        // Recompute opacity from fade
-        var base = Mapper.base.get(entity);
-        var fade = Mapper.fade.get(entity);
 
     }
 }

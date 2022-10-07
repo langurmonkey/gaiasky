@@ -4,10 +4,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagNoProcess;
 
 public class DatasetDescriptionUpdater extends AbstractUpdateSystem {
-
 
     public DatasetDescriptionUpdater(Family family, int priority) {
         super(family, priority);
@@ -27,25 +27,26 @@ public class DatasetDescriptionUpdater extends AbstractUpdateSystem {
 
         if (alpha == 0 && ds.previousAlpha != 0) {
             // Turn off children.
-            processChildren(entity, false);
+            enableChildrenProcessing(entity, false);
         } else if (alpha > 0 && ds.previousAlpha == 0) {
             // Turn on children.
-            processChildren(entity, true);
+            enableChildrenProcessing(entity, true);
         }
 
         ds.previousAlpha = alpha;
     }
 
-    protected void processChildren(Entity entity, boolean on) {
+    public void enableChildrenProcessing(Entity entity, boolean enable) {
         var graph = Mapper.graph.get(entity);
         if (graph != null && graph.children != null && graph.children.size > 0) {
             for (var child : graph.children) {
-                if (on) {
+                if (enable) {
                     // Remove no-process tag.
                     child.remove(TagNoProcess.class);
                 } else {
                     // Add no-process tag.
-                    child.add(getEngine().createComponent(TagNoProcess.class));
+                    var engine = getEngine();
+                    child.add(engine != null ? engine.createComponent(TagNoProcess.class) : new TagNoProcess());
                 }
             }
         }

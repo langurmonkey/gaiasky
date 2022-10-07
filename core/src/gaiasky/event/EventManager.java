@@ -71,7 +71,7 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Subscribes the given observer to the given event types.
+     * Subscribe the given observer to the given event types.
      *
      * @param observer The observer to subscribe.
      * @param events   The event types to subscribe to.
@@ -83,7 +83,7 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Registers a listener for the specified message code. Messages without an
+     * Register a listener for the specified message code. Messages without an
      * explicit receiver are broadcast to all its registered listeners.
      *
      * @param msg      the message code
@@ -119,7 +119,7 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Unregisters all the subscriptions of the given listeners.
+     * Unregister all the subscriptions of the given listeners.
      *
      * @param listeners The listeners to remove.
      */
@@ -135,8 +135,9 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Removes all subscriptions of {@link gaiasky.scene.entity.EntityRadio} for the given entity.
-     * @param entity
+     * Remove all subscriptions of {@link gaiasky.scene.entity.EntityRadio} for the given entity.
+     *
+     * @param entity The entity.
      */
     public void removeRadioSubscriptions(Entity entity) {
         synchronized (subscriptions) {
@@ -144,11 +145,11 @@ public class EventManager implements IObserver {
             for (int key : km) {
                 Set<IObserver> set = subscriptions.get(key);
                 Iterator<IObserver> it = set.iterator();
-                while(it.hasNext()){
+                while (it.hasNext()) {
                     IObserver obs = it.next();
-                    if(obs instanceof EntityRadio){
+                    if (obs instanceof EntityRadio) {
                         EntityRadio radio = (EntityRadio) obs;
-                        if(radio.getEntity() == entity) {
+                        if (radio.getEntity() == entity) {
                             it.remove();
                         }
                     }
@@ -159,9 +160,9 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Unregisters all the listeners for the specified message code.
+     * Unregister all the listeners for the specified message code.
      *
-     * @param msg the message code
+     * @param msg The message code.
      */
     public void clearSubscriptions(Event msg) {
         synchronized (subscriptions) {
@@ -176,17 +177,19 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Posts an event to the default event manager instance.
-     * @param event The event.
+     * Register a new event to the default event manager instance with the given source
+     * and data.
+     *
+     * @param event  The event.
      * @param source The source object, if any.
-     * @param data The event data.
+     * @param data   The event data.
      */
     public static void publish(final Event event, Object source, final Object... data) {
         instance.post(event, source, data);
     }
 
     /**
-     * Posts a new dataless event coming from the given source object.
+     * Register a new data-less event with the given source.
      *
      * @param event  The event.
      * @param source The source object, if any.
@@ -196,7 +199,7 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Posts a new event coming from the given source object and with the given data.
+     * Register a new event with the given source and with the given data.
      *
      * @param event  The event.
      * @param source The source object, if any.
@@ -214,7 +217,22 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Posts or registers a new event type with the given data and the default
+     * Register a new delayed event in the default manager with the given type, data, delay and the default
+     * time frame. The default time frame can be changed using the event
+     * {@link Event#EVENT_TIME_FRAME_CMD}. The event will be passed along after
+     * the specified delay time [ms] in the given time frame has passed.
+     *
+     * @param event   The event.
+     * @param source  The source object, if any.
+     * @param delayMs Milliseconds of delay in the given time frame.
+     * @param data    The event data.
+     */
+    public static void publishDelayed(Event event, Object source, long delayMs, Object... data) {
+        instance.postDelayed(event, source, delayMs, data);
+    }
+
+    /**
+     * Register a new delayed event with the given type, data, delay and the default
      * time frame. The default time frame can be changed using the event
      * {@link Event#EVENT_TIME_FRAME_CMD}. The event will be passed along after
      * the specified delay time [ms] in the given time frame has passed.
@@ -225,22 +243,11 @@ public class EventManager implements IObserver {
      * @param data    The event data.
      */
     public void postDelayed(Event event, Object source, long delayMs, Object... data) {
-        if (delayMs <= 0) {
-            post(event, source, data);
-        } else {
-            Telegram t = pool.obtain();
-            t.event = event;
-            t.source = source;
-            t.data = data;
-            t.timestamp = defaultTimeFrame.getCurrentTimeMs() + delayMs;
-
-            // Add to queue
-            queues.get(defaultTimeFrame).add(t);
-        }
+        postDelayed(event, source, delayMs, defaultTimeFrame, data);
     }
 
     /**
-     * Posts or registers a new event type with the given data. The event will
+     * Register a new event with the given type, data, delay and time frame. The event will
      * be passed along after the specified delay time [ms] in the given time
      * frame has passed.
      *

@@ -39,7 +39,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
 
     public static <T extends AbstractOrbitCoordinates> T getInstance(Class<T> clazz) {
         for (AbstractOrbitCoordinates o : instances) {
-            if(clazz.isInstance(o)) {
+            if (clazz.isInstance(o)) {
                 return (T) o;
             }
         }
@@ -47,7 +47,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         T obj = null;
         try {
             obj = clazz.getDeclaredConstructor().newInstance();
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
         return obj;
@@ -65,7 +65,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
                 if (params[1] instanceof Entity) {
                     var trajectory = Mapper.trajectory.get(entity);
                     var orbitObject = (Entity) params[1];
-                    trajectory.setBody(orbitObject, EntityUtils.getRadius(entity));
+                    trajectory.setBody(orbitObject, EntityUtils.getRadius(orbitObject));
                 }
             }
         }

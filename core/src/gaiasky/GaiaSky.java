@@ -6,6 +6,7 @@
 package gaiasky;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
@@ -49,6 +50,7 @@ import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.ModelComponent;
+import gaiasky.scene.system.update.DatasetDescriptionUpdater;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
 import gaiasky.script.IScriptingInterface;
@@ -776,6 +778,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         initialized = true;
     }
 
+    /**
+     * Forces a global scene update.
+     * Updates the scene with a very small dt to force
+     * the re-computation of all entities.
+     */
     public void touchSceneGraph() {
         // Update whole tree to initialize positions.
         settings.runtime.octreeLoadActive = false;
@@ -783,8 +790,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         settings.runtime.timeOn = true;
         // Set non-zero time to force update the positions.
         time.update(1e-9);
-        // Update whole scene.
+
         scene.update(time);
+
         // Clear render lists.
         sceneRenderer.swapRenderLists();
         // Time back to zero.
@@ -1242,7 +1250,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Update clock.
         time.update(dtGs);
 
-        // Update events.
+        // Update delayed events.
         EventManager.instance.dispatchDelayedMessages();
 
         // Update cameras.

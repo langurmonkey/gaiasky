@@ -926,6 +926,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if a given component type is on
      *
      * @param comp The component
+     *
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -936,6 +937,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if the component types are all on
      *
      * @param comp The components
+     *
      * @return Whether the components are all on
      */
     public boolean allOn(ComponentTypes comp) {
@@ -959,15 +961,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * of all components
      *
      * @param comp The components
+     *
      * @return The alpha value
      */
     public float alpha(ComponentTypes comp) {
         float alpha = 1;
 
-            for (int i = comp.nextSetBit(0); i >= 0; i = comp.nextSetBit(i + 1)) {
-                // operate on index i here
-                alpha *= alphas[i];
-            }
+        for (int i = comp.nextSetBit(0); i >= 0; i = comp.nextSetBit(i + 1)) {
+            // operate on index i here
+            alpha *= alphas[i];
+        }
         return alpha;
     }
 
@@ -998,6 +1001,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                     // Only toggle
                     visible.flip(ct.ordinal());
                     times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
+                }
+                if (visible.get(ct.ordinal())) {
+                    // We turned visibility on, trigger scene update.
+                    EventManager.publish(Event.SCENE_FORCE_UPDATE, this);
                 }
             }
         }
@@ -1057,6 +1064,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      *
      * @param type The component type.
      * @param t    The current time in seconds.
+     *
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type, double t) {
