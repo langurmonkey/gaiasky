@@ -23,6 +23,8 @@
  */
 package gaiasky.util.gaia.time;
 
+import gaiasky.util.coord.AstroUtils;
+
 import java.io.Serializable;
 
 /**
@@ -46,7 +48,7 @@ public interface Duration extends Serializable {
     double SECS_PER_MIN = 60.;
     double MINS_PER_HOUR = 60.;
     double HOURS_PER_DAY = 24.;
-    double DAYS_PER_JULIAN_YEAR = 365.25D;
+    double DAYS_PER_JULIAN_YEAR = AstroUtils.JD_TO_Y;
     double HOURS_PER_REV = 6;
     double REVS_PER_DAY = 4;
 

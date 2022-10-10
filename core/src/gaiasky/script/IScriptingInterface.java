@@ -906,9 +906,9 @@ public interface IScriptingInterface {
 
     /**
      * Returns the current simulation time as the number of milliseconds since
-     * Jan 1, 1970 GMT.
+     * 1970-01-01T00:00:00Z (UTC).
      *
-     * @return Number of milliseconds since the epoch (Jan 1, 1970).
+     * @return Number of milliseconds since the epoch (Jan 1, 1970 00:00:00 UTC).
      */
     long getSimulationTime();
 

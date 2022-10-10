@@ -24,6 +24,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.i18n.I18n;
@@ -810,14 +811,14 @@ public class GlobalResources {
         double minutes = seconds / 60d;
         double hours = minutes / 60d;
         double days = hours / 24d;
-        double years = days / 365.25d;
+        double years = days / AstroUtils.JD_TO_Y;
         if (seconds < 60) {
             return String.format("%1$.0f %2$s", seconds, I18n.msg("gui.unit.second"));
         } else if (minutes < 60) {
             return String.format("%1$.0f %2$s", minutes, I18n.msg("gui.unit.minute"));
         } else if (hours < 24) {
             return String.format("%1$.0f %2$s", hours, I18n.msg("gui.unit.hour"));
-        } else if (days < 365.25d) {
+        } else if (days < AstroUtils.JD_TO_Y) {
             return String.format("%1$.0f %2$s", days, I18n.msg("gui.unit.day"));
         } else {
             return String.format("%1$.0f %2$s", years, I18n.msg("gui.unit.year"));

@@ -36,28 +36,24 @@ public class RotationComponent {
 
     /**
      * Sets the rotation period.
-     * 
-     * @param rotationPeriod
-     *            The period in hours.
+     *
+     * @param rotationPeriod The rotation period in hours.
      */
     public void setPeriod(Double rotationPeriod) {
         this.period = rotationPeriod;
-        if (rotationPeriod != null) {
-            angularVelocity = 360 / rotationPeriod;
-        }
+        angularVelocity = 360.0 / rotationPeriod;
     }
 
     public void update(ITimeFrameProvider time) {
-        double t = time.getTime().toEpochMilli() - AstroUtils.J2000_MS;
-        angle = (meridianAngle + angularVelocity * t * Nature.MS_TO_H) % 360d;
+        long t = time.getTime().toEpochMilli() - AstroUtils.J2000_MS;
+        angle = (meridianAngle + angularVelocity * t * Nature.MS_TO_H) % 360.0;
     }
 
     /**
      * Sets the axial tilt, the angle between the equatorial plane and the
      * orbital plane.
-     * 
-     * @param f
-     *            Angle in deg.
+     *
+     * @param f Angle in deg.
      */
     public void setAxialtilt(Double f) {
         this.axialTilt = f;
@@ -70,9 +66,8 @@ public class RotationComponent {
     /**
      * Sets the inclination, the angle between the orbital plane and the
      * reference plane
-     * 
-     * @param i
-     *            Inclination in deg.
+     *
+     * @param i Inclination in deg.
      */
     public void setInclination(Double i) {
         inclination = i;
@@ -81,9 +76,8 @@ public class RotationComponent {
     /**
      * Sets the inclination, the angle between the orbital plane and the
      * reference plane
-     * 
-     * @param i
-     *            Inclination in deg.
+     *
+     * @param i Inclination in deg.
      */
     public void setInclination(Long i) {
         inclination = i;
@@ -91,9 +85,8 @@ public class RotationComponent {
 
     /**
      * Sets the ascending node.
-     * 
-     * @param an
-     *            Angle in deg.
+     *
+     * @param an Angle in deg.
      */
     public void setAscendingnode(Double an) {
         this.ascendingNode = an;
@@ -101,9 +94,8 @@ public class RotationComponent {
 
     /**
      * Sets the meridian angle.
-     * 
-     * @param ma
-     *            Angle in deg.
+     *
+     * @param ma Angle in deg.
      */
     public void setMeridianangle(Double ma) {
         this.meridianAngle = ma;
