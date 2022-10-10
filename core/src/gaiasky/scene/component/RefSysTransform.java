@@ -19,6 +19,7 @@ public class RefSysTransform implements Component {
     public void setTransformFunction(String transformFunction) {
         setTransformName(transformFunction);
     }
+
     public void setTransformName(String transformFunction) {
         setMatrix(transformFunction);
     }
@@ -38,17 +39,17 @@ public class RefSysTransform implements Component {
                 }
                 this.matrix = trf;
 
-                if(floatVersion) {
+                if (floatVersion && this.matrix != null) {
                     this.matrixf = this.matrix.putIn(new Matrix4());
                 }
             } catch (Exception e) {
                 logger.error(e);
             }
         } else {
-            if(matrix != null) {
+            if (matrix != null) {
                 matrix.idt();
             }
-            if(matrixf != null) {
+            if (matrixf != null) {
                 matrixf.idt();
             }
         }

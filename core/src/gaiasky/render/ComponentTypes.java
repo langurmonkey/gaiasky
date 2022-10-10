@@ -56,16 +56,18 @@ public class ComponentTypes extends BitSet {
         Nebulae("icon-elem-nebulae"),
         Meshes("icon-elem-meshes"),
 
+        Labels("icon-elem-labels"),
+        Orbits("icon-elem-orbits"),
+        CosmicLocations("icon-elem-cosmiclocations"),
+        Locations("icon-elem-locations"),
+        Countries("icon-elem-countries"),
+
         Equatorial("icon-elem-equatorial"),
         Ecliptic("icon-elem-ecliptic"),
         Galactic("icon-elem-galactic"),
         RecursiveGrid("icon-elem-recgrid"),
-        Labels("icon-elem-labels"),
 
 
-        Orbits("icon-elem-orbits"),
-        Locations("icon-elem-locations"),
-        Countries("icon-elem-countries"),
         Constellations("icon-elem-constellations"),
         Boundaries("icon-elem-boundaries"),
 

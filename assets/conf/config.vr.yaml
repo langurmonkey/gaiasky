@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30202
+configVersion: 30300
 
 #
 # Data configuration
@@ -249,6 +249,7 @@ scene:
     Labels: true
     Orbits: true
     Locations: false
+    CosmicLocations: true
     Countries: false
     Constellations: false
     Boundaries: false

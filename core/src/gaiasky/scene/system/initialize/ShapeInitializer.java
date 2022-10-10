@@ -37,6 +37,12 @@ public class ShapeInitializer extends AbstractInitSystem {
         var line = Mapper.line.get(entity);
         var label = Mapper.label.get(entity);
         var shape = Mapper.shape.get(entity);
+        var transform = Mapper.transform.get(entity);
+
+        // Transform.
+        if (transform.matrix != null) {
+            transform.matrixf = transform.matrix.putIn(new Matrix4());
+        }
 
         // Label.
         label.label = true;
@@ -51,7 +57,7 @@ public class ShapeInitializer extends AbstractInitSystem {
         line.lineWidth = 1.5f;
 
         // Focusable.
-        if(shape.focusable) {
+        if (shape.focusable) {
             // Create focus component.
             var focus = new Focus();
             // Focus consumer.

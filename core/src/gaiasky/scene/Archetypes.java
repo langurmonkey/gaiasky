@@ -199,7 +199,7 @@ public class Archetypes {
             addArchetype(modelName("octreewrapper.OctreeWrapper"), modelName("SceneGraphNode"), Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
 
             // ShapeObject
-            addArchetype(modelName("ShapeObject"), modelName("SceneGraphNode"), Model.class, Shape.class, RenderType.class, Label.class, Line.class, Coordinates.class, SolidAngle.class);
+            addArchetype(modelName("ShapeObject"), modelName("SceneGraphNode"), Model.class, Shape.class, RenderType.class, Label.class, Line.class, Coordinates.class, SolidAngle.class, RefSysTransform.class);
 
             // KeyframesPathObject
             addArchetype(modelName("KeyframesPathObject"), modelName("VertsObject"), Keyframes.class, Label.class);
