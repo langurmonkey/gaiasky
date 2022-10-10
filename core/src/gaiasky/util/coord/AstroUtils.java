@@ -629,7 +629,7 @@ public class AstroUtils {
         long y = year + 4800L - a;
         long m = month + 12L * a - 3L;
 
-        return (day + ((153.0 * m + 2.0) / 5.0) + 365.0 * y + (y / 4.0) - (y / 100.0) + (y / 400.0) - 32045.5);
+        return (day + ((153L * m + 2L) / 5L) + 365L * y + (y / 4L) - (y / 100L) + (y / 400L) - 32045.5);
     }
 
     /**
@@ -649,7 +649,7 @@ public class AstroUtils {
         long y = year + 4800L - a;
         long m = month + 12L * a - 3L;
 
-        return day + ((153.0 * m + 2.0) / 5.0) + 365.0 * y + (y / 4.0) - 32083.5;
+        return day + ((153L * m + 2L) / 5L) + 365L * y + (y / 4L) - 32083.5;
     }
 
     public static Instant julianDateToInstant(double jd) {
