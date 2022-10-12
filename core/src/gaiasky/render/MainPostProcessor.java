@@ -288,11 +288,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         curvature.setEnabled(Settings.settings.program.modeStereo.active && Settings.settings.program.modeStereo.profile == StereoProfile.VR_HEADSET);
         ppb.set(curvature);
 
-        // FISHEYE DISTORTION (DOME)
+        // FISHEYE PROJECTION (LEGACY)
         Fisheye fisheye = new Fisheye(width, height);
         fisheye.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
-        fisheye.setMode(0);
-        fisheye.setEnabled(Settings.settings.postprocess.fisheye);
+        fisheye.setMode(Settings.settings.postprocess.fisheye.mode);
+        fisheye.setEnabled(Settings.settings.postprocess.fisheye.active);
         ppb.set(fisheye);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
@@ -778,15 +778,19 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             break;
         case FISHEYE_CMD:
             active = (Boolean) data[0];
+            int mode = (Integer) data[1];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
-                    if (fisheye != null)
+                    if (fisheye != null) {
                         fisheye.setEnabled(active);
+                        fisheye.setMode(mode);
+                    }
                     LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
-                    if (glow != null)
+                    if (glow != null) {
                         glow.setNSamples(active ? 1 : Settings.settings.postprocess.lightGlow.samples);
+                    }
                 }
             }
             break;

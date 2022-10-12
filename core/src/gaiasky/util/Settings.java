@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonValue.ValueType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,6 +39,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
+
+import static com.badlogic.gdx.utils.JsonValue.ValueType.object;
 
 /**
  * This class contains the settings for Gaia Sky, organized into
@@ -193,7 +196,7 @@ public class Settings {
                 return Path.of(location).resolve(pth);
             } else {
                 var p = Path.of(pth);
-                if(p.toFile().exists()) {
+                if (p.toFile().exists()) {
                     // Relative to working dir, or absolute.
                     return p;
                 } else {
@@ -1394,7 +1397,7 @@ public class Settings {
         public ToneMappingSettings toneMapping;
         public SSRSettings ssr;
         public MotionBlurSettings motionBlur;
-        public boolean fisheye;
+        public FisheyeSettings fisheye;
 
         public PostprocessSettings() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.FISHEYE_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);
@@ -1465,6 +1468,15 @@ public class Settings {
             public boolean active;
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class FisheyeSettings {
+            public boolean active;
+            /**
+             * The projection mode.
+             */
+            public int mode;
+        }
+
         public Antialias getAntialias(int code) {
             return switch (code) {
                 case -1 -> Antialias.FXAA;
@@ -1484,20 +1496,8 @@ public class Settings {
             case SSR_CMD -> ssr.active = (Boolean) data[0];
             case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
             case FISHEYE_CMD -> {
-                fisheye = (Boolean) data[0];
-
-                // Post a message to the screen
-                if (fisheye) {
-                    String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
-                    ModePopupInfo mpi = new ModePopupInfo();
-                    mpi.title = I18n.msg("gui.planetarium.title");
-                    mpi.header = I18n.msg("gui.planetarium.notice.header");
-                    mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
-
-                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "planetarium", 10f);
-                } else {
-                    EventManager.publish(Event.MODE_POPUP_CMD, this, null, "planetarium");
-                }
+                fisheye.active = (Boolean) data[0];
+                fisheye.mode = (Integer) data[1];
             }
             case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
             case CONTRAST_CMD -> levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
@@ -1886,7 +1886,7 @@ public class Settings {
         SYSTEM_DEFAULT;
 
         public ZoneId getTimeZone() {
-            if(this.equals(UTC)) {
+            if (this.equals(UTC)) {
                 return ZoneId.of("UTC");
             } else {
                 return ZoneOffset.systemDefault();

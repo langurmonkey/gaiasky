@@ -400,7 +400,7 @@ public enum Event {
      */
     EXPOSURE_CMD,
     /**
-     * Fisheye effect toggle. Contains a boolean with the state.
+     * Fisheye effect toggle. Contains a boolean with the state, and an integer with the mode.
      **/
     FISHEYE_CMD,
     /**

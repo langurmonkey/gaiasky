@@ -512,8 +512,10 @@ postprocess:
   lightGlow:
     active: true
     samples: 10
-  # Activate/deactivate fisheye transformation
-  fisheye: false
+  # Fisheye post-processing projection
+  fisheye:
+    active: true
+    mode: 1
   # Image levels
   levels:
     # Brightness level in [-1,1] (default=0)
