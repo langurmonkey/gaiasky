@@ -10,15 +10,22 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
+import gaiasky.util.scene2d.OwnTextIconButton;
 
 import java.text.DecimalFormat;
 
@@ -26,9 +33,11 @@ import java.text.DecimalFormat;
  * Full OpenGL GUI with all the controls and whistles.
  */
 public class StereoGui extends AbstractGui {
-    private Skin skin;
+    private final Skin skin;
 
     protected NotificationsInterface notificationsOne, notificationsTwo;
+    protected Container<Button> buttonContainer;
+    protected Button back;
     protected CustomInterface customInterface;
 
     protected DecimalFormat nf;
@@ -67,14 +76,14 @@ public class StereoGui extends AbstractGui {
 
         nf = new DecimalFormat("##0.###");
 
-        // NOTIFICATIONS ONE - BOTTOM LEFT
+        // Notifications one - Bottom left
         notificationsOne = new NotificationsInterface(skin, lock, true, true, false, false);
         notificationsOne.setFillParent(true);
         notificationsOne.left().bottom();
         notificationsOne.pad(0, 5, 5, 0);
         interfaces.add(notificationsOne);
 
-        // NOTIFICATIONS TWO - BOTTOM CENTRE
+        // Notifications two - Bottom centre
         notificationsTwo = new NotificationsInterface(skin, lock, true, true, false, false);
         notificationsTwo.setFillParent(true);
         notificationsTwo.bottom();
@@ -82,11 +91,30 @@ public class StereoGui extends AbstractGui {
         notificationsTwo.pad(0, 5, 5, 0);
         interfaces.add(notificationsTwo);
 
+        // Back to normal mode - Bottom right
+        float bw = 48f, bh = 48f;
+        KeyBindings kb = KeyBindings.instance;
+
+        buttonContainer = new Container<>();
+        back = new OwnImageButton(skin, "sc-exit");
+        back.setSize(bw, bh);
+        back.setName("exit stereo mode");
+        back.addListener(new OwnTextHotkeyTooltip(I18n.msg("gui.stereo.notice.back"), kb.getStringKeys("action.toggle/element.stereomode"), skin));
+        back.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active);
+            }
+            return false;
+        });
+        buttonContainer.setActor(back);
+        buttonContainer.setFillParent(true);
+        buttonContainer.bottom().right().pad(0, 0, 5, 5);
+
         // CUSTOM MESSAGES
         customInterface = new CustomInterface(ui, skin, lock);
         interfaces.add(customInterface);
 
-        /** ADD TO UI **/
+        /* ADD TO UI */
         rebuildGui();
 
     }
@@ -95,10 +123,15 @@ public class StereoGui extends AbstractGui {
 
         if (ui != null) {
             ui.clear();
-            if (notificationsOne != null)
+            if (notificationsOne != null) {
                 ui.addActor(notificationsOne);
-            if (notificationsTwo != null)
+            }
+            if (notificationsTwo != null) {
                 ui.addActor(notificationsTwo);
+            }
+            if (buttonContainer != null) {
+                ui.addActor(buttonContainer);
+            }
 
         }
     }
