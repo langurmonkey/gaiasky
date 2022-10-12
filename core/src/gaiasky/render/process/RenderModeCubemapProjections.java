@@ -54,6 +54,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
             yPosFlag = true;
             yNegFlag = true;
             zPosFlag = true;
+            assert cubemapEffect != null;
             zNegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
             setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
         } else {// In 360 mode we always need all sides
@@ -73,8 +74,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         // using planetarium mode and the aperture is <= 180 by
         // skipping the -Z direction (back). We manipulate
         // the cameras before rendering instead.
-        cubemapEffect.setPlanetariumAngle(0);
-        angleFromZenith = planetariumAngle;
+        cubemapEffect.setPlanetariumAngle(planetariumAngle);
     }
 
     private void setPlanetariumAperture(float planetariumAperture) {
@@ -137,13 +137,16 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
                             // Clear
                             dispose();
                             frameBufferCubeMap.clear();
-                        } else {
-                            // All good
                         }
+
                     });
                     break;
                 case PLANETARIUM_APERTURE_CMD:
                     setPlanetariumAperture((float) data[0]);
+                    // Update projection, we may not need -Z anymore!
+                    GaiaSky.postRunnable(() -> {
+                        setProjection(Settings.settings.program.modeCubemap.projection);
+                    });
                     break;
                 case PLANETARIUM_ANGLE_CMD:
                     setPlanetariumAngle((float) data[0]);

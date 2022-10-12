@@ -38,8 +38,6 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
 
     // Backup of fov value
     protected float fovBak;
-    // Angle from zenith, for planetarium mode
-    protected float angleFromZenith = 0;
 
     private final Mosaic mosaic;
 
@@ -97,12 +95,12 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         viewport.setScreenBounds(0, 0, wh, wh);
         viewport.apply();
 
-        // RIGHT +X
         if (xPosFlag) {
+            // RIGHT +X
             rc.cubemapSide = CubemapSide.SIDE_RIGHT;
 
-            cam.up.set(upBak).rotate(dirUpCrs, -angleFromZenith);
-            cam.direction.set(dirBak).rotate(dirUpCrs, -angleFromZenith).rotate(cam.up, -90);
+            cam.up.set(upBak);
+            cam.direction.set(dirBak).rotate(cam.up, -90);
             cam.update();
 
             renderFace(xPosFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -112,8 +110,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // LEFT -X
             rc.cubemapSide = CubemapSide.SIDE_LEFT;
 
-            cam.up.set(upBak).rotate(dirUpCrs, -angleFromZenith);
-            cam.direction.set(dirBak).rotate(dirUpCrs, -angleFromZenith).rotate(cam.up, 90);
+            cam.up.set(upBak);
+            cam.direction.set(dirBak).rotate(cam.up, 90);
             cam.update();
 
             renderFace(xNegFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -123,8 +121,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // UP +Y
             rc.cubemapSide = CubemapSide.SIDE_UP;
 
-            cam.direction.set(dirBak).rotate(dirUpCrs, -angleFromZenith + 90);
-            cam.up.set(upBak).rotate(dirUpCrs, -angleFromZenith + 90);
+            cam.direction.set(dirBak).rotate(dirUpCrs,  90);
+            cam.up.set(upBak).rotate(dirUpCrs, 90);
             cam.update();
 
             renderFace(yPosFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -134,8 +132,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // DOWN -Y
             rc.cubemapSide = CubemapSide.SIDE_DOWN;
 
-            cam.direction.set(dirBak).rotate(dirUpCrs, -angleFromZenith - 90);
-            cam.up.set(upBak).rotate(dirUpCrs, -angleFromZenith - 90);
+            cam.direction.set(dirBak).rotate(dirUpCrs, -90);
+            cam.up.set(upBak).rotate(dirUpCrs, -90);
             cam.update();
 
             renderFace(yNegFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -145,8 +143,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // FRONT +Z
             rc.cubemapSide = CubemapSide.SIDE_FRONT;
 
-            cam.direction.set(dirBak).rotate(dirUpCrs, -angleFromZenith);
-            cam.up.set(upBak).rotate(dirUpCrs, -angleFromZenith);
+            cam.direction.set(dirBak);
+            cam.up.set(upBak);
             cam.update();
 
             renderFace(zPosFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -156,8 +154,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // BACK -Z
             rc.cubemapSide = CubemapSide.SIDE_BACK;
 
-            cam.up.set(upBak).rotate(dirUpCrs, -angleFromZenith);
-            cam.direction.set(dirBak).rotate(dirUpCrs, -angleFromZenith).rotate(upBak, -180);
+            cam.up.set(upBak);
+            cam.direction.set(dirBak).rotate(upBak, -180);
             cam.update();
 
             renderFace(zNegFb, camera, sgr, ppb, rw, rh, wh, t);

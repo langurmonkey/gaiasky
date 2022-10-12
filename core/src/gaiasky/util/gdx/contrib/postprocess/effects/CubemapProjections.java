@@ -22,11 +22,11 @@ public final class CubemapProjections extends PostProcessorEffect {
         HAMMER,
         FISHEYE;
 
-        public boolean isPlanetarium(){
+        public boolean isPlanetarium() {
             return this.equals(FISHEYE);
         }
 
-        public boolean isPanorama(){
+        public boolean isPanorama() {
             return !isPlanetarium();
         }
     }
@@ -49,22 +49,23 @@ public final class CubemapProjections extends PostProcessorEffect {
         filter.setSides(xpositive, xnegative, ypositive, ynegative, zpositive, znegative);
     }
 
-    public void setViewportSize(float w, float h){
+    public void setViewportSize(float w, float h) {
         filter.setViewportSize(w, h);
     }
 
-    public void setPlanetariumAperture(float ap){
+    public void setPlanetariumAperture(float ap) {
         filter.setPlanetariumAperture(ap);
     }
 
-    public void setPlanetariumAngle(float angle){
+    public void setPlanetariumAngle(float angle) {
         filter.setPlanetariumAngle(angle);
     }
 
-    public float getPlanetariumAngle(){
+    public float getPlanetariumAngle() {
         return filter.getPlanetariumAngle();
     }
-    public float getPlanetariumAperture(){
+
+    public float getPlanetariumAperture() {
         return filter.getPlanetariumAperture();
     }
 
