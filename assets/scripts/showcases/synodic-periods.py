@@ -191,13 +191,25 @@ gs.sleep(1.0)
 cameraUpdater = CameraUpdaterRunnable()
 gs.parkCameraRunnable("camera-updater", cameraUpdater)
 
+gs.sleep(2)
+gs.startSimulationTime()
+gs.sleep(30)
+gs.stopSimulationTime()
 
-#gs.startSimulationTime()
 
-#gs.sleep(10)
-#gs.setVisibility("element.orbits", False)
-gs.sleep(60)
+gs.setFov(90)
+gs.setCameraFocus("Sun")
+gs.sleep(.5)
+#gs.setCameraFree()
+#In [3]: [i for i in gs.getCameraPosition()]
+gs.setCameraPosition([-1101643066.4062498, -5883867.740631103, -770956298.8281249])
+gs.sleep(0.5)
+#In [4]: [i for i in gs.getCameraUp()]
+gs.setCameraUp([-0.129836636345712, 0.9748286046965904, 0.1812502119384385])
+gs.setCameraFree()
 
+gs.startSimulationTime()
+gs.sleep(30)
 gs.stopSimulationTime()
 
 
@@ -222,6 +234,10 @@ gs.forceUpdateScene();
 # clean up and finish
 gs.cameraStop()
 # Finish flushing
+
+gs.sleep(1.0)
+gs.unparkRunnable("camera-updater")
+gs.sleep(1.0)
 gs.sleepFrames(4)
 
 gs.maximizeInterfaceWindow()

@@ -152,8 +152,10 @@ gs = gateway.entry_point
 gs.cameraStop()
 
 gs.stopSimulationTime()
+gs.setVisibility("element.milkyway", False)
 gs.setVisibility("element.orbits", False)
 gs.setVisibility("element.others",False)
+
 
 gs.setCameraOrientationLock(False)
 gs.setCameraLock(True)
@@ -178,6 +180,9 @@ gs.setCameraFree()
 cameraUpdater = CameraUpdaterRunnable()
 gs.parkCameraRunnable("camera-updater", cameraUpdater)
 
+gs.hideDataset("Gaia DR3 large")
+gs.sleep(2)
+gs.startSimulationTime()
 
 #gs.startSimulationTime()
 
@@ -189,6 +194,11 @@ gs.stopSimulationTime()
 
 # clean up and finish
 gs.cameraStop()
+gs.sleep(1.0)
+gs.unparkRunnable("camera-updater")
+gs.sleep(1.0)
+
+
 # Finish flushing
 gs.sleepFrames(4)
 
