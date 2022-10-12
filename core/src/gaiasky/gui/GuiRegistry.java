@@ -5,7 +5,6 @@
 
 package gaiasky.gui;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
-import gaiasky.data.SceneJsonLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -67,9 +65,10 @@ public class GuiRegistry implements IObserver {
     /**
      * Mode change info popup
      */
-    public Table modeChangeTable;
+    public Table modeChangeInfoPopup;
 
-    private RemoveActorThread removeActorThread;
+    /** Task to remove the information pop-up. **/
+    private Task removePopup;
 
     /**
      * Last open location
@@ -518,20 +517,20 @@ public class GuiRegistry implements IObserver {
                         float pad10 = 16f;
                         float pad5 = 8f;
                         float pad3 = 4.8f;
-                        if (modeChangeTable != null) {
-                            modeChangeTable.remove();
+                        if (modeChangeInfoPopup != null) {
+                            modeChangeInfoPopup.remove();
                         }
-                        modeChangeTable = new Table(skin);
-                        modeChangeTable.setName("mct-" + name);
-                        modeChangeTable.setBackground("table-bg");
-                        modeChangeTable.pad(pad10);
+                        modeChangeInfoPopup = new Table(skin);
+                        modeChangeInfoPopup.setName("mct-" + name);
+                        modeChangeInfoPopup.setBackground("table-bg");
+                        modeChangeInfoPopup.pad(pad10);
 
                         // Fill up table
                         OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
-                        modeChangeTable.add(ttl).left().padBottom(pad10).row();
+                        modeChangeInfoPopup.add(ttl).left().padBottom(pad10).row();
 
                         OwnLabel dsc = new OwnLabel(mpi.header, skin);
-                        modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
+                        modeChangeInfoPopup.add(dsc).left().padBottom(pad5 * 3f).row();
 
                         Table keysTable = new Table(skin);
                         for (Pair<String[], String> m : mpi.mappings) {
@@ -551,9 +550,9 @@ public class GuiRegistry implements IObserver {
                             keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
                             keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
                         }
-                        modeChangeTable.add(keysTable).center().row();
+                        modeChangeInfoPopup.add(keysTable).center().row();
                         if (mpi.warn != null && !mpi.warn.isEmpty()) {
-                            modeChangeTable.add(new OwnLabel(mpi.warn, skin, "mono-pink")).left().padTop(pad10).padBottom(pad5).row();
+                            modeChangeInfoPopup.add(new OwnLabel(mpi.warn, skin, "mono-pink")).left().padTop(pad10).padBottom(pad5).row();
                         }
                         OwnTextButton closeButton = new OwnTextButton(I18n.msg("gui.ok") + " [esc]", skin);
                         closeButton.pad(pad3, pad10, pad3, pad10);
@@ -564,23 +563,34 @@ public class GuiRegistry implements IObserver {
                             }
                             return false;
                         });
-                        modeChangeTable.add(closeButton).right().padTop(pad10 * 2f);
+                        modeChangeInfoPopup.add(closeButton).right().padTop(pad10 * 2f);
 
-                        modeChangeTable.pack();
+                        modeChangeInfoPopup.pack();
 
                         // Add table to UI
-                        Container<Table> mct = new Container<>(modeChangeTable);
+                        Container<Table> mct = new Container<>(modeChangeInfoPopup);
                         mct.setFillParent(true);
                         mct.top();
                         mct.pad(pad10 * 2, 0, 0, 0);
                         ui.addActor(mct);
 
-                        startModePopupInfoThread(modeChangeTable, seconds);
+                        // Cancel and schedule task
+                        cancelRemovePopupTask();
+                        removePopup = new Task() {
+                            @Override
+                            public void run() {
+                                if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent()) {
+                                    modeChangeInfoPopup.remove();
+                                }
+                            }
+                        };
+                        Timer.schedule(removePopup, seconds);
+
                     } else {
                         // Remove
-                        if (modeChangeTable != null && modeChangeTable.hasParent() && modeChangeTable.getName().equals("mct-" + name)) {
-                            modeChangeTable.remove();
-                            modeChangeTable = null;
+                        if (modeChangeInfoPopup != null && modeChangeInfoPopup.hasParent() && modeChangeInfoPopup.getName().equals("mct-" + name)) {
+                            modeChangeInfoPopup.remove();
+                            modeChangeInfoPopup = null;
                         }
                     }
                 }
@@ -699,23 +709,28 @@ public class GuiRegistry implements IObserver {
         return false;
     }
 
+    /**
+     * Cancels the task that removes the information pop-up if it is
+     * scheduled.
+     *
+     * @return True if the task was canceled, false if it was not scheduled.
+     */
+    private boolean cancelRemovePopupTask() {
+        if (removePopup != null && removePopup.isScheduled()) {
+            removePopup.cancel();
+            return true;
+        }
+        return false;
+    }
+
     public boolean removeModeChangePopup() {
         boolean removed = false;
-        if (modeChangeTable != null) {
-            removed = modeChangeTable.remove();
-            // Kill thread
-            if (removeActorThread != null && removeActorThread.isAlive()) {
-                removeActorThread.interrupt();
-                removeActorThread = null;
-            }
+        if (modeChangeInfoPopup != null) {
+            removed = modeChangeInfoPopup.remove();
+            cancelRemovePopupTask();
         }
 
         return removed;
-    }
-
-    private void startModePopupInfoThread(Actor actor, float seconds) {
-        removeActorThread = new RemoveActorThread(actor, seconds);
-        removeActorThread.start();
     }
 
     /**
