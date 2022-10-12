@@ -1537,7 +1537,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 mpi.addMapping(I18n.msg("gui.stereo.notice.back"), keysStrToggle);
                 mpi.addMapping(I18n.msg("gui.stereo.notice.profile"), keysStrProfile);
 
-                EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 120f);
+                EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 10f);
             } else {
                 EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
             }

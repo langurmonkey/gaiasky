@@ -749,7 +749,6 @@ public class Settings {
         @JsonIgnore public boolean safeModeFlag;
         public boolean debugInfo;
         public boolean offlineMode;
-        public boolean hud;
         public boolean saveProceduralTextures = false;
         public MinimapSettings minimap;
         public FileChooserSettings fileChooser;
@@ -987,6 +986,7 @@ public class Settings {
         public static class UiSettings {
             public String theme;
             public float scale;
+            public boolean modeChangeInfo;
             public DistanceUnits distanceUnits;
 
             /**
@@ -1085,7 +1085,7 @@ public class Settings {
                         mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
                     }
 
-                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 120f);
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 10f);
                 } else {
                     EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                 }
@@ -1491,7 +1491,7 @@ public class Settings {
                     mpi.header = I18n.msg("gui.planetarium.notice.header");
                     mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
 
-                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "planetarium", 120f);
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "planetarium", 10f);
                 } else {
                     EventManager.publish(Event.MODE_POPUP_CMD, this, null, "planetarium");
                 }

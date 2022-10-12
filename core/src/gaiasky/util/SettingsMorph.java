@@ -269,7 +269,6 @@ public class SettingsMorph {
         var program = new ProgramSettings();
         program.safeMode = bool("program.safe.graphics.mode", p);
         program.debugInfo = bool("program.debuginfo", p);
-        program.hud = bool("program.display.hud", p);
         program.fileChooser = new FileChooserSettings();
         program.fileChooser.showHidden = bool("program.filechooser.showhidden", p);
         program.fileChooser.lastLocation = str("program.last.filesystem.location", p);

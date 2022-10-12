@@ -375,6 +375,8 @@ program:
     scale: 1.5
     # Preferred distance units [PC|LY]
     distanceUnits: PC
+    # Show mode change pop-up dialogs (panorama, planetarium, stereoscopic, and game modes)
+    modeChangeInfo: true
   # Ask for confirmation on exit
   exitConfirmation: true
   # Set to 'default' to use the system default locale, set to

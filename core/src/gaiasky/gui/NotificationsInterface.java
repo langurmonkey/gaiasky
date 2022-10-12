@@ -19,6 +19,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Pair;
+import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
@@ -316,7 +317,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 break;
             case MODE_POPUP_CMD:
                 ModePopupInfo mpi = (ModePopupInfo) data[0];
-                if (mpi != null) {
+                if (mpi != null && Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
                     addMessage(mpi.title);
                     addMessage(mpi.header);
                     for (Pair<String[], String> p : mpi.mappings) {
@@ -330,7 +331,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                                 msg.append("+");
                             }
                         }
-                        msg.append("> " + action);
+                        msg.append("> ").append(action);
                         addMessage(msg.toString());
                     }
                 }

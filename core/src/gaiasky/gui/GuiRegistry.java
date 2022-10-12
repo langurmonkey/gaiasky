@@ -508,7 +508,7 @@ public class GuiRegistry implements IObserver {
                 this.skin = (Skin) data[0];
                 break;
             case MODE_POPUP_CMD:
-                if (Settings.settings.runtime.displayGui) {
+                if (Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
                     ModePopupInfo mpi = (ModePopupInfo) data[0];
                     String name = (String) data[1];
 
@@ -569,7 +569,7 @@ public class GuiRegistry implements IObserver {
                         modeChangeTable.pack();
 
                         // Add table to UI
-                        Container mct = new Container<>(modeChangeTable);
+                        Container<Table> mct = new Container<>(modeChangeTable);
                         mct.setFillParent(true);
                         mct.top();
                         mct.pad(pad10 * 2, 0, 0, 0);

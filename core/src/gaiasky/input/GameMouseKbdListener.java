@@ -110,7 +110,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
             mpi.addMapping("Toggle mouse capture", "SHIFT", "CTRL", "L");
             mpi.addMapping("Go back to focus mode", "1");
 
-            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "gamemode", 120f);
+            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "gamemode", 10f);
         });
     }
 

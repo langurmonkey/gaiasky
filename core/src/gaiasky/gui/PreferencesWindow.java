@@ -67,7 +67,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final DecimalFormat nf3;
 
-    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
+    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -850,11 +850,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // POINTER COORDINATES
-        OwnLabel pointerCoordsLabel = new OwnLabel(I18n.msg("gui.ui.pointercoordinates"), skin);
-        pointerCoords = new OwnCheckBox("", skin);
-        pointerCoords.setChecked(settings.program.pointer.coordinates);
-
         // MINIMAP SIZE
         OwnLabel minimapSizeLabel = new OwnLabel(I18n.msg("gui.ui.minimap.size"), skin, "default");
         minimapSizeLabel.setWidth(labelWidth);
@@ -877,6 +872,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         distUnitsSelect.setWidth(textWidth * 3f);
         distUnitsSelect.setSelectedIndex(settings.program.ui.distanceUnits.ordinal());
 
+        // MODE CHANGE POP-UP CHECKBOX
+        OwnLabel modeChangeInfoLabel = new OwnLabel(I18n.msg("gui.ui.modechangeinfo"), skin);
+        modeChangeInfo = new OwnCheckBox("", skin);
+        modeChangeInfo.setChecked(settings.program.ui.modeChangeInfo);
+
         // LABELS
         labels.addAll(langLabel, themeLabel);
 
@@ -888,12 +888,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ui.add(uiScalelabel).left().padRight(pad20).padBottom(pad10);
         ui.add(uiScale).left().padRight(pad5).padBottom(pad10);
         ui.add(applyUiScale).left().padBottom(pad10).row();
-        ui.add(pointerCoordsLabel).left().padRight(pad20).padBottom(pad10);
-        ui.add(pointerCoords).colspan(2).left().padRight(pad5).padBottom(pad10).row();
         ui.add(minimapSizeLabel).left().padRight(pad5).padBottom(pad10);
         ui.add(minimapSize).colspan(2).left().padRight(pad5).padBottom(pad10).row();
         ui.add(distUnitsLabel).left().padRight(pad5).padBottom(pad10);
         ui.add(distUnitsSelect).colspan(2).left().padRight(pad5).padBottom(pad10).row();
+        ui.add(modeChangeInfoLabel).left().padRight(pad5).padBottom(pad10);
+        ui.add(modeChangeInfo).colspan(2).left().padRight(pad5).padBottom(pad10).row();
 
 
         /* CROSSHAIR AND MARKERS */
@@ -932,6 +932,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel titleGuides = new OwnLabel(I18n.msg("gui.ui.pointer.guides"), skin, "header");
         Table pg = new Table();
 
+        // POINTER COORDINATES CHECKBOX
+        OwnLabel pointerCoordsLabel = new OwnLabel(I18n.msg("gui.ui.pointercoordinates"), skin);
+        pointerCoords = new OwnCheckBox("", skin);
+        pointerCoords.setChecked(settings.program.pointer.coordinates);
+
         // GUIDES CHECKBOX
         OwnLabel pointerGuidesLabel = new OwnLabel(I18n.msg("gui.ui.pointer.guides.display"), skin);
         pointerGuides = new OwnCheckBox("", skin);
@@ -962,7 +967,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to table
         pg.add(pointerGuidesLabel).left().padBottom(pad5).padRight(pad20);
-        pg.add(pointerGuides).left().colspan(2).padBottom(pad5);
+        pg.add(pointerGuides).left().colspan(2).padBottom(pad5).row();
+        pg.add(pointerCoordsLabel).left().padRight(pad20).padBottom(pad10);
+        pg.add(pointerCoords).colspan(2).left().padRight(pad5).padBottom(pad10).row();
         pg.add(guidesTooltip).left().colspan(2).padBottom(pad5).row();
         pg.add(pointerGuidesColorLabel).left().padBottom(pad5).padRight(pad20);
         pg.add(pointerGuidesColor).left().size(colorPickerSize).padBottom(pad5).row();
@@ -2168,7 +2175,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         boolean reloadLang = !languageBean.locale.toLanguageTag().equals(settings.program.getLocale());
         boolean reloadUI = reloadLang || !settings.program.ui.theme.equals(newTheme.value) || settings.program.minimap.size != minimapSize.getValue();
         settings.program.locale = languageBean.locale.toLanguageTag();
-        I18n.forceInit(new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/objects"));
+        I18n.forceInit(new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"), new FileHandle(Settings.ASSETS_LOC + File.separator + "i18n/objects"));
         settings.program.ui.theme = newTheme.value;
         boolean previousPointerCoords = settings.program.pointer.coordinates;
         settings.program.pointer.coordinates = pointerCoords.isChecked();
@@ -2194,6 +2201,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Distance units
         settings.program.ui.distanceUnits = DistanceUnits.values()[distUnitsSelect.getSelectedIndex()];
 
+        // Mode change info
+        settings.program.ui.modeChangeInfo = modeChangeInfo.isChecked();
+
         // Performance
         bean = numThreads.getSelected();
         settings.performance.numberThreads = bean.value;
@@ -2214,23 +2224,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // Screenshots
-        File ssfile = new File(screenshotsLocation.getText().toString());
-        if (ssfile.exists() && ssfile.isDirectory())
-            settings.screenshot.location = ssfile.getAbsolutePath();
+        File ssFile = new File(screenshotsLocation.getText().toString());
+        if (ssFile.exists() && ssFile.isDirectory())
+            settings.screenshot.location = ssFile.getAbsolutePath();
         ScreenshotMode prev = settings.screenshot.mode;
         settings.screenshot.mode = ScreenshotMode.values()[screenshotMode.getSelectedIndex()];
         int ssw = Integer.parseInt(sswidthField.getText());
         int ssh = Integer.parseInt(ssheightField.getText());
-        boolean ssupdate = ssw != settings.screenshot.resolution[0] || ssh != settings.screenshot.resolution[1] || !prev.equals(settings.screenshot.mode);
+        boolean ssUpdate = ssw != settings.screenshot.resolution[0] || ssh != settings.screenshot.resolution[1] || !prev.equals(settings.screenshot.mode);
         settings.screenshot.resolution[0] = ssw;
         settings.screenshot.resolution[1] = ssh;
-        if (ssupdate)
+        if (ssUpdate)
             EventManager.publish(Event.SCREENSHOT_SIZE_UPDATE, this, settings.screenshot.resolution[0], settings.screenshot.resolution[1]);
 
         // Frame output
-        File fofile = new File(frameOutputLocation.getText().toString());
-        if (fofile.exists() && fofile.isDirectory())
-            settings.frame.location = fofile.getAbsolutePath();
+        File foFile = new File(frameOutputLocation.getText().toString());
+        if (foFile.exists() && foFile.isDirectory())
+            settings.frame.location = foFile.getAbsolutePath();
         String text = frameoutputPrefix.getText();
         if (text.matches("^\\w+$")) {
             settings.frame.prefix = text;
@@ -2288,7 +2298,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.program.exitConfirmation = exitConfirmation.isChecked();
 
         // Save configuration
-        SettingsManager.instance.persistSettings(new File(System.getProperty("properties.file")));
+        SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
         EventManager.publish(Event.PROPERTIES_WRITTEN, this);
 
         if (reloadScreenMode) {

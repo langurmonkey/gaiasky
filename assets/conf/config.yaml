@@ -275,8 +275,6 @@ program:
   debugInfo: false
   # Offline mode: never attempt any connection - disables updates and dataset downloads
   offlineMode: false
-  # Whether to display the HUD
-  hud: false
   # Save all procedurally-generated textures to the data folder
   # WARN: watch your disk space!
   saveProceduralTextures: false
@@ -375,6 +373,8 @@ program:
     scale: 1.0
     # Preferred distance units [PC|LY]
     distanceUnits: PC
+    # Show mode change pop-up dialogs (panorama, planetarium, stereoscopic, and game modes)
+    modeChangeInfo: true
   # Ask for confirmation on exit
   exitConfirmation: true
   # Set to 'default' to use the system default locale, set to
