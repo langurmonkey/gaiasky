@@ -41,11 +41,11 @@ void main()
     float d = length(xy);
     if (d < 1.0) {
 
-        if (u_mode == 0){
+        float z = sqrt(1.0 - d * d);
+        if (u_mode == 0) {
             float arx = min(1.0, vp.y / vp.x);
             float ary = min(1.0, vp.x / vp.y);
 
-            float z = sqrt(1.0 - d * d);
             float r = atan(d, z) / PI;
             float phi = atan(xy.y, xy.x);
 
@@ -54,7 +54,6 @@ void main()
             uv.y = (r * sin(phi) + 0.5) * ary + (1.0 - ary) / 2.0;
             fragColor = texture(u_texture0, uv);
         } else {
-            float z = sqrt(1.0 - d * d);
             float a = 1.0 / (z * tan(u_fov * 0.5));
             fragColor = texture(u_texture0, (tc * a) + 0.5);
         }

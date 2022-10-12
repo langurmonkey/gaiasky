@@ -43,7 +43,6 @@ public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
         }
     }
 
-
     public FisheyeDistortion(float width, float height) {
         super(ShaderLoader.fromFile("screenspace", "fisheye"));
         viewport = new Vector2(width, height);
@@ -61,14 +60,15 @@ public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
 
     /**
      * Sets the field of view, in degrees. Only needed when mode=1 (accurate)
-     * @param fovDegrees
+     *
+     * @param fovDegrees The field of view in degrees.
      */
-    public void setFov(float fovDegrees){
+    public void setFov(float fovDegrees) {
         this.fov = (float) Math.toRadians(fovDegrees);
         setParam(Param.Fov, this.fov);
     }
 
-    public void setMode(int mode){
+    public void setMode(int mode) {
         this.mode = mode;
         setParam(Param.Mode, this.mode);
     }
