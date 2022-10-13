@@ -113,7 +113,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                         button3d.setChecked(false);
                     }
                     // Enable/disable
-                    EventManager.publish(Event.CUBEMAP_CMD, buttonDome, buttonDome.isChecked(), CubemapProjection.FISHEYE);
+                    EventManager.publish(Event.CUBEMAP_CMD, buttonDome, buttonDome.isChecked(), CubemapProjection.AZIMUTHAL_EQUIDISTANT);
                     fieldOfView.setDisabled(buttonDome.isChecked());
                     return true;
                 }

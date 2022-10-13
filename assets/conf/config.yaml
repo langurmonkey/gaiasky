@@ -320,7 +320,7 @@ program:
   modeCubemap:
     # Start in cubemap mode
     active: false
-    # Projection to use for the cubemap mode, in [EQUIRECTANGULAR|CYLINDRICAL|HAMMER|FISHEYE]
+    # Projection to use for the cubemap mode, in [EQUIRECTANGULAR|CYLINDRICAL|HAMMER|AZIMUTHAL_EQUIDISTANT]
     # Set to 'fisheye' for planetarium mode
     projection: EQUIRECTANGULAR
     # The resolution at which to render each side of the cubemap
@@ -335,7 +335,7 @@ program:
   net:
     # Enable the REST API on this TCP port (negative to disable)
     restPort: -1
-    # Master configuraiton
+    # Master configuration
     master:
       # Is master instance
       # This means that the status is sent over the network to the slaves
@@ -510,10 +510,15 @@ postprocess:
   lightGlow:
     active: true
     samples: 10
-  # Fisheye post-processing projection
-  fisheye:
-    active: true
-    mode: 1
+  # Re-projection as post processing.
+  # Modes are:
+  # DEFAULT, ACCURATE
+  # STEREOGRAPHIC_SCREEN, STEREOGRAPHIC_LONG, STEREOGRAPHIC_SHORT, STEREOGRAPHIC_180
+  # LAMBERT_SCREEN, LAMBERT_LONG, LAMBERT_SHORT, LAMBERT_180
+  # ORTHOGRAPHIC_SCREEN, ORTHOGRAPHIC_LONG, ORTHOGRAPHIC_SHORT, ORTHOGRAPHIC_180
+  reprojection:
+    active: false
+    mode: DEFAULT
   # Image levels
   levels:
     # Brightness level in [-1,1] (default=0)

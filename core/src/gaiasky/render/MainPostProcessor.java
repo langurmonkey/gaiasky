@@ -124,7 +124,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.FISHEYE_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED);
+        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -288,12 +288,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         curvature.setEnabled(Settings.settings.program.modeStereo.active && Settings.settings.program.modeStereo.profile == StereoProfile.VR_HEADSET);
         ppb.set(curvature);
 
-        // FISHEYE PROJECTION (LEGACY)
-        Fisheye fisheye = new Fisheye(width, height);
-        fisheye.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
-        fisheye.setMode(Settings.settings.postprocess.fisheye.mode);
-        fisheye.setEnabled(Settings.settings.postprocess.fisheye.active);
-        ppb.set(fisheye);
+        // RE-PROJECTION
+        Reprojection reprojection = new Reprojection(width, height);
+        reprojection.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
+        reprojection.setMode(Settings.settings.postprocess.reprojection.mode.mode);
+        reprojection.setEnabled(Settings.settings.postprocess.reprojection.active);
+        ppb.set(reprojection);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
         initLevels(ppb);
@@ -630,9 +630,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
                             lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
                         }
-                        Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
-                        if (fisheye != null)
-                            fisheye.setFov(newFov);
+                        Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
+                        if (reprojection != null)
+                            reprojection.setFov(newFov);
                     }
                 }
             });
@@ -776,16 +776,16 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             break;
-        case FISHEYE_CMD:
+        case REPROJECTION_CMD:
             active = (Boolean) data[0];
             int mode = (Integer) data[1];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
-                    if (fisheye != null) {
-                        fisheye.setEnabled(active);
-                        fisheye.setMode(mode);
+                    Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
+                    if (reprojection != null) {
+                        reprojection.setEnabled(active);
+                        reprojection.setMode(mode);
                     }
                     LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
                     if (glow != null) {

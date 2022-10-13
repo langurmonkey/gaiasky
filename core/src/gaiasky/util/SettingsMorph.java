@@ -252,7 +252,7 @@ public class SettingsMorph {
         postprocess.motionBlur.active = f32("postprocess.motionblur", p) != 0;
         postprocess.lensFlare.active = bool("postprocess.lensflare", p);
         postprocess.lightGlow.active = bool("postprocess.lightscattering", p);
-        postprocess.fisheye.active = bool("postprocess.fisheye", p);
+        postprocess.reprojection.active = bool("postprocess.fisheye", p);
         var levels = new LevelsSettings();
         levels.brightness = f32("postprocess.brightness", p);
         levels.contrast = f32("postprocess.contrast", p);

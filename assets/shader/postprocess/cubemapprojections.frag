@@ -71,7 +71,7 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc) {
 }
 #endif//hammer
 
-#ifdef fisheye
+#ifdef azimuthal
 uniform float u_planetariumAngle;
 uniform float u_planetariumAperture;
 
@@ -113,7 +113,7 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
     }
 
 }
-#endif//fisheye
+#endif//azimuthal
 
 void main(void){
     fragColor = cubeToProjection(u_cubemap, v_texCoords);

@@ -189,9 +189,9 @@ public class Constants {
     public static final long MAX_FADE_TIME_MS = 30000;
 
     /** Maximum fov value, in degrees **/
-    public static final float MAX_FOV = 95f;
+    public static final float MAX_FOV = 140f;
     /** Minimum fov value, in degrees **/
-    public static final float MIN_FOV = 2f;
+    public static final float MIN_FOV = 1f;
 
     /** Minimum limit/frame/camrec fps value **/
     public static final double MIN_FPS = 0.05d;

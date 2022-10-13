@@ -9,9 +9,9 @@ import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
- * Fisheye distortion filter
+ * A re-projection filter with a bunch of projection types, encoded in mode.
  */
-public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
+public final class ReprojectionFilter extends Filter<ReprojectionFilter> {
     private final Vector2 viewport;
     private float fov;
     private int mode = 0;
@@ -43,13 +43,13 @@ public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
         }
     }
 
-    public FisheyeDistortion(float width, float height) {
-        super(ShaderLoader.fromFile("screenspace", "fisheye"));
+    public ReprojectionFilter(float width, float height) {
+        super(ShaderLoader.fromFile("screenspace", "reprojection"));
         viewport = new Vector2(width, height);
         rebind();
     }
 
-    public FisheyeDistortion(int width, int height) {
+    public ReprojectionFilter(int width, int height) {
         this((float) width, (float) height);
     }
 
@@ -83,6 +83,7 @@ public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
         setParams(Param.Texture0, u_texture0);
         setParams(Param.Viewport, viewport);
         setParams(Param.Fov, fov);
+        setParams(Param.Mode, mode);
 
         endParams();
     }

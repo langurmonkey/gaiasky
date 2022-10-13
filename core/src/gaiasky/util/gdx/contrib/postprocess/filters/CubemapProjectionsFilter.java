@@ -25,7 +25,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
- * Cubemap projections (spherical, cylindrical, hammer, fisheye) filter.
+ * Cubemap projections (spherical, cylindrical, hammer, azimuthal equidistant) filter.
  */
 public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFilter> {
 
@@ -70,13 +70,13 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         ShaderProgram equirectangular = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define equirectangular");
         ShaderProgram cylindrical = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define cylindrical");
         ShaderProgram hammeraitoff = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define hammer");
-        ShaderProgram fisheye = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define fisheye");
+        ShaderProgram azimuthal = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define azimuthal");
 
         programs = new ShaderProgram[4];
         programs[0] = equirectangular;
         programs[1] = cylindrical;
         programs[2] = hammeraitoff;
-        programs[3] = fisheye;
+        programs[3] = azimuthal;
 
         super.program = equirectangular;
         rebind();
@@ -90,24 +90,24 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
      */
     public void setProjection(CubemapProjections.CubemapProjection proj) {
         switch (proj) {
-        case EQUIRECTANGULAR:
+        case EQUIRECTANGULAR -> {
             super.program = programs[0];
             rebind();
-            break;
-        case CYLINDRICAL:
+        }
+        case CYLINDRICAL -> {
             super.program = programs[1];
             rebind();
-            break;
-        case HAMMER:
+        }
+        case HAMMER -> {
             super.program = programs[2];
             rebind();
-            break;
-        case FISHEYE:
+        }
+        case AZIMUTHAL_EQUIDISTANT -> {
             super.program = programs[3];
             rebind();
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
     }
 

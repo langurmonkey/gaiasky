@@ -20,10 +20,10 @@ public final class CubemapProjections extends PostProcessorEffect {
         EQUIRECTANGULAR,
         CYLINDRICAL,
         HAMMER,
-        FISHEYE;
+        AZIMUTHAL_EQUIDISTANT;
 
         public boolean isPlanetarium() {
-            return this.equals(FISHEYE);
+            return this.equals(AZIMUTHAL_EQUIDISTANT);
         }
 
         public boolean isPanorama() {

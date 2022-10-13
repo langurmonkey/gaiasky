@@ -7,7 +7,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonValue.ValueType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,7 +20,6 @@ import gaiasky.gui.KeyBindings;
 import gaiasky.gui.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings.DataSettings.*;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
@@ -39,8 +37,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
-
-import static com.badlogic.gdx.utils.JsonValue.ValueType.object;
 
 /**
  * This class contains the settings for Gaia Sky, organized into
@@ -1397,10 +1393,10 @@ public class Settings {
         public ToneMappingSettings toneMapping;
         public SSRSettings ssr;
         public MotionBlurSettings motionBlur;
-        public FisheyeSettings fisheye;
+        public ReprojectionSettings reprojection;
 
         public PostprocessSettings() {
-            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.FISHEYE_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);
+            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
@@ -1469,12 +1465,16 @@ public class Settings {
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class FisheyeSettings {
+        public static class ReprojectionSettings {
             public boolean active;
-            /**
-             * The projection mode.
+            /*
+             * The re-projection mode.
              */
-            public int mode;
+            public ReprojectionMode mode;
+
+            public void setReprojection(final String reprojectionString) {
+                mode = ReprojectionMode.valueOf(reprojectionString.toUpperCase());
+            }
         }
 
         public Antialias getAntialias(int code) {
@@ -1495,9 +1495,9 @@ public class Settings {
             case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
             case SSR_CMD -> ssr.active = (Boolean) data[0];
             case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
-            case FISHEYE_CMD -> {
-                fisheye.active = (Boolean) data[0];
-                fisheye.mode = (Integer) data[1];
+            case REPROJECTION_CMD -> {
+                reprojection.active = (Boolean) data[0];
+                reprojection.mode = (ReprojectionMode) data[1];
             }
             case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
             case CONTRAST_CMD -> levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
@@ -1664,6 +1664,32 @@ public class Settings {
     public enum ImageFormat {
         PNG,
         JPG
+    }
+
+    public enum ReprojectionMode {
+        DEFAULT(0),
+        ACCURATE(1),
+
+        STEREOGRAPHIC_SCREEN(10),
+        STEREOGRAPHIC_LONG(11),
+        STEREOGRAPHIC_SHORT(12),
+        STEREOGRAPHIC_180(13),
+
+        LAMBERT_SCREEN(20),
+        LAMBERT_LONG(21),
+        LAMBERT_SHORT(22),
+        LAMBERT_180(23),
+
+        ORTHOGRAPHIC_SCREEN(20),
+        ORTHOGRAPHIC_LONG(21),
+        ORTHOGRAPHIC_SHORT(22),
+        ORTHOGRAPHIC_180(23);
+
+        public final int mode;
+
+        ReprojectionMode(int mode) {
+            this.mode = mode;
+        }
     }
 
     public enum StereoProfile {

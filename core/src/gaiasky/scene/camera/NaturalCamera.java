@@ -1692,7 +1692,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         boolean modeStereo = Settings.settings.program.modeStereo.active;
         boolean modeStereoVR = modeStereo && Settings.settings.program.modeStereo.isStereoVR();
         boolean modeCubemap = Settings.settings.program.modeCubemap.active;
-        boolean modeFisheye = Settings.settings.postprocess.fisheye.active;
+        boolean modeFisheye = Settings.settings.postprocess.reprojection.active;
         boolean modeVR = Settings.settings.runtime.openVr;
 
         if (modeStereoVR) {

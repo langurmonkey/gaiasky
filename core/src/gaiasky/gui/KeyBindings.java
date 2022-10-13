@@ -319,7 +319,7 @@ public class KeyBindings {
         // toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active;
-            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.FISHEYE);
+            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
         }, noPanorama));
 
         // toggle cubemap mode
@@ -330,8 +330,8 @@ public class KeyBindings {
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
-            int newprojidx = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 1);
-            EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newprojidx]);
+            int newProjectionIndex = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 1);
+            EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
         }));
 
         // increase star point size by 0.5

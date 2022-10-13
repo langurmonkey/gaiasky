@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Renders the cube map projection mode. Basically, it renders the six sides of
  * the cube map (front, back, up, down, right, left) with a 90 degree fov each
- * and applies a cube map projection (spherical, cylindrical, hammer, fisheye)
+ * and applies a cube map projection (spherical, cylindrical, hammer, azimuthal equidistant)
  */
 public class RenderModeCubemapProjections extends RenderModeCubemap implements IRenderMode, IObserver {
 
@@ -48,7 +48,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         if (cubemapEffect != null) {
             cubemapEffect.setProjection(projection);
         }
-        if (projection == CubemapProjection.FISHEYE) {// In planetarium mode we only render back iff aperture > 180
+        if (projection == CubemapProjection.AZIMUTHAL_EQUIDISTANT) {// In planetarium mode we only render back iff aperture > 180
             xPosFlag = true;
             xNegFlag = true;
             yPosFlag = true;
@@ -138,7 +138,6 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
                             dispose();
                             frameBufferCubeMap.clear();
                         }
-
                     });
                     break;
                 case PLANETARIUM_APERTURE_CMD:

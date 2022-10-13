@@ -402,7 +402,7 @@ public enum Event {
     /**
      * Fisheye effect toggle. Contains a boolean with the state, and an integer with the mode.
      **/
-    FISHEYE_CMD,
+    REPROJECTION_CMD,
     /**
      * Issues the command to flush the frame system.
      **/

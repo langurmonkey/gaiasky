@@ -7,49 +7,49 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.FisheyeDistortion;
+import gaiasky.util.gdx.contrib.postprocess.filters.ReprojectionFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Fisheye effect
  */
-public final class Fisheye extends PostProcessorEffect {
-    private final FisheyeDistortion fisheye;
+public final class Reprojection extends PostProcessorEffect {
+    private final ReprojectionFilter reprojection;
 
-    public Fisheye(float width, float height) {
-        fisheye = new FisheyeDistortion(width, height);
+    public Reprojection(float width, float height) {
+        reprojection = new ReprojectionFilter(width, height);
     }
 
-    public Fisheye(int width, int height) {
+    public Reprojection(int width, int height) {
         this((float) width, (float) height);
     }
 
     public void setViewportSize(int width, int height) {
-        this.fisheye.setViewportSize(width, height);
+        this.reprojection.setViewportSize(width, height);
     }
 
     public void setFov(float fovDegrees) {
-        this.fisheye.setFov(fovDegrees);
+        this.reprojection.setFov(fovDegrees);
     }
 
     public void setMode(int mode) {
-        this.fisheye.setMode(mode);
+        this.reprojection.setMode(mode);
     }
 
     @Override
     public void dispose() {
-        fisheye.dispose();
+        reprojection.dispose();
     }
 
     @Override
     public void rebind() {
-        fisheye.rebind();
+        reprojection.rebind();
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        fisheye.setInput(src).setOutput(dest).render();
+        reprojection.setInput(src).setOutput(dest).render();
     }
 
 }

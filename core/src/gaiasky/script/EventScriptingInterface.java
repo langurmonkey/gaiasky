@@ -55,6 +55,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.screenshot.ImageRenderer;
@@ -2586,18 +2587,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCubemapMode(boolean state, String projection) {
-        CubemapProjections.CubemapProjection newProj = CubemapProjections.CubemapProjection.valueOf(projection.toUpperCase());
+        CubemapProjections.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
         postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
     }
 
     @Override
     public void setPanoramaMode(boolean state) {
-        postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjections.CubemapProjection.EQUIRECTANGULAR));
+        postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjection.EQUIRECTANGULAR));
     }
 
     @Override
     public void setPlanetariumMode(boolean state) {
-        postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjections.CubemapProjection.FISHEYE));
+        postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjection.AZIMUTHAL_EQUIDISTANT));
     }
 
     @Override
@@ -2609,8 +2610,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCubemapProjection(String projection) {
-        if (checkStringEnum(projection, CubemapProjections.CubemapProjection.class, "projection")) {
-            CubemapProjections.CubemapProjection newProj = CubemapProjections.CubemapProjection.valueOf(projection.toUpperCase());
+        if (checkStringEnum(projection, CubemapProjection.class, "projection")) {
+            CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
             em.post(Event.CUBEMAP_PROJECTION_CMD, this, newProj);
         }
     }
