@@ -189,7 +189,7 @@ public class Constants {
     public static final long MAX_FADE_TIME_MS = 30000;
 
     /** Maximum fov value, in degrees **/
-    public static final float MAX_FOV = 140f;
+    public static final float MAX_FOV = 150f;
     /** Minimum fov value, in degrees **/
     public static final float MIN_FOV = 1f;
 

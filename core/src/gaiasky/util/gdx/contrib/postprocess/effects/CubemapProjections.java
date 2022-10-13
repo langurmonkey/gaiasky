@@ -20,6 +20,7 @@ public final class CubemapProjections extends PostProcessorEffect {
         EQUIRECTANGULAR,
         CYLINDRICAL,
         HAMMER,
+        ORTHOGRAPHIC,
         AZIMUTHAL_EQUIDISTANT;
 
         public boolean isPlanetarium() {

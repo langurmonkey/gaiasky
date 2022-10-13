@@ -115,6 +115,59 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 }
 #endif//azimuthal
 
+#ifdef orthographic
+// Orthographic (spherical) hemispherical view
+//vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
+//    vec2 vp = u_viewport;
+//    tc = tc * 2.0 - 1.0;
+//    vec2 arv = vp.xy / min(vp.x, vp.y);
+//    tc *= arv;
+//    
+//	float r = length(tc);
+//	if (r <= 1.0) {
+//        vec3 cubemaptc;
+//        cubemaptc.x = tc.x;
+//        cubemaptc.y = -tc.y;
+//        cubemaptc.z = sqrt(1.0-r*r);
+//        return texture(cubemap, cubemaptc);
+//    } else {
+//        return vec4(0.0, 0.0, 0.0, 1.0);
+//    }
+//}
+vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
+    vec2 vp = u_viewport;
+    tc = (tc-vec2(0.0,0.5))*2.0;
+    vec2 arv = vp.xy / min(vp.x/2., vp.y);
+    tc *= arv;
+    
+    if (tc.x<=arv.x){
+		tc.x = tc.x - arv.x/2.;
+	    float r = length(tc);
+	    if (r <= 1.0) {
+            vec3 cubemaptc;
+            cubemaptc.x = -tc.x;
+            cubemaptc.y = -tc.y;
+            cubemaptc.z = -sqrt(1.0-r*r);
+            return texture(cubemap, cubemaptc);
+        } else {
+            return vec4(0.0, 0.0, 0.0, 1.0);
+        }
+    } else {
+		tc.x = tc.x - arv.x*1.5;
+		float r = length(tc);
+	    if (r <= 1.0) {
+            vec3 cubemaptc;
+            cubemaptc.x = tc.x;
+            cubemaptc.y = -tc.y;
+            cubemaptc.z = sqrt(1.0-r*r);
+            return texture(cubemap, cubemaptc);
+        } else {
+            return vec4(0.0, 0.0, 0.0, 1.0);
+        }
+	}
+}
+#endif//orthographic
+
 void main(void){
     fragColor = cubeToProjection(u_cubemap, v_texCoords);
 }
