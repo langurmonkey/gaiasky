@@ -275,7 +275,7 @@ public class Settings {
         public boolean screenOutput;
 
         public GraphicsSettings() {
-            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD);
+            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD, Event.BACKBUFFER_SCALE_CMD);
         }
 
         public void setQuality(final String qualityString) {
@@ -318,6 +318,8 @@ public class Settings {
                     // When FPS limit is active, dynamic resolution must be inactive
                     GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
                 }
+            } else if (event == Event.BACKBUFFER_SCALE_CMD) {
+                backBufferScale = (Float) data[0];
             }
         }
     }

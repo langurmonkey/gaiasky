@@ -307,6 +307,9 @@ public class Constants {
     public static final float UI_SCALE_INTERNAL_MAX = 1.7f;
     public static final float UI_SCALE_MIN = 0.75f;
     public static final float UI_SCALE_MAX = 3.0f;
+    public static final float BACKBUFFER_SCALE_MIN = 1.0f;
+    public static final float BACKBUFFER_SCALE_MAX = 2.5f;
+    public static final float BACKBUFFER_SCALE_STEP = 0.25f;
 
     // Max time for VSOP87 algorithms
     public static final long MAX_VSOP_TIME_MS = 20000L * (long) Nature.Y_TO_MS;

@@ -84,7 +84,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField,
             frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution,
             plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
+    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
@@ -762,6 +762,28 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(dynamicResolutionLabel).left().padRight(pad20).padBottom(pad5);
             experimental.add(dynamicResolution).left().padRight(pad10).padBottom(pad5);
             experimental.add(dynamicResolutionTooltip).left().padBottom(pad5).row();
+
+            // Back-buffer scale
+            OwnLabel backBufferScaleLabel = new OwnLabel(I18n.msg("gui.backbuffer.scale"), skin);
+            backBufferScaleLabel.setDisabled(settings.graphics.dynamicResolution);
+            backBufferScale = new OwnSlider(Constants.BACKBUFFER_SCALE_MIN, Constants.BACKBUFFER_SCALE_MAX, Constants.BACKBUFFER_SCALE_STEP, skin);
+            backBufferScale.setWidth(textWidth * 3f);
+            backBufferScale.setMappedValue(settings.graphics.backBufferScale);
+            backBufferScale.setDisabled(settings.graphics.dynamicResolution);
+            OwnImageButton backBufferTooltip = new OwnImageButton(skin, "tooltip");
+            backBufferTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.backbuffer.scale.info"), skin));
+            dynamicResolution.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    backBufferScale.setDisabled(dynamicResolution.isChecked());
+                    backBufferScaleLabel.setDisabled(dynamicResolution.isChecked());
+                    return true;
+                }
+                return false;
+            });
+
+            experimental.add(backBufferScaleLabel).left().padRight(pad20).padBottom(pad5);
+            experimental.add(backBufferScale).left().padRight(pad10).padBottom(pad5);
+            experimental.add(backBufferTooltip).left().padBottom(pad5).row();
 
             // SSR
             OwnLabel ssrLabel = new OwnLabel(I18n.msg("gui.ssr"), skin);
@@ -2188,7 +2210,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Motion blur
         if (motionBlur != null) {
-            reloadRenderSystem = reloadRenderSystem || settings.postprocess.motionBlur.active != motionBlur.isChecked();
+            reloadRenderSystem = settings.postprocess.motionBlur.active != motionBlur.isChecked();
             GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked()));
         }
 
@@ -2196,6 +2218,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (ssr != null) {
             reloadRenderSystem = reloadRenderSystem || settings.postprocess.ssr.active != ssr.isChecked();
             GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
+        }
+
+        // Back-buffer scale
+        if (backBufferScale != null && !backBufferScale.isDisabled()) {
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.BACKBUFFER_SCALE_CMD, backBufferScale, backBufferScale.getValue()));
         }
 
         // Interface

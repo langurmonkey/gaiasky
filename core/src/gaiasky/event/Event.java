@@ -404,6 +404,10 @@ public enum Event {
      **/
     REPROJECTION_CMD,
     /**
+     * Sets the back-buffer scale. Contains the new scale as a float.
+     */
+    BACKBUFFER_SCALE_CMD,
+    /**
      * Issues the command to flush the frame system.
      **/
     FLUSH_FRAMES,

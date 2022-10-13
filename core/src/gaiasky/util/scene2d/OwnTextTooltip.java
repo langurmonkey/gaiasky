@@ -36,7 +36,7 @@ public class OwnTextTooltip extends Tooltip<Label> {
     }
 
     public OwnTextTooltip(String text, Skin skin) {
-        this(text, skin, -1);
+        this(text, skin, 12);
     }
 
     public OwnTextTooltip(String text, Skin skin, String styleName) {
