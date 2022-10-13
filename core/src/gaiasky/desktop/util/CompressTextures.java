@@ -1,14 +1,9 @@
 package gaiasky.desktop.util;
 
-import com.badlogic.gdx.tools.ktx.KTXProcessor;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 
 /**
  * Compresses all PNG and JPG files in the given location into ETC1A-compressed ZKTX files.

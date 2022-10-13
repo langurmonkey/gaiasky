@@ -180,23 +180,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return TextureUtils.isLoaded(diffuseUnpacked, manager)
-                && TextureUtils.isLoaded(normalUnpacked, manager)
-                && TextureUtils.isLoaded(specularUnpacked, manager)
-                && TextureUtils.isLoaded(emissiveUnpacked, manager)
-                && TextureUtils.isLoaded(ringUnpacked, manager)
-                && TextureUtils.isLoaded(ringnormalUnpacked, manager)
-                && TextureUtils.isLoaded(heightUnpacked, manager)
-                && TextureUtils.isLoaded(roughnessUnapcked, manager)
-                && TextureUtils.isLoaded(metallicUnpacked, manager)
-                && TextureUtils.isLoaded(aoUnapcked, manager)
-                && TextureUtils.isLoaded(diffuseCubemap, manager)
-                && TextureUtils.isLoaded(normalCubemap, manager)
-                && TextureUtils.isLoaded(emissiveCubemap, manager)
-                && TextureUtils.isLoaded(specularCubemap, manager)
-                && TextureUtils.isLoaded(roughnessCubemap, manager)
-                && TextureUtils.isLoaded(metallicCubemap, manager)
-                && TextureUtils.isLoaded(heightCubemap, manager);
+        return TextureUtils.isLoaded(diffuseUnpacked, manager) && TextureUtils.isLoaded(normalUnpacked, manager) && TextureUtils.isLoaded(specularUnpacked, manager) && TextureUtils.isLoaded(emissiveUnpacked, manager) && TextureUtils.isLoaded(ringUnpacked, manager) && TextureUtils.isLoaded(ringnormalUnpacked, manager) && TextureUtils.isLoaded(heightUnpacked, manager) && TextureUtils.isLoaded(roughnessUnapcked, manager) && TextureUtils.isLoaded(metallicUnpacked, manager)
+                && TextureUtils.isLoaded(aoUnapcked, manager) && TextureUtils.isLoaded(diffuseCubemap, manager) && TextureUtils.isLoaded(normalCubemap, manager) && TextureUtils.isLoaded(emissiveCubemap, manager) && TextureUtils.isLoaded(specularCubemap, manager) && TextureUtils.isLoaded(roughnessCubemap, manager) && TextureUtils.isLoaded(metallicCubemap, manager) && TextureUtils.isLoaded(heightCubemap, manager);
     }
 
     /**
@@ -204,7 +189,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -226,7 +210,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -595,11 +578,24 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     private void initializeElevationData(Texture tex) {
         if (!heightInitialized.get()) {
             heightInitialized.set(true);
+            Pixmap auxPix = null;
+            final boolean ktx = heightUnpacked.toLowerCase().endsWith(".ktx") || heightUnpacked.toLowerCase().endsWith(".zktx");
+            if (ktx) {
+                Texture t = new Texture(new FileHandle(heightUnpacked));
+                t.getTextureData().prepare();
+                auxPix = t.getTextureData().consumePixmap();
+            }
+            final Pixmap ktxPixmap = auxPix;
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Construct RAM height map from texture
                 String heightUnpacked = GlobalResources.unpackAssetPath(height);
                 GaiaSky.postRunnable(() -> logger.info("Constructing elevation data from texture: " + heightUnpacked));
-                Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
+                Pixmap heightPixmap;
+                if (!ktx) {
+                    heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
+                } else {
+                    heightPixmap = ktxPixmap;
+                }
                 float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
                 for (int i = 0; i < heightPixmap.getWidth(); i++) {
                     for (int j = 0; j < heightPixmap.getHeight(); j++) {
@@ -766,26 +762,32 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         this.diffuseCubemap = new CubemapComponent();
         this.diffuseCubemap.setLocation(cubemap);
     }
+
     public void setNormalCubemap(String cubemap) {
         this.normalCubemap = new CubemapComponent();
         this.normalCubemap.setLocation(cubemap);
     }
+
     public void setSpecularCubemap(String cubemap) {
         this.specularCubemap = new CubemapComponent();
         this.specularCubemap.setLocation(cubemap);
     }
+
     public void setEmissiveColormap(String cubemap) {
         this.emissiveCubemap = new CubemapComponent();
         this.emissiveCubemap.setLocation(cubemap);
     }
+
     public void setHeightCubemap(String cubemap) {
         this.heightCubemap = new CubemapComponent();
         this.heightCubemap.setLocation(cubemap);
     }
+
     public void setMetallicCubemap(String cubemap) {
         this.metallicCubemap = new CubemapComponent();
         this.metallicCubemap.setLocation(cubemap);
     }
+
     public void setRoughnessCubemap(String cubemap) {
         this.roughnessCubemap = new CubemapComponent();
         this.roughnessCubemap.setLocation(cubemap);
