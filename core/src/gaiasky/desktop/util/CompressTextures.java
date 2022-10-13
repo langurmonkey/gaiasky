@@ -1,0 +1,85 @@
+package gaiasky.desktop.util;
+
+import com.badlogic.gdx.tools.ktx.KTXProcessor;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import org.apache.commons.io.FileUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
+/**
+ * Compresses all PNG and JPG files in the given location into ETC1A-compressed ZKTX files.
+ * If the target files already exist, they are overwritten.
+ */
+public class CompressTextures {
+
+    /**
+     * Program CLI arguments.
+     */
+    private static class CLIArgs {
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+
+        @Parameter(names = { "-l", "--location" }, description = "Specify the directory to process.", order = 1, required = true) private String location = null;
+    }
+
+    /**
+     * Compresses all PNG and JPG files in the given location into ETC1A-compressed ZKTX files.
+     *
+     * @param args The directory to process.
+     */
+    public static void main(String[] args) {
+
+        CLIArgs cliArgs = new CLIArgs();
+        JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
+        jc.setProgramName("texturecompressor");
+        try {
+            jc.parse(args);
+
+            if (cliArgs.help) {
+                printUsage(jc);
+                return;
+            }
+        } catch (Exception e) {
+            System.out.print("gaiasky: bad program arguments\n\n");
+            printUsage(jc);
+        }
+
+        var loc = Path.of(cliArgs.location);
+        //if (Files.exists(loc)) {
+        //    try (Stream<Path> list = Files.list(loc)) {
+        //        list.forEach((entry) -> {
+        //            var file = entry.toFile();
+        //            if (file.exists() && file.isFile() && file.canRead()) {
+        //                var fileName = entry.toAbsolutePath().toString();
+        //                if (fileName.toLowerCase().endsWith(".jpg")
+        //                        || fileName.toLowerCase().endsWith(".jpeg")
+        //                        || fileName.toLowerCase().endsWith(".png")) {
+        //                    try {
+        //                        var outName = fileName.substring(0, fileName.lastIndexOf('.')) + ".zktx";
+        //                        var outFile = Path.of(outName).toFile();
+        //                        if (outFile.exists()) {
+        //                            // Delete!
+        //                            FileUtils.delete(outFile);
+        //                        }
+        //                        KTXProcessor.convert(fileName, outName, false, true, false);
+        //                    } catch (Exception e) {
+        //                        System.out.println("Error: " + e);
+        //                    }
+        //                }
+        //            }
+        //        });
+        //    } catch (IOException e) {
+        //        System.out.println("Error: " + e);
+        //    }
+        //} else {
+        //    System.out.println("Location does not exist: " + loc);
+        //}
+    }
+
+    private static void printUsage(JCommander jc) {
+        jc.usage();
+    }
+}
