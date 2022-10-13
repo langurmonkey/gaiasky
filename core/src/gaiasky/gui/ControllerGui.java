@@ -112,7 +112,6 @@ public class ControllerGui extends AbstractGui {
         // Widget width
         float ww = 400f;
         float wh = 64f;
-        float sw = ww;
         float sh = 96f;
         float tfw = 240f;
         // Tab width
@@ -284,7 +283,7 @@ public class ControllerGui extends AbstractGui {
         cameraModel[1][0] = fovSlider;
         fovSlider.setValueSuffix("°");
         fovSlider.setName("field of view");
-        fovSlider.setWidth(sw);
+        fovSlider.setWidth(ww);
         fovSlider.setHeight(sh);
         fovSlider.setValue(Settings.settings.scene.camera.fov);
         fovSlider.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
@@ -301,7 +300,7 @@ public class ControllerGui extends AbstractGui {
         camSpeedSlider = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraModel[1][1] = camSpeedSlider;
         camSpeedSlider.setName("camera speed");
-        camSpeedSlider.setWidth(sw);
+        camSpeedSlider.setWidth(ww);
         camSpeedSlider.setHeight(sh);
         camSpeedSlider.setMappedValue(Settings.settings.scene.camera.speed);
         camSpeedSlider.addListener(event -> {
@@ -316,7 +315,7 @@ public class ControllerGui extends AbstractGui {
         camRotSlider = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         cameraModel[1][2] = camRotSlider;
         camRotSlider.setName("rotate speed");
-        camRotSlider.setWidth(sw);
+        camRotSlider.setWidth(ww);
         camRotSlider.setHeight(sh);
         camRotSlider.setMappedValue(Settings.settings.scene.camera.rotate);
         camRotSlider.addListener(event -> {
@@ -331,7 +330,7 @@ public class ControllerGui extends AbstractGui {
         camTurnSlider = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         cameraModel[1][3] = camTurnSlider;
         camTurnSlider.setName("turn speed");
-        camTurnSlider.setWidth(sw);
+        camTurnSlider.setWidth(ww);
         camTurnSlider.setHeight(sh);
         camTurnSlider.setMappedValue(Settings.settings.scene.camera.turn);
         camTurnSlider.addListener(event -> {
@@ -480,7 +479,7 @@ public class ControllerGui extends AbstractGui {
 
         // Slider
         bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-19");
-        bloomSlider.setWidth(sw);
+        bloomSlider.setWidth(ww);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity * 10f);
         bloomSlider.addListener(event -> {
@@ -960,7 +959,7 @@ public class ControllerGui extends AbstractGui {
     public void touchDown() {
         if (currentModel != null) {
             Actor actor = currentModel[fi][fj];
-            if (actor != null && actor instanceof Button) {
+            if (actor instanceof Button) {
                 final Button b = (Button) actor;
 
                 InputEvent inputEvent = Pools.obtain(InputEvent.class);
@@ -975,7 +974,7 @@ public class ControllerGui extends AbstractGui {
     public void touchUp() {
         if (currentModel != null) {
             Actor actor = currentModel[fi][fj];
-            if (actor != null && actor instanceof Button) {
+            if (actor instanceof Button) {
                 final Button b = (Button) actor;
 
                 InputEvent inputEvent = Pools.obtain(InputEvent.class);
@@ -997,7 +996,7 @@ public class ControllerGui extends AbstractGui {
     public void notify(final Event event, Object source, final Object... data) {
         // Empty by default
         switch (event) {
-        case SHOW_CONTROLLER_GUI_ACTION:
+        case SHOW_CONTROLLER_GUI_ACTION -> {
             NaturalCamera cam = (NaturalCamera) data[0];
             if (content.isVisible() && content.getParent() != null) {
                 // Hide and remove
@@ -1020,22 +1019,17 @@ public class ControllerGui extends AbstractGui {
                 cam.removeGamepadListener();
                 addControllerListener(cam, cam.getGamepadListener().getMappings());
             }
-
-            break;
-        case TIME_STATE_CMD:
+        }
+        case TIME_STATE_CMD -> {
             boolean on = (Boolean) data[0];
             timeStartStop.setProgrammaticChangeEvents(false);
-
             timeStartStop.setChecked(on);
             timeStartStop.setText(on ? "Stop time" : "Start time");
-
             timeStartStop.setProgrammaticChangeEvents(true);
-            break;
-        case SCENE_LOADED:
-            this.scene = (Scene) data[0];
-            break;
-        default:
-            break;
+        }
+        case SCENE_LOADED -> this.scene = (Scene) data[0];
+        default -> {
+        }
         }
     }
 
