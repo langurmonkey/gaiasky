@@ -1681,10 +1681,10 @@ public class Settings {
         LAMBERT_SHORT(22),
         LAMBERT_180(23),
 
-        ORTHOGRAPHIC_SCREEN(20),
-        ORTHOGRAPHIC_LONG(21),
-        ORTHOGRAPHIC_SHORT(22),
-        ORTHOGRAPHIC_180(23);
+        ORTHOGRAPHIC_SCREEN(30),
+        ORTHOGRAPHIC_LONG(31),
+        ORTHOGRAPHIC_SHORT(32),
+        ORTHOGRAPHIC_180(33);
 
         public final int mode;
 
