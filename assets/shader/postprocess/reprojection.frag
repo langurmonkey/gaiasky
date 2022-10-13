@@ -19,23 +19,23 @@ uniform float u_fov;
 //
 // Stereographic:
 //
-// 10 - fit screen in projection (default)
-// 11 - fit long axis in screen
-// 12 - fit short axis in screen 
+// 10 - fit screen in projection
+// 11 - fit long axis on screen
+// 12 - fit short axis on screen 
 // 13 - fit 180deg fov
 //
 // Lambert:
 // 
-// 20 - fit screen in projection (default)
-// 21 - fit long axis in screen
-// 22 - fit short axis in screen 
+// 20 - fit screen in projection
+// 21 - fit long axis on screen
+// 22 - fit short axis on screen 
 // 23 - fit 180deg fov
 //
 // Orthographic:
 //
-// 30 - fit screen in projection (default)
-// 31 - fit long axis in screen
-// 32 - fit short axis in screen 
+// 30 - fit screen in projection
+// 31 - fit long axis on screen
+// 32 - fit short axis on screen 
 // 33 - fit 180deg fov
 uniform int u_mode;
 
@@ -86,10 +86,11 @@ void main()
         vec2 xy = tc * arv;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < 1.0) {
-            float z = sqrt(1.0 - d * d);
-            float a = 1.0 / (z * tan(u_fov * 0.5));
-            fragColor = texture(u_texture0, (tc * a) + 0.5);
+        float z = sqrt(1.0 - d * d);
+        float a = 1.0 / (z * tan(u_fov * 0.5));
+        vec2 tc1 = (tc * a) + 0.5;
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<1.) ) {
+            fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
         }
@@ -108,10 +109,9 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1/2.) {
-            float a=4./(4.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rtexture=tan(2*atan(rscreen/2))
+        float a=4./(4.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;//rtexture=tan(2*atan(rscreen/2))
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.) ) {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -127,10 +127,9 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if ((xy.x) < fov1/2.) {
-            float a=4./(4.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rtexture=tan(2*atan(rscreen/2))
+        float a=4./(4.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.) ){
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -150,10 +149,9 @@ void main()
         vec2 xy = tc * arv * fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if ((xy.y) < fov1v/2.) {
-            float a=4./(4.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rtexture=tan(2*atan(rscreen/2))
+        float a=4./(4.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.)  )  {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -163,14 +161,14 @@ void main()
         vec2 arv = vp.xy / min(vp.x, vp.y);
         float fov0 = 2.*tan(u_fov/2.);//fov in gnomonic projection coordinates -- along short axis
         float v_fov = u_fov;
-        float fov1 = 4.*tan(3.1415926/4.);//fov in new projection (Stereographic); //fov in new projection (orthographic). covers fov of 180deg.
+        float fov1 = 4.;//fov in new projection (Stereographic); //fov in new projection (orthographic). covers fov of 180deg.
         // Coordinates of current fragment
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1/2.) {
-            float a=4./(4.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
+        float a=4./(4.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.)  )   {
             //rtexture=tan(2*atan(rscreen/2))
             fragColor = texture(u_texture0, tc1);
         } else {
@@ -189,12 +187,11 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-
-        if (d < fov1/2.) {
-            d=d*d;
-            float a=sqrt(4.0-d)/(2.0-d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        d=d*d;
+        float a=sqrt(4.0-d)/(2.0-d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.) ) {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -208,12 +205,11 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-
-        if ((xy.x) < fov1/2.) {
-            d=d*d;
-            float a=sqrt(4.0-d)/(2.0-d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        d=d*d;
+        float a=sqrt(4.0-d)/(2.0-d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.) )  {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -232,13 +228,11 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-
-
-        if ((xy.y) < fov1v/2.) {
-            d=d*d;
-            float a=sqrt(4.0-d)/(2.0-d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        d=d*d;
+        float a=sqrt(4.0-d)/(2.0-d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.) )  {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -252,13 +246,11 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-
-
-        if (d < fov1/2.) {
-            d=d*d;
-            float a=sqrt(4.0-d)/(2.0-d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        d=d*d;
+        float a=sqrt(4.0-d)/(2.0-d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rscreen=sqrt(2/(1+x^2+sqrt(1+x^2)))*x ; x=rtexture
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<2.) )  {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -278,10 +270,10 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1/2.) {
-            float a=1./sqrt(1.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rtexture=tan(asin(rscreen))
+        float a=1./sqrt(1.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rtexture=tan(asin(rscreen))
+        if  ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<1.) )  {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -296,10 +288,10 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if ((xy.x) < fov1/2.) {
-            float a=1./sqrt(1.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rtexture=tan(asin(rscreen))
+        float a=1./sqrt(1.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rtexture=tan(asin(rscreen))
+        if  ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<1.) )   {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -319,10 +311,10 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if ((xy.y) < fov1v/2.) {
-            float a=1./sqrt(1.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rtexture=tan(asin(rscreen))
+        float a=1./sqrt(1.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rtexture=tan(asin(rscreen))
+        if  ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<1.) )  {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -337,10 +329,10 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1/2.) {
-            float a=1./sqrt(1.-d*d);
-            vec2 tc1=(xy*a)/arv/fov0+0.5;
-            //rtexture=tan(asin(rscreen))
+        float a=1./sqrt(1.-d*d);
+        vec2 tc1=(xy*a)/arv/fov0+0.5;
+        //rtexture=tan(asin(rscreen))
+        if ((tc1.y <=1) && (tc1.y >=0) && (tc1.x <=1) && (tc1.x >=0) && (d<1.) )   {
             fragColor = texture(u_texture0, tc1);
         } else {
             fragColor = vec4(0.0, 0.0, 0.0, 1.0);
