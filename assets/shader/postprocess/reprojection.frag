@@ -127,7 +127,7 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1/2.) {
+        if ((xy.x) < fov1/2.) {
             float a=4./(4.-d*d);
             vec2 tc1=(xy*a)/arv/fov0+0.5;
             //rtexture=tan(2*atan(rscreen/2))
@@ -150,7 +150,7 @@ void main()
         vec2 xy = tc * arv * fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1v/2.) {
+        if ((xy.y) < fov1v/2.) {
             float a=4./(4.-d*d);
             vec2 tc1=(xy*a)/arv/fov0+0.5;
             //rtexture=tan(2*atan(rscreen/2))
@@ -209,7 +209,7 @@ void main()
         // Distance from centre to current fragment
         float d = length(xy);
 
-        if (d < fov1/2.) {
+        if ((xy.x) < fov1/2.) {
             d=d*d;
             float a=sqrt(4.0-d)/(2.0-d);
             vec2 tc1=(xy*a)/arv/fov0+0.5;
@@ -234,7 +234,7 @@ void main()
         float d = length(xy);
 
 
-        if (d < fov1v/2.) {
+        if ((xy.y) < fov1v/2.) {
             d=d*d;
             float a=sqrt(4.0-d)/(2.0-d);
             vec2 tc1=(xy*a)/arv/fov0+0.5;
@@ -296,7 +296,7 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1/2.) {
+        if ((xy.x) < fov1/2.) {
             float a=1./sqrt(1.-d*d);
             vec2 tc1=(xy*a)/arv/fov0+0.5;
             //rtexture=tan(asin(rscreen))
@@ -319,7 +319,7 @@ void main()
         vec2 xy = tc * arv*fov1;
         // Distance from centre to current fragment
         float d = length(xy);
-        if (d < fov1v/2.) {
+        if ((xy.y) < fov1v/2.) {
             float a=1./sqrt(1.-d*d);
             vec2 tc1=(xy*a)/arv/fov0+0.5;
             //rtexture=tan(asin(rscreen))
