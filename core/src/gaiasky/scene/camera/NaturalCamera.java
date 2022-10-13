@@ -1692,16 +1692,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         boolean modeStereo = Settings.settings.program.modeStereo.active;
         boolean modeStereoVR = modeStereo && Settings.settings.program.modeStereo.isStereoVR();
         boolean modeCubemap = Settings.settings.program.modeCubemap.active;
-        boolean modeFisheye = Settings.settings.postprocess.reprojection.active;
+        boolean modeReprojection = Settings.settings.postprocess.reprojection.active;
         boolean modeVR = Settings.settings.runtime.openVr;
 
-        if (modeStereoVR) {
+        if (modeStereoVR || modeReprojection) {
             // No pointer guides or cross-hairs
             return;
         }
 
         // Pointer guides
-        if (Settings.settings.program.pointer.guides.active && !modeStereo && !modeFisheye && !modeCubemap && !modeVR) {
+        if (Settings.settings.program.pointer.guides.active && !modeStereo && !modeCubemap && !modeVR) {
             int mouseX = Gdx.input.getX();
             int mouseY = rh - Gdx.input.getY();
             shapeRenderer.begin(ShapeType.Line);
@@ -1716,12 +1716,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         spriteBatch.begin();
 
-        boolean decal = modeCubemap || modeStereo || modeFisheye || modeVR;
+        boolean decal = modeCubemap || modeStereo || modeVR;
         float chScale = 1f;
         if (modeCubemap) {
             chScale = 4f;
-        } else if (modeFisheye) {
-            chScale = 2f;
         }
         // Mark home in ORANGE
         if (Settings.settings.scene.crosshair.home) {

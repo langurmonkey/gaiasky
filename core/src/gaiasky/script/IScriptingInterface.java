@@ -2071,14 +2071,15 @@ public interface IScriptingInterface {
     /**
      * Enables and disables the planetarium mode.
      *
-     * @param state The boolean sate. True to activate, false to deactivate.
+     * @param state The boolean state. True to activate, false to deactivate.
      */
     void setPlanetariumMode(boolean state);
 
     /**
      * Enables and disables the cubemap mode.
      *
-     * @param state The boolean sate. True to activate, false to deactivate.
+     * @param state The boolean state. True to activate, false to deactivate.
+     * @param projection The projection as as string.
      */
     void setCubemapMode(boolean state, String projection);
 
@@ -2088,6 +2089,29 @@ public interface IScriptingInterface {
      * @param state The boolean staet. True to activate, false to deactivate.
      */
     void setPanoramaMode(boolean state);
+
+    /**
+     * Sets the re-projection mode. Possible modes are:
+     * <ul>
+     *     <li>"disabled"</li>
+     *     <li>"default"</li>
+     *     <li>"accurate"</li>
+     *     <li>"stereographic_screen"</li>
+     *     <li>"stereographic_long"</li>
+     *     <li>"stereographic_short"</li>
+     *     <li>"stereographic_180"</li>
+     *     <li>"lambert_screen"</li>
+     *     <li>"lambert_long"</li>
+     *     <li>"lambert_short"</li>
+     *     <li>"lambert_180"</li>
+     *     <li>"orthographic_screen"</li>
+     *     <li>"orthographic_long"</li>
+     *     <li>"orthographic_short"</li>
+     *     <li>"orthographic_180"</li>
+     * </ul>
+     * @param mode The re-projection mode, as a string.
+     */
+    void setReprojectionMode(String mode);
 
     /**
      * Sets the resolution (width and height are the same) of each side of the

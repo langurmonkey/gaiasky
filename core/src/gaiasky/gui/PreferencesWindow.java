@@ -67,15 +67,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final DecimalFormat nf3;
 
-    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
+    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb,
+            cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb,
+            pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
+            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines,
+            dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer,
+            numThreads, screenshotMode, frameOutputMode, nShadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin;
     private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
-    private OwnTextField fadeTimeField, widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
+    private OwnSelectBox<ReprojectionMode> reprojectionMode;
+    private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField,
+            frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution,
+            plResolution, plAperture, plAngle, smResolution, maxFpsInput;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
@@ -84,16 +92,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private Cell<?> noticeHiResCell;
     private Table controllersTable;
 
-    private GlobalResources globalResources;
-
     // Backup values
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
     private boolean lensflareBak, lightGlowBak, debugInfoBak;
-    private Settings settings;
+    private ReprojectionMode reprojectionBak;
+
+    private final GlobalResources globalResources;
+    private final Settings settings;
 
     // This flag is active when the dialog is called from the welcome screen
-    private boolean welcomeScreen = false;
+    private final boolean welcomeScreen;
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
         this(stage, skin, globalResources, false);
@@ -539,11 +548,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ComboBoxBean[] nsh = new ComboBoxBean[nSh];
         IntStream.rangeClosed(1, nSh).forEach(s -> nsh[s - 1] = new ComboBoxBean(String.valueOf(s), s));
 
-        nshadows = new OwnSelectBox<>(skin);
-        nshadows.setItems(nsh);
-        nshadows.setWidth(textWidth * 3f);
-        nshadows.setSelected(nsh[settings.scene.renderer.shadow.number - 1]);
-        nshadows.setDisabled(!settings.scene.renderer.shadow.active);
+        nShadows = new OwnSelectBox<>(skin);
+        nShadows.setItems(nsh);
+        nShadows.setWidth(textWidth * 3f);
+        nShadows.setSelected(nsh[settings.scene.renderer.shadow.number - 1]);
+        nShadows.setDisabled(!settings.scene.renderer.shadow.active);
 
         // ENABLE SHADOWS
         OwnLabel shadowsLabel = new OwnLabel(I18n.msg("gui.graphics.shadows.enable"), skin);
@@ -552,7 +561,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         shadowsCb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Enable or disable resolution
-                enableComponents(shadowsCb.isChecked(), smResolution, smResolutionLabel, nshadows, nShadowsLabel);
+                enableComponents(shadowsCb.isChecked(), smResolution, smResolutionLabel, nShadows, nShadowsLabel);
                 return true;
             }
             return false;
@@ -566,7 +575,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         shadows.add(smResolutionLabel).left().padRight(pad20).padBottom(pad5);
         shadows.add(smResolution).left().padRight(pad10).padBottom(pad5).row();
         shadows.add(nShadowsLabel).left().padRight(pad20).padBottom(pad5);
-        shadows.add(nshadows).left().padRight(pad10).padBottom(pad5);
+        shadows.add(nShadows).left().padRight(pad10).padBottom(pad5);
 
         // Add to content
         contentGraphicsTable.add(titleShadows).left().padBottom(pad10).row();
@@ -719,6 +728,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // EXPERIMENTAL
             Label titleExperimental = new OwnLabel(I18n.msg("gui.experimental"), skin, "header");
             Table experimental = new Table();
+
+            // Re-projection
+            OwnLabel reprojectionLabel = new OwnLabel(I18n.msg("gui.reproj"), skin);
+            ReprojectionMode[] reprojectionModes = ReprojectionMode.values();
+            reprojectionMode = new OwnSelectBox<>(skin);
+            reprojectionMode.setItems(reprojectionModes);
+            reprojectionMode.setWidth(textWidth * 3f);
+            if (!settings.postprocess.reprojection.active) {
+                reprojectionMode.setSelected(reprojectionModes[ReprojectionMode.DISABLED.ordinal()]);
+            } else {
+                reprojectionMode.setSelected(reprojectionModes[settings.postprocess.reprojection.mode.ordinal()]);
+            }
+            reprojectionMode.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    var newMode = reprojectionMode.getSelected();
+                    EventManager.publish(Event.REPROJECTION_CMD, this, newMode != ReprojectionMode.DISABLED, newMode);
+                    return true;
+                }
+                return false;
+            });
+
+            experimental.add(reprojectionLabel).left().padRight(pad20).padBottom(pad5);
+            experimental.add(reprojectionMode).left().padRight(pad10).padBottom(pad5).row();
 
             // Dynamic resolution
             OwnLabel dynamicResolutionLabel = new OwnLabel(I18n.msg("gui.dynamicresolution"), skin);
@@ -1267,17 +1299,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsSizeLabel.setDisabled(settings.screenshot.isSimpleMode());
         final OwnLabel xLabel = new OwnLabel("x", skin);
         IValidator screenshotsSizeValidator = new IntValidator(ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE);
-        sswidthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.screenshot.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, screenshotsSizeValidator);
-        sswidthField.setWidth(textWidth);
-        sswidthField.setDisabled(settings.screenshot.isSimpleMode());
-        ssheightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.screenshot.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, screenshotsSizeValidator);
-        ssheightField.setWidth(textWidth);
-        ssheightField.setDisabled(settings.screenshot.isSimpleMode());
+        ssWidthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.screenshot.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, screenshotsSizeValidator);
+        ssWidthField.setWidth(textWidth);
+        ssWidthField.setDisabled(settings.screenshot.isSimpleMode());
+        ssHeightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.screenshot.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, screenshotsSizeValidator);
+        ssHeightField.setWidth(textWidth);
+        ssHeightField.setDisabled(settings.screenshot.isSimpleMode());
         HorizontalGroup ssSizeGroup = new HorizontalGroup();
         ssSizeGroup.space(pad10);
-        ssSizeGroup.addActor(sswidthField);
+        ssSizeGroup.addActor(ssWidthField);
         ssSizeGroup.addActor(xLabel);
-        ssSizeGroup.addActor(ssheightField);
+        ssSizeGroup.addActor(ssHeightField);
 
         // Mode
         OwnLabel ssModeLabel = new OwnLabel(I18n.msg("gui.screenshots.mode"), skin);
@@ -1289,7 +1321,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 // Simple
                 // Redraw
-                enableComponents(screenshotMode.getSelected().value != 0, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
+                enableComponents(screenshotMode.getSelected().value != 0, ssWidthField, ssHeightField, screenshotsSizeLabel, xLabel);
                 return true;
             }
             return false;
@@ -1368,55 +1400,55 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Prefix
         OwnLabel prefixLabel = new OwnLabel(I18n.msg("gui.frameoutput.prefix"), skin);
-        frameoutputPrefix = new OwnTextField(settings.frame.prefix, skin, new RegexpValidator("^\\w+$"));
-        frameoutputPrefix.setWidth(textWidth * 3f);
+        frameOutputPrefix = new OwnTextField(settings.frame.prefix, skin, new RegexpValidator("^\\w+$"));
+        frameOutputPrefix.setWidth(textWidth * 3f);
 
         // FPS
         OwnLabel fpsLabel = new OwnLabel(I18n.msg("gui.target.fps"), skin);
-        frameoutputFps = new OwnTextField(nf3.format(settings.frame.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
-        frameoutputFps.setWidth(textWidth * 3f);
+        frameOutputFps = new OwnTextField(nf3.format(settings.frame.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
+        frameOutputFps.setWidth(textWidth * 3f);
 
         // Size
         final OwnLabel frameoutputSizeLabel = new OwnLabel(I18n.msg("gui.frameoutput.size"), skin);
         frameoutputSizeLabel.setDisabled(settings.frame.isSimpleMode());
         final OwnLabel xLabelfo = new OwnLabel("x", skin);
         IValidator frameoutputSizeValidator = new IntValidator(ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE);
-        fowidthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.frame.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, frameoutputSizeValidator);
-        fowidthField.setWidth(textWidth);
-        fowidthField.setDisabled(settings.frame.isSimpleMode());
-        foheightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.frame.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, frameoutputSizeValidator);
-        foheightField.setWidth(textWidth);
-        foheightField.setDisabled(settings.frame.isSimpleMode());
+        foWidthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.frame.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, frameoutputSizeValidator);
+        foWidthField.setWidth(textWidth);
+        foWidthField.setDisabled(settings.frame.isSimpleMode());
+        foHeightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.frame.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, frameoutputSizeValidator);
+        foHeightField.setWidth(textWidth);
+        foHeightField.setDisabled(settings.frame.isSimpleMode());
         HorizontalGroup foSizeGroup = new HorizontalGroup();
         foSizeGroup.space(pad10);
-        foSizeGroup.addActor(fowidthField);
+        foSizeGroup.addActor(foWidthField);
         foSizeGroup.addActor(xLabelfo);
-        foSizeGroup.addActor(foheightField);
+        foSizeGroup.addActor(foHeightField);
 
         // Mode
         OwnLabel fomodeLabel = new OwnLabel(I18n.msg("gui.screenshots.mode"), skin);
         ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.msg("gui.screenshots.mode.redraw"), 1) };
-        frameoutputMode = new OwnSelectBox<>(skin);
-        frameoutputMode.setItems(frameoutputModes);
-        frameoutputMode.setWidth(textWidth * 3f);
-        frameoutputMode.addListener(event -> {
+        frameOutputMode = new OwnSelectBox<>(skin);
+        frameOutputMode.setItems(frameoutputModes);
+        frameOutputMode.setWidth(textWidth * 3f);
+        frameOutputMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Simple
                 // Redraw
-                enableComponents(frameoutputMode.getSelected().value != 0, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
+                enableComponents(frameOutputMode.getSelected().value != 0, foWidthField, foHeightField, frameoutputSizeLabel, xLabelfo);
                 return true;
             }
             return false;
         });
-        frameoutputMode.setSelected(frameoutputModes[settings.frame.mode.ordinal()]);
-        frameoutputMode.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.screenshotmode"), skin));
+        frameOutputMode.setSelected(frameoutputModes[settings.frame.mode.ordinal()]);
+        frameOutputMode.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.screenshotmode"), skin));
 
         OwnImageButton frameoutputModeTooltip = new OwnImageButton(skin, "tooltip");
         frameoutputModeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup foModeGroup = new HorizontalGroup();
         foModeGroup.space(pad5);
-        foModeGroup.addActor(frameoutputMode);
+        foModeGroup.addActor(frameOutputMode);
         foModeGroup.addActor(frameoutputModeTooltip);
 
         // Counter
@@ -1445,9 +1477,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameoutput.add(frameoutputLocationLabel).left().padRight(pad20).padBottom(pad5);
         frameoutput.add(frameOutputLocation).left().expandX().padBottom(pad5).row();
         frameoutput.add(prefixLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(frameoutputPrefix).left().padBottom(pad5).row();
+        frameoutput.add(frameOutputPrefix).left().padBottom(pad5).row();
         frameoutput.add(fpsLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(frameoutputFps).left().padBottom(pad5).row();
+        frameoutput.add(frameOutputFps).left().padBottom(pad5).row();
         frameoutput.add(fomodeLabel).left().padRight(pad20).padBottom(pad5);
         frameoutput.add(foModeGroup).left().expandX().padBottom(pad5).row();
         frameoutput.add(frameoutputSizeLabel).left().padRight(pad20).padBottom(pad5);
@@ -1476,8 +1508,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.msg("gui.target.fps"), skin);
-        camrecFps = new OwnTextField(nf3.format(settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
-        camrecFps.setWidth(textWidth * 3f);
+        camRecFps = new OwnTextField(nf3.format(settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
+        camRecFps.setWidth(textWidth * 3f);
         OwnImageButton camrecFpsTooltip = new OwnImageButton(skin, "tooltip");
         camrecFpsTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.playcamera.targetfps"), skin));
 
@@ -1491,7 +1523,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 KeyframePreferencesWindow kpw = new KeyframePreferencesWindow(stage, skin);
                 kpw.setAcceptRunnable(() -> {
                     if (kpw.camrecFps != null && kpw.camrecFps.isValid()) {
-                        camrecFps.setText(kpw.camrecFps.getText());
+                        camRecFps.setText(kpw.camrecFps.getText());
                     }
                 });
                 kpw.show(stage);
@@ -1513,7 +1545,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to table
         camrec.add(camfpsLabel).left().padRight(pad20).padBottom(pad5);
-        camrec.add(camrecFps).left().expandX().padBottom(pad5);
+        camrec.add(camRecFps).left().expandX().padBottom(pad5);
         camrec.add(camrecFpsTooltip).left().padLeft(pad5).padBottom(pad5).row();
         camrec.add(autoCamrecLabel).left().padRight(pad20).padBottom(pad5);
         camrec.add(cbAutoCamrec).left().padBottom(pad5);
@@ -1929,11 +1961,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         toneMappingBak = settings.postprocess.toneMapping.type;
         exposureBak = settings.postprocess.toneMapping.exposure;
         debugInfoBak = settings.program.debugInfo;
+        reprojectionBak = settings.postprocess.reprojection.mode;
     }
 
     protected void reloadControllerMappings(Path selectedFile) {
         Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
-        Path mappingsAssets = Path.of(settings.ASSETS_LOC, SysUtils.getMappingsDirName());
+        Path mappingsAssets = Path.of(Settings.ASSETS_LOC, SysUtils.getMappingsDirName());
         Path mappingsData = SysUtils.getDefaultMappingsDir();
         Array<Path> mappingFiles = new Array<>();
         GlobalResources.listRecursive(mappingsAssets, mappingFiles, ".inputListener", ".controller");
@@ -2142,7 +2175,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Shadow mapping
         settings.scene.renderer.shadow.active = shadowsCb.isChecked();
         int newShadowResolution = Integer.parseInt(smResolution.getText());
-        int newShadowNumber = nshadows.getSelected().value;
+        int newShadowNumber = nShadows.getSelected().value;
         final boolean reloadShadows = shadowsCb.isChecked() && (settings.scene.renderer.shadow.resolution != newShadowResolution || settings.scene.renderer.shadow.number != newShadowNumber);
 
         // Fade time
@@ -2229,8 +2262,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             settings.screenshot.location = ssFile.getAbsolutePath();
         ScreenshotMode prev = settings.screenshot.mode;
         settings.screenshot.mode = ScreenshotMode.values()[screenshotMode.getSelectedIndex()];
-        int ssw = Integer.parseInt(sswidthField.getText());
-        int ssh = Integer.parseInt(ssheightField.getText());
+        int ssw = Integer.parseInt(ssWidthField.getText());
+        int ssh = Integer.parseInt(ssHeightField.getText());
         boolean ssUpdate = ssw != settings.screenshot.resolution[0] || ssh != settings.screenshot.resolution[1] || !prev.equals(settings.screenshot.mode);
         settings.screenshot.resolution[0] = ssw;
         settings.screenshot.resolution[1] = ssh;
@@ -2241,23 +2274,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         File foFile = new File(frameOutputLocation.getText().toString());
         if (foFile.exists() && foFile.isDirectory())
             settings.frame.location = foFile.getAbsolutePath();
-        String text = frameoutputPrefix.getText();
+        String text = frameOutputPrefix.getText();
         if (text.matches("^\\w+$")) {
             settings.frame.prefix = text;
         }
         prev = settings.frame.mode;
-        settings.frame.mode = ScreenshotMode.values()[frameoutputMode.getSelectedIndex()];
-        int fow = Integer.parseInt(fowidthField.getText());
-        int foh = Integer.parseInt(foheightField.getText());
+        settings.frame.mode = ScreenshotMode.values()[frameOutputMode.getSelectedIndex()];
+        int fow = Integer.parseInt(foWidthField.getText());
+        int foh = Integer.parseInt(foHeightField.getText());
         boolean frameOutputUpdate = fow != settings.frame.resolution[0] || foh != settings.frame.resolution[1] || !prev.equals(settings.frame.mode);
         settings.frame.resolution[0] = fow;
         settings.frame.resolution[1] = foh;
-        settings.frame.targetFps = Parser.parseDouble(frameoutputFps.getText());
+        settings.frame.targetFps = Parser.parseDouble(frameOutputFps.getText());
         if (frameOutputUpdate)
             EventManager.publish(Event.FRAME_SIZE_UPDATE, this, settings.frame.resolution[0], settings.frame.resolution[1]);
 
         // Camera recording
-        EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camrecFps.getText()));
+        EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camRecFps.getText()));
         settings.camrecorder.auto = cbAutoCamrec.isChecked();
 
         // Cubemap resolution (same as plResolution)
@@ -2356,6 +2389,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.EXPOSURE_CMD, this, exposureBak);
         EventManager.publish(Event.TONEMAPPING_TYPE_CMD, this, toneMappingBak);
         EventManager.publish(Event.SHOW_DEBUG_CMD, this, debugInfoBak);
+        EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
     }
 
     private void reloadLanguage() {

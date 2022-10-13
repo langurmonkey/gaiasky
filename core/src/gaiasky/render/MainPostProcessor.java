@@ -29,12 +29,9 @@ import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings.Antialias;
-import gaiasky.util.Settings.GraphicsQuality;
+import gaiasky.util.Settings.*;
 import gaiasky.util.Settings.PostprocessSettings.LensFlareSettings;
 import gaiasky.util.Settings.PostprocessSettings.LightGlowSettings;
-import gaiasky.util.Settings.StereoProfile;
-import gaiasky.util.Settings.ToneMapping;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
@@ -778,14 +775,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             break;
         case REPROJECTION_CMD:
             active = (Boolean) data[0];
-            int mode = (Integer) data[1];
+            ReprojectionMode mode = (ReprojectionMode) data[1];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
                     if (reprojection != null) {
                         reprojection.setEnabled(active);
-                        reprojection.setMode(mode);
+                        reprojection.setMode(mode.mode);
                     }
                     LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
                     if (glow != null) {

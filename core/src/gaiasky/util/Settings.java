@@ -1667,6 +1667,7 @@ public class Settings {
     }
 
     public enum ReprojectionMode {
+        DISABLED(-1),
         DEFAULT(0),
         ACCURATE(1),
 
@@ -1689,6 +1690,16 @@ public class Settings {
 
         ReprojectionMode(int mode) {
             this.mode = mode;
+        }
+
+        @Override
+        public String toString() {
+            String name = I18n.msg("gui.reproj.mode." + this.name().toLowerCase(I18n.locale));
+            if (name != null && !name.isEmpty()) {
+                return name;
+            } else {
+                return this.name();
+            }
         }
     }
 

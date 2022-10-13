@@ -512,13 +512,14 @@ postprocess:
     samples: 10
   # Re-projection as post processing.
   # Modes are:
+  # DISABLED
   # DEFAULT, ACCURATE
   # STEREOGRAPHIC_SCREEN, STEREOGRAPHIC_LONG, STEREOGRAPHIC_SHORT, STEREOGRAPHIC_180
   # LAMBERT_SCREEN, LAMBERT_LONG, LAMBERT_SHORT, LAMBERT_180
   # ORTHOGRAPHIC_SCREEN, ORTHOGRAPHIC_LONG, ORTHOGRAPHIC_SHORT, ORTHOGRAPHIC_180
   reprojection:
     active: false
-    mode: DEFAULT
+    mode: DISABLED
   # Image levels
   levels:
     # Brightness level in [-1,1] (default=0)

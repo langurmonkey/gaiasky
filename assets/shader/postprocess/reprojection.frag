@@ -46,8 +46,12 @@ layout (location = 0) out vec4 fragColor;
 
 void main()
 {
-    vec2 vp = u_viewport;
+    if (u_mode < 0) {
+        // Disabled, pass-through.
+        fragColor = texture(u_texture0, v_texCoords);
+    }
 
+    vec2 vp = u_viewport;
     vec2 texCoords = v_texCoords;
 
     // Fisheye:

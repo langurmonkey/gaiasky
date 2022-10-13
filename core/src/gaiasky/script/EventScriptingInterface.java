@@ -48,6 +48,7 @@ import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.ReprojectionMode;
 import gaiasky.util.Settings.ScreenshotSettings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
@@ -2587,13 +2588,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCubemapMode(boolean state, String projection) {
-        CubemapProjections.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
-        postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
+        if (checkStringEnum(projection, CubemapProjection.class, "projection")) {
+            CubemapProjections.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
+            postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
+        }
     }
 
     @Override
     public void setPanoramaMode(boolean state) {
         postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjection.EQUIRECTANGULAR));
+    }
+
+    @Override
+    public void setReprojectionMode(String mode) {
+        if (checkStringEnum(mode, ReprojectionMode.class, "re-projection mode")) {
+            ReprojectionMode newMode = ReprojectionMode.valueOf(mode.toUpperCase());
+            postRunnable(() -> em.post(Event.REPROJECTION_CMD, this, newMode != ReprojectionMode.DISABLED, newMode));
+        }
     }
 
     @Override
