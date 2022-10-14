@@ -121,7 +121,7 @@ public class AttributeMap {
         putAll(Constel.class, "ids");
 
         // Boundaries
-        putAll(Boundaries.class, "boundaries");
+        putAll(Boundaries.class, "boundaries", "boundariesEquatorial");
 
         // ParticleSet
         putAll(ParticleSet.class, "provider:ParticleGroup", "position:ParticleGroup", "datafile", "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits", "particleSizeLimits", "colorMin", "colorMax");
