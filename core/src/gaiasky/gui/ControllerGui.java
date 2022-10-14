@@ -824,7 +824,7 @@ public class ControllerGui extends AbstractGui {
      *
      * @param i     The column
      * @param j     The row
-     * @param right Whehter scan right or left
+     * @param right Whether scan right or left
      *
      * @return True if the element was selected, false otherwise
      */
@@ -835,6 +835,9 @@ public class ControllerGui extends AbstractGui {
             while (currentModel[fi][fj] == null) {
                 // Move to next column
                 fi = (fi + (right ? 1 : -1)) % currentModel.length;
+                if(fi < 0) {
+                    fi = currentModel.length - 1;
+                }
                 if (fi == i) {
                     return false;
                 }
@@ -920,7 +923,7 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void right() {
-        selectInRow(update(fi, 1, currentModel.length), fj, false);
+        selectInRow(update(fi, 1, currentModel.length), fj, true);
         updateFocused();
     }
 
