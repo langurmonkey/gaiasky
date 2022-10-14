@@ -330,7 +330,7 @@ public class KeyBindings {
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
-            int newProjectionIndex = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 1);
+            int newProjectionIndex = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 2);
             EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
         }));
 
