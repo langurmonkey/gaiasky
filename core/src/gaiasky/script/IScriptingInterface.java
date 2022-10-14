@@ -1492,7 +1492,7 @@ public interface IScriptingInterface {
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param name   The name of the object.
+     * @param name     The name of the object.
      * @param position The position in the internal reference system and internal units.
      */
     void setObjectPosition(String name, double[] position);
@@ -1502,7 +1502,7 @@ public interface IScriptingInterface {
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param object  The object in a focus view wrapper.
+     * @param object   The object in a focus view wrapper.
      * @param position The position in the internal reference system and internal units.
      */
     void setObjectPosition(FocusView object, double[] position);
@@ -1512,7 +1512,7 @@ public interface IScriptingInterface {
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
-     * @param object     The object entity.
+     * @param object   The object entity.
      * @param position The position in the internal reference system and internal units.
      */
     void setObjectPosition(Entity object, double[] position);
@@ -2078,15 +2078,15 @@ public interface IScriptingInterface {
     /**
      * Enables and disables the cubemap mode.
      *
-     * @param state The boolean state. True to activate, false to deactivate.
-     * @param projection The projection as as string.
+     * @param state      The boolean state. True to activate, false to deactivate.
+     * @param projection The projection as a string.
      */
     void setCubemapMode(boolean state, String projection);
 
     /**
      * Enables and disables the panorama mode.
      *
-     * @param state The boolean staet. True to activate, false to deactivate.
+     * @param state The boolean state. True to activate, false to deactivate.
      */
     void setPanoramaMode(boolean state);
 
@@ -2109,6 +2109,7 @@ public interface IScriptingInterface {
      *     <li>"orthographic_short"</li>
      *     <li>"orthographic_180"</li>
      * </ul>
+     *
      * @param mode The re-projection mode, as a string.
      */
     void setReprojectionMode(String mode);
@@ -2127,18 +2128,25 @@ public interface IScriptingInterface {
 
     /**
      * Sets the cubemap projection to use.
-     * Accepted values are "EQUIRECTANGULAR", "CYLINDRICAL" and "HAMMER".
+     * Accepted values are:
+     * <ul>
+     *     <li>"equirectangular" - spherical projection.</li>
+     *     <li>"cylindrical" - cylindrical projection.</li>
+     *     <li>"hammer" - Hammer projection.</li>
+     *     <li>"orthographic" - orthographic projection, with the two hemispheres side-by-side.</li>
+     *     <li>"azimuthal_equidistant" - azimuthal equidistant projection, used in Planetarium mode.</li>
+     * </ul>
      * See {@link CubemapProjections} for possible
      * values.
      *
-     * @param projection The projection, in ["EQUIRECTANGULAR"|"CYLINDRICAL"|"HAMMER"].
+     * @param projection The projection, in ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"azimuthal_equidistant"].
      */
     void setCubemapProjection(String projection);
 
     /**
      * Enables and disables the stereoscopic mode.
      *
-     * @param state The boolean sate. True to activate, false to deactivate.
+     * @param state The boolean state. True to activate, false to deactivate.
      */
     void setStereoscopicMode(boolean state);
 
