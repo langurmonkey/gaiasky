@@ -3,6 +3,7 @@ package gaiasky.scene.system.render.draw.line;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -208,6 +209,9 @@ public class LineEntityRenderSystem {
                 }
                 previous = point;
             }
+            // Join last to first.
+            Vector3d first = points.get(0);
+            renderer.addLine(lineView, (float) first.x, (float) first.y, (float) first.z, (float) previous.x, (float) previous.y, (float) previous.z, body.color[0], body.color[1], body.color[2], alpha * base.opacity);
         }
     }
 
@@ -340,7 +344,7 @@ public class LineEntityRenderSystem {
                 if (hasTime) {
                     // Non-periodic orbits with times and trail
                     dAlpha = 1 / (float) stIdx * (1 - trajectory.trailMap);
-                    if(!reverse) {
+                    if (!reverse) {
                         dAlpha = -dAlpha;
                     }
                     float cAlpha;
