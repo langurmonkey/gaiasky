@@ -22,10 +22,15 @@ import java.nio.file.Path;
 public abstract class AbstractGamepadListener implements ControllerListener, IInputListener, IObserver {
     private static final Log logger = Logger.getLogger(AbstractGamepadListener.class);
 
+    protected static final double AXIS_TH = 0.3;
+    protected static final long AXIS_EVT_DELAY = 250;
+    protected static final long AXIS_POLL_DELAY = 50;
+
     protected IControllerMappings mappings;
     protected final EventManager em;
     protected final IntSet pressedKeys;
 
+    protected long lastAxisEvtTime = 0, lastAxisPollTime = 0;
 
     public AbstractGamepadListener(String mappingsFile) {
         this.em = EventManager.instance;

@@ -10,27 +10,33 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.input.AbstractGamepadListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -47,6 +53,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -71,7 +78,11 @@ public class WelcomeGui extends AbstractGui {
     private DataDescriptor serverDatasets;
     private DataDescriptor localDatasets;
 
+    private Array<Button> buttonList;
+    private int currentSelected = 0;
+
     private PopupNotificationsInterface popupInterface;
+    private final WelcomeGuiControllerListener controllerListener;
 
     /**
      * Creates an initial GUI
@@ -85,6 +96,7 @@ public class WelcomeGui extends AbstractGui {
         this.lock = new Object();
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
+        this.controllerListener = new WelcomeGuiControllerListener(Settings.settings.controls.gamepad.mappingsFile);
     }
 
     @Override
@@ -109,6 +121,17 @@ public class WelcomeGui extends AbstractGui {
         } else {
             // Otherwise, check for updates, etc.
             clearGui();
+
+            if (Controllers.getControllers().size > 0) {
+                // Detected controllers -> schedule notification.
+                Task notification = new Task() {
+                    @Override
+                    public void run() {
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Detected " + Controllers.getControllers().size + " gamepad(s)!\nSome functions in Gaia Sky may require a keyboard and mouse.", 10f);
+                    }
+                };
+                Timer.schedule(notification, 2);
+            }
 
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json");
             DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null, (digest) -> GaiaSky.postRunnable(() -> {
@@ -161,6 +184,8 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWelcomeUI() {
+        addControllerListener();
+        buttonList = new Array<>();
         serverDatasets = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;
         reloadLocalDatasets();
         // Center table
@@ -215,6 +240,8 @@ public class WelcomeGui extends AbstractGui {
             }
             return true;
         });
+        buttonList.add(startButton);
+
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.msg("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
         startGroup.add(startLabel).top().left().padBottom(pad16).row();
@@ -251,6 +278,8 @@ public class WelcomeGui extends AbstractGui {
             }
             return true;
         });
+        buttonList.add(datasetManagerButton);
+
         Table datasetManagerInfo = new Table(skin);
         OwnLabel downloadLabel = new OwnLabel(I18n.msg("gui.welcome.dsmanager.desc"), skin, textStyle);
         datasetManagerInfo.add(downloadLabel).top().left().padBottom(pad16);
@@ -303,6 +332,7 @@ public class WelcomeGui extends AbstractGui {
                 Gdx.app.exit();
             }
         });
+        buttonList.add(quitButton);
 
         // Title
         center.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
@@ -326,32 +356,41 @@ public class WelcomeGui extends AbstractGui {
         // Bottom icons
         OwnTextIconButton about = new OwnTextIconButton("", skin, "help");
         about.addListener(new OwnTextTooltip(I18n.msg("gui.help.about"), skin, 10));
-        about.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
+        about.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
                 if (aboutWindow == null) {
                     aboutWindow = new AboutWindow(ui, skin);
                 }
                 if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
                     aboutWindow.show(ui);
                 }
+                return true;
             }
+            return false;
         });
         about.pack();
 
         OwnTextIconButton preferences = new OwnTextIconButton("", skin, "preferences");
         preferences.addListener(new OwnTextTooltip(I18n.msg("gui.preferences"), skin, 10));
-        preferences.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
+        preferences.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
                 if (preferencesWindow == null) {
                     preferencesWindow = new PreferencesWindow(ui, skin, GaiaSky.instance.getGlobalResources(), true);
                 }
                 if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
                     preferencesWindow.show(ui);
                 }
+                return true;
             }
+            return false;
         });
         preferences.pack();
         preferences.setSize(about.getWidth(), about.getWidth());
+
+        // Add to button list.
+        buttonList.add(preferences);
+        buttonList.add(about);
+
         HorizontalGroup bottomRight = new HorizontalGroup();
         bottomRight.space(pad18);
         bottomRight.addActor(preferences);
@@ -406,6 +445,7 @@ public class WelcomeGui extends AbstractGui {
                 }
             }
         }
+        updateFocused();
         EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_CMD);
     }
 
@@ -426,8 +466,12 @@ public class WelcomeGui extends AbstractGui {
         }
     }
 
+    /**
+     * Starts gaia sky.
+     */
     private void gaiaSky() {
         EventManager.instance.removeAllSubscriptions(this);
+        removeControllerListener();
         ensureBaseDataEnabled(serverDatasets);
 
         if (popupInterface != null) {
@@ -457,7 +501,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void savePreferences() {
         // Save configuration
-        SettingsManager.instance.persistSettings(new File(System.getProperty("properties.file")));
+        SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
         EventManager.publish(Event.PROPERTIES_WRITTEN, this);
     }
 
@@ -626,6 +670,124 @@ public class WelcomeGui extends AbstractGui {
             float uiScale = (Float) data[0];
             this.updateUnitsPerPixel(1f / uiScale);
         }
+        }
+    }
+
+    private void addControllerListener() {
+        Settings.settings.controls.gamepad.addControllerListener(controllerListener);
+        controllerListener.activate();
+    }
+
+    private void removeControllerListener() {
+        Settings.settings.controls.gamepad.removeControllerListener(controllerListener);
+        controllerListener.deactivate();
+    }
+
+    public void updateFocused() {
+        if (buttonList != null && buttonList.size != 0) {
+            Button actor = buttonList.get(currentSelected);
+            ui.setKeyboardFocus(actor);
+        }
+    }
+
+    private void up() {
+        if (currentSelected == 0) {
+            currentSelected = buttonList.size - 1;
+        } else {
+            currentSelected = (currentSelected - 1) % buttonList.size;
+        }
+        updateFocused();
+    }
+
+    private void down() {
+        currentSelected = (currentSelected + 1) % buttonList.size;
+        updateFocused();
+    }
+
+    public void touchDown() {
+    }
+
+    public void touchUp() {
+        if (buttonList != null) {
+            Button b = buttonList.get(currentSelected);
+            ChangeEvent event = Pools.obtain(ChangeEvent.class);
+            event.setTarget(b);
+            b.fire(event);
+            Pools.free(event);
+        }
+    }
+
+    /**
+     * Enable controller button selection.
+     */
+    private class WelcomeGuiControllerListener extends AbstractGamepadListener {
+
+        public WelcomeGuiControllerListener(String mappingsFile) {
+            super(mappingsFile);
+        }
+
+        @Override
+        public void connected(Controller controller) {
+
+        }
+
+        @Override
+        public void disconnected(Controller controller) {
+
+        }
+
+        @Override
+        public boolean buttonDown(Controller controller, int buttonCode) {
+            if (buttonCode == mappings.getButtonA()) {
+                touchDown();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean buttonUp(Controller controller, int buttonCode) {
+            if (buttonCode == mappings.getButtonStart()) {
+                gaiaSky();
+            } else if (buttonCode == mappings.getButtonA()) {
+                touchUp();
+            } else if (buttonCode == mappings.getButtonDpadUp()) {
+                up();
+            } else if (buttonCode == mappings.getButtonDpadDown()) {
+                down();
+            }
+            return false;
+        }
+
+        @Override
+        public boolean axisMoved(Controller controller, int axisCode, float value) {
+            if (Math.abs(value) > AXIS_TH && System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
+                // Event-based
+                if (axisCode == mappings.getAxisLstickV()) {
+                    // LEFT STICK vertical - move vertically
+                    if (value > 0) {
+                        down();
+                    } else {
+                        up();
+                    }
+                }
+                lastAxisEvtTime = System.currentTimeMillis();
+            }
+            return true;
+        }
+
+        @Override
+        public void update() {
+
+        }
+
+        @Override
+        public void activate() {
+
+        }
+
+        @Override
+        public void deactivate() {
+
         }
     }
 

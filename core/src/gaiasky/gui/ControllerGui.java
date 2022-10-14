@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -86,7 +87,7 @@ public class ControllerGui extends AbstractGui {
         model = new ArrayList<>();
         content = new Table(skin);
         menu = new Table(skin);
-        guiControllerListener = new GUIControllerListener();
+        guiControllerListener = new GUIControllerListener(Settings.settings.controls.gamepad.mappingsFile);
         tabButtons = new ArrayList<>();
         tabContents = new ArrayList<>();
         pad5 = 8f;
@@ -982,7 +983,6 @@ public class ControllerGui extends AbstractGui {
                 b.fire(inputEvent);
                 Pools.free(inputEvent);
             }
-
         }
     }
 
@@ -1017,7 +1017,7 @@ public class ControllerGui extends AbstractGui {
 
                 // Remove natural listener, add GUI listener
                 cam.removeGamepadListener();
-                addControllerListener(cam, cam.getGamepadListener().getMappings());
+                addControllerListener(cam);
             }
         }
         case TIME_STATE_CMD -> {
@@ -1047,9 +1047,9 @@ public class ControllerGui extends AbstractGui {
         return false;
     }
 
-    private void addControllerListener(NaturalCamera cam, IControllerMappings mappings) {
+    private void addControllerListener(NaturalCamera cam) {
         guiControllerListener.setCamera(cam);
-        guiControllerListener.setMappings(mappings);
+        guiControllerListener.updateControllerMappings(Settings.settings.controls.gamepad.mappingsFile);
         Settings.settings.controls.gamepad.addControllerListener(guiControllerListener);
         guiControllerListener.activate();
     }
@@ -1059,32 +1059,23 @@ public class ControllerGui extends AbstractGui {
         guiControllerListener.deactivate();
     }
 
-    private class GUIControllerListener implements ControllerListener, IInputListener {
-        private static final double AXIS_TH = 0.3;
-        private static final long AXIS_EVT_DELAY = 250;
-        private static final long AXIS_POLL_DELAY = 50;
+    private class GUIControllerListener extends AbstractGamepadListener {
 
         // Left and right stick values
         private float lStickX = 0;
         private float lStickY = 0;
         private float rStickX = 0;
         private final float rStickY = 0;
-        private long lastAxisEvtTime = 0, lastAxisPollTime = 0;
         private final EventManager em;
         private NaturalCamera cam;
-        private IControllerMappings mappings;
 
-        public GUIControllerListener() {
-            super();
+        public GUIControllerListener(String mappingsFile) {
+            super(mappingsFile);
             this.em = EventManager.instance;
         }
 
         public void setCamera(NaturalCamera cam) {
             this.cam = cam;
-        }
-
-        public void setMappings(IControllerMappings mappings) {
-            this.mappings = mappings;
         }
 
         @Override
