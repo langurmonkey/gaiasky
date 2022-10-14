@@ -366,7 +366,9 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
         return getFrameBuffer(w, h, 0);
     }
 
-    public void resize(final int w, final int h) {
+    public void resize(int rw, int rh, int tw, int th) {
+        final int w = tw;
+        final int h = th;
         if (Settings.settings.program.modeStereo.active) {
             extendViewport.update(w, h);
             stretchViewport.update(w, h);

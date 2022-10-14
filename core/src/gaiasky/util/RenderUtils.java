@@ -52,8 +52,8 @@ public class RenderUtils {
         float tw = tex.getWidth();
         float th = tex.getHeight();
         float tar = tw / th;
-        float gw = g.getWidth();
-        float gh = g.getHeight();
+        float gw = (float) (g.getWidth() * Settings.settings.graphics.backBufferScale);
+        float gh = (float) (g.getHeight() * Settings.settings.graphics.backBufferScale);
         float gar = gw / gh;
 
         if (lastSize != null && (tw != lastSize.x || th != lastSize.y)) {
@@ -71,24 +71,20 @@ public class RenderUtils {
         if (gw > tw && gh > th) {
             x = 0;
             y = 0;
-            w = tw;
-            h = th;
             // Texture contained in screen, extend texture keeping ratio
             if (gar > tar) {
                 // Graphics are stretched horizontally
                 sw = (int) tw;
                 sh = (int) (tw / gar);
 
-                sx = (int) ((tw - sw) / 2f);
-                sy = (int) ((th - sh) / 2f);
             } else {
                 // Graphics are stretched vertically
                 sw = (int) (th * gar);
                 sh = (int) th;
 
-                sx = (int) ((tw - sw) / 2f);
-                sy = (int) ((th - sh) / 2f);
             }
+            sx = (int) ((tw - sw) / 2f);
+            sy = (int) ((th - sh) / 2f);
         } else if (tw >= gw) {
             sx = (int) ((tw - gw) / 2f);
             if (th >= gh) {
@@ -96,8 +92,6 @@ public class RenderUtils {
             } else {
                 x = 0;
                 y = 0;
-                w = tw;
-                h = th;
                 sw = (int) (th * gar);
                 sh = (int) th;
 
@@ -106,19 +100,14 @@ public class RenderUtils {
             }
         } else {
             w = gw;
-            if (th >= gh) {
-                x = 0;
-                y = 0;
-                w = tw;
-                h = th;
-                sw = (int) tw;
-                sh = (int) (tw / gar);
+            x = 0;
+            y = 0;
+            w = tw;
+            sw = (int) tw;
+            sh = (int) (tw / gar);
 
-                sx = (int) ((tw - sw) / 2f);
-                sy = (int) ((th - sh) / 2f);
-            } else {
-                h = gh;
-            }
+            sx = (int) ((tw - sw) / 2f);
+            sy = (int) ((th - sh) / 2f);
         }
         sb.begin();
         sb.draw(tex, x, y, w, h, sx, sy, sw, sh, false, true);

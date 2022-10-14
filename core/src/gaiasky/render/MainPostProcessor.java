@@ -368,7 +368,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     /**
-     * Updates the post processing effects' attributes using the new graphics quality
+     * Updates the post-processing effects' attributes using the new graphics quality
      *
      * @param ppb The post process bean
      * @param gq  The graphics quality
@@ -474,13 +474,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     @Override
-    public void resize(final int width, final int height) {
-        GaiaSky.postRunnable(() -> replace(RenderType.screen, (float) (width * Settings.settings.graphics.backBufferScale), (float) (height * Settings.settings.graphics.backBufferScale), width, height));
+    public void resize(final int width, final int height, final int targetWidth, final int targetHeight) {
+        GaiaSky.postRunnable(() -> resizeImmediate(width, height, targetWidth, targetHeight));
     }
 
     @Override
-    public void resizeImmediate(final int width, final int height) {
-        replace(RenderType.screen, (float) (width * Settings.settings.graphics.backBufferScale), (float) (height * Settings.settings.graphics.backBufferScale), width, height);
+    public void resizeImmediate(final int width, final int height, int targetWidth, int targetHeight) {
+        replace(RenderType.screen, width, height, targetWidth, targetHeight);
     }
 
     @Override

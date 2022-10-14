@@ -196,9 +196,9 @@ public interface IPostProcessor extends Disposable {
 
     PostProcessBean getPostProcessBean(RenderType type);
 
-    void resize(int width, int height);
+    void resize(int width, int height, int targetWidth, int targetHeight);
 
-    void resizeImmediate(int width, int height);
+    void resizeImmediate(int width, int height, int targetWidth, int targetHeight);
 
     boolean isLightScatterEnabled();
 }

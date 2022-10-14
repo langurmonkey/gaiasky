@@ -1348,12 +1348,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 if (loadingGui != null)
                     loadingGui.resizeImmediate(width, height);
             } else {
-                if (resizePostProcessors)
-                    postProcessor.resizeImmediate(renderWidth, renderHeight);
+                if (resizePostProcessors) {
+                    postProcessor.resizeImmediate(renderWidth, renderHeight, width, height);
+                }
 
-                if (resizeGuis)
-                    for (IGui gui : guis)
+                if (resizeGuis) {
+                    for (IGui gui : guis) {
                         gui.resizeImmediate(width, height);
+                    }
+                }
 
                 sceneRenderer.resize(width, height, renderWidth, renderHeight, resizeRenderSys);
 
@@ -1668,11 +1671,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             logger.info("Re-initializing main renderer");
             if (sceneRenderer != null) {
                 sceneRenderer.dispose();
+                // Initialize and load
+                sceneRenderer.doneLoading(assetManager);
+                sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
+                sceneRenderer.setRendering(true);
             }
-            // Initialize and load
-            sceneRenderer.doneLoading(assetManager);
-            sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
-            sceneRenderer.setRendering(true);
             break;
         case SCENE_FORCE_UPDATE:
             touchSceneGraph();

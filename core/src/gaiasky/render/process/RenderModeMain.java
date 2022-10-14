@@ -27,7 +27,7 @@ public class RenderModeMain extends RenderModeAbstract implements IRenderMode {
         // Viewport
         extendViewport.setCamera(camera.getCamera());
         extendViewport.setWorldSize(rw, rh);
-        extendViewport.setScreenSize(rw * rw / tw, rh * rh / th);
+        extendViewport.setScreenSize(rw, rh);
         extendViewport.apply();
 
         // Render
@@ -55,7 +55,7 @@ public class RenderModeMain extends RenderModeAbstract implements IRenderMode {
     }
 
     @Override
-    public void resize(int w, int h) {
+    public void resize(int rw, int rh, int tw, int th) {
     }
 
     @Override

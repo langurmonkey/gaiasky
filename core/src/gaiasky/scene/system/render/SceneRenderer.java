@@ -1078,22 +1078,48 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    public void resize(final int w, final int h, final int rw, final int rh) {
-        resize(w, h, rw, rh, false);
+    /**
+     * Resizes the scene renderer and all its sub-renderers and assets, but not the render systems.
+     *
+     * @param tw New target (screen) width.
+     * @param th New target (screen) height.
+     * @param rw New render buffer width.
+     * @param rh New render buffer height.
+     */
+    public void resize(final int tw, final int th, final int rw, final int rh) {
+        resize(tw, th, rw, rh, false);
     }
 
-    public void resize(final int w, final int h, final int rw, final int rh, boolean resizeRenderSys) {
-        if (resizeRenderSys)
-            resizeRenderSystems(w, h, rw, rh);
+    /**
+     * Resizes the scene renderer and all its sub-renderers and assets.
+     *
+     * @param tw              New target (screen) width.
+     * @param th              New target (screen) height.
+     * @param rw              New render buffer width.
+     * @param rh              New render buffer height.
+     * @param resizeRenderSys Also resize all render systems.
+     */
+    public void resize(final int tw, final int th, final int rw, final int rh, boolean resizeRenderSys) {
+        if (resizeRenderSys) {
+            resizeRenderSystems(tw, th, rw, rh);
+        }
 
         for (IRenderMode sgr : sgrList) {
-            sgr.resize(w, h);
+            sgr.resize(rw, rh, tw, th);
         }
     }
 
-    public void resizeRenderSystems(final int w, final int h, final int rw, final int rh) {
+    /**
+     * Resizes the render systems of this renderer.
+     *
+     * @param tw              New target (screen) width.
+     * @param th              New target (screen) height.
+     * @param rw              New render buffer width.
+     * @param rh              New render buffer height.
+     */
+    public void resizeRenderSystems(final int tw, final int th, final int rw, final int rh) {
         for (IRenderSystem rendSys : renderSystems) {
-            rendSys.resize(w, h);
+            rendSys.resize(tw, th);
         }
     }
 

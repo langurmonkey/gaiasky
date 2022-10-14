@@ -56,8 +56,7 @@ public class RenderModeFov extends RenderModeAbstract implements IRenderMode {
     }
 
     @Override
-    public void resize(int w, int h) {
-
+    public void resize(int rw, int rh, int tw, int th) {
     }
 
     @Override

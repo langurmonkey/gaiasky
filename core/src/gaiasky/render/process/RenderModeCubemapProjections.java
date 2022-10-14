@@ -101,8 +101,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     }
 
     @Override
-    public void resize(int w, int h) {
-
+    public void resize(int rw, int rh, int tw, int th) {
     }
 
     @Override
@@ -117,41 +116,41 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     public void notify(final Event event, Object source, final Object... data) {
         if (!Settings.settings.runtime.openVr) {
             switch (event) {
-                case CUBEMAP_CMD:
-                    CubemapProjection p = (CubemapProjection) data[1];
-                    GaiaSky.postRunnable(() -> {
-                        setProjection(p);
-                    });
-                    break;
-                case CUBEMAP_PROJECTION_CMD:
-                    p = (CubemapProjection) data[0];
-                    GaiaSky.postRunnable(() -> {
-                        setProjection(p);
-                    });
-                    break;
-                case CUBEMAP_RESOLUTION_CMD:
-                    int res = (Integer) data[0];
-                    GaiaSky.postRunnable(() -> {
-                        // Create new ones
-                        if (!frameBufferCubeMap.containsKey(getKey(res, res, 0))) {
-                            // Clear
-                            dispose();
-                            frameBufferCubeMap.clear();
-                        }
-                    });
-                    break;
-                case PLANETARIUM_APERTURE_CMD:
-                    setPlanetariumAperture((float) data[0]);
-                    // Update projection, we may not need -Z anymore!
-                    GaiaSky.postRunnable(() -> {
-                        setProjection(Settings.settings.program.modeCubemap.projection);
-                    });
-                    break;
-                case PLANETARIUM_ANGLE_CMD:
-                    setPlanetariumAngle((float) data[0]);
-                    break;
-                default:
-                    break;
+            case CUBEMAP_CMD:
+                CubemapProjection p = (CubemapProjection) data[1];
+                GaiaSky.postRunnable(() -> {
+                    setProjection(p);
+                });
+                break;
+            case CUBEMAP_PROJECTION_CMD:
+                p = (CubemapProjection) data[0];
+                GaiaSky.postRunnable(() -> {
+                    setProjection(p);
+                });
+                break;
+            case CUBEMAP_RESOLUTION_CMD:
+                int res = (Integer) data[0];
+                GaiaSky.postRunnable(() -> {
+                    // Create new ones
+                    if (!frameBufferCubeMap.containsKey(getKey(res, res, 0))) {
+                        // Clear
+                        dispose();
+                        frameBufferCubeMap.clear();
+                    }
+                });
+                break;
+            case PLANETARIUM_APERTURE_CMD:
+                setPlanetariumAperture((float) data[0]);
+                // Update projection, we may not need -Z anymore!
+                GaiaSky.postRunnable(() -> {
+                    setProjection(Settings.settings.program.modeCubemap.projection);
+                });
+                break;
+            case PLANETARIUM_ANGLE_CMD:
+                setPlanetariumAngle((float) data[0]);
+                break;
+            default:
+                break;
             }
         }
     }

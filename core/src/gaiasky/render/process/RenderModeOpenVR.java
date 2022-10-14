@@ -176,7 +176,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
 
         if (controllerHintGui != null)
             controllerHintGui.dispose();
-        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin,  graphics, 1f / uiScale);
+        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin, graphics, 1f / uiScale);
         controllerHintGui.initialize(null, sb);
         controllerHintGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
 
@@ -327,7 +327,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
         gui.render(width, height);
     }
 
-    public void resize(final int screenWidth, final int screenHeight) {
+    public void resize(int rw, int rh, int tw, int th) {
         if (lastSize != null)
             lastSize.set(-1, -1);
     }

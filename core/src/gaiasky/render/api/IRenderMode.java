@@ -33,10 +33,12 @@ public interface IRenderMode extends Disposable {
     /**
      * Resizes the assets of this renderer to the given new size
      *
-     * @param w New width
-     * @param h New height
+     * @param rw New render buffer width.
+     * @param rh New render buffer height.
+     * @param tw New target (screen) width.
+     * @param th New target (screen) height.
      */
-    void resize(final int w, final int h);
+    void resize(final int rw, final int rh, final int tw, final int th);
 
     RenderingContext getRenderingContext();
 
