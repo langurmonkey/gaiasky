@@ -11,6 +11,7 @@
 -  [DPAC](https://www.cosmos.esa.int/web/gaia/dpac/consortium) and the Gaia Collaboration
 -  The available catalogs and datasets have their own acknowledgements in the form of links to the original source and/or papers
 -  Floor van Leeuwen for the Hipparcos star name files.
+-  Pierre Barbier for the [constellation boundaries data](https://pbarbier.com/constellations/boundaries.html)
 
 ## Libraries and code
 
