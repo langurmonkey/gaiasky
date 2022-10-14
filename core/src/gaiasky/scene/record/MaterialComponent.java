@@ -578,24 +578,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     private void initializeElevationData(Texture tex) {
         if (!heightInitialized.get()) {
             heightInitialized.set(true);
-            Pixmap auxPix = null;
-            final boolean ktx = heightUnpacked.toLowerCase().endsWith(".ktx") || heightUnpacked.toLowerCase().endsWith(".zktx");
-            if (ktx) {
-                Texture t = new Texture(new FileHandle(heightUnpacked));
-                t.getTextureData().prepare();
-                auxPix = t.getTextureData().consumePixmap();
-            }
-            final Pixmap ktxPixmap = auxPix;
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Construct RAM height map from texture
                 String heightUnpacked = GlobalResources.unpackAssetPath(height);
                 GaiaSky.postRunnable(() -> logger.info("Constructing elevation data from texture: " + heightUnpacked));
-                Pixmap heightPixmap;
-                if (!ktx) {
-                    heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
-                } else {
-                    heightPixmap = ktxPixmap;
-                }
+                Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
                 float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
                 for (int i = 0; i < heightPixmap.getWidth(); i++) {
                     for (int j = 0; j < heightPixmap.getHeight(); j++) {
