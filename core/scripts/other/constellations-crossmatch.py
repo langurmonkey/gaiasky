@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Crossmatch between constellation lines data from http://www.midnightkite.com/index.aspx?AID=0&URL=StarChartFAQ and the
 processed HYG catalog. Output is a file with the constellation lines in the form [name, star1, star2]

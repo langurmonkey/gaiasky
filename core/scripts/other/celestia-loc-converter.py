@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 """
-Converts location files from celestia to Gaia Sandbox.
+Converts location files from celestia to Gaia Sky.
 :Author:
     Toni Sagrista Selles
 :Organization:
