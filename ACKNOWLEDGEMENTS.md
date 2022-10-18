@@ -23,7 +23,6 @@
 -  Sergei Klioner and Robin Geyer (TU Dresden) for the idea and octave implementation of the gravitational waves effect
 -  [Py4J](https://www.py4j.org)
 -  [set111](https://www.shadertoy.com/view/tsBXW3) for the original black hole shader code, licensed by default under [CC-BY-NC-SA](https://www.shadertoy.com/view/tsBXW3)
--  [gdx2sdl](https://github.com/electronstudio/sdl2gdx), licensed under GNU General Public License with the classpath exception
 
 
 ## Textures, models, music and other assets
