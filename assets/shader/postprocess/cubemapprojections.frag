@@ -168,6 +168,42 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 }
 #endif//orthographic
 
+#ifdef orthosphere
+// Orthographic view of the celestial sphere. 
+vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
+    vec2 vp = u_viewport;
+    tc = tc * 2.0 - 1.0;
+    vec2 arv = vp.xy / min(vp.x, vp.y);
+    tc *= arv;
+    
+    float r = length(tc);
+    if (r <= 1.0) {
+        vec3 cubemaptc;
+        //front
+        cubemaptc.x = tc.x;
+        cubemaptc.y = -tc.y;
+        cubemaptc.z = -sqrt(1.0-r*r);
+        vec4 b = texture(cubemap, cubemaptc);
+        
+        //back
+	    cubemaptc.z = -cubemaptc.z;
+	    vec4 a = texture(cubemap, cubemaptc);        
+
+        //dim the back a bit without affecting brightest areas (e.g. the Sun).
+        float c = 1.0 - 0.5*(b.x+b.y+b.z)/3.;
+        c = c*(0.5+0.5*(a.x+a.y+a.z)/3.);
+        a.x = a.x * c;
+        a.y = a.y * c;
+        a.z = a.z * c;
+		
+        return 1.0-(1.0-a)*(1.0-b); //screen overlay
+    } else {
+        return vec4(0.0, 0.0, 0.0, 1.0);
+    }
+}
+#endif//orthosphere
+
+
 void main(void){
     fragColor = cubeToProjection(u_cubemap, v_texCoords);
 }

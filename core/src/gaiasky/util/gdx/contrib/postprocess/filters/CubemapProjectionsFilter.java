@@ -72,13 +72,15 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         ShaderProgram hammeraitoff = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define hammer");
         ShaderProgram azimuthal = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define azimuthal");
         ShaderProgram orthographic = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define orthographic");
+        ShaderProgram orthosphere = ShaderLoader.fromFile("screenspace", "cubemapprojections", "#define orthosphere");
 
-        programs = new ShaderProgram[5];
+        programs = new ShaderProgram[6];
         programs[0] = equirectangular;
         programs[1] = cylindrical;
         programs[2] = hammeraitoff;
         programs[3] = orthographic;
-        programs[4] = azimuthal;
+        programs[4] = orthosphere;
+        programs[5] = azimuthal;
 
         super.program = equirectangular;
         rebind();
@@ -104,12 +106,16 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
             super.program = programs[2];
             rebind();
         }
-         case ORTHOGRAPHIC -> {
+        case ORTHOGRAPHIC -> {
             super.program = programs[3];
             rebind();
         }
-        case AZIMUTHAL_EQUIDISTANT -> {
+        case ORTHOSPHERE -> {
             super.program = programs[4];
+            rebind();
+        }
+        case AZIMUTHAL_EQUIDISTANT -> {
+            super.program = programs[5];
             rebind();
         }
         default -> {
