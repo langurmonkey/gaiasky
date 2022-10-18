@@ -1,7 +1,7 @@
-// Value is assumed to be normalized in [0,1] in all cases
+// Input value must be normalized for all color maps.
 
 
-// BLUES
+// Blues - Red channel
 float colormap_blues_red(float x) {
     if (x < 0.8724578971287745) {
         return ((((-2.98580898761749E+03 * x + 6.75014845489710E+03) * x - 4.96941610635258E+03) * x + 1.20190439358912E+03) * x - 2.94374708396149E+02) * x + 2.48449410219242E+02;
@@ -10,6 +10,7 @@ float colormap_blues_red(float x) {
     }
 }
 
+// Blues - Green channel
 float colormap_blues_green(float x) {
     if (x < 0.3725897611307026) {
         return -1.30453729372935E+02 * x + 2.51073069306930E+02;
@@ -18,6 +19,7 @@ float colormap_blues_green(float x) {
     }
 }
 
+// Blues - Blue channel
 float colormap_blues_blue(float x) {
     if (x < 0.8782350698420436) {
         return (((-1.66242968759033E+02 * x + 2.50865766027010E+02) * x - 1.82046165445353E+02) * x - 3.29698266187334E+01) * x + 2.53927912915449E+02;
@@ -26,6 +28,7 @@ float colormap_blues_blue(float x) {
     }
 }
 
+// Blues - Sequential color map
 vec3 colormap_blues(float x) {
     float r = clamp(colormap_blues_red(x) / 255.0, 0.0, 1.0);
     float g = clamp(colormap_blues_green(x) / 255.0, 0.0, 1.0);
@@ -33,7 +36,7 @@ vec3 colormap_blues(float x) {
     return vec3(r, g, b);
 }
 
-// GREENS
+// Greens - Red channel
 float colormap_greens_red(float x) {
     if (x < 0.6193682068820651) {
         return ((1.41021531432983E+02 * x - 3.78122271460656E+02) * x - 1.08403692154170E+02) * x + 2.45743977533647E+02;
@@ -42,10 +45,12 @@ float colormap_greens_red(float x) {
     }
 }
 
+// Greens - Green channel
 float colormap_greens_green(float x) {
     return (-1.37013460576160E+02 * x - 4.54698187198101E+01) * x + 2.52098684286706E+02;
 }
 
+// Greens - Blue channel
 float colormap_greens_blue(float x) {
     if (x < 0.5062477983469252) {
         return ((3.95067226937040E+02 * x - 4.52381961582927E+02) * x - 1.25304923569201E+02) * x + 2.43770002412197E+02;
@@ -54,13 +59,14 @@ float colormap_greens_blue(float x) {
     }
 }
 
+// Greens - Sequential color map
 vec3 colormap_greens(float x) { float r = clamp(colormap_greens_red(x) / 255.0, 0.0, 1.0);
     float g = clamp(colormap_greens_green(x) / 255.0, 0.0, 1.0);
     float b = clamp(colormap_greens_blue(x) / 255.0, 0.0, 1.0);
     return vec3(r, g, b);
 }
 
-// REDS
+// Reds - Red channel
 float colormap_reds_red(float x) {
     if (x < 0.7109796106815338) {
         return (((-9.58108609441667E+02 * x + 8.89060620527714E+02) * x - 2.42747192807495E+02) * x + 9.97906310565304E+00) * x + 2.54641252219400E+02;
@@ -69,6 +75,7 @@ float colormap_reds_red(float x) {
     }
 }
 
+// Reds - Green channel
 float colormap_reds_green(float x) {
     if (x < 0.7679868638515472) {
         return ((((2.66433610509335E+03 * x - 5.05488641558587E+03) * x + 3.69542277742922E+03) * x - 1.36931912848446E+03) * x - 5.12669839132577E+01) * x + 2.41929417192750E+02;
@@ -77,10 +84,12 @@ float colormap_reds_green(float x) {
     }
 }
 
+// Reds - Blue channel
 float colormap_reds_blue(float x) {
     return (((-6.83475279000297E+02 * x + 1.55250107598171E+03) * x - 9.25799053039285E+02) * x - 1.67380812671938E+02) * x + 2.37145226675143E+02;
 }
 
+// Reds - Sequential color map
 vec3 colormap_reds(float x) {
     float r = clamp(colormap_reds_red(x) / 255.0, 0.0, 1.0);
     float g = clamp(colormap_reds_green(x) / 255.0, 0.0, 1.0);
@@ -89,7 +98,7 @@ vec3 colormap_reds(float x) {
 }
 
 
-// RAINBOW18
+// Rainbow discrete
 vec3 colormap_rainbow18(float x) {
     float x16 = x * 16.0;
     const float s = 1.0 / 255.0;
@@ -128,15 +137,17 @@ vec3 colormap_rainbow18(float x) {
     }
 }
 
-// COOL
+// Cool - Red channel
 float colormap_cool_red(float x) {
     return (1.0 + 1.0 / 63.0) * x - 1.0 / 63.0;
 }
 
+// Cool - Green channel
 float colormap_cool_green(float x) {
     return -(1.0 + 1.0 / 63.0) * x + (1.0 + 1.0 / 63.0);
 }
 
+// Cool - Luminosity down and then up
 vec3 colormap_cool(float x) {
     float r = clamp(colormap_cool_red(x), 0.0, 1.0);
     float g = clamp(colormap_cool_green(x), 0.0, 1.0);
@@ -145,11 +156,11 @@ vec3 colormap_cool(float x) {
 }
 
 
-// SEISMIC
 float colormap_seismic_f(float x) {
     return ((-2010.0 * x + 2502.5950459) * x - 481.763180924) / 255.0;
 }
 
+// Seismic - Red channel
 float colormap_seismic_red(float x) {
     if (x < 0.0) {
         return 3.0 / 255.0;
@@ -166,6 +177,7 @@ float colormap_seismic_red(float x) {
     }
 }
 
+// Seismic - Green channel
 float colormap_seismic_green(float x) {
     if (x < 0.0) {
         return 0.0;
@@ -181,6 +193,7 @@ float colormap_seismic_green(float x) {
     }
 }
 
+// Seismic - Blue channel
 float colormap_seismic_blue(float x) {
     if (x < 0.0) {
         return 19.0 / 255.0;
@@ -200,16 +213,17 @@ float colormap_seismic_blue(float x) {
     }
 }
 
+// Seismic - Diverging color map
 vec3 colormap_seismic(float x) {
     return vec3(colormap_seismic_red(x), colormap_seismic_green(x), colormap_seismic_blue(x));
 }
 
 
-// CARNATION
 float colormap_f(float x) {
     return ((-9.93427e0 * x + 1.56301e1) * x + 2.44663e2 * x) / 255.0;
 }
 
+// Carnation - Blue channel
 float colormap_carnation_blue(float x) {
     if (x < 0.0) {
         return 11.0 / 255.0;
@@ -226,6 +240,7 @@ float colormap_carnation_blue(float x) {
     }
 }
 
+// Carnation - Green channel
 float colormap_carnation_green(float x) {
     if (x < 0.0) {
         return 0.0;
@@ -242,6 +257,7 @@ float colormap_carnation_green(float x) {
     }
 }
 
+// Carnation - Red channel
 float colormap_carnation_red(float x) {
     if (x < 0.16531216481302) {
         return 1.0;
@@ -256,11 +272,12 @@ float colormap_carnation_red(float x) {
     }
 }
 
+// Carnation - Diverging color map
 vec3 colormap_carnation(float x) {
     return vec3(colormap_carnation_red(x), colormap_carnation_green(x), colormap_carnation_blue(x));
 }
 
-// HOT METAL
+// Hot metal - Green channel
 float colormap_hotmetal_green(float x) {
     if (x < 0.6) {
         return 0.0;
@@ -271,6 +288,7 @@ float colormap_hotmetal_green(float x) {
     }
 }
 
+// Hot metal - Red channel
 float colormap_hotmetal_red(float x) {
     if (x < 0.0) {
         return 0.0;
@@ -281,11 +299,12 @@ float colormap_hotmetal_red(float x) {
     }
 }
 
+// Hot metal - Sequential with increasing L*, but not linear
 vec3 colormap_hotmetal(float x) {
     return vec3(colormap_hotmetal_red(x), colormap_hotmetal_green(x), 0.0);
 }
 
-// REGULAR RAINBOW
+// Regular rainbow - All around bad color map
 vec3 colormap_rainbow(float x) {
     float r = 0.0, g = 0.0, b = 0.0;
 
