@@ -2134,12 +2134,13 @@ public interface IScriptingInterface {
      *     <li>"cylindrical" - cylindrical projection.</li>
      *     <li>"hammer" - Hammer projection.</li>
      *     <li>"orthographic" - orthographic projection, with the two hemispheres side-by-side.</li>
+     *     <li>"orthosphere" - orthographic projection, with the two hemispheres overlaid. That gives an outside view of the camera's celestial sphere. </li>
      *     <li>"azimuthal_equidistant" - azimuthal equidistant projection, used in Planetarium mode.</li>
      * </ul>
      * See {@link CubemapProjections} for possible
      * values.
      *
-     * @param projection The projection, in ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"azimuthal_equidistant"].
+     * @param projection The projection, in ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"azimuthal_equidistant"].
      */
     void setCubemapProjection(String projection);
 
