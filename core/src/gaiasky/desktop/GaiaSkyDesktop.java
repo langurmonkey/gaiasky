@@ -214,6 +214,7 @@ public class GaiaSkyDesktop implements IObserver {
                 out.println();
                 out.println(I18n.msg("gui.help.homepage") + "\t<" + Settings.WEBPAGE + ">");
                 out.println(I18n.msg("gui.help.docs") + "\t\t<" + Settings.DOCUMENTATION + ">");
+                out.println(I18n.msg("gui.help.repo") + "\t<" + Settings.REPOSITORY + ">");
                 out.println();
                 out.println(I18n.msg("gui.help.javaversion") + " " + System.getProperty("java.vm.version"));
                 out.println();
