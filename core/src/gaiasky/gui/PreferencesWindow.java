@@ -2205,8 +2205,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Dynamic resolution
         settings.graphics.dynamicResolution = !settings.runtime.openVr && dynamicResolution.isChecked();
-        if (!settings.graphics.dynamicResolution)
+        if (!settings.graphics.dynamicResolution) {
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
+        }
 
         // Motion blur
         if (motionBlur != null) {

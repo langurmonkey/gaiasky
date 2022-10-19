@@ -2115,6 +2115,12 @@ public interface IScriptingInterface {
     void setReprojectionMode(String mode);
 
     /**
+     * Sets the scaling factor for the back-buffer.
+     * @param scale The back-buffer scaling factor.
+     */
+    void setBackBufferScale(float scale);
+
+    /**
      * Sets the resolution (width and height are the same) of each side of the
      * frame buffers used to capture each of the 6 directions that go into the
      * cubemap to construct the equirectangular image for the 360 mode. This

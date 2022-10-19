@@ -2403,9 +2403,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void changeFocus(FocusView object, NaturalCamera cam, double waitTimeSeconds) {
         // Post focus change and wait, if needed
         FocusView currentFocus = (FocusView) cam.getFocus();
-        if (currentFocus == null ||
-                Mapper.particleSet.has(currentFocus.getEntity()) ||
-                currentFocus.getEntity() != object.getEntity()) {
+        if (currentFocus == null || Mapper.particleSet.has(currentFocus.getEntity()) || currentFocus.getEntity() != object.getEntity()) {
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             em.post(Event.FOCUS_CHANGE_CMD, this, object.getEntity());
 
@@ -2604,6 +2602,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkStringEnum(mode, ReprojectionMode.class, "re-projection mode")) {
             ReprojectionMode newMode = ReprojectionMode.valueOf(mode.toUpperCase());
             postRunnable(() -> em.post(Event.REPROJECTION_CMD, this, newMode != ReprojectionMode.DISABLED, newMode));
+        }
+    }
+
+    @Override
+    public void setBackBufferScale(float scale) {
+        if (checkNum(scale, 0.5f, 4f, "back buffer scale")) {
+            postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
+            postRunnable(() -> em.post(Event.BACKBUFFER_SCALE_CMD, this, scale));
         }
     }
 
@@ -3872,7 +3878,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private <T extends Enum<T>> boolean checkStringEnum(String value, Class<T> clazz, String name) {
         if (checkString(value, name)) {
             for (Enum<T> en : EnumSet.allOf(clazz)) {
-                if (value.equalsIgnoreCase(en.toString())) {
+                if (value.equalsIgnoreCase(en.toString()) || value.equalsIgnoreCase(en.name())) {
                     return true;
                 }
             }
