@@ -288,7 +288,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         label.textScale = 0.3f;
         label.solidAnglePow = 1f;
-        label.labelFactor = 1e1f;
+        label.labelFactor = (float) (1e1f * Constants.DISTANCE_SCALE_FACTOR);
 
         scaffolding.billboardSizeFactor = 0.6e-3f;
     }

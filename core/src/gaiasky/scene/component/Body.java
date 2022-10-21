@@ -56,7 +56,7 @@ public class Body implements Component, ICopy {
     }
 
     public void setPosition(double[] pos) {
-        this.pos.set(pos[0], pos[1], pos[2]);
+        this.pos.set(pos[0] * Constants.DISTANCE_SCALE_FACTOR, pos[1] * Constants.DISTANCE_SCALE_FACTOR, pos[2] * Constants.DISTANCE_SCALE_FACTOR);
     }
 
     public void setPosKm(double[] pos) {
@@ -76,7 +76,7 @@ public class Body implements Component, ICopy {
     }
 
     public void setPosition(int[] pos) {
-        setPosition(new double[] { pos[0], pos[1], pos[2] });
+        setPosition(new double[] { pos[0] * Constants.DISTANCE_SCALE_FACTOR, pos[1] * Constants.DISTANCE_SCALE_FACTOR, pos[2] * Constants.DISTANCE_SCALE_FACTOR });
     }
 
     public void setSize(Double size) {

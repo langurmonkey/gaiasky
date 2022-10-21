@@ -176,6 +176,8 @@ public class BillboardEntityRenderSystem implements IObserver {
                     dist = (float) extra.radius / Constants.THRESHOLD_UP;
                 }
                 extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
+            } else {
+                extra.computedSize /= Constants.DISTANCE_SCALE_FACTOR;
             }
 
             extra.computedSize *= Settings.settings.scene.star.pointSize * (star ? 0.1f : 0.2f);
@@ -211,7 +213,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         boolean isModel = !isStar && Mapper.model.has(entity);
 
         final float fuzzySize = getRenderSizeCelestial(camera, entity, body, sa, scaffolding, extra);
-        final float radius = (float) (extra != null ? extra.radius : (body.size / 2d) * scaffolding.sizeScaleFactor);
+        final float radius = (float) (extra != null ? extra.radius : (body.size / (2d)) * scaffolding.sizeScaleFactor);
 
         Vector3 billboardPosition = graph.translation.put(F31);
         if (isModel) {
