@@ -153,13 +153,13 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     @Override
     public float textSize() {
         if (constel != null) {
-            return .2e7f;
+            return .2e7f * (float) Constants.DISTANCE_SCALE_FACTOR;
         } else if (loc != null) {
             return body.size / 1.5f;
         } else if (Mapper.keyframes.has(entity)) {
-            return label.labelMax;
+            return label.labelMax * (float) Constants.DISTANCE_SCALE_FACTOR;
         }
-        return (float) (label.labelMax * body.distToCamera * label.labelFactor);
+        return (float) (label.labelMax * body.distToCamera * label.labelFactor) * (float) Constants.DISTANCE_SCALE_FACTOR;
     }
 
     @Override
