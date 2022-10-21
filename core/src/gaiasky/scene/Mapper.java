@@ -76,5 +76,6 @@ public class Mapper {
     public static final ComponentMapper<TagSetElement> tagSetElement = ComponentMapper.getFor(TagSetElement.class);
     public static final ComponentMapper<TagInvisible> tagInvisible = ComponentMapper.getFor(TagInvisible.class);
     public static final ComponentMapper<TagBillboardGalaxy> tagBillboardGalaxy = ComponentMapper.getFor(TagBillboardGalaxy.class);
+    public static final ComponentMapper<TagNoClosest> tagNoClosest = ComponentMapper.getFor(TagNoClosest.class);
 
 }

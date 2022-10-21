@@ -234,7 +234,6 @@ public abstract class AbstractCamera implements ICamera {
      *
      * @param cb      The body.
      * @param fCamera The FovCamera.
-     *
      * @return True if the body is observed. False otherwise.
      */
     protected boolean computeVisibleFovs(Entity cb, FovCamera fCamera) {
@@ -242,8 +241,7 @@ public abstract class AbstractCamera implements ICamera {
         var graph = Mapper.graph.get(cb);
         Vector3d[] dirs;
         dirs = fCamera.directions;
-        return GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[0])
-                || GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[1]);
+        return GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[0]) || GlobalResources.isInView(graph.translation, body.distToCamera, fCamera.angleEdgeRad, dirs[1]);
     }
 
     public double getDistance() {
@@ -317,7 +315,7 @@ public abstract class AbstractCamera implements ICamera {
         if (cb instanceof FocusView) {
             FocusView candidate = (FocusView) cb;
             // A copy can never be the closest
-            if (!cb.isCopy()) {
+            if (!cb.isCopy() && !Mapper.tagNoClosest.has(((FocusView) cb).getEntity())) {
                 if (closestBody.getEntity() == null) {
                     closestBody.setEntity(candidate.getEntity());
                 } else {
@@ -332,7 +330,7 @@ public abstract class AbstractCamera implements ICamera {
     public void checkClosestBody(Entity cb) {
         // A copy can never be the closest
         var base = Mapper.base.get(cb);
-        if (!base.copy)
+        if (!base.copy && !Mapper.tagNoClosest.has(cb)) {
             if (!closestBody.isValid()) {
                 closestBody.setEntity(cb);
             } else {
@@ -345,6 +343,7 @@ public abstract class AbstractCamera implements ICamera {
                     closestBody.setEntity(prev);
                 }
             }
+        }
     }
 
     @Override

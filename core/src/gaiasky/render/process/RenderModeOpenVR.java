@@ -352,6 +352,8 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
         model.model.env = environment;
         scene.initializeEntity(entity);
         scene.setUpEntity(entity);
+        scene.engine.addEntity(entity);
+        EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, entity, false);
         return entity;
     }
 

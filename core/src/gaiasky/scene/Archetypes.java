@@ -205,7 +205,7 @@ public class Archetypes {
             addArchetype(modelName("KeyframesPathObject"), modelName("VertsObject"), Keyframes.class, Label.class);
 
             // VRDeviceModel
-            addArchetype(modelName("VRDeviceModel"), modelName("SceneGraphNode"), VRDevice.class, Model.class, Line.class);
+            addArchetype(modelName("VRDeviceModel"), modelName("SceneGraphNode"), VRDevice.class, Model.class, Line.class, TagNoClosest.class);
 
             return archetypes;
         } else {

@@ -7,7 +7,7 @@ import gaiasky.vr.openvr.VRContext;
 public class VRDevice implements Component {
 
     public VRContext.VRDevice device;
-    public Vector3 beamP0;
-    public Vector3 beamP1;
+    public Vector3 beamP0 = new Vector3();
+    public Vector3 beamP1 = new Vector3();
 
 }

@@ -179,7 +179,7 @@ public class BillboardEntityRenderSystem implements IObserver {
             }
 
             extra.computedSize *= Settings.settings.scene.star.pointSize * (star ? 0.1f : 0.2f);
-            return (float) ((extra.computedSize / Constants.DISTANCE_SCALE_FACTOR) * extra.primitiveRenderScale);
+            return (float) (extra.computedSize * extra.primitiveRenderScale);
         } else if (Mapper.fade.has(entity)) {
             // Regular billboards
             return getRenderSizeBillboardGalaxy(camera, body, scaffolding);

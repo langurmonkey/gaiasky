@@ -21,6 +21,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -188,6 +189,7 @@ public class GridRecInitializer extends AbstractInitSystem {
         if (Settings.settings.runtime.openVr) {
             var fade = Mapper.fade.get(entity);
             fade.setFadeOut(new double[] { 5e6, 50e6 });
+            fade.fadeOutMap = new Vector2d(1, 0);
         }
 
     }
