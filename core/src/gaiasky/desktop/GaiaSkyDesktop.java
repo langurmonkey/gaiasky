@@ -50,7 +50,7 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /*
-     * Source version to compare to config file and datasets.
+     * Source version, used to enable or disable datasets.
      * This is usually tag where each number is allocated 2 digits.
      * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
      * Version = major * 10000 + minor * 100 + rev
@@ -111,7 +111,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     /**
      * Formats the regular usage so that it removes the left padding characters.
-     * This is necessary so that help2man recognizes the OPTIONS block.
+     * This is necessary so that <code>help2man</code> recognizes the OPTIONS block.
      *
      * @param jc The JCommander object.
      */
