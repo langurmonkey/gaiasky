@@ -151,88 +151,86 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
 
                 float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-                synchronized (render) {
-                    if (!set.disposed) {
-                        boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
-                        if (!inGpu(render)) {
-                            int n = set.data().size();
-                            int offset = addMeshData(n);
-                            setOffset(render, offset);
-                            curr = meshes.get(offset);
-                            ensureTempVertsSize(n * curr.vertexSize);
-                            int numAdded = 0;
-                            for (int i = 0; i < n; i++) {
-                                if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                                    IParticleRecord particle = set.get(i);
-                                    if (!Double.isFinite(particle.size())) {
-                                        logger.debug("Star " + particle.id() + " has a non-finite size");
-                                        continue;
-                                    }
-                                    // COLOR
-                                    if (hlCmap) {
-                                        // Color map
-                                        double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                    } else {
-                                        // Plain
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
-                                    }
-
-                                    // SIZE
-                                    if (hl.isHlAllVisible() && hl.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor);
-                                    } else {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
-                                    }
-
-                                    // POSITION [u]
-                                    tempVerts[curr.vertexIdx] = (float) particle.x();
-                                    tempVerts[curr.vertexIdx + 1] = (float) particle.y();
-                                    tempVerts[curr.vertexIdx + 2] = (float) particle.z();
-
-                                    // PROPER MOTION [u/yr]
-                                    tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
-
-                                    curr.vertexIdx += curr.vertexSize;
-                                    numAdded++;
+                if (!set.disposed) {
+                    boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+                    if (!inGpu(render)) {
+                        int n = set.data().size();
+                        int offset = addMeshData(n);
+                        setOffset(render, offset);
+                        curr = meshes.get(offset);
+                        ensureTempVertsSize(n * curr.vertexSize);
+                        int numAdded = 0;
+                        for (int i = 0; i < n; i++) {
+                            if (utils.filter(i, set, desc) && set.isVisible(i)) {
+                                IParticleRecord particle = set.get(i);
+                                if (!Double.isFinite(particle.size())) {
+                                    logger.debug("Star " + particle.id() + " has a non-finite size");
+                                    continue;
                                 }
+                                // COLOR
+                                if (hlCmap) {
+                                    // Color map
+                                    double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                                } else {
+                                    // Plain
+                                    tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
+                                }
+
+                                // SIZE
+                                if (hl.isHlAllVisible() && hl.isHighlighted()) {
+                                    tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor);
+                                } else {
+                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
+                                }
+
+                                // POSITION [u]
+                                tempVerts[curr.vertexIdx] = (float) particle.x();
+                                tempVerts[curr.vertexIdx + 1] = (float) particle.y();
+                                tempVerts[curr.vertexIdx + 2] = (float) particle.z();
+
+                                // PROPER MOTION [u/yr]
+                                tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
+                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
+                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
+
+                                curr.vertexIdx += curr.vertexSize;
+                                numAdded++;
                             }
-                            int count = numAdded * curr.vertexSize;
-                            curr.mesh.setVertices(tempVerts, 0, count);
+                        }
+                        int count = numAdded * curr.vertexSize;
+                        curr.mesh.setVertices(tempVerts, 0, count);
 
-                            setInGpu(render, true);
+                        setInGpu(render, true);
 
+                    }
+
+                    /*
+                     * RENDER
+                     */
+                    curr = meshes.get(getOffset(render));
+                    if (curr != null) {
+                        if (starTex != null) {
+                            starTex.bind(0);
+                            shaderProgram.setUniformi("u_starTex", 0);
                         }
 
-                        /*
-                         * RENDER
-                         */
-                        curr = meshes.get(getOffset(render));
-                        if (curr != null) {
-                            if (starTex != null) {
-                                starTex.bind(0);
-                                shaderProgram.setUniformi("u_starTex", 0);
-                            }
+                        shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && hl.isHlAllVisible() ? opacityLimitsHlShowAll : opacityLimits, 0, 2);
 
-                            shaderProgram.setUniform2fv("u_opacityLimits", hl.isHighlighted() && hl.isHlAllVisible() ? opacityLimitsHlShowAll : opacityLimits, 0, 2);
+                        alphaSizeBrRc[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
+                        alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
+                        shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
-                            alphaSizeBrRc[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
-                            shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
+                        // Days since epoch
+                        // Emulate double with floats, for compatibility
+                        double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
+                        float curRt2 = (float) (curRt - (double) ((float) curRt));
+                        shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
-                            // Days since epoch
-                            // Emulate double with floats, for compatibility
-                            double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
-                            float curRt2 = (float) (curRt - (double) ((float) curRt));
-                            shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
-
-                            try {
-                                curr.mesh.render(shaderProgram, GL20.GL_POINTS);
-                            } catch (IllegalArgumentException e) {
-                                logger.error("Render exception");
-                            }
+                        try {
+                            curr.mesh.render(shaderProgram, GL20.GL_POINTS);
+                        } catch (IllegalArgumentException e) {
+                            logger.error("Render exception");
                         }
                     }
                 }
@@ -255,8 +253,8 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, renderable);
             }
             super.setInGpu(renderable, state);

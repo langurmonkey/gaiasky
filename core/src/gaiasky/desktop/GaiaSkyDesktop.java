@@ -33,6 +33,7 @@ import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.CamRecorder;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
+import gaiasky.util.math.MathUtilsd;
 import org.yaml.snakeyaml.Yaml;
 
 import java.awt.*;
@@ -179,7 +180,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Init properties file.
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                initConfigFile(cliArgs.vr);
+                gaiaSkyDesktop.setReinitializeUIScale(initConfigFile(cliArgs.vr));
             }
 
             // Init global configuration.
@@ -262,6 +263,9 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
+    // Force re-computing the UI scale.
+    private boolean reinitializeUIScale = false;
+
     public GaiaSkyDesktop() {
         super();
         EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.DISPOSE);
@@ -300,23 +304,23 @@ public class GaiaSkyDesktop implements IObserver {
                         fittingModes.add(mode);
                     }
                 }
-                if(fittingModes.size == 1) {
+                if (fittingModes.size == 1) {
                     // Only one available, use it.
                     myMode = fittingModes.get(0);
                 } else if (fittingModes.size > 1) {
                     // Check if bit depth and refresh rate are set.
-                    for(DisplayMode fittingMode : fittingModes) {
-                        if(myMode == null) {
+                    for (DisplayMode fittingMode : fittingModes) {
+                        if (myMode == null) {
                             myMode = fittingMode;
                         } else {
-                            if(s.graphics.fullScreen.bitDepth > 0
+                            if (s.graphics.fullScreen.bitDepth > 0
                                     && fittingMode.bitsPerPixel == s.graphics.fullScreen.bitDepth
                                     && s.graphics.fullScreen.refreshRate > 0
                                     && fittingMode.refreshRate == s.graphics.fullScreen.refreshRate) {
                                 myMode = fittingMode;
                                 break;
                             } else {
-                                if(fittingMode.refreshRate > myMode.refreshRate) {
+                                if (fittingMode.refreshRate > myMode.refreshRate) {
                                     myMode = fittingMode;
                                 }
                             }
@@ -327,7 +331,7 @@ public class GaiaSkyDesktop implements IObserver {
                 logger.debug("Using full screen mode: " + myMode);
 
                 if (myMode == null) {
-                    // Fall back to windowed.
+                    // Fall back to windowed mode.
                     logger.warn(I18n.msg("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
                     cfg.setWindowedMode(s.graphics.getScreenWidth(), s.graphics.getScreenHeight());
                     cfg.setResizable(s.graphics.resizable);
@@ -367,6 +371,13 @@ public class GaiaSkyDesktop implements IObserver {
         }
         // Color, Depth, stencil buffers, MSAA.
         cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
+
+        // Compute base UI scale.
+        if (reinitializeUIScale) {
+            // Height linear interpolation:
+            // 1-1080 -> 2-2160
+            s.program.ui.scale = MathUtilsd.lint(s.graphics.resolution[1], 1080, 2160, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MIN * 3f);
+        }
 
         // Launch app.
         try {
@@ -496,6 +507,10 @@ public class GaiaSkyDesktop implements IObserver {
         new Lwjgl3Application(new ErrorDialog(ex, message), cfg);
     }
 
+    public void setReinitializeUIScale(boolean b) {
+        this.reinitializeUIScale = b;
+    }
+
     private static void checkLogger(final ConsoleLogger consoleLogger) {
         EventManager.instance.clearAllSubscriptions();
         consoleLogger.subscribe();
@@ -540,9 +555,12 @@ public class GaiaSkyDesktop implements IObserver {
      * the default configuration file of this release
      * to determine whether the config file must be overwritten.
      *
+     * @return True if the configuration file has been initialized or
+     * overwritten with the default one, false otherwise.
+     *
      * @throws IOException If the file fails to be written successfully.
      */
-    private static void initConfigFile(final boolean vr) throws IOException {
+    private static boolean initConfigFile(final boolean vr) throws IOException {
         // Use user folder
         Path userFolderConfFile = SysUtils.getConfigDir().resolve(SettingsManager.getConfigFileName(vr));
 
@@ -600,6 +618,8 @@ public class GaiaSkyDesktop implements IObserver {
         }
         String props = userFolderConfFile.toAbsolutePath().toString();
         System.setProperty("properties.file", props);
+
+        return overwrite || !userConfExists;
     }
 
     /**

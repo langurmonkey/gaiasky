@@ -226,10 +226,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Get current resolution
         Table windowedResolutions = new Table(skin);
         IValidator widthValidator = new IntValidator(100, 10000);
-        widthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.graphics.resolution[0], 100, 10000)), skin, widthValidator);
+        widthField = new OwnTextField(Integer.toString(MathUtils.clamp(Gdx.graphics.getWidth(), 100, 10000)), skin, widthValidator);
         widthField.setWidth(textWidth);
         IValidator heightValidator = new IntValidator(100, 10000);
-        heightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.graphics.resolution[1], 100, 10000)), skin, heightValidator);
+        heightField = new OwnTextField(Integer.toString(MathUtils.clamp(Gdx.graphics.getHeight(), 100, 10000)), skin, heightValidator);
         heightField.setWidth(textWidth);
         final OwnLabel widthLabel = new OwnLabel(I18n.msg("gui.width") + ":", skin);
         final OwnLabel heightLabel = new OwnLabel(I18n.msg("gui.height") + ":", skin);

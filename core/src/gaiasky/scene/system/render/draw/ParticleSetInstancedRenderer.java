@@ -98,103 +98,101 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     @Override
     protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
         final Render render = (Render) renderable;
-        synchronized (render) {
-            var base = Mapper.base.get(render.entity);
-            var body = Mapper.body.get(render.entity);
-            var set = Mapper.particleSet.get(render.entity);
-            var hl = Mapper.highlight.get(render.entity);
-            var desc = Mapper.datasetDescription.get(render.entity);
+        var base = Mapper.base.get(render.entity);
+        var body = Mapper.body.get(render.entity);
+        var set = Mapper.particleSet.get(render.entity);
+        var hl = Mapper.highlight.get(render.entity);
+        var desc = Mapper.datasetDescription.get(render.entity);
 
-            float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
+        float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-            if (!set.disposed) {
-                boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
-                int n = set.pointData.size();
-                if (!inGpu(render)) {
-                    int offset = addMeshData(6, n);
-                    setOffset(render, offset);
-                    curr = meshes.get(offset);
-                    ensureInstanceAttribsSize(n * curr.instanceSize);
+        if (!set.disposed) {
+            boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+            int n = set.pointData.size();
+            if (!inGpu(render)) {
+                int offset = addMeshData(6, n);
+                setOffset(render, offset);
+                curr = meshes.get(offset);
+                ensureInstanceAttribsSize(n * curr.instanceSize);
 
-                    float[] c = utils.getColor(body, hl);
-                    float[] colorMin = set.getColorMin();
-                    float[] colorMax = set.getColorMax();
-                    double minDistance = set.getMinDistance();
-                    double maxDistance = set.getMaxDistance();
+                float[] c = utils.getColor(body, hl);
+                float[] colorMin = set.getColorMin();
+                float[] colorMax = set.getColorMax();
+                double minDistance = set.getMinDistance();
+                double maxDistance = set.getMaxDistance();
 
-                    int numParticlesAdded = 0;
-                    for (int i = 0; i < n; i++) {
-                        if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                            IParticleRecord particle = set.get(i);
-                            double[] p = particle.rawDoubleData();
+                int numParticlesAdded = 0;
+                for (int i = 0; i < n; i++) {
+                    if (utils.filter(i, set, desc) && set.isVisible(i)) {
+                        IParticleRecord particle = set.get(i);
+                        double[] p = particle.rawDoubleData();
 
-                            // COLOR
-                            if (hl.isHighlighted()) {
-                                if (hlCmap) {
-                                    // Color map
-                                    double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                                    tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                } else {
-                                    // Plain
-                                    tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
-                                }
+                        // COLOR
+                        if (hl.isHighlighted()) {
+                            if (hlCmap) {
+                                // Color map
+                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                             } else {
-                                if (colorMin != null && colorMax != null) {
-                                    double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-                                    // fac = 0 -> colorMin,  fac = 1 -> colorMax
-                                    double fac = (dist - minDistance) / (maxDistance - minDistance);
-                                    interpolateColor(colorMin, colorMax, c, fac);
-                                }
-                                float r = 0, g = 0, b = 0;
-                                if (set.colorNoise != 0) {
-                                    r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                }
-                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                                // Plain
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
                             }
-
-                            // SIZE
-                            tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor;
-
-                            // PARTICLE POSITION
-                            tempInstanceAttribs[curr.instanceIdx + particlePosOffset] = (float) p[0];
-                            tempInstanceAttribs[curr.instanceIdx + particlePosOffset + 1] = (float) p[1];
-                            tempInstanceAttribs[curr.instanceIdx + particlePosOffset + 2] = (float) p[2];
-
-                            curr.instanceIdx += curr.instanceSize;
-                            curr.numVertices++;
-                            numParticlesAdded++;
+                        } else {
+                            if (colorMin != null && colorMax != null) {
+                                double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                // fac = 0 -> colorMin,  fac = 1 -> colorMax
+                                double fac = (dist - minDistance) / (maxDistance - minDistance);
+                                interpolateColor(colorMin, colorMax, c, fac);
+                            }
+                            float r = 0, g = 0, b = 0;
+                            if (set.colorNoise != 0) {
+                                r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                            }
+                            tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
                         }
-                    }
-                    // Global (divisor=0) vertices (position, uv)
-                    curr.mesh.setVertices(tempVerts, 0, 24);
-                    // Per instance (divisor=1) vertices
-                    int count = numParticlesAdded * curr.instanceSize;
-                    setCount(render, count);
-                    curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
-                    setInGpu(render, true);
+                        // SIZE
+                        tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor;
+
+                        // PARTICLE POSITION
+                        tempInstanceAttribs[curr.instanceIdx + particlePosOffset] = (float) p[0];
+                        tempInstanceAttribs[curr.instanceIdx + particlePosOffset + 1] = (float) p[1];
+                        tempInstanceAttribs[curr.instanceIdx + particlePosOffset + 2] = (float) p[2];
+
+                        curr.instanceIdx += curr.instanceSize;
+                        curr.numVertices++;
+                        numParticlesAdded++;
+                    }
                 }
+                // Global (divisor=0) vertices (position, uv)
+                curr.mesh.setVertices(tempVerts, 0, 24);
+                // Per instance (divisor=1) vertices
+                int count = numParticlesAdded * curr.instanceSize;
+                setCount(render, count);
+                curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
-                /*
-                 * RENDER
-                 */
-                curr = meshes.get(getOffset(render));
-                if (curr != null) {
-                    float meanDist = (float) (set.getMeanDistance());
+                setInGpu(render, true);
+            }
 
-                    double s = .3e-4f;
-                    shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
-                    shaderProgram.setUniformf("u_falloff", set.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * sizeFactor), (float) (set.particleSizeLimits[1] * sizeFactor));
+            /*
+             * RENDER
+             */
+            curr = meshes.get(getOffset(render));
+            if (curr != null) {
+                float meanDist = (float) (set.getMeanDistance());
 
-                    try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
-                    } catch (IllegalArgumentException e) {
-                        logger.error(e, "Render exception");
-                    }
+                double s = .3e-4f;
+                shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
+                shaderProgram.setUniformf("u_falloff", set.profileDecay);
+                shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * sizeFactor * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimits[0] * sizeFactor), (float) (set.particleSizeLimits[1] * sizeFactor));
+
+                try {
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
+                } catch (IllegalArgumentException e) {
+                    logger.error(e, "Render exception");
                 }
             }
         }

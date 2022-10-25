@@ -338,7 +338,7 @@ public class Settings {
         public CrosshairSettings crosshair;
         public InitializationSettings initialization;
         public Map<String, Boolean> visibility;
-        @JsonIgnore public double distanceScaleDesktop = 1d;
+        @JsonIgnore public double distanceScaleDesktop = 1e4d;
         @JsonIgnore public double distanceScaleVr = 1e4d;
 
         public SceneSettings() {

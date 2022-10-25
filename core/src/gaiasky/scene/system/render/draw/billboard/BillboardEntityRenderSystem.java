@@ -176,8 +176,6 @@ public class BillboardEntityRenderSystem implements IObserver {
                     dist = (float) extra.radius / Constants.THRESHOLD_UP;
                 }
                 extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
-            } else {
-                extra.computedSize /= Constants.DISTANCE_SCALE_FACTOR;
             }
 
             extra.computedSize *= Settings.settings.scene.star.pointSize * (star ? 0.1f : 0.2f);
@@ -237,6 +235,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         shader.setUniformf("u_distance", (float) body.distToCamera);
         shader.setUniformf("u_apparent_angle", (float) body.solidAngleApparent);
         shader.setUniformf("u_thpoint", (float) sa.thresholdPoint * camera.getFovFactor());
+        shader.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
 
         // Whether light scattering is enabled or not
         shader.setUniformi("u_lightScattering", (isStar && GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) ? 1 : 0);

@@ -59,18 +59,18 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
-    protected void offsets(MeshData curr){
+    protected void offsets(MeshData curr) {
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         additionalOffset = curr.mesh.getVertexAttribute(OwnUsage.Additional) != null ? curr.mesh.getVertexAttribute(OwnUsage.Additional).offset / 4 : 0;
     }
 
-    protected void addVertexAttributes(Array<VertexAttribute> attributes){
+    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.Additional, 2, "a_additional"));
     }
 
-    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera){
+    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         stereoHalfWidth = Settings.settings.program.modeStereo.isStereoHalfWidth();
         this.camera = camera;
 
@@ -93,85 +93,83 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-        synchronized (render) {
-            if (!set.disposed) {
-                boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
-                if (!inGpu(render)) {
-                    int offset = addMeshData(set.pointData.size());
-                    setOffset(render, offset);
-                    curr = meshes.get(offset);
+        if (!set.disposed) {
+            boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+            if (!inGpu(render)) {
+                int offset = addMeshData(set.pointData.size());
+                setOffset(render, offset);
+                curr = meshes.get(offset);
 
-                    float[] c = utils.getColor(body, hl);
-                    float[] colorMin = set.getColorMin();
-                    float[] colorMax = set.getColorMax();
-                    double minDistance = set.getMinDistance();
-                    double maxDistance = set.getMaxDistance();
+                float[] c = utils.getColor(body, hl);
+                float[] colorMin = set.getColorMin();
+                float[] colorMax = set.getColorMax();
+                double minDistance = set.getMinDistance();
+                double maxDistance = set.getMaxDistance();
 
-                    ensureTempVertsSize(set.pointData.size() * curr.vertexSize);
-                    int n = set.pointData.size();
-                    int numAdded = 0;
-                    for (int i = 0; i < n; i++) {
-                        if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                            IParticleRecord pb = set.get(i);
-                            double[] p = pb.rawDoubleData();
-                            // COLOR
-                            if (hl.isHighlighted()) {
-                                if (hlCmap) {
-                                    // Color map
-                                    double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(pb), hl.getHlcmmin(), hl.getHlcmmax());
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                } else {
-                                    // Plain
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
-                                }
+                ensureTempVertsSize(set.pointData.size() * curr.vertexSize);
+                int n = set.pointData.size();
+                int numAdded = 0;
+                for (int i = 0; i < n; i++) {
+                    if (utils.filter(i, set, desc) && set.isVisible(i)) {
+                        IParticleRecord pb = set.get(i);
+                        double[] p = pb.rawDoubleData();
+                        // COLOR
+                        if (hl.isHighlighted()) {
+                            if (hlCmap) {
+                                // Color map
+                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(pb), hl.getHlcmmin(), hl.getHlcmmax());
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                             } else {
-                                if (colorMin != null && colorMax != null) {
-                                    double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-                                    // fac = 0 -> colorMin,  fac = 1 -> colorMax
-                                    double fac = (dist - minDistance) / (maxDistance - minDistance);
-                                    interpolateColor(colorMin, colorMax, c, fac);
-                                }
-                                float r = 0, g = 0, b = 0;
-                                if (set.colorNoise != 0) {
-                                    r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                    b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
-                                }
-                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                                // Plain
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
                             }
-
-                            // SIZE, CMAP_VALUE
-                            tempVerts[curr.vertexIdx + additionalOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor;
-
-                            // POSITION
-                            final int idx = curr.vertexIdx;
-                            tempVerts[idx] = (float) p[0];
-                            tempVerts[idx + 1] = (float) p[1];
-                            tempVerts[idx + 2] = (float) p[2];
-
-                            curr.vertexIdx += curr.vertexSize;
-                            numAdded++;
+                        } else {
+                            if (colorMin != null && colorMax != null) {
+                                double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                // fac = 0 -> colorMin,  fac = 1 -> colorMax
+                                double fac = (dist - minDistance) / (maxDistance - minDistance);
+                                interpolateColor(colorMin, colorMax, c, fac);
+                            }
+                            float r = 0, g = 0, b = 0;
+                            if (set.colorNoise != 0) {
+                                r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                                b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * set.colorNoise);
+                            }
+                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
                         }
+
+                        // SIZE, CMAP_VALUE
+                        tempVerts[curr.vertexIdx + additionalOffset] = (body.size + (float) (rand.nextGaussian() * body.size / 5d)) * sizeFactor * (float) Constants.DISTANCE_SCALE_FACTOR;
+
+                        // POSITION
+                        final int idx = curr.vertexIdx;
+                        tempVerts[idx] = (float) p[0];
+                        tempVerts[idx + 1] = (float) p[1];
+                        tempVerts[idx + 2] = (float) p[2];
+
+                        curr.vertexIdx += curr.vertexSize;
+                        numAdded++;
                     }
-                    int count = numAdded * curr.vertexSize;
-                    setCount(render, count);
-                    curr.mesh.setVertices(tempVerts, 0, count);
-
-                    setInGpu(render, true);
                 }
+                int count = numAdded * curr.vertexSize;
+                setCount(render, count);
+                curr.mesh.setVertices(tempVerts, 0, count);
 
-                curr = meshes.get(getOffset(render));
-                if (curr != null) {
-                    float meanDist = (float) (set.getMeanDistance());
+                setInGpu(render, true);
+            }
 
-                    shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
-                    shaderProgram.setUniformf("u_falloff", set.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.5)) * sizeFactor * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
-                    shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()), (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
+            curr = meshes.get(getOffset(render));
+            if (curr != null) {
+                float meanDist = (float) (set.getMeanDistance());
 
-                    curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                shaderProgram.setUniformf("u_alpha", alphas[base.ct.getFirstOrdinal()] * base.opacity);
+                shaderProgram.setUniformf("u_falloff", set.profileDecay);
+                shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.5)) * sizeFactor * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                shaderProgram.setUniformf("u_sizeLimits", (float) (set.particleSizeLimitsPoint[0] / camera.getFovFactor()), (float) (set.particleSizeLimitsPoint[1] / camera.getFovFactor()));
 
-                }
+                curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+
             }
         }
     }
@@ -185,8 +183,8 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, renderable);
             }
             if (state) {

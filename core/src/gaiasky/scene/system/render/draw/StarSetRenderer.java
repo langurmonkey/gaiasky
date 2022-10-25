@@ -105,105 +105,103 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
 
         float sizeFactor = utils.getDatasetSizeFactor(render.entity, hl, desc);
 
-        synchronized (render) {
-            if (!set.disposed) {
-                boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
-                if (!inGpu(render)) {
-                    int n = set.data().size();
-                    int offset = addMeshData(n * 4, n * 6);
-                    setOffset(render, offset);
-                    // Get mesh, reset indices
-                    curr = meshes.get(offset);
-                    ensureTempVertsSize(n * 4 * curr.vertexSize);
-                    ensureTempIndicesSize(n * 6);
-                    int numVerticesAdded = 0;
-                    int numStarsAdded = 0;
+        if (!set.disposed) {
+            boolean hlCmap = hl.isHighlighted() && !hl.isHlplain();
+            if (!inGpu(render)) {
+                int n = set.data().size();
+                int offset = addMeshData(n * 4, n * 6);
+                setOffset(render, offset);
+                // Get mesh, reset indices
+                curr = meshes.get(offset);
+                ensureTempVertsSize(n * 4 * curr.vertexSize);
+                ensureTempIndicesSize(n * 6);
+                int numVerticesAdded = 0;
+                int numStarsAdded = 0;
 
-                    for (int i = 0; i < n; i++) {
-                        if (utils.filter(i, set, desc) && set.isVisible(i)) {
-                            IParticleRecord particle = set.data().get(i);
-                            if (!Double.isFinite(particle.size())) {
-                                logger.debug("Star " + particle.id() + " has a non-finite size");
-                                continue;
-                            }
-                            // 4 vertices per star
-                            for (int vert = 0; vert < 4; vert++) {
-                                // Vertex POSITION
-                                tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
-                                tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
-
-                                // UV coordinates
-                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
-
-                                // COLOR
-                                if (hlCmap) {
-                                    // Color map
-                                    double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                } else {
-                                    // Plain
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
-                                }
-
-                                // SIZE
-                                tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
-
-                                // PROPER MOTION [u/yr]
-                                tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
-
-                                // STAR POSITION [u]
-                                tempVerts[curr.vertexIdx + starPosOffset] = (float) particle.x();
-                                tempVerts[curr.vertexIdx + starPosOffset + 1] = (float) particle.y();
-                                tempVerts[curr.vertexIdx + starPosOffset + 2] = (float) particle.z();
-
-                                curr.vertexIdx += curr.vertexSize;
-                                curr.numVertices++;
-                                numVerticesAdded++;
-                            }
-                            // Indices
-                            quadIndices(curr);
-                            numStarsAdded++;
+                for (int i = 0; i < n; i++) {
+                    if (utils.filter(i, set, desc) && set.isVisible(i)) {
+                        IParticleRecord particle = set.data().get(i);
+                        if (!Double.isFinite(particle.size())) {
+                            logger.debug("Star " + particle.id() + " has a non-finite size");
+                            continue;
                         }
-                    }
-                    int count = numVerticesAdded * curr.vertexSize;
-                    setCount(render, count);
-                    curr.mesh.setVertices(tempVerts, 0, count);
-                    curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
+                        // 4 vertices per star
+                        for (int vert = 0; vert < 4; vert++) {
+                            // Vertex POSITION
+                            tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
+                            tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
 
-                    setInGpu(render, true);
+                            // UV coordinates
+                            tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                            tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+
+                            // COLOR
+                            if (hlCmap) {
+                                // Color map
+                                double[] color = cmap.colormap(hl.getHlcmi(), hl.getHlcma().get(particle), hl.getHlcmmin(), hl.getHlcmmax());
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                            } else {
+                                // Plain
+                                tempVerts[curr.vertexIdx + curr.colorOffset] = utils.getColor(i, set, hl);
+                            }
+
+                            // SIZE
+                            tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * sizeFactor;
+
+                            // PROPER MOTION [u/yr]
+                            tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
+                            tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
+                            tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
+
+                            // STAR POSITION [u]
+                            tempVerts[curr.vertexIdx + starPosOffset] = (float) particle.x();
+                            tempVerts[curr.vertexIdx + starPosOffset + 1] = (float) particle.y();
+                            tempVerts[curr.vertexIdx + starPosOffset + 2] = (float) particle.z();
+
+                            curr.vertexIdx += curr.vertexSize;
+                            curr.numVertices++;
+                            numVerticesAdded++;
+                        }
+                        // Indices
+                        quadIndices(curr);
+                        numStarsAdded++;
+                    }
+                }
+                int count = numVerticesAdded * curr.vertexSize;
+                setCount(render, count);
+                curr.mesh.setVertices(tempVerts, 0, count);
+                curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
+
+                setInGpu(render, true);
+            }
+
+            /*
+             * RENDER
+             */
+            curr = meshes.get(getOffset(render));
+            if (curr != null) {
+                if (triComponent.starTex != null) {
+                    triComponent.starTex.bind(0);
+                    shaderProgram.setUniformi("u_starTex", 0);
                 }
 
-                /*
-                 * RENDER
-                 */
-                curr = meshes.get(getOffset(render));
-                if (curr != null) {
-                    if (triComponent.starTex != null) {
-                        triComponent.starTex.bind(0);
-                        shaderProgram.setUniformi("u_starTex", 0);
-                    }
+                triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
+                triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
+                shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
-                    triComponent.alphaSizeBr[0] = base.opacity * alphas[base.ct.getFirstOrdinal()];
-                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
-                    shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
+                // Days since epoch
+                // Emulate double with floats, for compatibility
+                double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
+                float curRt2 = (float) (curRt - (double) ((float) curRt));
+                shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
-                    // Days since epoch
-                    // Emulate double with floats, for compatibility
-                    double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);
-                    float curRt2 = (float) (curRt - (double) ((float) curRt));
-                    shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
+                // Opacity limits
+                triComponent.setOpacityLimitsUniform(shaderProgram, hl);
 
-                    // Opacity limits
-                    triComponent.setOpacityLimitsUniform(shaderProgram, hl);
-
-                    try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-                    } catch (IllegalArgumentException e) {
-                        logger.error(e, "Render exception");
-                    }
+                try {
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                } catch (IllegalArgumentException e) {
+                    logger.error(e, "Render exception");
                 }
             }
         }
