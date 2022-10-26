@@ -1369,13 +1369,9 @@ public enum Event {
     CLEAR_SHADERS,
 
     /**
-     * Disposes the post-processor and re-initializes it.
+     * Resets the main renderer.
      */
-    REINITIALIZE_POSTPROCESSOR,
-    /**
-     * Disposes the current scene graph renderer and re-initializes it.
-     */
-    REINITIALIZE_RENDERER,
+    RESET_RENDERER,
 
     /**
      * Contains an array of booleans with the visibility of each ComponentType,

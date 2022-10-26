@@ -1112,10 +1112,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     /**
      * Resizes the render systems of this renderer.
      *
-     * @param tw              New target (screen) width.
-     * @param th              New target (screen) height.
-     * @param rw              New render buffer width.
-     * @param rh              New render buffer height.
+     * @param tw New target (screen) width.
+     * @param th New target (screen) height.
+     * @param rw New render buffer width.
+     * @param rh New render buffer height.
      */
     public void resizeRenderSystems(final int tw, final int th, final int rw, final int rh) {
         for (IRenderSystem rendSys : renderSystems) {
@@ -1218,6 +1218,17 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
         return sys;
+    }
+
+    /**
+     * Resets the render flags for all systems.
+     */
+    public void resetRenderSystemFlags() {
+        for (IRenderSystem system : renderSystems) {
+            if (system instanceof AbstractRenderSystem) {
+                ((AbstractRenderSystem) system).resetFlags();
+            }
+        }
     }
 
 }

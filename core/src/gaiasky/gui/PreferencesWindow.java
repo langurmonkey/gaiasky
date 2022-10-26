@@ -2127,7 +2127,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 || settings.graphics.fullScreen.bitDepth != selected.bitsPerPixel))
                 || (!settings.graphics.fullScreen.active
                 && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
-        boolean reloadRenderSystem = false;
+        boolean resetRenderFlags = false;
 
         settings.graphics.fullScreen.active = fullScreen.isChecked();
 
@@ -2211,13 +2211,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Motion blur
         if (motionBlur != null) {
-            reloadRenderSystem = settings.postprocess.motionBlur.active != motionBlur.isChecked();
+            resetRenderFlags = settings.postprocess.motionBlur.active != motionBlur.isChecked();
             GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked()));
         }
 
         // SSR
         if (ssr != null) {
-            reloadRenderSystem = reloadRenderSystem || settings.postprocess.ssr.active != ssr.isChecked();
+            resetRenderFlags = resetRenderFlags || settings.postprocess.ssr.active != ssr.isChecked();
             GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
         }
 
@@ -2379,8 +2379,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             });
         }
 
-        if (reloadRenderSystem) {
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.REINITIALIZE_RENDERER, this));
+        if (resetRenderFlags) {
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.RESET_RENDERER, this));
         }
 
         if (reloadLang) {

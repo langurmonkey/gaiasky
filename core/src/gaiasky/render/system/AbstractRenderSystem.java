@@ -217,4 +217,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         postRunnables = null;
     }
 
+    public void resetFlags() {
+        vrScaleFlag = false;
+        depthBufferFlag = false;
+    }
 }

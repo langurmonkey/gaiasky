@@ -686,7 +686,7 @@ public class GlobalResources {
         FileHandle loc = Gdx.files.absolute(baseLocation);
         FileHandle[] files = loc.list();
         for (FileHandle file : files) {
-            for(String suffix : sideSuffixes) {
+            for (String suffix : sideSuffixes) {
                 if (file.name().contains("_" + suffix + ".")) {
                     // Found!
                     return file.file().getAbsolutePath().replaceAll("\\\\", "/");
@@ -715,34 +715,35 @@ public class GlobalResources {
     }
 
     /**
-     * Generates all combinations of all sizes of all the strings given in values
+     * Generates all combinations of all sizes of all the strings given in values.
      *
-     * @param values The input strings to combine
+     * @param values The input strings to combine.
      *
-     * @return The combinations
+     * @return The resulting combinations.
      */
     public static String[] combinations(String[] values) {
-        return combinations(values, 0).toArray(String.class);
-    }
-
-    private static Array<String> combinations(String[] values, int startIndex) {
         Array<String> combinations = new Array<>();
-        // Simple case
-        if (startIndex == values.length - 1) {
-            combinations.add("");
-            combinations.add(values[startIndex]);
-            return combinations;
-        }
-        // Recursive case
-        for (int i = startIndex; i < values.length; i++) {
-            // With and without
-            Array<String> cbs = combinations(values, i + 1);
-            for (String cb : cbs) {
-                combinations.add(cb);
-                combinations.add(values[i] + cb);
+        int n = values.length;
+        int top = (int) Math.pow(2, n);
+
+        // bits holds the integer whose binary representation indicates the state for each value (on/off).
+        for (int bits = 0; bits < top; bits++) {
+            StringBuilder defines = new StringBuilder();
+            String bin = TextUtils.padString(Integer.toBinaryString(bits), n, '0');
+
+            // Enable defines.
+            for (int bit = 0; bit < n; bit++) {
+                int idx = (n - 1) - bit;
+                if(bin.charAt(idx) == '1') {
+                    // Enable define at bit position.
+                    defines.append(values[bit]);
+                }
             }
+
+            combinations.add(defines.toString());
         }
-        return combinations;
+
+        return combinations.toArray(String.class);
     }
 
     /**

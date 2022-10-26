@@ -34,6 +34,7 @@ public class TextUtils {
      *
      * @param in         The character sequence.
      * @param breakChars The number of characters per line.
+     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(CharSequence in, int breakChars) {
@@ -46,6 +47,7 @@ public class TextUtils {
      *
      * @param in         The string.
      * @param breakChars The number of characters per line.
+     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(String in, int breakChars) {
@@ -59,6 +61,7 @@ public class TextUtils {
      * @param in         The string.
      * @param breakChars The number of characters per line.
      * @param forceBreak Break the string even when there are not separator characters.
+     *
      * @return The string, broken into lines.
      */
     public static String breakCharacters(String in, int breakChars, boolean forceBreak) {
@@ -163,6 +166,7 @@ public class TextUtils {
      * -> ModelTextureBump
      *
      * @param property The property displayName
+     *
      * @return The method name
      */
     public static String propertyToMethodName(String property) {
@@ -178,6 +182,7 @@ public class TextUtils {
      * Returns the given string with the first letter capitalised
      *
      * @param line The input string
+     *
      * @return The string with its first letter capitalised
      */
     public static String capitalise(String line) {
@@ -189,6 +194,7 @@ public class TextUtils {
      * others in lower case
      *
      * @param line The input string
+     *
      * @return The string with its first letter capitalised and the others in
      * lower case
      */
@@ -201,6 +207,7 @@ public class TextUtils {
      *
      * @param split The split
      * @param strs  The strings
+     *
      * @return The concatenation
      */
     public static String concatenate(String split, String... strs) {
@@ -222,6 +229,7 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
+     *
      * @return The concatenation
      */
     public static String concatenate(final String split, final Array<String> strings) {
@@ -241,6 +249,7 @@ public class TextUtils {
      *
      * @param split   The split
      * @param strings The strings
+     *
      * @return The concatenation
      */
     public static String concatenate(final String split, final java.util.List<String> strings) {
@@ -327,6 +336,7 @@ public class TextUtils {
      *
      * @param base     The base string
      * @param suffixes All the suffixes
+     *
      * @return The result
      */
     public static String[] concatAll(String base, String[] suffixes) {
@@ -719,10 +729,28 @@ public class TextUtils {
     }
 
     public static String classSimpleName(String className) {
-        if(className.contains(".")) {
-           return className.substring(className.lastIndexOf(".") + 1);
+        if (className.contains(".")) {
+            return className.substring(className.lastIndexOf(".") + 1);
         } else {
             return className;
+        }
+    }
+
+    /**
+     * Pads the given string with the given character to be the given length.
+     *
+     * @param str     The string to pad.
+     * @param length  The target length.
+     * @param padChar The padding character to use.
+     *
+     * @return The padded string, or the original string if its length was greater than
+     * the given target length.
+     */
+    public static String padString(String str, int length, char padChar) {
+        if(str.length() >= length) {
+            return str;
+        } else {
+            return String.format("%1$" + length + "s", str).replace(' ', padChar);
         }
     }
 

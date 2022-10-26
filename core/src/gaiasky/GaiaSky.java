@@ -6,7 +6,6 @@
 package gaiasky;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
@@ -50,7 +49,6 @@ import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.ModelComponent;
-import gaiasky.scene.system.update.DatasetDescriptionUpdater;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
@@ -681,7 +679,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE,
                 Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
-                Event.UI_SCALE_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR, Event.SCENE_FORCE_UPDATE);
+                Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE);
 
         // Re-enable input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -1655,26 +1653,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             key = (String) data[0];
             removeRunnable(key);
             break;
-        case REINITIALIZE_POSTPROCESSOR:
-            if (postProcessor != null) {
-                postProcessor.dispose();
-            } else {
-                postProcessor = new MainPostProcessor(scene);
-            }
-            // Initialize
-            postProcessor.initialize(assetManager);
-            // Set up
-            postProcessor.doneLoading(assetManager);
-            break;
-        case REINITIALIZE_RENDERER:
-            sceneRenderer.setRendering(false);
-            logger.info("Re-initializing main renderer");
+        case RESET_RENDERER:
             if (sceneRenderer != null) {
-                sceneRenderer.dispose();
-                // Initialize and load
-                sceneRenderer.doneLoading(assetManager);
-                sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
-                sceneRenderer.setRendering(true);
+                sceneRenderer.resetRenderSystemFlags();
             }
             break;
         case SCENE_FORCE_UPDATE:

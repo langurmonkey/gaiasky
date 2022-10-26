@@ -69,7 +69,7 @@ public final class PingPongBuffer {
         // BUFFER USED FOR THE ACTUAL RENDERING:
         // n RENDER TARGETS:
         //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
-        //      1: DEPTH - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
+        //      1: DEPTH   - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
         //      2: COLOR 1 - FLOAT TEXTURE ATTACHMENT (VELOCITY BUFFER)
         //      3: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
         //      4: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
@@ -131,7 +131,7 @@ public final class PingPongBuffer {
         // Reflection mask buffer
         if (hasReflectionMask) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-            reflectionMaskIndex = idx++;
+            reflectionMaskIndex = idx;
         }
 
         return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, velIndex, normalIndex, reflectionMaskIndex);
@@ -170,6 +170,7 @@ public final class PingPongBuffer {
      * <p>
      * If this instance of the object was owning the resources, they will be
      * preserved and will be restored by a {@link #reset()} call.
+     * </p>
      *
      * @param buffer1 the first buffer
      * @param buffer2 the second buffer
@@ -241,8 +242,7 @@ public final class PingPongBuffer {
 
     /**
      * Starts and/or continue ping-ponging, begin capturing on the next
-     * available buffer, returns the result of the previous {@link #capture()}
-     * call.
+     * available buffer, returns the result of the previous call.
      *
      * @return the Texture containing the result.
      */
