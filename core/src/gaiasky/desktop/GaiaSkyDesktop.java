@@ -37,6 +37,7 @@ import gaiasky.util.math.MathUtilsd;
 import org.yaml.snakeyaml.Yaml;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -426,10 +427,10 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg) {
-        configureWindowSize(cfg, 1f, 1f);
+        configureWindowSize(cfg, 1f, 1f, true);
     }
 
-    private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg, float widthFactor, float heightFactor) {
+    private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg, float widthFactor, float heightFactor, boolean force169Ratio) {
         int w = Settings.settings.graphics.getScreenWidth();
         int h = Settings.settings.graphics.getScreenHeight();
         if (!SysUtils.isMac()) {
@@ -437,9 +438,12 @@ public class GaiaSkyDesktop implements IObserver {
             if (w <= 0 || h <= 0) {
                 try {
                     GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                    java.awt.DisplayMode dm = gd.getDisplayMode();
-                    w = (int) Math.max(1600, (dm.getWidth() * 0.85f));
-                    h = (int) Math.max(900, (dm.getHeight() * 0.85f));
+                    GraphicsConfiguration gc = gd.getDefaultConfiguration();
+                    AffineTransform transform = gc.getDefaultTransform();
+                    double scaleX = transform.getScaleX();
+                    double scaleY = transform.getScaleY();
+                    w = (int) Math.max(1600, gc.getBounds().getWidth() * scaleX * 0.85f);
+                    h = (int) Math.max(900, gc.getBounds().getHeight() * scaleY * 0.85f);
                     Settings.settings.graphics.resolution[0] = w;
                     Settings.settings.graphics.resolution[1] = h;
                 } catch (HeadlessException he) {
@@ -473,6 +477,15 @@ public class GaiaSkyDesktop implements IObserver {
             Settings.settings.graphics.resolution[1] = h;
         }
 
+        // Force aspect ratio.
+        if (force169Ratio) {
+            if (h < w) {
+                // Horizontal ratio, force 16:9, while keeping height fixed.
+                w = (int) ((h / 9d) * 16d);
+            }  // Vertical ratio, do nothing.
+
+        }
+
         // Apply factors.
         Settings.settings.graphics.resolution[0] = (int) (Settings.settings.graphics.resolution[0] * widthFactor);
         Settings.settings.graphics.resolution[1] = (int) (Settings.settings.graphics.resolution[1] * heightFactor);
@@ -500,7 +513,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
-        configureWindowSize(cfg, 0.6f, 0.85f);
+        configureWindowSize(cfg, 0.6f, 0.85f, false);
         cfg.setResizable(false);
         cfg.setTitle(title);
 
