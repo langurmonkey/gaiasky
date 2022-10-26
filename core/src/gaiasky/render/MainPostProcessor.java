@@ -203,7 +203,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         // Add to scene graph
         initializeBlurObject();
         if (blurObject != null && !blurObjectAdded) {
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.SCENE_ADD_OBJECT_CMD, this, blurObject, false));
+            GaiaSky.postRunnable(() -> {
+                scene.engine.addEntity(blurObject);
+                EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, blurObject, false);
+            });
             blurObjectView = new BaseView(blurObject);
             blurObjectAdded = true;
         }
@@ -336,6 +339,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
             var body = Mapper.body.get(entity);
             body.setColor(new float[] { 0, 0, 0, 0 });
+            body.setSize(1.0);
 
             var label = Mapper.label.get(entity);
             label.label = false;
