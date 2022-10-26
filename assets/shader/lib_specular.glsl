@@ -1,4 +1,6 @@
-#define PI 3.14159
+#ifndef PI
+#define PI 3.141592653589793238462643383
+#endif // PI
 // https://gist.github.com/galek/53557375251e1a942dfa
 // compute fresnel specular factor for given base specular and product
 // product could be NdV or VdH depending on used technique
