@@ -307,7 +307,7 @@ public class Constants {
     public static final float UI_SCALE_INTERNAL_MAX = 1.7f;
     public static final float UI_SCALE_MIN = 0.75f;
     public static final float UI_SCALE_MAX = 3.0f;
-    public static final float BACKBUFFER_SCALE_MIN = 0.5f;
+    public static final float BACKBUFFER_SCALE_MIN = 0.1f;
     public static final float BACKBUFFER_SCALE_MAX = 4.0f;
     public static final float BACKBUFFER_SCALE_STEP = 0.1f;
 
