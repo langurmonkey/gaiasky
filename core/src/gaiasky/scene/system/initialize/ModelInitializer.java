@@ -48,7 +48,6 @@ import gaiasky.util.math.Vector3d;
 public class ModelInitializer extends AbstractInitSystem {
     private static final Logger.Log logger = Logger.getLogger(ModelInitializer.class.getSimpleName());
 
-
     /** Reference to the spacecraft radio. **/
     private SpacecraftRadio radio;
 
@@ -248,6 +247,8 @@ public class ModelInitializer extends AbstractInitSystem {
         if (model.renderConsumer == null) {
             model.renderConsumer = ModelEntityRenderSystem::renderGenericModel;
         }
+        // Model size. Used to compute an accurate solid angle.
+        initializeModelSize(model);
 
         // Default values
         celestial.innerRad = 0.2f;
@@ -383,6 +384,22 @@ public class ModelInitializer extends AbstractInitSystem {
     private void initializeClouds(AssetManager manager, CloudComponent cloudComponent) {
         if (cloudComponent != null) {
             cloudComponent.doneLoading(manager);
+        }
+    }
+
+    public static void initializeModelSize(Model model) {
+        if (model.model != null && model.model.params != null) {
+            if (model.model.params.containsKey("diameter")) {
+                model.modelSize = (Double) model.model.params.get("diameter");
+            } else if (model.model.params.containsKey("size")) {
+                model.modelSize = (Double) model.model.params.get("size");
+            } else if (model.model.params.containsKey("width")) {
+                model.modelSize = (Double) model.model.params.get("width");
+            } else if (model.model.params.containsKey("height")) {
+                model.modelSize = (Double) model.model.params.get("height");
+            } else if (model.model.params.containsKey("depth")) {
+                model.modelSize = (Double) model.model.params.get("depth");
+            }
         }
     }
 }

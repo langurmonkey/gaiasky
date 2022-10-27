@@ -14,6 +14,11 @@ public class Model implements Component {
 
     /** The model. **/
     public ModelComponent model;
+    /**
+     * In constructed models, this attribute is used to cache the model size (diameter, size, width, height, depth)
+     * in order to compute an accurate solid angle.
+     */
+    public double modelSize = 1;
 
     /** The render consumer. **/
     public Consumer10<ModelEntityRenderSystem, Entity, Model, IntModelBatch, Float, Double, RenderingContext, RenderGroup, Boolean, Boolean> renderConsumer;

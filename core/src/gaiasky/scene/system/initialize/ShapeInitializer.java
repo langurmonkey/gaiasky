@@ -106,5 +106,8 @@ public class ShapeInitializer extends AbstractInitSystem {
         if (rt.renderGroup == null) {
             rt.renderGroup = RenderGroup.MODEL_BG;
         }
+
+        // Model size. Used to compute an accurate solid angle.
+        ModelInitializer.initializeModelSize(modelComp);
     }
 }

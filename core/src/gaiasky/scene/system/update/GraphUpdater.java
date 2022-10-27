@@ -165,7 +165,10 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 body.solidAngleApparent = body.solidAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
             } else {
                 // Regular objects.
-                body.solidAngle = FastMath.atan(body.size / body.distToCamera);
+                // Take into account size of model objects.
+                var model = Mapper.model.get(entity);
+                double modelSize = model != null ? model.modelSize : 1;
+                body.solidAngle = FastMath.atan(body.size * modelSize / body.distToCamera);
                 body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
             }
 

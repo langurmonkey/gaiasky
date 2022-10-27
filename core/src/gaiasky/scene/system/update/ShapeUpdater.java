@@ -7,7 +7,6 @@ import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.LightingUtils;
-import gaiasky.util.math.Vector3d;
 
 import java.util.Locale;
 
