@@ -3,7 +3,7 @@ style: github
 template: releasenotes.tpl.txt
 info:
     title: Gaia Sky release notes
-    repository_url: https://gitlab.com/gaiasky/gaiasky
+    repository_url: https://codeberg.org/gaiasky/gaiasky
 
 options:
 
