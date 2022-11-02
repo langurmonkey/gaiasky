@@ -2069,7 +2069,7 @@ public interface IScriptingInterface {
     void setExposureToneMappingLevel(double level);
 
     /**
-     * Enables and disables the planetarium mode.
+     * Enables or disables the planetarium mode.
      *
      * @param state The boolean state. True to activate, false to deactivate.
      */
@@ -2084,11 +2084,70 @@ public interface IScriptingInterface {
     void setCubemapMode(boolean state, String projection);
 
     /**
-     * Enables and disables the panorama mode.
+     * Enables or disables the panorama mode.
      *
      * @param state The boolean state. True to activate, false to deactivate.
      */
     void setPanoramaMode(boolean state);
+
+    /**
+     * Sets the resolution (width and height are the same) of each side of the
+     * frame buffers used to capture each of the 6 directions that go into the
+     * cubemap to construct the equirectangular image for the 360 mode. This
+     * should roughly be 1/3 of the output resolution at which the 360 mode are
+     * to be captured (or screen resolution).
+     *
+     * @param resolution The resolution of each of the sides of the cubemap for the 360
+     *                   mode.
+     */
+    void setCubemapResolution(int resolution);
+
+    /**
+     * Sets the cubemap projection to use.
+     * Accepted values are:
+     * <ul>
+     *     <li>"equirectangular" - spherical projection.</li>
+     *     <li>"cylindrical" - cylindrical projection.</li>
+     *     <li>"hammer" - Hammer projection.</li>
+     *     <li>"orthographic" - orthographic projection, with the two hemispheres side-by-side.</li>
+     *     <li>"orthosphere" - orthographic projection, with the two hemispheres overlaid. That gives an outside view of the camera's celestial sphere. </li>
+     *     <li>"orthosphere_crosseye" - same as orthosphere, but duplicated to produce a stereoscopic cross-eye image (side by side). </li>
+     *     <li>"azimuthal_equidistant" - azimuthal equidistant projection, used in Planetarium mode.</li>
+     * </ul>
+     * See {@link CubemapProjections} for possible
+     * values.
+     *
+     * @param projection The projection, in ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"orthosphere_crossye"|"azimuthal_equidistant"].
+     */
+    void setCubemapProjection(String projection);
+
+    /**
+     * Enables or disables the orthosphere view mode.
+     *
+     * @param state The state, true to activate and false to deactivate.
+     */
+    void setOrthosphereViewMode(boolean state);
+
+    /**
+     * Enables and disables the stereoscopic mode.
+     *
+     * @param state The boolean state. True to activate, false to deactivate.
+     */
+    void setStereoscopicMode(boolean state);
+
+    /**
+     * Changes the stereoscopic profile.
+     *
+     * @param index The index of the new profile:
+     *              <ul>
+     *              <li>0 - VR_HEADSET</li>
+     *              <li>1 - HD_3DTV</li>
+     *              <li>2 - CROSSEYE</li>
+     *              <li>3 - PARALLEL_VIEW</li>
+     *              <li>4 - ANAGLYPHIC (red-cyan)</li>
+     *              </ul>
+     */
+    void setStereoscopicProfile(int index);
 
     /**
      * Sets the re-projection mode. Possible modes are:
@@ -2116,60 +2175,10 @@ public interface IScriptingInterface {
 
     /**
      * Sets the scaling factor for the back-buffer.
+     *
      * @param scale The back-buffer scaling factor.
      */
     void setBackBufferScale(float scale);
-
-    /**
-     * Sets the resolution (width and height are the same) of each side of the
-     * frame buffers used to capture each of the 6 directions that go into the
-     * cubemap to construct the equirectangular image for the 360 mode. This
-     * should roughly be 1/3 of the output resolution at which the 360 mode are
-     * to be captured (or screen resolution).
-     *
-     * @param resolution The resolution of each of the sides of the cubemap for the 360
-     *                   mode.
-     */
-    void setCubemapResolution(int resolution);
-
-    /**
-     * Sets the cubemap projection to use.
-     * Accepted values are:
-     * <ul>
-     *     <li>"equirectangular" - spherical projection.</li>
-     *     <li>"cylindrical" - cylindrical projection.</li>
-     *     <li>"hammer" - Hammer projection.</li>
-     *     <li>"orthographic" - orthographic projection, with the two hemispheres side-by-side.</li>
-     *     <li>"orthosphere" - orthographic projection, with the two hemispheres overlaid. That gives an outside view of the camera's celestial sphere. </li>
-     *     <li>"azimuthal_equidistant" - azimuthal equidistant projection, used in Planetarium mode.</li>
-     * </ul>
-     * See {@link CubemapProjections} for possible
-     * values.
-     *
-     * @param projection The projection, in ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"azimuthal_equidistant"].
-     */
-    void setCubemapProjection(String projection);
-
-    /**
-     * Enables and disables the stereoscopic mode.
-     *
-     * @param state The boolean state. True to activate, false to deactivate.
-     */
-    void setStereoscopicMode(boolean state);
-
-    /**
-     * Changes the stereoscopic profile.
-     *
-     * @param index The index of the new profile:
-     *              <ul>
-     *              <li>0 - VR_HEADSET</li>
-     *              <li>1 - HD_3DTV</li>
-     *              <li>2 - CROSSEYE</li>
-     *              <li>3 - PARALLEL_VIEW</li>
-     *              <li>4 - ANAGLYPHIC (red-cyan)</li>
-     *              </ul>
-     */
-    void setStereoscopicProfile(int index);
 
     /**
      * Gets the current frame number. Useful for timing actions in scripts.

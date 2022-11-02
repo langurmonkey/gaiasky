@@ -2634,6 +2634,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setOrthosphereViewMode(boolean state) {
+        postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjection.ORTHOSPHERE));
+    }
+
+    @Override
     public void setStereoscopicMode(boolean state) {
         postRunnable(() -> em.post(Event.STEREOSCOPIC_CMD, this, state));
     }

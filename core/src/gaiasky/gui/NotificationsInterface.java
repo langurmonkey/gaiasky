@@ -323,16 +323,18 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                     for (Pair<String[], String> p : mpi.mappings) {
                         String[] keys = p.getFirst();
                         String action = p.getSecond();
-                        StringBuilder msg = new StringBuilder();
-                        msg.append("<");
-                        for (int i = 0; i < keys.length; i++) {
-                            msg.append(keys[i].toUpperCase());
-                            if (i < keys.length - 1) {
-                                msg.append("+");
+                        if (keys != null && keys.length > 0 && action != null && !action.isEmpty()) {
+                            StringBuilder msg = new StringBuilder();
+                            msg.append("<");
+                            for (int i = 0; i < keys.length; i++) {
+                                msg.append(keys[i].toUpperCase());
+                                if (i < keys.length - 1) {
+                                    msg.append("+");
+                                }
                             }
+                            msg.append("> ").append(action);
+                            addMessage(msg.toString());
                         }
-                        msg.append("> ").append(action);
-                        addMessage(msg.toString());
                     }
                 }
                 break;

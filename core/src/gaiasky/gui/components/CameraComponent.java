@@ -34,7 +34,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     protected SelectBox<CameraComboBoxBean> cameraMode;
     protected OwnSliderPlus fieldOfView, cameraSpeed, turnSpeed, rotateSpeed;
     protected CheckBox focusLock, orientationLock, cinematic;
-    protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonMaster;
+    protected OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonMaster;
     protected boolean fovFlag = true;
     private boolean fieldLock = false;
 
@@ -91,6 +91,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
                         buttonCubemap.setChecked(false);
                         buttonDome.setProgrammaticChangeEvents(true);
                         buttonDome.setChecked(false);
+                        buttonOrthosphere.setProgrammaticChangeEvents(true);
+                        buttonOrthosphere.setChecked(false);
                     }
                     // Enable/disable
                     EventManager.publish(Event.STEREOSCOPIC_CMD, button3d, button3d.isChecked());
@@ -111,6 +113,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
                         buttonCubemap.setChecked(false);
                         button3d.setProgrammaticChangeEvents(true);
                         button3d.setChecked(false);
+                        buttonOrthosphere.setProgrammaticChangeEvents(true);
+                        buttonOrthosphere.setChecked(false);
                     }
                     // Enable/disable
                     EventManager.publish(Event.CUBEMAP_CMD, buttonDome, buttonDome.isChecked(), CubemapProjection.AZIMUTHAL_EQUIDISTANT);
@@ -133,10 +137,36 @@ public class CameraComponent extends GuiComponent implements IObserver {
                         buttonDome.setChecked(false);
                         button3d.setProgrammaticChangeEvents(true);
                         button3d.setChecked(false);
+                        buttonOrthosphere.setProgrammaticChangeEvents(true);
+                        buttonOrthosphere.setChecked(false);
                     }
                     // Enable/disable
                     EventManager.publish(Event.CUBEMAP_CMD, buttonCubemap, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR);
                     fieldOfView.setDisabled(buttonCubemap.isChecked());
+                    return true;
+                }
+                return false;
+            });
+
+            final Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
+            buttonOrthosphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
+            buttonOrthosphere.setProgrammaticChangeEvents(false);
+            final String hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere");
+            buttonOrthosphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
+            buttonOrthosphere.setName("orthosphere");
+            buttonOrthosphere.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (buttonOrthosphere.isChecked()) {
+                        buttonCubemap.setProgrammaticChangeEvents(true);
+                        buttonCubemap.setChecked(false);
+                        buttonDome.setProgrammaticChangeEvents(true);
+                        buttonDome.setChecked(false);
+                        button3d.setProgrammaticChangeEvents(true);
+                        button3d.setChecked(false);
+                    }
+                    // Enable/disable
+                    EventManager.publish(Event.CUBEMAP_CMD, buttonOrthosphere, buttonOrthosphere.isChecked(), CubemapProjection.ORTHOSPHERE);
+                    fieldOfView.setDisabled(buttonOrthosphere.isChecked());
                     return true;
                 }
                 return false;
@@ -284,6 +314,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             buttonGroup.addActor(button3d);
             buttonGroup.addActor(buttonDome);
             buttonGroup.addActor(buttonCubemap);
+            buttonGroup.addActor(buttonOrthosphere);
             if (Settings.settings.program.net.isMasterInstance())
                 buttonGroup.addActor(buttonMaster);
         }
@@ -404,6 +435,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
                     buttonDome.setProgrammaticChangeEvents(false);
                     buttonDome.setChecked(enable);
                     buttonDome.setProgrammaticChangeEvents(true);
+                    fieldOfView.setDisabled(enable);
+                } else if (proj.isOrthosphere() && source != buttonOrthosphere) {
+                    buttonOrthosphere.setProgrammaticChangeEvents(false);
+                    buttonOrthosphere.setChecked(enable);
+                    buttonOrthosphere.setProgrammaticChangeEvents(true);
                     fieldOfView.setDisabled(enable);
                 }
 

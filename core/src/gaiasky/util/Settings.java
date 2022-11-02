@@ -909,6 +909,17 @@ public class Settings {
             }
 
             /**
+             * Checks whether the program is in orthosphere view mode
+             *
+             * @return Whether orthosphere view mode is on
+             */
+            @JsonIgnore
+            public boolean isOrthosphereOn() {
+                return active && projection.isOrthosphere();
+            }
+
+
+            /**
              * Checks whether we are in fixed fov mode (slave, planetarium, panorama)
              *
              * @return Whether we are in a fixed-fov mode
@@ -1084,6 +1095,13 @@ public class Settings {
                         mpi.title = I18n.msg("gui.planetarium.title");
                         mpi.header = I18n.msg("gui.planetarium.notice.header");
                         mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
+                    } else if (modeCubemap.projection.isOrthosphere()) {
+                        String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere");
+                        String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere.profile");
+                        mpi.title = I18n.msg("gui.orthosphere.title");
+                        mpi.header = I18n.msg("gui.orthosphere.notice.header");
+                        mpi.addMapping(I18n.msg("gui.orthosphere.notice.back"), keysStrToggle);
+                        mpi.addMapping(I18n.msg("gui.orthosphere.notice.profile"), keysStrProfile);
                     }
 
                     EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 10f);

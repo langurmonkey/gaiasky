@@ -29,8 +29,12 @@ public final class CubemapProjections extends PostProcessorEffect {
             return this.equals(AZIMUTHAL_EQUIDISTANT);
         }
 
+        public boolean isOrthosphere() {
+            return this.equals(ORTHOSPHERE) || this.equals(ORTHOSPHERE_CROSSEYE);
+        }
+
         public boolean isPanorama() {
-            return !isPlanetarium();
+            return !isPlanetarium() && !isOrthosphere();
         }
     }
 

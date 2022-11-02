@@ -538,17 +538,19 @@ public class GuiRegistry implements IObserver {
                             keysGroup.space(pad3);
                             String[] keys = m.getFirst();
                             String action = m.getSecond();
-                            for (int i = 0; i < keys.length; i++) {
-                                TextButton key = new TextButton(keys[i], skin, "key");
-                                key.pad(0, pad3, 0, pad3);
-                                key.pad(pad5);
-                                keysGroup.addActor(key);
-                                if (i < keys.length - 1) {
-                                    keysGroup.addActor(new OwnLabel("+", skin));
+                            if (keys != null && keys.length > 0 && action != null && !action.isEmpty()) {
+                                for (int i = 0; i < keys.length; i++) {
+                                    TextButton key = new TextButton(keys[i], skin, "key");
+                                    key.pad(0, pad3, 0, pad3);
+                                    key.pad(pad5);
+                                    keysGroup.addActor(key);
+                                    if (i < keys.length - 1) {
+                                        keysGroup.addActor(new OwnLabel("+", skin));
+                                    }
                                 }
+                                keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
+                                keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
                             }
-                            keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
-                            keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
                         }
                         modeChangeInfoPopup.add(keysTable).center().row();
                         if (mpi.warn != null && !mpi.warn.isEmpty()) {

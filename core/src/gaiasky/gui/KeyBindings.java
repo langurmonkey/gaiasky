@@ -318,20 +318,36 @@ public class KeyBindings {
 
         // toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
-            boolean enable = !Settings.settings.program.modeCubemap.active;
+            boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPlanetariumOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
         }, noPanorama));
 
         // toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
-            boolean enable = !Settings.settings.program.modeCubemap.active;
+            boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPanoramaOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.EQUIRECTANGULAR);
         }, noPlanetarium));
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
-            int newProjectionIndex = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 4);
-            EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
+            if (Settings.settings.program.modeCubemap.isPanoramaOn()) {
+                int newProjectionIndex = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 4);
+                EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
+            }
+        }));
+
+        // toggle orthosphere mode
+        addAction(new ProgramAction("action.toggle/element.orthosphere", () -> {
+            boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isOrthosphereOn();
+            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.ORTHOSPHERE);
+        }, noPlanetarium));
+
+        // toggle orthosphere profile
+        addAction(new ProgramAction("action.toggle/element.orthosphere.profile", () -> {
+            if (Settings.settings.program.modeCubemap.isOrthosphereOn()) {
+                int newProfileIndex = Settings.settings.program.modeCubemap.projection == CubemapProjection.ORTHOSPHERE ? CubemapProjection.ORTHOSPHERE_CROSSEYE.ordinal() : CubemapProjection.ORTHOSPHERE.ordinal();
+                EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProfileIndex]);
+            }
         }));
 
         // increase star point size by 0.5
