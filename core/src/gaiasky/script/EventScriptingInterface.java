@@ -2796,6 +2796,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             var body = Mapper.body.get(entity);
             body.setColor(color);
             body.setLabelColor(color);
+            body.setSizePc(100d);
 
             var line = Mapper.line.get(entity);
             line.lineWidth = (float) lineWidth;

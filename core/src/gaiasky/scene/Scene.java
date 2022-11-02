@@ -547,7 +547,7 @@ public class Scene {
     public void insert(Entity entity, boolean addToIndex) {
         var base = Mapper.base.get(entity);
         var graph = Mapper.graph.get(entity);
-        Entity parent = getEntity(graph.parentName);
+        var parent = getEntity(graph.parentName);
         boolean ok = true;
         if (addToIndex) {
             ok = index.addToIndex(entity);

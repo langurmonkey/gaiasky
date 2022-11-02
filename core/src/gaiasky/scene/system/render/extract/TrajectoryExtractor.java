@@ -54,6 +54,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                 boolean added = false;
                 float angleLimit = (float) Settings.settings.scene.renderer.orbitSolidAngleThreshold * camera.getFovFactor();
                 if (body.solidAngle > angleLimit) {
+
                     if (body.solidAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
                         trajectory.alpha = MathUtilsd.lint(body.solidAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, body.color[3]);
                     } else {

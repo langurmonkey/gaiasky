@@ -45,7 +45,7 @@ public class TrajectoryUtils {
     public void initOrbitMetadata(Body body, Trajectory trajectory, Verts verts) {
         PointCloudData pointCloudData = verts.pointCloudData;
         if (pointCloudData != null) {
-            if(pointCloudData.hasTime()) {
+            if (pointCloudData.hasTime()) {
                 trajectory.orbitStartMs = pointCloudData.getDate(0).toEpochMilli();
                 trajectory.orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
             }
@@ -60,13 +60,21 @@ public class TrajectoryUtils {
         trajectory.orbitTrail = trajectory.orbitTrail | trajectory.mustRefresh | (trajectory.providerClass != null && trajectory.providerClass.equals(OrbitalParametersProvider.class));
     }
 
-    public void updateSize(Body body, Trajectory trajectory, Verts verts){
+    public void updateSize(Body body, Trajectory trajectory, Verts verts) {
         PointCloudData pointCloudData = verts.pointCloudData;
         if (pointCloudData != null) {
             if (!trajectory.onlyBody && pointCloudData.getNumPoints() > 0) {
-                int last = pointCloudData.getNumPoints() - 1;
-                D31.set(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
-                body.size = (float) D31.len() * 5;
+                pointCloudData.loadPoint(D31, 0);
+                int n = pointCloudData.getNumPoints();
+                double len = 0;
+                for (int i = 1; i < n; i++) {
+                    pointCloudData.loadPoint(D32, i);
+                    double newLen = D32.sub(D31).len();
+                    if (newLen > len) {
+                        len = newLen;
+                    }
+                }
+                body.size = (float) (len * 2.5);
             }
         }
     }
