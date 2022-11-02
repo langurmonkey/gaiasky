@@ -204,6 +204,66 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 #endif//orthosphere
 
 
+
+#ifdef orthosphere_crosseye
+vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
+    vec2 vp = u_viewport;
+    tc = (tc-vec2(0.0,0.5))*2.0;
+    vec2 arv = vp.xy / min(vp.x/2., vp.y);
+    tc *= arv;
+    
+    if (tc.x<=arv.x){
+	tc.x = tc.x - arv.x/2.;
+	float r = length(tc);
+	if (r <= 1.0) {
+            vec3 cubemaptc;
+            float sx = tc.x;
+            cubemaptc.y = -tc.y;
+            float sz = -sqrt(1.0-r*r);
+            cubemaptc.x = (30. * sx -       sz)/sqrt(901.);//rotation for each view.
+            cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);//coefficients are normalized
+            vec4 b = texture(cubemap, cubemaptc);
+	        sz = -sz;
+            cubemaptc.x = (30. * sx -       sz)/sqrt(901.);
+            cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);
+	        vec4 a = texture(cubemap, cubemaptc);   
+	        float c = 1.0 - 0.5*(b.x+b.y+b.z)/3.;
+            c = c*(0.5+0.5*(a.x+a.y+a.z)/3.);
+            a.x = a.x * c;
+            a.y = a.y * c;
+            a.z = a.z * c;
+            return 1.0-(1.0-a)*(1.0-b);
+        } else {
+            return vec4(0.0, 0.0, 0.0, 1.0);
+        }
+    } else {
+	tc.x = tc.x - arv.x*1.5;
+	float r = length(tc);
+	if (r <= 1.0) {
+            vec3 cubemaptc;
+            float sx = tc.x;
+            cubemaptc.y = -tc.y;
+            float sz = -sqrt(1.0-r*r);
+            cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
+            cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
+            vec4 b = texture(cubemap, cubemaptc);
+	    sz = -sz;
+            cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
+            cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
+	    vec4 a = texture(cubemap, cubemaptc);   
+            float c = 1.0 - 0.5*(b.x+b.y+b.z)/3.;
+            c = c*(0.5+0.5*(a.x+a.y+a.z)/3.);
+            a.x = a.x * c;
+            a.y = a.y * c;
+            a.z = a.z * c;
+            return 1.0-(1.0-a)*(1.0-b);
+        } else {
+            return vec4(0.0, 0.0, 0.0, 1.0);
+        }
+	}
+}
+#endif//orthosphere_crosseye
+
 void main(void){
     fragColor = cubeToProjection(u_cubemap, v_texCoords);
 }
