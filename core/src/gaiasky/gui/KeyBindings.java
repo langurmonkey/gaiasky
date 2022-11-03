@@ -195,6 +195,8 @@ public class KeyBindings {
         BooleanRunnable noPanorama = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPanorama());
         // Condition that checks that planetarium mode is off
         BooleanRunnable noPlanetarium = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPlanetarium());
+        // Condition that checks that orthosphere view mode is off
+        BooleanRunnable noOrthosphere = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isOrthosphere());
         // Condition that checks that we are not a slave with a special projection
         BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
         // Condition that checks that we are a master and have slaves
@@ -320,18 +322,18 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPlanetariumOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
-        }, noPanorama));
+        }, noPanorama, noOrthosphere));
 
         // toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPanoramaOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.EQUIRECTANGULAR);
-        }, noPlanetarium));
+        }, noPlanetarium, noOrthosphere));
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
             if (Settings.settings.program.modeCubemap.isPanoramaOn()) {
-                int newProjectionIndex = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 4);
+                int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
         }));
@@ -340,12 +342,12 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/element.orthosphere", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isOrthosphereOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.ORTHOSPHERE);
-        }, noPlanetarium));
+        }, noPlanetarium, noPanorama));
 
         // toggle orthosphere profile
         addAction(new ProgramAction("action.toggle/element.orthosphere.profile", () -> {
             if (Settings.settings.program.modeCubemap.isOrthosphereOn()) {
-                int newProfileIndex = Settings.settings.program.modeCubemap.projection == CubemapProjection.ORTHOSPHERE ? CubemapProjection.ORTHOSPHERE_CROSSEYE.ordinal() : CubemapProjection.ORTHOSPHERE.ordinal();
+                int newProfileIndex = Settings.settings.program.modeCubemap.projection.getNextOrthosphereProfile().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProfileIndex]);
             }
         }));

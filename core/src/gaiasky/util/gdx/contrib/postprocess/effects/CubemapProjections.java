@@ -10,6 +10,10 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.CubemapProjectionsFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 /**
  * Fisheye effect
  */
@@ -35,6 +39,26 @@ public final class CubemapProjections extends PostProcessorEffect {
 
         public boolean isPanorama() {
             return !isPlanetarium() && !isOrthosphere();
+        }
+
+        public CubemapProjection getNextPanoramaProjection() {
+            return getNext(CubemapProjection::isPanorama);
+        }
+
+        public CubemapProjection getNextOrthosphereProfile() {
+            return getNext(CubemapProjection::isOrthosphere);
+        }
+
+        public CubemapProjection getNext(Function<CubemapProjection, Boolean> supplier) {
+            final int n = CubemapProjection.values().length;
+            int i = this.ordinal();
+            while (true) {
+                i = (i + 1) % n;
+                var proj = CubemapProjection.values()[i];
+                if (supplier.apply(proj)) {
+                    return proj;
+                }
+            }
         }
     }
 
