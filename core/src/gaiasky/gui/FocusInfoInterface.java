@@ -79,10 +79,10 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         this.setBackground("table-bg");
         this.skin = skin;
         // Widget width
-        float width = 360f;
+        float width = 300f;
 
         nf = new DecimalFormat("##0.##");
-        sf = new DecimalFormat("0.###E0");
+        sf = new DecimalFormat("0.##E0");
 
         view = new FocusView();
 
@@ -258,7 +258,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusActionsGroup.addActor(landOn);
         focusActionsGroup.addActor(landAt);
 
-        float w = 208f;
+        float w = 170f;
         focusId.setWidth(w);
 
         focusRA.setWidth(w);
@@ -313,13 +313,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             pointerInfo.add(pointerName).width(width).left().colspan(3).row();
             pointerInfo.add(pointerImgBtn1).left().padRight(pad3);
             pointerInfo.add(RADECPointerLabel).left();
-            pointerInfo.add(pointerRADEC).left().padLeft(pad15).row();
+            pointerInfo.add(pointerRADEC).expandX().left().padLeft(pad5).row();
             pointerInfo.add(pointerImgBtn2).left().padRight(pad3);
             pointerInfo.add(lonLatLabel).left();
-            pointerInfo.add(pointerLonLat).left().padLeft(pad15).row();
+            pointerInfo.add(pointerLonLat).expandX().left().padLeft(pad5).row();
             pointerInfo.add(viewImgBtn).left().padRight(pad3);
             pointerInfo.add(RADECViewLabel).left();
-            pointerInfo.add(viewRADEC).left().padLeft(pad15);
+            pointerInfo.add(viewRADEC).expandX().left().padLeft(pad5);
         }
 
         // CAMERA INFO
