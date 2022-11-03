@@ -15,15 +15,12 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.parse.Parser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.*;
+import java.nio.file.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -446,14 +443,27 @@ public class KeyBindings {
 
     private void initMappings() {
         final String mappingsFileName = "keyboard.mappings";
-        // Check if keyboard.mappings file exists in data folder, otherwise copy it there
+        // Check if keyboard.mappings file exists in data folder and version is greater or equal to ours, otherwise overwrite it.
         Path customMappings = SysUtils.getDefaultMappingsDir().resolve(mappingsFileName);
-        Path defaultMappings = Paths.get(Settings.settings.ASSETS_LOC, SysUtils.getMappingsDirName(), mappingsFileName);
+        Path defaultMappings = Paths.get(Settings.ASSETS_LOC, SysUtils.getMappingsDirName(), mappingsFileName);
         if (!Files.exists(customMappings)) {
-            try {
-                Files.copy(defaultMappings, customMappings, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                logger.error(e);
+            // Mappings file does not exist, just copy it.
+            overwriteMappingsFile(defaultMappings, customMappings, false);
+        } else {
+            // Check versions.
+            var customVersionStr = readFirstLine(customMappings);
+            var defaultVersionStr = readFirstLine(defaultMappings);
+            if (customVersionStr.isEmpty() || !customVersionStr.get().startsWith("#v")) {
+                // We have no version in local file, overwrite.
+                overwriteMappingsFile(defaultMappings, customMappings, true);
+            } else if (defaultVersionStr.isPresent()) {
+                var customVersion = Parser.parseInt(customVersionStr.get().substring(2));
+                var defaultVersion = Parser.parseInt(defaultVersionStr.get().substring(2));
+
+                if (defaultVersion > customVersion) {
+                    // Our version is greater, overwrite.
+                    overwriteMappingsFile(defaultMappings, customMappings, true);
+                }
             }
         }
         logger.info(I18n.msg("notif.kbd.mappings.file.use", customMappings));
@@ -481,7 +491,57 @@ public class KeyBindings {
         } catch (Exception e) {
             logger.error(e, I18n.msg("notif.kbd.mappings.error", customMappings));
         }
+    }
 
+    /**
+     * Copies the file src to the file to, optionally making a backup.
+     *
+     * @param src    The source file.
+     * @param dst    The destination file.
+     * @param backup Whether to create a backup of dst if it exists.
+     */
+    private void overwriteMappingsFile(Path src, Path dst, boolean backup) {
+        assert src != null && src.toFile().exists() && src.toFile().isFile() && src.toFile().canRead() : "Source file does not exist or not readable.";
+        assert dst != null : "Destination file can't be null.";
+        if (backup && dst.toFile().exists() && dst.toFile().canRead()) {
+            Date date = Calendar.getInstance().getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-hhmmss");
+            String strDate = dateFormat.format(date);
+
+            var backupName = dst.getFileName().toString() + "." + strDate;
+            Path backupFile = dst.getParent().resolve(backupName);
+            // Copy.
+            try {
+                Files.copy(dst, backupFile, StandardCopyOption.REPLACE_EXISTING);
+                logger.info("Local mappings file backed up as " + backupFile);
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+        // Actually copy file.
+        try {
+            Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+            logger.info("Default keyboard mappings file copied to " + dst);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
+    /**
+     * Reads the first line of a file.
+     *
+     * @param file The path pointing to the file to read.
+     *
+     * @return The first line as a string.
+     */
+    private Optional<String> readFirstLine(Path file) {
+        try {
+            BufferedReader brTest = new BufferedReader(new FileReader(file.toFile()));
+            String line = brTest.readLine();
+            return Optional.of(line);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     private Array<Pair<String, String>> readMappingsFile(Path file) throws IOException {

@@ -15,6 +15,7 @@ action.help                                 = H
 # Exit
 action.exit                                 = ESC
 action.exit                                 = CTRL_L Q
+action.exit                                 = CAPS_LOCK
 
 # Home
 action.home                                 = HOME
