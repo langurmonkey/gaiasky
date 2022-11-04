@@ -82,9 +82,9 @@ public class CollapsiblePane extends Table {
                 }
             }
         }
-        mainLabel.addListener(new ClickListener(){
+        mainLabel.addListener(new ClickListener() {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if(event.getButton() == Buttons.LEFT)
+                if (event.getButton() == Buttons.LEFT)
                     toggleExpandCollapse(mainLabel);
 
                 // Bubble up
@@ -243,17 +243,17 @@ public class CollapsiblePane extends Table {
     /**
      * Creates a collapsible pane.
      *
-     * @param stage     The main stage.
-     * @param labelText The text of the label.
-     * @param content   The content actor.
-     * @param width     The preferred width of this pane.
-     * @param skin      The skin to use.
-     * @param shortcut  The keyboard shortcut to use.
-     * @param topIcons  List of top icons that will be added between the label and the
-     *                  expand/detach icons.
+     * @param stage    The main stage.
+     * @param title    The title.
+     * @param content  The content actor.
+     * @param width    The preferred width of this pane.
+     * @param skin     The skin to use.
+     * @param shortcut The keyboard shortcut to use.
+     * @param topIcons List of top icons that will be added between the label and the
+     *                 expand/detach icons.
      */
-    public CollapsiblePane(Stage stage, String labelText, final Actor content, float width, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
-        this(stage, labelText, content, width, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
+    public CollapsiblePane(Stage stage, String title, final Actor content, float width, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
+        this(stage, title, content, width, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
     }
 
     private CollapsibleWindow createWindow(String labelText, final Actor content, Skin skin, Stage stage, float x, float y) {

@@ -63,9 +63,9 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         this.maximized = false;
 
         this.skin = skin;
-        float pad05 = 5f;
-        float pad10 = 10f;
-        float pad20 = 20f;
+        float pad05 = 8f;
+        float pad10 = 16f;
+        float pad20 = 24f;
         float minWidth = 120f;
 
         pad(pad05);
@@ -81,16 +81,15 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         fps.setAlignment(Align.right);
         fps.setColor(skin.getColor("green"));
         fps.addListener(new OwnTextTooltip(I18n.msg("gui.debug.fps.info"), skin));
-        add(fps).colspan(2).right().minWidth(minWidth).padBottom(pad05);
+        add(fps).right().minWidth(minWidth).padBottom(pad05);
         row();
 
         /* SPF */
         spf = new OwnLabel("", skin, "hud-med");
         spf.setAlignment(Align.right);
         spf.addListener(new OwnTextTooltip(I18n.msg("gui.debug.spf.info"), skin));
-        add(spf).colspan(2).right().minWidth(minWidth).padBottom(pad10);
+        add(spf).right().minWidth(minWidth).padBottom(pad05);
         row();
-
 
         /* MINIMIZE/MAXIMIZE */
         extra = new Table(skin);
@@ -112,11 +111,12 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
             }
         });
 
-        add(toggleSize).colspan(2).padBottom(pad05).right().row();
         extraCell = add();
+        row();
         if (maximized) {
             extraCell.setActor(extra);
         }
+        add(toggleSize).right().row();
 
         /* GRAPHICS DEVICE */
         final Settings settings = Settings.settings;

@@ -7,9 +7,10 @@ package gaiasky.gui;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -21,16 +22,14 @@ import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.scene2d.OwnImageButton;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextIconButton;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 
 import java.text.DecimalFormat;
 
@@ -60,6 +59,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private final Table moreInfo;
     private final Table rulerInfo;
     private final Table focusNames;
+    private Table content;
+    private Cell<Table> contentCell;
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
 
@@ -67,6 +68,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private Vector3b posb;
 
     DecimalFormat nf, sf;
+
+    private boolean maximized;
 
     float pad1, pad3, pad5, pad10, pad15, bw;
 
@@ -77,7 +80,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     public FocusInfoInterface(Skin skin, boolean vr) {
         super(skin);
         this.setBackground("table-bg");
+        this.maximized = true;
         this.skin = skin;
+        this.content = new Table(skin);
         // Widget width
         float width = 300f;
 
@@ -337,13 +342,38 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         rulerInfo.add(rulerNameGroup).left().row();
         rulerInfo.add(rulerDist).left();
 
-        focusInfoCell = add(focusInfo).align(Align.left);
+        // MINIMIZE/MAXIMIZE
+        Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
+        toggleSize.setColor(ColorUtils.gYellowC);
+        toggleSize.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                if (maximized) {
+                    maximized = false;
+                    contentCell.setActor(null);
+                    toggleSize.setText("(+)");
+                } else {
+                    maximized = true;
+                    contentCell.setActor(content);
+                    toggleSize.setText("(-)");
+                }
+                pack();
+            }
+        });
+
+        focusInfoCell = content.add(focusInfo).left();
+        content.row();
+        content.add(pointerInfo).left();
+        content.row();
+        content.add(cameraInfo).left();
+        content.row();
+        rulerCell = content.add(rulerInfo).left();
+        if(maximized) {
+            contentCell = add(content);
+        } else {
+            contentCell = add();
+        }
         row();
-        add(pointerInfo).align(Align.left);
-        row();
-        add(cameraInfo).align(Align.left);
-        row();
-        rulerCell = add(rulerInfo).align(Align.left);
+        add(toggleSize).right().pad(pad5).row();
         pack();
         rulerCell.clearActor();
 
