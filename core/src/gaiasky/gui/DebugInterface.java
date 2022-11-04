@@ -48,7 +48,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final Object lock;
     private final Skin skin;
 
-    private final Cell extraCell;
+    private final Cell<Table> extraCell;
     private final Table extra;
     private boolean maximized;
 

@@ -51,7 +51,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     protected HorizontalGroup focusActionsGroup;
 
-    private FocusView view;
+    private final FocusView view;
     protected IFocus currentFocus;
     private ExternalInformationUpdater externalInfoUpdater;
 
@@ -59,13 +59,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private final Table moreInfo;
     private final Table rulerInfo;
     private final Table focusNames;
-    private Table content;
-    private Cell<Table> contentCell;
+    private final Table content;
+    private final Cell<Table> contentCell;
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
 
-    private Vector3d pos;
-    private Vector3b posb;
+    private final Vector3d pos;
+    private final Vector3b posb;
 
     DecimalFormat nf, sf;
 

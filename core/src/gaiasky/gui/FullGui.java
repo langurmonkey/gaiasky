@@ -563,7 +563,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(Settings.settings.getSuperShortApplicationName(), skin, ui, catalogManager);
+        controlsWindow = new ControlsWindow(Settings.getSuperShortApplicationName(), skin, ui, catalogManager);
         controlsWindow.setScene(scene);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();

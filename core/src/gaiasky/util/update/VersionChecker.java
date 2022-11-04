@@ -70,15 +70,17 @@ public class VersionChecker implements Runnable {
                 }
 
                 // Find newest tag.
-                VersionObject newest = null;
-                for(var tag : tags) {
-                   if(newest == null || tag.created.isAfter(newest.created)) {
-                       newest = tag;
-                   }
-                }
+                if (!tags.isEmpty()) {
+                    VersionObject newest = null;
+                    for (var tag : tags) {
+                        if (newest == null || tag.created.isAfter(newest.created)) {
+                            newest = tag;
+                        }
+                    }
 
-                // Here is the commit object
-                listener.handle(new VersionCheckEvent(newest.json.getString("name"), newest.version, newest.created));
+                    // Here is the commit object
+                    listener.handle(new VersionCheckEvent(newest.json.getString("name"), newest.version, newest.created));
+                }
 
             }
 
