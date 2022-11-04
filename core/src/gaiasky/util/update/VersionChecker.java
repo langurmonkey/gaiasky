@@ -69,7 +69,13 @@ public class VersionChecker implements Runnable {
                     }
                 }
 
-                VersionObject newest = tags.last();
+                // Find newest tag.
+                VersionObject newest = null;
+                for(var tag : tags) {
+                   if(newest == null || tag.created.isAfter(newest.created)) {
+                       newest = tag;
+                   }
+                }
 
                 // Here is the commit object
                 listener.handle(new VersionCheckEvent(newest.json.getString("name"), newest.version, newest.created));
@@ -110,10 +116,10 @@ public class VersionChecker implements Runnable {
      */
     public static Integer stringToVersionNumber(String tag) {
         try {
-            Integer v = 0;
+            int v = 0;
             String[] tokens = tag.split("\\.");
-            if (tokens == null || tokens.length < 3) {
-                logger.info("Could not parse version '" + tag + "', assuming development version");
+            if (tokens.length < 3) {
+                logger.debug("Could not parse version '" + tag + "', assuming development or beta version");
                 return MAX_VERSION_NUMBER;
             }
             String major = parseSingleToken(tokens[0]);
@@ -126,7 +132,7 @@ public class VersionChecker implements Runnable {
 
             return v;
         } catch (Exception e) {
-            logger.info("Could not parse version '" + tag + "', assuming development version");
+            logger.debug("Could not parse version '" + tag + "', assuming development or beta version");
             // Development-branch
             return MAX_VERSION_NUMBER;
         }
