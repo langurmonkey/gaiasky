@@ -162,8 +162,8 @@ public class AboutWindow extends GenericDialog {
         Link homepage = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
 
         // Twitter
-        Label twtitle = new OwnLabel(I18n.msg("gui.help.twitter"), skin);
-        Link tw = new Link("@GaiaSky_Dev", linkStyle, "https://twitter.com/GaiaSky_Dev");
+        Label twtitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
+        Link tw = new Link(Settings.SOCIAL_MEDIA_NAME, linkStyle, Settings.SOCIAL_MEDIA_URL);
 
         // Author
         Label authortitle = new OwnLabel(I18n.msg("gui.help.author"), skin);

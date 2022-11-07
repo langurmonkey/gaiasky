@@ -65,6 +65,8 @@ public class Settings {
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
     public static final String DOCUMENTATION = "https://gaia.ari.uni-heidelberg.de/gaiasky/docs";
     public static final String REPOSITORY = "https://codeberg.org/gaiasky/gaiasky";
+    public static final String SOCIAL_MEDIA_NAME = "#GaiaSky";
+    public static final String SOCIAL_MEDIA_URL = "https://mastodon.social/tags/GaiaSky";
     public static final String ICON_URL;
     public static final String REPO_ISSUES = REPOSITORY + "/issues";
     public static final String AUTHOR_NAME = "Toni Sagristà Sellés";
