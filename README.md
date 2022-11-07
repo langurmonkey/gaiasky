@@ -21,7 +21,7 @@ To get the latest up-to-date and most complete information,
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
 *  Read the [**official documentation**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)
 *  Submit a [**bug** or a **feature request**](https://codeberg.org/gaiasky/gaiasky/issues)
-*  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
+*  Follow development news at [#GaiaSky@mastodon](https://mastodon.social/tags/GaiaSky)
 
 This file contains the following sections:
 
