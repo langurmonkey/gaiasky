@@ -110,17 +110,17 @@ public class AboutWindow extends GenericDialog {
         final Table contentHelp = new Table(skin);
         contentHelp.align(Align.top);
 
-        OwnLabel gaiasky = new OwnLabel(Settings.settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
+        OwnLabel gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
 
         // User manual
         Label homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
         Label homepageTxt = new OwnLabel(I18n.msg("gui.help.help1"), skin);
-        Link homepageLink = new Link(Settings.settings.WEBPAGE, linkStyle, Settings.settings.WEBPAGE);
+        Link homepageLink = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
 
         // Wiki
         Label docsTitle = new OwnLabel(I18n.msg("gui.help.docs"), skin);
         Label docsTxt = new OwnLabel(I18n.msg("gui.help.help2"), skin);
-        Link docsLink = new Link(Settings.settings.DOCUMENTATION, linkStyle, Settings.settings.DOCUMENTATION);
+        Link docsLink = new Link(Settings.DOCUMENTATION, linkStyle, Settings.DOCUMENTATION);
 
         // Icon
         FileHandle gsIcon = Gdx.files.internal(Settings.settings.runtime.openVr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
@@ -171,8 +171,8 @@ public class AboutWindow extends GenericDialog {
         Table author = new Table(skin);
         Label authorname = new OwnLabel(Settings.AUTHOR_NAME, skin);
         Link authormail = new Link(Settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.AUTHOR_EMAIL);
-        Link authorpage = new Link("www.tonisagrista.com", linkStyle, "https://tonisagrista.com");
-        Link authormasto = new Link("@jumpinglangur@mastodont.cat", linkStyle, "https://mastodont.cat/@jumpinglangur");
+        Link authorpage = new Link("tonisagrista.com", linkStyle, "https://tonisagrista.com");
+        Link authormasto = new Link("@jumpinglangur@mastodon.social", linkStyle, "https://mastodon.social/@jumpinglangur");
         author.add(authorname).left().row();
         author.add(authormail).left().row();
         author.add(authorpage).left().row();
