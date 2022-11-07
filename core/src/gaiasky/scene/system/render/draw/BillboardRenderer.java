@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -16,15 +15,17 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.view.BillboardView;
-import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.comp.DistanceEntityComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+
+import java.util.List;
 
 /**
  * Renders billboards (camera-oriented quads), optionally with a global texture. If a texture is not provided,
@@ -144,7 +145,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if ((componentType == null || alphas[componentType.ordinal()] != 0)) {
             renderables.sort(comp);
 

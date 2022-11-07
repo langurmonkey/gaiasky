@@ -5,7 +5,8 @@
 
 package gaiasky.scene.system.render.draw;
 
-import com.badlogic.gdx.utils.Array;
+import java.util.List;
+
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
@@ -38,7 +39,7 @@ public class TessellationRenderer extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (mustRender()) {
             // Triangles for tessellation
             GL41.glPatchParameteri(GL41.GL_PATCH_VERTICES, 3);

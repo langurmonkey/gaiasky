@@ -5,7 +5,7 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.utils.Array;
+import java.util.List;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
@@ -26,7 +26,7 @@ public interface IRenderSystem extends Disposable {
      * @param t The time, in seconds, since the session start.
      * @param rc The rendering context object.
      */
-    void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc);
+    void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc);
 
     /**
      * Resize the current render target with the given width and height.

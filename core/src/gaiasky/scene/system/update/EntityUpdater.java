@@ -1,6 +1,7 @@
 package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import gaiasky.scene.component.GraphNode;
 
 /**
@@ -11,6 +12,12 @@ import gaiasky.scene.component.GraphNode;
  * the scene graph tree, and updates their positions depth-first.
  */
 public interface EntityUpdater {
+
+    /**
+     * Returns the family for this updater.
+     * @return The family.
+     */
+    Family getFamily();
 
     /**
      * Updates the entity.

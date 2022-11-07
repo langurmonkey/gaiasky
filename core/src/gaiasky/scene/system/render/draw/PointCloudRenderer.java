@@ -11,10 +11,12 @@ import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+
+import java.util.List;
 
 /**
  * Contains some common code to all point cloud renderers and some
@@ -108,8 +110,8 @@ public abstract class PointCloudRenderer extends ImmediateModeRenderSystem imple
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size() > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();

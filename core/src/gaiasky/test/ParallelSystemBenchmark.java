@@ -12,6 +12,7 @@ import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -26,18 +27,18 @@ import java.util.logging.SimpleFormatter;
 public class ParallelSystemBenchmark {
 
     /** Number of rounds for each test. **/
-    private static int ROUNDS = 10;
+    private static final int ROUNDS = 10;
 
     /** Number of rounds for warm-up. **/
-    private static int ROUNDS_WARMUP = 0;
+    private static final int ROUNDS_WARMUP = 2;
 
     /** Number of iterations that we run the engine. **/
-    private static int ENGINE_ITERATIONS = 2;
+    private static final int ENGINE_ITERATIONS = 10;
 
     /**
-     * Number of entities to try.
+     * Number of entities to use.
      */
-    private static int[] SIZES = new int[] { 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000 };
+    private static final int[] SIZES = new int[] { 250, 500, 1_000, 2_000, 5_000 };
 
     public static void main(String[] args) {
         (new ParallelSystemBenchmark()).test();
@@ -46,8 +47,8 @@ public class ParallelSystemBenchmark {
     /**
      * The sequential system.
      */
-    private class MySequentialSystem extends IteratingSystem {
-        private Consumer<Entity> fn;
+    private static class MySequentialSystem extends IteratingSystem {
+        private final Consumer<Entity> fn;
 
         public MySequentialSystem(Family family, Consumer<Entity> fn) {
             super(family);
@@ -63,8 +64,8 @@ public class ParallelSystemBenchmark {
     /**
      * The parallel system
      */
-    private class MyParallelSystem extends ParallelSystem {
-        private Consumer<Entity> fn;
+    private static class MyParallelSystem extends ParallelSystem {
+        private final Consumer<Entity> fn;
 
         public MyParallelSystem(Family family, Consumer<Entity> fn) {
             super(family);
@@ -78,7 +79,7 @@ public class ParallelSystemBenchmark {
     }
 
     protected Logger log;
-    private DecimalFormat df;
+    private final DecimalFormat df;
 
     public ParallelSystemBenchmark() {
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%4$-2s] %5$s %n");
@@ -91,24 +92,25 @@ public class ParallelSystemBenchmark {
     }
 
     private void test() {
-        log.info(pad("Java version", 22) + System.getProperty("java.version"));
-        log.info(pad("ROUNDS", 22) + formatNumber(ROUNDS, 22));
-        log.info(pad("ROUNDS (warm-up)", 22) + formatNumber(ROUNDS_WARMUP, 22));
-        log.info(pad("ENGINE_ITERATIONS", 22) + formatNumber(ENGINE_ITERATIONS, 22));
-        log.info(pad("N_ENTITIES", 22) + pad(Arrays.toString(SIZES), 22));
+        int pad = 22;
+        log.info(pad("Java version", pad) + System.getProperty("java.version"));
+        log.info(pad("ROUNDS", pad) + formatNumber(ROUNDS, pad));
+        log.info(pad("ROUNDS (warm-up)", pad) + formatNumber(ROUNDS_WARMUP, pad));
+        log.info(pad("ENGINE_ITERATIONS", pad) + formatNumber(ENGINE_ITERATIONS, pad));
+        log.info(pad("N_ENTITIES", pad) + pad(Arrays.toString(SIZES), pad));
         log.info("");
 
-        final Random rand = new Random(123l);
+
         Consumer<Entity> func = entity -> {
             Base base = entity.getComponent(Base.class);
             Body body = entity.getComponent(Body.class);
-            body.distToCamera = base.opacity + 200_000_000;
+            body.distToCamera = 20;
             double value = 0;
             for (int i = 0; i < body.distToCamera; i++) {
-                value += Math.atan(rand.nextDouble()) * Math.log(i);
+                value += Math.atan(ThreadLocalRandom.current().nextDouble()) * Math.log(i) * Math.pow(body.distToCamera, 30) + Math.pow(ThreadLocalRandom.current().nextDouble(), 12);
             }
-            for (int j = 0; j < 200_000_000; j++) {
-                value += Math.cos(rand.nextDouble()) * Math.log10(j);
+            for (int j = 0; j < 50; j++) {
+                value += Math.cos(ThreadLocalRandom.current().nextDouble()) * Math.log10(j) * Math.pow(body.distToCamera, 12) + Math.pow(ThreadLocalRandom.current().nextDouble(), 12);
             }
             SingleMatrix m = entity.getComponent(SingleMatrix.class);
             m.matrix.idt().rotate(3, 1, 0, 32).scl(23).det();
@@ -116,39 +118,43 @@ public class ParallelSystemBenchmark {
             base.id = (long) (value);
         };
 
-        EntitySystem sequential = new MySequentialSystem(Family.all(Base.class, Body.class).get(), func);
-        EntitySystem parallel = new MyParallelSystem(Family.all(Base.class, Body.class).get(), func);
-
         // Prepare engine
-        Engine engine = new PooledEngine();
         for (int nEntities : SIZES) {
-            engine.removeAllSystems();
-            engine.removeAllEntities();
+            System.gc();
+            Engine engine = new PooledEngine();
 
             // Prepare entities
             for (int i = 0; i < nEntities; i++) {
                 Entity entity = new Entity();
                 entity.add(new Base());
+                entity.add(new Body());
                 entity.add(new SingleMatrix());
                 entity.getComponent(SingleMatrix.class).matrix = new Matrix4();
 
                 engine.addEntity(entity);
             }
 
-            log.info(pad(nEntities + " entities", 20) + pad("clock time", 28) + pad("cpu time", 28));
-            log.info("-------------------------------------------------------------------");
+            // Create systems
+            EntitySystem sequential = new MySequentialSystem(Family.all(Base.class, SingleMatrix.class).get(), func);
+            EntitySystem parallel = new MyParallelSystem(Family.all(Base.class, SingleMatrix.class).get(), func);
 
-            // Parallel
+            log.info(pad(nEntities + " entities", 20) + pad("clock time", 28) + pad("cpu time", 28));
+            log.info("----------------------------------------------------------------------");
+
+            // Warm-up
+            test(engine, sequential, ROUNDS_WARMUP, false);
             test(engine, parallel, ROUNDS_WARMUP, false);
+
+            // Test
+            test(engine, sequential, ROUNDS, true);
             test(engine, parallel, ROUNDS, true);
 
-            // Sequential
-            test(engine, sequential, ROUNDS_WARMUP, false);
-            test(engine, sequential, ROUNDS, true);
 
-
-            log.info("-------------------------------------------------------------------");
+            log.info("----------------------------------------------------------------------");
             log.info("");
+
+            engine.removeAllEntities();
+            engine.removeAllSystems();
         }
     }
 
@@ -193,8 +199,8 @@ public class ParallelSystemBenchmark {
 
     private double mean(long[] array) {
         long total = 0;
-        for (int i = 0; i < array.length; i++) {
-            total += array[i];
+        for (long l : array) {
+            total += l;
         }
         return total / array.length;
     }
@@ -202,18 +208,18 @@ public class ParallelSystemBenchmark {
     private double stdev(long[] array, double mean) {
         double sum = 0;
         double n = array.length;
-        for (int i = 0; i < n; i++) {
-            sum += Math.pow(array[i] / 1_000_000d - mean, 2.0);
+        for (long l : array) {
+            sum += Math.pow(l / 1_000_000d - mean, 2.0);
         }
         return Math.sqrt(sum / n);
     }
 
     private String pad(String str, int len) {
-        String strPad = str;
+        StringBuilder strPad = new StringBuilder(str);
         while (strPad.length() < len) {
-            strPad += " ";
+            strPad.append(" ");
         }
-        return strPad;
+        return strPad.toString();
     }
 
     private String format(double num) {

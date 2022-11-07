@@ -18,6 +18,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.entity.LightingUtils;
 import gaiasky.scene.record.ITransform;
 import gaiasky.scene.record.RotationComponent;
+import gaiasky.scene.system.ParallelSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.camera.Proximity;

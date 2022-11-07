@@ -34,6 +34,8 @@ import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 /**
  * Renders vertices using a VBO.
  */
@@ -98,7 +100,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (isLine()) {
             // Enable GL_LINE_SMOOTH
             Gdx.gl20.glEnable(GL11.GL_LINE_SMOOTH);

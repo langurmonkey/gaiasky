@@ -36,6 +36,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 /**
  * Renders star sets using <code>GL_POINT</code> primitives.
  */
@@ -116,8 +118,8 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size() > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
             float starPointSize = StarSettings.getStarPointSize();
 

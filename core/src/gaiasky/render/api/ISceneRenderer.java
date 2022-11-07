@@ -2,7 +2,7 @@ package gaiasky.render.api;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.utils.Array;
+import java.util.List;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
 
@@ -46,16 +46,18 @@ public interface ISceneRenderer {
 
     /**
      * Gets the current render process.
-     * @return
+     *
+     * @return The render mode.
      */
     IRenderMode getRenderProcess();
 
     /**
      * Returns the post-processing glow frame buffer.
+     *
      * @return The glow frame buffer.
      */
     FrameBuffer getGlowFrameBuffer();
 
     /** Returnst he render lists of this renderer. **/
-    Array<Array<IRenderable>> renderListsFront();
+    List<List<IRenderable>> renderListsFront();
 }

@@ -18,13 +18,13 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.ImmediateModeRenderSystem;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Render;
-import gaiasky.scene.entity.ParticleUtils;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.FovCamera;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.Render;
+import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.record.VariableRecord;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -35,6 +35,8 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
+
+import java.util.List;
 
 /**
  * Renders variable star sets which have periodical light curve data using <code>GL_POINT</code> primitives.
@@ -116,8 +118,8 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size() > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
             float starPointSize = StarSettings.getStarPointSize();
 

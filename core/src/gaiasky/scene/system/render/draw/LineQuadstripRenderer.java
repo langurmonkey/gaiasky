@@ -26,6 +26,8 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
+import java.util.List;
+
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).
  * Slower than using GL_LINES primitive, but higher quality.
@@ -311,7 +313,7 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
 
         // Reset

@@ -35,6 +35,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 /**
  * Renders single points. Gathers all celestial entities that are to be
  * represented using point primitives into a mesh and renders them with
@@ -137,11 +139,11 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         curr.clear();
 
-        ensureTempVertsSize(renderables.size * curr.vertexSize);
-        ensureMeshSize(renderables.size);
+        ensureTempVertsSize(renderables.size() * curr.vertexSize);
+        ensureMeshSize(renderables.size());
         renderables.forEach(r -> {
             Entity entity = ((Render) r).entity;
             view.setEntity(entity);

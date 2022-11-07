@@ -27,6 +27,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 /**
  * Renders symbolic objects (usually part of the UI) as points.
  */
@@ -93,7 +95,7 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);

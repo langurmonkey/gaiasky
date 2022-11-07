@@ -295,14 +295,14 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         for (IRenderable renderable : renderables) {
             Render render = (Render) renderable;
             var base = Mapper.base.get(render.entity);
             var set = Mapper.billboardSet.get(render.entity);
 
             switch (set.status) {
-            case NOT_LOADED:
+            case NOT_LOADED -> {
                 // PRELOAD
                 set.setStatus(LoadStatus.LOADING);
                 Thread loader = new Thread(() -> {
@@ -310,13 +310,13 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     set.setStatus(LoadStatus.READY);
                 });
                 loader.start();
-                break;
-            case READY:
+            }
+            case READY -> {
                 // TO GPU
                 streamToGpu(render, base);
                 set.setStatus(LoadStatus.LOADED);
-                break;
-            case LOADED:
+            }
+            case LOADED -> {
                 // RENDER
                 float alpha = getAlpha(renderable);
                 if (alpha > 0) {
@@ -350,7 +350,8 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                         switch (dataset.blending) {
                         case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                         case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                        };
+                        }
+                        ;
                         // Depth mask
                         Gdx.gl20.glDepthMask(dataset.depthMask);
 
@@ -364,7 +365,7 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     }
                     shaderProgram.end();
                 }
-                break;
+            }
             }
         }
     }

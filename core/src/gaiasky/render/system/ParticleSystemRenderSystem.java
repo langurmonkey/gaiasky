@@ -1,5 +1,6 @@
 package gaiasky.render.system;
 
+import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -41,12 +42,12 @@ public class ParticleSystemRenderSystem extends AbstractRenderSystem {
         trf = new Matrix4();
     }
 
-    public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
+    public void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
         renderStud(null, camera, t);
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         pointSpriteParticleBatch.setCamera(camera.getCamera());
 
         if (explosionInstance == null) {

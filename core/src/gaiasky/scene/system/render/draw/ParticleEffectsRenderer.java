@@ -29,6 +29,7 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
 import java.util.Random;
 
 public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
@@ -185,7 +186,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
     }
 
     @Override
-    public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
+    public void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
         this.rc = rc;
         run(preRunnables, renderables, camera);
         renderStud(renderables, camera, t);
@@ -193,7 +194,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         float alpha = getAlpha(ct);
         if (alpha > 0) {
             updatePositions(camera);

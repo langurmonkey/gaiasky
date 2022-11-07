@@ -11,11 +11,13 @@ import gaiasky.render.RenderGroup;
 import gaiasky.render.api.I3DTextRenderable;
 import gaiasky.render.api.IAnnotationsRenderable;
 import gaiasky.render.api.IRenderable;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+
+import java.util.List;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
@@ -43,10 +45,10 @@ public class FontRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         batch.begin();
 
-        int size = renderables.size;
+        int size = renderables.size();
         ExtShaderProgram program = programs[0];
         if (program == null) {
             for (int i = 0; i < size; i++) {
@@ -60,7 +62,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
         batch.end();
     }
 
-    private void renderFont3D(Array<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float alpha) {
+    private void renderFont3D(List<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float alpha) {
 
         renderables.forEach(r -> {
             I3DTextRenderable lr = (I3DTextRenderable) r;

@@ -86,7 +86,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * The front render lists contain the objects which are actually rendered in the current cycle. The back
      * render lists get updated by the update thread.
      **/
-    private Array<Array<IRenderable>> renderLists;
+    private List<List<IRenderable>> renderLists;
 
     private Array<IRenderSystem> renderSystems;
 
@@ -136,7 +136,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private final VRContext vrContext;
     private final GlobalResources globalResources;
 
-    private Array<IRenderable> stars;
+    private List<IRenderable> stars;
 
     private AbstractRenderSystem billboardStarsProc;
 
@@ -158,7 +158,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Initialize the render assets.
         renderAssets.initialize(manager);
 
-        stars = new Array<>();
+        stars = new ArrayList<>();
 
         renderSystems = new Array<>();
 
@@ -213,9 +213,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // Initialize render lists
         RenderGroup[] renderGroups = values();
-        renderLists = new Array<>(false, renderGroups.length);
+        renderLists = new ArrayList<>(renderGroups.length);
         for (int i = 0; i < renderGroups.length; i++) {
-            renderLists.add(new Array<>(false, 20));
+            renderLists.add(new ArrayList<>(20));
         }
 
         // Set reference
@@ -481,11 +481,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.rendering.set(rendering);
     }
 
-    public Array<Array<IRenderable>> renderListsFront() {
+    public List<List<IRenderable>> renderListsFront() {
         return renderLists;
     }
 
-    public Array<Array<IRenderable>> renderListsBack() {
+    public List<List<IRenderable>> renderListsBack() {
         return renderLists;
     }
 
@@ -533,7 +533,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
         if (Settings.settings.postprocess.lightGlow.active && frameBuffer != null) {
             // Get all billboard stars
-            Array<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
+            List<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
 
             stars.clear();
             for (IRenderable st : billboardStars) {
@@ -545,8 +545,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
 
             // Get all models
-            Array<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
-            Array<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
+            List<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
+            List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
 
             // VR controllers
             if (Settings.settings.runtime.openVr) {
@@ -554,7 +554,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 if (vrContext != null) {
                     for (Entity m : sgrVR.controllerObjects) {
                         var render = Mapper.render.get(m);
-                        if (!models.contains(render, true))
+                        if (!models.contains(render))
                             controllers.add(m);
                     }
                 }
@@ -575,7 +575,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             renderAssets.mbPixelLightingOpaque.end();
 
             // Render tessellated models
-            if (modelsTess.size > 0) {
+            if (modelsTess.size() > 0) {
                 renderAssets.mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
                 for (IRenderable model : modelsTess) {
                     renderModel(model, renderAssets.mbPixelLightingOpaqueTessellation, 1, false);
@@ -595,11 +595,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     }
 
-    private void addCandidates(Array<IRenderable> models, List<Entity> candidates) {
+    private void addCandidates(List<IRenderable> models, List<Entity> candidates) {
         if (candidates != null) {
             candidates.clear();
             int num = 0;
-            for (int i = 0; i < models.size; i++) {
+            for (int i = 0; i < models.size(); i++) {
                 Render render = (Render) models.get(i);
                 var scaffolding = Mapper.modelScaffolding.get(render.entity);
                 if (scaffolding != null) {
@@ -764,8 +764,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
              * shadow if different</li>
              * </ul>
              */
-            Array<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
-            Array<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
+            List<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
+            List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 
             int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openVr) ? 2 : Settings.settings.program.modeCubemap.active ? 6 : 1;
@@ -831,7 +831,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
-                    Array<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
+                    List<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
                     process.render(l, camera, t, renderContext);
                 } else {
                     process.render(null, camera, t, renderContext);
@@ -864,7 +864,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
-                    Array<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
+                    List<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
                     process.render(l, camera, t, renderContext);
                 } else {
                     process.render(null, camera, t, renderContext);
@@ -902,7 +902,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
-                    Array<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
+                    List<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
                     process.render(l, camera, t, renderContext);
                 } else {
                     process.render(null, camera, t, renderContext);

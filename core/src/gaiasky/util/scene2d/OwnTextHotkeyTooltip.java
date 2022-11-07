@@ -90,8 +90,6 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
     public void setStyle(TextTooltipStyle style) {
         if (style == null)
             throw new NullPointerException("style cannot be null");
-        if (!(style instanceof TextTooltipStyle))
-            throw new IllegalArgumentException("style must be a TextTooltipStyle.");
         label.setStyle(style.label);
         getContainer().setBackground(style.background);
         getContainer().maxWidth(style.wrapWidth);

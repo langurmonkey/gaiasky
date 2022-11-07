@@ -7,6 +7,9 @@ package gaiasky.render.system;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector3;
+
+import java.util.List;
+
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
@@ -63,8 +66,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     @Override
-    public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
-        if (renderables != null && renderables.size != 0) {
+    public void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
+        if (renderables != null && renderables.size() != 0) {
             this.rc = rc;
             run(preRunnables, renderables, camera);
             renderStud(renderables, camera, t);
@@ -72,7 +75,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
     }
 
-    public abstract void renderStud(Array<IRenderable> renderables, ICamera camera, double t);
+    public abstract void renderStud(List<IRenderable> renderables, ICamera camera, double t);
 
     public void addPreRunnables(RenderSystemRunnable... r) {
         preRunnables.addAll(r);
@@ -82,7 +85,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         postRunnables.addAll(r);
     }
 
-    protected void run(Array<RenderSystemRunnable> runnables, Array<IRenderable> renderables, ICamera camera) {
+    protected void run(Array<RenderSystemRunnable> runnables, List<IRenderable> renderables, ICamera camera) {
         if (runnables != null) {
             for (RenderSystemRunnable runnable : runnables)
                 runnable.run(this, renderables, camera);
@@ -126,7 +129,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     public interface RenderSystemRunnable {
-        void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera);
+        void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera);
     }
 
     protected void addEffectsUniforms(ExtShaderProgram shaderProgram, ICamera camera) {

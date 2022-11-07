@@ -25,6 +25,7 @@ import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
 
@@ -82,9 +83,9 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     }
 
     @Override
-    public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
+    public void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera) {
         synchronized (lock) {
-            int size = renderables.size;
+            int size = renderables.size();
             Settings settings = Settings.settings;
             if (GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) {
                 // Compute light positions for light scattering or light

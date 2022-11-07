@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A simple EntitySystem that iterates over each entity in parallel and calls processEntity() for each entity every time the EntitySystem is
@@ -21,7 +22,7 @@ import java.util.concurrent.ForkJoinPool;
  * @author Toni Sagrista
  */
 public abstract class ParallelSystem extends EntitySystem {
-    private Family family;
+    private final Family family;
     private ImmutableArray<Entity> entities;
 
     private final ForkJoinPool forkJoinPool;

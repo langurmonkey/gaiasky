@@ -20,6 +20,8 @@ import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
+import java.util.List;
+
 /**
  * Renders text (labels, annotations, titles, etc.) in two and three dimensional space.
  * TODO - extend AbstractRenderSystem instead of FontRenderSystem
@@ -53,14 +55,14 @@ public class TextRenderer extends FontRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         batch.begin();
 
-        int size = renderables.size;
+        int size = renderables.size();
         ExtShaderProgram program = programs[0];
         if (program == null) {
-            for (int i = 0; i < size; i++) {
-                Render render = (Render) renderables.get(i);
+            for (IRenderable renderable : renderables) {
+                Render render = (Render) renderable;
                 girdRenderer.render(render, batch, camera, font2d, getAlpha(render.entity));
             }
         } else {
@@ -69,7 +71,7 @@ public class TextRenderer extends FontRenderSystem {
         batch.end();
     }
 
-    private void renderFont3D(Array<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float alpha) {
+    private void renderFont3D(List<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float alpha) {
         renderables.forEach(r -> {
             Render render = (Render) r;
             var entity = render.entity;

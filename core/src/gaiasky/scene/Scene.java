@@ -59,7 +59,7 @@ public class Scene {
     private Array<AbstractInitSystem> initializers;
     private IndexInitializer indexInitializer;
     /** Holds all update systems. **/
-    private Array<AbstractUpdateSystem> updaters;
+    private Array<EntityUpdater> updaters;
     /** Holds all extract systems. **/
     private Array<AbstractExtractSystem> extractors;
 
@@ -183,10 +183,10 @@ public class Scene {
         initializeEntities(true);
     }
 
-    public void addSystemsToEngine(Array<? extends EntitySystem> systems) {
+    public void addSystemsToEngine(Array<?> systems) {
         if (engine != null) {
-            for (EntitySystem system : systems) {
-                engine.addSystem(system);
+            for (Object system : systems) {
+                engine.addSystem((EntitySystem) system);
             }
         }
     }
@@ -201,7 +201,7 @@ public class Scene {
     /**
      * Add a new updater system to the scene.
      */
-    private void addUpdater(AbstractUpdateSystem system) {
+    private void addUpdater(EntityUpdater system) {
         updaters.add(system);
     }
 
@@ -269,11 +269,12 @@ public class Scene {
 
     /**
      * Inserts the given entity into the index by running the index initializer system on it.
+     *
      * @param entity The entity.
      */
     public void addToIndex(Entity entity) {
         if (Mapper.base.has(entity)) {
-           indexInitializer.initializeEntity(entity);
+            indexInitializer.initializeEntity(entity);
         }
     }
 
@@ -408,7 +409,7 @@ public class Scene {
      */
     public void updateEntity(Entity entity, float deltaTime) {
         if (updaters != null) {
-            for (AbstractUpdateSystem system : updaters) {
+            for (EntityUpdater system : updaters) {
                 if (system.getFamily().matches(entity)) {
                     system.updateEntity(entity, deltaTime);
                 }

@@ -28,6 +28,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class LinePrimitiveRenderer extends LineRenderSystem {
     protected static final Log logger = Logger.getLogger(LinePrimitiveRenderer.class);
@@ -93,7 +94,7 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
 
         shaderProgram = getShaderProgram();
         shaderProgram.begin();

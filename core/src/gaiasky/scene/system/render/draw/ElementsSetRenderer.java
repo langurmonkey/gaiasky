@@ -36,6 +36,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -86,7 +87,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         for (IRenderable renderable : renderables) {
             Render render = (Render) renderable;
             var graph = Mapper.graph.get(render.entity);

@@ -15,6 +15,8 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
+import java.util.List;
+
 /**
  * Common code to all render systems that render quads with GPU instancing.
  */
@@ -180,8 +182,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size() > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();

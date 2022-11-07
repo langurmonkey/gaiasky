@@ -5,6 +5,7 @@
 
 package gaiasky.scene.system.render.draw;
 
+import java.util.List;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
@@ -38,7 +39,7 @@ public class ModelRenderer extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (mustRender()) {
             batch.begin(camera.getCamera());
             renderables.forEach(r -> {

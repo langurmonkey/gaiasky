@@ -34,6 +34,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -85,8 +86,8 @@ public class ElementsRenderer extends PointCloudTriRenderSystem implements IObse
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        int n = renderables.size;
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        int n = renderables.size();
         if (n > 0 && renderables.get(0).getOpacity() > 0) {
             Render first = (Render) renderables.get(0);
             var base = Mapper.base.get(first.entity);
