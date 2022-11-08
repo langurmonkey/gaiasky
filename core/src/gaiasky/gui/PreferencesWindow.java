@@ -67,23 +67,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final DecimalFormat nf3;
 
-    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb,
-            cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb,
-            pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
-            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines,
-            dynamicResolution, motionBlur, ssr;
+    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer,
-            numThreads, screenshotMode, frameOutputMode, nShadows, distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameOutputMode, nShadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin;
     private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
-    private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField,
-            frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution,
-            plResolution, plAperture, plAngle, smResolution, maxFpsInput;
+    private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
@@ -211,10 +204,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         DisplayMode selectedMode = null;
         for (DisplayMode dm : modes) {
-            if (dm.width == settings.graphics.fullScreen.resolution[0]
-                    && dm.height == settings.graphics.fullScreen.resolution[1]
-                    && dm.bitsPerPixel == settings.graphics.fullScreen.bitDepth
-                    && dm.refreshRate == settings.graphics.fullScreen.refreshRate) {
+            if (dm.width == settings.graphics.fullScreen.resolution[0] && dm.height == settings.graphics.fullScreen.resolution[1] && dm.bitsPerPixel == settings.graphics.fullScreen.bitDepth && dm.refreshRate == settings.graphics.fullScreen.refreshRate) {
                 selectedMode = dm;
                 break;
             }
@@ -2119,14 +2109,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         final boolean reloadFullScreenMode = fullScreen.isChecked() != settings.graphics.fullScreen.active;
         final var selected = fullScreenResolutions.getSelected();
-        final boolean reloadScreenMode = reloadFullScreenMode
-                || (settings.graphics.fullScreen.active
-                && (settings.graphics.fullScreen.resolution[0] != selected.width
-                || settings.graphics.fullScreen.resolution[1] != selected.height
-                || settings.graphics.fullScreen.refreshRate != selected.refreshRate
-                || settings.graphics.fullScreen.bitDepth != selected.bitsPerPixel))
-                || (!settings.graphics.fullScreen.active
-                && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
+        final boolean reloadScreenMode = reloadFullScreenMode || (settings.graphics.fullScreen.active && (settings.graphics.fullScreen.resolution[0] != selected.width || settings.graphics.fullScreen.resolution[1] != selected.height || settings.graphics.fullScreen.refreshRate != selected.refreshRate || settings.graphics.fullScreen.bitDepth != selected.bitsPerPixel)) || (!settings.graphics.fullScreen.active && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText()))
+                || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
         boolean resetRenderFlags = false;
 
         settings.graphics.fullScreen.active = fullScreen.isChecked();
@@ -2186,6 +2170,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Elevation representation
         ElevationType newType = elevationSb.getSelected().type;
+        if (SysUtils.isMac() && newType.isTessellation()) {
+            newType = ElevationType.NONE;
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.elevation.macos"));
+            logger.info(I18n.msg("gui.elevation.macos"));
+        }
         boolean reloadElevation = newType != settings.scene.renderer.elevation.type;
         if (reloadElevation) {
             EventManager.publish(Event.ELEVATION_TYPE_CMD, this, newType);
