@@ -149,7 +149,7 @@ public class SettingsManager {
         settings.graphics.backBufferResolution[1] = (int) (settings.graphics.resolution[1] * settings.graphics.backBufferScale);
 
         // Disable tessellation on macOS
-        if (SysUtils.isMac()) {
+        if (SysUtils.isMac() && settings.scene.renderer.elevation.type.isTessellation()) {
             settings.scene.renderer.elevation.type = ElevationType.NONE;
         }
 
