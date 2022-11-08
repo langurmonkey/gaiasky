@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.util.Settings.DistanceUnits;
+import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsd;
@@ -146,6 +147,11 @@ public class SettingsManager {
         settings.graphics.backBufferResolution = new int[2];
         settings.graphics.backBufferResolution[0] = (int) (settings.graphics.resolution[0] * settings.graphics.backBufferScale);
         settings.graphics.backBufferResolution[1] = (int) (settings.graphics.resolution[1] * settings.graphics.backBufferScale);
+
+        // Disable tessellation on macOS
+        if (SysUtils.isMac()) {
+            settings.scene.renderer.elevation.type = ElevationType.NONE;
+        }
 
         // Minimap size
         settings.program.minimap.size = MathUtilsd.clamp(settings.program.minimap.size, Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
