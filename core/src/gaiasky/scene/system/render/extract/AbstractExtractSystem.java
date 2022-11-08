@@ -9,6 +9,7 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.LabelView;
 
 import java.util.List;
@@ -38,8 +39,17 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
         this.renderLists = renderer.renderListsFront();
     }
 
-    protected boolean shouldRender(Base base) {
-        return base.opacity > 0 && !base.copy && GaiaSky.instance.isOn(base.ct) && base.isVisible();
+    /**
+     * Computes whether the entity with the given base component must be rendered.
+     * Entities must be rendered when their opacity is non-zero, they are visible,
+     * they are not a copy, and all of their component types are active.
+     *
+     * @param base The base component of the entity.
+     *
+     * @return Whether the entity must be rendered.
+     */
+    protected boolean mustRender(Base base) {
+        return base.opacity > 0 && !base.copy && renderer.allOn(base.ct) && base.isVisible();
     }
 
     /**
@@ -52,12 +62,7 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         try {
-            assert renderLists != null : "Render lists are not set in " + this.getClass().getSimpleName();
-            List<IRenderable> renderList = renderLists.get(rg.ordinal());
-            synchronized (renderList) {
-                renderList.add(renderable);
-            }
-            return true;
+            return renderLists.get(rg.ordinal()).add(renderable);
         } catch (Exception e) {
             return false;
         }

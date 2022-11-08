@@ -15,7 +15,7 @@ public class VertsExtractor extends AbstractExtractSystem {
         var base = Mapper.base.get(entity);
         var verts = Mapper.verts.get(entity);
         // Lines only make sense with 2 or more points
-        if (this.shouldRender(base) && verts.pointCloudData != null && verts.pointCloudData.getNumPoints() > 1) {
+        if (this.mustRender(base) && verts.pointCloudData != null && verts.pointCloudData.getNumPoints() > 1) {
             var render = Mapper.render.get(entity);
             addToRender(render, verts.renderGroup);
         }

@@ -2,7 +2,6 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -41,7 +40,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
     protected void addToRenderLists(Entity entity, ICamera camera) {
         var base = Mapper.base.get(entity);
 
-        if (this.shouldRender(base)) {
+        if (this.mustRender(base)) {
             var trajectory = Mapper.trajectory.get(entity);
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
@@ -85,7 +84,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                 }
             }
             // Orbital elements renderer
-            if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
+            if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && renderer.isOn(ComponentType.Asteroids)) {
                 addToRender(render, RenderGroup.ORBITAL_ELEMENTS_PARTICLE);
             }
             if (base.forceLabel) {

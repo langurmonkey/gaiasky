@@ -18,7 +18,7 @@ public class MeshExtractor extends AbstractExtractSystem {
         var render = Mapper.render.get(entity);
         var mesh = Mapper.mesh.get(entity);
 
-        if (shouldRender(base) && GaiaSky.instance.isInitialised()) {
+        if (mustRender(base) && GaiaSky.instance.isInitialised()) {
             switch (mesh.shading) {
             case ADDITIVE -> addToRender(render, RenderGroup.MODEL_VERT_ADDITIVE);
             case REGULAR -> addToRender(render, RenderGroup.MODEL_PIX_EARLY);

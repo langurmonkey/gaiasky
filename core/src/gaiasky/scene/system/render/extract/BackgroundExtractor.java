@@ -21,7 +21,7 @@ public class BackgroundExtractor extends AbstractExtractSystem {
     private void addToRenderLists(Entity entity) {
         var base = Mapper.base.get(entity);
 
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             var render = Mapper.render.get(entity);
 
             if(Mapper.grid.has(entity)) {

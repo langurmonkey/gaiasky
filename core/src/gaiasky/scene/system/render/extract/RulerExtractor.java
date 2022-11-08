@@ -14,7 +14,7 @@ public class RulerExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
         var ruler = Mapper.ruler.get(entity);
-        if (shouldRender(base) && ruler.rulerOk) {
+        if (mustRender(base) && ruler.rulerOk) {
             var render = Mapper.render.get(entity);
             addToRender(render, RenderGroup.LINE);
             addToRender(render, RenderGroup.FONT_LABEL);

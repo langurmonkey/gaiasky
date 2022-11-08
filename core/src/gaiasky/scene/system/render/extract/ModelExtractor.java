@@ -2,7 +2,6 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -38,7 +37,7 @@ public class ModelExtractor extends AbstractExtractSystem {
         var coord = Mapper.coordinates.get(entity);
         Coordinates parentCoord = Mapper.coordinates.get(graph.parent);
 
-        if (shouldRender(base) && isValidPosition(coord) && isValidPosition(parentCoord)) {
+        if (mustRender(base) && isValidPosition(coord) && isValidPosition(parentCoord)) {
             var body = Mapper.body.get(entity);
             var model = Mapper.model.get(entity);
             var sa = Mapper.sa.get(entity);
@@ -126,7 +125,7 @@ public class ModelExtractor extends AbstractExtractSystem {
 
     private boolean renderText(Base base, Body body, SolidAngle sa) {
         return base.names != null
-                && GaiaSky.instance.isOn(ComponentTypes.ComponentType.Labels)
+                && renderer.isOn(ComponentTypes.ComponentType.Labels)
                 && (base.forceLabel || FastMath.pow(body.solidAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
     }
 

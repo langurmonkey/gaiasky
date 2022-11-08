@@ -13,6 +13,7 @@ import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ICopy;
 import gaiasky.scene.component.IDisposable;
 import gaiasky.scene.system.initialize.*;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.extract.*;
 import gaiasky.scene.system.update.*;
 import gaiasky.scene.view.FocusView;

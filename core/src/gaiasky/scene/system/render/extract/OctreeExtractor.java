@@ -2,10 +2,11 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
+import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Octree;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
@@ -23,7 +24,12 @@ public class OctreeExtractor extends AbstractExtractSystem {
     public OctreeExtractor(Family family, int priority) {
         super(family, priority);
         this.particleSetExtractor = new ParticleSetExtractor(null, 0);
-        particleSetExtractor.setRenderer(GaiaSky.instance.sceneRenderer);
+    }
+
+    @Override
+    public void setRenderer(ISceneRenderer renderer) {
+        super.setRenderer(renderer);
+        particleSetExtractor.setRenderer(renderer);
     }
 
     @Override
@@ -56,7 +62,7 @@ public class OctreeExtractor extends AbstractExtractSystem {
     }
 
     public void addToRenderLists(Base base, OctreeNode octant, ICamera camera) {
-        if (shouldRender(base) && Settings.settings.runtime.drawOctree && octant.observed) {
+        if (mustRender(base) && Settings.settings.runtime.drawOctree && octant.observed) {
             boolean added = addToRender(octant, LINE);
 
             if (added) {

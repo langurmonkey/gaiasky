@@ -19,7 +19,7 @@ public class ClusterExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
 
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
 

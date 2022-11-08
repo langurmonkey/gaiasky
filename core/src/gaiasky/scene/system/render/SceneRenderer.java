@@ -122,7 +122,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     public Map<Entity, Matrix4> smCombinedMap;
 
     /** Contains the code to render models. **/
-    private ModelEntityRenderSystem shadowModelRenderer;
+    private final ModelEntityRenderSystem shadowModelRenderer;
 
     // Light glow pre-render
     private FrameBuffer glowFb;
@@ -140,9 +140,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     private AbstractRenderSystem billboardStarsProc;
 
-    private AtomicBoolean rendering;
+    private final AtomicBoolean rendering;
 
-    private RenderAssets renderAssets;
+    private final RenderAssets renderAssets;
 
     public SceneRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
@@ -213,9 +213,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         // Initialize render lists
         RenderGroup[] renderGroups = values();
-        renderLists = new ArrayList<>(renderGroups.length);
+        renderLists = (new ArrayList<>(renderGroups.length));
         for (int i = 0; i < renderGroups.length; i++) {
-            renderLists.add(new ArrayList<>(20));
+            renderLists.add((new ArrayList<>(20)));
         }
 
         // Set reference

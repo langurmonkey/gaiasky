@@ -17,7 +17,7 @@ public class VRDeviceExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        if (this.shouldRender(base)) {
+        if (this.mustRender(base)) {
             var render = Mapper.render.get(entity);
             addToRender(render, RenderGroup.MODEL_PIX);
             addToRender(render, RenderGroup.LINE);

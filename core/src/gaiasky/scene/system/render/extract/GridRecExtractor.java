@@ -14,7 +14,7 @@ public class GridRecExtractor extends AbstractExtractSystem{
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             var render = Mapper.render.get(entity);
             var label = Mapper.label.get(entity);
 

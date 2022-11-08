@@ -13,7 +13,7 @@ public class KeyframeExtractor extends AbstractExtractSystem {
     private void extractVerts(Entity entity) {
         var base = Mapper.base.get(entity);
         var verts = Mapper.verts.get(entity);
-        if (shouldRender(base) && verts.pointCloudData != null && verts.pointCloudData.getNumPoints() > 0) {
+        if (mustRender(base) && verts.pointCloudData != null && verts.pointCloudData.getNumPoints() > 0) {
             var render = Mapper.render.get(entity);
             addToRender(render, verts.renderGroup);
         }
@@ -30,7 +30,7 @@ public class KeyframeExtractor extends AbstractExtractSystem {
 
         // Extract main object
         var base = Mapper.base.get(entity);
-        if (shouldRender(base) && (kf.selected != null || kf.highlighted != null)) {
+        if (mustRender(base) && (kf.selected != null || kf.highlighted != null)) {
             var render = Mapper.render.get(entity);
             addToRender(render, RenderGroup.FONT_LABEL);
         }

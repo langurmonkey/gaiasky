@@ -2,7 +2,6 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -25,7 +24,7 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
 
     public void extractEntity(Entity entity) {
         var base = Mapper.base.get(entity);
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             var render = Mapper.render.get(entity);
             if (Mapper.starSet.has(entity)) {
                 addToRenderLists(render, Mapper.starSet.get(entity));
@@ -46,7 +45,7 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
         if (Settings.settings.scene.star.group.billboard) {
             addToRender(render, RenderGroup.BILLBOARD_STAR);
         }
-        if (GaiaSky.instance.sceneRenderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
+        if (renderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
             addToRender(render, RenderGroup.LINE);
         }
         addToRender(render, RenderGroup.FONT_LABEL);

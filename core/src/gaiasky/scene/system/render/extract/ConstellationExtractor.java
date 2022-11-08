@@ -16,7 +16,7 @@ public class ConstellationExtractor extends AbstractExtractSystem {
         var base = Mapper.base.get(entity);
         var constel = Mapper.constel.get(entity);
 
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             var render = Mapper.render.get(entity);
 
             addToRender(render, RenderGroup.LINE);

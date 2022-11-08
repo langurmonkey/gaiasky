@@ -14,7 +14,7 @@ public class LocExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             addToRender(Mapper.render.get(entity), RenderGroup.FONT_LABEL);
         }
     }

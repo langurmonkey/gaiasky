@@ -2,7 +2,6 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -35,7 +34,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
         var base = Mapper.base.get(entity);
         camera.checkClosestParticle(view);
 
-        if (this.shouldRender(base)) {
+        if (this.mustRender(base)) {
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
             var renderType = Mapper.renderType.get(entity);
@@ -91,7 +90,7 @@ public class ParticleExtractor extends AbstractExtractSystem {
 
     private boolean renderText(Body body, SolidAngle sa, ParticleExtra particleExtra) {
         return particleExtra.computedSize > 0 &&
-                GaiaSky.instance.isOn(ComponentType.Labels) &&
-                body.solidAngleApparent >= (sa.thresholdLabel / GaiaSky.instance.cameraManager.getFovFactor());
+                renderer.isOn(ComponentType.Labels) &&
+                body.solidAngleApparent >= (sa.thresholdLabel / camera.getFovFactor());
     }
 }

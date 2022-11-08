@@ -13,7 +13,7 @@ public class ShapeExtractor extends AbstractExtractSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             var render = Mapper.render.get(entity);
             var renderType = Mapper.renderType.get(entity);
             addToRender(render, renderType.renderGroup != null ? renderType.renderGroup : RenderGroup.MODEL_BG);

@@ -14,7 +14,7 @@ public class AxesExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
 
-        if (shouldRender(base)) {
+        if (mustRender(base)) {
             var render = Mapper.render.get(entity);
             addToRender(render, RenderGroup.LINE);
         }

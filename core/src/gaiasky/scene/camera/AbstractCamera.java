@@ -311,7 +311,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public void checkClosestBody(IFocus cb) {
+    public synchronized void checkClosestBody(IFocus cb) {
         if (cb instanceof FocusView) {
             FocusView candidate = (FocusView) cb;
             // A copy can never be the closest
@@ -327,7 +327,7 @@ public abstract class AbstractCamera implements ICamera {
         }
     }
 
-    public void checkClosestBody(Entity cb) {
+    public synchronized void checkClosestBody(Entity cb) {
         // A copy can never be the closest
         var base = Mapper.base.get(cb);
         if (!base.copy && !Mapper.tagNoClosest.has(cb)) {
@@ -366,7 +366,7 @@ public abstract class AbstractCamera implements ICamera {
         return proximity.effective[i];
     }
 
-    public void checkClosestParticle(IFocus star) {
+    public synchronized void checkClosestParticle(IFocus star) {
         if (star instanceof NearbyRecord) {
             proximity.update((NearbyRecord) star);
         } else {

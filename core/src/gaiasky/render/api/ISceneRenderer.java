@@ -3,6 +3,9 @@ package gaiasky.render.api;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import java.util.List;
+
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
 
@@ -43,6 +46,24 @@ public interface ISceneRenderer {
      * @param manager The asset manager.
      */
     void doneLoading(AssetManager manager);
+
+    /**
+     * Checks if a given component type is on.
+     *
+     * @param comp The component.
+     *
+     * @return Whether the component is on.
+     */
+   boolean isOn(ComponentType comp);
+
+   /**
+     * Checks if the component types are all on.
+     *
+     * @param comp The components.
+     *
+     * @return Whether the components are all on.
+     */
+    boolean allOn(ComponentTypes comp);
 
     /**
      * Gets the current render process.

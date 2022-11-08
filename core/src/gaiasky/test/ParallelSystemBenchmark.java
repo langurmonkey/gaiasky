@@ -38,7 +38,7 @@ public class ParallelSystemBenchmark {
     /**
      * Number of entities to use.
      */
-    private static final int[] SIZES = new int[] { 250, 500, 1_000, 2_000, 5_000 };
+    private static final int[] SIZES = new int[] { 50, 100, 250, 500, 1_000, 2_000, 5_000, 10_000};
 
     public static void main(String[] args) {
         (new ParallelSystemBenchmark()).test();
@@ -107,13 +107,10 @@ public class ParallelSystemBenchmark {
             body.distToCamera = 20;
             double value = 0;
             for (int i = 0; i < body.distToCamera; i++) {
-                value += Math.atan(ThreadLocalRandom.current().nextDouble()) * Math.log(i) * Math.pow(body.distToCamera, 30) + Math.pow(ThreadLocalRandom.current().nextDouble(), 12);
-            }
-            for (int j = 0; j < 50; j++) {
-                value += Math.cos(ThreadLocalRandom.current().nextDouble()) * Math.log10(j) * Math.pow(body.distToCamera, 12) + Math.pow(ThreadLocalRandom.current().nextDouble(), 12);
+                value += Math.atan(ThreadLocalRandom.current().nextDouble()) * Math.log(i) * Math.pow(body.distToCamera, 12);
             }
             SingleMatrix m = entity.getComponent(SingleMatrix.class);
-            m.matrix.idt().rotate(3, 1, 0, 32).scl(23).det();
+            m.matrix.idt().rotate(3, 1, 0, 32).scl(23);
 
             base.id = (long) (value);
         };
