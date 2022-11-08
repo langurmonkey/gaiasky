@@ -377,7 +377,7 @@ public class GaiaSkyDesktop implements IObserver {
         if (reinitializeUIScale) {
             // Height linear interpolation:
             // 1-1080 -> 2-2160
-            s.program.ui.scale = MathUtilsd.lint(s.graphics.resolution[1], 1080, 2160, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MIN * 3f);
+            s.program.ui.scale = MathUtilsd.lint(s.graphics.resolution[1], 1080, 2880, 1f, 2f);
         }
 
         // Launch app.
