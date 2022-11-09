@@ -27,7 +27,7 @@ public class AstroUtils {
     static final public double JD_TO_Y = 365.25;
 
     /**
-     * Julian date of reference epoch J2000 = 2451544.5 =
+     * Julian date of reference epoch J2000 = JD2451544.5 =
      * 2000-01-01T00:00:00Z.
      **/
     static final public double JD_J2000 = getJulianDate(2000.0);
