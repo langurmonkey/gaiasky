@@ -31,19 +31,19 @@ public class AstroUtils {
      **/
     static final public double JD_J2000 = getJulianDate(2000.0);
     /**
-     * Julian date of reference epoch J2015.0 = JD2455197.5 =
+     * Julian date of reference epoch J2015.0 = JD2457023.5 =
      * 2015-01-01T00:00:00Z.
      **/
     static final public double JD_J2015 = getJulianDate(2015.0);
 
     /**
-     * Julian date of the Gaia DR2 reference epoch, J2015.5 = JD2455197.5 =
+     * Julian date of the Gaia DR2 reference epoch, J2015.5 = JD2457206.125 =
      * 2015-01-01T00:00:00Z.
      **/
     static final public double JD_J2015_5 = getJulianDate(2015.5);
 
     /**
-     * Julian date of the variable stars' epoch: 2010-01-01T00:00:00Z.
+     * Julian date of the variable stars' epoch: J2010 = JD2455197.5 = 2010-01-01T00:00:00Z.
      **/
     static final public double JD_J2010 = getJulianDate(2010.0);
 
