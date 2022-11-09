@@ -128,8 +128,8 @@ public class AboutWindow extends GenericDialog {
         FileHandle gsIcon = Gdx.files.internal(Settings.settings.runtime.openVr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Image gaiaskyIcon = new Image(iconTex);
-        gaiaskyIcon.setOrigin(Align.center);
+        Image gaiaSkyIcon = new Image(iconTex);
+        gaiaSkyIcon.setOrigin(Align.center);
 
         // Add all to content
         contentHelp.add(gaiasky).pad(pad10).padTop(pad20).padBottom(pad10 * 5f).colspan(2);
@@ -146,7 +146,7 @@ public class AboutWindow extends GenericDialog {
         contentHelp.add(new OwnLabel("", skin)).padBottom(pad10 * 4f);
         contentHelp.add(docsLink).align(Align.left).padBottom(pad10 * 4f);
         contentHelp.row();
-        contentHelp.add(gaiaskyIcon).colspan(2).align(Align.center);
+        contentHelp.add(gaiaSkyIcon).colspan(2).align(Align.center);
         contentHelp.pack();
 
         /* CONTENT 2 - ABOUT */
@@ -160,57 +160,57 @@ public class AboutWindow extends GenericDialog {
         intro.setWidth(contentWidth);
 
         // Home page
-        Label homepagetitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
+        Label homePageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
         Link homepage = new Link(Settings.WEBPAGE, linkStyle, Settings.WEBPAGE);
 
         // Twitter
-        Label twtitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
+        Label devNewsTitle = new OwnLabel(I18n.msg("gui.help.devnews"), skin);
         Link tw = new Link(Settings.SOCIAL_MEDIA_NAME, linkStyle, Settings.SOCIAL_MEDIA_URL);
 
         // Author
-        Label authortitle = new OwnLabel(I18n.msg("gui.help.author"), skin);
+        Label authorTitle = new OwnLabel(I18n.msg("gui.help.author"), skin);
 
         Table author = new Table(skin);
-        Label authorname = new OwnLabel(Settings.AUTHOR_NAME, skin);
-        Link authormail = new Link(Settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.AUTHOR_EMAIL);
-        Link authorpage = new Link("tonisagrista.com", linkStyle, "https://tonisagrista.com");
-        Link authormasto = new Link("@jumpinglangur@mastodon.social", linkStyle, "https://mastodon.social/@jumpinglangur");
-        author.add(authorname).left().row();
-        author.add(authormail).left().row();
-        author.add(authorpage).left().row();
-        author.add(authormasto).left().row();
+        Label authorName = new OwnLabel(Settings.AUTHOR_NAME, skin);
+        Link authorMail = new Link(Settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.AUTHOR_EMAIL);
+        Link authorPage = new Link("tonisagrista.com", linkStyle, "https://tonisagrista.com");
+        Link authorMasto = new Link("@jumpinglangur@mastodon.social", linkStyle, "https://mastodon.social/@jumpinglangur");
+        author.add(authorName).left().row();
+        author.add(authorMail).left().row();
+        author.add(authorPage).left().row();
+        author.add(authorMasto).left().row();
 
         // Contributor
-        Label contribtitle = new OwnLabel(I18n.msg("gui.help.contributors"), skin);
+        Label contribTitle = new OwnLabel(I18n.msg("gui.help.contributors"), skin);
 
         Table contrib = new Table(skin);
         contrib.align(Align.left);
-        Label contribname = new OwnLabel("Apl. Prof. Dr. Stefan Jordan", skin);
-        Link contribmail = new Link("jordan@ari.uni-heidelberg.de", linkStyle, "mailto:jordan@ari.uni-heidelberg.de");
-        contrib.add(contribname).left().row();
-        contrib.add(contribmail).left().row();
+        Label contribName = new OwnLabel("Apl. Prof. Dr. Stefan Jordan", skin);
+        Link contribMail = new Link("jordan@ari.uni-heidelberg.de", linkStyle, "mailto:jordan@ari.uni-heidelberg.de");
+        contrib.add(contribName).left().row();
+        contrib.add(contribMail).left().row();
 
         // License
-        HorizontalGroup licenseh = new HorizontalGroup();
-        licenseh.space(pad10);
+        HorizontalGroup licenseHorizontal = new HorizontalGroup();
+        licenseHorizontal.space(pad10);
 
-        VerticalGroup licensev = new VerticalGroup();
-        TextArea licensetext = new OwnTextArea(I18n.msg("gui.help.license"), skin.get("regular", TextFieldStyle.class));
-        licensetext.setDisabled(true);
-        licensetext.setPrefRows(3);
-        licensetext.setWidth(taWidth2 / 2f);
-        Link licenselink = new Link(Settings.LICENSE_URL, linkStyle, Settings.LICENSE_URL);
+        VerticalGroup licenseVertical = new VerticalGroup();
+        TextArea licenseText = new OwnTextArea(I18n.msg("gui.help.license"), skin.get("regular", TextFieldStyle.class));
+        licenseText.setDisabled(true);
+        licenseText.setPrefRows(3);
+        licenseText.setWidth(taWidth2 / 2f);
+        Link licenseLink = new Link(Settings.LICENSE_URL, linkStyle, Settings.LICENSE_URL);
 
-        licensev.addActor(licensetext);
-        licensev.addActor(licenselink);
+        licenseVertical.addActor(licenseText);
+        licenseVertical.addActor(licenseLink);
 
-        licenseh.addActor(licensev);
+        licenseHorizontal.addActor(licenseVertical);
 
         // Thanks
         HorizontalGroup thanks = new HorizontalGroup();
         thanks.space(pad10).pad(pad10);
-        Container<Actor> thanksc = new Container<>(thanks);
-        thanksc.setBackground(skin.getDrawable("bg-clear"));
+        Container<Actor> thanksSc = new Container<>(thanks);
+        thanksSc.setBackground(skin.getDrawable("bg-clear"));
 
         Image zah = new Image(getSpriteDrawable(Gdx.files.internal("img/zah.png")));
         Image dlr = new Image(getSpriteDrawable(Gdx.files.internal("img/dlr.png")));
@@ -224,21 +224,21 @@ public class AboutWindow extends GenericDialog {
 
         contentAbout.add(intro).colspan(2).left().padTop(pad20);
         contentAbout.row();
-        contentAbout.add(homepagetitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(homePageTitle).left().padRight(pad10).padTop(pad10);
         contentAbout.add(homepage).left().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(twtitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(devNewsTitle).left().padRight(pad10).padTop(pad10);
         contentAbout.add(tw).left().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(authortitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(authorTitle).left().padRight(pad10).padTop(pad10);
         contentAbout.add(author).left().padTop(pad5).padTop(pad10);
         contentAbout.row();
-        contentAbout.add(contribtitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(contribTitle).left().padRight(pad10).padTop(pad10);
         contentAbout.add(contrib).left().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(licenseh).colspan(2).center().padTop(pad10);
+        contentAbout.add(licenseHorizontal).colspan(2).center().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(thanksc).colspan(2).center().padTop(pad10 * 4f);
+        contentAbout.add(thanksSc).colspan(2).center().padTop(pad10 * 4f);
         contentAbout.pack();
 
         /* CONTENT 3 - SYSTEM */
@@ -540,15 +540,6 @@ public class AboutWindow extends GenericDialog {
 
     }
 
-    private boolean exists(FileHandle fh) {
-        try {
-            fh.read().close();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     @Override
     protected void accept() {
     }
@@ -589,14 +580,14 @@ public class AboutWindow extends GenericDialog {
             }
             // There's a new version!
             checkLabel.setText(I18n.msg("gui.newversion.available", Settings.settings.version, tagVersion + " [" + df.format(tagDate) + "]"));
-            final String uri = Settings.settings.WEBPAGE_DOWNLOADS;
+            final String uri = Settings.WEBPAGE_DOWNLOADS;
 
             OwnTextButton getNewVersion = new OwnTextButton(I18n.msg("gui.newversion.getit"), skin);
             getNewVersion.pad(0, pad10, 0, pad10);
             getNewVersion.setHeight(40f);
             getNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    Gdx.net.openURI(Settings.settings.WEBPAGE_DOWNLOADS);
+                    Gdx.net.openURI(Settings.WEBPAGE_DOWNLOADS);
                     return true;
                 }
                 return false;
