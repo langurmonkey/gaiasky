@@ -35,6 +35,15 @@ if [[ ! $CURRENT_TAG =~ $RE ]]; then
 else
     # Use regexp to match x.y.z[-rcww]
     echo "git-chglog -> $OUTPUT"
-    git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)?$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $CURRENT_TAG && echo "File saved to $OUTPUT"
+    git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)?$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $CURRENT_TAG
+
+    # Remove duplicate lines
+    awk '!seen[$0]++' $OUTPUT > $OUTPUT.bak
+    mv $OUTPUT.bak $OUTPUT
+    # Add line break before '#'
+    sed -z 's/\n#/\n\n#/g' $OUTPUT > $OUTPUT.bak
+    mv $OUTPUT.bak $OUTPUT
+
+    echo "File saved to $OUTPUT"
 fi
 echo "Done"

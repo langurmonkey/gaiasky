@@ -26,8 +26,8 @@
   </description>
 
   <releases>
-    <release version="3.2.1" date="2022-06-21" urgency="high">
-      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.2.1.41e4b0a5b/releasenotes.txt</url>
+    <release version="3.3.0" date="2022-11-11" urgency="high">
+      <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.3.0.1e50985ef/releasenotes.txt</url>
     </release>
   </releases>
 

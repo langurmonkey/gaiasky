@@ -21,5 +21,13 @@ echo "Creating release notes: $CURRENT_TAG"
 
 echo "git-chglog -> $OUTPUT"
 git-chglog --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $RC_TAG && echo "File saved to $OUTPUT"
+
+# Remove duplicate lines
+awk '!seen[$0]++' $OUTPUT > $OUTPUT.bak
+mv $OUTPUT.bak $OUTPUT
+# Add line break before '#'
+sed -z 's/\n#/\n\n#/g' $OUTPUT > $OUTPUT.bak
+mv $OUTPUT.bak $OUTPUT
+
 echo "Done"
 
