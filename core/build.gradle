@@ -3,6 +3,7 @@ apply plugin: "com.install4j.gradle"
 apply plugin: "de.undercouch.download"
 
 
+import com.install4j.gradle.Install4jTask
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 sourceCompatibility = 15
@@ -65,7 +66,7 @@ sourceSets {
 
 abstract class GaiaSkyRun extends JavaExec {
     public GaiaSkyRun() {
-        mainClass = project.mainClassName
+        main(project.mainClassName)
     }
 
     public void setup() {
@@ -105,7 +106,7 @@ task runTranslationStatus(dependsOn: jar, type: JavaExec, description: "Runs the
     classpath += project.files(project.ext.assetsDir)
     standardInput = System.in
     workingDir = project.ext.workDir
-    mainClass = "gaiasky.desktop.util.I18nStatus"
+    main("gaiasky.desktop.util.I18nStatus")
 }
 
 task runI18nFormatter(dependsOn: jar, type: JavaExec, description: "Formats i18n files according to a reference file") {
@@ -114,7 +115,7 @@ task runI18nFormatter(dependsOn: jar, type: JavaExec, description: "Formats i18n
     classpath += project.files(project.ext.assetsDir)
     standardInput = System.in
     workingDir = project.ext.workDir
-    mainClass = "gaiasky.desktop.util.I18nFormatter"
+    main("gaiasky.desktop.util.I18nFormatter")
 }
 
 task createDistDir(description: "Creates the releases/dist folder") {
@@ -340,7 +341,7 @@ task downloadAndExtractJDK(dependsOn: downloadJDK, description: "Extracts the do
     doLast {
         File jdkArchivePath = new File("$tmpDir", "$jdkArchive")
         // Delete pre-existing jre
-        project.tmpDir.eachFile (groovy.io.FileType.DIRECTORIES) { dir ->
+        project.tmpDir.eachFile(groovy.io.FileType.DIRECTORIES) { dir ->
             delete "$dir"
         }
         // Extract
@@ -356,7 +357,7 @@ task downloadAndExtractJDK(dependsOn: downloadJDK, description: "Extracts the do
 }
 
 task createAppimage(dependsOn: [createTar, downloadAndExtractJDK], description: "Creates the appimage package for Gaia Sky") {
-    doLast{
+    doLast {
         String gsId = "gaiasky"
         String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
 
@@ -442,7 +443,7 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
     }
 }
 
-def buildTime() {
+static def buildTime() {
     return new Date()
 }
 
@@ -487,7 +488,7 @@ task createDeb(dependsOn: createTar, description: "Creates the .deb package") {
     }
 }
 
-task prepareInstall4jScript(dependsOn: 'createTar' , description: "Prepares the install4j script and copies it to the packages folder") {
+task prepareInstall4jScript(dependsOn: 'createTar', description: "Prepares the install4j script and copies it to the packages folder") {
     doLast {
         copy {
             from "installerscripts/template.install4j"
@@ -503,13 +504,13 @@ task prepareInstall4jScript(dependsOn: 'createTar' , description: "Prepares the 
     }
 }
 
-task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs the install4j task to create the installers") {
+task install4jMedia(type: Install4jTask, description: "Runs the install4j task to create the installers") {
     dependsOn 'prepareInstall4jScript'
 
     if (project.hasProperty("winKeystorePassword")) {
         winKeystorePassword = project.ext.winKeystorePassword
     } else {
-        if(gradle.startParameter.taskNames.contains("core:pack")){
+        if (gradle.startParameter.taskNames.contains("core:pack")) {
             throw new GradleException("Please specify the kesytore password for signing Windows packages:\ngradlew core:pack -PwinKeystorePassword=yourpass")
         }
     }
