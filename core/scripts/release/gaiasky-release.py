@@ -161,7 +161,7 @@ if __name__ == '__main__':
         print("================ TODOs ================")
         print()
         print(" > Your release %s is in %s/releases" % (arguments.tag, arguments.gs_folder))
-        print(" > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget update.xml)")
+        print(" > Upload the files in andromeda.ari.uni-heidelberg.de:/gaiasky/files/releases/ (do not forget updates.xml)")
         print(" > Update symlink to latest: rm latest && ln -s new_release latest")
         print(" > Generate the html listings for the new files: dir2html")
         print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
