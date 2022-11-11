@@ -5,7 +5,11 @@
 
 # Utils dir, with a relative path core/utils/ to the root gaiasky directory
 UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-GSDIR=`realpath $UTILSDIR/../../../`
+if [ -z "$GS" ]; then
+  GSDIR=`realpath $UTILSDIR/../../../`
+else
+  GSDIR="$GS"
+fi
 
 if [[ $# -ne 2 ]]; then
     echo "Usage: $0 VERSION OUTPUT"
@@ -23,27 +27,26 @@ echo "Creating release notes: $CURRENT_TAG"
 # Test tag for regexp, if it does not fit, use $RELEASENOTES if it exists
 RE="^([0-9]+\.)?([0-9]+\.)?([0-9]+)$"
 
-if [[ ! $CURRENT_TAG =~ $RE ]]; then
-    echo "Tag $CURRENT_TAG does not match $RE, trying to use $RELEASENOTES"
-    if [[ -e $RELEASENOTES ]]; then
-        # Use it
-        echo "$GSDIR/releasenotes.txt -> $OUTPUT"
-        cp $GSDIR/releasenotes.txt $OUTPUT
-    else
-        echo "File $RELEASENOTES does not exist"
-    fi
+if [[ -e $RELEASENOTES ]]; then
+    # If $GS/releasenotes.txt exists, use it
+    echo "$GSDIR/releasenotes.txt -> $OUTPUT"
+    cp $GSDIR/releasenotes.txt $OUTPUT
 else
-    # Use regexp to match x.y.z[-rcww]
-    echo "git-chglog -> $OUTPUT"
-    git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)?$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $CURRENT_TAG
+  if [[ ! $CURRENT_TAG =~ $RE ]]; then
+      echo "Tag $CURRENT_TAG does not match $RE, trying to use $RELEASENOTES"
+  else
+      # Use regexp to match x.y.z[-rcww]
+      echo "git-chglog -> $OUTPUT"
+      git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)?$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $CURRENT_TAG
 
-    # Remove duplicate lines
-    awk '!seen[$0]++' $OUTPUT > $OUTPUT.bak
-    mv $OUTPUT.bak $OUTPUT
-    # Add line break before '#'
-    sed -z 's/\n#/\n\n#/g' $OUTPUT > $OUTPUT.bak
-    mv $OUTPUT.bak $OUTPUT
+      # Remove duplicate lines
+      awk '!seen[$0]++' $OUTPUT > $OUTPUT.bak
+      mv $OUTPUT.bak $OUTPUT
+      # Add line break before '#'
+      sed -z 's/\n#/\n\n#/g' $OUTPUT > $OUTPUT.bak
+      mv $OUTPUT.bak $OUTPUT
 
-    echo "File saved to $OUTPUT"
+      echo "File saved to $OUTPUT"
+  fi
 fi
 echo "Done"
