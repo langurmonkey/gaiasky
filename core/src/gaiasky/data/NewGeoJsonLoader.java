@@ -19,8 +19,8 @@ import java.util.Map;
 /**
  * Loads GeoJson files into ECS entities.
  */
-public class NewGeoJsonLoader extends AbstractSceneLoader {
-    private static final Logger.Log logger = Logger.getLogger(NewGeoJsonLoader.class);
+public class GeoJsonLoader extends AbstractSceneLoader {
+    private static final Logger.Log logger = Logger.getLogger(GeoJsonLoader.class);
 
     @Override
     public Array<Entity> loadData() throws FileNotFoundException {

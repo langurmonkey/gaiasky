@@ -184,32 +184,56 @@ public class Settings {
             this.reflectionSkyboxLocation = location;
         }
 
-        public Path dataPath(String path) {
+        public Path dataPath(String pathStr, String dsLocation) {
             // Windows does not allow asterisks in paths
-            String pth = path.replaceAll("\\*", Constants.STAR_SUBSTITUTE);
+            String resolvedPathStr = pathStr.replaceAll("\\*", Constants.STAR_SUBSTITUTE);
 
-            if (pth.startsWith("data/")) {
+            if (resolvedPathStr.startsWith("data/")) {
                 // Path is in data directory, just remove leading 'data/' and prepend data location
-                pth = pth.substring(5);
-                return Path.of(location).resolve(pth);
+                String pathFromDataStr = resolvedPathStr.substring(5);
+                Path pathFromData = Path.of(pathFromDataStr);
+                Path resolvedPath = Path.of(location).resolve(pathFromDataStr);
+                // We inject the location if:
+                // - the current resolved path does not exist, and
+                // - the dataset location is not null or empty, and
+                // - the injected dataset location is not already in the path.
+                if (!Files.exists(resolvedPath) && dsLocation != null && !dsLocation.isEmpty() && !pathFromData.getName(0).toString().equals(dsLocation)) {
+                    // Use dsLocation
+                    return Path.of(location).resolve(dsLocation).resolve(pathFromDataStr);
+                } else {
+                    // It exists, use as it is
+                    return resolvedPath;
+                }
             } else {
-                var p = Path.of(pth);
+                var p = Path.of(resolvedPathStr);
                 if (p.toFile().exists()) {
                     // Relative to working dir, or absolute.
                     return p;
                 } else {
                     // In data directory.
-                    return Path.of(location).resolve(pth);
+                    return Path.of(location).resolve(resolvedPathStr);
                 }
             }
         }
 
+        public Path dataPath(String path) {
+            return dataPath(path, Constants.DEFAULT_DATASET_KEY);
+        }
+
+        public String dataFile(String path, String dsLocation) {
+            return dataPath(path, dsLocation).toString().replaceAll("\\\\", "/");
+        }
+
         public String dataFile(String path) {
-            return dataPath(path).toString().replaceAll("\\\\", "/");
+            return dataFile(path, Constants.DEFAULT_DATASET_KEY);
+        }
+
+        public FileHandle dataFileHandle(String path, String dsLocation) {
+            return new FileHandle(dataFile(path, dsLocation));
         }
 
         public FileHandle dataFileHandle(String path) {
-            return new FileHandle(dataFile(path));
+            return dataFileHandle(path, Constants.DEFAULT_DATASET_KEY);
         }
 
         /**
@@ -923,7 +947,6 @@ public class Settings {
             public boolean isOrthosphereOn() {
                 return active && projection.isOrthosphere();
             }
-
 
             /**
              * Checks whether we are in fixed fov mode (slave, planetarium, panorama)

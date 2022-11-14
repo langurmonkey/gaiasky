@@ -38,10 +38,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * A basic component that contains the info on a material
@@ -943,21 +945,22 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public void randomizeAll(long seed, double bodySize) {
-        Random rand = new Random(seed);
+        var rand = new Random(seed);
         setHeight("generate");
         setDiffuse("generate");
         setNormal("generate");
         setSpecular("generate");
-        Path dataPath = Settings.settings.data.dataPath("tex/base");
+        var dataPath = Settings.settings.data.dataPath("tex/base");
         Array<String> luts = new Array<>();
-        try {
-            java.util.List<Path> l = Files.list(dataPath).filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
+        try (var paths = Files.list(dataPath)) {
+            List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
             for (Path p : l) {
                 String name = p.toString();
                 luts.add("data" + name.substring(name.indexOf("/tex/base/")));
             }
         } catch (Exception ignored) {
         }
+
         if (luts.isEmpty()) {
             luts.add("data/tex/base/biome-lut.png");
             luts.add("data/tex/base/biome-smooth-lut.png");

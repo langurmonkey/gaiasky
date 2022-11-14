@@ -409,7 +409,7 @@ public class DatasetManagerWindow extends GenericDialog {
         int added = 0;
         for (DatasetType type : dataDescriptor.types) {
             List<DatasetDesc> datasets = type.datasets;
-            List<DatasetDesc> filtered = datasets.stream().filter(d -> mode == DatasetMode.AVAILABLE ? !d.exists : true).collect(Collectors.toList());
+            List<DatasetDesc> filtered = datasets.stream().filter(d -> mode != DatasetMode.AVAILABLE || !d.exists).collect(Collectors.toList());
             if (!filtered.isEmpty()) {
                 OwnLabel dsType = new OwnLabel(I18n.msg("gui.download.type." + type.typeStr), skin, "hud-header");
                 leftTable.add(dsType).left().padTop(pad10).row();

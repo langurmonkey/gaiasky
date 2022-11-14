@@ -21,6 +21,7 @@ public interface ISceneLoader {
 
 
     void initialize(String[] files, Scene scene) throws RuntimeException;
+    void initialize(String[] files, String dsLocation, Scene scene) throws RuntimeException;
 
     void initialize(DataSource ds, Scene scene);
 
@@ -35,5 +36,6 @@ public interface ISceneLoader {
     void setDescription(String description);
 
     void setParams(Map<String, Object> params);
+    Object interceptDataFilePath(Class<?> valueClass, Object val);
 
 }

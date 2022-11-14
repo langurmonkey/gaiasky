@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
-import gaiasky.data.NewStarClusterLoader;
+import gaiasky.data.StarClusterLoader;
 import gaiasky.data.SceneJsonLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
@@ -3278,7 +3278,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     postRunnable(() -> {
                         // Load data
-                        NewStarClusterLoader scl = new NewStarClusterLoader();
+                        StarClusterLoader scl = new StarClusterLoader();
                         scl.initialize(ds, scene);
                         scl.setParentName(dsName);
                         scl.loadData();

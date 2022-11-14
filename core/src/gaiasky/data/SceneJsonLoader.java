@@ -12,14 +12,15 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scene.Scene;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.i18n.I18n;
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,6 +63,13 @@ public class SceneJsonLoader {
         JsonReader jsonReader = new JsonReader();
         JsonValue model = jsonReader.parse(jsonFile.read());
 
+        // The dataset directory corresponding to this JSON file. Usually coincides with the dataset key.
+        // For old-style datasets, this should be null.
+        var dataLocation = Path.of(Settings.settings.data.location);
+        var parent = jsonFile.file().toPath().getParent();
+        // Check that the dataset parent is not the data location. Otherwise, get its name.
+        var datasetDirectory = dataLocation.toAbsolutePath().compareTo(parent.toAbsolutePath()) == 0 ? null : parent.getFileName().toString();
+
         // Must have a 'data' element.
         if (model.has("data")) {
             String name = model.get("name") != null ? model.get("name").asString() : null;
@@ -79,13 +87,11 @@ public class SceneJsonLoader {
 
                 // Loader mappings.
                 switch (clazzName) {
-                case "gaiasky.data.JsonLoader" -> clazzName = "gaiasky.data.NewJsonLoader";
-                case "gaiasky.data.GeoJsonLoader" -> clazzName = "gaiasky.data.NewGeoJsonLoader";
                 case "gaiasky.data.group.OctreeGroupLoader" -> clazzName = "gaiasky.data.OctreeLoader";
-                case "gaiasky.data.cluster.StarClusterLoader" -> clazzName = "gaiasky.data.NewStarClusterLoader";
+                case "gaiasky.data.cluster.StarClusterLoader" -> clazzName = "gaiasky.data.StarClusterLoader";
                 }
 
-                @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
+                Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
                 JsonValue filesJson = child.get("files");
                 if (filesJson != null) {
@@ -102,14 +108,14 @@ public class SceneJsonLoader {
                         loader.setParams(params);
 
                     // Init loader.
-                    loader.initialize(files, scene);
+                    loader.initialize(files, datasetDirectory, scene);
 
                     JsonValue curr = filesJson;
                     while (curr.next != null) {
                         curr = curr.next;
                         String nameAttr = curr.name;
                         Object val = null;
-                        Class valueClass = null;
+                        Class<?> valueClass = null;
                         if (curr.isDouble()) {
                             val = curr.asDouble();
                             valueClass = Double.class;
@@ -121,6 +127,7 @@ public class SceneJsonLoader {
                             valueClass = Long.class;
                         }
                         if (val != null) {
+                            val = loader.interceptDataFilePath(valueClass, val);
                             String methodName = "set" + TextUtils.propertyToMethodName(nameAttr);
                             Method m = searchMethod(methodName, valueClass, clazz);
                             if (m != null)
@@ -140,7 +147,7 @@ public class SceneJsonLoader {
             }
         } else {
             // Use regular JsonLoader.
-            NewJsonLoader loader = new NewJsonLoader();
+            JsonLoader loader = new JsonLoader();
             loader.initialize(new String[] { jsonFile.file().getAbsolutePath() }, scene);
             // Load data.
             var data = loader.loadData();
@@ -170,4 +177,5 @@ public class SceneJsonLoader {
         }
         return m;
     }
+
 }

@@ -9,11 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
-import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 
 import java.io.File;
@@ -105,7 +102,7 @@ public class DatasetDesc {
         if (this.key == null) {
             this.key = this.name.replaceAll("\\s+", "-");
         }
-        this.baseData = key.equals("default-data");
+        this.baseData = key.equals(Constants.DEFAULT_DATASET_KEY);
 
         if (source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
@@ -192,7 +189,7 @@ public class DatasetDesc {
     /**
      * Checks the version file of the given path, if it is a correct JSON
      * file and contains a top-level "version" attribute. Otherwise, it
-     * returns the default lowest version (0)
+     * returns the default the lowest version (0)
      *
      * @param path The path with the file to check
      *

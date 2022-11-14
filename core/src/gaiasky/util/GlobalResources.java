@@ -107,8 +107,8 @@ public class GlobalResources {
 
     public void reloadDataFiles() {
         // Star group textures
-        manager.load(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
-        manager.load(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
+        manager.load(Settings.settings.data.dataFile("data/tex/base/star.jpg"), Texture.class);
+        manager.load(Settings.settings.data.dataFile("data/tex/base/lut.jpg"), Texture.class);
     }
 
     public void updateSkin() {

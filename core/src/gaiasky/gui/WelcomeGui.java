@@ -11,14 +11,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -53,7 +51,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -409,7 +406,7 @@ public class WelcomeGui extends AbstractGui {
         } else {
             // Check if there is an update for the base data, and show a notice if so
             if (serverDatasets != null && serverDatasets.updatesAvailable) {
-                DatasetDesc baseData = serverDatasets.findDataset("default-data");
+                DatasetDesc baseData = serverDatasets.findDataset(Constants.DEFAULT_DATASET_KEY);
                 if (baseData != null && baseData.myVersion < baseData.serverVersion) {
                     // We have a base data update, show notice
                     GenericDialog baseDataNotice = new GenericDialog(I18n.msg("gui.basedata.title"), skin, ui) {
@@ -588,28 +585,43 @@ public class WelcomeGui extends AbstractGui {
      * @return True if basic data is found
      */
     private boolean baseDataPresent() {
-        Array<Path> required = new Array<>();
-        fillBasicDataFiles(required);
+        Array<Path> newFiles = new Array<>();
+        Array<Path> oldFiles = new Array<>();
+        fillBasicDataFiles(newFiles, oldFiles);
 
-        for (Path p : required) {
+
+        boolean newPresent = true;
+        for (Path p : newFiles) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
                 logger.info("Data files not found: " + p);
-                return false;
+                newPresent = false;
             }
         }
 
-        return true;
+        boolean oldPresent = true;
+        for (Path p : oldFiles) {
+            if (!Files.exists(p) || !Files.isReadable(p)) {
+                logger.info("Data files not found: " + p);
+                oldPresent = false;
+            }
+        }
+
+        return newPresent || oldPresent;
     }
 
-    private void fillBasicDataFiles(Array<Path> required) {
-        Path dataPath = Paths.get(Settings.settings.data.location).normalize();
-        required.add(dataPath.resolve("data-main.json"));
-        required.add(dataPath.resolve("asteroids.json"));
-        required.add(dataPath.resolve("planets.json"));
-        required.add(dataPath.resolve("satellites.json"));
-        required.add(dataPath.resolve("tex/base"));
-        required.add(dataPath.resolve("orbit"));
-        required.add(dataPath.resolve("galaxy"));
+    private void fillBasicDataFiles(Array<Path> newFiles, Array<Path> oldFiles) {
+        // Fill in new data format.
+        Path location = Paths.get(Settings.settings.data.location).normalize();
+        newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY));
+
+        // Old data format.
+        oldFiles.add(location.resolve("data-main.json"));
+        oldFiles.add(location.resolve("planets.json"));
+        oldFiles.add(location.resolve("moons.json"));
+        oldFiles.add(location.resolve("tex"));
+        oldFiles.add(location.resolve("galaxy"));
+        oldFiles.add(location.resolve("models"));
+        oldFiles.add(location.resolve("orbit"));
     }
 
     @Override

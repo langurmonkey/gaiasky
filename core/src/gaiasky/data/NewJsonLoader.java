@@ -46,7 +46,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
     }
 
     /** Maps old attributes to components. **/
-    private AttributeMap attributeMap;
+    private final AttributeMap attributeMap;
 
     /**
      * Creates a new instance.
@@ -65,7 +65,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
         JsonReader json = new JsonReader();
         for (String filePath : filePaths) {
             try {
-                FileHandle file = Settings.settings.data.dataFileHandle(filePath);
+                FileHandle file = Settings.settings.data.dataFileHandle(filePath, datasetDirectory);
                 JsonValue model = json.parse(file.read());
                 // Must have an 'objects' element.
                 if (model.has("objects")) {
@@ -127,6 +127,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                     value = getValue(attribute);
                     if (value instanceof String) {
                         value = ((String) value).replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                        value = interceptDataFilePath(String.class, value);
                     }
                 } else if (attribute.isArray()) {
                     // We suppose our children are of the same type
@@ -134,6 +135,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
                     case stringValue -> {
                         valueClass = String[].class;
                         value = attribute.asStringArray();
+                        value = interceptDataFilePaths((String[]) value);
                     }
                     case doubleValue -> {
                         valueClass = double[].class;
@@ -340,20 +342,12 @@ public class NewJsonLoader extends AbstractSceneLoader {
     private Object getValue(JsonValue val) {
         Object value = null;
         switch (val.type()) {
-        case stringValue:
-            value = val.asString();
-            break;
-        case doubleValue:
-            value = val.asDouble();
-            break;
-        case booleanValue:
-            value = val.asBoolean();
-            break;
-        case longValue:
-            value = val.asLong();
-            break;
-        default:
-            break;
+        case stringValue -> value = val.asString();
+        case doubleValue -> value = val.asDouble();
+        case booleanValue -> value = val.asBoolean();
+        case longValue -> value = val.asLong();
+        default -> {
+        }
         }
         return value;
     }
@@ -361,20 +355,12 @@ public class NewJsonLoader extends AbstractSceneLoader {
     private Class<?> getValueClass(JsonValue val) {
         Class<?> valueClass = null;
         switch (val.type()) {
-        case stringValue:
-            valueClass = String.class;
-            break;
-        case doubleValue:
-            valueClass = Double.class;
-            break;
-        case booleanValue:
-            valueClass = Boolean.class;
-            break;
-        case longValue:
-            valueClass = Long.class;
-            break;
-        default:
-            break;
+        case stringValue -> valueClass = String.class;
+        case doubleValue -> valueClass = Double.class;
+        case booleanValue -> valueClass = Boolean.class;
+        case longValue -> valueClass = Long.class;
+        default -> {
+        }
         }
         return valueClass;
     }
@@ -454,6 +440,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
         JsonValue child = json.child;
         while (child != null) {
             Object val = getValue(child);
+            val = interceptDataFilePath(val.getClass(), val);
             if (val != null) {
                 map.put(child.name, val);
             }
