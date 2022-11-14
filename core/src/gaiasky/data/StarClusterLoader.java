@@ -56,8 +56,8 @@ import java.util.Map;
  * <li>nstars: {@link UCDParser#nstarscolnames}</li>
  * </ul>
  */
-public class NewStarClusterLoader extends AbstractSceneLoader {
-    private static final Log logger = Logger.getLogger(NewStarClusterLoader.class);
+public class StarClusterLoader extends AbstractSceneLoader {
+    private static final Log logger = Logger.getLogger(StarClusterLoader.class);
     boolean active = true;
     private Archetype archetype;
     private int numLoaded = 0;

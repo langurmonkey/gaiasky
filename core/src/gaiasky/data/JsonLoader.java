@@ -29,8 +29,8 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class NewJsonLoader extends AbstractSceneLoader {
-    private static final Logger.Log logger = Logger.getLogger(NewJsonLoader.class);
+public class JsonLoader extends AbstractSceneLoader {
+    private static final Logger.Log logger = Logger.getLogger(JsonLoader.class);
 
     // Old components package. This was moved during the ECS refactor.
     private static final String COMPONENTS_PACKAGE = "gaiasky.scene.record.";
@@ -51,7 +51,7 @@ public class NewJsonLoader extends AbstractSceneLoader {
     /**
      * Creates a new instance.
      */
-    public NewJsonLoader() {
+    public JsonLoader() {
         this.attributeMap = new AttributeMap();
         this.attributeMap.initialize();
     }
