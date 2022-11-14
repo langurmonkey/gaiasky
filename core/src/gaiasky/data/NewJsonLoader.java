@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.beust.jcommander.internal.Maps;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.AttributeMap;

@@ -143,8 +143,8 @@ out float o_fragHeight;
         h.y = fetchHeight(vec2(p.x + dp.x, p.y)).r;
         h.z = fetchHeight(vec2(p.x, p.y - dp.y)).r;
         h.w = fetchHeight(vec2(p.x, p.y + dp.y)).r;
-        vec3 va = normalize(vec3(size.xy, h.x - h.y));
-        vec3 vb = normalize(vec3(size.yx, h.z - h.w));
+        vec3 va = normalize(vec3(size.xy, -h.x + h.y));
+        vec3 vb = normalize(vec3(size.yx, -h.z + h.w));
         vec3 n = cross(va, vb);
         return normalize(n);
     }
