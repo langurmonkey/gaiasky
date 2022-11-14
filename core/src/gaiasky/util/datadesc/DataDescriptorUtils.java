@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.gui.DatasetManagerWindow;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -62,13 +63,14 @@ public class DataDescriptorUtils {
      * it returns null.
      *
      * @param fh The pointer to the server JSON file.
+     *
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildServerDatasets(FileHandle fh) {
         if (fh != null) {
             this.fh = fh;
         }
-        if(this.fh != null) {
+        if (this.fh != null) {
             logger.info("Building data descriptor model: " + this.fh.file().toPath());
 
             JsonValue dataDesc = reader.parse(this.fh);
@@ -152,6 +154,7 @@ public class DataDescriptorUtils {
      * or 'dataset-'.
      *
      * @param server The server data descriptor, for combining with the local catalogs.
+     *
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
@@ -172,8 +175,16 @@ public class DataDescriptorUtils {
         Array<FileHandle> catalogFiles = new Array<>();
 
         for (FileHandle catalogLocation : catalogLocations) {
-            FileHandle[] cfs = catalogLocation.list(pathname -> (pathname.getName().startsWith("catalog-") || pathname.getName().startsWith("dataset-")) && pathname.getName().endsWith(".json"));
-            catalogFiles.addAll(cfs);
+            final var cfs = catalogLocation.list(pathname -> (pathname.canRead()
+                    && pathname.isDirectory()
+                    && !pathname.getName().equals(Constants.DEFAULT_DATASET_KEY)
+                    && pathname.toPath().resolve("dataset.json").toFile().exists()));
+
+            for (FileHandle fh : cfs) {
+                var fhDescriptor = new FileHandle(fh.file().toPath().resolve("dataset.json").toFile());
+                catalogFiles.add(fhDescriptor);
+            }
+
         }
 
         JsonReader reader = new JsonReader();

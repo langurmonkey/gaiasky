@@ -585,43 +585,24 @@ public class WelcomeGui extends AbstractGui {
      * @return True if basic data is found
      */
     private boolean baseDataPresent() {
-        Array<Path> newFiles = new Array<>();
-        Array<Path> oldFiles = new Array<>();
-        fillBasicDataFiles(newFiles, oldFiles);
+        Array<Path> defaultDatasetFiles = new Array<>();
+        fillDefaultDatasetFiles(defaultDatasetFiles);
 
-
-        boolean newPresent = true;
-        for (Path p : newFiles) {
+        for (Path p : defaultDatasetFiles) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
                 logger.info("Data files not found: " + p);
-                newPresent = false;
+                return false;
             }
         }
 
-        boolean oldPresent = true;
-        for (Path p : oldFiles) {
-            if (!Files.exists(p) || !Files.isReadable(p)) {
-                logger.info("Data files not found: " + p);
-                oldPresent = false;
-            }
-        }
-
-        return newPresent || oldPresent;
+        return true;
     }
 
-    private void fillBasicDataFiles(Array<Path> newFiles, Array<Path> oldFiles) {
+    private void fillDefaultDatasetFiles(Array<Path> newFiles) {
         // Fill in new data format.
         Path location = Paths.get(Settings.settings.data.location).normalize();
         newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY));
-
-        // Old data format.
-        oldFiles.add(location.resolve("data-main.json"));
-        oldFiles.add(location.resolve("planets.json"));
-        oldFiles.add(location.resolve("moons.json"));
-        oldFiles.add(location.resolve("tex"));
-        oldFiles.add(location.resolve("galaxy"));
-        oldFiles.add(location.resolve("models"));
-        oldFiles.add(location.resolve("orbit"));
+        newFiles.add(location.resolve(Constants.DEFAULT_DATASET_KEY).resolve("dataset.json"));
     }
 
     @Override

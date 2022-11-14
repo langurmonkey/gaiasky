@@ -340,6 +340,7 @@ public class Constants {
 
     // Asterisks must be substituted because windows does not allow them in paths
     public static final String STAR_SUBSTITUTE = "%#QUAL#%";
+    public static final String DATA_LOCATION_TOKEN = "$data/";
     public static final String DEFAULT_DATASET_KEY = "default-data";
 
     /** Generated height keyword **/
