@@ -61,7 +61,7 @@ public class DatasetDesc {
     }
 
     public DatasetDesc(JsonReader reader, JsonValue source) {
-       this(reader, source, null);
+        this(reader, source, null);
     }
 
     public DatasetDesc(JsonReader reader, JsonValue source, FileHandle localCatalogFile) {
@@ -71,8 +71,10 @@ public class DatasetDesc {
         // Check if we have it
         if (source.has("check")) {
             this.checkStr = source.getString("check");
-            this.checkPath = Paths.get(Settings.settings.data.location, checkStr);
-            this.checkStr = "data/" + source.getString("check");
+            if (!this.checkStr.startsWith(Constants.DATA_LOCATION_TOKEN)) {
+                this.checkStr = Constants.DATA_LOCATION_TOKEN + this.checkStr;
+            }
+            this.checkPath = Settings.settings.data.dataPath(checkStr);
             this.exists = Files.exists(checkPath) && Files.isReadable(checkPath);
             this.serverVersion = source.getInt("version", 0);
             if (this.exists) {
@@ -85,7 +87,7 @@ public class DatasetDesc {
             this.checkPath = localCatalogFile.file().toPath();
             Path dataLocation = Path.of(Settings.settings.data.location);
             String relative = dataLocation.toUri().relativize(this.checkPath.toUri()).getPath();
-            this.checkStr = "data/" + relative;
+            this.checkStr = Constants.DATA_LOCATION_TOKEN + relative;
             this.exists = localCatalogFile.exists();
         }
 
@@ -171,15 +173,18 @@ public class DatasetDesc {
 
         // Data
         JsonValue dataFiles = null;
-        if(source.has("files")) {
+        if (source.has("files")) {
             dataFiles = source.get("files");
         } else if (source.has("data") && source.get("data").isArray()) {
             dataFiles = source.get("data");
         }
-        if(dataFiles != null) {
+        if (dataFiles != null) {
             try {
                 this.files = dataFiles.asStringArray();
-            } catch (Exception e) {
+                for (int i = 0; i < this.files.length; i++) {
+                    this.files[i] = Settings.settings.data.dataFile(this.files[i]);
+                }
+            } catch (Exception ignored) {
             }
         } else {
             this.files = null;

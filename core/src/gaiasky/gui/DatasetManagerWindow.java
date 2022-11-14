@@ -479,7 +479,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 logger.info(I18n.msg("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
                             }
                         } else {
-                            select.setChecked(TextUtils.contains("data/" + dataset.checkStr, currentSetting));
+                            select.setChecked(TextUtils.contains(Constants.DATA_LOCATION_TOKEN + dataset.checkStr, currentSetting));
                             select.addListener(new OwnTextTooltip(dataset.checkPath.toString(), skin));
                         }
                         select.setSize(installOrSelectSize, installOrSelectSize);
@@ -945,10 +945,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 } else {
                     logger.error(I18n.msg("gui.download.failed", name + " - " + url));
                     tempDownload.delete();
-                    if (errorMessage != null)
-                        setStatusError(dataset, errorMessage);
-                    else
-                        setStatusError(dataset);
+                    setStatusError(dataset, errorMessage);
                     currentDownloads.remove(dataset.key);
                     resetSelectedDataset();
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), 10f);
@@ -1111,11 +1108,15 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void setStatusError(DatasetDesc ds) {
-        EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1);
+        setStatusError(ds, null);
     }
 
     private void setStatusError(DatasetDesc ds, String message) {
-        EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1, message);
+        if (message != null && !message.isEmpty()) {
+            EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1, message);
+        } else {
+            EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1);
+        }
     }
 
     private void setStatusCancelled(DatasetDesc ds) {
@@ -1265,7 +1266,7 @@ public class DatasetManagerWindow extends GenericDialog {
             return;
         String filePath = null;
         if (dataset.checkStr != null) {
-            filePath = TextUtils.ensureStartsWith(dataset.checkStr, "data/");
+            filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
         }
         if (filePath != null && !filePath.isBlank()) {
             if (!Settings.settings.data.dataFiles.contains(filePath)) {
@@ -1279,7 +1280,7 @@ public class DatasetManagerWindow extends GenericDialog {
         if (!dataset.baseData) {
             String filePath = null;
             if (dataset.checkStr != null) {
-                filePath = TextUtils.ensureStartsWith(dataset.checkStr, "data/");
+                filePath = TextUtils.ensureStartsWith(dataset.checkStr, Constants.DATA_LOCATION_TOKEN);
             }
             if (filePath != null && !filePath.isBlank()) {
                 Settings.settings.data.dataFiles.remove(filePath);
@@ -1309,16 +1310,23 @@ public class DatasetManagerWindow extends GenericDialog {
                             if (fileToDelete.endsWith("/")) {
                                 fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
                             }
-                            // Expand possible wildcards
-                            String basePath = "";
+                            // Separate parent from file.
+                            String baseParent = "";
                             String baseName = fileToDelete;
                             if (fileToDelete.contains("/")) {
-                                basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
+                                baseParent = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
                                 baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
                             }
-                            Path dataPath = Paths.get(Settings.settings.data.location);
-                            dataPath = dataPath.toRealPath();
-                            File directory = dataPath.resolve(basePath).toFile();
+                            // Add data location if necessary.
+                            Path dataPath;
+                            Path basePath = Path.of(baseParent);
+                            if (!basePath.isAbsolute()) {
+                                dataPath = Paths.get(Settings.settings.data.location).resolve(baseParent);
+                            } else {
+                                dataPath = basePath;
+                            }
+                            File directory = dataPath.toRealPath().toFile();
+                            // Expand possible wildcards.
                             Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
                             for (File file : files) {
                                 if (!file.equals(directory) && file.exists()) {

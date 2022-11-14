@@ -188,9 +188,9 @@ public class Settings {
             // Windows does not allow asterisks in paths
             String resolvedPathStr = pathStr.replaceAll("\\*", Constants.STAR_SUBSTITUTE);
 
-            if (resolvedPathStr.startsWith("data/")) {
+            if (resolvedPathStr.startsWith(Constants.DATA_LOCATION_TOKEN)) {
                 // Path is in data directory, just remove leading 'data/' and prepend data location
-                String pathFromDataStr = resolvedPathStr.substring(5);
+                String pathFromDataStr = resolvedPathStr.replace(Constants.DATA_LOCATION_TOKEN, "");
                 Path pathFromData = Path.of(pathFromDataStr);
                 Path resolvedPath = Path.of(location).resolve(pathFromDataStr);
                 // We inject the location if:
@@ -493,12 +493,12 @@ public class Settings {
             @JsonIgnore
             public String getStarTexture() {
                 String starTexIdx = String.format("%02d", textureIndex);
-                String texture = settings.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
+                String texture = settings.data.dataFile(GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                 if (!Files.exists(Path.of(texture))) {
                     // Fall back to whatever available
                     for (int i = 1; i < 9; i++) {
                         starTexIdx = String.format("%02d", i);
-                        texture = settings.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
+                        texture = settings.data.dataFile(GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                         if (Files.exists(Path.of(texture)))
                             return texture;
                     }
@@ -1475,9 +1475,9 @@ public class Settings {
             public int blurPasses = 35;
             public float flareSaturation = 0.8f;
             public float bias = -0.98f;
-            public String texLensColor = "data/tex/base/lenscolor.png";
-            public String texLensDirt = "data/tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg";
-            public String texLensStarburst = "data/tex/base/lensstarburst.jpg";
+            public String texLensColor = Constants.DATA_LOCATION_TOKEN + "tex/base/lenscolor.png";
+            public String texLensDirt = Constants.DATA_LOCATION_TOKEN + "tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg";
+            public String texLensStarburst = Constants.DATA_LOCATION_TOKEN + "tex/base/lensstarburst.jpg";
             public float fboScale = 0.2f;
         }
 

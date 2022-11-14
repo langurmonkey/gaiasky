@@ -505,8 +505,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             } catch (Exception ignored) {
             }
             if (luts.isEmpty()) {
-                luts.add("data/tex/base/biome-lut.png");
-                luts.add("data/tex/base/biome-smooth-lut.png");
+                luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
+                luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
             }
             OwnSelectBox<String> lutsBox = new OwnSelectBox<>(skin);
             lutsBox.setItems(luts);

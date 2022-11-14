@@ -129,8 +129,8 @@ public class ParticleUtils {
             throw new RuntimeException("The incoming star model component can't be null!");
         }
 
-        Texture tex = manager.get(Settings.settings.data.dataFile("data/tex/base/star.jpg"), Texture.class);
-        Texture lut = manager.get(Settings.settings.data.dataFile("data/tex/base/lut.jpg"), Texture.class);
+        Texture tex = manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/star.jpg"), Texture.class);
+        Texture lut = manager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/lut.jpg"), Texture.class);
         tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         Map<String, Object> params = new TreeMap<>();

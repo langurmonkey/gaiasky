@@ -149,12 +149,12 @@ public class SettingsMorph {
             String[] tokens = jsonObjects.split(",");
             dataFiles.addAll(Arrays.asList(tokens));
         }
-        // Make paths relative to data/
+        // Make paths relative to $data/
         data.dataFiles = new ArrayList<>(dataFiles.size());
         for(String dataFile : dataFiles) {
             Path dataLocation = Path.of(Settings.settings.data.location);
             String relative = dataLocation.toUri().relativize(new java.io.File(dataFile).toURI()).getPath();
-            String f = "data/" + relative;
+            String f = Constants.DATA_LOCATION_TOKEN + relative;
             data.dataFiles.add(f);
         }
 

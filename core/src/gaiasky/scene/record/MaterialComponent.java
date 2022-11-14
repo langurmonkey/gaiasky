@@ -118,7 +118,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     private Material material, ringMaterial;
 
     // Biome lookup texture
-    public String biomeLUT = "data/tex/base/biome-lut.png";
+    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png";
     public float biomeHueShift = 0;
 
     private AtomicBoolean heightGenerated = new AtomicBoolean(false);
@@ -962,8 +962,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
 
         if (luts.isEmpty()) {
-            luts.add("data/tex/base/biome-lut.png");
-            luts.add("data/tex/base/biome-smooth-lut.png");
+            luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
+            luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
         }
         setBiomelut(luts.get(rand.nextInt(luts.size)));
         setBiomehueshift(rand.nextDouble() * 360.0);

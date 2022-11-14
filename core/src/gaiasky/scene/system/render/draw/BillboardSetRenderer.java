@@ -54,7 +54,7 @@ import java.util.Set;
 public class BillboardSetRenderer extends PointCloudTriRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(BillboardSetRenderer.class);
 
-    private static final String texFolder = "data/galaxy/sprites/";
+    private static final String texFolder = Constants.DATA_LOCATION_TOKEN + "galaxy/sprites/";
 
     private final Vector3 aux3f1;
 

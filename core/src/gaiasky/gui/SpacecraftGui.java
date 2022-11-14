@@ -146,7 +146,7 @@ public class SpacecraftGui extends AbstractGui {
         db = new DecalBatch(4, new CameraGroupStrategy(aiCam));
         mb = new IntModelBatch();
 
-        assetManager.load(Settings.settings.data.dataFile("data/tex/base/attitudeindicator.png"), Texture.class);
+        assetManager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class);
         assetManager.load("img/ai-pointer.png", Texture.class);
         assetManager.load("img/ai-vel.png", Texture.class);
         assetManager.load("img/ai-antivel.png", Texture.class);
@@ -158,7 +158,7 @@ public class SpacecraftGui extends AbstractGui {
      * Constructs the interface
      */
     public void doneLoading(AssetManager assetManager) {
-        aiTexture = assetManager.get(Settings.settings.data.dataFile("data/tex/base/attitudeindicator.png"), Texture.class);
+        aiTexture = assetManager.get(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/attitudeindicator.png"), Texture.class);
         aiTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         aiPointerTexture = assetManager.get("img/ai-pointer.png", Texture.class);
         aiPointerTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);

@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30300
+configVersion: 30301
 
 #
 # Data configuration
@@ -11,14 +11,13 @@ data:
   # Windows and macOS: in your user directory: $HOME/.gaiasky/data
   # Linux: ~/.local/share/gaiasky/data
   location: null
-  # Data files to load at startup, using the relative form from the data location (i.e. starting with 'data/')
-  # 'data/data-main.json' should always be there
-  # Additionally to the files defined here, any file in the data folder with the format
-  # "autoload-*.json" will also be loaded using the JsonLoader
+  # Data files to load at startup, using the relative form from the data location (placeholder is '$data/').
+  # They should use the format '$/data/[dataset-name]/dataset.json.
+  # The base data pack '$data/default-data/dataset.json' should always be there.
   dataFiles:
-    - data/data-main.json
+    - $data/default-data/dataset.json
   # Location of the skybox used for cubemap reflections within the data folder (data/tex/skybox/[...]/)
-  reflectionSkyboxLocation: data/tex/skybox/gaiasky/
+  reflectionSkyboxLocation: $data/default-data/tex/skybox/gaiasky/
   # Use all terms in position algorithms (VSOP87 and moon coordinates)
   highAccuracy: false
   # Use real attitude or NSL for Gaia
@@ -502,15 +501,15 @@ postprocess:
     blurPasses: 35
     flareSaturation: 0.8
     bias: -0.98
-    texLensColor: data/tex/base/lenscolor.png
-    texLensDirt: data/tex/base/lensdirt%#QUAL#%.jpg
-    texLensStarburst: data/tex/base/lensstarburst.jpg
+    texLensColor: $data/default-data/tex/base/lenscolor.png
+    texLensDirt: $data/default-data/tex/base/lensdirt%#QUAL#%.jpg
+    texLensStarburst: $data/default-data/tex/base/lensstarburst.jpg
     fboScale: 0.2
   # Light glow effect
   lightGlow:
     active: true
     samples: 10
-  # Re-projection as post processing.
+  # Re-projection as post-processing.
   # Modes are:
   # DISABLED
   # DEFAULT, ACCURATE

@@ -1,6 +1,7 @@
 package gaiasky.data;
 
 import gaiasky.scene.Scene;
+import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import uk.ac.starlink.util.DataSource;
 
@@ -47,10 +48,10 @@ public abstract class AbstractSceneLoader implements ISceneLoader {
 
     public Object interceptDataFilePath(Class<?> valueClass, Object val) {
         // Intercept file paths.
-        if (valueClass == String.class && ((String) val).startsWith("data/")) {
-            // Path is in data directory, just remove leading 'data/' and prepend data location
+        if (valueClass == String.class && ((String) val).startsWith(Constants.DATA_LOCATION_TOKEN)) {
+            // Path is in data directory, just remove leading '$data/' and prepend data location
             String resolvedPathStr = (String) val;
-            String pathFromDataStr = resolvedPathStr.substring(5);
+            String pathFromDataStr = resolvedPathStr.replace(Constants.DATA_LOCATION_TOKEN, "");
             Path pathFromData = Path.of(pathFromDataStr);
             Path resolvedPath = Path.of(Settings.settings.data.location).resolve(pathFromDataStr);
             // We inject the location if:
@@ -59,7 +60,7 @@ public abstract class AbstractSceneLoader implements ISceneLoader {
             // - the injected dataset location is not already in the path.
             if (!Files.exists(resolvedPath) && datasetDirectory != null && !datasetDirectory.isEmpty() && !pathFromData.getName(0).toString().equals(datasetDirectory)) {
                 // Use dsLocation
-                return Path.of("data/").resolve(datasetDirectory).resolve(pathFromDataStr).toString();
+                return Path.of(Constants.DATA_LOCATION_TOKEN).resolve(datasetDirectory).resolve(pathFromDataStr).toString();
             }
         }
         return val;

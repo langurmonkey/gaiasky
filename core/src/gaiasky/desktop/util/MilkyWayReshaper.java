@@ -11,6 +11,7 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.gui.ConsoleLogger;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
@@ -25,7 +26,7 @@ public class MilkyWayReshaper {
     private static final Logger.Log logger = Logger.getLogger(MilkyWayReshaper.class);
 
     static int[] moduluses = new int[] {10, 5, 2, 0, 0};
-    static String f = "data/galaxy/";
+    static String f = Constants.DATA_LOCATION_TOKEN + "galaxy/";
     static String[] filesIn = new String[] { f + "galaxy_ArmDust.dat.gz", f + "galaxy_Bulge.dat.gz", f + "galaxy_Gas.dat.gz", f + "galaxy_HII.dat.gz", f + "galaxy_Stars.dat.gz" };
     static String[] filesOut = new String[] { f + "galaxy_ArmDust.dat", f + "galaxy_Bulge.dat", f + "galaxy_Gas.dat", f + "galaxy_HII.dat", f + "galaxy_Stars.dat" };
 

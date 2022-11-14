@@ -283,7 +283,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         billboardStarsProc.addPostRunnables(lpu);
 
         // BILLBOARD GALAXIES
-        AbstractRenderSystem billboardGalaxiesProc = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies, false);
+        AbstractRenderSystem billboardGalaxiesProc = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", ComponentType.Galaxies, false);
         billboardGalaxiesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // BILLBOARD SPRITES
@@ -372,7 +372,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem labelsProc = new TextRenderer(this, FONT_LABEL, alphas, renderAssets.fontBatch, renderAssets.distanceFieldFontShader, renderAssets.font3d, renderAssets.font2d, renderAssets.fontTitles);
 
         // BILLBOARD SSO
-        AbstractRenderSystem billboardSSOProc = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders, "data/tex/base/sso.png", null, false);
+        AbstractRenderSystem billboardSSOProc = new BillboardRenderer(this, BILLBOARD_SSO, alphas, renderAssets.starBillboardShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/sso.png", null, false);
         billboardSSOProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
 
         // MODEL ATMOSPHERE
