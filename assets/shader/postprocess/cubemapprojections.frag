@@ -255,16 +255,16 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
             cubemaptc.x = (30. * sx -       sz)/sqrt(901.);//rotation for each view.
             cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);//coefficients are normalized
             vec4 b = texture(cubemap, cubemaptc);
-	        sz = -sz;
-            cubemaptc.x = (30. * sx -       sz)/sqrt(901.);
-            cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);
+
 	    //    vec4 a = texture(cubemap, cubemaptc);   
         float scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
         vec4 a =  vec4(0.0, 0.0, 0.0, 1.0);
         if (r*scale<1){
-			cubemaptc.x = tc.x*scale;
+	    sz = sqrt(1.0-r*r*scale*scale);
+            sx=tc.x*scale;
+	    cubemaptc.x = (30. * sx -       sz)/sqrt(901.);
+            cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);
 			cubemaptc.y = -tc.y*scale;
-			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
 			
 			a.x = texture(cubemap, cubemaptc).x;
 		} 
@@ -272,9 +272,11 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 		n=1.0+(n-1.0)*1.003;
         scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
         if (r*scale<1){
-			cubemaptc.x = tc.x*scale;
+	    sz = sqrt(1.0-r*r*scale*scale);
+            sx=tc.x*scale;
+	    cubemaptc.x = (30. * sx -       sz)/sqrt(901.);
+            cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);
 			cubemaptc.y = -tc.y*scale;
-			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
 			
 			a.y = texture(cubemap, cubemaptc).y;
 		}
@@ -282,9 +284,11 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 		n=1.0+(n-1.0)*1.003;
         scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
         if (r*scale<1){
-			cubemaptc.x = tc.x*scale;
+	    sz = sqrt(1.0-r*r*scale*scale);
+            sx=tc.x*scale;
+	    cubemaptc.x = (30. * sx -       sz)/sqrt(901.);
+            cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);
 			cubemaptc.y = -tc.y*scale;
-			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
 			
 			a.z = texture(cubemap, cubemaptc).z;
 		} 
@@ -308,16 +312,17 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
             cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
             cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
             vec4 b = texture(cubemap, cubemaptc);
-	    sz = -sz;
-            cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
-            cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
+
 	    //vec4 a = texture(cubemap, cubemaptc);   
         float scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
         vec4 a =  vec4(0.0, 0.0, 0.0, 1.0);
         if (r*scale<1){
-			cubemaptc.x = tc.x*scale;
+	    sz = sqrt(1.0-r*r*scale*scale);
+            sx=tc.x*scale;
+	    cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
+            cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
+
 			cubemaptc.y = -tc.y*scale;
-			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
 			
 			a.x = texture(cubemap, cubemaptc).x;
 		} 
@@ -325,9 +330,11 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 		n=1.0+(n-1.0)*1.003;
         scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
         if (r*scale<1){
-			cubemaptc.x = tc.x*scale;
+	    sz = sqrt(1.0-r*r*scale*scale);
+            sx=tc.x*scale;
+	    cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
+            cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
 			cubemaptc.y = -tc.y*scale;
-			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
 			
 			a.y = texture(cubemap, cubemaptc).y;
 		}
@@ -335,9 +342,11 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 		n=1.0+(n-1.0)*1.003;
         scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
         if (r*scale<1){
-			cubemaptc.x = tc.x*scale;
+	    sz = sqrt(1.0-r*r*scale*scale);
+            sx=tc.x*scale;
+	    cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
+            cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
 			cubemaptc.y = -tc.y*scale;
-			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
 			
 			a.z = texture(cubemap, cubemaptc).z;
 		} 
