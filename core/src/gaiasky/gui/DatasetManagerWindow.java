@@ -368,8 +368,8 @@ public class DatasetManagerWindow extends GenericDialog {
             }
             content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
         } else {
-            Cell left = content.add().top().left().padRight(pad20);
-            Cell right = content.add().top().left();
+            Cell<?> left = content.add().top().left().padRight(pad20);
+            Cell<?> right = content.add().top().left();
 
             int datasets = reloadLeftPane(left, right, dataDescriptor, mode, width);
             if (datasets > 0) {
@@ -383,7 +383,7 @@ public class DatasetManagerWindow extends GenericDialog {
         me.pack();
     }
 
-    private int reloadLeftPane(Cell left, Cell right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
+    private int reloadLeftPane(Cell<?> left, Cell<?> right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
         Table leftTable = new Table(skin);
         leftTable.align(Align.topRight);
         leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
@@ -541,7 +541,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     button.addListener(new InputListener() {
                         @Override
                         public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
-                            if (event != null && event instanceof InputEvent) {
+                            if (event instanceof InputEvent) {
                                 InputEvent ie = (InputEvent) event;
                                 InputEvent.Type type = ie.getType();
                                 if (type == InputEvent.Type.touchDown) {
@@ -654,7 +654,7 @@ public class DatasetManagerWindow extends GenericDialog {
         return added;
     }
 
-    private void reloadRightPane(Cell cell, DatasetDesc dataset, DatasetMode mode) {
+    private void reloadRightPane(Cell<?> cell, DatasetDesc dataset, DatasetMode mode) {
         if (rightPaneWatcher != null) {
             rightPaneWatcher.dispose();
             watchers.remove(rightPaneWatcher);
@@ -668,7 +668,7 @@ public class DatasetManagerWindow extends GenericDialog {
             t.add(l).center().padTop(pad20 * 3);
         } else {
             // Type icon
-            String dType = dataset != null && dataset.type != null ? dataset.type : "other";
+            String dType = dataset.type != null ? dataset.type : "other";
             Image typeImage = new OwnImage(skin.getDrawable(getIcon(dType)));
             float scl = 0.7f;
             float iw = typeImage.getWidth();
@@ -1010,8 +1010,11 @@ public class DatasetManagerWindow extends GenericDialog {
             }
             File curFile = new File(out, entry.getName());
             File parent = curFile.getParentFile();
-            if (!parent.exists())
-                parent.mkdirs();
+            if (!parent.exists()) {
+                if (!parent.mkdirs()) {
+                    logger.info("Parent directory not created, already exists: " + parent.toPath());
+                }
+            }
 
             IOUtils.copy(tarIs, new FileOutputStream(curFile));
 
@@ -1079,11 +1082,10 @@ public class DatasetManagerWindow extends GenericDialog {
         if (dataDownloads) {
             final Path tempDir = SysUtils.getTempDir(Settings.settings.data.location);
             // Clean up partial downloads
-            try {
-                final Stream<Path> stream = java.nio.file.Files.find(tempDir, 2, (path, basicFileAttributes) -> {
-                    final File file = path.toFile();
-                    return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
-                });
+            try (final Stream<Path> stream = Files.find(tempDir, 2, (path, basicFileAttributes) -> {
+                final File file = path.toFile();
+                return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
+            })) {
                 stream.forEach(this::deleteFile);
             } catch (IOException e) {
                 logger.error(e);
@@ -1127,8 +1129,7 @@ public class DatasetManagerWindow extends GenericDialog {
     protected void accept() {
         final GenericDialog myself = me;
         // Create a copy
-        Map<String, Pair<DatasetDesc, HttpRequest>> copy = new HashMap<>();
-        copy.putAll(currentDownloads);
+        Map<String, Pair<DatasetDesc, HttpRequest>> copy = new HashMap<>(currentDownloads);
 
         if (!copy.isEmpty()) {
             GenericDialog question = new GenericDialog(I18n.msg("gui.download.close.title"), skin, stage) {

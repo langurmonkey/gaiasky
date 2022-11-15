@@ -21,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
@@ -107,7 +106,10 @@ public class DataDescriptorUtils {
                 boolean hasMinGsVersion = dst.has("mingsversion");
                 int minGsVersion = dst.getInt("mingsversion", 0);
                 int thisVersion = dst.getInt("version", 0);
-                if (!hasMinGsVersion || GaiaSkyDesktop.SOURCE_VERSION >= minGsVersion) {
+
+                // Only datasets with minGsVersion are supported.
+                // Only datasets with new format in 3.3.1 supported.
+                if (hasMinGsVersion && GaiaSkyDesktop.SOURCE_VERSION >= minGsVersion && minGsVersion >= 30301) {
                     // Dataset type
                     String type = dst.getString("type");
 
@@ -220,7 +222,7 @@ public class DataDescriptorUtils {
             Iterator<DatasetDesc> it = existing.iterator();
             while (it.hasNext()) {
                 DatasetDesc remote = it.next();
-                if (remote.checkPath.getFileName().toString().equals(path.getFileName().toString())) {
+                if (remote.checkPath.equals(path)) {
                     // Found in remotes
                     dd = remote;
                     it.remove();
