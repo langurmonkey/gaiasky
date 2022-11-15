@@ -17,8 +17,14 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 public class DataDescriptorUtils {
     private static final Log logger = Logger.getLogger(DataDescriptorUtils.class);
@@ -71,9 +77,25 @@ public class DataDescriptorUtils {
             this.fh = fh;
         }
         if (this.fh != null) {
-            logger.info("Building data descriptor model: " + this.fh.file().toPath());
+            logger.info("Building data descriptor model from file: " + this.fh.file().toPath());
 
-            JsonValue dataDesc = reader.parse(this.fh);
+            InputStream inputStream;
+            try {
+                FileInputStream fis = new FileInputStream(this.fh.file());
+
+                try {
+                    fis = new FileInputStream(this.fh.file());
+                    inputStream = new GZIPInputStream(fis);
+                } catch (IOException e) {
+                    logger.info("Not a gzipped file, trying uncompressed.");
+                    inputStream = fis;
+                }
+            } catch (FileNotFoundException e) {
+                logger.error("Error reading file: " + this.fh.file().toPath());
+                return null;
+            }
+
+            JsonValue dataDesc = reader.parse(inputStream);
 
             Map<String, JsonValue> bestDs = new HashMap<>();
             Map<String, List<JsonValue>> typeMap = new HashMap<>();

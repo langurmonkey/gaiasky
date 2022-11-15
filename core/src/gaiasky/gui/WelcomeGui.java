@@ -130,7 +130,7 @@ public class WelcomeGui extends AbstractGui {
                 Timer.schedule(notification, 2);
             }
 
-            dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json");
+            dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json.gz");
             DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null, (digest) -> GaiaSky.postRunnable(() -> {
                 // Data descriptor ok. Skip welcome screen only if flag and base data present
                 if (skipWelcome && baseDataPresent()) {
@@ -148,7 +148,7 @@ public class WelcomeGui extends AbstractGui {
                 }
                 if (baseDataPresent()) {
                     // Go on all in
-                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI()));
+                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, ui, this::buildWelcomeUI));
                 } else {
                     // Error and exit
                     logger.error(I18n.msg("gui.welcome.error.nobasedata"));
