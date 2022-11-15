@@ -169,8 +169,10 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 #endif//orthographic
 
 #ifdef orthosphere
+uniform float u_celestialSphereIndexOfRefraction;
 // Orthographic view of the celestial sphere. 
 vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
+	float n = u_celestialSphereIndexOfRefraction;
     vec2 vp = u_viewport;
     tc = tc * 2.0 - 1.0;
     vec2 arv = vp.xy / min(vp.x, vp.y);
@@ -186,9 +188,37 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
         vec4 b = texture(cubemap, cubemaptc);
         
         //back
-	    cubemaptc.z = -cubemaptc.z;
-	    vec4 a = texture(cubemap, cubemaptc);        
-
+        //float n=1.33;
+        float scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        vec4 a =  vec4(0.0, 0.0, 0.0, 1.0);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.x = texture(cubemap, cubemaptc).x;
+		} 
+		
+		n=1.0+(n-1.0)*1.003;
+        scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.y = texture(cubemap, cubemaptc).y;
+		}
+		
+		n=1.0+(n-1.0)*1.003;
+        scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.z = texture(cubemap, cubemaptc).z;
+		} 
+        
         //dim the back a bit without affecting brightest areas (e.g. the Sun).
         float c = 1.0 - 0.5*(b.x+b.y+b.z)/3.;
         c = c*(0.5+0.5*(a.x+a.y+a.z)/3.);
@@ -206,7 +236,9 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 
 
 #ifdef orthosphere_crosseye
+uniform float u_celestialSphereIndexOfRefraction;
 vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
+	float n = u_celestialSphereIndexOfRefraction;
     vec2 vp = u_viewport;
     tc = (tc-vec2(0.0,0.5))*2.0;
     vec2 arv = vp.xy / min(vp.x/2., vp.y);
@@ -226,7 +258,36 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 	        sz = -sz;
             cubemaptc.x = (30. * sx -       sz)/sqrt(901.);
             cubemaptc.z = (      sx + 30. * sz)/sqrt(901.);
-	        vec4 a = texture(cubemap, cubemaptc);   
+	    //    vec4 a = texture(cubemap, cubemaptc);   
+        float scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        vec4 a =  vec4(0.0, 0.0, 0.0, 1.0);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.x = texture(cubemap, cubemaptc).x;
+		} 
+		
+		n=1.0+(n-1.0)*1.003;
+        scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.y = texture(cubemap, cubemaptc).y;
+		}
+		
+		n=1.0+(n-1.0)*1.003;
+        scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.z = texture(cubemap, cubemaptc).z;
+		} 
 	        float c = 1.0 - 0.5*(b.x+b.y+b.z)/3.;
             c = c*(0.5+0.5*(a.x+a.y+a.z)/3.);
             a.x = a.x * c;
@@ -250,7 +311,36 @@ vec4 cubeToProjection(samplerCube cubemap, vec2 tc){
 	    sz = -sz;
             cubemaptc.x = (30. * sx +       sz)/sqrt(901.);
             cubemaptc.z = (    - sx + 30. * sz)/sqrt(901.);
-	    vec4 a = texture(cubemap, cubemaptc);   
+	    //vec4 a = texture(cubemap, cubemaptc);   
+        float scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        vec4 a =  vec4(0.0, 0.0, 0.0, 1.0);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.x = texture(cubemap, cubemaptc).x;
+		} 
+		
+		n=1.0+(n-1.0)*1.003;
+        scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.y = texture(cubemap, cubemaptc).y;
+		}
+		
+		n=1.0+(n-1.0)*1.003;
+        scale = sin(2.0*asin(r/n)-asin(r))/r; //(-1+2.0*r*r/(n*n)+2.0*sqrt(1.0-r*r)*sqrt(1.0-r*r/n/n)/n);
+        if (r*scale<1){
+			cubemaptc.x = tc.x*scale;
+			cubemaptc.y = -tc.y*scale;
+			cubemaptc.z = sqrt(1.0-r*r*scale*scale);
+			
+			a.z = texture(cubemap, cubemaptc).z;
+		} 
             float c = 1.0 - 0.5*(b.x+b.y+b.z)/3.;
             c = c*(0.5+0.5*(a.x+a.y+a.z)/3.);
             a.x = a.x * c;

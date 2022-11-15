@@ -292,6 +292,7 @@ public class SettingsMorph {
         program.modeCubemap.active = bool("program.cubemap", p);
         program.modeCubemap.setProjection(str("program.cubemap.projection", p));
         program.modeCubemap.faceResolution = i32("program.cubemap.face.resolution", p);
+        program.modeCubemap.celestialSphereIndexOfRefraction = f32("program.modeCubemap.celestialSphereIndexOfRefraction", p);
         program.modeCubemap.planetarium = new PlanetariumSettings();
         program.modeCubemap.planetarium.angle = f32("program.planetarium.angle", p);
         program.modeCubemap.planetarium.aperture = f32("program.planetarium.aperture", p);

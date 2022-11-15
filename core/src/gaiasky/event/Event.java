@@ -540,6 +540,10 @@ public enum Event {
      **/
     HUE_CMD,
     /**
+     * Sets the index of refraction of the celestial sphere when orthospheric view is on.
+     */
+    INDEXOFREFRACTION_CMD,
+    /**
      * Informs Gaia Sky is fully initialized and normal operation is about to start.
      */
     INITIALIZED_INFO,

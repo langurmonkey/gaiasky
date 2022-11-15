@@ -2613,6 +2613,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+
+    @Override
+    public void setIndexOfRefraction(float ior) {
+            postRunnable(() -> em.post(Event.INDEXOFREFRACTION_CMD, this, ior));
+    }
+
     @Override
     public void setPlanetariumMode(boolean state) {
         postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjection.AZIMUTHAL_EQUIDISTANT));

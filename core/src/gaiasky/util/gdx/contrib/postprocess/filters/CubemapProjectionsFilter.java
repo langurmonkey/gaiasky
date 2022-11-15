@@ -31,14 +31,15 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
 
     private final ShaderProgram[] programs;
     private final Vector2 viewport;
-    private float planetariumAperture, planetariumAngle;
+    private float planetariumAperture, planetariumAngle, celestialSphereIndexOfRefraction;
 
     public enum Param implements Parameter {
         // @formatter:off
         Cubemap("u_cubemap", 0),
         Viewport("u_viewport", 2),
         PlanetariumAperture("u_planetariumAperture", 0),
-        PlanetariumAngle("u_planetariumAngle", 0);
+        PlanetariumAngle("u_planetariumAngle", 0),
+        CelestialSphereIndexOfRefraction("u_celestialSphereIndexOfRefraction", 1);
         // @formatter:on
 
         private final String mnemonic;
@@ -187,12 +188,19 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         this.planetariumAngle = angle;
         setParam(Param.PlanetariumAngle, angle);
     }
+    public void setCelestialSphereIndexOfRefraction(float ior){
+        this.celestialSphereIndexOfRefraction = ior;
+        setParam(Param.CelestialSphereIndexOfRefraction, ior);
+    }
 
     public float getPlanetariumAperture(){
         return this.planetariumAperture;
     }
     public float getPlanetariumAngle(){
         return this.planetariumAngle;
+    }
+    public float getCelestialSphereIndexOfRefraction(){
+        return this.celestialSphereIndexOfRefraction;
     }
 
     @Override
@@ -202,6 +210,7 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         setParams(Param.Viewport, viewport);
         setParams(Param.PlanetariumAperture, planetariumAperture);
         setParams(Param.PlanetariumAngle, planetariumAngle);
+        setParams(Param.CelestialSphereIndexOfRefraction, celestialSphereIndexOfRefraction);
         endParams();
     }
 
