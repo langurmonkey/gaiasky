@@ -262,8 +262,8 @@ public class DataDescriptorUtils {
             }
             dd.datasetType = dt;
 
-            // Only datasets with new format in 3.3.1 supported.
-            if (GaiaSkyDesktop.SOURCE_VERSION >= dd.minGsVersion && dd.minGsVersion >= 30301) {
+            // Only datasets without "mingsversion" or with new format in 3.3.1 supported.
+            if (dd.minGsVersion < 0 || GaiaSkyDesktop.SOURCE_VERSION >= dd.minGsVersion && dd.minGsVersion >= 30301) {
                 dt.datasets.add(dd);
             }
         }
