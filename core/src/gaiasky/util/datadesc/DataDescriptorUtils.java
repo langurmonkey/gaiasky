@@ -261,7 +261,11 @@ public class DataDescriptorUtils {
                 types.add(dt);
             }
             dd.datasetType = dt;
-            dt.datasets.add(dd);
+
+            // Only datasets with new format in 3.3.1 supported.
+            if (GaiaSkyDesktop.SOURCE_VERSION >= dd.minGsVersion && dd.minGsVersion >= 30301) {
+                dt.datasets.add(dd);
+            }
         }
         // Sort
         Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
