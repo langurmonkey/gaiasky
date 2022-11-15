@@ -2341,7 +2341,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         
         // Index of refraction
-        GaiaSky.postRunnable(() -> EventManager.publish(Event.INDEXOFREFRACTION_CMD, celestialSphereIndexOfRefraction, celestialSphereIndexOfRefraction.getValue()));
+        EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
 
 
         // Controllers

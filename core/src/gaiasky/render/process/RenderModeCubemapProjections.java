@@ -122,15 +122,11 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
             switch (event) {
             case CUBEMAP_CMD:
                 CubemapProjection p = (CubemapProjection) data[1];
-                GaiaSky.postRunnable(() -> {
-                    setProjection(p);
-                });
+                GaiaSky.postRunnable(() -> setProjection(p));
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 p = (CubemapProjection) data[0];
-                GaiaSky.postRunnable(() -> {
-                    setProjection(p);
-                });
+                GaiaSky.postRunnable(() -> setProjection(p));
                 break;
             case CUBEMAP_RESOLUTION_CMD:
                 int res = (Integer) data[0];
@@ -146,20 +142,17 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
             case PLANETARIUM_APERTURE_CMD:
                 setPlanetariumAperture((float) data[0]);
                 // Update projection, we may not need -Z anymore!
-                GaiaSky.postRunnable(() -> {
-                    setProjection(Settings.settings.program.modeCubemap.projection);
-                });
+                GaiaSky.postRunnable(() -> setProjection(Settings.settings.program.modeCubemap.projection));
                 break;
             case PLANETARIUM_ANGLE_CMD:
                 setPlanetariumAngle((float) data[0]);
                 break;
             case INDEXOFREFRACTION_CMD:
-                setCelestialSphereIndexOfRefraction((float) data[0]);
+                GaiaSky.postRunnable(() -> setCelestialSphereIndexOfRefraction((float) data[0]));
                 break;
             default:
                 break;
             }
         }
     }
-
 }

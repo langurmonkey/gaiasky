@@ -2616,7 +2616,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setIndexOfRefraction(float ior) {
-            postRunnable(() -> em.post(Event.INDEXOFREFRACTION_CMD, this, ior));
+            em.post(Event.INDEXOFREFRACTION_CMD, this, ior);
     }
 
     @Override
