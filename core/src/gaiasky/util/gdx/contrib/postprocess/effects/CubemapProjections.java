@@ -91,6 +91,9 @@ public final class CubemapProjections extends PostProcessorEffect {
     public void setPlanetariumAngle(float angle) {
         filter.setPlanetariumAngle(angle);
     }
+    public void setCelestialSphereIndexOfRefraction(float ior) {
+        filter.setCelestialSphereIndexOfRefraction(ior);
+    }
 
     public float getPlanetariumAngle() {
         return filter.getPlanetariumAngle();
@@ -98,6 +101,9 @@ public final class CubemapProjections extends PostProcessorEffect {
 
     public float getPlanetariumAperture() {
         return filter.getPlanetariumAperture();
+    }
+    public float getCelestialSphereIndexOfRefraction() {
+        return filter.getCelestialSphereIndexOfRefraction();
     }
 
     @Override

@@ -77,7 +77,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale;
+    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
@@ -774,6 +774,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(backBufferScaleLabel).left().padRight(pad20).padBottom(pad5);
             experimental.add(backBufferScale).left().padRight(pad10).padBottom(pad5);
             experimental.add(backBufferTooltip).left().padBottom(pad5).row();
+
+
+            // Index of refraction of celestial sphere
+            OwnLabel celestialSphereIndexOfRefractionLabel = new OwnLabel(I18n.msg("gui.indexofrefraction"), skin);
+            celestialSphereIndexOfRefraction = new OwnSlider(1.f, 2.5f, 0.05f, skin);
+            celestialSphereIndexOfRefraction.setWidth(textWidth * 3f);
+            celestialSphereIndexOfRefraction.setMappedValue(settings.program.modeCubemap.celestialSphereIndexOfRefraction);
+            OwnImageButton celestialSphereIndexOfRefractionTooltip = new OwnImageButton(skin, "tooltip");
+            celestialSphereIndexOfRefractionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.indexofrefraction.info"), skin));
+
+            experimental.add(celestialSphereIndexOfRefractionLabel).left().padRight(pad20).padBottom(pad5);
+            experimental.add(celestialSphereIndexOfRefraction).left().padRight(pad10).padBottom(pad5);
+            experimental.add(celestialSphereIndexOfRefractionTooltip).left().padBottom(pad5).row();
 
             // SSR
             OwnLabel ssrLabel = new OwnLabel(I18n.msg("gui.ssr"), skin);
@@ -2326,6 +2339,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (pa != settings.program.modeCubemap.planetarium.angle) {
             EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, pa);
         }
+        
+        // Index of refraction
+        GaiaSky.postRunnable(() -> EventManager.publish(Event.INDEXOFREFRACTION_CMD, celestialSphereIndexOfRefraction, celestialSphereIndexOfRefraction.getValue()));
+
 
         // Controllers
         if (controllerMappings.getSelected() != null) {

@@ -38,10 +38,10 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
         setPlanetariumAperture(Settings.settings.program.modeCubemap.planetarium.aperture);
         setProjection(Settings.settings.program.modeCubemap.projection);
-
+        setCelestialSphereIndexOfRefraction(Settings.settings.program.modeCubemap.celestialSphereIndexOfRefraction);
         copy = new Copy();
 
-        EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_CMD, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD);
+        EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_CMD, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.INDEXOFREFRACTION_CMD);
     }
 
     private void setProjection(CubemapProjection projection) {
@@ -79,6 +79,10 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
     private void setPlanetariumAperture(float planetariumAperture) {
         cubemapEffect.setPlanetariumAperture(planetariumAperture);
+    }
+    
+    private void setCelestialSphereIndexOfRefraction(float ior) {
+        cubemapEffect.setCelestialSphereIndexOfRefraction(ior);
     }
 
     @Override
@@ -148,6 +152,9 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
                 break;
             case PLANETARIUM_ANGLE_CMD:
                 setPlanetariumAngle((float) data[0]);
+                break;
+            case INDEXOFREFRACTION_CMD:
+                setCelestialSphereIndexOfRefraction((float) data[0]);
                 break;
             default:
                 break;

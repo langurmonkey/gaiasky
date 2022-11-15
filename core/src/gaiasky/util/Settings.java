@@ -270,6 +270,7 @@ public class Settings {
         public double fpsLimit;
         public double backBufferScale;
         @JsonIgnore public int[] backBufferResolution;
+        public float celestialSphereIndexOfRefraction;
         public boolean dynamicResolution;
         // This controls the dynamic resolution levels available as back buffer scales.
         // Add more items to add more levels.
@@ -277,7 +278,7 @@ public class Settings {
         public boolean screenOutput;
 
         public GraphicsSettings() {
-            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD, Event.BACKBUFFER_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD, Event.BACKBUFFER_SCALE_CMD, Event.INDEXOFREFRACTION_CMD);
         }
 
         public void setQuality(final String qualityString) {
@@ -322,6 +323,9 @@ public class Settings {
                 }
             } else if (event == Event.BACKBUFFER_SCALE_CMD) {
                 backBufferScale = (Float) data[0];
+            }
+            else if (event == Event.INDEXOFREFRACTION_CMD) {
+                celestialSphereIndexOfRefraction = (Float) data[0];
             }
         }
     }
@@ -769,7 +773,7 @@ public class Settings {
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
 
         public ProgramSettings() {
-            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
         }
 
         @JsonIgnore
@@ -879,7 +883,7 @@ public class Settings {
             public CubemapProjection projection;
             public int faceResolution;
             public PlanetariumSettings planetarium;
-
+            public float celestialSphereIndexOfRefraction;
             public void setProjection(final String projectionString) {
                 projection = CubemapProjection.valueOf(projectionString.toUpperCase());
             }
@@ -1114,6 +1118,9 @@ public class Settings {
             case CUBEMAP_PROJECTION_CMD:
                 modeCubemap.projection = (CubemapProjections.CubemapProjection) data[0];
                 logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
+                break;
+            case INDEXOFREFRACTION_CMD:
+                modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
                 break;
             case CUBEMAP_RESOLUTION_CMD:
                 modeCubemap.faceResolution = (int) data[0];

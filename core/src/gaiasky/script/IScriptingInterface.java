@@ -2127,6 +2127,12 @@ public interface IScriptingInterface {
      * @param state The state, true to activate and false to deactivate.
      */
     void setOrthosphereViewMode(boolean state);
+    /**
+     * Sets index of refraction of celestial sphere in orthosphere view mode.
+     *
+     * @param ior The index of refraction.
+     */
+    void setIndexOfRefraction(float ior);
 
     /**
      * Enables and disables the stereoscopic mode.
