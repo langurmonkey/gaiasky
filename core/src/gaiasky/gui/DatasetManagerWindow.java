@@ -782,10 +782,10 @@ public class DatasetManagerWindow extends GenericDialog {
             // Scroll
             OwnScrollPane infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
             infoScroll.setScrollingDisabled(true, false);
+            infoScroll.setExpand(true);
             infoScroll.setSmoothScrolling(false);
             infoScroll.setFadeScrollBars(false);
             infoScroll.setWidth(1050f);
-            infoScroll.setHeight(600f);
 
             OwnTextIconButton cancelDownloadButton = null;
             if (currentDownloads.containsKey(dataset.key)) {
