@@ -479,7 +479,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 logger.info(I18n.msg("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
                             }
                         } else {
-                            select.setChecked(TextUtils.contains(Constants.DATA_LOCATION_TOKEN + dataset.checkStr, currentSetting));
+                            select.setChecked(isPathIn(Settings.settings.data.dataFile(dataset.checkStr), currentSetting));
                             select.addListener(new OwnTextTooltip(dataset.checkPath.toString(), skin));
                         }
                         select.setSize(installOrSelectSize, installOrSelectSize);
@@ -565,7 +565,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     datasetContext.addItem(update);
                                                 }
                                                 if (!dataset.baseData && !dataset.type.equals("texture-pack") && dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
-                                                    boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
+                                                    boolean enabled = isPathIn(dataset.catalogFile.path(), currentSetting);
                                                     if (enabled) {
                                                         // Disable
                                                         MenuItem disable = new MenuItem(I18n.msg("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
@@ -701,8 +701,8 @@ public class DatasetManagerWindow extends GenericDialog {
                     status.setColor(ColorUtils.gRedC);
                 } else {
                     // Notify status
-                    java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
-                    boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
+                    List<String> currentSetting = Settings.settings.data.dataFiles;
+                    boolean enabled = isPathIn(dataset.catalogFile.path(), currentSetting);
                     status = new OwnLabel(I18n.msg(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
                 }
             }
@@ -831,6 +831,20 @@ public class DatasetManagerWindow extends GenericDialog {
             rightPaneWatcher = new DatasetWatcher(dataset, null, null, status, t);
             watchers.add(rightPaneWatcher);
         }
+    }
+
+    private boolean isPathIn(String path, List<String> setting) {
+        for (String candidate : setting) {
+            var candidatePath = Settings.settings.data.dataPath(candidate);
+            try {
+                if (Path.of(path).toRealPath().equals(candidatePath.toRealPath())) {
+                    return true;
+                }
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+        return false;
     }
 
     public void refresh() {

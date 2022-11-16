@@ -12,6 +12,7 @@ import gaiasky.GaiaSky;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -376,7 +377,7 @@ public class TextUtils {
             return base;
     }
 
-    public static boolean contains(String name, java.util.List<String> list) {
+    public static boolean contains(String name, List<String> list) {
         for (String candidate : list)
             if (candidate != null && !candidate.isEmpty() && name.contains(candidate))
                 return true;
