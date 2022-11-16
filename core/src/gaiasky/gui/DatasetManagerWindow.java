@@ -785,7 +785,7 @@ public class DatasetManagerWindow extends GenericDialog {
             infoScroll.setSmoothScrolling(false);
             infoScroll.setFadeScrollBars(false);
             infoScroll.setWidth(1050f);
-            infoScroll.setHeight(300f);
+            infoScroll.setHeight(600f);
 
             OwnTextIconButton cancelDownloadButton = null;
             if (currentDownloads.containsKey(dataset.key)) {
