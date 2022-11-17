@@ -85,12 +85,6 @@ public class SceneJsonLoader {
             while (child != null) {
                 String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
-                // Loader mappings.
-                switch (clazzName) {
-                case "gaiasky.data.group.OctreeGroupLoader" -> clazzName = "gaiasky.data.OctreeLoader";
-                case "gaiasky.data.cluster.StarClusterLoader" -> clazzName = "gaiasky.data.StarClusterLoader";
-                }
-
                 Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
                 JsonValue filesJson = child.get("files");

@@ -169,19 +169,28 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
     }
 
     @Override
+    public void initialize(String[] files, String dsLocation, Scene scene) throws RuntimeException {
+        super.initialize(files, dsLocation, scene);
+        initializePrivate();
+    }
+
+    @Override
     public void initialize(String[] files, Scene scene) throws RuntimeException {
         super.initialize(files, scene);
-        if (files == null || files.length < 2) {
-            throw new RuntimeException("Error loading octree files: " + (files != null ? files.length : "files array is null"));
+        initializePrivate();
+    }
+
+    private void initializePrivate(){
+        if (filePaths == null || filePaths.length < 2) {
+            throw new RuntimeException("Error loading octree files: " + (filePaths != null ? filePaths.length : "files array is null"));
         }
-        particles = files[0];
-        metadata = files[1];
+        particles = filePaths[0];
+        metadata = filePaths[1];
 
         utils = new StarSetUtils(scene);
         sceneGraphBuilder = new SceneGraphBuilderSystem(scene.index(), null, 0);
         setInitializer = new ParticleSetInitializer(true, null, 0);
         baseInitializer = new BaseInitializer(scene, true, null, 0);
-
     }
 
     /**
