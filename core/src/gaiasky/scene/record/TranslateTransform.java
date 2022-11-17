@@ -12,14 +12,19 @@ public class TranslateTransform implements ITransform {
     /** Translation **/
     double[] vector;
 
-    public void apply(Matrix4 mat){
+    public void apply(Matrix4 mat) {
         mat.translate((float) vector[0], (float) vector[1], (float) vector[2]);
     }
-    public void apply(Matrix4d mat){
+
+    public void apply(Matrix4d mat) {
         mat.translate(vector[0], vector[1], vector[2]);
     }
 
-    public void setVector(double[] vector){
+    public void setVector(double[] vector) {
         this.vector = vector;
+    }
+
+    public double[] getVector() {
+        return vector;
     }
 }

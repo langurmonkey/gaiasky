@@ -9,10 +9,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.AffineTransformations;
-import gaiasky.scene.component.Body;
-import gaiasky.scene.component.GraphNode;
-import gaiasky.scene.component.ModelScaffolding;
+import gaiasky.scene.component.*;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.entity.LightingUtils;
@@ -77,7 +74,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
             setToLocalTransform(entity, body, graph, cloud.cloud.size, 1, cloud.cloud.localTransform, true);
         }
         if (engine != null && engine.render) {
-            EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(), engine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
+            EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(), MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
         }
     }
 
@@ -168,9 +165,7 @@ public class ModelUpdater extends AbstractUpdateSystem {
         }
 
         // Apply transformations
-        AffineTransformations affine = Mapper.affine.get(entity);
-        if (affine != null && affine.transformations != null)
-            for (ITransform tc : affine.transformations)
-                tc.apply(localTransform);
+        var affine = Mapper.affine.get(entity);
+        affine.apply(localTransform);
     }
 }

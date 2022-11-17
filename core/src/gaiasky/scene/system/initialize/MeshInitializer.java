@@ -69,25 +69,35 @@ public class MeshInitializer extends AbstractInitSystem {
             else
                 mesh.coordinateSystem.idt();
 
-            // REFSYS ROTATION
+            // Put reference system transformation in mesh.coordinateSystem.
             var transform = Mapper.transform.get(entity);
-            if(transform.matrix != null) {
+            if (transform.matrix != null) {
                 Matrix4 m = new Matrix4();
                 transform.matrix.putIn(m);
                 mesh.coordinateSystem.mul(m);
             }
 
+            // Apply affine transformations in specific order.
             var body = Mapper.body.get(entity);
             var affine = Mapper.affine.get(entity);
-            if(affine != null && affine.transformations != null) {
-                affine.apply(mesh.coordinateSystem);
+            if (affine != null) {
+                var rotate = affine.getRotateTransform();
+                var scale = affine.getScaleTransform();
+                var translate = affine.getTranslateTransform();
 
-                // Set translation to position
-                Vector3 translation = new Vector3();
-                mesh.coordinateSystem.getTranslation(translation);
-                body.pos.set(translation);
+                if (rotate != null) {
+                    rotate.apply(mesh.coordinateSystem);
+                }
+
+                if (translate != null) {
+                    body.pos.set(translate.getVector());
+                    translate.apply(mesh.coordinateSystem);
+                }
+
+                if (scale != null) {
+                    scale.apply(mesh.coordinateSystem);
+                }
             }
-
 
         }
     }

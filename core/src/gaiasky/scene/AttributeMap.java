@@ -91,7 +91,7 @@ public class AttributeMap {
         putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues");
 
         // AffineTransformations
-        putAll(AffineTransformations.class, "transformations");
+        putAll(AffineTransformations.class, "transformations", "scale", "rotate", "translate", "translatePc");
 
         // Fade
         putAll(Fade.class, "fadein", "fadeIn", "fadeInMap", "fadeout", "fadeOut", "fadeOutMap", "fade", "fadepc", "fadePc", "positionobjectname", "fadeObjectName", "fadePosition");

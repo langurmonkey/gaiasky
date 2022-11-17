@@ -31,14 +31,12 @@ public class MeshUpdater extends AbstractUpdateSystem {
             var body = Mapper.body.get(entity);
             var graph = Mapper.graph.get(entity);
             var mesh = Mapper.mesh.get(entity);
-            var affine = Mapper.affine.get(entity);
 
             // Update local transform
             float[] trn = graph.translation.valuesf(auxArray);
             graph.localTransform.idt().translate(trn[0], trn[1], trn[2]).scl(body.size).mul(mesh.coordinateSystem);
 
-            // Apply transformations
-            affine.apply(graph.localTransform);
+            // Affine transformations for meshes are already contained in mesh.coordinateSystem.
         }
     }
 }

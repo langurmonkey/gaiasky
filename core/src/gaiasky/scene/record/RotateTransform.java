@@ -11,7 +11,7 @@ import gaiasky.util.math.Matrix4d;
 public class RotateTransform implements ITransform {
     /** Rotation axis. **/
     double[] axis;
-    /** Rotation angle. **/
+    /** Rotation angle [deg]. **/
     double angle;
     
     public void apply(Matrix4 mat){
