@@ -11,18 +11,25 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.desktop.GaiaSkyDesktop;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.gui.DatasetManagerWindow;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
+import org.apache.commons.io.FileUtils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 public class DataDescriptorUtils {
@@ -274,5 +281,62 @@ public class DataDescriptorUtils {
         DataDescriptor desc = new DataDescriptor(types, datasets);
         DataDescriptor.localDataDescriptor = desc;
         return desc;
+    }
+
+    /**
+     * Checks whether the current data location contains old-version (pre-3.3.1) datasets.
+     *
+     * @return True if the data location contains old datasets.
+     */
+    public static boolean dataLocationOldVersionDatasetsCheck() {
+        final var dataLocation = Path.of(Settings.settings.data.location);
+
+        // Check presence of data-main.json
+        if (Files.exists(dataLocation.resolve("data-main.json"))) {
+            return true;
+        }
+
+        // Check presence of .json files, or directories without dataset.json.
+        try (Stream<Path> stream = Files.list(dataLocation)) {
+            var num = stream.filter(p -> {
+                if (p.toFile().isFile() && p.getFileName().toString().endsWith(".json")) {
+                    return true;
+                } else
+                    return p.toFile().isDirectory() && !p.equals(dataLocation) && !p.resolve("dataset.json").toFile().exists() && !p.getFileName().toString().equals("tmp");
+            }).count();
+            return num > 0;
+        } catch (IOException e) {
+            logger.warn(e);
+        }
+
+        return false;
+    }
+
+    public static void cleanDataLocationOldDatasets() {
+        final var dataLocation = Path.of(Settings.settings.data.location);
+        try (Stream<Path> stream = Files.list(dataLocation)) {
+            var toDelete = stream.filter(p -> {
+                if (p.toFile().isFile() && p.getFileName().toString().endsWith(".json")) {
+                    return true;
+                } else
+                    return p.toFile().isDirectory() && !p.equals(dataLocation) && !p.resolve("dataset.json").toFile().exists() && !p.getFileName().toString().equals("tmp");
+            }).collect(Collectors.toList());
+            if(!toDelete.isEmpty()) {
+                for (var delete : toDelete) {
+                    if (Files.exists(delete)) {
+                        String message = I18n.msg("gui.dscheck.deleting",": data/" + delete.getFileName().toString());
+                        logger.info(message);
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, dataLocation, message, 5f);
+                        FileUtils.deleteQuietly(delete.toFile());
+                    }
+                }
+                String message = I18n.msg("gui.dscheck.finish");
+                logger.info(message);
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, dataLocation, message, 5f);
+            }
+        } catch (Exception e) {
+            logger.warn(e);
+        }
+
     }
 }

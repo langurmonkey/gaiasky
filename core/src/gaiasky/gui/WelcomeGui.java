@@ -41,6 +41,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -107,6 +108,23 @@ public class WelcomeGui extends AbstractGui {
         popupInterface.top().right();
         popupInterface.setFillParent(true);
 
+        if (DataDescriptorUtils.dataLocationOldVersionDatasetsCheck()) {
+            var fsCheck = new DataLocationCheckWindow(I18n.msg("gui.dscheck.title"), skin, ui);
+            fsCheck.setAcceptRunnable(() -> {
+                // Clean old datasets in a thread in the background.
+                GaiaSky.instance.getExecutorService().execute(DataDescriptorUtils::cleanDataLocationOldDatasets);
+                // Continue immediately.
+                continueWelcomeGui();
+            });
+            fsCheck.setCancelRunnable(this::continueWelcomeGui);
+            fsCheck.show(ui);
+        } else {
+            continueWelcomeGui();
+        }
+
+    }
+
+    private void continueWelcomeGui() {
         if (vrStatus.vrInitFailed()) {
             if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, ui));

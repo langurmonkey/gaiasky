@@ -6,6 +6,7 @@
 package gaiasky.gui;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
@@ -49,6 +51,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected GenericDialog me;
     protected Table content, bottom;
     private String acceptText = null, cancelText = null;
+    private String acceptStyle = "default", cancelStyle = "default";
     protected boolean modal = true;
 
     protected float lastPosX = -1, lastPosY = -1;
@@ -89,11 +92,40 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
     }
 
+    public void setAcceptButtonStyle(String style) {
+        this.acceptStyle = style;
+        if (acceptButton != null) {
+            acceptButton.setStyle(skin.get(this.acceptStyle, TextButtonStyle.class));
+            recalculateButtonSize();
+        }
+    }
+
+    public void setAcceptButtonColor(Color col) {
+        if (acceptButton != null) {
+            acceptButton.setColor(col);
+        }
+    }
+
     public void setCancelText(String cancelText) {
         this.cancelText = cancelText;
         if (cancelButton != null) {
             cancelButton.setText(cancelText);
             recalculateButtonSize();
+        }
+    }
+
+    public void setCancelButtonStyle(String style) {
+        this.cancelStyle = style;
+        if (cancelButton != null) {
+            cancelButton.setStyle(skin.get(this.cancelStyle, TextButtonStyle.class));
+            recalculateButtonSize();
+        }
+    }
+
+    public void setCancelButtonColors(Color textColor, Color buttonColor) {
+        if (cancelButton != null) {
+            cancelButton.setColor(buttonColor);
+            cancelButton.getLabel().setColor(textColor);
         }
     }
 
@@ -103,12 +135,22 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     protected void recalculateButtonSize() {
+        // Width
         float w = 128f;
         for (Actor button : buttonGroup.getChildren()) {
             w = Math.max(button.getWidth() + pad10 * 4f, w);
         }
         for (Actor button : buttonGroup.getChildren()) {
             button.setWidth(w);
+        }
+
+        // Height
+        float h = 30f;
+        for (Actor button : buttonGroup.getChildren()) {
+            h = Math.max(button.getHeight(), h);
+        }
+        for (Actor button : buttonGroup.getChildren()) {
+            button.setHeight(h);
         }
     }
 
@@ -119,7 +161,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         buttonGroup.space(pad5);
 
         if (acceptText != null) {
-            acceptButton = new OwnTextButton(acceptText, skin, "default");
+            acceptButton = new OwnTextButton(acceptText, skin, acceptStyle);
             acceptButton.setName("accept");
             acceptButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
@@ -135,7 +177,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
             buttonGroup.addActor(acceptButton);
         }
         if (cancelText != null) {
-            cancelButton = new OwnTextButton(cancelText, skin, "default");
+            cancelButton = new OwnTextButton(cancelText, skin, cancelStyle);
             cancelButton.setName("cancel");
             cancelButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
@@ -290,7 +332,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         return this;
     }
 
-    protected void showDialogHook(Stage stage){
+    protected void showDialogHook(Stage stage) {
     }
 
     /**
@@ -378,7 +420,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public void setAcceptRunnable(Runnable r) {
         this.acceptRunnable = r;
     }
-
 
     public boolean hasAcceptRunnable() {
         return acceptRunnable != null;

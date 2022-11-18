@@ -969,6 +969,10 @@
       "font": "ui-17",
       "fontColor": "blue"
     },
+    "link-large": {
+      "font": "ui-21",
+      "fontColor": "blue"
+    },
     "sc-header": {
       "font": "ui-19-bold",
       "fontColor": "sc-blue"
