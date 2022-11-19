@@ -149,6 +149,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                             Entity node = scene.getEntity(name);
                             if (Mapper.focus.has(node)) {
                                 view.setEntity(node);
+                                view.getFocus(name);
                                 IFocus focus = view;
                                 boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                                 boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
