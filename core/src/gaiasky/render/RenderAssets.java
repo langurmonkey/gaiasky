@@ -21,6 +21,7 @@ import gaiasky.util.gdx.shader.loader.RelativisticShaderProviderLoader.Relativis
 import gaiasky.util.gdx.shader.loader.TessellationShaderProviderLoader;
 import gaiasky.util.gdx.shader.provider.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParameter;
+import gaiasky.util.i18n.I18n;
 
 /**
  * Centralizes the creation and loading of render assets: shaders, fonts, batch objects, etc.

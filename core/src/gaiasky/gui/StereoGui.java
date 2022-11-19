@@ -25,7 +25,6 @@ import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
-import gaiasky.util.scene2d.OwnTextIconButton;
 
 import java.text.DecimalFormat;
 
@@ -77,17 +76,17 @@ public class StereoGui extends AbstractGui {
         nf = new DecimalFormat("##0.###");
 
         // Notifications one - Bottom left
-        notificationsOne = new NotificationsInterface(skin, lock, true, true, false, false);
+        notificationsOne = new NotificationsInterface(skin, true, true, false, false);
         notificationsOne.setFillParent(true);
         notificationsOne.left().bottom();
         notificationsOne.pad(0, 5, 5, 0);
         interfaces.add(notificationsOne);
 
         // Notifications two - Bottom centre
-        notificationsTwo = new NotificationsInterface(skin, lock, true, true, false, false);
+        notificationsTwo = new NotificationsInterface(skin, true, true, false, false);
         notificationsTwo.setFillParent(true);
         notificationsTwo.bottom();
-        notificationsTwo.setX(Gdx.graphics.getWidth() / 2);
+        notificationsTwo.setX(Gdx.graphics.getWidth() / 2.0f);
         notificationsTwo.pad(0, 5, 5, 0);
         interfaces.add(notificationsTwo);
 

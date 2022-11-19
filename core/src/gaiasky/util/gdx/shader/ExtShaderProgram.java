@@ -34,9 +34,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.i18n.I18n;
 
 import java.lang.StringBuilder;
 import java.nio.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>
@@ -81,6 +83,8 @@ public class ExtShaderProgram implements Disposable {
     /** flag indicating whether attributes & uniforms must be present at all times **/
     public static boolean pedantic = true;
 
+    /** Have we logged yet? **/
+    public static AtomicBoolean logged = new AtomicBoolean(false);
     /**
      * code that is always added to the vertex shader code, typically used to inject a #version line. Note that this is added
      * as-is, you should include a newline (`\n`) if needed.
@@ -169,19 +173,23 @@ public class ExtShaderProgram implements Disposable {
         this.vertexShaderSource = vertexShaderCode;
         this.fragmentShaderSource = fragmentShaderCode;
 
-        logger.debug("Loading shaders: " + vertexFile + ", " + fragmentFile);
+        if (vertexFile != null && fragmentFile != null && !logged.get()) {
+            logger.info(I18n.msg("notif.shader.compile"));
+            logged.set(true);
+        }
+        logger.debug(I18n.msg("notif.shader.load", vertexFile, fragmentFile));
         compileShaders(vertexShaderCode, fragmentShaderCode);
         if (isCompiled()) {
             fetchAttributes();
             fetchUniforms();
             addManagedShader(Gdx.app, this);
         } else {
-            logger.error("Shader compilation failed");
+            logger.error(I18n.msg("notif.shader.compile.fail"));
             if (vertexFile != null) {
-                logger.error("Vertex shader file: " + vertexFile);
+                logger.error(I18n.msg("notif.shader.vertex", vertexFile));
             }
             if (fragmentFile != null) {
-                logger.error("Fragment shader file: " + fragmentFile);
+                logger.error(I18n.msg("notif.shader.fragment", fragmentFile));
             }
             logger.error(getLog());
         }
@@ -209,9 +217,8 @@ public class ExtShaderProgram implements Disposable {
      */
     private void compileShaders(String vertexShader, String fragmentShader) {
         vertexShaderHandle = loadShader(GL20.GL_VERTEX_SHADER, vertexShader);
-        logger.debug("Vertex shader loaded with handle: " + vertexShaderHandle);
         fragmentShaderHandle = loadShader(GL20.GL_FRAGMENT_SHADER, fragmentShader);
-        logger.debug("Fragment shader loaded with handle: " + fragmentShaderHandle);
+        logger.debug(I18n.msg("notif.shader.load.handle", vertexShaderHandle, fragmentShaderHandle));
 
         if (vertexShaderHandle == -1 || fragmentShaderHandle == -1) {
             isCompiled = false;

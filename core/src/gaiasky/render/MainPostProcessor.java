@@ -107,6 +107,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void initialize(AssetManager manager) {
         this.manager = manager;
+        logger.info(I18n.msg("notif.postproc.init"));
         LensFlareSettings settings = Settings.settings.postprocess.lensFlare;
         lensDirtName = Settings.settings.data.dataFile(GlobalResources.unpackAssetPath(settings.texLensDirt));
         lensColorName = Settings.settings.data.dataFile(settings.texLensColor);

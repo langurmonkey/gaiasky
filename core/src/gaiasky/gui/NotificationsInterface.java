@@ -47,11 +47,13 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     boolean permanent = false;
     boolean multiple;
     boolean writeDates = true;
+    // Whether to show the notification sources.
+    boolean showSources = false;
 
     /**
      * Lock object for synchronization
      **/
-    Object lock;
+    final Object lock;
 
     /**
      * Initializes the notifications interface.
@@ -91,9 +93,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param bg       Apply background
      */
     public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean bg) {
-        this(null, DEFAULT_TIMEOUT, skin, multiple, bg);
-        this.lock = lock;
-
+        this(null, DEFAULT_TIMEOUT, skin, multiple, bg, lock);
     }
 
     /**
@@ -105,8 +105,9 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param multiple  Multiple messages enabled
      * @param bg        Apply background
      */
-    public NotificationsInterface(List<MessageBean> logs, long msTimeout, Skin skin, boolean multiple, boolean bg) {
+    public NotificationsInterface(List<MessageBean> logs, long msTimeout, Skin skin, boolean multiple, boolean bg, Object lock) {
         super(skin);
+        this.lock = lock;
         if (logs != null)
             historical.addAll(logs);
         this.msTimeout = msTimeout;
@@ -207,19 +208,23 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
             case POST_NOTIFICATION:
                 LoggerLevel level = (LoggerLevel) data[0];
                 Object[] dat = (Object[]) data[1];
-                String message = "";
+                java.lang.StringBuilder message = new java.lang.StringBuilder();
                 boolean perm = false;
-                for (int i = 0; i < dat.length; i++) {
+                int startIndex = 0;
+                if (dat.length > 1 && !showSources) {
+                    startIndex = 1;
+                }
+                for (int i = startIndex; i < dat.length; i++) {
                     if (i == dat.length - 1 && dat[i] instanceof Boolean) {
                         perm = (Boolean) dat[i];
                     } else {
-                        message += dat[i].toString();
+                        message.append(dat[i].toString());
                         if (i < dat.length - 1 && !(i == dat.length - 2 && dat[dat.length - 1] instanceof Boolean)) {
-                            message += TAG_SEPARATOR;
+                            message.append(TAG_SEPARATOR);
                         }
                     }
                 }
-                addMessage(message, perm, level);
+                addMessage(message.toString(), perm, level);
                 break;
             case FOCUS_CHANGED:
                 if (data[0] != null) {
