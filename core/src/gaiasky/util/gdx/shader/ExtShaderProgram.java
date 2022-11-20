@@ -129,6 +129,8 @@ public class ExtShaderProgram implements Disposable {
     /** fragment shader source **/
     private String fragmentShaderSource;
 
+    private String vertexShaderFile, fragmentShaderFile;
+
     /** whether this shader was invalidated **/
     private boolean invalidated;
 
@@ -156,27 +158,10 @@ public class ExtShaderProgram implements Disposable {
 
         this.vertexShaderSource = vertexShaderCode;
         this.fragmentShaderSource = fragmentShaderCode;
+        this.vertexShaderFile = vertexFile;
+        this.fragmentShaderFile = fragmentFile;
 
-        if (vertexFile != null && fragmentFile != null && !logged.get()) {
-            logger.info(I18n.msg("notif.shader.compile"));
-            logged.set(true);
-        }
-        logger.debug(I18n.msg("notif.shader.load", vertexFile, fragmentFile));
-        compileShaders(vertexShaderCode, fragmentShaderCode);
-        if (isCompiled()) {
-            fetchAttributes();
-            fetchUniforms();
-            addManagedShader(Gdx.app, this);
-        } else {
-            logger.error(I18n.msg("notif.shader.compile.fail"));
-            if (vertexFile != null) {
-                logger.error(I18n.msg("notif.shader.vertex", vertexFile));
-            }
-            if (fragmentFile != null) {
-                logger.error(I18n.msg("notif.shader.fragment", fragmentFile));
-            }
-            logger.error(getLog());
-        }
+        compile();
     }
 
     /**
@@ -191,6 +176,34 @@ public class ExtShaderProgram implements Disposable {
 
     public ExtShaderProgram(FileHandle vertexShader, FileHandle fragmentShader) {
         this(vertexShader.readString(), fragmentShader.readString());
+    }
+
+    public void compile() {
+       if (!isCompiled) {
+           // Log only once -- this is to avoid overflowing the loading GUI in non-lazy loading.
+           if (vertexShaderFile != null && fragmentShaderFile != null && !logged.get()) {
+               logger.info(I18n.msg("notif.shader.compile"));
+               logged.set(true);
+           }
+
+           logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
+           compileShaders(vertexShaderSource, fragmentShaderSource);
+           if (isCompiled()) {
+               fetchAttributes();
+               fetchUniforms();
+               addManagedShader(Gdx.app, this);
+           } else {
+               logger.error(I18n.msg("notif.shader.compile.fail"));
+               if (vertexShaderFile != null) {
+                   logger.error(I18n.msg("notif.shader.vertex", vertexShaderFile));
+               }
+               if (fragmentShaderFile != null) {
+                   logger.error(I18n.msg("notif.shader.fragment", fragmentShaderFile));
+               }
+               logger.error(getLog());
+           }
+
+       }
     }
 
     /**
