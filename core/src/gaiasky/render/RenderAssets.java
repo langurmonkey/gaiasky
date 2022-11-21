@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -114,11 +115,24 @@ public class RenderAssets {
         ExtShaderProgram.pedantic = false;
 
         /* DATA LOAD */
-        String[] defines = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
-        String[] names = GlobalResources.combinations(new String[] { SUFFIX_SSR, SUFFIX_VELBUFF, SUFFIX_REL, SUFFIX_GRAV });
+
+        // Build arrays of names and defines.
+        Array<String> namesSource = new Array<>(String.class);
+        Array<String> definesSource = new Array<>(String.class);
+        namesSource.add(SUFFIX_SSR, SUFFIX_VELBUFF);
+        definesSource.add("#define ssrFlag\n", "#define velocityBufferFlag\n");
+        if (Settings.settings.runtime.relativisticAberration && Settings.settings.runtime.gravitationalWaves) {
+            namesSource.add(SUFFIX_REL, SUFFIX_GRAV);
+            definesSource.add("#define relativisticEffects\n", "#define gravitationalWaves\n");
+        }
+        String[] defines = GlobalResources.combinations(definesSource.toArray());
+        String[] names = GlobalResources.combinations(namesSource.toArray());
+
         // Color mapping in shaders
-        String[] definesCmap = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n" });
-        String[] namesCmap = GlobalResources.combinations(new String[] { SUFFIX_SSR, SUFFIX_VELBUFF, SUFFIX_REL, SUFFIX_GRAV, SUFFIX_COLMAP });
+        namesSource.add(SUFFIX_COLMAP);
+        definesSource.add("#define colorMap\n");
+        String[] definesCmap = GlobalResources.combinations(definesSource.toArray());
+        String[] namesCmap = GlobalResources.combinations(namesSource.toArray());
 
         // Direct shaders
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
