@@ -551,7 +551,7 @@ public class GlobalResources {
             @Override
             public FileVisitResult visitFileFailed(Path file, IOException exc) {
 
-                System.out.println("skipped: " + file + " (" + exc + ")");
+                logger.info("skipped: " + file + " (" + exc + ")");
                 // Skip folders that can't be traversed
                 return FileVisitResult.CONTINUE;
             }
@@ -560,7 +560,7 @@ public class GlobalResources {
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
 
                 if (exc != null)
-                    System.out.println("had trouble traversing: " + dir + " (" + exc + ")");
+                    logger.info("had trouble traversing: " + dir + " (" + exc + ")");
                 // Ignore errors traversing a folder
                 return FileVisitResult.CONTINUE;
             }

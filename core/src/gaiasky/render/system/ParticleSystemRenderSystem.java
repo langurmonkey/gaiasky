@@ -1,6 +1,5 @@
 package gaiasky.render.system;
 
-import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -10,21 +9,23 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.graphics.g3d.particles.batches.PointSpriteParticleBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IRenderable;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 
-public class ParticleSystemRenderSystem extends AbstractRenderSystem {
-    private ParticleSystem particleSystem;
-    private PointSpriteParticleBatch pointSpriteParticleBatch;
-    private ParticleEffect explosion, explosionInstance;
+import java.util.List;
 
-    private ModelBatch modelBatch;
-    private Matrix4 trf;
+public class ParticleSystemRenderSystem extends AbstractRenderSystem {
+    private final ParticleSystem particleSystem;
+    private final PointSpriteParticleBatch pointSpriteParticleBatch;
+    private final ParticleEffect explosion;
+    private ParticleEffect explosionInstance;
+
+    private final ModelBatch modelBatch;
+    private final Matrix4 trf;
 
     public ParticleSystemRenderSystem(SceneRenderer sceneRenderer) {
         super(sceneRenderer, null, null, null);

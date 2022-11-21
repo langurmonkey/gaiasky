@@ -93,25 +93,25 @@ public class ExtShaderProgram implements Disposable {
     private boolean isLazy;
 
     /** Uniform lookup. **/
-    private final ObjectIntMap<String> uniforms = new ObjectIntMap<>();
+    private ObjectIntMap<String> uniforms;
 
     /** Uniform types. **/
-    private final ObjectIntMap<String> uniformTypes = new ObjectIntMap<>();
+    private ObjectIntMap<String> uniformTypes;
 
     /** Uniform sizes. **/
-    private final ObjectIntMap<String> uniformSizes = new ObjectIntMap<>();
+    private ObjectIntMap<String> uniformSizes;
 
     /** Uniform names. **/
     private String[] uniformNames;
 
     /** Attribute lookup. **/
-    private final ObjectIntMap<String> attributes = new ObjectIntMap<>();
+    private ObjectIntMap<String> attributes;
 
     /** Attribute types. **/
-    private final ObjectIntMap<String> attributeTypes = new ObjectIntMap<>();
+    private ObjectIntMap<String> attributeTypes;
 
     /** Attribute sizes. **/
-    private final ObjectIntMap<String> attributeSizes = new ObjectIntMap<>();
+    private ObjectIntMap<String> attributeSizes;
 
     /** Attribute names. **/
     private String[] attributeNames;
@@ -194,13 +194,25 @@ public class ExtShaderProgram implements Disposable {
         this(vertexShader.readString(), fragmentShader.readString());
     }
 
+    private void initializeLocalAssets() {
+        uniforms = new ObjectIntMap<>();
+        uniformTypes = new ObjectIntMap<>();
+        uniformSizes = new ObjectIntMap<>();
+        attributes = new ObjectIntMap<>();
+        attributeTypes = new ObjectIntMap<>();
+        attributeSizes = new ObjectIntMap<>();
+    }
+
     public void compile() {
         if (!isCompiled) {
+            initializeLocalAssets();
+
             if (name != null) {
                 logger.info(I18n.msg("notif.shader.compile", name));
             }
 
             logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
+
             compileShaders(vertexShaderSource, fragmentShaderSource);
             if (isCompiled()) {
                 fetchAttributes();

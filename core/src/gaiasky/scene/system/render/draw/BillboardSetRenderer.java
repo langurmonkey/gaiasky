@@ -81,10 +81,12 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     @Override
     protected void initShaderProgram() {
         for (ExtShaderProgram shaderProgram : programs) {
-            shaderProgram.begin();
-            shaderProgram.setUniformf("u_pointAlphaMin", 0.1f);
-            shaderProgram.setUniformf("u_pointAlphaMax", 1.0f);
-            shaderProgram.end();
+            if (shaderProgram.isCompiled()) {
+                shaderProgram.begin();
+                shaderProgram.setUniformf("u_pointAlphaMin", 0.1f);
+                shaderProgram.setUniformf("u_pointAlphaMax", 1.0f);
+                shaderProgram.end();
+            }
         }
         initializeTextureArray(Settings.settings.graphics.quality);
     }
@@ -100,13 +102,17 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
         FileHandle d03 = unpack("dust-03" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle d04 = unpack("dust-04" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle d05 = unpack("dust-05" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
-        ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         for (ExtShaderProgram shaderProgram : programs) {
-            shaderProgram.begin();
-            ta.bind(0);
-            shaderProgram.setUniformi("u_textures", 0);
+            if (shaderProgram.isCompiled()) {
+                if (ta == null) {
+                    ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
+                    ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+                }
+                shaderProgram.begin();
+                ta.bind(0);
+                shaderProgram.setUniformi("u_textures", 0);
+            }
         }
     }
 
@@ -115,16 +121,18 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
     }
 
     private void disposeTextureArray() {
-        ta.dispose();
+        if (ta != null) {
+            ta.dispose();
+        }
     }
 
     private void disposeMeshes(Render key) {
         if (meshes != null && meshes.containsKey(key)) {
             MeshDataWrap[] m = meshes.get(key);
             if (m != null && m.length > 0) {
-                for (int i = 0; i < m.length; i++) {
-                    if (m[i] != null && m[i].meshData != null) {
-                        m[i].meshData.dispose();
+                for (MeshDataWrap meshDataWrap : m) {
+                    if (meshDataWrap != null && meshDataWrap.meshData != null) {
+                        meshDataWrap.meshData.dispose();
                     }
                 }
                 meshes.remove(key);

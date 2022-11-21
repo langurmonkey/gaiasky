@@ -5,7 +5,6 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.I3DTextRenderable;
@@ -51,8 +50,8 @@ public class FontRenderSystem extends AbstractRenderSystem {
         int size = renderables.size();
         ExtShaderProgram program = programs[0];
         if (program == null) {
-            for (int i = 0; i < size; i++) {
-                IAnnotationsRenderable s = (IAnnotationsRenderable) renderables.get(i);
+            for (IRenderable renderable : renderables) {
+                IAnnotationsRenderable s = (IAnnotationsRenderable) renderable;
                 // Render sprite
                 s.render(batch, camera, font2d, getAlpha(s));
             }

@@ -195,22 +195,22 @@ public class Frustumd {
     /** Returns whether the given bounding box is in the frustum.
      * @return Whether the bounding box is in the frustum */
     public boolean boundsInFrustum(double x, double y, double z, double halfWidth, double halfHeight, double halfDepth) {
-        for (int i = 0, len2 = planes.length; i < len2; i++) {
-            if (planes[i].testPoint(x + halfWidth, y + halfHeight, z + halfDepth) != PlaneSide.Back)
+        for (Planed plane : planes) {
+            if (plane.testPoint(x + halfWidth, y + halfHeight, z + halfDepth) != PlaneSide.Back)
                 continue;
-            if (planes[i].testPoint(x + halfWidth, y + halfHeight, z - halfDepth) != PlaneSide.Back)
+            if (plane.testPoint(x + halfWidth, y + halfHeight, z - halfDepth) != PlaneSide.Back)
                 continue;
-            if (planes[i].testPoint(x + halfWidth, y - halfHeight, z + halfDepth) != PlaneSide.Back)
+            if (plane.testPoint(x + halfWidth, y - halfHeight, z + halfDepth) != PlaneSide.Back)
                 continue;
-            if (planes[i].testPoint(x + halfWidth, y - halfHeight, z - halfDepth) != PlaneSide.Back)
+            if (plane.testPoint(x + halfWidth, y - halfHeight, z - halfDepth) != PlaneSide.Back)
                 continue;
-            if (planes[i].testPoint(x - halfWidth, y + halfHeight, z + halfDepth) != PlaneSide.Back)
+            if (plane.testPoint(x - halfWidth, y + halfHeight, z + halfDepth) != PlaneSide.Back)
                 continue;
-            if (planes[i].testPoint(x - halfWidth, y + halfHeight, z - halfDepth) != PlaneSide.Back)
+            if (plane.testPoint(x - halfWidth, y + halfHeight, z - halfDepth) != PlaneSide.Back)
                 continue;
-            if (planes[i].testPoint(x - halfWidth, y - halfHeight, z + halfDepth) != PlaneSide.Back)
+            if (plane.testPoint(x - halfWidth, y - halfHeight, z + halfDepth) != PlaneSide.Back)
                 continue;
-            if (planes[i].testPoint(x - halfWidth, y - halfHeight, z - halfDepth) != PlaneSide.Back)
+            if (plane.testPoint(x - halfWidth, y - halfHeight, z - halfDepth) != PlaneSide.Back)
                 continue;
             return false;
         }
@@ -218,48 +218,4 @@ public class Frustumd {
         return true;
     }
 
-    // /**
-    // * Calculates the pick ray for the given window coordinates. Assumes the window coordinate system has it's y downwards. The
-    // * returned Ray is a member of this instance so don't reuse it outside this class.
-    // *
-    // * @param screen_width The window width in pixels
-    // * @param screen_height The window height in pixels
-    // * @param mouse_x The window x-coordinate
-    // * @param mouse_y The window y-coordinate
-    // * @param pos The camera position
-    // * @param dir The camera direction, having unit length
-    // * @param up The camera up vector, having unit length
-    // * @return the picking ray.
-    // */
-    // public Ray calculatePickRay (float screen_width, float screen_height, float mouse_x, float mouse_y, Vector3d pos, Vector3d dir,
-    // Vector3d up) {
-    // float n_x = mouse_x - screen_width / 2.0f;
-    // float n_y = mouse_y - screen_height / 2.0f;
-    // n_x /= screen_width / 2.0f;
-    // n_y /= screen_height / 2.0f;
-    //
-    // Z.set(dir.tmp().mul(-1)).nor();
-    // X.set(up.tmp().crs(Z)).nor();
-    // Y.set(Z.tmp().crs(X)).nor();
-    // near_center.set(pos.tmp3().sub(Z.tmp2().mul(near)));
-    // Vector3d near_point = X.tmp3().mul(near_width).mul(n_x).add(Y.tmp2().mul(near_height).mul(n_y));
-    // near_point.add(near_center);
-    //
-    // return ray.set(near_point.tmp(), near_point.sub(pos).nor());
-    // }
-
-    // public static void main(String[] argv) {
-    // PerspectiveCamera camera = new PerspectiveCamera(45, 2, 2);
-    // // camera.rotate(90, 0, 1, 0);
-    // camera.update();
-    // System.out.println(camera.direction);
-    // System.out.println(Arrays.toString(camera.frustum.planes));
-    //
-    // OrthographicCamera camOrtho = new OrthographicCamera(2, 2);
-    // camOrtho.near = 1;
-    // // camOrtho.rotate(90, 1, 0, 0);
-    // camOrtho.update();
-    // System.out.println(camOrtho.direction);
-    // System.out.println(Arrays.toString(camOrtho.frustum.planes));
-    // }
 }

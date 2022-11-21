@@ -23,7 +23,7 @@ import org.lwjgl.opengl.GL41;
  */
 public class TessellationRenderer extends AbstractRenderSystem {
     private final IntModelBatch batch;
-    private ModelEntityRenderSystem renderObject;
+    private final ModelEntityRenderSystem renderObject;
 
     /**
      * Creates a new model batch render component.

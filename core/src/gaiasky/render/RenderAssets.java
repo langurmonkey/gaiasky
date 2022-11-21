@@ -131,7 +131,6 @@ public class RenderAssets {
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
-
         // Initialize point cloud shaders - depends on point cloud mode
         final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
         particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffix + ".vertex.glsl", "shader/particle.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
@@ -365,7 +364,7 @@ public class RenderAssets {
 
     private ExtShaderProgram fetchShaderProgram(final AssetManager manager, final String descriptor, final String name) {
         ExtShaderProgram shader = manager.get(descriptor);
-        if (!shader.isCompiled()) {
+        if (!shader.isLazy() && !shader.isCompiled()) {
             logger.error(name + " shader compilation failed:\n" + shader.getLog());
         }
         return shader;

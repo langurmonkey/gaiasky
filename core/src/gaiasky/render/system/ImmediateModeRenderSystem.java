@@ -31,7 +31,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     // Renderables that are already in the GPU
     protected Set<IRenderable> inGpu;
     // Offset and count per renderable, if needed
-    private Map<IRenderable, Integer> offsets, counts;
+    private final Map<IRenderable, Integer> offsets;
+    private final Map<IRenderable, Integer> counts;
 
     public static class MeshData {
 
@@ -148,8 +149,6 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         offsets = new HashMap<>();
         counts = new HashMap<>();
     }
-
-    protected abstract void initShaderProgram();
 
     protected abstract void initVertices();
 

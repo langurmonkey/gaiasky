@@ -23,7 +23,7 @@ import gaiasky.util.gdx.IntModelBatch;
 public class ModelRenderer extends AbstractRenderSystem {
 
     protected IntModelBatch batch;
-    private ModelEntityRenderSystem renderObject;
+    private final ModelEntityRenderSystem renderObject;
 
     /**
      * Creates a new model batch render component.

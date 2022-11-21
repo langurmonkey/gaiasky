@@ -18,7 +18,8 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
-/** {@link AssetLoader} for {@link ExtShaderProgram} instances loaded from text files. If the file suffix is ".vert", it is assumed
+/**
+ * {@link AssetLoader} for {@link ExtShaderProgram} instances loaded from text files. If the file suffix is ".vert", it is assumed
  * to be a vertex shader, and a fragment shader is found using the same file name with a ".frag" suffix. And vice versa if the
  * file suffix is ".frag". These default suffixes can be changed in the ShaderProgramLoader constructor.
  * <p>
@@ -27,7 +28,9 @@ import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
  * <p>
  * The above default behavior for finding the files can be overridden by explicitly setting the file names in a
  * {@link ShaderProgramParameter}. The parameter can also be used to prepend code to the programs.
- * @author cypherdare */
+ *
+ * @author cypherdare
+ */
 public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProgram, ShaderProgramProvider.ShaderProgramParameter> {
 
     private String vertexFileSuffix = ".vertex.glsl";
@@ -97,9 +100,9 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
     static public String getShaderCode(String prefix, String code) {
         code = code.trim();
         if (code.startsWith("#version") && !prefix.isEmpty()) {
-            int firstlineend = code.indexOf('\n') + 1;
-            String versionStr = code.substring(0, firstlineend);
-            return versionStr + prefix + code.substring(firstlineend);
+            int firstLineEnd = code.indexOf('\n') + 1;
+            String versionStr = code.substring(0, firstLineEnd);
+            return versionStr + prefix + code.substring(firstLineEnd);
         } else {
             return prefix + code;
         }
@@ -108,19 +111,27 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
     static public class ShaderProgramParameter extends AssetLoaderParameters<ExtShaderProgram> {
         /** Name of the shader. Optional. **/
         public String name;
-        /** File name to be used for the vertex program instead of the default determined by the file name used to submit this asset
-         * to AssetManager. */
+        /**
+         * File name to be used for the vertex program instead of the default determined by the file name used to submit this asset
+         * to AssetManager.
+         */
         public String vertexFile;
-        /** File name to be used for the fragment program instead of the default determined by the file name used to submit this
-         * asset to AssetManager. */
+        /**
+         * File name to be used for the fragment program instead of the default determined by the file name used to submit this
+         * asset to AssetManager.
+         */
         public String fragmentFile;
         /** Whether to log (at the error level) the shader's log if it fails to compile. Default true. */
         public boolean logOnCompileFailure = true;
-        /** Code that is always added to the vertex shader code. This is added as-is, and you should include a newline (`\n`) if
-         * needed. {@linkplain ExtShaderProgram#prependVertexCode} is placed before this code. */
+        /**
+         * Code that is always added to the vertex shader code. This is added as-is, and you should include a newline (`\n`) if
+         * needed. {@linkplain ExtShaderProgram#prependVertexCode} is placed before this code.
+         */
         public String prependVertexCode;
-        /** Code that is always added to the fragment shader code. This is added as-is, and you should include a newline (`\n`) if
-         * needed. {@linkplain ExtShaderProgram#prependFragmentCode} is placed before this code. */
+        /**
+         * Code that is always added to the fragment shader code. This is added as-is, and you should include a newline (`\n`) if
+         * needed. {@linkplain ExtShaderProgram#prependFragmentCode} is placed before this code.
+         */
         public String prependFragmentCode;
     }
 }

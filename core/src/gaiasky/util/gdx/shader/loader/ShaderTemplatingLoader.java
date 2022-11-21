@@ -26,7 +26,7 @@ public class ShaderTemplatingLoader {
         return resolveIncludes(in);
     }
 
-    public static String resolveIncludes(String in){
+    public static String resolveIncludes(String in) {
         final StringBuilder stringBuilder = new StringBuilder();
 
         Scanner scanner = new Scanner(in);

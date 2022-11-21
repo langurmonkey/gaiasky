@@ -38,7 +38,7 @@ public class BillboardRenderer extends AbstractRenderSystem implements IObserver
     private Texture billboardTexture;
     private final ComponentType componentType;
 
-    private BillboardView view;
+    private final BillboardView view;
     private final BillboardEntityRenderSystem renderSystem;
 
     // Render metadata

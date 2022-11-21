@@ -214,9 +214,20 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         if (!program.isCompiled()) {
             // Compile shader
             program.compile();
+            // Initialize
+            initShaderProgram();
+
         }
         return program;
     }
+
+    /**
+     * Initializes metadata or essential uniforms in the shader program.
+     */
+    protected void initShaderProgram() {
+        // Empty by default, override if needed.
+    }
+
 
     public void dispose() {
         preRunnables.clear();

@@ -21,7 +21,7 @@ import gaiasky.scene.camera.ICamera;
  */
 public class ShapeRenderer extends AbstractRenderSystem {
 
-    private ShapeEntityRenderSystem renderSystem;
+    private final ShapeEntityRenderSystem renderSystem;
     /**
      * The shape renderer
      */
