@@ -14,6 +14,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.RenderAssets;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
@@ -77,12 +78,12 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
                 fragmentCode = getShaderCode(parameter.prependFragmentCode, fragmentCode);
         }
 
-        // Lazy load deactivated modes (relativistic and gravitational waves) and off modes (motion blur and SSR).
+        // Lazy-load deactivated shaders (relativistic and gravitational waves) and off-by-default modes (motion blur and SSR).
         boolean lazyLoad = parameter != null && parameter.name != null
                 && (parameter.name.contains(RenderAssets.SUFFIX_REL)
                 || parameter.name.contains(RenderAssets.SUFFIX_GRAV)
-                || parameter.name.contains(RenderAssets.SUFFIX_VELBUFF)
-                || parameter.name.contains(RenderAssets.SUFFIX_SSR)
+                || (parameter.name.contains(RenderAssets.SUFFIX_VELBUFF) && !Settings.settings.postprocess.motionBlur.active)
+                || (parameter.name.contains(RenderAssets.SUFFIX_SSR) && !Settings.settings.postprocess.ssr.active)
         );
 
         ExtShaderProgram shaderProgram = new ExtShaderProgram(parameter != null ? parameter.name : null, vertFileName, fragFileName, vertexCode, fragmentCode, lazyLoad);
