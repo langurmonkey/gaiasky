@@ -16,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import gaiasky.desktop.util.DesktopMusicActors;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -24,7 +23,6 @@ import gaiasky.gui.components.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Scene;
 import gaiasky.util.CatalogManager;
-import gaiasky.util.MusicManager;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
@@ -239,22 +237,6 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         //	gaia.align(Align.left);
         //	mainActors.add(gaia);
         //	panes.put(gaiaComponent.getClass().getSimpleName(), gaia);
-
-        /* ----MUSIC GROUP---- */
-        if (MusicManager.initialized()) {
-            MusicComponent musicComponent = new MusicComponent(skin, ui);
-            musicComponent.initialize();
-
-            DesktopMusicActors dma = new DesktopMusicActors();
-            Actor[] musicActors = dma.getActors(skin);
-
-            shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.music");
-
-            CollapsiblePane music = new CollapsiblePane(ui, I18n.msg("gui.music"), musicComponent.getActor(), getContentWidth(), skin, false, shortcut, musicActors);
-            music.align(Align.left);
-            mainActors.add(music);
-            panes.put(musicComponent.getClass().getSimpleName(), music);
-        }
 
         Table buttonsTable;
         /* BUTTONS */
