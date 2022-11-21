@@ -25,14 +25,16 @@ public class ScriptingServer {
 
     private static ClientServer gatewayServer;
     private static GatewayServerListener listener;
+    private static IScriptingInterface scriptingInterface;
     private static final AtomicInteger connections = new AtomicInteger(0);
 
-    public static void initialize() {
-        initialize(false);
+    public static void initialize(IScriptingInterface scriptingInterface) {
+        initialize(scriptingInterface, false);
     }
 
-    public static void initialize(boolean force) {
+    public static void initialize(IScriptingInterface scriptingInterface, boolean force) {
         if (!Settings.settings.program.net.slave.active) {
+            ScriptingServer.scriptingInterface = scriptingInterface;
             if (force && gatewayServer != null) {
                 // Shutdown
                 try {
@@ -43,7 +45,7 @@ public class ScriptingServer {
             }
             if (gatewayServer == null) {
                 try {
-                    gatewayServer = new ClientServer(GaiaSky.instance.scripting());
+                    gatewayServer = new ClientServer(scriptingInterface);
                     listener = new DefaultGatewayServerListener() {
 
                         @Override
@@ -76,7 +78,7 @@ public class ScriptingServer {
                         @Override
                         public void serverStopped() {
                             logger.info("Server stopped");
-                            initialize(true);
+                            initialize(scriptingInterface, true);
                         }
 
                         @Override
@@ -87,7 +89,7 @@ public class ScriptingServer {
                         @Override
                         public void serverError(Exception e) {
                             logger.error(e);
-                            initialize(force);
+                            initialize(scriptingInterface, force);
                         }
                     };
                     gatewayServer.getJavaServer().addListener(listener);

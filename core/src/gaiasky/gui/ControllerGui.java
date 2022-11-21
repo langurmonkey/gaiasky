@@ -51,7 +51,7 @@ public class ControllerGui extends AbstractGui {
 
     private final Table content, menu;
     private Table searchT, camT, timeT, optT, typesT, sysT;
-    private Cell contentCell, infoCell;
+    private Cell<?> contentCell, infoCell;
     private OwnTextButton searchButton, cameraButton, timeButton, optionsButton, typesButton, systemButton;
     // Contains a matrix (column major) of actors for each tab
     private final List<Actor[][]> model;

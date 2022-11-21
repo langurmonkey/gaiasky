@@ -55,6 +55,7 @@ import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
+import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.Logger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -417,9 +418,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         assetManager.setLoader(IntModel.class, ".obj.gz", new OwnObjLoader(new GzipInputStreamProvider(), internalResolver));
         assetManager.setLoader(IntModel.class, ".g3dj", new G3dModelLoader(new JsonReader(), internalResolver));
         assetManager.setLoader(IntModel.class, ".g3db", new G3dModelLoader(new UBJsonReader(), internalResolver));
-        // Remove Model loaders
+        assetManager.setLoader(GaiaSkyAssets.class, new GaiaSkyLoader(internalResolver));
 
-        // Init global resources
+        // Init global resources -- Can't be postponed!
         this.globalResources = new GlobalResources(assetManager);
 
         // Initialize screenshots manager
@@ -428,8 +429,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Catalog manager
         this.catalogManager = new CatalogManager();
 
-        this.scripting = new EventScriptingInterface(this.assetManager, this.catalogManager);
-
         // Initialise master manager
         MasterManager.initialize();
         // Load slave assets
@@ -437,15 +436,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise dataset updater
         this.executorService = new GaiaSkyExecutorService();
-
-        // Bookmarks
-        this.bookmarksManager = new BookmarksManager();
-
-        // Location log
-        LocationLogManager.initialize();
-
-        // Init timer thread
-        Timer.instance();
 
         // Initialise Cameras
         cameraManager = new CameraManager(assetManager, CameraMode.FOCUS_MODE, vr, globalResources);
@@ -457,15 +447,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         final VRStatus vrStatus = createVR();
         cameraManager.updateFrustumPlanes();
 
-        // Tooltip to 1s
-        TooltipManager.getInstance().initialTime = 1f;
-
-        // Initialise hidden helper user
-        HiddenHelperUser.initialize();
-
-        // Initialise gravitational waves helper
-        RelativisticEffectsManager.initialize(time);
-
         // GUI
         guis = new ArrayList<>(3);
 
@@ -476,9 +457,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sceneRenderer = new SceneRenderer(vrContext, globalResources);
         sceneRenderer.initialize(assetManager);
 
-        // Initialise scripting gateway server
-        if (!noScripting)
-            ScriptingServer.initialize();
+        // Load various assets
+        assetManager.load("gaiasky-assets", GaiaSkyAssets.class, new GaiaSkyLoaderParameters(this, noScripting));
 
         // Tell the asset manager to load all the assets
         final Set<AssetBean> assets = AssetBean.getAssets();
@@ -578,6 +558,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * to their classes and removes the Loading message
      */
     private void doneLoading() {
+        // Get assets
+        final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
+
         windowCreated = true;
         // Dispose of initial and loading GUIs
         welcomeGui.dispose();
@@ -605,11 +588,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             vrLoadingRightFb = null;
         }
 
-        /*
-         * SAMP client
-         */
-        sampClient = new SAMPClient(this.catalogManager);
-        sampClient.initialize(globalResources.getSkin());
+        // Collect assets
+        scripting = assets.scriptingInterface;
+        bookmarksManager = assets.bookmarksManager;
+        sampClient = assets.sampClient;
 
         /*
          * POST-PROCESSOR
@@ -1677,6 +1659,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public GlobalResources getGlobalResources() {
         return this.globalResources;
+    }
+
+    public CatalogManager getCatalogManager() {
+        return this.catalogManager;
     }
 
     /**

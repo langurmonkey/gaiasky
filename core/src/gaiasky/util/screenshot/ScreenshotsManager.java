@@ -50,7 +50,7 @@ public class ScreenshotsManager implements IObserver {
 
     public IFileImageRenderer frameRenderer, screenshotRenderer;
     private final ScreenshotCmd screenshot;
-    private IGui renderGui;
+    private final IGui renderGui;
 
     public ScreenshotsManager(final GlobalResources globalResources) {
         super();
@@ -59,7 +59,7 @@ public class ScreenshotsManager implements IObserver {
         screenshot = new ScreenshotCmd();
 
         // Frame output GUI
-        renderGui = new RenderGui(globalResources.getSkin(), (Lwjgl3Graphics) Gdx.graphics, Settings.settings.program.ui.scale);
+        renderGui = new RenderGui(globalResources.getSkin(), Gdx.graphics, Settings.settings.program.ui.scale);
         renderGui.initialize(null, globalResources.getSpriteBatch());
         renderGui.doneLoading(null);
 
