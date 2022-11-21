@@ -57,95 +57,107 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ExtShaderProgram implements Disposable {
     private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
 
-    /** default name for position attributes **/
+    /** Default name for position attributes. **/
     public static final String POSITION_ATTRIBUTE = "a_position";
-    /** default name for color attributes **/
+    /** Default name for color attributes. **/
     public static final String COLOR_ATTRIBUTE = "a_color";
-    /** default name for texture coordinates attributes, append texture unit number **/
+    /** Default name for texture coordinates attributes, append texture unit number. **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
 
-    /** flag indicating whether attributes & uniforms must be present at all times **/
+    /** Flag indicating whether attributes & uniforms must be present at all times. **/
     public static boolean pedantic = true;
-
-    /** Have we logged yet? **/
-    public static AtomicBoolean logged = new AtomicBoolean(false);
     /**
-     * code that is always added to the vertex shader code, typically used to inject a #version line. Note that this is added
+     * Code that is always added to the vertex shader code, typically used to inject a #version line. Note that this is added
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependVertexCode = "";
 
     /**
-     * code that is always added to every fragment shader code, typically used to inject a #version line. Note that this is added
+     * Code that is always added to every fragment shader code, typically used to inject a #version line. Note that this is added
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependFragmentCode = "";
 
-    /** the list of currently available shaders **/
+    /** The list of currently available shaders. **/
     private final static ObjectMap<Application, Array<ExtShaderProgram>> shaders = new ObjectMap<>();
 
-    /** the log **/
+    /** The log. **/
     private String log = "";
 
-    /** whether this program compiled successfully **/
-    private boolean isCompiled;
+    /** The shader name, if any. **/
+    private String name;
 
-    /** uniform lookup **/
+    /** Whether this program compiled successfully. **/
+    private boolean isCompiled;
+    /** Whether lazy loading is activated for this shader. **/
+    private boolean isLazy;
+
+    /** Uniform lookup. **/
     private final ObjectIntMap<String> uniforms = new ObjectIntMap<>();
 
-    /** uniform types **/
+    /** Uniform types. **/
     private final ObjectIntMap<String> uniformTypes = new ObjectIntMap<>();
 
-    /** uniform sizes **/
+    /** Uniform sizes. **/
     private final ObjectIntMap<String> uniformSizes = new ObjectIntMap<>();
 
-    /** uniform names **/
+    /** Uniform names. **/
     private String[] uniformNames;
 
-    /** attribute lookup **/
+    /** Attribute lookup. **/
     private final ObjectIntMap<String> attributes = new ObjectIntMap<>();
 
-    /** attribute types **/
+    /** Attribute types. **/
     private final ObjectIntMap<String> attributeTypes = new ObjectIntMap<>();
 
-    /** attribute sizes **/
+    /** Attribute sizes. **/
     private final ObjectIntMap<String> attributeSizes = new ObjectIntMap<>();
 
-    /** attribute names **/
+    /** Attribute names. **/
     private String[] attributeNames;
 
-    /** program handle **/
+    /** Program handle. **/
     private int program;
 
-    /** vertex shader handle **/
+    /** Vertex shader handle. **/
     private int vertexShaderHandle;
 
-    /** fragment shader handle **/
+    /** Fragment shader handle. **/
     private int fragmentShaderHandle;
 
-    /** vertex shader source **/
+    /** Vertex shader source. **/
     private String vertexShaderSource;
 
-    /** fragment shader source **/
+    /** Fragment shader source. **/
     private String fragmentShaderSource;
 
     private String vertexShaderFile, fragmentShaderFile;
 
-    /** whether this shader was invalidated **/
+    /** Whether this shader was invalidated. **/
     private boolean invalidated;
 
     public ExtShaderProgram() {
     }
 
+    public ExtShaderProgram(String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode) {
+        this(null, vertexFile, fragmentFile, vertexShaderCode, fragmentShaderCode, false);
+    }
+
+    public ExtShaderProgram(String name, String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode) {
+        this(name, vertexFile, fragmentFile, vertexShaderCode, fragmentShaderCode, false);
+    }
+
     /**
      * Constructs a new ShaderProgram and immediately compiles it.
      *
+     * @param name               The shader name, if any.
      * @param vertexFile         The vertex shader file.
      * @param fragmentFile       The fragment shader file.
      * @param vertexShaderCode   The vertex shader code.
      * @param fragmentShaderCode The fragment shader code.
+     * @param lazyLoading        Whether to use lazy loading, only preparing the data without actually compiling the shaders.
      */
-    public ExtShaderProgram(String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode) {
+    public ExtShaderProgram(String name, String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode, boolean lazyLoading) {
         if (vertexShaderCode == null)
             throw new IllegalArgumentException("vertex shader must not be null");
         if (fragmentShaderCode == null)
@@ -156,12 +168,16 @@ public class ExtShaderProgram implements Disposable {
         if (prependFragmentCode != null && prependFragmentCode.length() > 0)
             fragmentShaderCode = prependFragmentCode + fragmentShaderCode;
 
+        this.isLazy = lazyLoading;
+        this.name = name;
         this.vertexShaderSource = vertexShaderCode;
         this.fragmentShaderSource = fragmentShaderCode;
         this.vertexShaderFile = vertexFile;
         this.fragmentShaderFile = fragmentFile;
 
-        compile();
+        if (!lazyLoading) {
+            compile();
+        }
     }
 
     /**
@@ -179,31 +195,29 @@ public class ExtShaderProgram implements Disposable {
     }
 
     public void compile() {
-       if (!isCompiled) {
-           // Log only once -- this is to avoid overflowing the loading GUI in non-lazy loading.
-           if (vertexShaderFile != null && fragmentShaderFile != null && !logged.get()) {
-               logger.info(I18n.msg("notif.shader.compile"));
-               logged.set(true);
-           }
+        if (!isCompiled) {
+            if (name != null) {
+                logger.info(I18n.msg("notif.shader.compile", name));
+            }
 
-           logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
-           compileShaders(vertexShaderSource, fragmentShaderSource);
-           if (isCompiled()) {
-               fetchAttributes();
-               fetchUniforms();
-               addManagedShader(Gdx.app, this);
-           } else {
-               logger.error(I18n.msg("notif.shader.compile.fail"));
-               if (vertexShaderFile != null) {
-                   logger.error(I18n.msg("notif.shader.vertex", vertexShaderFile));
-               }
-               if (fragmentShaderFile != null) {
-                   logger.error(I18n.msg("notif.shader.fragment", fragmentShaderFile));
-               }
-               logger.error(getLog());
-           }
+            logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
+            compileShaders(vertexShaderSource, fragmentShaderSource);
+            if (isCompiled()) {
+                fetchAttributes();
+                fetchUniforms();
+                addManagedShader(Gdx.app, this);
+            } else {
+                logger.error(I18n.msg("notif.shader.compile.fail"));
+                if (vertexShaderFile != null) {
+                    logger.error(I18n.msg("notif.shader.vertex", vertexShaderFile));
+                }
+                if (fragmentShaderFile != null) {
+                    logger.error(I18n.msg("notif.shader.fragment", fragmentShaderFile));
+                }
+                logger.error(getLog());
+            }
 
-       }
+        }
     }
 
     /**
@@ -310,9 +324,14 @@ public class ExtShaderProgram implements Disposable {
         return log;
     }
 
-    /** @return whether this ShaderProgram compiled successfully. */
+    /** @return whether this program compiled successfully. */
     public boolean isCompiled() {
         return isCompiled;
+    }
+
+    /** @return whether this program has lazy loading activated. */
+    public boolean isLazy() {
+        return isLazy;
     }
 
     private int fetchAttributeLocation(String name) {
@@ -942,6 +961,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return whether the attribute is available in the shader
      */
     public boolean hasAttribute(String name) {
@@ -950,6 +970,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return the type of the attribute, one of {@link GL20#GL_FLOAT}, {@link GL20#GL_FLOAT_VEC2} etc.
      */
     public int getAttributeType(String name) {
@@ -958,6 +979,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return the location of the attribute or -1.
      */
     public int getAttributeLocation(String name) {
@@ -966,6 +988,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the attribute
+     *
      * @return the size of the attribute or 0.
      */
     public int getAttributeSize(String name) {
@@ -974,6 +997,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return whether the uniform is available in the shader
      */
     public boolean hasUniform(String name) {
@@ -982,6 +1006,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return the type of the uniform, one of {@link GL20#GL_FLOAT}, {@link GL20#GL_FLOAT_VEC2} etc.
      */
     public int getUniformType(String name) {
@@ -990,6 +1015,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return the location of the uniform or -1.
      */
     public int getUniformLocation(String name) {
@@ -998,6 +1024,7 @@ public class ExtShaderProgram implements Disposable {
 
     /**
      * @param name the name of the uniform
+     *
      * @return the size of the uniform or 0.
      */
     public int getUniformSize(String name) {

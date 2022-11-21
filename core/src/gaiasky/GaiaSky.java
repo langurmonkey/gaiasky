@@ -16,6 +16,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
@@ -43,12 +44,12 @@ import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.ModelComponent;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
@@ -84,15 +85,14 @@ import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.openvr.Texture;
 import org.lwjgl.openvr.VR;
 import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.*;
 import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -139,7 +139,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Loading texture.
      **/
-    public Texture vrLoadingLeftTex, vrLoadingRightTex;
+    public org.lwjgl.openvr.Texture vrLoadingLeftTex, vrLoadingRightTex;
 
     /**
      * Maps the VR devices to model objects.
@@ -402,7 +402,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         final FileHandleResolver internalResolver = new InternalFileHandleResolver();
         final FileHandleResolver dataResolver = fileName -> settings.data.dataFileHandle(fileName);
         assetManager = new AssetManager(internalResolver);
-        assetManager.setLoader(com.badlogic.gdx.graphics.Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
+        assetManager.setLoader(Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));

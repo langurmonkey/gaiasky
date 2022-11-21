@@ -210,7 +210,12 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
             // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
             num = 2;
         }
-        return programs[num];
+        var program = programs[num];
+        if (!program.isCompiled()) {
+            // Compile shader
+            program.compile();
+        }
+        return program;
     }
 
     public void dispose() {

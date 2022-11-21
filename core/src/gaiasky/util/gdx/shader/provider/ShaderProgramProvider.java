@@ -1,24 +1,7 @@
-
 /*
  * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  * See the file LICENSE.md in the project root for full license details.
  */
-
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   https://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 
 package gaiasky.util.gdx.shader.provider;
 
@@ -30,6 +13,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.render.RenderAssets;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
@@ -93,7 +77,15 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
                 fragmentCode = getShaderCode(parameter.prependFragmentCode, fragmentCode);
         }
 
-        ExtShaderProgram shaderProgram = new ExtShaderProgram(vertFileName, fragFileName, vertexCode, fragmentCode);
+        // Lazy load deactivated modes (relativistic and gravitational waves) and off modes (motion blur and SSR).
+        boolean lazyLoad = parameter != null && parameter.name != null
+                && (parameter.name.contains(RenderAssets.SUFFIX_REL)
+                || parameter.name.contains(RenderAssets.SUFFIX_GRAV)
+                || parameter.name.contains(RenderAssets.SUFFIX_VELBUFF)
+                || parameter.name.contains(RenderAssets.SUFFIX_SSR)
+        );
+
+        ExtShaderProgram shaderProgram = new ExtShaderProgram(parameter != null ? parameter.name : null, vertFileName, fragFileName, vertexCode, fragmentCode, lazyLoad);
         if ((parameter == null || parameter.logOnCompileFailure) && !shaderProgram.isCompiled()) {
             manager.getLogger().error("ExtShaderProgram " + fileName + " failed to compile:\n" + shaderProgram.getLog());
         }
@@ -113,6 +105,8 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
     }
 
     static public class ShaderProgramParameter extends AssetLoaderParameters<ExtShaderProgram> {
+        /** Name of the shader. Optional. **/
+        public String name;
         /** File name to be used for the vertex program instead of the default determined by the file name used to submit this asset
          * to AssetManager. */
         public String vertexFile;

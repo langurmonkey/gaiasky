@@ -90,6 +90,15 @@ public class RenderAssets {
 
     public ExtSpriteBatch spriteBatch, fontBatch;
 
+    /**
+     * Shader name parts.
+     */
+    public static final String SUFFIX_SSR = "SSR";
+    public static final String SUFFIX_VELBUFF = "Velbuff";
+    public static final String SUFFIX_REL = "Rel";
+    public static final String SUFFIX_GRAV = "Grav";
+    public static final String SUFFIX_COLMAP = "Colmap";
+
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;
     }
@@ -106,10 +115,10 @@ public class RenderAssets {
 
         /* DATA LOAD */
         String[] defines = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
-        String[] names = GlobalResources.combinations(new String[] { "SSR", "Velbuff", "Rel", "Grav" });
+        String[] names = GlobalResources.combinations(new String[] { SUFFIX_SSR, SUFFIX_VELBUFF, SUFFIX_REL, SUFFIX_GRAV });
         // Color mapping in shaders
         String[] definesCmap = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n" });
-        String[] namesCmap = GlobalResources.combinations(new String[] { "SSR", "Velbuff", "Rel", "Grav", "Colmap" });
+        String[] namesCmap = GlobalResources.combinations(new String[] { SUFFIX_SSR, SUFFIX_VELBUFF, SUFFIX_REL, SUFFIX_GRAV, SUFFIX_COLMAP });
 
         // Direct shaders
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
@@ -322,11 +331,12 @@ public class RenderAssets {
      * @return The asset descriptor for the shader program.
      */
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager, String vertexShader, String fragmentShader, String[] names, String[] prepend) {
-        @SuppressWarnings("unchecked") AssetDescriptor<ExtShaderProgram>[] result = new AssetDescriptor[prepend.length];
+        AssetDescriptor<ExtShaderProgram>[] result = new AssetDescriptor[prepend.length];
 
         int i = 0;
         for (String prep : prepend) {
             ShaderProgramParameter spp = new ShaderProgramParameter();
+            spp.name = names[i];
             spp.prependVertexCode = prep;
             spp.prependFragmentCode = prep;
             spp.vertexFile = vertexShader;
@@ -346,7 +356,7 @@ public class RenderAssets {
 
         for (int i = 0; i < n; i++) {
             shaders[i] = manager.get(descriptors[i]);
-            if (!shaders[i].isCompiled()) {
+            if (!shaders[i].isLazy() && !shaders[i].isCompiled()) {
                 logger.error(names[i] + " shader compilation failed:\n" + shaders[i].getLog());
             }
         }
