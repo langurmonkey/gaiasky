@@ -159,7 +159,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnTextIconButton tab360 = createTab(I18n.msg("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin);
         final OwnTextIconButton tabPlanetarium = createTab(I18n.msg("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin);
         final OwnTextIconButton tabData = createTab(I18n.msg("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin);
-        final OwnTextIconButton tabGaia = createTab(I18n.msg("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin);
         final OwnTextIconButton tabSystem = createTab(I18n.msg("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin);
 
         group.add(tabGraphics).row();
@@ -172,9 +171,21 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         group.add(tab360).row();
         group.add(tabPlanetarium).row();
         group.add(tabData).row();
-        group.add(tabGaia).row();
         group.add(tabSystem).row();
         content.add(group).align(Align.left | Align.top).padLeft(pad5);
+
+        tabs = new Array<>();
+        tabs.add(tabGraphics);
+        tabs.add(tabUI);
+        tabs.add(tabPerformance);
+        tabs.add(tabControls);
+        tabs.add(tabScreenshots);
+        tabs.add(tabFrames);
+        tabs.add(tabCamera);
+        tabs.add(tab360);
+        tabs.add(tabPlanetarium);
+        tabs.add(tabData);
+        tabs.add(tabSystem);
 
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
@@ -1755,25 +1766,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // Add to content
-        contentDataTable.add(titleGeneralData).left().padBottom(pad10).row();
-        contentDataTable.add(highAccuracyPositionsLabel).left().padBottom(pad20);
-        contentDataTable.add(highAccuracyPositions).left().padRight(pad20).padBottom(pad20);
-        contentDataTable.add(highAccTooltip).left().padBottom(pad20).row();
-        if (!welcomeScreen) {
-            contentDataTable.add(titleData).left().colspan(3).padBottom(pad10).row();
-            contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad5).row();
-            contentDataTable.add(dataDownload).left().colspan(3);
-        }
-
-        /*
-         * ==== GAIA ====
-         */
-        final Table contentGaia = new Table(skin);
-        contentGaia.setWidth(contentWidth);
-        contentGaia.align(Align.top | Align.left);
-        contents.add(contentGaia);
-
         // ATTITUDE
         OwnLabel titleAttitude = new OwnLabel(I18n.msg("gui.gaia.attitude"), skin, "header");
         Table attitude = new Table(skin);
@@ -1814,8 +1806,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         nsl.addListener(attNoticeListener);
 
         // Add to content
-        contentGaia.add(titleAttitude).left().padBottom(pad10).row();
-        contentGaia.add(attitude).left();
+        contentDataTable.add(titleGeneralData).left().padBottom(pad10).row();
+        contentDataTable.add(highAccuracyPositionsLabel).left().padBottom(pad20);
+        contentDataTable.add(highAccuracyPositions).left().padRight(pad20).padBottom(pad20);
+        contentDataTable.add(highAccTooltip).left().padBottom(pad20).row();
+        if (!welcomeScreen) {
+            contentDataTable.add(titleData).left().colspan(3).padBottom(pad10).row();
+            contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad5).row();
+            contentDataTable.add(dataDownload).left().colspan(3).padBottom(pad20).row();
+        }
+        contentDataTable.add(titleAttitude).left().padBottom(pad10).row();
+        contentDataTable.add(attitude).left();
+
 
         /*
          * ==== SYSTEM ====
@@ -1900,7 +1902,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabContent.addActor(content360);
         tabContent.addActor(contentPlanetarium);
         tabContent.addActor(contentData);
-        tabContent.addActor(contentGaia);
         tabContent.addActor(contentSystem);
 
         /* ADD TO MAIN TABLE */
@@ -1922,7 +1923,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     content360.setVisible(tab360.isChecked());
                     contentPlanetarium.setVisible(tabPlanetarium.isChecked());
                     contentData.setVisible(tabData.isChecked());
-                    contentGaia.setVisible(tabGaia.isChecked());
                     contentSystem.setVisible(tabSystem.isChecked());
                     if (lastTabFlag)
                         lastTab = (OwnTextIconButton) actor;
@@ -1939,7 +1939,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tab360.addListener(tab_listener);
         tabPlanetarium.addListener(tab_listener);
         tabData.addListener(tab_listener);
-        tabGaia.addListener(tab_listener);
         tabSystem.addListener(tab_listener);
 
         lastTabFlag = false;
@@ -1957,7 +1956,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabs.add(tab360);
         tabs.add(tabPlanetarium);
         tabs.add(tabData);
-        tabs.add(tabGaia);
         tabs.add(tabSystem);
         lastTabFlag = true;
 

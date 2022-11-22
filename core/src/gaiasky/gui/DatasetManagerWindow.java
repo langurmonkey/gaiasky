@@ -1425,7 +1425,9 @@ public class DatasetManagerWindow extends GenericDialog {
             if (target instanceof CheckBox) {
                 // Check or uncheck
                 CheckBox cb = (CheckBox) target;
-                cb.setChecked(!cb.isChecked());
+                if(!cb.isDisabled()) {
+                    cb.setChecked(!cb.isChecked());
+                }
             } else {
                 // Fire change event
                 ChangeEvent event = Pools.obtain(ChangeEvent.class);
@@ -1463,12 +1465,6 @@ public class DatasetManagerWindow extends GenericDialog {
             Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
             Actor target = selection.getSecond();
             stage.setKeyboardFocus(target);
-            target.setColor(Color.YELLOW);
-            for (Pair<DatasetDesc, Actor> actor : selectionOrder) {
-                if (actor.getSecond() != target) {
-                    actor.getSecond().setColor(Color.WHITE);
-                }
-            }
             // Move scroll
             target = target.getParent();
             int si = selectedIndex;
