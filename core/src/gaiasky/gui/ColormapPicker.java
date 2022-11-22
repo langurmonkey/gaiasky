@@ -675,8 +675,9 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         @Override
-        protected void accept() {
+        protected boolean accept() {
             // Nothing
+            return true;
         }
 
         @Override

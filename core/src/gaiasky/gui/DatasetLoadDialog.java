@@ -455,8 +455,8 @@ public class DatasetLoadDialog extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
-
+    protected boolean accept() {
+        return true;
     }
 
     @Override

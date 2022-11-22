@@ -140,8 +140,9 @@ public class CrashGui extends AbstractGui {
         }
 
         @Override
-        protected void accept() {
+        protected boolean accept() {
             GaiaSky.postRunnable(() -> Gdx.app.exit());
+            return true;
         }
 
         @Override

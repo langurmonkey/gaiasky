@@ -47,8 +47,9 @@ public class UpdatePopup extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         // Do nothing
+        return true;
     }
 
     @Override

@@ -43,8 +43,9 @@ public class NewBookmarkFolderDialog extends GenericDialog {
     }
 
     @Override
-    public void accept(){
+    public boolean accept(){
         stage.unfocusAll();
+        return true;
     }
     @Override
     public void cancel(){

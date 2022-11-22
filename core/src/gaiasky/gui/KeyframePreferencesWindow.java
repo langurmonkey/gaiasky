@@ -92,10 +92,11 @@ public class KeyframePreferencesWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camrecFps.getText()));
         Settings.settings.camrecorder.keyframe.position = CameraKeyframeManager.PathType.values()[posMethod.getSelectedIndex()];
         Settings.settings.camrecorder.keyframe.orientation = CameraKeyframeManager.PathType.values()[orientationMethod.getSelectedIndex()];
+        return true;
     }
 
     @Override

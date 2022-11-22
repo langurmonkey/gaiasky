@@ -186,7 +186,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
 
         String slave = slaveSelect.getSelected();
         String logStr = "";
@@ -220,6 +220,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
             logger.warn("Slave is down, no configuration sent: " + slave);
         }
 
+        return true;
     }
 
     private synchronized void updateSlaveStatusText(boolean connected) {

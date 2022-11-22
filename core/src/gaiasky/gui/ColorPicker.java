@@ -270,8 +270,9 @@ public class ColorPicker extends ColorPickerAbstract {
         }
 
         @Override
-        protected void accept() {
+        protected boolean accept() {
             // Nothing
+            return true;
         }
 
         @Override

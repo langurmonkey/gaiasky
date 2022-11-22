@@ -220,11 +220,12 @@ public class SearchDialog extends GenericDialog {
     }
 
     @Override
-    public void accept() {
+    public boolean accept() {
         cancelTasks();
         removeCandidates();
         stage.unfocusAll();
         info(null);
+        return true;
     }
 
     @Override

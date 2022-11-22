@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.GaiaSky;
 import gaiasky.gui.GenericDialog;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.Link;
@@ -48,10 +49,11 @@ public class GuiUtils {
             }
 
             @Override
-            protected void accept() {
+            protected boolean accept() {
                 if (ok != null) {
                     ok.run();
                 }
+                return true;
             }
 
             @Override
@@ -90,13 +92,14 @@ public class GuiUtils {
             }
 
             @Override
-            protected void accept() {
-                Gdx.app.exit();
+            protected boolean accept() {
+                GaiaSky.postRunnable(Gdx.app::exit);
+                return true;
             }
 
             @Override
             protected void cancel() {
-                Gdx.app.exit();
+                GaiaSky.postRunnable(Gdx.app::exit);
             }
 
             @Override
@@ -124,13 +127,14 @@ public class GuiUtils {
             }
 
             @Override
-            protected void accept() {
-                Gdx.app.exit();
+            protected boolean accept() {
+                GaiaSky.postRunnable(Gdx.app::exit);
+                return true;
             }
 
             @Override
             protected void cancel() {
-                Gdx.app.exit();
+                GaiaSky.postRunnable(Gdx.app::exit);
             }
 
             @Override
@@ -158,13 +162,14 @@ public class GuiUtils {
             }
 
             @Override
-            protected void accept() {
-                Gdx.app.exit();
+            protected boolean accept() {
+                GaiaSky.postRunnable(Gdx.app::exit);
+                return true;
             }
 
             @Override
             protected void cancel() {
-                Gdx.app.exit();
+                GaiaSky.postRunnable(Gdx.app::exit);
             }
 
             @Override

@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.HttpRequest;
+import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,11 +23,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.input.AbstractGamepadListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -115,14 +119,17 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private DataDescriptor serverDd, localDd;
+    private DatasetMode currentMode;
+    private Cell<?> left, right;
     private OwnScrollPane leftScroll;
-    private DatasetDesc[] selectedDataset;
-    private float[][] scroll;
-    private static int selectedTab = 0;
+    private final DatasetDesc[] selectedDataset;
+    private final float[][] scroll;
 
-    private Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
+    private final Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
 
-    private Map<String, Button>[] buttonMap;
+    private final Map<String, Button>[] buttonMap;
+    private final List<Pair<DatasetDesc, Actor>> selectionOrder;
+    private int selectedIndex = 0;
 
     private final Color highlight;
 
@@ -134,10 +141,10 @@ public class DatasetManagerWindow extends GenericDialog {
     private final Set<DatasetWatcher> watchers;
     private DatasetWatcher rightPaneWatcher;
 
-    private AtomicBoolean initialized;
+    private final AtomicBoolean initialized;
 
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd) {
-        this(stage, skin, serverDd, true, null);
+        this(stage, skin, serverDd, true, I18n.msg("gui.close"));
     }
 
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
@@ -153,27 +160,15 @@ public class DatasetManagerWindow extends GenericDialog {
         this.buttonMap[0] = new HashMap<>();
         this.buttonMap[1] = new HashMap<>();
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
+        this.selectionOrder = new ArrayList<>();
 
+        this.gamepadListener = new DatasetManagerGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
         this.dataLocation = dataLocation;
 
         setAcceptText(acceptText);
 
         // Build
         buildSuper();
-
-        // Alternative accept button that checks the current downloads
-        OwnTextButton acceptButton = new OwnTextButton(I18n.msg("gui.close"), skin, "default");
-        acceptButton.setName("accept-alt");
-        acceptButton.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                accept();
-                return true;
-            }
-            return false;
-
-        });
-        buttonGroup.addActor(acceptButton);
-        recalculateButtonSize();
     }
 
     @Override
@@ -202,12 +197,17 @@ public class DatasetManagerWindow extends GenericDialog {
             tabInstalledText = I18n.msg("gui.download.tab.installed");
         }
 
+        tabs = new Array<>();
+
         final OwnTextButton tabAvail = new OwnTextButton(I18n.msg("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad5);
         tabAvail.setWidth(tabWidth);
         final OwnTextButton tabInstalled = new OwnTextButton(tabInstalledText, skin, "toggle-big");
         tabInstalled.pad(pad5);
         tabInstalled.setWidth(tabWidth);
+
+        tabs.add(tabAvail);
+        tabs.add(tabInstalled);
 
         tabGroup.addActor(tabAvail);
         tabGroup.addActor(tabInstalled);
@@ -277,6 +277,7 @@ public class DatasetManagerWindow extends GenericDialog {
         Link manualDownload = new Link(I18n.msg("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
         content.add(manualDownload).center();
 
+        addGamepadListener();
         initialized.set(true);
     }
 
@@ -347,12 +348,12 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void reloadAvailable(Table content, float width) {
-        reloadBothPanes(content, width, serverDd, DatasetMode.AVAILABLE);
+        reloadBothPanes(content, width, serverDd, currentMode = DatasetMode.AVAILABLE);
     }
 
     private void reloadInstalled(Table content, float width) {
         this.localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
-        reloadBothPanes(content, width, localDd, DatasetMode.INSTALLED);
+        reloadBothPanes(content, width, localDd, currentMode = DatasetMode.INSTALLED);
     }
 
     private enum DatasetMode {
@@ -368,8 +369,8 @@ public class DatasetManagerWindow extends GenericDialog {
             }
             content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
         } else {
-            Cell<?> left = content.add().top().left().padRight(pad20);
-            Cell<?> right = content.add().top().left();
+            left = content.add().top().left().padRight(pad20);
+            right = content.add().top().left();
 
             int datasets = reloadLeftPane(left, right, dataDescriptor, mode, width);
             if (datasets > 0) {
@@ -404,7 +405,10 @@ public class DatasetManagerWindow extends GenericDialog {
         });
 
         // Current selected datasets
-        java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
+        List<String> currentSetting = Settings.settings.data.dataFiles;
+
+        selectionOrder.clear();
+        selectedIndex = 0;
 
         int added = 0;
         for (DatasetType type : dataDescriptor.types) {
@@ -635,8 +639,13 @@ public class DatasetManagerWindow extends GenericDialog {
 
                     leftTable.add(button).left().row();
 
-                    if (selectedDataset[mode.ordinal()] == null)
+                    // Add check.
+                    selectionOrder.add(new Pair<>(dataset, installOrSelect));
+
+                    if (selectedDataset[mode.ordinal()] == null) {
                         selectedDataset[mode.ordinal()] = dataset;
+                        selectedIndex = selectionOrder.size() - 1;
+                    }
 
                     // Create watcher
                     watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null, null));
@@ -1140,7 +1149,7 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         final GenericDialog myself = me;
         // Create a copy
         Map<String, Pair<DatasetDesc, HttpRequest>> copy = new HashMap<>(currentDownloads);
@@ -1160,7 +1169,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
 
                 @Override
-                protected void accept() {
+                protected boolean accept() {
                     // Cancel all requests
                     Set<String> keys = copy.keySet();
                     for (String key : keys) {
@@ -1170,7 +1179,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     if (this.acceptRunnable != null) {
                         this.acceptRunnable.run();
                     }
-                    myself.hide();
+                    return true;
                 }
 
                 @Override
@@ -1191,16 +1200,21 @@ public class DatasetManagerWindow extends GenericDialog {
             if (this.acceptRunnable != null) {
                 this.acceptRunnable.run();
             }
-            myself.hide();
+            myself.hide(); // Close.
         }
+        removeGamepadListener();
+        // Do not close dialog, we close it.
+        return false;
     }
 
     @Override
     protected void cancel() {
+        removeGamepadListener();
     }
 
     @Override
     public void dispose() {
+        removeGamepadListener();
 
     }
 
@@ -1315,7 +1329,7 @@ public class DatasetManagerWindow extends GenericDialog {
             }
 
             @Override
-            protected void accept() {
+            protected boolean accept() {
                 DatasetDesc serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
                 boolean deleted = false;
                 // Delete
@@ -1371,6 +1385,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
                 // RELOAD DATASETS VIEW
                 GaiaSky.postRunnable(() -> reloadAll());
+                return true;
             }
 
             @Override
@@ -1396,5 +1411,146 @@ public class DatasetManagerWindow extends GenericDialog {
         scroll[0][1] = 0f;
         scroll[1][0] = 0f;
         scroll[1][1] = 0f;
+    }
+
+    public void fire() {
+        Actor target = stage.getKeyboardFocus();
+        if (target == null) {
+            if (selectionOrder != null) {
+                target = selectionOrder.get(selectedIndex).getSecond();
+            }
+        }
+
+        if (target != null) {
+            if (target instanceof CheckBox) {
+                // Check or uncheck
+                CheckBox cb = (CheckBox) target;
+                cb.setChecked(!cb.isChecked());
+            } else {
+                // Fire change event
+                ChangeEvent event = Pools.obtain(ChangeEvent.class);
+                event.setTarget(target);
+                target.fire(event);
+                Pools.free(event);
+            }
+        }
+    }
+
+    public void cycleDialogButtons() {
+        Actor target = stage.getKeyboardFocus();
+        if (target == acceptButton && cancelButton != null) {
+            stage.setKeyboardFocus(cancelButton);
+        } else {
+            stage.setKeyboardFocus(acceptButton);
+        }
+    }
+
+    private void up() {
+        selectedIndex = selectedIndex - 1;
+        if (selectedIndex < 0) {
+            selectedIndex = selectionOrder.size() - 1;
+        }
+        updateSelection();
+    }
+
+    private void down() {
+        selectedIndex = (selectedIndex + 1) % selectionOrder.size();
+        updateSelection();
+    }
+
+    private void updateSelection() {
+        if (selectedIndex >= 0 && selectedIndex < selectionOrder.size()) {
+            Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
+            Actor target = selection.getSecond();
+            stage.setKeyboardFocus(target);
+            target.setColor(Color.YELLOW);
+            for (Pair<DatasetDesc, Actor> actor : selectionOrder) {
+                if (actor.getSecond() != target) {
+                    actor.getSecond().setColor(Color.WHITE);
+                }
+            }
+            // Move scroll
+            target = target.getParent();
+            int si = selectedIndex;
+            leftScroll.setScrollY(si * target.getHeight());
+            // Update right pane
+            GaiaSky.postRunnable(() -> reloadRightPane(right, selection.getFirst(), currentMode));
+            selectedDataset[currentMode.ordinal()] = selection.getFirst();
+        }
+    }
+
+    private class DatasetManagerGamepadListener extends AbstractGamepadListener {
+
+        public DatasetManagerGamepadListener(String mappingsFile) {
+            super(mappingsFile);
+        }
+
+        @Override
+        public void connected(Controller controller) {
+
+        }
+
+        @Override
+        public void disconnected(Controller controller) {
+
+        }
+
+        @Override
+        public boolean buttonDown(Controller controller, int buttonCode) {
+            return true;
+        }
+
+        @Override
+        public boolean buttonUp(Controller controller, int buttonCode) {
+            if (buttonCode == mappings.getButtonStart()) {
+                accept();
+            } else if (buttonCode == mappings.getButtonA()) {
+                fire();
+            } else if (buttonCode == mappings.getButtonB() || buttonCode == mappings.getButtonSelect()) {
+                cycleDialogButtons();
+            } else if (buttonCode == mappings.getButtonDpadUp()) {
+                up();
+            } else if (buttonCode == mappings.getButtonDpadDown()) {
+                down();
+            } else if (buttonCode == mappings.getButtonRB()) {
+                tabRight();
+            } else if (buttonCode == mappings.getButtonLB()) {
+                tabLeft();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean axisMoved(Controller controller, int axisCode, float value) {
+            if (Math.abs(value) > AXIS_TH && System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
+                // Event-based
+                if (axisCode == mappings.getAxisLstickV()) {
+                    // LEFT STICK vertical - move vertically
+                    if (value > 0) {
+                        down();
+                    } else {
+                        up();
+                    }
+                }
+                lastAxisEvtTime = System.currentTimeMillis();
+            }
+            return true;
+        }
+
+        @Override
+        public void update() {
+
+        }
+
+        @Override
+        public void activate() {
+
+        }
+
+        @Override
+        public void deactivate() {
+
+        }
+
     }
 }

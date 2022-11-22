@@ -531,7 +531,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         // Generate and save mappings file
         Path mappings = SysUtils.getDefaultMappingsDir();
         Path file = mappings.resolve(filename.getText() + ".controller");
@@ -608,6 +608,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         }
         EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, file.toAbsolutePath().toString());
         restoreControllerListener();
+        return true;
     }
 
     @Override

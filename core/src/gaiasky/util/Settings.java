@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.beust.jcommander.internal.Sets;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -347,8 +348,7 @@ public class Settings {
                 }
             } else if (event == Event.BACKBUFFER_SCALE_CMD) {
                 backBufferScale = (Float) data[0];
-            }
-            else if (event == Event.INDEXOFREFRACTION_CMD) {
+            } else if (event == Event.INDEXOFREFRACTION_CMD) {
                 celestialSphereIndexOfRefraction = (Float) data[0];
             }
         }
@@ -908,6 +908,7 @@ public class Settings {
             public int faceResolution;
             public PlanetariumSettings planetarium;
             public float celestialSphereIndexOfRefraction;
+
             public void setProjection(final String projectionString) {
                 projection = CubemapProjection.valueOf(projectionString.toUpperCase());
             }
@@ -1211,24 +1212,41 @@ public class Settings {
                 return false;
             }
 
-            private void addListener(Controller c, ControllerListener cl) {
-                if (!controllerListenersMap.containsKey(c)) {
+            /**
+             * Adds the given listener to the given controller in our local map.
+             *
+             * @param controller         The controller.
+             * @param controllerListener The listener.
+             */
+            private void addListener(Controller controller, ControllerListener controllerListener) {
+                if (!controllerListenersMap.containsKey(controller)) {
                     Set<ControllerListener> cs = new HashSet<>();
-                    cs.add(cl);
-                    controllerListenersMap.put(c, cs);
+                    cs.add(controllerListener);
+                    controllerListenersMap.put(controller, cs);
                 } else {
-                    Set<ControllerListener> cs = controllerListenersMap.get(c);
-                    cs.add(cl);
+                    Set<ControllerListener> cs = controllerListenersMap.get(controller);
+                    cs.add(controllerListener);
                 }
             }
 
-            private void removeListener(Controller c, ControllerListener cl) {
-                if (controllerListenersMap.containsKey(c)) {
-                    Set<ControllerListener> cs = controllerListenersMap.get(c);
-                    cs.remove(cl);
+            /**
+             * Removes the given listener from the given controller in our local map.
+             *
+             * @param controller         The controller.
+             * @param controllerListener The listener.
+             */
+            private void removeListener(Controller controller, ControllerListener controllerListener) {
+                if (controllerListenersMap.containsKey(controller)) {
+                    Set<ControllerListener> cs = controllerListenersMap.get(controller);
+                    cs.remove(controllerListener);
                 }
             }
 
+            /**
+             * Adds the given controller listeners to all detected controllers.
+             *
+             * @param listener The controller listener.
+             */
             public void addControllerListener(ControllerListener listener) {
                 Array<Controller> controllers = Controllers.getControllers();
                 for (Controller controller : controllers) {
@@ -1242,6 +1260,13 @@ public class Settings {
                 }
             }
 
+            /**
+             * Adds the given controller listener to the controller with the given name, if it is not
+             * blacklisted.
+             *
+             * @param listener       The controller listener.
+             * @param controllerName The controller name.
+             */
             public void addControllerListener(ControllerListener listener, String controllerName) {
                 Array<Controller> controllers = Controllers.getControllers();
                 for (Controller controller : controllers) {
@@ -1255,6 +1280,11 @@ public class Settings {
                 }
             }
 
+            /**
+             * Removes the given listener from all controllers.
+             *
+             * @param listener The listener to remove.
+             */
             public void removeControllerListener(ControllerListener listener) {
                 Array<Controller> controllers = Controllers.getControllers();
                 for (Controller controller : controllers) {
@@ -1265,6 +1295,9 @@ public class Settings {
                 }
             }
 
+            /**
+             * Removes all controller listeners from all controllers.
+             */
             public void removeAllControllerListeners() {
                 Array<Controller> controllers = Controllers.getControllers();
                 for (Controller controller : controllers) {
@@ -1277,6 +1310,35 @@ public class Settings {
                         }
                     }
                 }
+            }
+
+            /**
+             * Adds all controller listeners in the set to all detected controllers.
+             *
+             * @param controllerListeners The listeners.
+             */
+            @JsonIgnore
+            public void setControllerListeners(Set<ControllerListener> controllerListeners) {
+                if (controllerListeners != null) {
+                    for (ControllerListener listener : controllerListeners) {
+                        addControllerListener(listener);
+                    }
+                }
+            }
+
+            /**
+             * Returns a copy of the current controller listeners for the first detected controller.
+             *
+             * @return A set with all current controller listeners.
+             */
+            @JsonIgnore
+            public Set<ControllerListener> getControllerListeners() {
+                Array<Controller> controllers = Controllers.getControllers();
+                if (!controllers.isEmpty()) {
+                    Controller c = controllers.get(0);
+                    return new HashSet<>(controllerListenersMap.get(c));
+                }
+                return null;
             }
         }
     }

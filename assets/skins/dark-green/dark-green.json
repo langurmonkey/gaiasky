@@ -1134,6 +1134,7 @@
       "checkboxOnOver": "check-on-over",
       "checkboxOver": "check-off-over",
       "checkboxOffDisabled": "check-off-disabled",
+      "focused": "check-on-over",
       "font": "ui-18",
       "fontColor": "white"
     },

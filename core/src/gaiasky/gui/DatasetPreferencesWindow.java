@@ -411,7 +411,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         // Point size
         if (highlightSizeFactor.isValid()) {
             float newVal = Parser.parseFloat(highlightSizeFactor.getText());
@@ -450,7 +450,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 ci.highlight(ci.highlighted);
             }
         }
-
+        return true;
     }
 
     @Override

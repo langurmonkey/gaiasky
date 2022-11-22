@@ -70,7 +70,7 @@ public class ReleaseNotesWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         // Write current version to $WORKDIR/.releasenotes.rev
         Path releaseNotesRev = SysUtils.getReleaseNotesRevisionFile();
         try {
@@ -80,6 +80,7 @@ public class ReleaseNotesWindow extends GenericDialog {
         } catch (IOException e) {
             logger.error(e);
         }
+        return true;
     }
 
     @Override

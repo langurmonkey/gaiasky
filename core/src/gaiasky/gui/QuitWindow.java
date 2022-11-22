@@ -44,12 +44,13 @@ public class QuitWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         // Update exit confirmation
         Settings.settings.program.exitConfirmation = !doNotAsk.isChecked();
         // Only run if it does not have an accept runnable already
         // Otherwise, it comes from the exit hook
         GaiaSky.postRunnable(() -> Gdx.app.exit());
+        return true;
     }
 
     @Override

@@ -95,8 +95,9 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         // Nothing
+        return true;
     }
 
     @Override

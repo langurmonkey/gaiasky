@@ -6,26 +6,30 @@
 package gaiasky.gui;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.input.AbstractGamepadListener;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.scene2d.CollapsibleWindow;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.Separator;
+
+import java.util.Set;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
@@ -64,6 +68,14 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected Runnable acceptRunnable, cancelRunnable;
 
     private Actor previousKeyboardFocus, previousScrollFocus;
+
+    // The gamepad listener for this window, if any.
+    protected AbstractGamepadListener gamepadListener;
+
+    /** If this dialog has tabs, this list holds them. **/
+    protected Array<Button> tabs;
+    /** Currently selected tab **/
+    protected int selectedTab = 0;
 
     protected InputListener ignoreTouchDown = new InputListener() {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -165,10 +177,12 @@ public abstract class GenericDialog extends CollapsibleWindow {
             acceptButton.setName("accept");
             acceptButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    accept();
+                    boolean close = accept();
                     if (acceptRunnable != null)
                         acceptRunnable.run();
-                    me.hide();
+                    if (close) {
+                        me.hide();
+                    }
                     return true;
                 }
                 return false;
@@ -225,10 +239,12 @@ public abstract class GenericDialog extends CollapsibleWindow {
                     case Keys.ENTER:
                         if (enterExit) {
                             // Exit
-                            accept();
+                            boolean close = accept();
                             if (acceptRunnable != null)
                                 acceptRunnable.run();
-                            me.hide();
+                            if (close) {
+                                me.hide();
+                            }
                         }
                         // Do not propagate to parents
                         event.stop();
@@ -275,9 +291,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected abstract void build();
 
     /**
-     * The accept function, if any
+     * The accept function, if any.
+     *
+     * @return True if the dialog must close after the call, false otherwise.
      */
-    protected abstract void accept();
+    protected abstract boolean accept();
 
     /**
      * The cancel function, if any
@@ -448,6 +466,55 @@ public abstract class GenericDialog extends CollapsibleWindow {
         for (Disableable c : components) {
             if (c != null)
                 c.setDisabled(!enabled);
+        }
+    }
+
+    // Backup of the gamepad listeners present before entering this dialog.
+    protected Set<ControllerListener> backupGamepadListeners = null;
+
+    protected void addGamepadListener() {
+        if (gamepadListener != null) {
+            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            GaiaSky.postRunnable(() -> {
+                // Backup and clean
+                backupGamepadListeners = gamepadSettings.getControllerListeners();
+                gamepadSettings.removeAllControllerListeners();
+
+                // Add and activate.
+                gamepadSettings.addControllerListener(gamepadListener);
+                gamepadListener.activate();
+            });
+        }
+    }
+
+    protected void removeGamepadListener() {
+        if (gamepadListener != null) {
+            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            // Remove current listener
+            gamepadSettings.removeControllerListener(gamepadListener);
+            gamepadListener.deactivate();
+
+            // Restore backup.
+            gamepadSettings.setControllerListeners(backupGamepadListeners);
+            backupGamepadListeners = null;
+        }
+    }
+
+    protected void tabRight() {
+        if (tabs != null) {
+            selectedTab = (selectedTab + 1) % tabs.size;
+            Button tab = tabs.get(selectedTab);
+            tabs.get(selectedTab).setChecked(true);
+        }
+    }
+
+    protected void tabLeft() {
+        if (tabs != null) {
+            selectedTab = selectedTab - 1;
+            if (selectedTab < 0) {
+                selectedTab = tabs.size - 1;
+            }
+            tabs.get(selectedTab).setChecked(true);
         }
     }
 

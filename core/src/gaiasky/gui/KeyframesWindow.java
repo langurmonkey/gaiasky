@@ -1064,8 +1064,9 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         // Accept not present
+        return true;
     }
 
     @Override

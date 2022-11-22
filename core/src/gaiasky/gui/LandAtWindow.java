@@ -99,12 +99,13 @@ public class LandAtWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         if (latlonCb.isChecked()) {
             EventManager.publish(Event.LAND_AT_LOCATION_OF_OBJECT, this, target, Double.parseDouble(longitude.getText()), Double.parseDouble(latitude.getText()));
         } else if (locationCb.isChecked()) {
             EventManager.publish(Event.LAND_AT_LOCATION_OF_OBJECT, this, target, location.getText());
         }
+        return true;
     }
 
     @Override

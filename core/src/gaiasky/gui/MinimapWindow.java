@@ -53,7 +53,8 @@ public class MinimapWindow extends GenericDialog {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
+        return true;
     }
 
     @Override

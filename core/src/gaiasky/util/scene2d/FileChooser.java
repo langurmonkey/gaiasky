@@ -590,10 +590,11 @@ public class FileChooser extends GenericDialog {
     }
 
     @Override
-    public void accept() {
+    public boolean accept() {
         if (resultListener != null) {
             resultListener.result(true, getResult());
         }
+        return true;
     }
 
     @Override
@@ -674,7 +675,8 @@ public class FileChooser extends GenericDialog {
         }
 
         @Override
-        protected void accept() {
+        protected boolean accept() {
+            return true;
         }
 
         @Override

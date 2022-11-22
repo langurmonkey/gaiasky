@@ -623,7 +623,7 @@ public class GuiRegistry implements IObserver {
                     }
 
                     @Override
-                    protected void accept() {
+                    protected boolean accept() {
                         // Shut down
                         GaiaSky.postRunnable(() -> {
                             Gdx.app.exit();
@@ -659,6 +659,7 @@ public class GuiRegistry implements IObserver {
                                 }
                             }
                         });
+                        return true;
                     }
 
                     @Override

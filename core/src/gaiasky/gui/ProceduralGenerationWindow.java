@@ -877,7 +877,8 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
+        return true;
     }
 
     @Override

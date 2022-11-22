@@ -17,10 +17,12 @@ import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -41,7 +43,6 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
-import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -80,7 +81,7 @@ public class WelcomeGui extends AbstractGui {
     private int currentSelected = 0;
 
     private PopupNotificationsInterface popupInterface;
-    private final WelcomeGuiControllerListener controllerListener;
+    private final WelcomeGuiGamepadListener gamepadListener;
 
     /**
      * Creates an initial GUI
@@ -94,7 +95,7 @@ public class WelcomeGui extends AbstractGui {
         this.lock = new Object();
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
-        this.controllerListener = new WelcomeGuiControllerListener(Settings.settings.controls.gamepad.mappingsFile);
+        this.gamepadListener = new WelcomeGuiGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
     }
 
     @Override
@@ -338,16 +339,22 @@ public class WelcomeGui extends AbstractGui {
         }
 
         // Exit button
-        OwnTextIconButton quitButton = new OwnTextIconButton(I18n.msg("gui.exit"), skin, "quit");
-        quitButton.setSpace(pad16);
-        quitButton.align(Align.center);
-        quitButton.setSize(bw * 0.5f, bh * 0.6f);
-        quitButton.addListener(new ClickListener() {
+        OwnTextIconButton exitButton = new OwnTextIconButton(I18n.msg("gui.exit"), skin, "quit");
+        exitButton.setSpace(pad16);
+        exitButton.align(Align.center);
+        exitButton.setSize(bw * 0.5f, bh * 0.6f);
+        exitButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit();
+                GaiaSky.postRunnable(Gdx.app::exit);
             }
         });
-        buttonList.add(quitButton);
+        exitButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                GaiaSky.postRunnable(Gdx.app::exit);
+            }
+        });
+        buttonList.add(exitButton);
 
         // Title
         center.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
@@ -363,7 +370,7 @@ public class WelcomeGui extends AbstractGui {
         center.add(selectionInfo).colspan(2).center().top().padBottom(pad32 * 4f).row();
 
         // Quit
-        center.add(quitButton).center().top().colspan(2);
+        center.add(exitButton).center().top().colspan(2);
 
         // Version line table
         Table topLeft = new VersionLineTable(skin);
@@ -440,8 +447,9 @@ public class WelcomeGui extends AbstractGui {
                         }
 
                         @Override
-                        protected void accept() {
+                        protected boolean accept() {
                             // Nothing
+                            return true;
                         }
 
                         @Override
@@ -685,13 +693,17 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void addControllerListener() {
-        Settings.settings.controls.gamepad.addControllerListener(controllerListener);
-        controllerListener.activate();
+        GaiaSky.postRunnable(() -> {
+            Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
+            gamepadListener.activate();
+        });
     }
 
     private void removeControllerListener() {
-        Settings.settings.controls.gamepad.removeControllerListener(controllerListener);
-        controllerListener.deactivate();
+        GaiaSky.postRunnable(() -> {
+            Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
+            gamepadListener.deactivate();
+        });
     }
 
     public void updateFocused() {
@@ -731,9 +743,9 @@ public class WelcomeGui extends AbstractGui {
     /**
      * Enable controller button selection.
      */
-    private class WelcomeGuiControllerListener extends AbstractGamepadListener {
+    private class WelcomeGuiGamepadListener extends AbstractGamepadListener {
 
-        public WelcomeGuiControllerListener(String mappingsFile) {
+        public WelcomeGuiGamepadListener(String mappingsFile) {
             super(mappingsFile);
         }
 
@@ -766,7 +778,7 @@ public class WelcomeGui extends AbstractGui {
             } else if (buttonCode == mappings.getButtonDpadDown()) {
                 down();
             }
-            return false;
+            return true;
         }
 
         @Override

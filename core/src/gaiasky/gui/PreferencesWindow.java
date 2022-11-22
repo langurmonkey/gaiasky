@@ -27,6 +27,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.gui.beans.*;
+import gaiasky.input.AbstractGamepadListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -115,7 +116,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         setAcceptText(I18n.msg("gui.saveprefs"));
         setCancelText(I18n.msg("gui.cancel"));
 
-        // Build UI
+        // Build UI.
         buildSuper();
 
         EventManager.instance.subscribe(this, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO);
@@ -774,7 +775,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(backBufferScaleLabel).left().padRight(pad20).padBottom(pad5);
             experimental.add(backBufferScale).left().padRight(pad10).padBottom(pad5);
             experimental.add(backBufferTooltip).left().padBottom(pad5).row();
-
 
             // Index of refraction of celestial sphere
             OwnLabel celestialSphereIndexOfRefractionLabel = new OwnLabel(I18n.msg("gui.indexofrefraction"), skin);
@@ -1970,6 +1970,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     public GenericDialog show(Stage stage, Action action) {
         GenericDialog result = super.show(stage, action);
         updateBackupValues();
+        addGamepadListener();
         return result;
     }
 
@@ -2068,15 +2069,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    protected void accept() {
+    protected boolean accept() {
         saveCurrentPreferences();
         unsubscribe();
+        removeGamepadListener();
+        return true;
     }
 
     @Override
     protected void cancel() {
         revertLivePreferences();
         unsubscribe();
+        removeGamepadListener();
     }
 
     @Override
@@ -2089,7 +2093,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Path userFolderConfFile = userFolder.resolve("config.yaml");
 
         // Internal config
-        Path confFolder = Paths.get(settings.ASSETS_LOC, "conf" + File.separator);
+        Path confFolder = Paths.get(Settings.ASSETS_LOC, "conf" + File.separator);
         Path internalFolderConfFile = confFolder.resolve("config.yaml");
 
         // Delete current conf
@@ -2339,10 +2343,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (pa != settings.program.modeCubemap.planetarium.angle) {
             EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, pa);
         }
-        
+
         // Index of refraction
         EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
-
 
         // Controllers
         if (controllerMappings.getSelected() != null) {
@@ -2512,4 +2515,5 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         }
     }
+
 }
