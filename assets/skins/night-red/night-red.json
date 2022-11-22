@@ -367,6 +367,12 @@
     "up": {
       "imageUp": "iconic-arrow-thick-top"
     },
+    "caret-up": {
+      "imageUp": "iconic-caret-top"
+    },
+    "caret-down": {
+      "imageUp": "iconic-caret-bottom"
+    },
     "caret-left": {
       "imageUp": "iconic-caret-left"
     },
@@ -437,6 +443,17 @@
       "imageUp": "help-icon"
     },
     "quit": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "over": "default-round-sel",
+      "disabled": "default-round-disabled",
+      "focused": "default-round-sel",
+      "checked": "default-round-down",
+      "checkedOver": "default-round-down-sel",
+      "checkedFocused": "default-round-down-sel",
+      "font": "title-21",
+      "fontColor": "theme",
+      "disabledFontColor": "dark-gray",
       "imageUp": "quit-icon"
     },
     "car": {
@@ -796,6 +813,10 @@
       "fontColor": "theme"
     },
     "header": {
+      "font": "title-21",
+      "fontColor": "theme"
+    },
+    "header-raw": {
       "font": "title-21",
       "fontColor": "theme"
     },

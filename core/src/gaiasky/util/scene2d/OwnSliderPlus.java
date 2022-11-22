@@ -8,6 +8,7 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -37,10 +38,14 @@ public class OwnSliderPlus extends Slider {
     // produce the label to be displayed.
     private Function<Float, String> valueLabelTransform;
 
-    public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
+    public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin, String labelStyle) {
         super(min, max, stepSize, false, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, mapMin, mapMax, "default");
+        setUp(title, mapMin, mapMax, labelStyle);
+    }
+
+    public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
+        this(title, min, max, stepSize, mapMin, mapMax, skin, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
@@ -48,6 +53,7 @@ public class OwnSliderPlus extends Slider {
         this.skin = skin;
         setUp(title, min, max, "default");
     }
+
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style) {
         super(min, max, stepSize, false, skin, style);
         this.skin = skin;
@@ -102,7 +108,7 @@ public class OwnSliderPlus extends Slider {
         });
     }
 
-    public void setValueLabelTransform(Function<Float, String> transform){
+    public void setValueLabelTransform(Function<Float, String> transform) {
         this.valueLabelTransform = transform;
     }
 

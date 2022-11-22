@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -50,13 +49,13 @@ public class ControllerGui extends AbstractGui {
     private static final Logger.Log logger = Logger.getLogger(ControllerGui.class.getSimpleName());
 
     private final Table content, menu;
-    private Table searchT, camT, timeT, optT, typesT, sysT;
+    private Table searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
     private Cell<?> contentCell, infoCell;
-    private OwnTextButton searchButton, cameraButton, timeButton, optionsButton, typesButton, systemButton;
+    private OwnTextButton searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     // Contains a matrix (column major) of actors for each tab
     private final List<Actor[][]> model;
     private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
-    private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton;
+    private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider;
     private OwnTextField searchField;
     private OwnLabel infoMessage;
@@ -280,7 +279,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // FOV
-        fovSlider = new OwnSliderPlus(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
+        fovSlider = new OwnSliderPlus(I18n.msg("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin, "header-raw");
         cameraModel[1][0] = fovSlider;
         fovSlider.setValueSuffix("°");
         fovSlider.setName("field of view");
@@ -298,7 +297,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Speed
-        camSpeedSlider = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
+        camSpeedSlider = new OwnSliderPlus(I18n.msg("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin, "header-raw");
         cameraModel[1][1] = camSpeedSlider;
         camSpeedSlider.setName("camera speed");
         camSpeedSlider.setWidth(ww);
@@ -313,7 +312,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Rot
-        camRotSlider = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
+        camRotSlider = new OwnSliderPlus(I18n.msg("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin, "header-raw");
         cameraModel[1][2] = camRotSlider;
         camRotSlider.setName("rotate speed");
         camRotSlider.setWidth(ww);
@@ -328,7 +327,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Turn
-        camTurnSlider = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
+        camTurnSlider = new OwnSliderPlus(I18n.msg("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin, "header-raw");
         cameraModel[1][3] = camTurnSlider;
         camTurnSlider.setName("turn speed");
         camTurnSlider.setWidth(ww);
@@ -472,14 +471,53 @@ public class ControllerGui extends AbstractGui {
         tabContents.add(container(typesT, w, h));
         updatePads(typesT);
 
-        // OPTIONS
-        Actor[][] optionsModel = new Actor[1][4];
-        model.add(optionsModel);
+        // CONTROLS
+        Actor[][] controlsModel = new Actor[1][2];
+        model.add(controlsModel);
 
-        optT = new Table(skin);
+        controlsT = new Table(skin);
+
+
+        // Invert X
+        invertXButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "X"), skin, "toggle-big");
+        controlsModel[0][0] = invertXButton;
+        invertXButton.setWidth(ww);
+        invertXButton.setChecked(Settings.settings.controls.gamepad.invertX);
+        invertXButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.INVERT_X_CMD, invertXButton, invertXButton.isChecked());
+                return true;
+            }
+            return false;
+        });
+        controlsT.add(invertXButton).padBottom(pad10).row();
+
+        // Invert Y
+        invertYButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "Y"), skin, "toggle-big");
+        controlsModel[0][1] = invertYButton;
+        invertYButton.setWidth(ww);
+        invertYButton.setChecked(Settings.settings.controls.gamepad.invertY);
+        invertYButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.INVERT_Y_CMD, invertYButton, invertYButton.isChecked());
+                return true;
+            }
+            return false;
+        });
+        controlsT.add(invertYButton);
+
+        controlsT.setSize(w, h);
+        tabContents.add(container(controlsT, w, h));
+        updatePads(controlsT);
+
+        // GRAPHICS
+        Actor[][] graphicsModel = new Actor[1][4];
+        model.add(graphicsModel);
+
+        graphicsT = new Table(skin);
 
         // Slider
-        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-19");
+        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "header-raw");
         bloomSlider.setWidth(ww);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity * 10f);
@@ -490,12 +528,12 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        optionsModel[0][0] = bloomSlider;
-        optT.add(bloomSlider).padBottom(pad10).row();
+        graphicsModel[0][0] = bloomSlider;
+        graphicsT.add(bloomSlider).padBottom(pad10).row();
 
         // Lens flare
         flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
-        optionsModel[0][1] = flareButton;
+        graphicsModel[0][1] = flareButton;
         flareButton.setWidth(ww);
         flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
         flareButton.addListener(event -> {
@@ -505,11 +543,11 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        optT.add(flareButton).padBottom(pad10).row();
+        graphicsT.add(flareButton).padBottom(pad10).row();
 
         // Star glow
         starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
-        optionsModel[0][2] = starGlowButton;
+        graphicsModel[0][2] = starGlowButton;
         starGlowButton.setWidth(ww);
         starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
         starGlowButton.addListener(event -> {
@@ -519,11 +557,11 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        optT.add(starGlowButton).padBottom(pad10).row();
+        graphicsT.add(starGlowButton).padBottom(pad10).row();
 
         // Motion blur
         motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
-        optionsModel[0][3] = motionBlurButton;
+        graphicsModel[0][3] = motionBlurButton;
         motionBlurButton.setWidth(ww);
         motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur.active);
         motionBlurButton.addListener(event -> {
@@ -533,10 +571,10 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        optT.add(motionBlurButton);
+        graphicsT.add(motionBlurButton);
 
-        tabContents.add(container(optT, w, h));
-        updatePads(optT);
+        tabContents.add(container(graphicsT, w, h));
+        updatePads(graphicsT);
 
         // SYSTEM
         Actor[][] systemModel = new Actor[1][1];
@@ -600,11 +638,21 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        optionsButton = new OwnTextButton(I18n.msg("gui.options"), skin, "toggle-big");
-        tabButtons.add(optionsButton);
-        optionsButton.addListener((event) -> {
+        controlsButton = new OwnTextButton(I18n.msg("gui.controls"), skin, "toggle-big");
+        tabButtons.add(controlsButton);
+        controlsButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                selectedTab = tabButtons.indexOf(optionsButton);
+                selectedTab = tabButtons.indexOf(controlsButton);
+                updateTabs();
+            }
+            return false;
+        });
+
+        graphicsButton = new OwnTextButton(I18n.msg("gui.graphics"), skin, "toggle-big");
+        tabButtons.add(graphicsButton);
+        graphicsButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(graphicsButton);
                 updateTabs();
             }
             return false;
@@ -620,14 +668,15 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
+        // Tab buttons styling.
         for (OwnTextButton b : tabButtons) {
             b.pad(pad10);
             b.setMinWidth(tw);
         }
 
-        // Left and Right indicators
+        // Left and Right indicators.
         OwnTextButton lb, rb;
-        rb = new OwnTextIconButton("RB", Align.right, skin, "caret-right");
+        rb = new OwnTextIconButton("RB", Align.left, skin, "caret-down");
         rb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 tabRight();
@@ -635,7 +684,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
         rb.pad(pad10);
-        lb = new OwnTextIconButton("LB", Align.left, skin, "caret-left");
+        lb = new OwnTextIconButton("LB", Align.left, skin, "caret-up");
         lb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 tabLeft();
@@ -643,22 +692,22 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
         lb.pad(pad10);
-        menu.add(lb).center().padBottom(pad10).padRight(pad30);
-        menu.add(searchButton).center().padBottom(pad10);
-        menu.add(cameraButton).center().padBottom(pad10);
-        menu.add(timeButton).center().padBottom(pad10);
-        menu.add(typesButton).center().padBottom(pad10);
-        menu.add(optionsButton).center().padBottom(pad10);
-        menu.add(systemButton).center().padBottom(pad10);
-        menu.add(rb).center().padBottom(pad10).padLeft(pad30).row();
-
-        contentCell = menu.add().colspan(7);
+        menu.add(lb).center().padBottom(pad30).row();
+        menu.add(searchButton).left().row();
+        menu.add(cameraButton).left().row();
+        menu.add(timeButton).left().row();
+        menu.add(typesButton).left().row();
+        menu.add(controlsButton).left().row();
+        menu.add(graphicsButton).left().row();
+        menu.add(systemButton).left().padBottom(pad30).row();
+        menu.add(rb).center();
 
         Table padTable = new Table(skin);
         padTable.pad(pad30);
         padTable.setBackground("table-border");
         menu.pack();
-        padTable.add(menu).center();
+        padTable.add(menu).left();
+        contentCell = padTable.add();
 
         content.add(padTable);
 
@@ -688,7 +737,7 @@ public class ControllerGui extends AbstractGui {
             key.setWidth(width);
         key.addListener(el);
         m[i][j] = key;
-        Cell c = searchT.add(key).padRight(pad5).padBottom(pad10);
+        Cell<?> c = searchT.add(key).padRight(pad5).padBottom(pad10);
         if (nl)
             c.row();
         if (colspan > 1)
@@ -701,7 +750,7 @@ public class ControllerGui extends AbstractGui {
             key.setWidth(width);
         key.addListener(el);
         m[i][j] = key;
-        Cell c = searchT.add(key).padRight(pad5).padBottom(pad10);
+        Cell<?> c = searchT.add(key).padRight(pad5).padBottom(pad10);
         if (nl)
             c.row();
         if (colspan > 1)
@@ -795,7 +844,7 @@ public class ControllerGui extends AbstractGui {
 
     private void updatePads(Table t) {
         Array<Cell> cells = t.getCells();
-        for (Cell c : cells) {
+        for (Cell<?> c : cells) {
             if (c.getActor() instanceof Button) {
                 ((Button) c.getActor()).pad(pad20);
             }
@@ -835,7 +884,7 @@ public class ControllerGui extends AbstractGui {
             while (currentModel[fi][fj] == null) {
                 // Move to next column
                 fi = (fi + (right ? 1 : -1)) % currentModel.length;
-                if(fi < 0) {
+                if (fi < 0) {
                     fi = currentModel.length - 1;
                 }
                 if (fi == i) {

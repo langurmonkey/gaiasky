@@ -2353,8 +2353,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, mappingsFile);
             }
         }
-        settings.controls.gamepad.invertX = invertX.isChecked();
-        settings.controls.gamepad.invertY = invertY.isChecked();
+        EventManager.publish(Event.INVERT_X_CMD, this, invertX.isChecked());
+        EventManager.publish(Event.INVERT_Y_CMD, this, invertY.isChecked());
 
         // Gaia attitude
         settings.data.realGaiaAttitude = real.isChecked();

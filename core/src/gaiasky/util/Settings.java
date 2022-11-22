@@ -1186,7 +1186,7 @@ public class Settings {
         public GamepadSettings gamepad;
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class GamepadSettings {
+        public static class GamepadSettings implements IObserver {
             public String mappingsFile;
             public boolean invertX;
             public boolean invertY;
@@ -1198,6 +1198,7 @@ public class Settings {
 
             public GamepadSettings() {
                 controllerListenersMap = new HashMap<>();
+                EventManager.instance.subscribe(this, Event.INVERT_X_CMD, Event.INVERT_Y_CMD);
             }
 
             public boolean isControllerBlacklisted(String controllerName) {
@@ -1339,6 +1340,14 @@ public class Settings {
                     return new HashSet<>(controllerListenersMap.get(c));
                 }
                 return null;
+            }
+
+            @Override
+            public void notify(Event event, Object source, Object... data) {
+                switch (event) {
+                case INVERT_X_CMD -> this.invertX = (Boolean) data[0];
+                case INVERT_Y_CMD -> this.invertY = (Boolean) data[0];
+                }
             }
         }
     }

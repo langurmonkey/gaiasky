@@ -1398,6 +1398,9 @@ public enum Event {
     /** Show/hide controller GUI **/
     SHOW_CONTROLLER_GUI_ACTION,
 
+    INVERT_X_CMD,
+    INVERT_Y_CMD,
+
     /**
      * This event informs a new DISTANCE_SCALE_FACTOR is in place
      */
