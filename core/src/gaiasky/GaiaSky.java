@@ -51,8 +51,6 @@ import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
-import gaiasky.script.EventScriptingInterface;
-import gaiasky.script.HiddenHelperUser;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
@@ -838,7 +836,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         stereoGui = new StereoGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
         stereoGui.initialize(assetManager, globalResources.getSpriteBatch());
 
-        controllerGui = new ControllerGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        controllerGui = new GamepadGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
         controllerGui.initialize(assetManager, globalResources.getSpriteBatch());
 
         if (guis != null) {

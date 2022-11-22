@@ -704,8 +704,8 @@ public class GuiRegistry implements IObserver {
     public boolean removeControllerGui() {
         for (int i = 0; i < guis.size; i++) {
             IGui gui = guis.get(i);
-            if (gui instanceof ControllerGui) {
-                ControllerGui cgui = (ControllerGui) gui;
+            if (gui instanceof GamepadGui) {
+                GamepadGui cgui = (GamepadGui) gui;
                 return cgui.removeControllerGui(GaiaSky.instance.cameraManager.naturalCamera);
             }
         }

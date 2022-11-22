@@ -45,8 +45,8 @@ import java.util.Set;
 /**
  * GUI that is operated with a game controller and optimized for that purpose.
  */
-public class ControllerGui extends AbstractGui {
-    private static final Logger.Log logger = Logger.getLogger(ControllerGui.class.getSimpleName());
+public class GamepadGui extends AbstractGui {
+    private static final Logger.Log logger = Logger.getLogger(GamepadGui.class.getSimpleName());
 
     private final Table content, menu;
     private Table searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
@@ -79,7 +79,7 @@ public class ControllerGui extends AbstractGui {
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
-    public ControllerGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public GamepadGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.em = EventManager.instance;
