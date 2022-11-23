@@ -27,10 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
-import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
@@ -38,6 +35,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.util.*;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
@@ -664,6 +662,14 @@ public class WelcomeGui extends AbstractGui {
     }
 
     @Override
+    public void update(double dt) {
+        super.update(dt);
+        if (gamepadListener != null) {
+            gamepadListener.update();
+        }
+    }
+
+    @Override
     protected void rebuildGui() {
 
     }
@@ -727,10 +733,7 @@ public class WelcomeGui extends AbstractGui {
         updateFocused();
     }
 
-    public void touchDown() {
-    }
-
-    public void touchUp() {
+    public void fireChange() {
         if (buttonList != null) {
             Button b = buttonList.get(currentSelected);
             ChangeEvent event = Pools.obtain(ChangeEvent.class);
@@ -760,58 +763,70 @@ public class WelcomeGui extends AbstractGui {
         }
 
         @Override
-        public boolean buttonDown(Controller controller, int buttonCode) {
-            if (buttonCode == mappings.getButtonA()) {
-                touchDown();
+        public void pollAxis() {
+            if (lastControllerUsed != null) {
+                float value = (float) applyZeroPoint(lastControllerUsed.getAxis(mappings.getAxisLstickV()));
+                if (value > 0) {
+                    down();
+                } else if (value < 0) {
+                    up();
+                }
             }
-            return true;
         }
 
         @Override
-        public boolean buttonUp(Controller controller, int buttonCode) {
+        public void pollButtons() {
+            if (pressedKeys.contains(mappings.getButtonDpadUp())) {
+                up();
+            } else if (pressedKeys.contains(mappings.getButtonDpadDown())) {
+                down();
+            }
+        }
+
+        @Override
+        public boolean buttonDown(Controller controller, int buttonCode) {
+            addPressedKey(buttonCode);
             if (buttonCode == mappings.getButtonStart()) {
                 gaiaSky();
             } else if (buttonCode == mappings.getButtonA()) {
-                touchUp();
+                fireChange();
             } else if (buttonCode == mappings.getButtonDpadUp()) {
                 up();
             } else if (buttonCode == mappings.getButtonDpadDown()) {
                 down();
             }
+            lastControllerUsed = controller;
+            return true;
+        }
+
+        @Override
+        public boolean buttonUp(Controller controller, int buttonCode) {
+            removePressedKey(buttonCode);
+            lastControllerUsed = controller;
             return true;
         }
 
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
-            if (Math.abs(value) > AXIS_TH && System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
+            long now = TimeUtils.millis();
+            if (now - lastAxisEvtTime > AXIS_EVT_DELAY) {
                 // Event-based
                 if (axisCode == mappings.getAxisLstickV()) {
+                    value = (float) applyZeroPoint(value);
                     // LEFT STICK vertical - move vertically
                     if (value > 0) {
                         down();
-                    } else {
+                        lastAxisEvtTime = now;
+                    } else if (value < 0) {
                         up();
+                        lastAxisEvtTime = now;
                     }
                 }
-                lastAxisEvtTime = System.currentTimeMillis();
             }
+            lastControllerUsed = controller;
             return true;
         }
 
-        @Override
-        public void update() {
-
-        }
-
-        @Override
-        public void activate() {
-
-        }
-
-        @Override
-        public void deactivate() {
-
-        }
     }
 
 }

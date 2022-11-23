@@ -1305,8 +1305,9 @@ public class Settings {
                     if (!isControllerBlacklisted(controller.getName())) {
                         Set<ControllerListener> s = controllerListenersMap.get(controller);
                         if (s != null) {
-                            for (ControllerListener cl : s)
+                            for (ControllerListener cl : s) {
                                 controller.removeListener(cl);
+                            }
                             s.clear();
                         }
                     }

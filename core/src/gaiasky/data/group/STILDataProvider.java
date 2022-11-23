@@ -62,9 +62,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     // Dataset options, may be null
     private DatasetOptions datasetOptions;
     // Store already visited colname:attribute pairs.
-    private Map<String, Integer> stringAttributesMap;
+    private final Map<String, Integer> stringAttributesMap;
     // Store the last index for a given attribute.
-    private Map<String, Integer> lastIndexMap;
+    private final Map<String, Integer> lastIndexMap;
 
     // These names are not allowed
     private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
@@ -263,6 +263,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             String unitC;
 
                             Pair<UCD, Double> pos3 = getDoubleUcd(ucdParser.POS3, row);
+                            if(pos3.getSecond() > 750) {
+                                int abcd= 3;
+                            }
                             // Check missing pos3 -> Use default parallax
                             if (ucdParser.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
                                 c = new Pair<>(null, 0.04);
@@ -321,8 +324,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double appMag;
                             if (!ucdParser.MAG.isEmpty()) {
                                 Pair<UCD, Double> appMagPair = getDoubleUcd(ucdParser.MAG, row);
-                                assert appMagPair != null;
-                                appMag = appMagPair.getSecond();
+                                if(appMagPair == null) {
+                                    // Default magnitude
+                                    appMag = 15;
+                                } else {
+                                    appMag = appMagPair.getSecond();
+                                }
                             } else {
                                 // Default magnitude
                                 appMag = 15;

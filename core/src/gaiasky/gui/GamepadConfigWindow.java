@@ -11,14 +11,18 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.input.AbstractGamepadListener;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
@@ -48,7 +52,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private Map<Gamepad, OwnTextField> inputFields;
 
     private final String controllerName;
-    private ControllerMappings mappings;
+    private GamepadMappings mappings;
 
     private Gamepad currGamepad;
     private OwnTextField currTextField, filename;
@@ -108,12 +112,12 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         }
     }
 
-    public GamepadConfigWindow(String controllerName, ControllerMappings mappings, Stage stage, Skin skin) {
+    public GamepadConfigWindow(String controllerName, GamepadMappings mappings, Stage stage, Skin skin) {
         super("Configure controller: " + controllerName, skin, stage);
         this.controllerName = controllerName;
         this.mappings = mappings;
         if (this.mappings == null) {
-            this.mappings = new ControllerMappings(this.controllerName);
+            this.mappings = new GamepadMappings(this.controllerName);
         }
 
         none = "-" + I18n.msg("gui.none").toLowerCase() + "-";
@@ -194,12 +198,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         inputInfo.put(Gamepad.LT, new Trio<>(lt, new float[] { -354, -265 }, I18n.msg("gui.controller.lt")));
         inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[] { 354, -265 }, I18n.msg("gui.controller.rt")));
 
-        // Remove all controller listeners
-        Settings.settings.controls.gamepad.removeAllControllerListeners();
-
         // Park our own
-        ConfigGamepadListener ccl = new ConfigGamepadListener();
-        Settings.settings.controls.gamepad.addControllerListener(ccl);
+        gamepadListener = new ConfigGamepadListener(mappings);
 
         // Build UI
         buildSuper();
@@ -341,7 +341,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         content.pack();
     }
 
-    private String getMappingsValue(Gamepad gpd, ControllerMappings m) {
+    private String getMappingsValue(Gamepad gpd, GamepadMappings m) {
         if (m == null)
             return none;
 
@@ -525,18 +525,13 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         }
     }
 
-    private void restoreControllerListener() {
-        Settings.settings.controls.gamepad.removeAllControllerListeners();
-        EventManager.publish(Event.CONTROLLER_CONNECTED_INFO, this, controllerName);
-    }
-
     @Override
     protected boolean accept() {
         // Generate and save mappings file
         Path mappings = SysUtils.getDefaultMappingsDir();
         Path file = mappings.resolve(filename.getText() + ".controller");
 
-        ControllerMappings cm = this.mappings;
+        GamepadMappings cm = this.mappings;
 
         // Power value
         cm.AXIS_VALUE_POW = axisPower.getValue();
@@ -607,13 +602,11 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
             savedFile = file;
         }
         EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, file.toAbsolutePath().toString());
-        restoreControllerListener();
         return true;
     }
 
     @Override
     protected void cancel() {
-        restoreControllerListener();
     }
 
     @Override
@@ -628,13 +621,21 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     /**
      * Listens to gamepad input events in order to configure the axes and buttons.
      */
-    private class ConfigGamepadListener implements ControllerListener {
+    private class ConfigGamepadListener extends AbstractGamepadListener {
         boolean capturingAxis = false;
         long lastT = System.currentTimeMillis();
         long lastAxisT = System.currentTimeMillis();
-        long minDelayT = 800;
-        long minAxisT = 800;
+        long minDelayT = 300;
+        long minAxisT = 300;
         double[] axes = new double[40];
+
+        public ConfigGamepadListener(String mappingsFile) {
+            super(mappingsFile);
+        }
+
+        public ConfigGamepadListener(IGamepadMappings mappings) {
+            super(mappings);
+        }
 
         @Override
         public void connected(Controller controller) {
@@ -647,23 +648,41 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         }
 
         @Override
+        public void pollAxis() {
+
+        }
+
+        @Override
+        public void pollButtons() {
+
+        }
+
+        @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
-            if (currGamepad != null && currTextField != null && currGamepad.isButton() && System.currentTimeMillis() - lastT > minDelayT) {
-                currTextField.setText(button + " " + buttonCode);
-                jumpToNext();
-                lastT = System.currentTimeMillis();
+            super.buttonDown(controller, buttonCode);
+            Actor focus = stage.getKeyboardFocus();
+            if(focus instanceof Button && buttonCode == mappings.getButtonA()) {
+                // Press it!
+                focus.fire(new ChangeEvent());
+            } else {
+                if (currGamepad != null && currTextField != null && currGamepad.isButton() && System.currentTimeMillis() - lastT > minDelayT) {
+                    currTextField.setText(button + " " + buttonCode);
+                    jumpToNext();
+                    lastT = System.currentTimeMillis();
+                }
+                currentInput.setText(button + " " + buttonCode);
             }
-            currentInput.setText(button + " " + buttonCode);
             return true;
         }
 
         @Override
         public boolean buttonUp(Controller controller, int buttonCode) {
-            return false;
+            return super.buttonUp(controller, buttonCode);
         }
 
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
+            value = (float) applyZeroPoint(value);
             if (currGamepad != null && currTextField != null && currGamepad.isAxis() && (System.currentTimeMillis() - lastT > minDelayT || capturingAxis)) {
                 if (!capturingAxis) {
                     // Start capturing
@@ -704,7 +723,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
             if (currTextField != inputFields.get(Gamepad.values()[Gamepad.values().length - 1])) {
                 currTextField.next(false);
             } else {
-                stage.setKeyboardFocus(null);
+                stage.setKeyboardFocus(acceptButton);
             }
         }
     }

@@ -14,11 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.input.AbstractGamepadListener;
@@ -61,7 +61,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected float lastPosX = -1, lastPosY = -1;
 
     protected HorizontalGroup buttonGroup;
-    protected TextButton acceptButton, cancelButton;
+    public TextButton acceptButton, cancelButton;
 
     protected boolean enterExit = true, escExit = true;
 
@@ -73,9 +73,14 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected AbstractGamepadListener gamepadListener;
 
     /** If this dialog has tabs, this list holds them. **/
-    protected Array<Button> tabs;
+    protected Array<Button> tabButtons;
     /** Currently selected tab **/
     protected int selectedTab = 0;
+
+    /** Actual actor for each tab. **/
+    protected Array<Actor> tabContents;
+    /** Tab contents stack. **/
+    protected Stack tabStack;
 
     protected InputListener ignoreTouchDown = new InputListener() {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -138,6 +143,56 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (cancelButton != null) {
             cancelButton.setColor(buttonColor);
             cancelButton.getLabel().setColor(textColor);
+        }
+    }
+
+    /**
+     * Add tab contents to the list of tabs.
+     * @param tabContent The contents.
+     */
+    protected void addTabContent(Actor tabContent) {
+        if (tabStack == null) {
+            tabStack = new Stack();
+        }
+        if(tabContents == null) {
+            tabContents = new Array<>();
+        }
+        tabStack.add(tabContent);
+        tabContents.add(tabContent);
+    }
+
+    /**
+     * Prepares the tab button listeners that make tab buttons actually change the content. It also
+     * sets up the button group, which restricts the number of tabs that can be checked at onece to one.
+     */
+    protected void setUpTabListeners() {
+        if(tabContents != null && tabButtons != null && tabButtons.size == tabContents.size) {
+            // Let only one tab button be checked at a time
+            ButtonGroup<Button> tabsGroup = new ButtonGroup<>();
+            tabsGroup.setMinCheckCount(1);
+            tabsGroup.setMaxCheckCount(1);
+
+            // Listen to changes in the tab button checked states
+            // Set visibility of the tab content to match the checked state
+            ChangeListener tabListener = new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    if (((Button) actor).isChecked()) {
+                        for (int i = 0; i < tabContents.size; i++) {
+                            tabContents.get(i).setVisible(tabButtons.get(i).isChecked());
+                        }
+                        if (tabButtons != null) {
+                            selectedTab = tabsGroup.getCheckedIndex();
+                        }
+                    }
+                }
+            };
+
+            // Add listeners to tabs, and tabs and groups.
+            for (int i = 0; i < tabButtons.size; i++) {
+                tabButtons.get(i).addListener(tabListener);
+                tabsGroup.add(tabButtons.get(i));
+            }
         }
     }
 
@@ -221,30 +276,20 @@ public abstract class GenericDialog extends CollapsibleWindow {
         // Add keys for ESC, ENTER and TAB
         me.addListener(event -> {
             if (event instanceof InputEvent) {
-                InputEvent ievent = (InputEvent) event;
-                if (ievent.getType() == Type.keyUp) {
-                    int key = ievent.getKeyCode();
+                InputEvent inputEvent = (InputEvent) event;
+                if (inputEvent.getType() == Type.keyUp) {
+                    int key = inputEvent.getKeyCode();
                     switch (key) {
                     case Keys.ESCAPE:
                         if (escExit) {
-                            // Exit
-                            cancel();
-                            if (cancelRunnable != null)
-                                cancelRunnable.run();
-                            me.hide();
+                            closeCancel();
                         }
                         // Do not propagate to parents
                         event.stop();
                         return true;
                     case Keys.ENTER:
                         if (enterExit) {
-                            // Exit
-                            boolean close = accept();
-                            if (acceptRunnable != null)
-                                acceptRunnable.run();
-                            if (close) {
-                                me.hide();
-                            }
+                            closeAccept();
                         }
                         // Do not propagate to parents
                         event.stop();
@@ -291,6 +336,33 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected abstract void build();
 
     /**
+     * Closes the window with the accept action
+     */
+    public void closeAccept() {
+        // Exit
+        boolean close = accept();
+        if (acceptRunnable != null) {
+            acceptRunnable.run();
+        }
+        if (close) {
+            removeGamepadListener();
+            me.hide();
+        }
+    }
+
+    /**
+     * Closes the window with the cancel action
+     */
+    public void closeCancel() {
+        cancel();
+        if (cancelRunnable != null) {
+            cancelRunnable.run();
+        }
+        removeGamepadListener();
+        me.hide();
+    }
+
+    /**
      * The accept function, if any.
      *
      * @return True if the dialog must close after the call, false otherwise.
@@ -327,11 +399,21 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (action != null)
             addAction(action);
 
+        addGamepadListener();
+
         if (this.modal)
             // Disable input
             EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
 
         return this;
+    }
+
+    public Actor getActualContentContainer() {
+        if (tabButtons != null && !tabButtons.isEmpty()) {
+            return tabContents.get(selectedTab);
+        } else {
+            return content;
+        }
     }
 
     /**
@@ -398,6 +480,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
             addAction(sequence(action, Actions.removeListener(ignoreTouchDown, true), Actions.removeActor()));
         } else
             remove();
+
+        removeGamepadListener();
 
         if (this.modal)
             // Enable input
@@ -472,22 +556,20 @@ public abstract class GenericDialog extends CollapsibleWindow {
     // Backup of the gamepad listeners present before entering this dialog.
     protected Set<ControllerListener> backupGamepadListeners = null;
 
-    protected void addGamepadListener() {
+    private void addGamepadListener() {
         if (gamepadListener != null) {
             GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
-            GaiaSky.postRunnable(() -> {
-                // Backup and clean
-                backupGamepadListeners = gamepadSettings.getControllerListeners();
-                gamepadSettings.removeAllControllerListeners();
+            // Backup and clean
+            backupGamepadListeners = gamepadSettings.getControllerListeners();
+            gamepadSettings.removeAllControllerListeners();
 
-                // Add and activate.
-                gamepadSettings.addControllerListener(gamepadListener);
-                gamepadListener.activate();
-            });
+            // Add and activate.
+            gamepadSettings.addControllerListener(gamepadListener);
+            gamepadListener.activate();
         }
     }
 
-    protected void removeGamepadListener() {
+    private void removeGamepadListener() {
         if (gamepadListener != null) {
             GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
             // Remove current listener
@@ -500,24 +582,44 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
     }
 
-    protected void tabRight() {
-        if (tabs != null) {
-            selectedTab = (selectedTab + 1) % tabs.size;
-            Button tab = tabs.get(selectedTab);
-            tabs.get(selectedTab).setChecked(true);
+    public void tabRight() {
+        if (tabButtons != null) {
+            selectedTab = (selectedTab + 1) % tabButtons.size;
+            Button tab = tabButtons.get(selectedTab);
+            tabButtons.get(selectedTab).setChecked(true);
         }
     }
 
-    protected void tabLeft() {
-        if (tabs != null) {
+    public void tabLeft() {
+        if (tabButtons != null) {
             selectedTab = selectedTab - 1;
             if (selectedTab < 0) {
-                selectedTab = tabs.size - 1;
+                selectedTab = tabButtons.size - 1;
             }
-            tabs.get(selectedTab).setChecked(true);
+            tabButtons.get(selectedTab).setChecked(true);
         }
+    }
+
+    public Table getContent() {
+        return content;
+    }
+
+    public Table getBottom() {
+        return bottom;
+    }
+
+    public Array<Button> getTabButtons() {
+        return tabButtons;
     }
 
     public abstract void dispose();
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (gamepadListener != null) {
+            gamepadListener.update();
+        }
+    }
 
 }

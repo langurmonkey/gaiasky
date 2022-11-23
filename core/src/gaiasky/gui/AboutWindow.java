@@ -17,11 +17,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
+import gaiasky.input.WindowGamepadListener;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -61,6 +62,8 @@ public class AboutWindow extends GenericDialog {
         // Build
         buildSuper();
 
+        gamepadListener = new WindowGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage, this);
+
     }
 
     @Override
@@ -77,8 +80,8 @@ public class AboutWindow extends GenericDialog {
         boolean showUpdateTab = !SysUtils.launchedViaInstall4j();
 
         // Create the tab buttons
-        HorizontalGroup group = new HorizontalGroup();
-        group.align(Align.left);
+        HorizontalGroup tabGroup = new HorizontalGroup();
+        tabGroup.align(Align.left);
 
         final Button tabHelp = new OwnTextButton(I18n.msg("gui.help.help"), skin, "toggle-big");
         tabHelp.pad(pad5);
@@ -95,18 +98,22 @@ public class AboutWindow extends GenericDialog {
             tabUpdates.setWidth(tabWidth);
         }
 
-        group.addActor(tabHelp);
-        group.addActor(tabAbout);
-        group.addActor(tabSystem);
+        tabGroup.addActor(tabHelp);
+        tabGroup.addActor(tabAbout);
+        tabGroup.addActor(tabSystem);
         if (showUpdateTab)
-            group.addActor(tabUpdates);
+            tabGroup.addActor(tabUpdates);
 
-        content.add(group).align(Align.left).padLeft(pad5);
+        tabButtons = new Array<>();
+        tabButtons.add(tabHelp);
+        tabButtons.add(tabAbout);
+        tabButtons.add(tabSystem);
+        if (showUpdateTab)
+            tabButtons.add(tabUpdates);
+
+        content.add(tabGroup).align(Align.left).padLeft(pad5);
         content.row();
         content.pad(pad10);
-
-        // Create the tab content. Just using images here for simplicity.
-        Stack tabContent = new Stack();
 
         /* CONTENT 1 - HELP */
         final Table contentHelp = new Table(skin);
@@ -425,7 +432,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(javaVMVersionTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
         contentSystem.add(javaVMVersion).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add( javaVMVendorTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
+        contentSystem.add(javaVMVendorTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
         contentSystem.add(javaVMVendor).align(Align.left).padTop(pad5);
         contentSystem.row();
         contentSystem.add(memInfoButton).colspan(2).align(Align.left).padTop(pad10);
@@ -502,42 +509,16 @@ public class AboutWindow extends GenericDialog {
         }
 
         /* ADD ALL CONTENT */
-        tabContent.addActor(contentHelp);
-        tabContent.addActor(contentAbout);
-        tabContent.addActor(systemScroll);
+        addTabContent(contentHelp);
+        addTabContent(contentAbout);
+        addTabContent(systemScroll);
         if (showUpdateTab)
-            tabContent.addActor(contentUpdates);
+            addTabContent(contentUpdates);
 
-        content.add(tabContent).expand().fill();
+        content.add(tabStack).expand().fill();
 
-        // Listen to changes in the tab button checked states
-        // Set visibility of the tab content to match the checked state
-        ChangeListener tabListener = new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                contentHelp.setVisible(tabHelp.isChecked());
-                contentAbout.setVisible(tabAbout.isChecked());
-                systemScroll.setVisible(tabSystem.isChecked());
-                if (showUpdateTab)
-                    contentUpdates.setVisible(tabUpdates.isChecked());
-            }
-        };
-        tabHelp.addListener(tabListener);
-        tabAbout.addListener(tabListener);
-        tabSystem.addListener(tabListener);
-        if (showUpdateTab)
-            tabUpdates.addListener(tabListener);
-
-        // Let only one tab button be checked at a time
-        ButtonGroup<Button> tabs = new ButtonGroup<>();
-        tabs.setMinCheckCount(1);
-        tabs.setMaxCheckCount(1);
-        tabs.add(tabHelp);
-        tabs.add(tabAbout);
-        tabs.add(tabSystem);
-        if (showUpdateTab)
-            tabs.add(tabUpdates);
-
+        // Set tab listeners.
+        setUpTabListeners();
     }
 
     @Override

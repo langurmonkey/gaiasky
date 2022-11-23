@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.HttpRequest;
-import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,13 +23,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.input.AbstractGamepadListener;
+import gaiasky.input.WindowGamepadListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -197,7 +195,7 @@ public class DatasetManagerWindow extends GenericDialog {
             tabInstalledText = I18n.msg("gui.download.tab.installed");
         }
 
-        tabs = new Array<>();
+        tabButtons = new Array<>();
 
         final OwnTextButton tabAvail = new OwnTextButton(I18n.msg("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad5);
@@ -206,8 +204,8 @@ public class DatasetManagerWindow extends GenericDialog {
         tabInstalled.pad(pad5);
         tabInstalled.setWidth(tabWidth);
 
-        tabs.add(tabAvail);
-        tabs.add(tabInstalled);
+        tabButtons.add(tabAvail);
+        tabButtons.add(tabInstalled);
 
         tabGroup.addActor(tabAvail);
         tabGroup.addActor(tabInstalled);
@@ -277,7 +275,6 @@ public class DatasetManagerWindow extends GenericDialog {
         Link manualDownload = new Link(I18n.msg("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
         content.add(manualDownload).center();
 
-        addGamepadListener();
         initialized.set(true);
     }
 
@@ -1202,20 +1199,16 @@ public class DatasetManagerWindow extends GenericDialog {
             }
             myself.hide(); // Close.
         }
-        removeGamepadListener();
         // Do not close dialog, we close it.
         return false;
     }
 
     @Override
     protected void cancel() {
-        removeGamepadListener();
     }
 
     @Override
     public void dispose() {
-        removeGamepadListener();
-
     }
 
     private void backupScrollValues() {
@@ -1413,40 +1406,6 @@ public class DatasetManagerWindow extends GenericDialog {
         scroll[1][1] = 0f;
     }
 
-    public void fire() {
-        Actor target = stage.getKeyboardFocus();
-        if (target == null) {
-            if (selectionOrder != null) {
-                target = selectionOrder.get(selectedIndex).getSecond();
-            }
-        }
-
-        if (target != null) {
-            if (target instanceof CheckBox) {
-                // Check or uncheck
-                CheckBox cb = (CheckBox) target;
-                if(!cb.isDisabled()) {
-                    cb.setChecked(!cb.isChecked());
-                }
-            } else {
-                // Fire change event
-                ChangeEvent event = Pools.obtain(ChangeEvent.class);
-                event.setTarget(target);
-                target.fire(event);
-                Pools.free(event);
-            }
-        }
-    }
-
-    public void cycleDialogButtons() {
-        Actor target = stage.getKeyboardFocus();
-        if (target == acceptButton && cancelButton != null) {
-            stage.setKeyboardFocus(cancelButton);
-        } else {
-            stage.setKeyboardFocus(acceptButton);
-        }
-    }
-
     private void up() {
         selectedIndex = selectedIndex - 1;
         if (selectedIndex < 0) {
@@ -1475,78 +1434,20 @@ public class DatasetManagerWindow extends GenericDialog {
         }
     }
 
-    private class DatasetManagerGamepadListener extends AbstractGamepadListener {
+    private class DatasetManagerGamepadListener extends WindowGamepadListener {
 
         public DatasetManagerGamepadListener(String mappingsFile) {
-            super(mappingsFile);
+            super(mappingsFile, stage, me);
         }
 
         @Override
-        public void connected(Controller controller) {
-
+        public void moveUp() {
+            up();
         }
 
         @Override
-        public void disconnected(Controller controller) {
-
+        public void moveDown() {
+            down();
         }
-
-        @Override
-        public boolean buttonDown(Controller controller, int buttonCode) {
-            return true;
-        }
-
-        @Override
-        public boolean buttonUp(Controller controller, int buttonCode) {
-            if (buttonCode == mappings.getButtonStart()) {
-                accept();
-            } else if (buttonCode == mappings.getButtonA()) {
-                fire();
-            } else if (buttonCode == mappings.getButtonB() || buttonCode == mappings.getButtonSelect()) {
-                cycleDialogButtons();
-            } else if (buttonCode == mappings.getButtonDpadUp()) {
-                up();
-            } else if (buttonCode == mappings.getButtonDpadDown()) {
-                down();
-            } else if (buttonCode == mappings.getButtonRB()) {
-                tabRight();
-            } else if (buttonCode == mappings.getButtonLB()) {
-                tabLeft();
-            }
-            return true;
-        }
-
-        @Override
-        public boolean axisMoved(Controller controller, int axisCode, float value) {
-            if (Math.abs(value) > AXIS_TH && System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
-                // Event-based
-                if (axisCode == mappings.getAxisLstickV()) {
-                    // LEFT STICK vertical - move vertically
-                    if (value > 0) {
-                        down();
-                    } else {
-                        up();
-                    }
-                }
-                lastAxisEvtTime = System.currentTimeMillis();
-            }
-            return true;
-        }
-
-        @Override
-        public void update() {
-
-        }
-
-        @Override
-        public void activate() {
-
-        }
-
-        @Override
-        public void deactivate() {
-
-        }
-
     }
 }

@@ -1,13 +1,16 @@
 package gaiasky.input;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.ControllerMappings;
-import gaiasky.gui.IControllerMappings;
+import gaiasky.gui.AbstractGamepadMappings;
+import gaiasky.gui.GamepadMappings;
+import gaiasky.gui.IGamepadMappings;
 import gaiasky.gui.IInputListener;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -22,21 +25,26 @@ import java.nio.file.Path;
 public abstract class AbstractGamepadListener implements ControllerListener, IInputListener, IObserver {
     private static final Log logger = Logger.getLogger(AbstractGamepadListener.class);
 
-    protected static final double AXIS_TH = 0.3;
     protected static final long AXIS_EVT_DELAY = 250;
-    protected static final long AXIS_POLL_DELAY = 50;
+    protected static final long AXIS_POLL_DELAY = 400;
 
-    protected IControllerMappings mappings;
+    protected static final long BUTTON_POLL_DELAY = 400;
+
+    protected Controller lastControllerUsed = null;
+    protected IGamepadMappings mappings;
     protected final EventManager em;
     protected final IntSet pressedKeys;
 
-    protected long lastAxisEvtTime = 0, lastAxisPollTime = 0;
+    protected long lastAxisEvtTime = 0, lastButtonPollTime = 0;
 
     public AbstractGamepadListener(String mappingsFile) {
+        this(AbstractGamepadMappings.readGamepadMappings(mappingsFile));
+    }
+
+    public AbstractGamepadListener(IGamepadMappings mappings) {
+        this.mappings = mappings;
         this.em = EventManager.instance;
         this.pressedKeys = new IntSet();
-        updateControllerMappings(mappingsFile);
-
         em.subscribe(this, Event.RELOAD_CONTROLLER_MAPPINGS);
     }
 
@@ -45,21 +53,14 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         return Math.abs(value) >= mappings.getZeroPoint() ? value : 0;
     }
 
-    public IControllerMappings getMappings() {
+    public IGamepadMappings getMappings() {
         return mappings;
     }
 
-    public boolean updateControllerMappings(String mappingsFile) {
-        if (Files.exists(Path.of(mappingsFile))) {
-            mappings = new ControllerMappings(null, Path.of(mappingsFile));
-        } else {
-            Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
-            if(Files.exists(internalMappings)){
-                mappings = new ControllerMappings(null, internalMappings);
-            }
-        }
-        return false;
+    public void setMappings(IGamepadMappings mappings) {
+        this.mappings = mappings;
     }
+
 
     public void addPressedKey(int keycode) {
         pressedKeys.add(keycode);
@@ -77,6 +78,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
      * Returns true if any of the keys are pressed
      *
      * @param keys The keys to test
+     *
      * @return True if any is pressed
      */
     public boolean anyPressed(int... keys) {
@@ -86,7 +88,6 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         }
         return false;
     }
-
 
     @Override
     public void connected(Controller controller) {
@@ -101,7 +102,34 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     @Override
+    public boolean buttonDown(Controller controller, int buttonCode) {
+        addPressedKey(buttonCode);
+        return false;
+    }
+
+    @Override
+    public boolean buttonUp(Controller controller, int buttonCode) {
+        removePressedKey(buttonCode);
+        return false;
+    }
+
+    public abstract void pollAxis();
+    public abstract void pollButtons();
+
+    @Override
     public void update() {
+        long now = TimeUtils.millis();
+        // AXIS POLL
+        if(now - lastAxisEvtTime > AXIS_POLL_DELAY) {
+            pollAxis();
+            lastAxisEvtTime = now;
+        }
+
+        // BUTTON POLL
+        if(now - lastButtonPollTime > BUTTON_POLL_DELAY) {
+            pollButtons();
+            lastButtonPollTime = now;
+        }
     }
 
     @Override
@@ -117,7 +145,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.RELOAD_CONTROLLER_MAPPINGS) {
-            updateControllerMappings((String) data[0]);
+            mappings = AbstractGamepadMappings.readGamepadMappings((String) data[0]);
         }
     }
 }

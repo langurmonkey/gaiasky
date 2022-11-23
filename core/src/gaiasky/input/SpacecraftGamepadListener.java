@@ -29,6 +29,16 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
     }
 
     @Override
+    public void pollAxis() {
+
+    }
+
+    @Override
+    public void pollButtons() {
+
+    }
+
+    @Override
     public void update() {
         if (lastController != null) {
             double thrust = lastController.getAxis(mappings.getAxisLstickV());

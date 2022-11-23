@@ -130,4 +130,13 @@ public class MainGamepadListener extends AbstractGamepadListener {
         return treated;
     }
 
+    @Override
+    public void pollAxis() {
+
+    }
+
+    @Override
+    public void pollButtons() {
+
+    }
 }

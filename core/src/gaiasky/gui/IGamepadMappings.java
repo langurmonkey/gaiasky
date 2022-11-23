@@ -5,7 +5,7 @@
 
 package gaiasky.gui;
 
-public interface IControllerMappings {
+public interface IGamepadMappings {
 
     /**
      * The configured axis zero point. Axis values below this value

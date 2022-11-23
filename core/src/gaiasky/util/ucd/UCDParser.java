@@ -33,7 +33,7 @@ public class UCDParser {
     public static String[] distcolnames = new String[] { "dist", "distance" };
     public static String[] zcolnames = new String[] { "z", "Z" };
     public static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx", "par" };
-    public static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
+    public static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "g_mag", "bmag", "gmag" };
     public static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
     public static String[] teffcolnames = new String[] { "teff", "t_eff", "temperature", "effective_temperature" };
     public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
@@ -228,7 +228,7 @@ public class UCDParser {
             String posrefsys = getBestRefsys(pos);
             for (UCD candidate : pos) {
                 String meaning = candidate.ucd[0][1];
-                String coord = candidate.ucd[0].length > 2 ? candidate.ucd[0][2] : null;
+                final String coord = candidate.ucd[0].length > 2 ? candidate.ucd[0][2] : null;
                 boolean derived = checkDerivedQuantity(candidate.ucd);
 
                 // Filter using best reference system (posrefsys)
@@ -236,41 +236,35 @@ public class UCDParser {
                     switch (meaning) {
                     case "eq":
                         switch (coord) {
-                        case "ra":
+                        case "ra" -> {
                             setDefaultUnit(candidate, "deg");
                             add(candidate, racolnames, this.POS1);
-                            break;
-                        case "dec":
+                        }
+                        case "dec" -> {
                             setDefaultUnit(candidate, "deg");
                             add(candidate, decolnames, this.POS2);
-                            break;
+                        }
                         }
                         break;
                     case "ecliptic":
                     case "galactic":
                         switch (coord) {
-                        case "lon":
+                        case "lon" -> {
                             setDefaultUnit(candidate, "deg");
                             this.POS1.add(candidate);
-                            break;
-                        case "lat":
+                        }
+                        case "lat" -> {
                             setDefaultUnit(candidate, "deg");
                             this.POS2.add(candidate);
-                            break;
+                        }
                         }
                         break;
                     case "cartesian":
                         setDefaultUnit(candidate, "pc");
                         switch (coord) {
-                        case "x":
-                            this.POS1.add(candidate);
-                            break;
-                        case "y":
-                            this.POS2.add(candidate);
-                            break;
-                        case "z":
-                            this.POS3.add(candidate);
-                            break;
+                        case "x" -> this.POS1.add(candidate);
+                        case "y" -> this.POS2.add(candidate);
+                        case "z" -> this.POS3.add(candidate);
                         }
                         break;
                     case "parallax":

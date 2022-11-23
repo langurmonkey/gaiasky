@@ -123,7 +123,7 @@ public class GuiRegistry implements IObserver {
         this.catalogManager = catalogManager;
         this.view = new FocusView();
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION);
+        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
     }
 
     public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
@@ -677,6 +677,14 @@ public class GuiRegistry implements IObserver {
                 restart.buildSuper();
                 restart.show(ui);
                 break;
+            case CLOSE_ALL_GUI_WINDOWS_CMD:
+                var actors = ui.getActors();
+                for (var actor : actors) {
+                    if (actor instanceof GenericDialog) {
+                        closeWindow((GenericDialog) actor);
+                    }
+                }
+                break;
             case UI_RELOAD_CMD:
                 reloadUI((GlobalResources) data[0]);
                 break;
@@ -685,6 +693,12 @@ public class GuiRegistry implements IObserver {
             }
         }
 
+    }
+
+    private void closeWindow(GenericDialog dialog) {
+        if (dialog != null && dialog.isVisible() && dialog.hasParent()) {
+            dialog.closeCancel();
+        }
     }
 
     private Array<Actor> getElementsOfType(Class<? extends Actor> clazz) {

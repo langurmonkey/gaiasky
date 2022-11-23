@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -29,13 +31,11 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.NaturalCamera;
-import gaiasky.util.Constants;
-import gaiasky.util.Logger;
-import gaiasky.util.Settings;
-import gaiasky.util.SlaveManager;
+import gaiasky.util.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -422,7 +422,6 @@ public class GamepadGui extends AbstractGui {
 
         float buttonPadHor = 9.6f;
         float buttonPadVert = 4f;
-        Set<Button> buttons = new HashSet<>();
         ComponentType[] visibilityEntities = ComponentType.values();
         boolean[] visible = new boolean[visibilityEntities.length];
         for (int i = 0; i < visibilityEntities.length; i++)
@@ -463,7 +462,6 @@ public class GamepadGui extends AbstractGui {
                     di++;
 
                 }
-                buttons.add(button);
             }
         }
 
@@ -472,15 +470,65 @@ public class GamepadGui extends AbstractGui {
         updatePads(typesT);
 
         // CONTROLS
-        Actor[][] controlsModel = new Actor[1][2];
+        Actor[][] controlsModel = new Actor[1][3];
         model.add(controlsModel);
 
         controlsT = new Table(skin);
 
+        // Controllers list
+        var controllers = Controllers.getControllers();
+        Controller controller = null;
+        for (var c : controllers) {
+            if (!Settings.settings.controls.gamepad.isControllerBlacklisted(c.getName())) {
+                // Found it!
+                controller = c;
+                break;
+            }
+        }
+        if (controller == null) {
+            // Error!
+            OwnLabel noControllers = new OwnLabel(I18n.msg("gui.controller.nocontrollers"), skin, "header-blue");
+            controlsT.add(noControllers).padBottom(pad10).row();
+            controlsModel[0][0] = new OwnTextButton("", skin, "toggle-big");
+        } else {
+            final var controllerName = controller.getName();
+            Table controllerTable = new Table(skin);
+
+            OwnLabel detectedController = new OwnLabel(I18n.msg("gui.controller.detected"), skin, "header-raw");
+            OwnLabel controllerNameLabel = new OwnLabel(controllerName, skin, "header-blue");
+
+            OwnTextButton configureControllerButton = new OwnTextButton(I18n.msg("gui.controller.configure"), skin, "big");
+            configureControllerButton.setWidth(ww);
+            configureControllerButton.setHeight(wh);
+            configureControllerButton.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    // Get currently selected mappings
+                    GamepadMappings mappings = new GamepadMappings(controllerName, Path.of(Settings.settings.controls.gamepad.mappingsFile));
+                    GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, mappings, ui, skin);
+                    ccw.setAcceptRunnable(() -> {
+                        if (ccw.savedFile != null) {
+                            // File was saved, reload, select
+                            EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, ccw.savedFile.toAbsolutePath().toString());
+                        }
+                    });
+                    ccw.show(ui);
+                    return true;
+                }
+                return false;
+            });
+
+            controllerTable.add(detectedController).padBottom(pad10).padRight(pad20);
+            controllerTable.add(controllerNameLabel).padBottom(pad10).row();
+            controllerTable.add(configureControllerButton).center().colspan(2);
+
+            controlsT.add(controllerTable).padBottom(pad20 * 2).row();
+
+            controlsModel[0][0] = configureControllerButton;
+        }
 
         // Invert X
         invertXButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "X"), skin, "toggle-big");
-        controlsModel[0][0] = invertXButton;
+        controlsModel[0][1] = invertXButton;
         invertXButton.setWidth(ww);
         invertXButton.setChecked(Settings.settings.controls.gamepad.invertX);
         invertXButton.addListener(event -> {
@@ -494,7 +542,7 @@ public class GamepadGui extends AbstractGui {
 
         // Invert Y
         invertYButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "Y"), skin, "toggle-big");
-        controlsModel[0][1] = invertYButton;
+        controlsModel[0][2] = invertYButton;
         invertYButton.setWidth(ww);
         invertYButton.setChecked(Settings.settings.controls.gamepad.invertY);
         invertYButton.addListener(event -> {
@@ -1070,6 +1118,9 @@ public class GamepadGui extends AbstractGui {
                 // Remove natural listener, add GUI listener
                 cam.removeGamepadListener();
                 addControllerListener(cam);
+
+                // Close all open windows.
+                EventManager.publish(Event.CLOSE_ALL_GUI_WINDOWS_CMD, this);
             }
         }
         case TIME_STATE_CMD -> {
@@ -1101,7 +1152,7 @@ public class GamepadGui extends AbstractGui {
 
     private void addControllerListener(NaturalCamera cam) {
         guiControllerListener.setCamera(cam);
-        guiControllerListener.updateControllerMappings(Settings.settings.controls.gamepad.mappingsFile);
+        guiControllerListener.setMappings(AbstractGamepadMappings.readGamepadMappings(Settings.settings.controls.gamepad.mappingsFile));
         Settings.settings.controls.gamepad.addControllerListener(guiControllerListener);
         guiControllerListener.activate();
     }
@@ -1112,12 +1163,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     private class GUIControllerListener extends AbstractGamepadListener {
-
-        // Left and right stick values
-        private float lStickX = 0;
-        private float lStickY = 0;
         private float rStickX = 0;
-        private final float rStickY = 0;
         private final EventManager em;
         private NaturalCamera cam;
 
@@ -1137,6 +1183,16 @@ public class GamepadGui extends AbstractGui {
 
         @Override
         public void disconnected(Controller controller) {
+
+        }
+
+        @Override
+        public void pollAxis() {
+
+        }
+
+        @Override
+        public void pollButtons() {
 
         }
 
@@ -1175,11 +1231,11 @@ public class GamepadGui extends AbstractGui {
 
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
-            if (Math.abs(value) > AXIS_TH && System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
+            value = (float) applyZeroPoint(value);
+            if (System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
                 // Event-based
                 if (axisCode == mappings.getAxisLstickH()) {
                     // LEFT STICK horizontal - move horizontally
-                    lStickX = value;
                     if (value > 0) {
                         right();
                     } else {
@@ -1187,7 +1243,6 @@ public class GamepadGui extends AbstractGui {
                     }
                 } else if (axisCode == mappings.getAxisLstickV()) {
                     // LEFT STICK vertical - move vertically
-                    lStickY = value;
                     if (value > 0) {
                         down();
                     } else {
@@ -1208,14 +1263,15 @@ public class GamepadGui extends AbstractGui {
         @Override
         public void update() {
             // Right stick moves slider
-            boolean update = System.currentTimeMillis() - lastAxisPollTime > AXIS_POLL_DELAY;
-            if (Math.abs(rStickX) > AXIS_TH && update) {
+            long now = TimeUtils.millis();
+            boolean update = now - lastAxisEvtTime > AXIS_POLL_DELAY;
+            if (rStickX != 0 && update) {
                 if (rStickX > 0) {
                     sliderUp(0.05f);
-                } else {
+                } else if(rStickX < 0) {
                     sliderDown(0.05f);
                 }
-                lastAxisPollTime = System.currentTimeMillis();
+                lastAxisEvtTime = now;
             }
         }
 

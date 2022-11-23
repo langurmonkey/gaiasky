@@ -814,6 +814,10 @@
       "font": "title-21",
       "fontColor": "white"
     },
+    "header-blue": {
+      "font": "title-21",
+      "fontColor": "blue"
+    },
     "header-s": {
       "font": "title-20",
       "fontColor": "theme2"

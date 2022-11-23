@@ -6,17 +6,21 @@
 package gaiasky.gui;
 
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Defines all controller inputs
  */
-public abstract class AbstractControllerMappings implements IControllerMappings {
-    protected static final Logger.Log logger = Logger.getLogger(AbstractControllerMappings.class);
+public abstract class AbstractGamepadMappings implements IGamepadMappings {
+    protected static final Logger.Log logger = Logger.getLogger(AbstractGamepadMappings.class);
 
     public double AXIS_VALUE_POW = 4d;
 
-    public double ZERO_POINT = 0.1;
+    public double ZERO_POINT = 0.2;
 
     public int AXIS_LSTICK_H = -1;
     public double AXIS_LSTICK_H_SENS = 1d;
@@ -212,5 +216,19 @@ public abstract class AbstractControllerMappings implements IControllerMappings 
     @Override
     public double getAxisLTSensitivity() {
         return MathUtilsd.clamp(AXIS_LT_SENS, 0.01, 100.0);
+    }
+
+    public static IGamepadMappings readGamepadMappings(String mappingsFile) {
+        IGamepadMappings mappings = null;
+        final Path mappingsPath = Path.of(mappingsFile);
+        if (Files.exists(mappingsPath)) {
+            mappings = new GamepadMappings(null, mappingsPath);
+        } else {
+            Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
+            if (Files.exists(internalMappings)) {
+                mappings = new GamepadMappings(null, internalMappings);
+            }
+        }
+        return mappings;
     }
 }

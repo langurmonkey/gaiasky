@@ -11,6 +11,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -27,7 +28,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.gui.beans.*;
-import gaiasky.input.AbstractGamepadListener;
+import gaiasky.input.WindowGamepadListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -59,11 +60,6 @@ import static gaiasky.util.Settings.OriginType.values;
 public class PreferencesWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(PreferencesWindow.class);
 
-    // Remember the last tab opened
-    private static OwnTextIconButton lastTab;
-    private static boolean lastTabFlag = true;
-
-    private final Array<Actor> contents;
     private final Array<OwnLabel> labels;
 
     private final DecimalFormat nf3;
@@ -75,7 +71,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin;
     private OwnSelectBox<StrComboBoxBean> theme;
-    private OwnSelectBox<FileComboBoxBean> controllerMappings;
+    private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction;
@@ -106,7 +102,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         super(I18n.msg("gui.settings") + " - " + Settings.settings.version.version + " - " + I18n.msg("gui.build", Settings.settings.version.build), skin, stage);
 
         this.settings = Settings.settings;
-        this.contents = new Array<>();
+        this.tabContents = new Array<>();
         this.labels = new Array<>();
         this.globalResources = globalResources;
         this.welcomeScreen = welcomeScreen;
@@ -118,6 +114,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Build UI.
         buildSuper();
+
+        gamepadListener = new WindowGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage, this);
 
         EventManager.instance.subscribe(this, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO);
     }
@@ -146,8 +144,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         boolean vr = settings.runtime.openVr;
 
         // Create the tab buttons
-        Table group = new Table(skin);
-        group.align(Align.left | Align.top);
+        Table tabsTable = new Table(skin);
+        tabsTable.align(Align.left | Align.top);
 
         final OwnTextIconButton tabGraphics = createTab(I18n.msg("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin);
         final OwnTextIconButton tabUI = createTab(I18n.msg("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin);
@@ -161,35 +159,35 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnTextIconButton tabData = createTab(I18n.msg("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin);
         final OwnTextIconButton tabSystem = createTab(I18n.msg("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin);
 
-        group.add(tabGraphics).row();
-        group.add(tabUI).row();
-        group.add(tabPerformance).row();
-        group.add(tabControls).row();
-        group.add(tabScreenshots).row();
-        group.add(tabFrames).row();
-        group.add(tabCamera).row();
-        group.add(tab360).row();
-        group.add(tabPlanetarium).row();
-        group.add(tabData).row();
-        group.add(tabSystem).row();
-        content.add(group).align(Align.left | Align.top).padLeft(pad5);
+        tabsTable.add(tabGraphics).row();
+        tabsTable.add(tabUI).row();
+        tabsTable.add(tabPerformance).row();
+        tabsTable.add(tabControls).row();
+        tabsTable.add(tabScreenshots).row();
+        tabsTable.add(tabFrames).row();
+        tabsTable.add(tabCamera).row();
+        tabsTable.add(tab360).row();
+        tabsTable.add(tabPlanetarium).row();
+        tabsTable.add(tabData).row();
+        tabsTable.add(tabSystem).row();
+        content.add(tabsTable).align(Align.left | Align.top).padLeft(pad5);
 
-        tabs = new Array<>();
-        tabs.add(tabGraphics);
-        tabs.add(tabUI);
-        tabs.add(tabPerformance);
-        tabs.add(tabControls);
-        tabs.add(tabScreenshots);
-        tabs.add(tabFrames);
-        tabs.add(tabCamera);
-        tabs.add(tab360);
-        tabs.add(tabPlanetarium);
-        tabs.add(tabData);
-        tabs.add(tabSystem);
+        tabButtons = new Array<>();
+        tabButtons.add(tabGraphics);
+        tabButtons.add(tabUI);
+        tabButtons.add(tabPerformance);
+        tabButtons.add(tabControls);
+        tabButtons.add(tabScreenshots);
+        tabButtons.add(tabFrames);
+        tabButtons.add(tabCamera);
+        tabButtons.add(tab360);
+        tabButtons.add(tabPlanetarium);
+        tabButtons.add(tabData);
+        tabButtons.add(tabSystem);
 
         // Create the tab content. Just using images here for simplicity.
-        Stack tabContent = new Stack();
-        tabContent.setSize(contentWidth, contentHeight);
+        tabStack = new Stack();
+        tabStack.setSize(contentWidth, contentHeight);
 
         /*
          * ==== GRAPHICS ====
@@ -200,7 +198,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentGraphics.setHeight(scrollHeight);
         contentGraphics.setScrollingDisabled(true, false);
         contentGraphics.setFadeScrollBars(false);
-        contents.add(contentGraphics);
         contentGraphicsTable.align(Align.top | Align.left);
 
         // RESOLUTION/MODE
@@ -269,6 +266,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel vsyncLabel = new OwnLabel(I18n.msg("gui.vsync"), skin);
         vsync = new OwnCheckBox("", skin);
         vsync.setChecked(settings.graphics.vsync);
+        vsync.setColor(Color.YELLOW);
 
         // LIMIT FPS
         IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
@@ -838,7 +836,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentUI = new Table(skin);
         contentUI.setWidth(contentWidth);
         contentUI.align(Align.top | Align.left);
-        contents.add(contentUI);
 
         OwnLabel titleUI = new OwnLabel(I18n.msg("gui.ui.interfacesettings"), skin, "header");
 
@@ -1086,7 +1083,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentPerformance = new Table(skin);
         contentPerformance.setWidth(contentWidth);
         contentPerformance.align(Align.top | Align.left);
-        contents.add(contentPerformance);
 
         // MULTITHREADING
         OwnLabel titleMultiThread = new OwnLabel(I18n.msg("gui.multithreading"), skin, "header");
@@ -1187,19 +1183,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentControls = new Table(skin);
         contentControls.setWidth(contentWidth);
         contentControls.align(Align.top | Align.left);
-        contents.add(contentControls);
 
         OwnLabel titleController = new OwnLabel(I18n.msg("gui.controller"), skin, "header");
 
         // DETECTED CONTROLLER NAMES
         controllersTable = new Table(skin);
         OwnLabel detectedLabel = new OwnLabel(I18n.msg("gui.controller.detected"), skin);
-        generateControllersList(controllersTable);
+        generateGamepadsList(controllersTable);
 
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(I18n.msg("gui.controller.mappingsfile"), skin);
-        controllerMappings = new OwnSelectBox<>(skin);
-        reloadControllerMappings(null);
+        gamepadMappings = new OwnSelectBox<>(skin);
+        reloadGamepadMappings(null);
 
         // INVERT X
         OwnLabel invertXLabel = new OwnLabel(I18n.msg("gui.controller.axis.invert", "X"), skin);
@@ -1276,7 +1271,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentControls.add(detectedLabel).left().padBottom(pad10).padRight(pad10);
         contentControls.add(controllersTable).left().padBottom(pad10).row();
         contentControls.add(mappingsLabel).left().padBottom(pad10).padRight(pad10);
-        contentControls.add(controllerMappings).left().padBottom(pad10).row();
+        contentControls.add(gamepadMappings).left().padBottom(pad10).row();
         contentControls.add(invertXLabel).left().padBottom(pad10).padRight(pad10);
         contentControls.add(invertX).left().padBottom(pad10).row();
         contentControls.add(invertYLabel).left().padBottom(pad10).padRight(pad10);
@@ -1290,7 +1285,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentScreenshots = new Table(skin);
         contentScreenshots.setWidth(contentWidth);
         contentScreenshots.align(Align.top | Align.left);
-        contents.add(contentScreenshots);
 
         // SCREEN CAPTURE
         OwnLabel titleScreenshots = new OwnLabel(I18n.msg("gui.screencapture"), skin, "header");
@@ -1395,7 +1389,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentFrames = new Table(skin);
         contentFrames.setWidth(contentWidth);
         contentFrames.align(Align.top | Align.left);
-        contents.add(contentFrames);
 
         // FRAME OUTPUT CONFIG
         OwnLabel titleFrameoutput = new OwnLabel(I18n.msg("gui.frameoutput"), skin, "header");
@@ -1535,7 +1528,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentCamera = new Table(skin);
         contentCamera.setWidth(contentWidth);
         contentCamera.align(Align.top | Align.left);
-        contents.add(contentCamera);
 
         // CAMERA RECORDING
         Table camrec = new Table(skin);
@@ -1598,7 +1590,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table content360 = new Table(skin);
         content360.setWidth(contentWidth);
         content360.align(Align.top | Align.left);
-        contents.add(content360);
 
         // CUBEMAP
         OwnLabel titleCubemap = new OwnLabel(I18n.msg("gui.360"), skin, "header");
@@ -1645,7 +1636,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentPlanetarium = new Table(skin);
         contentPlanetarium.setWidth(contentWidth);
         contentPlanetarium.align(Align.top | Align.left);
-        contents.add(contentPlanetarium);
 
         // CUBEMAP
         OwnLabel titlePlanetarium = new OwnLabel(I18n.msg("gui.planetarium"), skin, "header");
@@ -1712,7 +1702,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentData.setHeight(scrollHeight);
         contentData.setScrollingDisabled(true, false);
         contentData.setFadeScrollBars(false);
-        contents.add(contentData);
 
         // GENERAL OPTIONS
         OwnLabel titleGeneralData = new OwnLabel(I18n.msg("gui.data.options"), skin, "header");
@@ -1825,7 +1814,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final Table contentSystem = new Table(skin);
         contentSystem.setWidth(contentWidth);
         contentSystem.align(Align.top | Align.left);
-        contents.add(contentSystem);
 
         // STATS
         OwnLabel titleStats = new OwnLabel(I18n.msg("gui.system.reporting"), skin, "header");
@@ -1892,83 +1880,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             l.setWidth(maxLabelWidth);
 
         /* ADD ALL CONTENT */
-        tabContent.addActor(contentGraphics);
-        tabContent.addActor(contentUI);
-        tabContent.addActor(contentPerformance);
-        tabContent.addActor(contentControls);
-        tabContent.addActor(contentScreenshots);
-        tabContent.addActor(contentFrames);
-        tabContent.addActor(contentCamera);
-        tabContent.addActor(content360);
-        tabContent.addActor(contentPlanetarium);
-        tabContent.addActor(contentData);
-        tabContent.addActor(contentSystem);
+        addTabContent(contentGraphics);
+        addTabContent(contentUI);
+        addTabContent(contentPerformance);
+        addTabContent(contentControls);
+        addTabContent(contentScreenshots);
+        addTabContent(contentFrames);
+        addTabContent(contentCamera);
+        addTabContent(content360);
+        addTabContent(contentPlanetarium);
+        addTabContent(contentData);
+        addTabContent(contentSystem);
 
         /* ADD TO MAIN TABLE */
-        content.add(tabContent).left().padLeft(pad15).expand().fill();
+        content.add(tabStack).left().padLeft(pad15).expand().fill();
 
-        // Listen to changes in the tab button checked states
-        // Set visibility of the tab content to match the checked state
-        ChangeListener tab_listener = new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                if (((Button) actor).isChecked()) {
-                    contentGraphics.setVisible(tabGraphics.isChecked());
-                    contentUI.setVisible(tabUI.isChecked());
-                    contentPerformance.setVisible(tabPerformance.isChecked());
-                    contentControls.setVisible(tabControls.isChecked());
-                    contentScreenshots.setVisible(tabScreenshots.isChecked());
-                    contentFrames.setVisible(tabFrames.isChecked());
-                    contentCamera.setVisible(tabCamera.isChecked());
-                    content360.setVisible(tab360.isChecked());
-                    contentPlanetarium.setVisible(tabPlanetarium.isChecked());
-                    contentData.setVisible(tabData.isChecked());
-                    contentSystem.setVisible(tabSystem.isChecked());
-                    if (lastTabFlag)
-                        lastTab = (OwnTextIconButton) actor;
-                }
-            }
-        };
-        tabGraphics.addListener(tab_listener);
-        tabUI.addListener(tab_listener);
-        tabPerformance.addListener(tab_listener);
-        tabControls.addListener(tab_listener);
-        tabScreenshots.addListener(tab_listener);
-        tabFrames.addListener(tab_listener);
-        tabCamera.addListener(tab_listener);
-        tab360.addListener(tab_listener);
-        tabPlanetarium.addListener(tab_listener);
-        tabData.addListener(tab_listener);
-        tabSystem.addListener(tab_listener);
-
-        lastTabFlag = false;
-        // Let only one tab button be checked at a time
-        ButtonGroup<Button> tabs = new ButtonGroup<>();
-        tabs.setMinCheckCount(1);
-        tabs.setMaxCheckCount(1);
-        tabs.add(tabGraphics);
-        tabs.add(tabUI);
-        tabs.add(tabPerformance);
-        tabs.add(tabControls);
-        tabs.add(tabScreenshots);
-        tabs.add(tabFrames);
-        tabs.add(tabCamera);
-        tabs.add(tab360);
-        tabs.add(tabPlanetarium);
-        tabs.add(tabData);
-        tabs.add(tabSystem);
-        lastTabFlag = true;
-
-        if (lastTab != null)
-            tabs.setChecked(lastTab.getText().toString());
-
+        // Set tab listeners.
+        setUpTabListeners();
     }
 
     @Override
     public GenericDialog show(Stage stage, Action action) {
         GenericDialog result = super.show(stage, action);
         updateBackupValues();
-        addGamepadListener();
         return result;
     }
 
@@ -1988,8 +1922,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         reprojectionBak = settings.postprocess.reprojection.mode;
     }
 
-    protected void reloadControllerMappings(Path selectedFile) {
-        Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
+    protected void reloadGamepadMappings(Path selectedFile) {
+        Array<FileComboBoxBean> gamepadMappingsFile = new Array<>();
         Path mappingsAssets = Path.of(Settings.ASSETS_LOC, SysUtils.getMappingsDirName());
         Path mappingsData = SysUtils.getDefaultMappingsDir();
         Array<Path> mappingFiles = new Array<>();
@@ -1998,7 +1932,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         FileComboBoxBean selected = null;
         for (Path path : mappingFiles) {
             FileComboBoxBean fileBean = new MappingFileComboBoxBean(path);
-            controllerMappingsFiles.add(fileBean);
+            gamepadMappingsFile.add(fileBean);
             if (selectedFile == null && settings.controls.gamepad.mappingsFile.endsWith(path.getFileName().toString())) {
                 selected = fileBean;
             } else if (selectedFile != null && selectedFile.toAbsolutePath().toString().endsWith(path.getFileName().toString())) {
@@ -2006,12 +1940,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             }
         }
 
-        controllerMappings.setItems(controllerMappingsFiles);
-        controllerMappings.setSelected(selected);
-        controllerMappings.pack();
+        gamepadMappings.setItems(gamepadMappingsFile);
+        gamepadMappings.setSelected(selected);
+        gamepadMappings.pack();
     }
 
-    protected void generateControllersList(Table table) {
+    protected void generateGamepadsList(Table table) {
         Array<Controller> controllers = Controllers.getControllers();
 
         Array<OwnLabel> controllerNames = new Array<>();
@@ -2027,7 +1961,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         if (controllerNames.isEmpty()) {
             controllerNames.add(new OwnLabel(I18n.msg("gui.controller.nocontrollers"), skin));
-
         }
 
         if (table == null)
@@ -2043,12 +1976,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 config.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         // Get currently selected mappings
-                        ControllerMappings cm = new ControllerMappings(controllerName, Path.of(controllerMappings.getSelected().file));
+                        GamepadMappings cm = new GamepadMappings(controllerName, Path.of(gamepadMappings.getSelected().file));
                         GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, cm, stage, skin);
                         ccw.setAcceptRunnable(() -> {
                             if (ccw.savedFile != null) {
                                 // File was saved, reload, select
-                                reloadControllerMappings(ccw.savedFile);
+                                reloadGamepadMappings(ccw.savedFile);
                             }
                         });
                         ccw.show(stage);
@@ -2070,7 +2003,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     protected boolean accept() {
         saveCurrentPreferences();
         unsubscribe();
-        removeGamepadListener();
         return true;
     }
 
@@ -2078,7 +2010,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     protected void cancel() {
         revertLivePreferences();
         unsubscribe();
-        removeGamepadListener();
     }
 
     @Override
@@ -2346,8 +2277,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
 
         // Controllers
-        if (controllerMappings.getSelected() != null) {
-            String mappingsFile = controllerMappings.getSelected().file;
+        if (gamepadMappings.getSelected() != null) {
+            String mappingsFile = gamepadMappings.getSelected().file;
             if (!mappingsFile.equals(settings.controls.gamepad.mappingsFile)) {
                 settings.controls.gamepad.mappingsFile = mappingsFile;
                 EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, mappingsFile);
@@ -2508,7 +2439,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateControllersList(controllersTable);
+        case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateGamepadsList(controllersTable);
         default -> {
         }
         }

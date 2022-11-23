@@ -319,10 +319,12 @@ public enum Event {
      **/
     DISPLAY_GUI_CMD,
     DISPLAY_MEM_INFO_WINDOW,
+    /** All open windows must be closed **/
+    CLOSE_ALL_GUI_WINDOWS_CMD,
 
     /**
      * Change UI scale factor. Contains the new internal scale factor.
-     */
+     **/
     UI_SCALE_CMD,
 
     /**

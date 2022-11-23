@@ -22,13 +22,13 @@ import java.util.Properties;
 /**
  * Reads inputListener mappings from a file
  */
-public class ControllerMappings extends AbstractControllerMappings {
+public class GamepadMappings extends AbstractGamepadMappings {
     private String controllerName;
 
     /**
      * Create empty controller mappings
      */
-    public ControllerMappings(String controllerName) {
+    public GamepadMappings(String controllerName) {
         super();
         this.controllerName = controllerName;
     }
@@ -39,7 +39,7 @@ public class ControllerMappings extends AbstractControllerMappings {
      * @param controllerName Controller name, or null
      * @param mappingsFile   The mappings file
      */
-    public ControllerMappings(String controllerName, Path mappingsFile) {
+    public GamepadMappings(String controllerName, Path mappingsFile) {
         this(controllerName);
         // If no controller name
         if (controllerName == null || controllerName.isBlank()) {
