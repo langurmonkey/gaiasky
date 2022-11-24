@@ -323,14 +323,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.align(Align.left);
 
         cameraGroup.add(group(modeLabel, cameraMode, pad3)).top().left().padBottom(pad9).row();
-        cameraGroup.add(group(new Label(I18n.msg("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, pad3)).top().left().padBottom(pad9).row();
+        cameraGroup.add(group(new Label(I18n.msg("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, pad3)).top().left().padBottom(pad20).row();
         cameraGroup.add(fieldOfView).top().left().padBottom(pad9).row();
         cameraGroup.add(cameraSpeed).top().left().padBottom(pad9).row();
         cameraGroup.add(rotateSpeed).top().left().padBottom(pad9).row();
-        cameraGroup.add(turnSpeed).top().left().padBottom(pad9).row();
+        cameraGroup.add(turnSpeed).top().left().padBottom(pad20).row();
         cameraGroup.add(cinematic).top().left().padBottom(pad9).row();
         cameraGroup.add(focusLock).top().left().padBottom(pad9).row();
-        cameraGroup.add(orientationLock).top().left().padBottom(pad9).row();
+        cameraGroup.add(orientationLock).top().left().row();
         if (!Settings.settings.runtime.openVr)
             cameraGroup.add(group(new Label("", skin), buttonGroup, pad3)).top().center();
 
