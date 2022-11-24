@@ -483,13 +483,13 @@ public interface IScriptingInterface {
      * <code>rotation</code> degrees around <code>focus<code> using the camera
      * up vector as a rotation axis.
      *
-     * @param focus     The name of the focus object.
-     * @param other     The name of the other object, to the fine a line from this to
-     *                  foucs. Usually a light source.
-     * @param rotation  The rotation angle, in degrees.
-     * @param viewAngle The view angle which determines the distance, in degrees.
+     * @param focus      The name of the focus object.
+     * @param other      The name of the other object, to the fine a line from this to
+     *                   foucs. Usually a light source.
+     * @param rotation   The rotation angle, in degrees.
+     * @param solidAngle The target solid angle which determines the distance, in degrees.
      */
-    void setCameraPositionAndFocus(String focus, String other, double rotation, double viewAngle);
+    void setCameraPositionAndFocus(String focus, String other, double rotation, double solidAngle);
 
     /**
      * Sets the camera in free mode and points it to the given coordinates in equatorial system.
@@ -1377,11 +1377,11 @@ public interface IScriptingInterface {
      * until the object view angle <code>viewAngle</code> is met. If angle is
      * negative, the default angle is <code>20 degrees</code>.
      *
-     * @param name      The name or id (HIP, TYC, sourceId) of the object.
-     * @param viewAngle The target view angle of the object, in degrees. The angle
-     *                  gets larger and larger as we approach the object.
+     * @param name       The name or id (HIP, TYC, sourceId) of the object.
+     * @param solidAngle The target solid angle of the object, in degrees. The angle
+     *                   gets larger and larger as we approach the object.
      */
-    void goToObject(String name, double viewAngle);
+    void goToObject(String name, double solidAngle);
 
     /**
      * Runs a seamless trip to the object with the name <code>focusName</code>
@@ -1394,13 +1394,13 @@ public interface IScriptingInterface {
      * {@link #setTurningCameraSpeed(float)}.
      *
      * @param name            The name or id (HIP, TYC, sourceId) of the object.
-     * @param viewAngle       The target view angle of the object, in degrees. The angle
+     * @param solidAngle      The target solid angle of the object, in degrees. The angle
      *                        gets larger and larger as we approach the object.
      * @param waitTimeSeconds The seconds to wait for the camera direction vector and the
      *                        vector from the camera position to the target object to be
      *                        aligned.
      */
-    void goToObject(String name, double viewAngle, float waitTimeSeconds);
+    void goToObject(String name, double solidAngle, float waitTimeSeconds);
 
     /**
      * Sets the camera in focus mode with the given focus object and instantly moves
@@ -2127,6 +2127,7 @@ public interface IScriptingInterface {
      * @param state The state, true to activate and false to deactivate.
      */
     void setOrthosphereViewMode(boolean state);
+
     /**
      * Sets index of refraction of celestial sphere in orthosphere view mode.
      *

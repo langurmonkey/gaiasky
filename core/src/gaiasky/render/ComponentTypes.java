@@ -92,8 +92,8 @@ public class ComponentTypes extends BitSet {
             }
         }
 
-        public String key;
-        public String style;
+        public final String key;
+        public final String style;
 
         ComponentType(String icon) {
             this.key = "element." + name().toLowerCase();

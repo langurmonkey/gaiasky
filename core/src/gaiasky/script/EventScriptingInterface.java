@@ -459,8 +459,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraPositionAndFocus(String focus, String other, double rotation, double viewAngle) {
-        if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
+    public void setCameraPositionAndFocus(String focus, String other, double rotation, double solidAngle) {
+        if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
             if (scene.index().containsEntity(focus) && scene.index().containsEntity(other)) {
                 Entity focusObj, otherObj;
@@ -473,13 +473,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     focusView.setEntity(otherObj);
                     focusView.getFocus(other);
                 }
-                setCameraPositionAndFocus(focusObj, otherObj, rotation, viewAngle);
+                setCameraPositionAndFocus(focusObj, otherObj, rotation, solidAngle);
             }
         }
     }
 
-    public void setCameraPositionAndFocus(String focus, String other, long rotation, long viewAngle) {
-        setCameraPositionAndFocus(focus, other, (double) rotation, (double) viewAngle);
+    public void setCameraPositionAndFocus(String focus, String other, long rotation, long solidAngle) {
+        setCameraPositionAndFocus(focus, other, (double) rotation, (double) solidAngle);
     }
 
     public void pointAtSkyCoordinate(double ra, double dec) {
@@ -491,8 +491,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         pointAtSkyCoordinate((double) ra, (double) dec);
     }
 
-    private void setCameraPositionAndFocus(Entity focus, Entity other, double rotation, double viewAngle) {
-        if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
+    private void setCameraPositionAndFocus(Entity focus, Entity other, double rotation, double solidAngle) {
+        if (checkNum(solidAngle, 1e-50d, Double.MAX_VALUE, "solidAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             em.post(Event.FOCUS_CHANGE_CMD, this, focus);
@@ -500,7 +500,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             synchronized (focusView) {
                 focusView.setEntity(focus);
                 double radius = focusView.getRadius();
-                double dist = radius / Math.tan(Math.toRadians(viewAngle / 2)) + radius;
+                double dist = radius / Math.tan(Math.toRadians(solidAngle / 2)) + radius;
 
                 // Up to ecliptic north pole
                 Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
@@ -746,7 +746,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         } else {
             ComponentType ct = ComponentType.getFromKey(key);
-            return Settings.settings.scene.visibility.get(ct);
+            return Settings.settings.scene.visibility.get(ct.key);
         }
     }
 
@@ -1391,41 +1391,41 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void goToObject(String name, double viewAngle, float waitTimeSeconds) {
-        goToObject(name, viewAngle, waitTimeSeconds, null);
+    public void goToObject(String name, double solidAngle, float waitTimeSeconds) {
+        goToObject(name, solidAngle, waitTimeSeconds, null);
     }
 
-    public void goToObject(String name, double viewAngle, int waitTimeSeconds) {
-        goToObject(name, viewAngle, (float) waitTimeSeconds);
+    public void goToObject(String name, double solidAngle, int waitTimeSeconds) {
+        goToObject(name, solidAngle, (float) waitTimeSeconds);
     }
 
-    public void goToObject(String name, long viewAngle, int waitTimeSeconds) {
-        goToObject(name, (double) viewAngle, (float) waitTimeSeconds);
+    public void goToObject(String name, long solidAngle, int waitTimeSeconds) {
+        goToObject(name, (double) solidAngle, (float) waitTimeSeconds);
     }
 
-    public void goToObject(String name, long viewAngle, float waitTimeSeconds) {
-        goToObject(name, (double) viewAngle, waitTimeSeconds);
+    public void goToObject(String name, long solidAngle, float waitTimeSeconds) {
+        goToObject(name, (double) solidAngle, waitTimeSeconds);
     }
 
-    private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
+    private void goToObject(String name, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             if (scene.index().containsEntity(name)) {
                 Entity focus = scene.findFocus(name);
                 focusView.setEntity(focus);
                 focusView.getFocus(name);
-                goToObject(focus, viewAngle, waitTimeSeconds, stop);
+                goToObject(focus, solidAngle, waitTimeSeconds, stop);
             } else {
                 logger.info("FOCUS_MODE object does not exist: " + name);
             }
         }
     }
 
-    public void goToObject(String name, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
-        goToObject(name, viewAngle, (float) waitTimeSeconds, stop);
+    public void goToObject(String name, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
+        goToObject(name, solidAngle, (float) waitTimeSeconds, stop);
     }
 
-    void goToObject(Entity object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        if (checkNotNull(object, "object") && checkNum(viewAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "viewAngle")) {
+    void goToObject(Entity object, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
+        if (checkNotNull(object, "object") && checkNum(solidAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "solidAngle")) {
             stops.add(stop);
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
@@ -1433,7 +1433,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             changeFocus(focusView, cam, waitTimeSeconds);
 
             /* target angle */
-            double target = Math.toRadians(viewAngle);
+            double target = Math.toRadians(solidAngle);
             if (target < 0)
                 target = Math.toRadians(20d);
 
@@ -1473,8 +1473,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void goToObject(Entity object, double viewAngle, int waitTimeSeconds, AtomicBoolean stop) {
-        goToObject(object, viewAngle, (float) waitTimeSeconds, stop);
+    public void goToObject(Entity object, double solidAngle, int waitTimeSeconds, AtomicBoolean stop) {
+        goToObject(object, solidAngle, (float) waitTimeSeconds, stop);
     }
 
     @Override
@@ -1917,7 +1917,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void displayMessageObject(final int id, final String message, final double x, final double y, final List color, final double fontSize) {
+    public void displayMessageObject(final int id, final String message, final double x, final double y, final List<?> color, final double fontSize) {
         displayMessageObject(id, message, x, y, dArray(color), fontSize);
     }
 
@@ -2167,16 +2167,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Object monitor = new Object();
             IObserver watcher = (event, source, data) -> {
                 switch (event) {
-                case CAMERA_PLAY_INFO:
+                case CAMERA_PLAY_INFO -> {
                     Boolean status = (Boolean) data[0];
                     if (!status) {
                         synchronized (monitor) {
                             monitor.notify();
                         }
                     }
-                    break;
-                default:
-                    break;
+                }
+                default -> {
+                }
                 }
             };
             em.subscribe(watcher, Event.CAMERA_PLAY_INFO);
@@ -2406,7 +2406,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void changeFocus(FocusView object, NaturalCamera cam, double waitTimeSeconds) {
         // Post focus change and wait, if needed
         FocusView currentFocus = (FocusView) cam.getFocus();
-        if (currentFocus == null || Mapper.particleSet.has(currentFocus.getEntity()) || currentFocus.getEntity() != object.getEntity()) {
+        if (currentFocus == null || currentFocus.isSet() || currentFocus.getEntity() != object.getEntity()) {
             em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             em.post(Event.FOCUS_CHANGE_CMD, this, object.getEntity());
 

@@ -263,9 +263,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             String unitC;
 
                             Pair<UCD, Double> pos3 = getDoubleUcd(ucdParser.POS3, row);
-                            if(pos3.getSecond() > 750) {
-                                int abcd= 3;
-                            }
                             // Check missing pos3 -> Use default parallax
                             if (ucdParser.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
                                 c = new Pair<>(null, 0.04);
