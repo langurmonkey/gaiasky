@@ -535,8 +535,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraSpeed(final float speed) {
-        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
-            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this, speed / 10f, false));
+        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
+            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED), false));
+        }
     }
 
     public void setCameraSpeed(final int speed) {
@@ -550,8 +551,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraRotationSpeed(float speed) {
-        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
+        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
             postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
+        }
     }
 
     public void setCameraRotationSpeed(final int speed) {
@@ -569,8 +571,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraTurningSpeed(float speed) {
-        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
+        if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
             postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
+        }
     }
 
     public void setCameraTurningSpeed(final int speed) {
@@ -2613,10 +2616,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-
     @Override
     public void setIndexOfRefraction(float ior) {
-            em.post(Event.INDEXOFREFRACTION_CMD, this, ior);
+        em.post(Event.INDEXOFREFRACTION_CMD, this, ior);
     }
 
     @Override
