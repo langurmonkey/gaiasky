@@ -964,6 +964,78 @@
     "mono-pink": {
       "font": "mono",
       "fontColor": "pink"
+    },
+    "msg-13": {
+      "font": "ui-13",
+      "fontColor": "white"
+    },
+    "msg-14": {
+      "font": "ui-14",
+      "fontColor": "white"
+    },
+    "msg-15": {
+      "font": "ui-15",
+      "fontColor": "white"
+    },
+    "msg-17": {
+      "font": "ui-17",
+      "fontColor": "white"
+    },
+    "msg-18": {
+      "font": "ui-18",
+      "fontColor": "white"
+    },
+    "msg-19": {
+      "font": "ui-19",
+      "fontColor": "white"
+    },
+    "msg-20": {
+      "font": "ui-20",
+      "fontColor": "white"
+    },
+    "msg-21": {
+      "font": "ui-21",
+      "fontColor": "white"
+    },
+    "msg-22": {
+      "font": "ui-21",
+      "fontColor": "white"
+    },
+    "msg-23": {
+      "font": "ui-23",
+      "fontColor": "white"
+    },
+    "msg-24": {
+      "font": "ui-23",
+      "fontColor": "white"
+    },
+    "msg-25": {
+      "font": "ui-25",
+      "fontColor": "white"
+    },
+    "msg-26": {
+      "font": "ui-25",
+      "fontColor": "white"
+    },
+    "msg-27": {
+      "font": "ui-28",
+      "fontColor": "white"
+    },
+    "msg-28": {
+      "font": "ui-28",
+      "fontColor": "white"
+    },
+    "msg-29": {
+      "font": "ui-28",
+      "fontColor": "white"
+    },
+    "msg-30": {
+      "font": "ui-30",
+      "fontColor": "white"
+    },
+    "msg-33": {
+      "font": "ui-33",
+      "fontColor": "white"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
