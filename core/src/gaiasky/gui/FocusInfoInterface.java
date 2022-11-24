@@ -45,7 +45,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected Button goTo, landOn, landAt, bookmark;
     protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
-    protected OwnLabel camName, camVel, camPos, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
+    protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
     protected OwnLabel focusIdExpand;
 
@@ -165,7 +165,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         camTracking = new OwnLabel("-", skin, "hud");
         camVel = new OwnLabel("", skin, "hud");
         camDistSol = new OwnLabel("", skin, "hud");
-        camPos = new OwnLabel("", skin, "hud");
 
         // Ruler
         rulerName = new OwnLabel(I18n.msg("gui.ruler.title"), skin, "hud-header");
@@ -334,8 +333,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         cameraInfo.add(new OwnLabel(I18n.msg("gui.camera.vel"), skin, "hud")).left();
         cameraInfo.add(camVel).left().padLeft(pad15).row();
         cameraInfo.add(new OwnLabel(I18n.msg("gui.focusinfo.distance.sol"), skin, "hud")).left();
-        cameraInfo.add(camDistSol).left().padLeft(pad15).row();
-        cameraInfo.add(camPos).left().colspan(2);
+        cameraInfo.add(camDistSol).left().padLeft(pad15);
 
         // RULER INFO
         rulerInfo.add(rulerName).left().row();
@@ -625,10 +623,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x, s.program.ui.distanceUnits);
             Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y, s.program.ui.distanceUnits);
             Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z, s.program.ui.distanceUnits);
-            String camPosStr = "[" + sf.format(x.getFirst()) + " " + x.getSecond() + ", " + sf.format(y.getFirst()) + " " + y.getSecond() + ", " + sf.format(z.getFirst()) + " " + z.getSecond() + "]";
             camVel.setText(sf.format((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
-            camPos.setText(TextUtils.capString(camPosStr, 40));
-            camPos.addListener(new OwnTextTooltip(camPosStr, skin));
             Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lend(), s.program.ui.distanceUnits);
             camDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
         }
