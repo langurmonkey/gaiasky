@@ -32,7 +32,7 @@ public class OwnProgressBar extends ProgressBar {
     }
 
     public void setTitle(String title, Skin skin){
-        this.titleLabel = new OwnLabel(title, skin, "ui-13");
+        this.titleLabel = new OwnLabel(title, skin, "small");
     }
 
     public void setPrefWidth(float prefWidth) {

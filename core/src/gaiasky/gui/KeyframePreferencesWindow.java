@@ -73,21 +73,21 @@ public class KeyframePreferencesWindow extends GenericDialog {
         OwnLabel time = new OwnLabel(I18n.msg("gui.time"), skin);
         OwnLabel timeMethod = new OwnLabel(I18n.msg("gui.interpolation.linear"), skin);
 
-        content.add(generalTitle).left().top().colspan(2).padBottom(pad10).row();
+        content.add(generalTitle).left().top().colspan(2).padBottom(pad18).row();
 
-        content.add(camfpsLabel).left().padRight(pad10).padBottom(pad10 * 3f);
-        content.add(camrecFps).left().padBottom(pad10 * 3f).row();
+        content.add(camfpsLabel).left().padRight(pad18).padBottom(pad18 * 3f);
+        content.add(camrecFps).left().padBottom(pad18 * 3f).row();
 
-        content.add(interpTitle).left().top().colspan(2).padBottom(pad10).row();
+        content.add(interpTitle).left().top().colspan(2).padBottom(pad18).row();
 
-        content.add(pos).left().padRight(pad10).padBottom(pad10);
-        content.add(posMethod).left().padBottom(pad10).row();
+        content.add(pos).left().padRight(pad18).padBottom(pad18);
+        content.add(posMethod).left().padBottom(pad18).row();
 
-        content.add(orientation).left().padRight(pad10).padBottom(pad10);
-        content.add(orientationMethod).left().padBottom(pad10).row();
+        content.add(orientation).left().padRight(pad18).padBottom(pad18);
+        content.add(orientationMethod).left().padBottom(pad18).row();
 
-        content.add(time).left().padRight(pad10).padBottom(pad10 * 3f);
-        content.add(timeMethod).left().padBottom(pad10 * 3f).row();
+        content.add(time).left().padRight(pad18).padBottom(pad18 * 3f);
+        content.add(timeMethod).left().padBottom(pad18 * 3f).row();
 
     }
 

@@ -74,7 +74,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction;
+    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
@@ -123,7 +123,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnTextIconButton createTab(String title, Image img, Skin skin) {
         OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), img, skin, "toggle-big");
         tab.addListener(new OwnTextTooltip(title, skin));
-        tab.pad(pad5);
+        tab.pad(pad10);
         tab.setWidth(480f);
         return tab;
     }
@@ -170,7 +170,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabsTable.add(tabPlanetarium).row();
         tabsTable.add(tabData).row();
         tabsTable.add(tabSystem).row();
-        content.add(tabsTable).align(Align.left | Align.top).padLeft(pad5);
+        content.add(tabsTable).align(Align.left | Align.top).padLeft(pad10);
 
         tabButtons = new Array<>();
         tabButtons.add(tabGraphics);
@@ -233,13 +233,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnLabel widthLabel = new OwnLabel(I18n.msg("gui.width") + ":", skin);
         final OwnLabel heightLabel = new OwnLabel(I18n.msg("gui.height") + ":", skin);
 
-        windowedResolutions.add(widthLabel).left().padRight(pad5);
-        windowedResolutions.add(widthField).left().padRight(pad5);
-        windowedResolutions.add(heightLabel).left().padRight(pad5);
+        windowedResolutions.add(widthLabel).left().padRight(pad10);
+        windowedResolutions.add(widthField).left().padRight(pad10);
+        windowedResolutions.add(heightLabel).left().padRight(pad10);
         windowedResolutions.add(heightField).left().row();
 
         // Radio buttons
-        fullScreen = new OwnCheckBox(I18n.msg("gui.fullscreen"), skin, "radio", pad5);
+        fullScreen = new OwnCheckBox(I18n.msg("gui.fullscreen"), skin, "radio", pad10);
         fullScreen.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 selectFullscreen(fullScreen.isChecked(), widthField, heightField, fullScreenResolutions, widthLabel, heightLabel);
@@ -249,7 +249,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
         fullScreen.setChecked(settings.graphics.fullScreen.active);
 
-        windowed = new OwnCheckBox(I18n.msg("gui.windowed"), skin, "radio", pad5);
+        windowed = new OwnCheckBox(I18n.msg("gui.windowed"), skin, "radio", pad10);
         windowed.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 selectFullscreen(!windowed.isChecked(), widthField, heightField, fullScreenResolutions, widthLabel, heightLabel);
@@ -285,24 +285,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
         HorizontalGroup maxFpsGroup = new HorizontalGroup();
-        maxFpsGroup.space(pad10);
+        maxFpsGroup.space(pad18);
         maxFpsGroup.addActor(maxFps);
         maxFpsGroup.addActor(this.maxFpsInput);
 
         labels.addAll(vsyncLabel, maxFpsLabel);
 
-        mode.add(fullScreen).left().padRight(pad10);
+        mode.add(fullScreen).left().padRight(pad18);
         mode.add(fullScreenResolutions).left().row();
-        mode.add(windowed).left().padRight(pad10).padTop(pad10).padBottom(pad5);
-        mode.add(windowedResolutions).left().padTop(pad10).padBottom(pad5).row();
-        mode.add(vsyncLabel).left().padRight(pad20).padBottom(pad5);
-        mode.add(vsync).left().padBottom(pad5).row();
-        mode.add(maxFpsLabel).left().padRight(pad20).padBottom(pad5);
-        mode.add(maxFpsGroup).left().padBottom(pad5).row();
+        mode.add(windowed).left().padRight(pad18).padTop(pad18).padBottom(pad10);
+        mode.add(windowedResolutions).left().padTop(pad18).padBottom(pad10).row();
+        mode.add(vsyncLabel).left().padRight(pad34).padBottom(pad10);
+        mode.add(vsync).left().padBottom(pad10).row();
+        mode.add(maxFpsLabel).left().padRight(pad34).padBottom(pad10);
+        mode.add(maxFpsGroup).left().padBottom(pad10).row();
 
         // Add to content
-        contentGraphicsTable.add(titleResolution).left().padBottom(pad10).row();
-        contentGraphicsTable.add(mode).left().padBottom(pad20).row();
+        contentGraphicsTable.add(titleResolution).left().padBottom(pad18).row();
+        contentGraphicsTable.add(mode).left().padBottom(pad34).row();
 
         // GRAPHICS SETTINGS
         Label titleGraphics = new OwnLabel(I18n.msg("gui.graphicssettings"), skin, "header");
@@ -349,8 +349,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        OwnImageButton gqualityTooltip = new OwnImageButton(skin, "tooltip");
-        gqualityTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
+        OwnImageButton gQualityTooltip = new OwnImageButton(skin, "tooltip");
+        gQualityTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.gquality.info"), skin));
 
         // AA
         OwnLabel aaLabel = new OwnLabel(I18n.msg("gui.aa"), skin);
@@ -385,7 +385,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // BLOOM
         OwnLabel bloomLabel = new OwnLabel(I18n.msg("gui.bloom"), skin, "default");
-        Slider bloomEffect = new OwnSlider(Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
+        Slider bloomEffect = new OwnSliderPlus("", Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
         bloomEffect.setName("bloom effect");
         bloomEffect.setWidth(sliderWidth);
         bloomEffect.setValue(settings.postprocess.bloom.intensity * 10f);
@@ -399,7 +399,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // UNSHARP MASK
         OwnLabel unsharpMaskLabel = new OwnLabel(I18n.msg("gui.unsharpmask"), skin, "default");
-        Slider unsharpMaskFactor = new OwnSlider(Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
+        Slider unsharpMaskFactor = new OwnSliderPlus("", Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
         unsharpMaskFactor.setName("unsharp mask factor");
         unsharpMaskFactor.setWidth(sliderWidth);
         unsharpMaskFactor.setValue(settings.postprocess.unsharpMask.factor);
@@ -448,41 +448,41 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnImageButton fadeTimeTooltip = new OwnImageButton(skin, "tooltip");
         fadeTimeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.fadetime.info"), skin));
 
-        graphics.add(graphicsQualityLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(graphicsQuality).left().padRight(pad10).padBottom(pad5);
-        graphics.add(gqualityTooltip).left().padBottom(pad5).row();
+        graphics.add(graphicsQualityLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(graphicsQuality).left().padRight(pad18).padBottom(pad10);
+        graphics.add(gQualityTooltip).left().padBottom(pad10).row();
         noticeHiResCell = graphics.add();
         noticeHiResCell.colspan(3).left().row();
-        graphics.add(aaLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(aa).left().padRight(pad10).padBottom(pad5);
-        graphics.add(aaTooltip).left().padBottom(pad5).row();
+        graphics.add(aaLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(aa).left().padRight(pad18).padBottom(pad10);
+        graphics.add(aaTooltip).left().padBottom(pad10).row();
         if (!settings.runtime.openVr) {
             OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
             OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
             pointCloudTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.pointcloud.info"), skin));
             OwnLabel restart = new OwnLabel(I18n.msg("gui.restart"), skin, "default-pink");
-            graphics.add(pointCloudLabel).left().padRight(pad20).padBottom(pad5);
-            graphics.add(pointCloudRenderer).left().padBottom(pad5);
-            graphics.add(pointCloudTooltip).left().padRight(pad20).padBottom(pad5);
-            graphics.add(restart).left().padRight(pad20).padBottom(pad5).row();
+            graphics.add(pointCloudLabel).left().padRight(pad34).padBottom(pad10);
+            graphics.add(pointCloudRenderer).left().padBottom(pad10);
+            graphics.add(pointCloudTooltip).left().padRight(pad34).padBottom(pad10);
+            graphics.add(restart).left().padRight(pad34).padBottom(pad10).row();
         }
-        graphics.add(lrLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(lineRenderer).left().padBottom(pad5).row();
-        graphics.add(bloomLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(bloomEffect).left().padBottom(pad5).row();
-        graphics.add(unsharpMaskLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(unsharpMaskFactor).left().padBottom(pad5).row();
-        graphics.add(lensFlareLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(lensFlare).left().padBottom(pad5).row();
-        graphics.add(lightGlowLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(lightGlow).left().padBottom(pad5).row();
-        graphics.add(fadeTimeLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(fadeTimeField).left().padRight(pad10).padBottom(pad5);
-        graphics.add(fadeTimeTooltip).left().padRight(pad20).padBottom(pad5).row();
+        graphics.add(lrLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(lineRenderer).left().padBottom(pad10).row();
+        graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(bloomEffect).left().padBottom(pad10).row();
+        graphics.add(unsharpMaskLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(unsharpMaskFactor).left().padBottom(pad10).row();
+        graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(lensFlare).left().padBottom(pad10).row();
+        graphics.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(lightGlow).left().padBottom(pad10).row();
+        graphics.add(fadeTimeLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(fadeTimeField).left().padRight(pad18).padBottom(pad10);
+        graphics.add(fadeTimeTooltip).left().padRight(pad34).padBottom(pad10).row();
 
         // Add to content
-        contentGraphicsTable.add(titleGraphics).left().padBottom(pad10).row();
-        contentGraphicsTable.add(graphics).left().padBottom(pad20).row();
+        contentGraphicsTable.add(titleGraphics).left().padBottom(pad18).row();
+        contentGraphicsTable.add(graphics).left().padBottom(pad34).row();
 
         // ELEVATION
         Label titleElevation = new OwnLabel(I18n.msg("gui.elevation.title"), skin, "header");
@@ -511,7 +511,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tessQualityLabel = new OwnLabel(I18n.msg("gui.elevation.tessellation.quality"), skin);
         tessQualityLabel.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
 
-        tessQuality = new OwnSlider(Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, skin);
+        tessQuality = new OwnSliderPlus("", Constants.MIN_TESS_QUALITY, Constants.MAX_TESS_QUALITY, 0.1f, skin);
         tessQuality.setDisabled(!settings.scene.renderer.elevation.type.isTessellation());
         tessQuality.setWidth(sliderWidth);
         tessQuality.setValue((float) settings.scene.renderer.elevation.quality);
@@ -519,14 +519,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // LABELS
         labels.add(elevationTypeLabel, tessQualityLabel);
 
-        elevation.add(elevationTypeLabel).left().padRight(pad20).padBottom(pad5);
-        elevation.add(elevationSb).left().padRight(pad10).padBottom(pad5).row();
-        elevation.add(tessQualityLabel).left().padRight(pad20).padBottom(pad5);
-        elevation.add(tessQuality).left().padRight(pad10).padBottom(pad5);
+        elevation.add(elevationTypeLabel).left().padRight(pad34).padBottom(pad10);
+        elevation.add(elevationSb).left().padRight(pad18).padBottom(pad10).row();
+        elevation.add(tessQualityLabel).left().padRight(pad34).padBottom(pad10);
+        elevation.add(tessQuality).left().padRight(pad18).padBottom(pad10);
 
         // Add to content
-        contentGraphicsTable.add(titleElevation).left().padBottom(pad10).row();
-        contentGraphicsTable.add(elevation).left().padBottom(pad20).row();
+        contentGraphicsTable.add(titleElevation).left().padBottom(pad18).row();
+        contentGraphicsTable.add(elevation).left().padBottom(pad34).row();
 
         // SHADOWS
         Label titleShadows = new OwnLabel(I18n.msg("gui.graphics.shadows"), skin, "header");
@@ -570,16 +570,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // LABELS
         labels.add(smResolutionLabel);
 
-        shadows.add(shadowsLabel).left().padRight(pad20).padBottom(pad5);
-        shadows.add(shadowsCb).left().padRight(pad10).padBottom(pad5).row();
-        shadows.add(smResolutionLabel).left().padRight(pad20).padBottom(pad5);
-        shadows.add(smResolution).left().padRight(pad10).padBottom(pad5).row();
-        shadows.add(nShadowsLabel).left().padRight(pad20).padBottom(pad5);
-        shadows.add(nShadows).left().padRight(pad10).padBottom(pad5);
+        shadows.add(shadowsLabel).left().padRight(pad34).padBottom(pad10);
+        shadows.add(shadowsCb).left().padRight(pad18).padBottom(pad10).row();
+        shadows.add(smResolutionLabel).left().padRight(pad34).padBottom(pad10);
+        shadows.add(smResolution).left().padRight(pad18).padBottom(pad10).row();
+        shadows.add(nShadowsLabel).left().padRight(pad34).padBottom(pad10);
+        shadows.add(nShadows).left().padRight(pad18).padBottom(pad10);
 
         // Add to content
-        contentGraphicsTable.add(titleShadows).left().padBottom(pad10).row();
-        contentGraphicsTable.add(shadows).left().padBottom(pad20).row();
+        contentGraphicsTable.add(titleShadows).left().padBottom(pad18).row();
+        contentGraphicsTable.add(shadows).left().padBottom(pad34).row();
 
         // IMAGE LEVELS
         Label titleDisplay = new OwnLabel(I18n.msg("gui.graphics.imglevels"), skin, "header");
@@ -588,7 +588,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         /* Brightness */
         OwnLabel brightnessLabel = new OwnLabel(I18n.msg("gui.brightness"), skin, "default");
-        Slider brightness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+        Slider brightness = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         brightness.setName("brightness");
         brightness.setWidth(sliderWidth);
         brightness.setValue(MathUtilsd.lint(settings.postprocess.levels.brightness, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
@@ -600,12 +600,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        imageLevels.add(brightnessLabel).left().padRight(pad20).padBottom(pad5);
-        imageLevels.add(brightness).left().padRight(pad10).padBottom(pad5).row();
+        imageLevels.add(brightnessLabel).left().padRight(pad34).padBottom(pad10);
+        imageLevels.add(brightness).left().padRight(pad18).padBottom(pad10).row();
 
         /* Contrast */
         OwnLabel contrastLabel = new OwnLabel(I18n.msg("gui.contrast"), skin, "default");
-        Slider contrast = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+        Slider contrast = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         contrast.setName("contrast");
         contrast.setWidth(sliderWidth);
         contrast.setValue(MathUtilsd.lint(settings.postprocess.levels.contrast, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
@@ -617,12 +617,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        imageLevels.add(contrastLabel).left().padRight(pad20).padBottom(pad5);
-        imageLevels.add(contrast).left().padRight(pad10).padBottom(pad5).row();
+        imageLevels.add(contrastLabel).left().padRight(pad34).padBottom(pad10);
+        imageLevels.add(contrast).left().padRight(pad18).padBottom(pad10).row();
 
         /* Hue */
         OwnLabel hueLabel = new OwnLabel(I18n.msg("gui.hue"), skin, "default");
-        Slider hue = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+        Slider hue = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         hue.setName("hue");
         hue.setWidth(sliderWidth);
         hue.setValue(MathUtilsd.lint(settings.postprocess.levels.hue, Constants.MIN_HUE, Constants.MAX_HUE, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
@@ -634,12 +634,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        imageLevels.add(hueLabel).left().padRight(pad20).padBottom(pad5);
-        imageLevels.add(hue).left().padRight(pad10).padBottom(pad5).row();
+        imageLevels.add(hueLabel).left().padRight(pad34).padBottom(pad10);
+        imageLevels.add(hue).left().padRight(pad18).padBottom(pad10).row();
 
         /* Saturation */
         OwnLabel saturationLabel = new OwnLabel(I18n.msg("gui.saturation"), skin, "default");
-        Slider saturation = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
+        Slider saturation = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         saturation.setName("saturation");
         saturation.setWidth(sliderWidth);
         saturation.setValue(MathUtilsd.lint(settings.postprocess.levels.saturation, Constants.MIN_SATURATION, Constants.MAX_SATURATION, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
@@ -651,12 +651,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        imageLevels.add(saturationLabel).left().padRight(pad20).padBottom(pad5);
-        imageLevels.add(saturation).left().padRight(pad10).padBottom(pad5).row();
+        imageLevels.add(saturationLabel).left().padRight(pad34).padBottom(pad10);
+        imageLevels.add(saturation).left().padRight(pad18).padBottom(pad10).row();
 
         /* Gamma */
         OwnLabel gammaLabel = new OwnLabel(I18n.msg("gui.gamma"), skin, "default");
-        Slider gamma = new OwnSlider(Constants.MIN_GAMMA, Constants.MAX_GAMMA, 0.1f, false, skin);
+        Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, 0.1f, false, skin);
         gamma.setName("gamma");
         gamma.setWidth(sliderWidth);
         gamma.setValue(settings.postprocess.levels.gamma);
@@ -668,8 +668,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        imageLevels.add(gammaLabel).left().padRight(pad20).padBottom(pad5);
-        imageLevels.add(gamma).left().padRight(pad10).padBottom(pad5).row();
+        imageLevels.add(gammaLabel).left().padRight(pad34).padBottom(pad10);
+        imageLevels.add(gamma).left().padRight(pad18).padBottom(pad10).row();
 
         /* Tone Mapping */
         OwnLabel toneMappingLabel = new OwnLabel(I18n.msg("gui.tonemapping.type"), skin, "default");
@@ -684,13 +684,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         toneMappingSelect.setItems(toneMappingTypes);
         toneMappingSelect.setWidth(textWidth * 3f);
         toneMappingSelect.setSelectedIndex(settings.postprocess.toneMapping.type.ordinal());
-        imageLevels.add(toneMappingLabel).left().padRight(pad20).padBottom(pad5);
-        imageLevels.add(toneMappingSelect).left().padBottom(pad5).row();
+        imageLevels.add(toneMappingLabel).left().padRight(pad34).padBottom(pad10);
+        imageLevels.add(toneMappingSelect).left().padBottom(pad10).row();
 
         /* Exposure */
         OwnLabel exposureLabel = new OwnLabel(I18n.msg("gui.exposure"), skin, "default");
         exposureLabel.setDisabled(settings.postprocess.toneMapping.type != ToneMapping.EXPOSURE);
-        Slider exposure = new OwnSlider(Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
+        Slider exposure = new OwnSliderPlus("", Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE, 0.1f, false, skin);
         exposure.setName("exposure");
         exposure.setWidth(sliderWidth);
         exposure.setValue(settings.postprocess.toneMapping.exposure);
@@ -714,15 +714,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        imageLevels.add(exposureLabel).left().padRight(pad20).padBottom(pad5);
-        imageLevels.add(exposure).left().padRight(pad10).padBottom(pad5).row();
+        imageLevels.add(exposureLabel).left().padRight(pad34).padBottom(pad10);
+        imageLevels.add(exposure).left().padRight(pad18).padBottom(pad10).row();
 
         // LABELS
         labels.addAll(brightnessLabel, contrastLabel, hueLabel, saturationLabel, gammaLabel);
 
         // Add to content
-        contentGraphicsTable.add(titleDisplay).left().padBottom(pad10).row();
-        contentGraphicsTable.add(imageLevels).left().padBottom(pad20).row();
+        contentGraphicsTable.add(titleDisplay).left().padBottom(pad18).row();
+        contentGraphicsTable.add(imageLevels).left().padBottom(pad34).row();
 
         if (!settings.runtime.openVr) {
             // EXPERIMENTAL
@@ -749,8 +749,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 return false;
             });
 
-            experimental.add(reprojectionLabel).left().padRight(pad20).padBottom(pad5);
-            experimental.add(reprojectionMode).left().padRight(pad10).padBottom(pad5).row();
+            experimental.add(reprojectionLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(reprojectionMode).left().padRight(pad18).padBottom(pad10).row();
 
             // Dynamic resolution
             OwnLabel dynamicResolutionLabel = new OwnLabel(I18n.msg("gui.dynamicresolution"), skin);
@@ -759,14 +759,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             OwnImageButton dynamicResolutionTooltip = new OwnImageButton(skin, "tooltip");
             dynamicResolutionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.dynamicresolution.info"), skin));
 
-            experimental.add(dynamicResolutionLabel).left().padRight(pad20).padBottom(pad5);
-            experimental.add(dynamicResolution).left().padRight(pad10).padBottom(pad5);
-            experimental.add(dynamicResolutionTooltip).left().padBottom(pad5).row();
+            experimental.add(dynamicResolutionLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(dynamicResolution).left().padRight(pad18).padBottom(pad10);
+            experimental.add(dynamicResolutionTooltip).left().padBottom(pad10).row();
 
             // Back-buffer scale
             OwnLabel backBufferScaleLabel = new OwnLabel(I18n.msg("gui.backbuffer.scale"), skin);
             backBufferScaleLabel.setDisabled(settings.graphics.dynamicResolution);
-            backBufferScale = new OwnSlider(Constants.BACKBUFFER_SCALE_MIN, Constants.BACKBUFFER_SCALE_MAX, Constants.BACKBUFFER_SCALE_STEP, skin);
+            backBufferScale = new OwnSliderPlus("", Constants.BACKBUFFER_SCALE_MIN, Constants.BACKBUFFER_SCALE_MAX, Constants.BACKBUFFER_SCALE_STEP, skin);
             backBufferScale.setWidth(textWidth * 3f);
             backBufferScale.setMappedValue(settings.graphics.backBufferScale);
             backBufferScale.setDisabled(settings.graphics.dynamicResolution);
@@ -781,21 +781,21 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 return false;
             });
 
-            experimental.add(backBufferScaleLabel).left().padRight(pad20).padBottom(pad5);
-            experimental.add(backBufferScale).left().padRight(pad10).padBottom(pad5);
-            experimental.add(backBufferTooltip).left().padBottom(pad5).row();
+            experimental.add(backBufferScaleLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(backBufferScale).left().padRight(pad18).padBottom(pad10);
+            experimental.add(backBufferTooltip).left().padBottom(pad10).row();
 
             // Index of refraction of celestial sphere
             OwnLabel celestialSphereIndexOfRefractionLabel = new OwnLabel(I18n.msg("gui.indexofrefraction"), skin);
-            celestialSphereIndexOfRefraction = new OwnSlider(1.f, 2.5f, 0.05f, skin);
+            celestialSphereIndexOfRefraction = new OwnSliderPlus("", 1.f, 2.5f, 0.05f, skin);
             celestialSphereIndexOfRefraction.setWidth(textWidth * 3f);
             celestialSphereIndexOfRefraction.setMappedValue(settings.program.modeCubemap.celestialSphereIndexOfRefraction);
             OwnImageButton celestialSphereIndexOfRefractionTooltip = new OwnImageButton(skin, "tooltip");
             celestialSphereIndexOfRefractionTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.indexofrefraction.info"), skin));
 
-            experimental.add(celestialSphereIndexOfRefractionLabel).left().padRight(pad20).padBottom(pad5);
-            experimental.add(celestialSphereIndexOfRefraction).left().padRight(pad10).padBottom(pad5);
-            experimental.add(celestialSphereIndexOfRefractionTooltip).left().padBottom(pad5).row();
+            experimental.add(celestialSphereIndexOfRefractionLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(celestialSphereIndexOfRefraction).left().padRight(pad18).padBottom(pad10);
+            experimental.add(celestialSphereIndexOfRefractionTooltip).left().padBottom(pad10).row();
 
             // SSR
             OwnLabel ssrLabel = new OwnLabel(I18n.msg("gui.ssr"), skin);
@@ -805,9 +805,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
             ssrTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.ssr.info"), skin));
 
-            experimental.add(ssrLabel).left().padRight(pad20).padBottom(pad5);
-            experimental.add(ssr).left().padRight(pad10).padBottom(pad5);
-            experimental.add(ssrTooltip).left().padBottom(pad5).row();
+            experimental.add(ssrLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(ssr).left().padRight(pad18).padBottom(pad10);
+            experimental.add(ssrTooltip).left().padBottom(pad10).row();
 
             // MOTION BLUR
             OwnLabel motionBlurLabel = new OwnLabel(I18n.msg("gui.motionblur"), skin);
@@ -816,15 +816,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur.active);
             motionBlur.setDisabled(safeMode || vr);
 
-            experimental.add(motionBlurLabel).left().padRight(pad20).padBottom(pad5);
-            experimental.add(motionBlur).left().padRight(pad10).padBottom(pad5);
+            experimental.add(motionBlurLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(motionBlur).left().padRight(pad18).padBottom(pad10);
 
             // LABELS
             labels.addAll(dynamicResolutionLabel);
             labels.addAll(ssrLabel);
 
             // Add to content
-            contentGraphicsTable.add(titleExperimental).left().padBottom(pad10).row();
+            contentGraphicsTable.add(titleExperimental).left().padBottom(pad18).row();
             contentGraphicsTable.add(experimental).left();
         }
 
@@ -901,11 +901,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // SCALING
         OwnLabel uiScalelabel = new OwnLabel(I18n.msg("gui.ui.theme.scale"), skin);
         uiScalelabel.setWidth(labelWidth);
-        uiScale = new OwnSlider(Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_SMALL, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, skin);
+        uiScale = new OwnSliderPlus("", Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_SMALL, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, skin);
         uiScale.setWidth(textWidth * 3f);
         uiScale.setMappedValue(settings.program.ui.scale);
         OwnTextButton applyUiScale = new OwnTextButton(I18n.msg("gui.apply"), skin);
-        applyUiScale.pad(0, pad10, 0, pad10);
+        applyUiScale.pad(0, pad18, 0, pad18);
         applyUiScale.setHeight(buttonHeight);
         applyUiScale.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -918,7 +918,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // MINIMAP SIZE
         OwnLabel minimapSizeLabel = new OwnLabel(I18n.msg("gui.ui.minimap.size"), skin, "default");
         minimapSizeLabel.setWidth(labelWidth);
-        minimapSize = new OwnSlider(Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE, 1f, skin);
+        minimapSize = new OwnSliderPlus("", Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE, 1f, skin);
         minimapSize.setName("minimapSize");
         minimapSize.setWidth(sliderWidth);
         minimapSize.setValue(settings.program.minimap.size);
@@ -946,19 +946,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.addAll(langLabel, themeLabel);
 
         // Add to table
-        ui.add(langLabel).left().padRight(pad20).padBottom(pad10);
-        ui.add(lang).colspan(2).left().padBottom(pad10).row();
-        ui.add(themeLabel).left().padRight(pad20).padBottom(pad10);
-        ui.add(theme).colspan(2).left().padBottom(pad10).row();
-        ui.add(uiScalelabel).left().padRight(pad20).padBottom(pad10);
-        ui.add(uiScale).left().padRight(pad5).padBottom(pad10);
-        ui.add(applyUiScale).left().padBottom(pad10).row();
-        ui.add(minimapSizeLabel).left().padRight(pad5).padBottom(pad10);
-        ui.add(minimapSize).colspan(2).left().padRight(pad5).padBottom(pad10).row();
-        ui.add(distUnitsLabel).left().padRight(pad5).padBottom(pad10);
-        ui.add(distUnitsSelect).colspan(2).left().padRight(pad5).padBottom(pad10).row();
-        ui.add(modeChangeInfoLabel).left().padRight(pad5).padBottom(pad10);
-        ui.add(modeChangeInfo).colspan(2).left().padRight(pad5).padBottom(pad10).row();
+        ui.add(langLabel).left().padRight(pad34).padBottom(pad18);
+        ui.add(lang).colspan(2).left().padBottom(pad18).row();
+        ui.add(themeLabel).left().padRight(pad34).padBottom(pad18);
+        ui.add(theme).colspan(2).left().padBottom(pad18).row();
+        ui.add(uiScalelabel).left().padRight(pad34).padBottom(pad18);
+        ui.add(uiScale).left().padRight(pad10).padBottom(pad18);
+        ui.add(applyUiScale).left().padBottom(pad18).row();
+        ui.add(minimapSizeLabel).left().padRight(pad10).padBottom(pad18);
+        ui.add(minimapSize).colspan(2).left().padRight(pad10).padBottom(pad18).row();
+        ui.add(distUnitsLabel).left().padRight(pad10).padBottom(pad18);
+        ui.add(distUnitsSelect).colspan(2).left().padRight(pad10).padBottom(pad18).row();
+        ui.add(modeChangeInfoLabel).left().padRight(pad10).padBottom(pad18);
+        ui.add(modeChangeInfo).colspan(2).left().padRight(pad10).padBottom(pad18).row();
 
 
         /* CROSSHAIR AND MARKERS */
@@ -986,12 +986,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.add(crosshairClosestLabel, crosshairHomeLabel, crosshairFocusLabel);
 
         // Add to table
-        ch.add(crosshairFocusLabel).left().padRight(pad20).padBottom(pad5);
-        ch.add(crosshairFocus).left().padBottom(pad5).row();
-        ch.add(crosshairClosestLabel).left().padRight(pad20).padBottom(pad5);
-        ch.add(crosshairClosest).left().padBottom(pad5).row();
-        ch.add(crosshairHomeLabel).left().padRight(pad20).padBottom(pad5);
-        ch.add(crosshairHome).left().padBottom(pad5).row();
+        ch.add(crosshairFocusLabel).left().padRight(pad34).padBottom(pad10);
+        ch.add(crosshairFocus).left().padBottom(pad10).row();
+        ch.add(crosshairClosestLabel).left().padRight(pad34).padBottom(pad10);
+        ch.add(crosshairClosest).left().padBottom(pad10).row();
+        ch.add(crosshairHomeLabel).left().padRight(pad34).padBottom(pad10);
+        ch.add(crosshairHome).left().padBottom(pad10).row();
 
         /* POINTER GUIDES */
         OwnLabel titleGuides = new OwnLabel(I18n.msg("gui.ui.pointer.guides"), skin, "header");
@@ -1010,7 +1010,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnImageButton guidesTooltip = new OwnImageButton(skin, "tooltip");
         guidesTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.ui.pointer.guides.info"), skin));
         HorizontalGroup pointerGuidesCbGroup = new HorizontalGroup();
-        pointerGuidesCbGroup.space(pad10);
+        pointerGuidesCbGroup.space(pad18);
         pointerGuidesCbGroup.addActor(pointerGuides);
         pointerGuidesCbGroup.addActor(guidesTooltip);
 
@@ -1023,7 +1023,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // GUIDES WIDTH
         OwnLabel pointerGuidesWidthLabel = new OwnLabel(I18n.msg("gui.ui.pointer.guides.width"), skin, "default");
         pointerGuidesWidthLabel.setWidth(labelWidth);
-        pointerGuidesWidth = new OwnSlider(Constants.MIN_POINTER_GUIDES_WIDTH, Constants.MAX_POINTER_GUIDES_WIDTH, Constants.SLIDER_STEP_TINY, skin);
+        pointerGuidesWidth = new OwnSliderPlus("", Constants.MIN_POINTER_GUIDES_WIDTH, Constants.MAX_POINTER_GUIDES_WIDTH, Constants.SLIDER_STEP_TINY, skin);
         pointerGuidesWidth.setName("pointerguideswidth");
         pointerGuidesWidth.setWidth(sliderWidth);
         pointerGuidesWidth.setValue(settings.program.pointer.guides.width);
@@ -1031,15 +1031,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.add(pointerGuidesLabel, pointerGuidesColorLabel, pointerGuidesWidthLabel);
 
         // Add to table
-        pg.add(pointerGuidesLabel).left().padBottom(pad5).padRight(pad20);
-        pg.add(pointerGuides).left().colspan(2).padBottom(pad5).row();
-        pg.add(pointerCoordsLabel).left().padRight(pad20).padBottom(pad10);
-        pg.add(pointerCoords).colspan(2).left().padRight(pad5).padBottom(pad10).row();
-        pg.add(guidesTooltip).left().colspan(2).padBottom(pad5).row();
-        pg.add(pointerGuidesColorLabel).left().padBottom(pad5).padRight(pad20);
-        pg.add(pointerGuidesColor).left().size(colorPickerSize).padBottom(pad5).row();
-        pg.add(pointerGuidesWidthLabel).left().padBottom(pad5).padRight(pad20);
-        pg.add(pointerGuidesWidth).left().padBottom(pad5).padRight(pad20);
+        pg.add(pointerGuidesLabel).left().padBottom(pad10).padRight(pad34);
+        pg.add(pointerGuidesCbGroup).left().colspan(2).padBottom(pad10).row();
+        pg.add(pointerCoordsLabel).left().padRight(pad34).padBottom(pad18);
+        pg.add(pointerCoords).left().padRight(pad10).padBottom(pad18).row();
+        pg.add(pointerGuidesColorLabel).left().padBottom(pad10).padRight(pad34);
+        pg.add(pointerGuidesColor).left().size(colorPickerSize).padBottom(pad10).row();
+        pg.add(pointerGuidesWidthLabel).left().padBottom(pad10).padRight(pad34);
+        pg.add(pointerGuidesWidth).left().padBottom(pad10).padRight(pad34);
 
         /* RECURSIVE GRID */
         OwnLabel titleRecgrid = new OwnLabel(I18n.msg("gui.ui.recursivegrid"), skin, "header");
@@ -1061,19 +1060,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         recGridProjectionLines.setChecked(settings.program.recursiveGrid.projectionLines);
 
         // Add to table
-        rg.add(originLabel).left().padBottom(pad5).padRight(pad20);
-        rg.add(recGridOrigin).left().padBottom(pad5).row();
-        rg.add(recGridProjectionLinesLabel).left().padBottom(pad5).padRight(pad20);
-        rg.add(recGridProjectionLines).left().padBottom(pad5);
+        rg.add(originLabel).left().padBottom(pad10).padRight(pad34);
+        rg.add(recGridOrigin).left().padBottom(pad10).row();
+        rg.add(recGridProjectionLinesLabel).left().padBottom(pad10).padRight(pad34);
+        rg.add(recGridProjectionLines).left().padBottom(pad10);
 
         // Add to content
-        contentUI.add(titleUI).left().padBottom(pad10).row();
-        contentUI.add(ui).left().padBottom(pad20).row();
-        contentUI.add(titleCrosshair).left().padBottom(pad10).row();
-        contentUI.add(ch).left().padBottom(pad20).row();
-        contentUI.add(titleGuides).left().padBottom(pad10).row();
-        contentUI.add(pg).left().padBottom(pad20).row();
-        contentUI.add(titleRecgrid).left().padBottom(pad10).row();
+        contentUI.add(titleUI).left().padBottom(pad18).row();
+        contentUI.add(ui).left().padBottom(pad34).row();
+        contentUI.add(titleCrosshair).left().padBottom(pad18).row();
+        contentUI.add(ch).left().padBottom(pad34).row();
+        contentUI.add(titleGuides).left().padBottom(pad18).row();
+        contentUI.add(pg).left().padBottom(pad34).row();
+        contentUI.add(titleRecgrid).left().padBottom(pad18).row();
         contentUI.add(rg).left();
 
 
@@ -1115,10 +1114,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         numThreads.setDisabled(!multithreadCb.isChecked());
 
         // Add to table
-        multiThread.add(multithreadLabel).left().padRight(pad20).padBottom(pad5);
-        multiThread.add(multithreadCb).left().padBottom(pad5).row();
-        multiThread.add(numThreadsLabel).left().padRight(pad20).padBottom(pad5);
-        multiThread.add(numThreads).left().padBottom(pad5).row();
+        multiThread.add(multithreadLabel).left().padRight(pad34).padBottom(pad10);
+        multiThread.add(multithreadCb).left().padBottom(pad10).row();
+        multiThread.add(numThreadsLabel).left().padRight(pad34).padBottom(pad10);
+        multiThread.add(numThreads).left().padBottom(pad10).row();
         final Cell<Actor> noticeMultiThreadCell = multiThread.add((Actor) null);
         noticeMultiThreadCell.colspan(2).left();
 
@@ -1140,8 +1139,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // Add to content
-        contentPerformance.add(titleMultiThread).left().padBottom(pad10).row();
-        contentPerformance.add(multiThread).left().padBottom(pad20).row();
+        contentPerformance.add(titleMultiThread).left().padBottom(pad18).row();
+        contentPerformance.add(multiThread).left().padBottom(pad34).row();
 
         // DRAW DISTANCE
         OwnLabel titleLod = new OwnLabel(I18n.msg("gui.lod"), skin, "header");
@@ -1155,7 +1154,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Draw distance
         OwnLabel ddLabel = new OwnLabel(I18n.msg("gui.lod.thresholds"), skin);
-        lodTransitions = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 0.1f, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG, false, skin);
+        lodTransitions = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 0.1f, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG, skin);
         lodTransitions.setDisplayValueMapped(true);
         lodTransitions.setWidth(sliderWidth);
         lodTransitions.setMappedValue(settings.scene.octree.threshold[0] * MathUtilsd.radDeg);
@@ -1167,14 +1166,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.addAll(numThreadsLabel, ddLabel, lodFadeLabel);
 
         // Add to table
-        lod.add(lodFadeLabel).left().padRight(pad20).padBottom(pad5);
-        lod.add(lodFadeCb).colspan(2).left().padBottom(pad5).row();
-        lod.add(ddLabel).left().padRight(pad20).padBottom(pad5);
-        lod.add(lodTransitions).left().padRight(pad10).padBottom(pad5);
-        lod.add(lodTooltip).left().padBottom(pad5);
+        lod.add(lodFadeLabel).left().padRight(pad34).padBottom(pad10);
+        lod.add(lodFadeCb).colspan(2).left().padBottom(pad10).row();
+        lod.add(ddLabel).left().padRight(pad34).padBottom(pad10);
+        lod.add(lodTransitions).left().padRight(pad18).padBottom(pad10);
+        lod.add(lodTooltip).left().padBottom(pad10);
 
         // Add to content
-        contentPerformance.add(titleLod).left().padBottom(pad10).row();
+        contentPerformance.add(titleLod).left().padBottom(pad18).row();
         contentPerformance.add(lod).left();
 
         /*
@@ -1231,19 +1230,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controls.add(new OwnLabel(I18n.msg("gui.keymappings.action"), skin, "header")).left();
         controls.add(new OwnLabel(I18n.msg("gui.keymappings.keys"), skin, "header")).left().row();
 
-        controls.add(new OwnLabel(I18n.msg("action.forward"), skin)).left().padRight(pad10);
+        controls.add(new OwnLabel(I18n.msg("action.forward"), skin)).left().padRight(pad18);
         controls.add(new OwnLabel(GSKeys.toString(Keys.UP).toUpperCase(), skin, "mono-pink")).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.backward"), skin)).left().padRight(pad10);
+        controls.add(new OwnLabel(I18n.msg("action.backward"), skin)).left().padRight(pad18);
         controls.add(new OwnLabel(GSKeys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink")).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.left"), skin)).left().padRight(pad10);
+        controls.add(new OwnLabel(I18n.msg("action.left"), skin)).left().padRight(pad18);
         controls.add(new OwnLabel(GSKeys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink")).left().row();
-        controls.add(new OwnLabel(I18n.msg("action.right"), skin)).left().padRight(pad10);
+        controls.add(new OwnLabel(I18n.msg("action.right"), skin)).left().padRight(pad18);
         controls.add(new OwnLabel(GSKeys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink")).left().row();
 
         // Controls
         for (String[] action : data) {
             HorizontalGroup keysGroup = new HorizontalGroup();
-            keysGroup.space(pad5);
+            keysGroup.space(pad10);
             for (int j = 1; j < action.length; j++) {
                 String[] keys = action[j].split("\\+");
                 for (int k = 0; k < keys.length; k++) {
@@ -1254,7 +1253,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 if (j < action.length - 1)
                     keysGroup.addActor(new OwnLabel("/", skin));
             }
-            controls.add(new OwnLabel(action[0], skin)).left().padRight(pad10);
+            controls.add(new OwnLabel(action[0], skin)).left().padRight(pad18);
             controls.add(keysGroup).left().row();
         }
 
@@ -1267,16 +1266,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         scrolls.add(controlsScroll);
 
         // Add to content
-        contentControls.add(titleController).colspan(2).left().padBottom(pad10).row();
-        contentControls.add(detectedLabel).left().padBottom(pad10).padRight(pad10);
-        contentControls.add(controllersTable).left().padBottom(pad10).row();
-        contentControls.add(mappingsLabel).left().padBottom(pad10).padRight(pad10);
-        contentControls.add(gamepadMappings).left().padBottom(pad10).row();
-        contentControls.add(invertXLabel).left().padBottom(pad10).padRight(pad10);
-        contentControls.add(invertX).left().padBottom(pad10).row();
-        contentControls.add(invertYLabel).left().padBottom(pad10).padRight(pad10);
-        contentControls.add(invertY).left().padBottom(pad10).row();
-        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad10).row();
+        contentControls.add(titleController).colspan(2).left().padBottom(pad18).row();
+        contentControls.add(detectedLabel).left().padBottom(pad18).padRight(pad18);
+        contentControls.add(controllersTable).left().padBottom(pad18).row();
+        contentControls.add(mappingsLabel).left().padBottom(pad18).padRight(pad18);
+        contentControls.add(gamepadMappings).left().padBottom(pad18).row();
+        contentControls.add(invertXLabel).left().padBottom(pad18).padRight(pad18);
+        contentControls.add(invertX).left().padBottom(pad18).row();
+        contentControls.add(invertYLabel).left().padBottom(pad18).padRight(pad18);
+        contentControls.add(invertY).left().padBottom(pad18).row();
+        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad18).row();
         contentControls.add(controlsScroll).colspan(2).left();
 
         /*
@@ -1304,7 +1303,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel screenshotsLocationLabel = new OwnLabel(I18n.msg("gui.screenshots.save"), skin);
         screenshotsLocationLabel.pack();
         screenshotsLocation = new OwnTextButton(settings.screenshot.location, skin);
-        screenshotsLocation.pad(pad5);
+        screenshotsLocation.pad(pad10);
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.screenshots.directory.choose"), skin, stage, Paths.get(settings.screenshot.location), FileChooser.FileChooserTarget.DIRECTORIES);
@@ -1336,7 +1335,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ssHeightField.setWidth(textWidth);
         ssHeightField.setDisabled(settings.screenshot.isSimpleMode());
         HorizontalGroup ssSizeGroup = new HorizontalGroup();
-        ssSizeGroup.space(pad10);
+        ssSizeGroup.space(pad18);
         ssSizeGroup.addActor(ssWidthField);
         ssSizeGroup.addActor(xLabel);
         ssSizeGroup.addActor(ssHeightField);
@@ -1363,7 +1362,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsModeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup ssModeGroup = new HorizontalGroup();
-        ssModeGroup.space(pad5);
+        ssModeGroup.space(pad10);
         ssModeGroup.addActor(screenshotMode);
         ssModeGroup.addActor(screenshotsModeTooltip);
 
@@ -1371,16 +1370,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.addAll(screenshotsLocationLabel, ssModeLabel, screenshotsSizeLabel);
 
         // Add to table
-        screenshots.add(screenshotsInfo).colspan(2).left().padBottom(pad5).row();
-        screenshots.add(screenshotsLocationLabel).left().padRight(pad20).padBottom(pad5);
-        screenshots.add(screenshotsLocation).left().expandX().padBottom(pad5).row();
-        screenshots.add(ssModeLabel).left().padRight(pad20).padBottom(pad5);
-        screenshots.add(ssModeGroup).left().expandX().padBottom(pad5).row();
-        screenshots.add(screenshotsSizeLabel).left().padRight(pad20).padBottom(pad5);
-        screenshots.add(ssSizeGroup).left().expandX().padBottom(pad5).row();
+        screenshots.add(screenshotsInfo).colspan(2).left().padBottom(pad10).row();
+        screenshots.add(screenshotsLocationLabel).left().padRight(pad34).padBottom(pad10);
+        screenshots.add(screenshotsLocation).left().expandX().padBottom(pad10).row();
+        screenshots.add(ssModeLabel).left().padRight(pad34).padBottom(pad10);
+        screenshots.add(ssModeGroup).left().expandX().padBottom(pad10).row();
+        screenshots.add(screenshotsSizeLabel).left().padRight(pad34).padBottom(pad10);
+        screenshots.add(ssSizeGroup).left().expandX().padBottom(pad10).row();
 
         // Add to content
-        contentScreenshots.add(titleScreenshots).left().padBottom(pad10).row();
+        contentScreenshots.add(titleScreenshots).left().padBottom(pad18).row();
         contentScreenshots.add(screenshots).left();
 
         /*
@@ -1407,7 +1406,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Save location
         OwnLabel frameoutputLocationLabel = new OwnLabel(I18n.msg("gui.frameoutput.location"), skin);
         frameOutputLocation = new OwnTextButton(settings.frame.location, skin);
-        frameOutputLocation.pad(pad5);
+        frameOutputLocation.pad(pad10);
         frameOutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.frameoutput.directory.choose"), skin, stage, Paths.get(settings.frame.location), FileChooser.FileChooserTarget.DIRECTORIES);
@@ -1449,7 +1448,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         foHeightField.setWidth(textWidth);
         foHeightField.setDisabled(settings.frame.isSimpleMode());
         HorizontalGroup foSizeGroup = new HorizontalGroup();
-        foSizeGroup.space(pad10);
+        foSizeGroup.space(pad18);
         foSizeGroup.addActor(foWidthField);
         foSizeGroup.addActor(xLabelfo);
         foSizeGroup.addActor(foHeightField);
@@ -1476,18 +1475,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameoutputModeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.screenshotmode"), skin));
 
         HorizontalGroup foModeGroup = new HorizontalGroup();
-        foModeGroup.space(pad5);
+        foModeGroup.space(pad10);
         foModeGroup.addActor(frameOutputMode);
         foModeGroup.addActor(frameoutputModeTooltip);
 
         // Counter
         OwnLabel counterLabel = new OwnLabel(I18n.msg("gui.frameoutput.sequence"), skin);
         HorizontalGroup counterGroup = new HorizontalGroup();
-        counterGroup.space(pad5);
+        counterGroup.space(pad10);
         frameSequenceNumber = new OwnLabel(Integer.toString(ImageRenderer.getSequenceNumber()), skin);
         frameSequenceNumber.setWidth(textWidth * 3f);
         OwnTextButton resetCounter = new OwnTextButton(I18n.msg("gui.frameoutput.sequence.reset"), skin);
-        resetCounter.pad(pad10);
+        resetCounter.pad(pad18);
         resetCounter.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 ImageRenderer.resetSequenceNumber();
@@ -1502,24 +1501,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.addAll(frameoutputLocationLabel, prefixLabel, fpsLabel, fomodeLabel, frameoutputSizeLabel);
 
         // Add to table
-        frameoutput.add(frameoutputInfo).colspan(2).left().padBottom(pad5).row();
-        frameoutput.add(frameoutputLocationLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(frameOutputLocation).left().expandX().padBottom(pad5).row();
-        frameoutput.add(prefixLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(frameOutputPrefix).left().padBottom(pad5).row();
-        frameoutput.add(fpsLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(frameOutputFps).left().padBottom(pad5).row();
-        frameoutput.add(fomodeLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(foModeGroup).left().expandX().padBottom(pad5).row();
-        frameoutput.add(frameoutputSizeLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(foSizeGroup).left().expandX().padBottom(pad5).row();
-        frameoutput.add(counterLabel).left().padRight(pad20).padBottom(pad5);
-        frameoutput.add(counterGroup).left().expandX().padBottom(pad5).row();
-        frameoutput.add().padRight(pad20);
+        frameoutput.add(frameoutputInfo).colspan(2).left().padBottom(pad10).row();
+        frameoutput.add(frameoutputLocationLabel).left().padRight(pad34).padBottom(pad10);
+        frameoutput.add(frameOutputLocation).left().expandX().padBottom(pad10).row();
+        frameoutput.add(prefixLabel).left().padRight(pad34).padBottom(pad10);
+        frameoutput.add(frameOutputPrefix).left().padBottom(pad10).row();
+        frameoutput.add(fpsLabel).left().padRight(pad34).padBottom(pad10);
+        frameoutput.add(frameOutputFps).left().padBottom(pad10).row();
+        frameoutput.add(fomodeLabel).left().padRight(pad34).padBottom(pad10);
+        frameoutput.add(foModeGroup).left().expandX().padBottom(pad10).row();
+        frameoutput.add(frameoutputSizeLabel).left().padRight(pad34).padBottom(pad10);
+        frameoutput.add(foSizeGroup).left().expandX().padBottom(pad10).row();
+        frameoutput.add(counterLabel).left().padRight(pad34).padBottom(pad10);
+        frameoutput.add(counterGroup).left().expandX().padBottom(pad10).row();
+        frameoutput.add().padRight(pad34);
         frameoutput.add(resetCounter).left();
 
         // Add to content
-        contentFrames.add(titleFrameoutput).left().padBottom(pad10).row();
+        contentFrames.add(titleFrameoutput).left().padBottom(pad18).row();
         contentFrames.add(frameoutput).left();
 
         /*
@@ -1544,7 +1543,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Keyframe preferences
         Button keyframePrefs = new OwnTextIconButton(I18n.msg("gui.keyframes.preferences"), skin, "preferences");
         keyframePrefs.setName("keyframe preferences");
-        keyframePrefs.pad(pad10);
+        keyframePrefs.pad(pad18);
         keyframePrefs.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.editprefs"), skin));
         keyframePrefs.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
@@ -1572,16 +1571,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.add(autoCamrecLabel);
 
         // Add to table
-        camrec.add(camfpsLabel).left().padRight(pad20).padBottom(pad5);
-        camrec.add(camRecFps).left().expandX().padBottom(pad5);
-        camrec.add(camrecFpsTooltip).left().padLeft(pad5).padBottom(pad5).row();
-        camrec.add(autoCamrecLabel).left().padRight(pad20).padBottom(pad5);
-        camrec.add(cbAutoCamrec).left().padBottom(pad5);
-        camrec.add(camrecAutoTooltip).left().padLeft(pad5).padBottom(pad5).row();
-        camrec.add(keyframePrefs).colspan(3).left().padTop(pad20 * 2f).row();
+        camrec.add(camfpsLabel).left().padRight(pad34).padBottom(pad10);
+        camrec.add(camRecFps).left().expandX().padBottom(pad10);
+        camrec.add(camrecFpsTooltip).left().padLeft(pad10).padBottom(pad10).row();
+        camrec.add(autoCamrecLabel).left().padRight(pad34).padBottom(pad10);
+        camrec.add(cbAutoCamrec).left().padBottom(pad10);
+        camrec.add(camrecAutoTooltip).left().padLeft(pad10).padBottom(pad10).row();
+        camrec.add(keyframePrefs).colspan(3).left().padTop(pad34 * 2f).row();
 
         // Add to content
-        contentCamera.add(titleCamrec).left().padBottom(pad10).row();
+        contentCamera.add(titleCamrec).left().padBottom(pad18).row();
         contentCamera.add(camrec).left();
 
         /*
@@ -1622,12 +1621,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.add(cmResolutionLabel);
 
         // Add to table
-        cubemap.add(cmInfo).colspan(2).left().padBottom(pad5).row();
-        cubemap.add(cmResolutionLabel).left().padRight(pad20).padBottom(pad5);
-        cubemap.add(cmResolution).left().expandX().padBottom(pad5).row();
+        cubemap.add(cmInfo).colspan(2).left().padBottom(pad10).row();
+        cubemap.add(cmResolutionLabel).left().padRight(pad34).padBottom(pad10);
+        cubemap.add(cmResolution).left().expandX().padBottom(pad10).row();
 
         // Add to content
-        content360.add(titleCubemap).left().padBottom(pad10).row();
+        content360.add(titleCubemap).left().padBottom(pad18).row();
         content360.add(cubemap).left();
 
         /*
@@ -1678,16 +1677,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.add(plResolutionLabel);
 
         // Add to table
-        planetarium.add(apertureLabel).left().padRight(pad20).padBottom(pad10 * 3f);
-        planetarium.add(plAperture).left().expandX().padBottom(pad10 * 3f).row();
-        planetarium.add(plAngleLabel).left().padRight(pad20).padBottom(pad10 * 3f);
-        planetarium.add(plAngle).left().expandX().padBottom(pad10 * 3f).row();
-        planetarium.add(plInfo).colspan(2).left().padBottom(pad5).row();
-        planetarium.add(plResolutionLabel).left().padRight(pad20).padBottom(pad5);
-        planetarium.add(plResolution).left().expandX().padBottom(pad5).row();
+        planetarium.add(apertureLabel).left().padRight(pad34).padBottom(pad18 * 3f);
+        planetarium.add(plAperture).left().expandX().padBottom(pad18 * 3f).row();
+        planetarium.add(plAngleLabel).left().padRight(pad34).padBottom(pad18 * 3f);
+        planetarium.add(plAngle).left().expandX().padBottom(pad18 * 3f).row();
+        planetarium.add(plInfo).colspan(2).left().padBottom(pad10).row();
+        planetarium.add(plResolutionLabel).left().padRight(pad34).padBottom(pad10);
+        planetarium.add(plResolution).left().expandX().padBottom(pad10).row();
 
         // Add to content
-        contentPlanetarium.add(titlePlanetarium).left().padBottom(pad10).row();
+        contentPlanetarium.add(titlePlanetarium).left().padBottom(pad18).row();
         contentPlanetarium.add(planetarium).left();
 
 
@@ -1727,7 +1726,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataSourceInfo.clearListeners();
 
         final OwnTextButton dataDownload = new OwnTextButton(I18n.msg("gui.download.title"), skin);
-        dataDownload.pad(pad20, pad20 * 2f, pad20, pad20 * 2f);
+        dataDownload.pad(pad34, pad34 * 2f, pad34, pad34 * 2f);
         dataDownload.setHeight(buttonHeight);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1759,9 +1758,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel titleAttitude = new OwnLabel(I18n.msg("gui.gaia.attitude"), skin, "header");
         Table attitude = new Table(skin);
 
-        real = new OwnCheckBox(I18n.msg("gui.gaia.real"), skin, "radio", pad5);
+        real = new OwnCheckBox(I18n.msg("gui.gaia.real"), skin, "radio", pad10);
         real.setChecked(settings.data.realGaiaAttitude);
-        nsl = new OwnCheckBox(I18n.msg("gui.gaia.nsl"), skin, "radio", pad5);
+        nsl = new OwnCheckBox(I18n.msg("gui.gaia.nsl"), skin, "radio", pad10);
         nsl.setChecked(!settings.data.realGaiaAttitude);
 
         OwnLabel restart = new OwnLabel(I18n.msg("gui.restart"), skin, "default-pink");
@@ -1769,9 +1768,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         new ButtonGroup<>(real, nsl);
 
         // Add to table
-        attitude.add(restart).left().padBottom(pad10).row();
-        attitude.add(nsl).left().padBottom(pad5).row();
-        attitude.add(real).left().padBottom(pad5).row();
+        attitude.add(restart).left().padBottom(pad18).row();
+        attitude.add(nsl).left().padBottom(pad10).row();
+        attitude.add(real).left().padBottom(pad10).row();
         final Cell<Actor> noticeAttCell = attitude.add((Actor) null);
         noticeAttCell.colspan(2).left();
 
@@ -1795,16 +1794,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         nsl.addListener(attNoticeListener);
 
         // Add to content
-        contentDataTable.add(titleGeneralData).left().padBottom(pad10).row();
-        contentDataTable.add(highAccuracyPositionsLabel).left().padBottom(pad20);
-        contentDataTable.add(highAccuracyPositions).left().padRight(pad20).padBottom(pad20);
-        contentDataTable.add(highAccTooltip).left().padBottom(pad20).row();
+        contentDataTable.add(titleGeneralData).left().padBottom(pad18).row();
+        contentDataTable.add(highAccuracyPositionsLabel).left().padBottom(pad34);
+        contentDataTable.add(highAccuracyPositions).left().padRight(pad34).padBottom(pad34);
+        contentDataTable.add(highAccTooltip).left().padBottom(pad34).row();
         if (!welcomeScreen) {
-            contentDataTable.add(titleData).left().colspan(3).padBottom(pad10).row();
-            contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad5).row();
-            contentDataTable.add(dataDownload).left().colspan(3).padBottom(pad20).row();
+            contentDataTable.add(titleData).left().colspan(3).padBottom(pad18).row();
+            contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad10).row();
+            contentDataTable.add(dataDownload).left().colspan(3).padBottom(pad34).row();
         }
-        contentDataTable.add(titleAttitude).left().padBottom(pad10).row();
+        contentDataTable.add(titleAttitude).left().padBottom(pad18).row();
         contentDataTable.add(attitude).left();
 
 
@@ -1851,33 +1850,33 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             return false;
         });
-        reloadDefaults.pad(0, pad10, 0, pad10);
+        reloadDefaults.pad(0, pad18, 0, pad18);
         reloadDefaults.setHeight(buttonHeight);
 
         OwnLabel warningLabel = new OwnLabel(I18n.msg("gui.system.reloaddefaults.warn"), skin, "default-red");
 
         // Add to table
-        stats.add(debugInfoLabel).left().padBottom(pad5);
-        stats.add(debugInfo).left().padBottom(pad5).row();
-        stats.add(exitConfirmationLabel).left().padBottom(pad10);
-        stats.add(exitConfirmation).left().padBottom(pad10).row();
-        stats.add(warningLabel).left().colspan(2).padBottom(pad20).row();
+        stats.add(debugInfoLabel).left().padBottom(pad10);
+        stats.add(debugInfo).left().padBottom(pad10).row();
+        stats.add(exitConfirmationLabel).left().padBottom(pad18);
+        stats.add(exitConfirmation).left().padBottom(pad18).row();
+        stats.add(warningLabel).left().colspan(2).padBottom(pad34).row();
         stats.add(reloadDefaults).left().colspan(2);
 
         // Add to content
-        contentSystem.add(titleStats).left().padBottom(pad10).row();
+        contentSystem.add(titleStats).left().padBottom(pad18).row();
         contentSystem.add(stats).left();
 
         /* COMPUTE LABEL WIDTH */
-        float maxLabelWidth = 0;
+        float maxLabelWidth = textWidth * 2.5f;
         for (OwnLabel l : labels) {
             l.pack();
             if (l.getWidth() > maxLabelWidth)
                 maxLabelWidth = l.getWidth();
         }
-        maxLabelWidth = Math.max(textWidth * 2, maxLabelWidth);
-        for (OwnLabel l : labels)
+        for (OwnLabel l : labels) {
             l.setWidth(maxLabelWidth);
+        }
 
         /* ADD ALL CONTENT */
         addTabContent(contentGraphics);
@@ -1893,7 +1892,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         addTabContent(contentSystem);
 
         /* ADD TO MAIN TABLE */
-        content.add(tabStack).left().padLeft(pad15).expand().fill();
+        content.add(tabStack).left().padLeft(pad20).expand().fill();
 
         // Set tab listeners.
         setUpTabListeners();
@@ -1969,10 +1968,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         int i = 0;
         for (OwnLabel cn : controllerNames) {
             String controllerName = cn.getName();
-            table.add(cn).left().padBottom(i == controllerNames.size - 1 ? 0f : pad10).padRight(pad20);
+            table.add(cn).left().padBottom(i == controllerNames.size - 1 ? 0f : pad18).padRight(pad34);
             if (controllerName != null && !settings.controls.gamepad.isControllerBlacklisted(controllerName)) {
                 OwnTextButton config = new OwnTextButton(I18n.msg("gui.controller.configure"), skin);
-                config.pad(pad5, pad10, pad5, pad10);
+                config.pad(pad10, pad18, pad10, pad18);
                 config.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         // Get currently selected mappings
@@ -1989,7 +1988,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     }
                     return false;
                 });
-                table.add(config).left().padBottom(i == controllerNames.size - 1 ? 0f : pad10).row();
+                table.add(config).left().padBottom(i == controllerNames.size - 1 ? 0f : pad18).row();
             } else {
                 table.add().left().row();
             }

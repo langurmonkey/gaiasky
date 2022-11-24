@@ -52,21 +52,21 @@ public class VRInfoGui extends AbstractGui {
         infoFocus = new Table(skin);
         infoFocus.setBackground("table-bg");
         infoFocus.pad(5f);
-        OwnLabel focusLabel = new OwnLabel("You are in focus mode", skin, "msg-21");
+        OwnLabel focusLabel = new OwnLabel("You are in focus mode", skin, "big");
         focusLabel.setColor(1, 1, 0, 1);
         infoFocus.add(focusLabel).left().row();
-        infoFocus.add(new OwnLabel("Push the joystick to get back", skin, "msg-21")).left().row();
-        infoFocus.add(new OwnLabel("to free mode", skin, "msg-21")).left().row();
+        infoFocus.add(new OwnLabel("Push the joystick to get back", skin, "big")).left().row();
+        infoFocus.add(new OwnLabel("to free mode", skin, "big")).left().row();
 
         infoFree = new Table(skin);
         infoFree.setBackground("table-bg");
         infoFree.pad(5f);
-        OwnLabel freeLabel = new OwnLabel("You are in free mode", skin, "msg-21");
+        OwnLabel freeLabel = new OwnLabel("You are in free mode", skin, "big");
         freeLabel.setColor(1, 1, 0, 1);
         infoFree.add(freeLabel).left().row();
-        infoFree.add(new OwnLabel("You can select an object by", skin, "msg-21")).left().row();
-        infoFree.add(new OwnLabel("pointing at it and pressing", skin, "msg-21")).left().row();
-        infoFree.add(new OwnLabel("the trigger", skin, "msg-21")).left().row();
+        infoFree.add(new OwnLabel("You can select an object by", skin, "big")).left().row();
+        infoFree.add(new OwnLabel("pointing at it and pressing", skin, "big")).left().row();
+        infoFree.add(new OwnLabel("the trigger", skin, "big")).left().row();
 
         if (GaiaSky.instance.cameraManager.mode.isFocus()) {
             infoCell.setActor(infoFocus);

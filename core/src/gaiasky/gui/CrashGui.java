@@ -94,26 +94,26 @@ public class CrashGui extends AbstractGui {
 
             // Crash image
             Image img = new Image(new Texture(Gdx.files.internal("img/crash.png")));
-            content.add(img).center().padBottom(pad10 * 2f).row();
+            content.add(img).center().padBottom(pad18 * 2f).row();
 
             // Delete data folder and try again
-            content.add(new OwnLabel(I18n.msg("gui.crash.info.1"), skin)).left().padBottom(pad5).row();
+            content.add(new OwnLabel(I18n.msg("gui.crash.info.1"), skin)).left().padBottom(pad10).row();
             OwnLabel dloc = new OwnLabel(TextUtils.capString(Settings.settings.data.location, 50), skin, "hud-subheader");
             dloc.addListener(new OwnTextTooltip(Settings.settings.data.location, skin));
-            content.add(dloc).left().padBottom(pad10 * 3f).row();
+            content.add(dloc).left().padBottom(pad18 * 3f).row();
 
             // Crash log
-            content.add(new OwnLabel(I18n.msg("gui.crash.info.2"), skin)).left().padBottom(pad5).row();
+            content.add(new OwnLabel(I18n.msg("gui.crash.info.2"), skin)).left().padBottom(pad10).row();
             OwnLabel cloc = new OwnLabel(TextUtils.capString(SysUtils.getCrashReportsDir().toString(), 50), skin, "hud-subheader");
             cloc.addListener(new OwnTextTooltip(SysUtils.getCrashReportsDir().toString(), skin));
-            content.add(cloc).left().padBottom(pad5).row();
-            content.add(new OwnLabel(I18n.msg("gui.crash.info.3"), skin)).left().padBottom(pad5).row();
-            content.add(new Link(Settings.settings.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), Settings.settings.REPO_ISSUES)).left().padBottom(pad10 * 3f).row();
+            content.add(cloc).left().padBottom(pad10).row();
+            content.add(new OwnLabel(I18n.msg("gui.crash.info.3"), skin)).left().padBottom(pad10).row();
+            content.add(new Link(Settings.settings.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), Settings.settings.REPO_ISSUES)).left().padBottom(pad18 * 3f).row();
 
             // Stack trace
             float taw = 720f;
             float tah = 240f;
-            content.add(new OwnLabel(I18n.msg("gui.crash.stack"), skin, "ui-19")).left().padBottom(pad5).row();
+            content.add(new OwnLabel(I18n.msg("gui.crash.stack"), skin, "big")).left().padBottom(pad10).row();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             crash.printStackTrace(pw);

@@ -198,10 +198,10 @@ public class DatasetManagerWindow extends GenericDialog {
         tabButtons = new Array<>();
 
         final OwnTextButton tabAvail = new OwnTextButton(I18n.msg("gui.download.tab.available"), skin, "toggle-big");
-        tabAvail.pad(pad5);
+        tabAvail.pad(pad10);
         tabAvail.setWidth(tabWidth);
         final OwnTextButton tabInstalled = new OwnTextButton(tabInstalledText, skin, "toggle-big");
-        tabInstalled.pad(pad5);
+        tabInstalled.pad(pad10);
         tabInstalled.setWidth(tabWidth);
 
         tabButtons.add(tabAvail);
@@ -218,17 +218,17 @@ public class DatasetManagerWindow extends GenericDialog {
         // Content
         final Table contentAvail = new Table(skin);
         contentAvail.align(Align.top);
-        contentAvail.pad(pad10);
+        contentAvail.pad(pad18);
 
         final Table contentInstalled = new Table(skin);
         contentInstalled.align(Align.top);
-        contentInstalled.pad(pad10);
+        contentInstalled.pad(pad18);
 
         /* ADD ALL CONTENT */
         tabContent.addActor(contentAvail);
         tabContent.addActor(contentInstalled);
 
-        content.add(tabContent).expand().fill().padBottom(pad20).row();
+        content.add(tabContent).expand().fill().padBottom(pad34).row();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state
@@ -288,7 +288,7 @@ public class DatasetManagerWindow extends GenericDialog {
         OwnImageButton catalogsLocTooltip = new OwnImageButton(skin, "tooltip");
         catalogsLocTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.download.location.info"), skin));
         HorizontalGroup catalogsLocGroup = new HorizontalGroup();
-        catalogsLocGroup.space(pad10);
+        catalogsLocGroup.space(pad18);
         catalogsLocGroup.addActor(catalogsLocLabel);
         catalogsLocGroup.addActor(catalogsLocTooltip);
 
@@ -298,9 +298,9 @@ public class DatasetManagerWindow extends GenericDialog {
         dataLocationButton.pad(buttonPad * 4f);
         dataLocationButton.setMinWidth(1000f);
 
-        dataLocTable.add(catalogsLocGroup).left().padBottom(pad10);
-        dataLocTable.add(dataLocationButton).left().padLeft(pad5).padBottom(pad10).row();
-        Cell<Actor> notice = dataLocTable.add((Actor) null).colspan(2).padBottom(pad10);
+        dataLocTable.add(catalogsLocGroup).left().padBottom(pad18);
+        dataLocTable.add(dataLocationButton).left().padLeft(pad10).padBottom(pad18).row();
+        Cell<Actor> notice = dataLocTable.add((Actor) null).colspan(2).padBottom(pad18);
         notice.row();
 
         content.add(dataLocTable).center().row();
@@ -362,11 +362,11 @@ public class DatasetManagerWindow extends GenericDialog {
         content.clear();
         if (dataDescriptor == null || dataDescriptor.datasets.isEmpty()) {
             if (mode == DatasetMode.AVAILABLE) {
-                content.add(new OwnLabel(I18n.msg("gui.download.noconnection.title"), skin)).center().padTop(pad20 * 2f).padBottom(pad10).row();
+                content.add(new OwnLabel(I18n.msg("gui.download.noconnection.title"), skin)).center().padTop(pad34 * 2f).padBottom(pad18).row();
             }
-            content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
+            content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad34 * 2f).row();
         } else {
-            left = content.add().top().left().padRight(pad20);
+            left = content.add().top().left().padRight(pad34);
             right = content.add().top().left();
 
             int datasets = reloadLeftPane(left, right, dataDescriptor, mode, width);
@@ -374,7 +374,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 reloadRightPane(right, selectedDataset[mode.ordinal()], mode);
             } else {
                 content.clear();
-                content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
+                content.add(new OwnLabel(I18n.msg("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad34 * 2f).row();
             }
 
         }
@@ -413,11 +413,11 @@ public class DatasetManagerWindow extends GenericDialog {
             List<DatasetDesc> filtered = datasets.stream().filter(d -> mode != DatasetMode.AVAILABLE || !d.exists).collect(Collectors.toList());
             if (!filtered.isEmpty()) {
                 OwnLabel dsType = new OwnLabel(I18n.msg("gui.download.type." + type.typeStr), skin, "hud-header");
-                leftTable.add(dsType).left().padTop(pad20 * 2f).padBottom(pad10).row();
+                leftTable.add(dsType).left().padTop(pad34 * 2f).padBottom(pad18).row();
 
                 for (DatasetDesc dataset : filtered) {
                     Table t = new Table(skin);
-                    t.pad(pad10, pad10, 0, pad10);
+                    t.pad(pad18, pad18, 0, pad18);
 
                     String tooltipText = dataset.key;
 
@@ -431,7 +431,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
                     // Title
                     String titleString = dataset.name;
-                    OwnLabel title = new OwnLabel(TextUtils.capString(titleString, 60), skin, "ui-23");
+                    OwnLabel title = new OwnLabel(TextUtils.capString(titleString, 60), skin, "huge");
                     title.setWidth(width * 0.41f);
                     if (dataset.outdated) {
                         title.setColor(highlight);
@@ -516,7 +516,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         }
                     }
                     HorizontalGroup versionSize = new HorizontalGroup();
-                    versionSize.space(pad20 * 2f);
+                    versionSize.space(pad34 * 2f);
                     versionSize.addActor(version);
                     versionSize.addActor(size);
 
@@ -526,11 +526,11 @@ public class DatasetManagerWindow extends GenericDialog {
                     progress.setValue(60f);
                     progress.setVisible(false);
 
-                    t.add(typeImage).left().padRight(pad10);
-                    t.add(title).left().padRight(pad10);
+                    t.add(typeImage).left().padRight(pad18);
+                    t.add(title).left().padRight(pad18);
                     t.add(installOrSelect).right().row();
                     t.add();
-                    t.add(versionSize).colspan(2).left().padRight(pad10).padBottom(pad5).row();
+                    t.add(versionSize).colspan(2).left().padRight(pad18).padBottom(pad10).row();
                     t.add(progress).colspan(3).expandX();
                     t.pack();
                     OwnButton button = new OwnButton(t, skin, "dataset", false);
@@ -671,7 +671,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         if (dataset == null) {
             OwnLabel l = new OwnLabel(I18n.msg("gui.download.noselected"), skin);
-            t.add(l).center().padTop(pad20 * 3);
+            t.add(l).center().padTop(pad34 * 3);
         } else {
             // Type icon
             String dType = dataset.type != null ? dataset.type : "other";
@@ -689,7 +689,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
             // Title group
             HorizontalGroup titleGroup = new HorizontalGroup();
-            titleGroup.space(pad10);
+            titleGroup.space(pad18);
             titleGroup.addActor(typeImage);
             titleGroup.addActor(title);
 
@@ -752,7 +752,7 @@ public class DatasetManagerWindow extends GenericDialog {
             Link link = null;
             if (dataset.link != null && !dataset.link.isBlank()) {
                 String linkStr = dataset.link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
-                link = new Link(TextUtils.breakCharacters(linkStr, 100, true), skin, dataset.link);
+                link = new Link(TextUtils.breakCharacters(linkStr, 80, true), skin, dataset.link);
             }
 
             Table infoTable = new Table(skin);
@@ -769,7 +769,8 @@ public class DatasetManagerWindow extends GenericDialog {
                 releaseNotesString = "-";
             }
             releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
-            OwnLabel releaseNotes = new OwnLabel(I18n.msg("gui.download.releasenotes", releaseNotesString), skin);
+            OwnLabel releaseNotesTitle = new OwnLabel(I18n.msg("gui.download.releasenotes"), skin, "grey-large");
+            OwnLabel releaseNotes = new OwnLabel(releaseNotesString, skin);
             releaseNotes.setWidth(1000f);
 
             // Files
@@ -781,8 +782,9 @@ public class DatasetManagerWindow extends GenericDialog {
             }
             OwnLabel files = new OwnLabel(I18n.msg("gui.download.files", filesString), skin, "grey-large");
 
-            infoTable.add(desc).top().left().padBottom(pad20).row();
-            infoTable.add(releaseNotes).top().left().padBottom(pad20).row();
+            infoTable.add(desc).top().left().padBottom(pad34).row();
+            infoTable.add(releaseNotesTitle).top().left().padBottom(pad18).row();
+            infoTable.add(releaseNotes).top().left().padBottom(pad34).row();
             infoTable.add(files).top().left();
 
             // Scroll
@@ -810,16 +812,16 @@ public class DatasetManagerWindow extends GenericDialog {
                 });
             }
 
-            t.add(titleGroup).top().left().padBottom(pad5).padTop(pad20).row();
-            t.add(status).top().left().padLeft(pad10 * 3f).padBottom(pad20).row();
-            t.add(type).top().left().padBottom(pad5).row();
-            t.add(version).top().left().padBottom(pad5).row();
-            t.add(key).top().left().padBottom(pad5).row();
-            t.add(size).top().left().padBottom(pad5).row();
-            t.add(nObjects).top().left().padBottom(pad10).row();
-            t.add(link).top().left().padBottom(pad20 * 2f).row();
-            t.add(infoScroll).top().left().padBottom(pad20).row();
-            t.add(cancelDownloadButton).padTop(pad20).center();
+            t.add(titleGroup).top().left().padBottom(pad10).padTop(pad34).row();
+            t.add(status).top().left().padLeft(pad18 * 3f).padBottom(pad34).row();
+            t.add(type).top().left().padBottom(pad10).row();
+            t.add(version).top().left().padBottom(pad10).row();
+            t.add(key).top().left().padBottom(pad10).row();
+            t.add(size).top().left().padBottom(pad10).row();
+            t.add(nObjects).top().left().padBottom(pad18).row();
+            t.add(link).top().left().padBottom(pad34 * 2f).row();
+            t.add(infoScroll).top().left().padBottom(pad34).row();
+            t.add(cancelDownloadButton).padTop(pad34).center();
 
             // Scroll
             OwnScrollPane scrollPane = new OwnScrollPane(t, skin, "minimalist-nobg");
@@ -1157,11 +1159,11 @@ public class DatasetManagerWindow extends GenericDialog {
                 @Override
                 protected void build() {
                     content.clear();
-                    content.add(new OwnLabel(I18n.msg("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad20).row();
-                    content.add(new OwnLabel(I18n.msg("gui.download.close.current"), skin)).left().padBottom(pad10).row();
+                    content.add(new OwnLabel(I18n.msg("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad34).row();
+                    content.add(new OwnLabel(I18n.msg("gui.download.close.current"), skin)).left().padBottom(pad18).row();
                     for (String key : copy.keySet()) {
                         DatasetDesc dd = copy.get(key).getFirst();
-                        content.add(new OwnLabel(dd.name, skin, "warp")).center().padBottom(pad5).row();
+                        content.add(new OwnLabel(dd.name, skin, "warp")).center().padBottom(pad10).row();
                     }
                 }
 
@@ -1317,8 +1319,8 @@ public class DatasetManagerWindow extends GenericDialog {
             protected void build() {
                 content.clear();
                 String title = dataset.name;
-                content.add(new OwnLabel(I18n.msg("gui.download.delete.text"), skin)).left().padBottom(pad10 * 2f).row();
-                content.add(new OwnLabel(title, skin, "warp")).center().padBottom(pad10 * 2f).row();
+                content.add(new OwnLabel(I18n.msg("gui.download.delete.text"), skin)).left().padBottom(pad18 * 2f).row();
+                content.add(new OwnLabel(title, skin, "warp")).center().padBottom(pad18 * 2f).row();
             }
 
             @Override

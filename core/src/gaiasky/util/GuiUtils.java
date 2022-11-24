@@ -36,14 +36,14 @@ public class GuiUtils {
                 String text;
                 if (Settings.settings.program.offlineMode) {
                     OwnLabel info = new OwnLabel(I18n.msg("gui.download.offlinemode.continue"), skin);
-                    content.add(info).pad(pad10).row();
+                    content.add(info).pad(pad18).row();
                     Link docs = new Link(I18n.msg("gui.wiki.moreinfo"), skin, Settings.DOCUMENTATION + "/Config-file.html");
-                    content.add(docs).pad(pad10).padTop(pad15).row();
+                    content.add(docs).pad(pad18).padTop(pad20).row();
                 } else {
                     OwnLabel info = new OwnLabel(I18n.msg("gui.download.noconnection.continue"), skin);
-                    content.add(info).pad(pad10).row();
+                    content.add(info).pad(pad18).row();
                     Link manualDownload = new Link(I18n.msg("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
-                    content.add(manualDownload).pad(pad10);
+                    content.add(manualDownload).pad(pad18);
                 }
 
             }

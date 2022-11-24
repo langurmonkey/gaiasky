@@ -285,8 +285,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // ADD
         OwnTextIconButton addKeyframe = new OwnTextIconButton(I18n.msg("gui.keyframes.add.end"), skin, "add");
         addKeyframe.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.add.end"), skin));
-        addKeyframe.pad(pad5);
-        left.add(addKeyframe).left().colspan(2).padBottom(pad5).row();
+        addKeyframe.pad(pad10);
+        left.add(addKeyframe).left().colspan(2).padBottom(pad10).row();
         addKeyframe.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Add at end
@@ -308,8 +308,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         secondsInput = new OwnTextField("1.0", skin, secondsValidator);
         secondsInput.setWidth(96f);
         OwnLabel secondsLabel = new OwnLabel(I18n.msg("gui.keyframes.secsafter") + ":", skin);
-        left.add(secondsLabel).center().left().padRight(pad10).padBottom(pad10);
-        left.add(secondsInput).center().left().padBottom(pad10).row();
+        left.add(secondsLabel).center().left().padRight(pad18).padBottom(pad18);
+        left.add(secondsInput).center().left().padBottom(pad18).row();
 
         // NAME
         LengthValidator lengthValidator = new LengthValidator(0, 15);
@@ -317,8 +317,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         nameInput = new OwnTextField("", skin, nameValidator);
         nameInput.setWidth(96f);
         OwnLabel nameLabel = new OwnLabel(I18n.msg("gui.keyframes.name") + ":", skin);
-        left.add(nameLabel).center().left().padRight(pad10).padBottom(pad10);
-        left.add(nameInput).center().left().padBottom(pad10).row();
+        left.add(nameLabel).center().left().padRight(pad18).padBottom(pad18);
+        left.add(nameInput).center().left().padBottom(pad18).row();
 
         left.pack();
 
@@ -336,7 +336,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll.setWidth(540f);
         rightScroll.setFadeScrollBars(true);
 
-        right.add(keyframesTitle).top().left().padBottom(pad10).row();
+        right.add(keyframesTitle).top().left().padBottom(pad18).row();
         right.add(rightScroll).center().left();
 
         right.pack();
@@ -344,7 +344,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         /* RE-NORMALIZE TIME */
         OwnTextButton normalizeTime = new OwnTextButton(I18n.msg("gui.keyframes.normalize"), skin);
         normalizeTime.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.normalize"), skin));
-        normalizeTime.pad(pad10);
+        normalizeTime.pad(pad18);
         normalizeTime.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (keyframes != null && keyframes.size > 2) {
@@ -383,12 +383,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /* ACTION BUTTONS */
         HorizontalGroup buttons = new HorizontalGroup();
-        buttons.space(pad10);
+        buttons.space(pad18);
 
         // Open keyframes
         OwnTextIconButton open = new OwnTextIconButton(I18n.msg("gui.keyframes.load"), skin, "open");
         open.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.load"), skin));
-        open.pad(pad5);
+        open.pad(pad10);
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.msg("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
@@ -439,7 +439,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Save keyframes
         OwnTextIconButton save = new OwnTextIconButton(I18n.msg("gui.keyframes.save"), skin, "save");
         save.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.save"), skin));
-        save.pad(pad5);
+        save.pad(pad10);
         save.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 String suggestedName = lastKeyframeFileName == null ? df.format(new Date()) + "_keyframes.gkf" : lastKeyframeFileName;
@@ -465,7 +465,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Export to camera path
         OwnTextIconButton export = new OwnTextIconButton(I18n.msg("gui.keyframes.export"), skin, "export");
         export.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.export"), skin));
-        export.pad(pad5);
+        export.pad(pad10);
         export.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 String suggestedName = df.format(new Date()) + ".gsc";
@@ -490,7 +490,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Keyframe preferences
         Button preferences = new OwnTextIconButton(I18n.msg("gui.preferences"), skin, "preferences");
         preferences.setName("keyframe preferences");
-        preferences.pad(pad5);
+        preferences.pad(pad10);
         preferences.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.editprefs"), skin));
         preferences.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -520,11 +520,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         buttons.addActor(preferences);
 
         /* FINAL LAYOUT */
-        content.add(left).top().left().padRight(pad10 * 2f).padBottom(pad10 * 3f);
-        content.add(right).width(592f).top().left().padBottom(pad10).row();
+        content.add(left).top().left().padRight(pad18 * 2f).padBottom(pad18 * 3f);
+        content.add(right).width(592f).top().left().padBottom(pad18).row();
         notice = content.add();
-        notice.padBottom(pad10 * 2f).expandY().center().colspan(2).row();
-        content.add(normalizeTime).colspan(2).bottom().center().padBottom(pad10).row();
+        notice.padBottom(pad18 * 2f).expandY().center().colspan(2).row();
+        content.add(normalizeTime).colspan(2).bottom().center().padBottom(pad18).row();
         content.add(buttons).colspan(2).bottom().right().row();
 
         // CLEAR
@@ -686,7 +686,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             secondsCell = table.add();
             secondsCells.put(kf, secondsCell);
         }
-        secondsCell.setActor(secondsL).left().padRight(pad10 / 2f).padBottom(pad5);
+        secondsCell.setActor(secondsL).left().padRight(pad18 / 2f).padBottom(pad10);
         secondsL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.seconds", kf.seconds, Settings.settings.frame.targetFps), skin));
         // Can't modify time of first keyframe; it's always zero
         if (index > 0)
@@ -757,7 +757,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             namesCells.put(kf, nameCell);
         }
         nameCell.clearActor();
-        nameCell.setActor(nameL).left().padRight(pad10 / 2f).padBottom(pad5);
+        nameCell.setActor(nameL).left().padRight(pad18 / 2f).padBottom(pad10);
         keyframeNames.put(kf, nameL);
         nameL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.name"), skin));
         nameL.addListener((event) -> {
@@ -820,7 +820,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         framesL.setWidth(64f);
         framesL.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.kf.frames", frame, (1d / Settings.settings.frame.targetFps)), skin));
         addHighlightListener(framesL, kf);
-        table.add(framesL).left().padRight(pad10).padBottom(pad5);
+        table.add(framesL).left().padRight(pad18).padBottom(pad10);
 
         // Clock - time
         Image clockImg = new Image(skin.getDrawable("clock"));
@@ -828,7 +828,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         clockImg.setScale(0.7f);
         clockImg.setOrigin(Align.center);
         addHighlightListener(clockImg, kf);
-        table.add(clockImg).width(clockImg.getWidth()).left().padRight(pad10).padBottom(pad5);
+        table.add(clockImg).width(clockImg.getWidth()).left().padRight(pad18).padBottom(pad10);
 
         // Frame name
         addFrameName(kf, index, table);
@@ -852,7 +852,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(goTo, kf);
-        table.add(goTo).left().padRight(pad5).padBottom(pad5);
+        table.add(goTo).left().padRight(pad10).padBottom(pad10);
 
         // Seam
         OwnTextIconButton seam = new OwnTextIconButton("", skin, "seam", "toggle");
@@ -884,7 +884,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(seam, kf);
-        table.add(seam).left().padRight(pad5).padBottom(pad5);
+        table.add(seam).left().padRight(pad10).padBottom(pad10);
 
         // Add after
         OwnTextIconButton addKeyframe = new OwnTextIconButton("", skin, "add");
@@ -919,7 +919,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(addKeyframe, kf);
-        table.add(addKeyframe).left().padRight(pad5).padBottom(pad5);
+        table.add(addKeyframe).left().padRight(pad10).padBottom(pad10);
 
         // Rubbish
         OwnTextIconButton rubbish = new OwnTextIconButton("", skin, "rubbish");
@@ -945,7 +945,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             return false;
         });
         addHighlightListener(rubbish, kf);
-        Cell<?> rub = table.add(rubbish).left().padBottom(pad5);
+        Cell<?> rub = table.add(rubbish).left().padBottom(pad10);
         rub.row();
         table.pack();
 

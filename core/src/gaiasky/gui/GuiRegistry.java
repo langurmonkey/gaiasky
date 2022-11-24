@@ -619,7 +619,7 @@ public class GuiRegistry implements IObserver {
                     @Override
                     protected void build() {
                         content.clear();
-                        content.add(new OwnLabel(text, skin)).left().padBottom(pad10 * 2f).row();
+                        content.add(new OwnLabel(text, skin)).left().padBottom(pad18 * 2f).row();
                     }
 
                     @Override

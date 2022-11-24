@@ -34,20 +34,20 @@ import java.util.Set;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public abstract class GenericDialog extends CollapsibleWindow {
+    protected static float pad34;
     protected static float pad20;
-    protected static float pad15;
+    protected static float pad18;
     protected static float pad10;
-    protected static float pad5;
 
     static {
         updatePads();
     }
 
     public static void updatePads() {
-        pad20 = 32f;
-        pad15 = 18f;
-        pad10 = 16f;
-        pad5 = 8f;
+        pad34 = 34f;
+        pad20 = 20f;
+        pad18 = 18f;
+        pad10 = 10f;
     }
 
     final protected Stage stage;
@@ -163,7 +163,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     /**
      * Prepares the tab button listeners that make tab buttons actually change the content. It also
-     * sets up the button group, which restricts the number of tabs that can be checked at onece to one.
+     * sets up the button group, which restricts the number of tabs that can be checked at once to one.
      */
     protected void setUpTabListeners() {
         if(tabContents != null && tabButtons != null && tabButtons.size == tabContents.size) {
@@ -205,7 +205,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         // Width
         float w = 128f;
         for (Actor button : buttonGroup.getChildren()) {
-            w = Math.max(button.getWidth() + pad10 * 4f, w);
+            w = Math.max(button.getWidth() + pad18 * 4f, w);
         }
         for (Actor button : buttonGroup.getChildren()) {
             button.setWidth(w);
@@ -217,7 +217,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
             h = Math.max(button.getHeight(), h);
         }
         for (Actor button : buttonGroup.getChildren()) {
-            button.setHeight(h);
+            button.setHeight(h + 5);
         }
     }
 
@@ -225,7 +225,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         // BUTTONS
         buttonGroup = new HorizontalGroup();
-        buttonGroup.space(pad5);
+        buttonGroup.space(pad10);
 
         if (acceptText != null) {
             acceptButton = new OwnTextButton(acceptText, skin, acceptStyle);
@@ -263,9 +263,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
         recalculateButtonSize();
 
-        add(content).left().pad(pad10).row();
-        add(bottom).expandY().bottom().right().padRight(pad10).row();
-        add(buttonGroup).pad(pad10).bottom().right();
+        add(content).left().pad(pad18).row();
+        add(bottom).expandY().bottom().right().padRight(pad18).row();
+        add(buttonGroup).pad(pad18).bottom().right();
         getTitleTable().align(Align.left);
 
         // Align top left
@@ -511,7 +511,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public void addSeparator(int colspan) {
         if (content != null)
-            content.add(new Separator(skin, "menu")).padTop(pad10).padBottom(pad10).colspan(colspan).fill().expand().row();
+            content.add(new Separator(skin, "menu")).padTop(pad18).padBottom(pad18).colspan(colspan).fill().expand().row();
     }
 
     /**

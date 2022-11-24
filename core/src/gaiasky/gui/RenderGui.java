@@ -49,7 +49,7 @@ public class RenderGui extends AbstractGui {
     @Override
     public void doneLoading(AssetManager assetManager) {
         mainTable = new Table(skin);
-        time = new OwnLabel("", skin, "ui-17");
+        time = new OwnLabel("", skin, "default");
         mainTable.add(time);
         mainTable.setFillParent(true);
         mainTable.right().bottom();

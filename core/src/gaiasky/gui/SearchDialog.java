@@ -161,7 +161,7 @@ public class SearchDialog extends GenericDialog {
                                                 });
                                                 matchingLabels.add(m);
                                                 m.setWidth(searchInput.getWidth());
-                                                Cell<?> c = candidates.add(m).left().padBottom(pad5);
+                                                Cell<?> c = candidates.add(m).left().padBottom(pad10);
                                                     c.row();
                                             });
                                             candidates.pack();
@@ -216,7 +216,7 @@ public class SearchDialog extends GenericDialog {
 
         content.add(searchInput).top().left().expand().row();
         infoCell = content.add();
-        infoCell.top().left().padTop(pad5).expand().row();
+        infoCell.top().left().padTop(pad10).expand().row();
     }
 
     @Override

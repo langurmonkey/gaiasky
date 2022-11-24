@@ -287,28 +287,28 @@ public class ArchiveViewWindow extends GenericDialog {
                 table.add(links).colspan(2).padTop(pad * 2).padBottom(pad * 2);
                 table.row();
 
-                table.add(new OwnLabel(I18n.msg("gui.data.name"), skin, "msg-21")).padLeft(pad * 2).left();
-                table.add(new OwnLabel(st.getName(), skin, "msg-21")).padLeft(pad * 2).padRight(pad * 2).left();
+                table.add(new OwnLabel(I18n.msg("gui.data.name"), skin, "big")).padLeft(pad * 2).left();
+                table.add(new OwnLabel(st.getName(), skin, "big")).padLeft(pad * 2).padRight(pad * 2).left();
                 table.row().padTop(pad * 2);
                 for (int col = 0; col < data[0].length; col++) {
                     Actor first = null;
 
                     if (data.length <= 2) {
-                        first = new OwnLabel(data[0][col], skin, "ui-19");
+                        first = new OwnLabel(data[0][col], skin, "big");
                     } else {
                         HorizontalGroup hg = new HorizontalGroup();
                         hg.space(5);
                         ImageButton tooltip = new ImageButton(skin, "tooltip");
                         tooltip.addListener(new OwnTextTooltip(data[2][col], skin));
                         hg.addActor(tooltip);
-                        hg.addActor(new OwnLabel(data[0][col], skin, "ui-19"));
+                        hg.addActor(new OwnLabel(data[0][col], skin, "big"));
 
                         first = hg;
 
                     }
 
                     table.add(first).padLeft(pad * 2).left();
-                    table.add(new OwnLabel(data[1][col], skin, "ui-21")).padLeft(pad * 2f).padRight(pad * 2f).left();
+                    table.add(new OwnLabel(data[1][col], skin, "big")).padLeft(pad * 2f).padRight(pad * 2f).left();
                     left();
                     table.row();
                 }
@@ -320,7 +320,7 @@ public class ArchiveViewWindow extends GenericDialog {
             // Error getting data
             GaiaSky.postRunnable(() -> {
                 String msg = I18n.msg("error.gaiacatalog.data", st.getName());
-                table.add(new OwnLabel(msg, skin, "ui-21"));
+                table.add(new OwnLabel(msg, skin, "big"));
                 finish();
             });
         }
@@ -329,7 +329,7 @@ public class ArchiveViewWindow extends GenericDialog {
             // Error
             GaiaSky.postRunnable(() -> {
                 String msg = error;
-                table.add(new OwnLabel(msg, skin, "ui-21"));
+                table.add(new OwnLabel(msg, skin, "big"));
                 finish();
             });
         }
@@ -337,7 +337,7 @@ public class ArchiveViewWindow extends GenericDialog {
         public void notFound() {
             // Not found
             String msg = I18n.msg("error.gaiacatalog.notfound", st.getName());
-            table.add(new OwnLabel(msg, skin, "ui-21"));
+            table.add(new OwnLabel(msg, skin, "big"));
             finish();
         }
 

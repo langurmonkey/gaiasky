@@ -42,7 +42,7 @@ public class MinimapWindow extends GenericDialog {
         Container<TextureWidget> mapTop = new Container<>();
         mapTop.setActor(minimap.getTopProjection());
 
-        content.add(mapName).left().padBottom(pad10).row();
+        content.add(mapName).left().padBottom(pad18).row();
 
         content.add(headerSide).left().padBottom(pb).row();
         content.add(mapSide).left().padBottom(pb).row();

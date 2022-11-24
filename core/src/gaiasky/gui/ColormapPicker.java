@@ -266,7 +266,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             Container<Table> cont = new Container<>(container);
 
             // Radio buttons
-            plainColor = new OwnCheckBox(I18n.msg("gui.colorpicker.plaincolor"), skin, "radio", pad5);
+            plainColor = new OwnCheckBox(I18n.msg("gui.colorpicker.plaincolor"), skin, "radio", pad10);
             plainColor.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     if (plainColor.isChecked()) {
@@ -279,9 +279,9 @@ public class ColormapPicker extends ColorPickerAbstract {
                 return false;
             });
             plainColor.setChecked(catalogInfo.plainColor);
-            content.add(plainColor).left().padBottom(pad5).row();
+            content.add(plainColor).left().padBottom(pad10).row();
 
-            colormap = new OwnCheckBox(I18n.msg("gui.colorpicker.colormap"), skin, "radio", pad5);
+            colormap = new OwnCheckBox(I18n.msg("gui.colorpicker.colormap"), skin, "radio", pad10);
             colormap.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     if (colormap.isChecked()) {
@@ -294,7 +294,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 return false;
             });
             colormap.setChecked(!catalogInfo.plainColor);
-            content.add(colormap).left().padBottom(pad5 * 2f).row();
+            content.add(colormap).left().padBottom(pad10 * 2f).row();
 
             new ButtonGroup<>(plainColor, colormap);
 
@@ -305,7 +305,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             float sbWidth = 272f;
 
             // Color map
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.colormap"), skin)).left().padRight(pad10).padBottom(pad5).padTop(pad10 * 2);
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.colormap"), skin)).left().padRight(pad18).padBottom(pad10).padTop(pad18 * 2);
             ComboBoxBean[] gqs = new ComboBoxBean[cmapList.size];
             for (Pair<String, Integer> cmapDef : cmapList) {
                 gqs[cmapDef.getSecond()] = new ComboBoxBean(I18n.msg("gui.colormap." + cmapDef.getFirst()), cmapDef.getSecond());
@@ -322,15 +322,15 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(cmap).colspan(2).left().padBottom(pad5).padTop(pad10 * 2).row();
+            container.add(cmap).colspan(2).left().padBottom(pad10).padTop(pad18 * 2).row();
 
             // Color map image
             cmapImageCell = container.add();
-            cmapImageCell.colspan(3).center().padBottom(pad10 * 2).row();
+            cmapImageCell.colspan(3).center().padBottom(pad18 * 2).row();
             updateCmapImage(cmap.getSelected().value);
 
             // Attribute
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.attribute"), skin)).left().padRight(pad10).padBottom(pad5);
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.attribute"), skin)).left().padRight(pad18).padBottom(pad10);
             var catalog = catalogInfo.entity;
             view.setEntity(catalog);
             boolean stars = view.getStarSet() != null || view.isOctree();
@@ -379,10 +379,10 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(attribs).colspan(2).left().padBottom(pad5).row();
+            container.add(attribs).colspan(2).left().padBottom(pad10).row();
 
             // Min mapping value
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.min"), skin)).left().padRight(pad10).padBottom(pad5);
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.min"), skin)).left().padRight(pad18).padBottom(pad10);
             minMap = new OwnTextField(Double.toString(getCmapMin(cmapAttrib, catalogInfo)), skin);
             minMap.setWidth(sbWidth * 0.9f);
             minMap.addListener(event -> {
@@ -393,7 +393,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(minMap).left().padBottom(pad5).padRight(pad5);
+            container.add(minMap).left().padBottom(pad10).padRight(pad10);
             // Reload
             OwnImageButton reloadCmap = new OwnImageButton(skin, "reload");
             reloadCmap.addListener(new OwnTextTooltip(I18n.msg("gui.colorpicker.minmax.reload"), skin, 3));
@@ -404,10 +404,10 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(reloadCmap).left().padBottom(pad5).row();
+            container.add(reloadCmap).left().padBottom(pad10).row();
 
             // Max mapping value
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.max"), skin)).left().padRight(pad10).padBottom(pad5);
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.max"), skin)).left().padRight(pad18).padBottom(pad10);
             maxMap = new OwnTextField(Double.toString(getCmapMax(cmapAttrib, catalogInfo)), skin);
             maxMap.setWidth(sbWidth * 0.9f);
             maxMap.addListener(event -> {
@@ -418,7 +418,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(maxMap).colspan(2).left().padBottom(pad5);
+            container.add(maxMap).colspan(2).left().padBottom(pad10);
             container.add().row();
 
             // Select
@@ -537,7 +537,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             float colsize = 160f;
 
             HorizontalGroup hg = new HorizontalGroup();
-            hg.space(pad10);
+            hg.space(pad18);
             Image oldColorImage = new Image(skin.getDrawable("white"));
             oldColorImage.setColor(color[0], color[1], color[2], color[3]);
             Table ocol = new Table();
@@ -650,28 +650,28 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
             });
 
-            container.add(hg).padBottom(pad10 * 2f).colspan(3).row();
+            container.add(hg).padBottom(pad18 * 2f).colspan(3).row();
 
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.red"), skin)).padRight(pad10).padBottom(pad10);
-            container.add(sred).left().padRight(pad10).padBottom(pad10);
-            container.add(tred).padBottom(pad10).row();
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.red"), skin)).padRight(pad18).padBottom(pad18);
+            container.add(sred).left().padRight(pad18).padBottom(pad18);
+            container.add(tred).padBottom(pad18).row();
 
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.green"), skin)).padRight(pad10).padBottom(pad10);
-            container.add(sgreen).left().padRight(pad10).padBottom(pad10);
-            container.add(tgreen).padBottom(pad10).row();
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.green"), skin)).padRight(pad18).padBottom(pad18);
+            container.add(sgreen).left().padRight(pad18).padBottom(pad18);
+            container.add(tgreen).padBottom(pad18).row();
 
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.blue"), skin)).padRight(pad10).padBottom(pad10);
-            container.add(sblue).left().padRight(pad10).padBottom(pad10);
-            container.add(tblue).padBottom(pad10).row();
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.blue"), skin)).padRight(pad18).padBottom(pad18);
+            container.add(sblue).left().padRight(pad18).padBottom(pad18);
+            container.add(tblue).padBottom(pad18).row();
 
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.alpha"), skin)).padRight(pad10).padBottom(pad10);
-            container.add(salpha).left().padRight(pad10).padBottom(pad10);
-            container.add(talpha).padBottom(pad10).row();
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.alpha"), skin)).padRight(pad18).padBottom(pad18);
+            container.add(salpha).left().padRight(pad18).padBottom(pad18);
+            container.add(talpha).padBottom(pad18).row();
 
-            container.add(new OwnLabel(I18n.msg("gui.colorpicker.hex"), skin)).padRight(pad10).padBottom(pad10);
-            container.add(hexfield).colspan(2).left().padBottom(pad10).row();
+            container.add(new OwnLabel(I18n.msg("gui.colorpicker.hex"), skin)).padRight(pad18).padBottom(pad18);
+            container.add(hexfield).colspan(2).left().padBottom(pad18).row();
 
-            container.add(coltable).colspan(3).padBottom(pad10).row();
+            container.add(coltable).colspan(3).padBottom(pad18).row();
         }
 
         @Override

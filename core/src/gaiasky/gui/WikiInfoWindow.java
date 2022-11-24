@@ -268,7 +268,7 @@ public class WikiInfoWindow extends GenericDialog {
                 return;
             }
             String text = TextUtils.html2text(root.getString("extract"));
-            OwnLabel textLabel = new OwnLabel(text, skin, "ui-23", 60);
+            OwnLabel textLabel = new OwnLabel(text, skin, "big", 60);
 
             // Link
             Link wikiLink = null;
@@ -293,7 +293,7 @@ public class WikiInfoWindow extends GenericDialog {
             // Error getting data
             GaiaSky.postRunnable(() -> {
                 String msg = I18n.msg("error.wiki.data", wikiName);
-                table.add(new OwnLabel(msg, skin, "ui-21"));
+                table.add(new OwnLabel(msg, skin, "big"));
                 table.pack();
                 finish();
             });
@@ -302,7 +302,7 @@ public class WikiInfoWindow extends GenericDialog {
         public void ko(String error) {
             // Error
             GaiaSky.postRunnable(() -> {
-                table.add(new OwnLabel(error, skin, "ui-21"));
+                table.add(new OwnLabel(error, skin, "big"));
                 table.pack();
                 finish();
             });

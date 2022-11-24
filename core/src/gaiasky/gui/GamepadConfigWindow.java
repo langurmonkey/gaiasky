@@ -7,14 +7,12 @@ package gaiasky.gui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
@@ -24,7 +22,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
 import gaiasky.util.Trio;
 import gaiasky.util.i18n.I18n;
@@ -213,10 +210,10 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
         // Main tips
         OwnLabel tip = new OwnLabel(I18n.msg("gui.controller.tip.config"), skin);
-        content.add(tip).colspan(2).padBottom(pad10 * 2f).row();
+        content.add(tip).colspan(2).padBottom(pad18 * 2f).row();
 
         // Controller
-        Cell<?> controllerCell = content.add().padRight(pad10 * 2);
+        Cell<?> controllerCell = content.add().padRight(pad18 * 2);
 
         Table controllerTable = new Table(skin);
         controllerTable.setBackground(new SpriteDrawable(new Sprite(controller)));
@@ -229,7 +226,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         currentInput = new OwnLabel(none, skin, "default-blue");
 
         HorizontalGroup lastInputGroup = new HorizontalGroup();
-        lastInputGroup.space(pad10);
+        lastInputGroup.space(pad18);
         lastInputGroup.addActor(currentInputLabel);
         lastInputGroup.addActor(currentInput);
 
@@ -242,7 +239,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         filenameTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.controller.filename.tooltip", SysUtils.getDefaultMappingsDir().toAbsolutePath()), skin));
 
         HorizontalGroup filenameGroup = new HorizontalGroup();
-        filenameGroup.space(pad20);
+        filenameGroup.space(pad34);
         filenameGroup.addActor(fileLabel);
         filenameGroup.addActor(filename);
         filenameGroup.addActor(filenameTooltip);
@@ -252,7 +249,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         Gamepad[] gpds = Gamepad.values();
         for (Gamepad gpd : gpds) {
             Trio<Texture, float[], String> t = inputInfo.get(gpd);
-            inputTable.add(new OwnLabel(t.getThird() + ": ", skin, lw)).left().padBottom(pad5).padRight(pad10);
+            inputTable.add(new OwnLabel(t.getThird() + ": ", skin, lw)).left().padBottom(pad10).padRight(pad18);
 
             OwnTextField inputField = new OwnTextField(getMappingsValue(gpd, mappings), skin);
             inputField.setWidth(iw);
@@ -274,7 +271,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 }
                 return false;
             });
-            inputTable.add(inputField).left().padBottom(pad5).row();
+            inputTable.add(inputField).left().padBottom(pad10).row();
         }
 
         // Sensitivity
@@ -306,34 +303,34 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
         OwnLabel titleSensitivity = new OwnLabel(I18n.msg("gui.controller.sensitivity"), skin, "header-s");
 
-        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.lstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
-        sensitivityTable01.add(lsx).left().padBottom(pad5).row();
-        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.lstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
-        sensitivityTable01.add(lsy).left().padBottom(pad5).row();
-        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.rstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
-        sensitivityTable01.add(rsx).left().padBottom(pad5).row();
-        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.rstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
-        sensitivityTable01.add(rsy).left().padBottom(pad5).row();
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.lstick") + " X:", skin, lw)).left().padRight(pad18).padBottom(pad10);
+        sensitivityTable01.add(lsx).left().padBottom(pad10).row();
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.lstick") + " Y:", skin, lw)).left().padRight(pad18).padBottom(pad10);
+        sensitivityTable01.add(lsy).left().padBottom(pad10).row();
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.rstick") + " X:", skin, lw)).left().padRight(pad18).padBottom(pad10);
+        sensitivityTable01.add(rsx).left().padBottom(pad10).row();
+        sensitivityTable01.add(new OwnLabel(I18n.msg("gui.controller.rstick") + " Y:", skin, lw)).left().padRight(pad18).padBottom(pad10);
+        sensitivityTable01.add(rsy).left().padBottom(pad10).row();
 
-        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.lt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
-        sensitivityTable02.add(lts).left().padBottom(pad5).row();
-        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.rt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad20);
-        sensitivityTable02.add(rts).left().padBottom(pad20).row();
-        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.axis.pow") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.lt") + ":", skin, lw)).left().padRight(pad18).padBottom(pad10);
+        sensitivityTable02.add(lts).left().padBottom(pad10).row();
+        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.rt") + ":", skin, lw)).left().padRight(pad18).padBottom(pad34);
+        sensitivityTable02.add(rts).left().padBottom(pad34).row();
+        sensitivityTable02.add(new OwnLabel(I18n.msg("gui.controller.axis.pow") + ":", skin, lw)).left().padRight(pad18).padBottom(pad10);
         sensitivityTable02.add(axisPower).left();
 
         // Add inputs and the rest
         content.add(inputTable).left();
         content.row();
-        content.add(lastInputGroup).padBottom(pad10);
+        content.add(lastInputGroup).padBottom(pad18);
         content.row();
-        content.add(titleSensitivity).left().colspan(2).padBottom(pad10);
+        content.add(titleSensitivity).left().colspan(2).padBottom(pad18);
         content.add();
         content.row();
         content.add(sensitivityTable01).left().top();
         content.add(sensitivityTable02).left().top();
         content.row();
-        content.add(filenameGroup).colspan(2).padTop(pad20);
+        content.add(filenameGroup).colspan(2).padTop(pad34);
 
         // Select first
         GaiaSky.postRunnable(() -> stage.setKeyboardFocus(inputFields.get(gpds[0])));

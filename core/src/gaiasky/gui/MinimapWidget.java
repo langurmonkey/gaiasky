@@ -31,7 +31,7 @@ public class MinimapWidget implements Disposable {
     private final TextureWidget sideProjection;
     int side, side2;
     int sideShort, sideShort2;
-    private Vector3d aux3d;
+    private final Vector3d aux3d;
 
     private final Array<IMinimapScale> scales;
     private IMinimapScale current;
@@ -49,7 +49,7 @@ public class MinimapWidget implements Disposable {
 
         SpriteBatch sb = new SpriteBatch(1000, spriteShader);
 
-        BitmapFont font = skin.getFont("ui-20");
+        BitmapFont font = skin.getFont("ui-23");
 
         tfb = new FrameBuffer(Format.RGBA8888, side, side, true);
         sfb = new FrameBuffer(Format.RGBA8888, side, sideShort, true);

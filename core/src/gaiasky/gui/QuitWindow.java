@@ -35,9 +35,9 @@ public class QuitWindow extends GenericDialog {
     protected void build() {
         content.clear();
 
-        content.add(new OwnLabel(I18n.msg("gui.quit.sure"), skin)).left().padBottom(pad10 * 2f).row();
+        content.add(new OwnLabel(I18n.msg("gui.quit.sure"), skin)).left().padBottom(pad18 * 2f).row();
 
-        doNotAsk = new OwnCheckBox(I18n.msg("gui.donotask"), skin, pad5);
+        doNotAsk = new OwnCheckBox(I18n.msg("gui.donotask"), skin, pad10);
         doNotAsk.setChecked(false);
 
         bottom.add(doNotAsk).right().row();

@@ -308,13 +308,14 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             return false;
         });
 
+        float pad = 3f;
         buttonsTable = new Table(skin);
-        buttonsTable.add(map).pad(1).top().left();
-        buttonsTable.add(load).pad(1).top().left();
-        buttonsTable.add(preferences).pad(1).top().left();
-        buttonsTable.add(showLog).pad(1).top().left();
-        buttonsTable.add(about).pad(1).top().left();
-        buttonsTable.add(quit).pad(1).top().left();
+        buttonsTable.add(map).pad(pad).top().left();
+        buttonsTable.add(load).pad(pad).top().left();
+        buttonsTable.add(preferences).pad(pad).top().left();
+        buttonsTable.add(showLog).pad(pad).top().left();
+        buttonsTable.add(about).pad(pad).top().left();
+        buttonsTable.add(quit).pad(pad).top().left();
 
         buttonsTable.pack();
 

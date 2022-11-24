@@ -84,17 +84,17 @@ public class AboutWindow extends GenericDialog {
         tabGroup.align(Align.left);
 
         final Button tabHelp = new OwnTextButton(I18n.msg("gui.help.help"), skin, "toggle-big");
-        tabHelp.pad(pad5);
+        tabHelp.pad(pad10);
         tabHelp.setWidth(tabWidth);
         final Button tabAbout = new OwnTextButton(I18n.msg("gui.help.about"), skin, "toggle-big");
-        tabAbout.pad(pad5);
+        tabAbout.pad(pad10);
         tabAbout.setWidth(tabWidth);
         final Button tabSystem = new OwnTextButton(I18n.msg("gui.help.system"), skin, "toggle-big");
-        tabSystem.pad(pad5);
+        tabSystem.pad(pad10);
         tabSystem.setWidth(tabWidth);
         final Button tabUpdates = showUpdateTab ? new OwnTextButton(I18n.msg("gui.newversion"), skin, "toggle-big") : null;
         if (showUpdateTab) {
-            tabUpdates.pad(pad5);
+            tabUpdates.pad(pad10);
             tabUpdates.setWidth(tabWidth);
         }
 
@@ -111,9 +111,9 @@ public class AboutWindow extends GenericDialog {
         if (showUpdateTab)
             tabButtons.add(tabUpdates);
 
-        content.add(tabGroup).align(Align.left).padLeft(pad5);
+        content.add(tabGroup).align(Align.left).padLeft(pad10);
         content.row();
-        content.pad(pad10);
+        content.pad(pad18);
 
         /* CONTENT 1 - HELP */
         final Table contentHelp = new Table(skin);
@@ -139,19 +139,19 @@ public class AboutWindow extends GenericDialog {
         gaiaSkyIcon.setOrigin(Align.center);
 
         // Add all to content
-        contentHelp.add(gaiasky).pad(pad10).padTop(pad20).padBottom(pad10 * 5f).colspan(2);
+        contentHelp.add(gaiasky).pad(pad18).padTop(pad34).padBottom(pad18 * 5f).colspan(2);
         contentHelp.row();
-        contentHelp.add(homepageTitle).align(Align.left).padRight(pad20);
+        contentHelp.add(homepageTitle).align(Align.left).padRight(pad34);
         contentHelp.add(homepageTxt).align(Align.left);
         contentHelp.row();
-        contentHelp.add(new OwnLabel("", skin)).padBottom(pad10);
-        contentHelp.add(homepageLink).align(Align.left).padBottom(pad10);
+        contentHelp.add(new OwnLabel("", skin)).padBottom(pad18);
+        contentHelp.add(homepageLink).align(Align.left).padBottom(pad18);
         contentHelp.row();
-        contentHelp.add(docsTitle).align(Align.left).padRight(pad20);
+        contentHelp.add(docsTitle).align(Align.left).padRight(pad34);
         contentHelp.add(docsTxt).align(Align.left);
         contentHelp.row();
-        contentHelp.add(new OwnLabel("", skin)).padBottom(pad10 * 4f);
-        contentHelp.add(docsLink).align(Align.left).padBottom(pad10 * 4f);
+        contentHelp.add(new OwnLabel("", skin)).padBottom(pad18 * 4f);
+        contentHelp.add(docsLink).align(Align.left).padBottom(pad18 * 4f);
         contentHelp.row();
         contentHelp.add(gaiaSkyIcon).colspan(2).align(Align.center);
         contentHelp.pack();
@@ -199,7 +199,7 @@ public class AboutWindow extends GenericDialog {
 
         // License
         HorizontalGroup licenseHorizontal = new HorizontalGroup();
-        licenseHorizontal.space(pad10);
+        licenseHorizontal.space(pad18);
 
         VerticalGroup licenseVertical = new VerticalGroup();
         TextArea licenseText = new OwnTextArea(I18n.msg("gui.help.license"), skin.get("regular", TextFieldStyle.class));
@@ -215,7 +215,7 @@ public class AboutWindow extends GenericDialog {
 
         // Thanks
         HorizontalGroup thanks = new HorizontalGroup();
-        thanks.space(pad10).pad(pad10);
+        thanks.space(pad18).pad(pad18);
         Container<Actor> thanksSc = new Container<>(thanks);
         thanksSc.setBackground(skin.getDrawable("bg-clear"));
 
@@ -229,23 +229,23 @@ public class AboutWindow extends GenericDialog {
         thanks.addActor(bwt);
         thanks.addActor(dpac);
 
-        contentAbout.add(intro).colspan(2).left().padTop(pad20);
+        contentAbout.add(intro).colspan(2).left().padTop(pad34);
         contentAbout.row();
-        contentAbout.add(homePageTitle).left().padRight(pad10).padTop(pad10);
-        contentAbout.add(homepage).left().padTop(pad10);
+        contentAbout.add(homePageTitle).left().padRight(pad18).padTop(pad18);
+        contentAbout.add(homepage).left().padTop(pad18);
         contentAbout.row();
-        contentAbout.add(devNewsTitle).left().padRight(pad10).padTop(pad10);
-        contentAbout.add(tw).left().padTop(pad10);
+        contentAbout.add(devNewsTitle).left().padRight(pad18).padTop(pad18);
+        contentAbout.add(tw).left().padTop(pad18);
         contentAbout.row();
-        contentAbout.add(authorTitle).left().padRight(pad10).padTop(pad10);
-        contentAbout.add(author).left().padTop(pad5).padTop(pad10);
+        contentAbout.add(authorTitle).left().padRight(pad18).padTop(pad18);
+        contentAbout.add(author).left().padTop(pad10).padTop(pad18);
         contentAbout.row();
-        contentAbout.add(contribTitle).left().padRight(pad10).padTop(pad10);
-        contentAbout.add(contrib).left().padTop(pad10);
+        contentAbout.add(contribTitle).left().padRight(pad18).padTop(pad18);
+        contentAbout.add(contrib).left().padTop(pad18);
         contentAbout.row();
-        contentAbout.add(licenseHorizontal).colspan(2).center().padTop(pad10);
+        contentAbout.add(licenseHorizontal).colspan(2).center().padTop(pad18);
         contentAbout.row();
-        contentAbout.add(thanksSc).colspan(2).center().padTop(pad10 * 4f);
+        contentAbout.add(thanksSc).colspan(2).center().padTop(pad18 * 4f);
         contentAbout.pack();
 
         /* CONTENT 3 - SYSTEM */
@@ -311,7 +311,7 @@ public class AboutWindow extends GenericDialog {
 
         TextButton memInfoButton = new OwnTextButton(I18n.msg("gui.help.meminfo"), skin, "default");
         memInfoButton.setName("memoryinfo");
-        memInfoButton.pad(0, pad10, 0, pad10);
+        memInfoButton.pad(0, pad18, 0, pad18);
         memInfoButton.setHeight(buttonHeight);
         memInfoButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -374,72 +374,72 @@ public class AboutWindow extends GenericDialog {
         scrolls.add(glExtensionsScroll);
 
         // BUILD
-        contentSystem.add(buildInfo).colspan(2).align(Align.left).padTop(pad20).padBottom(pad5);
+        contentSystem.add(buildInfo).colspan(2).align(Align.left).padTop(pad34).padBottom(pad10);
         contentSystem.row();
-        contentSystem.add(versionTitle).align(Align.topLeft).padRight(pad10).width(titleWidth);
+        contentSystem.add(versionTitle).align(Align.topLeft).padRight(pad18).width(titleWidth);
         contentSystem.add(version).align(Align.left);
         contentSystem.row();
-        contentSystem.add(revisionTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(revision).align(Align.left).padTop(pad5);
+        contentSystem.add(revisionTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(revision).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(timeTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(time).align(Align.left).padTop(pad5);
+        contentSystem.add(timeTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(time).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(builderTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(builder).align(Align.left).padTop(pad5);
+        contentSystem.add(builderTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(builder).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(systemTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(system).align(Align.left).padTop(pad5);
+        contentSystem.add(systemTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(system).align(Align.left).padTop(pad10);
         contentSystem.row();
 
         // PATHS
-        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
+        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
         contentSystem.row();
-        contentSystem.add(configTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(configTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(config).align(Align.left);
         contentSystem.row();
-        contentSystem.add(dataTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(dataTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(data).align(Align.left);
         contentSystem.row();
-        contentSystem.add(screenshotsTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(screenshotsTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(screenshots).align(Align.left);
         contentSystem.row();
-        contentSystem.add(framesTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(framesTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(frames).align(Align.left);
         contentSystem.row();
-        contentSystem.add(cameraTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(cameraTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(camera).align(Align.left);
         contentSystem.row();
-        contentSystem.add(mappingsTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(mappingsTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(mappings).align(Align.left);
         contentSystem.row();
-        contentSystem.add(musicTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(musicTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(music).align(Align.left);
         contentSystem.row();
 
         // JAVA
-        contentSystem.add(javaInfo).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
+        contentSystem.add(javaInfo).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
         contentSystem.row();
-        contentSystem.add(javaVersionTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(javaVersionTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(javaVersion).align(Align.left);
         contentSystem.row();
-        contentSystem.add(javaRuntimeTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(javaRuntime).align(Align.left).padTop(pad5);
+        contentSystem.add(javaRuntimeTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(javaRuntime).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(javaVMNameTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(javaVMName).align(Align.left).padTop(pad5);
+        contentSystem.add(javaVMNameTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(javaVMName).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(javaVMVersionTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(javaVMVersion).align(Align.left).padTop(pad5);
+        contentSystem.add(javaVMVersionTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(javaVMVersion).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(javaVMVendorTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(javaVMVendor).align(Align.left).padTop(pad5);
+        contentSystem.add(javaVMVendorTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(javaVMVendor).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(memInfoButton).colspan(2).align(Align.left).padTop(pad10);
+        contentSystem.add(memInfoButton).colspan(2).align(Align.left).padTop(pad18);
         contentSystem.row();
 
         // SYSTEM
-        contentSystem.add(sysInfo).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
+        contentSystem.add(sysInfo).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
         contentSystem.row();
         try {
             SystemInfo si = new SystemInfo();
@@ -449,33 +449,33 @@ public class AboutWindow extends GenericDialog {
             Label cpuTitle = new OwnLabel(I18n.msg("gui.help.cpu"), skin);
             Label cpu = new OwnLabel(cp.toString(), skin);
 
-            contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-            contentSystem.add(cpu).align(Align.left).padTop(pad5);
+            contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+            contentSystem.add(cpu).align(Align.left).padTop(pad10);
             contentSystem.row();
         } catch (Error e) {
-            contentSystem.add(new OwnLabel(I18n.msg("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad10).padBottom(pad10).row();
+            contentSystem.add(new OwnLabel(I18n.msg("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad18).padBottom(pad18).row();
         }
-        contentSystem.add(sysOSTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(sysOSTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(sysOS).align(Align.left);
         contentSystem.row();
-        contentSystem.add(glRendererTitle).align(Align.topLeft).padRight(pad10).padTop(pad10);
-        contentSystem.add(glRenderer).align(Align.left).padTop(pad5);
+        contentSystem.add(glRendererTitle).align(Align.topLeft).padRight(pad18).padTop(pad18);
+        contentSystem.add(glRenderer).align(Align.left).padTop(pad10);
         contentSystem.row();
 
         // GL
-        contentSystem.add(glInfo).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
+        contentSystem.add(glInfo).colspan(2).align(Align.left).padTop(pad18).padBottom(pad10);
         contentSystem.row();
-        contentSystem.add(glVersionTitle).align(Align.topLeft).padRight(pad10);
+        contentSystem.add(glVersionTitle).align(Align.topLeft).padRight(pad18);
         contentSystem.add(glVersion).align(Align.left);
         contentSystem.row();
-        contentSystem.add(glVendorTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(glVendor).align(Align.left).padTop(pad5);
+        contentSystem.add(glVendorTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(glVendor).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(glslVersionTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(glslVersion).align(Align.left).padTop(pad5);
+        contentSystem.add(glslVersionTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(glslVersion).align(Align.left).padTop(pad10);
         contentSystem.row();
-        contentSystem.add(glExtensionsTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
-        contentSystem.add(glExtensionsScroll).align(Align.left).padTop(pad5);
+        contentSystem.add(glExtensionsTitle).align(Align.topLeft).padRight(pad18).padTop(pad10);
+        contentSystem.add(glExtensionsScroll).align(Align.left).padTop(pad10);
 
         OwnScrollPane systemScroll = new OwnScrollPane(contentSystem, skin, "minimalist-nobg");
         systemScroll.setFadeScrollBars(false);
@@ -496,7 +496,7 @@ public class AboutWindow extends GenericDialog {
             checkTable = new Table(skin);
             checkLabel = new OwnLabel("", skin);
 
-            checkTable.add(checkLabel).top().left().padBottom(pad5).row();
+            checkTable.add(checkLabel).top().left().padBottom(pad10).row();
             if (Settings.settings.program.update.lastCheck == null || new Date().getTime() - Settings.settings.program.update.lastCheck.toEpochMilli() > Settings.ProgramSettings.UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
                 // Check!
                 checkLabel.setText(I18n.msg("gui.newversion.checking"));
@@ -505,7 +505,7 @@ public class AboutWindow extends GenericDialog {
                 // Inform latest
                 newVersionCheck(Settings.settings.version.version, Settings.settings.version.versionNumber, Settings.settings.version.buildTime, false);
             }
-            contentUpdates.add(checkTable).left().top().padTop(pad20);
+            contentUpdates.add(checkTable).left().top().padTop(pad34);
         }
 
         /* ADD ALL CONTENT */
@@ -565,7 +565,7 @@ public class AboutWindow extends GenericDialog {
             final String uri = Settings.WEBPAGE_DOWNLOADS;
 
             OwnTextButton getNewVersion = new OwnTextButton(I18n.msg("gui.newversion.getit"), skin);
-            getNewVersion.pad(0, pad10, 0, pad10);
+            getNewVersion.pad(0, pad18, 0, pad18);
             getNewVersion.setHeight(40f);
             getNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -574,7 +574,7 @@ public class AboutWindow extends GenericDialog {
                 }
                 return false;
             });
-            checkTable.add(getNewVersion).center().padTop(pad10).padBottom(pad5).row();
+            checkTable.add(getNewVersion).center().padTop(pad18).padBottom(pad10).row();
 
             Link link = new Link(uri, linkStyle, uri);
             checkTable.add(link).center();
@@ -585,7 +585,7 @@ public class AboutWindow extends GenericDialog {
             checkLabel.setText(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
             // Add check now button
             OwnTextButton checkNewVersion = new OwnTextButton(I18n.msg("gui.newversion.checknow"), skin);
-            checkNewVersion.pad(pad5, pad10, pad5, pad10);
+            checkNewVersion.pad(pad10, pad18, pad10, pad18);
             checkNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     checkLabel.setText(I18n.msg("gui.newversion.checking"));
@@ -595,7 +595,7 @@ public class AboutWindow extends GenericDialog {
                 }
                 return false;
             });
-            checkTable.add(checkNewVersion).center().padTop(pad10);
+            checkTable.add(checkNewVersion).center().padTop(pad18);
         }
     }
 
@@ -607,7 +607,7 @@ public class AboutWindow extends GenericDialog {
                 VersionCheckEvent vce = (VersionCheckEvent) event;
                 if (!vce.isFailed()) {
                     checkTable.clear();
-                    checkTable.add(checkLabel).top().left().padBottom(pad5).row();
+                    checkTable.add(checkLabel).top().left().padBottom(pad10).row();
                     // All is fine
                     newVersionCheck(vce.getTag(), vce.getVersionNumber(), vce.getTagTime(), true);
 

@@ -59,7 +59,7 @@ public class AddShapeDialog extends GenericDialog {
         content.clear();
 
         OwnLabel info = new OwnLabel(I18n.msg("gui.shape.info", object.getName()), skin, "hud-subheader");
-        content.add(info).left().padBottom(pad15).row();
+        content.add(info).left().padBottom(pad20).row();
 
         // Name
         addName(content, "1 " + I18n.msg("gui.unit.au") + " -> " + objectName);
@@ -89,18 +89,18 @@ public class AddShapeDialog extends GenericDialog {
         sizeGroup.space(15f);
         sizeGroup.addActor(size);
         sizeGroup.addActor(units);
-        content.add(new OwnLabel(I18n.msg("gui.shape.size"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
-        content.add(sizeGroup).left().padBottom(pad10).row();
+        content.add(new OwnLabel(I18n.msg("gui.shape.size"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        content.add(sizeGroup).left().padBottom(pad18).row();
 
         // Show label
-        showLabel = new OwnCheckBox(I18n.msg("gui.shape.label"), skin, pad5);
+        showLabel = new OwnCheckBox(I18n.msg("gui.shape.label"), skin, pad10);
         showLabel.setChecked(true);
-        content.add(showLabel).left().colspan(2).padRight(pad10).padBottom(pad10).row();
+        content.add(showLabel).left().colspan(2).padRight(pad18).padBottom(pad18).row();
 
         // Track
-        track = new OwnCheckBox(I18n.msg("gui.shape.track"), skin, pad5);
+        track = new OwnCheckBox(I18n.msg("gui.shape.track"), skin, pad10);
         track.setChecked(true);
-        content.add(track).left().colspan(2).padRight(pad10).padBottom(pad5);
+        content.add(track).left().colspan(2).padRight(pad18).padBottom(pad10);
 
         // Separator
         addSeparator(2);
@@ -110,8 +110,8 @@ public class AddShapeDialog extends GenericDialog {
         shape.setWidth(fieldWidth);
         shape.setItems(ShapeComboBoxBean.defaultShapes());
         shape.setSelectedIndex(0);
-        content.add(new OwnLabel(I18n.msg("gui.shape.shape"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
-        content.add(shape).left().padBottom(pad10).row();
+        content.add(new OwnLabel(I18n.msg("gui.shape.shape"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        content.add(shape).left().padBottom(pad18).row();
 
         // Color
         addColor(content);
@@ -121,8 +121,8 @@ public class AddShapeDialog extends GenericDialog {
         primitive.setWidth(fieldWidth);
         primitive.setItems(PrimitiveComboBoxBean.defaultShapes());
         primitive.setSelectedIndex(0);
-        content.add(new OwnLabel(I18n.msg("gui.shape.primitive"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
-        content.add(primitive).left().padBottom(pad10).row();
+        content.add(new OwnLabel(I18n.msg("gui.shape.primitive"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        content.add(primitive).left().padBottom(pad18).row();
 
     }
 
@@ -137,16 +137,16 @@ public class AddShapeDialog extends GenericDialog {
             }
             return true;
         });
-        container.add(new OwnLabel(I18n.msg("gui.shape.name"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
-        container.add(name).left().padBottom(pad10).row();
+        container.add(new OwnLabel(I18n.msg("gui.shape.name"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        container.add(name).left().padBottom(pad18).row();
     }
 
     private void addColor(Table container) {
         color = new ColorPicker(new float[] { 0.3f, 0.4f, 1f, 1f }, stage, skin);
-        container.add(new OwnLabel(I18n.msg("gui.shape.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
+        container.add(new OwnLabel(I18n.msg("gui.shape.color"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
         Table lc = new Table(skin);
         lc.add(color).size(cpSize);
-        container.add(lc).left().padBottom(pad5).row();
+        container.add(lc).left().padBottom(pad10).row();
     }
 
     private void recomputeObjectName() {

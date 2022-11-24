@@ -27,8 +27,8 @@ import java.io.StringWriter;
  */
 public class ErrorDialog implements ApplicationListener {
 
-    private Exception cause;
-    private String message;
+    private final Exception cause;
+    private final String message;
     private Stage ui;
 
     public ErrorDialog(Exception cause, String message) {
@@ -54,12 +54,12 @@ public class ErrorDialog implements ApplicationListener {
         // Title
         OwnLabel title = new OwnLabel(I18n.msg("error.crash.title"), skin, "header-large");
         // Subtitle
-        OwnLabel subtitle = new OwnLabel(I18n.msg("notif.error", TextUtils.breakCharacters(cause.getLocalizedMessage(), 30)), skin, "ui-21");
+        OwnLabel subtitle = new OwnLabel(I18n.msg("notif.error", TextUtils.breakCharacters(cause.getLocalizedMessage(), 30)), skin, "default");
         // Notification
         OwnLabel urlLabel = new OwnLabel(I18n.msg("error.crash.exception.1"), skin, "header-s");
         Link url = new Link(Settings.REPO_ISSUES, skin, Settings.REPO_ISSUES);
         OwnLabel applicationMessageLabel = new OwnLabel(I18n.msg("error.crash.applicationmessage"), skin, "header-s");
-        OwnLabel applicationMessage = new OwnLabel(message, skin, "ui-15");
+        OwnLabel applicationMessage = new OwnLabel(message, skin, "default");
 
         // Stack trace
         StringWriter sw = new StringWriter();

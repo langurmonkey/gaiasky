@@ -92,10 +92,10 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
                 slaveMarker.setColor(Color.RED);
             }
             slaveStatuses[i] = slaveMarker;
-            statusTable.add(slaveMarker).left().padRight(pad10);
+            statusTable.add(slaveMarker).left().padRight(pad18);
         }
-        content.add(statusLabel).center().left().padRight(pad10).padBottom(pad10 * 2f);
-        content.add(statusTable).center().left().padBottom(pad10 * 2f).row();
+        content.add(statusLabel).center().left().padRight(pad18).padBottom(pad18 * 2f);
+        content.add(statusTable).center().left().padBottom(pad18 * 2f).row();
 
         // Instance
         Array<String> slaveList = getSlaveBeans();
@@ -113,12 +113,12 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
             return false;
         });
         OwnLabel slaveLabel = new OwnLabel(I18n.msg("gui.slave.config.instance") + ":", skin);
-        content.add(slaveLabel).center().left().padRight(pad10).padBottom(pad10);
-        content.add(slaveSelect).center().left().padBottom(pad10).row();
+        content.add(slaveLabel).center().left().padRight(pad18).padBottom(pad18);
+        content.add(slaveSelect).center().left().padBottom(pad18).row();
 
         // Slave status label
         slaveStatusLabel = new OwnLabel("", skin);
-        content.add(slaveStatusLabel).colspan(2).center().padBottom(pad10 * 2f).row();
+        content.add(slaveStatusLabel).colspan(2).center().padBottom(pad18 * 2f).row();
         if (slaves.size() > 0)
             updateSlaveStatusText(slaves.get(0));
 
@@ -126,26 +126,26 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
         yaw = new OwnTextField("", skin, angleVal);
         yaw.setWidth(tw);
         OwnLabel yawLabel = new OwnLabel(I18n.msg("gui.slave.config.yaw") + ":", skin);
-        content.add(yawLabel).center().left().padRight(pad10).padBottom(pad10);
-        content.add(yaw).center().left().padBottom(pad10).row();
+        content.add(yawLabel).center().left().padRight(pad18).padBottom(pad18);
+        content.add(yaw).center().left().padBottom(pad18).row();
         // Pitch
         pitch = new OwnTextField("", skin, angleVal);
         pitch.setWidth(tw);
         OwnLabel pitchLabel = new OwnLabel(I18n.msg("gui.slave.config.pitch") + ":", skin);
-        content.add(pitchLabel).center().left().padRight(pad10).padBottom(pad10);
-        content.add(pitch).center().left().padBottom(pad10).row();
+        content.add(pitchLabel).center().left().padRight(pad18).padBottom(pad18);
+        content.add(pitch).center().left().padBottom(pad18).row();
         // Roll
         roll = new OwnTextField("", skin, angleVal);
         roll.setWidth(tw);
         OwnLabel rollLabel = new OwnLabel(I18n.msg("gui.slave.config.roll") + ":", skin);
-        content.add(rollLabel).center().left().padRight(pad10).padBottom(pad10);
-        content.add(roll).center().left().padBottom(pad10).row();
+        content.add(rollLabel).center().left().padRight(pad18).padBottom(pad18);
+        content.add(roll).center().left().padBottom(pad18).row();
         // FOV
         fov = new OwnTextField("", skin, fovVal);
         fov.setWidth(tw);
         OwnLabel fovLabel = new OwnLabel(I18n.msg("gui.slave.config.fov") + ":", skin);
-        content.add(fovLabel).center().left().padRight(pad10).padBottom(pad10);
-        content.add(fov).center().left().padBottom(pad10).row();
+        content.add(fovLabel).center().left().padRight(pad18).padBottom(pad18);
+        content.add(fov).center().left().padBottom(pad18).row();
 
         if (slaveSelect.getSelected() != null)
             pullParameters(slaveSelect.getSelected());

@@ -41,7 +41,7 @@ public class ReleaseNotesWindow extends GenericDialog {
             String releaseNotes = Files.readString(releaseNotesFile).trim();
 
             OwnLabel title = new OwnLabel(Settings.getApplicationTitle(false) + "   " + Settings.settings.version.version, skin, "header");
-            content.add(title).left().pad(pad10).padBottom(pad20).row();
+            content.add(title).left().pad(pad18).padBottom(pad34).row();
 
             OwnTextArea releaseNotesText = new OwnTextArea(releaseNotes, skin, "disabled-nobg");
             releaseNotesText.setDisabled(true);
@@ -59,7 +59,7 @@ public class ReleaseNotesWindow extends GenericDialog {
             scroll.setForceScroll(false, true);
             scroll.setSmoothScrolling(false);
             scroll.setFadeScrollBars(false);
-            content.add(scroll).center().pad(pad10);
+            content.add(scroll).center().pad(pad18);
             content.pack();
 
         } catch (IOException e) {

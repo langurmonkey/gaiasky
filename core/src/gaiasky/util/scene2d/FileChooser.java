@@ -199,10 +199,10 @@ public class FileChooser extends GenericDialog {
             return false;
         });
 
-        controlsTable.add(home).left().padRight(pad5);
-        controlsTable.add(back).left().padRight(pad5);
-        controlsTable.add(parent).left().padRight(pad5);
-        controlsTable.add(fwd).left().padRight(pad10);
+        controlsTable.add(home).left().padRight(pad10);
+        controlsTable.add(back).left().padRight(pad10);
+        controlsTable.add(parent).left().padRight(pad10);
+        controlsTable.add(fwd).left().padRight(pad18);
 
         // Text input with current location
         location = new OwnTextField("", skin);
@@ -227,7 +227,7 @@ public class FileChooser extends GenericDialog {
             }
             return false;
         });
-        controlsTable.add(location).left().padLeft(pad10).row();
+        controlsTable.add(location).left().padLeft(pad18).row();
 
         if (target == FileChooserTarget.DIRECTORIES || target == FileChooserTarget.ALL) {
             // New directory button
@@ -260,7 +260,7 @@ public class FileChooser extends GenericDialog {
                 }
                 return false;
             });
-            controlsTable.add(newDirectory).colspan(5).right().padLeft(pad10).padTop(pad5).padBottom(pad5);
+            controlsTable.add(newDirectory).colspan(5).right().padLeft(pad18).padTop(pad10).padBottom(pad10);
         }
 
         // In windows, we need to be able to change drives
@@ -651,7 +651,7 @@ public class FileChooser extends GenericDialog {
         protected void build() {
             content.clear();
 
-            content.add(new OwnLabel(I18n.msg("gui.fc.newdirectory.name"), skin)).left().padRight(pad10);
+            content.add(new OwnLabel(I18n.msg("gui.fc.newdirectory.name"), skin)).left().padRight(pad18);
 
             name = new OwnTextField("", skin);
             name.setWidth(350f);

@@ -74,7 +74,7 @@ public class LogWindow extends GenericDialog {
 
         Button reload = new OwnTextIconButton("", skin, "reload");
         reload.setName("update log");
-        reload.pad(pad5);
+        reload.pad(pad10);
         reload.addListener(new OwnTextTooltip(I18n.msg("gui.log.update"), skin));
         reload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -86,7 +86,7 @@ public class LogWindow extends GenericDialog {
 
         Button export = new OwnTextButton(I18n.msg("gui.log.export"), skin);
         export.setName("export log");
-        export.pad(pad5);
+        export.pad(pad10);
         export.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 export();

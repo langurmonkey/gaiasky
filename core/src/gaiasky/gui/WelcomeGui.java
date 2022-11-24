@@ -437,11 +437,11 @@ public class WelcomeGui extends AbstractGui {
                         @Override
                         protected void build() {
                             content.clear();
-                            content.pad(pad20, pad28 * 2f, pad20, pad28 * 2f);
-                            content.add(new OwnLabel(I18n.msg("gui.basedata.default", baseData.name, I18n.msg("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
-                            content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
-                            content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad20);
-                            content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
+                            content.pad(pad34, pad28 * 2f, pad34, pad28 * 2f);
+                            content.add(new OwnLabel(I18n.msg("gui.basedata.default", baseData.name, I18n.msg("gui.welcome.dsmanager")), skin, "huge")).left().colspan(3).padBottom(pad34 * 2f).row();
+                            content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad34);
+                            content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad34);
+                            content.add(new OwnLabel(I18n.msg("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad34);
                         }
 
                         @Override

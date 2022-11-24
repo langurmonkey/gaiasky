@@ -59,14 +59,14 @@ public class DatasetLoadDialog extends GenericDialog {
         content.clear();
 
         OwnLabel info = new OwnLabel(I18n.msg("gui.dsload.info"), skin, "hud-subheader");
-        content.add(info).left().padBottom(pad15).row();
+        content.add(info).left().padBottom(pad20).row();
 
         // Table containing the actual widget
         Table container = new Table(skin);
         Container<Table> cont = new Container<>(container);
 
         // Radio buttons
-        stars = new OwnCheckBox(I18n.msg("gui.dsload.stars"), skin, "radio", pad5);
+        stars = new OwnCheckBox(I18n.msg("gui.dsload.stars"), skin, "radio", pad10);
         stars.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (stars.isChecked()) {
@@ -79,9 +79,9 @@ public class DatasetLoadDialog extends GenericDialog {
             return false;
         });
         stars.setChecked(true);
-        content.add(stars).left().padBottom(pad10).row();
+        content.add(stars).left().padBottom(pad18).row();
 
-        particles = new OwnCheckBox(I18n.msg("gui.dsload.particles"), skin, "radio", pad5);
+        particles = new OwnCheckBox(I18n.msg("gui.dsload.particles"), skin, "radio", pad10);
         particles.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (particles.isChecked()) {
@@ -94,9 +94,9 @@ public class DatasetLoadDialog extends GenericDialog {
             return false;
         });
         particles.setChecked(false);
-        content.add(particles).left().padBottom(pad10).row();
+        content.add(particles).left().padBottom(pad18).row();
 
-        clusters = new OwnCheckBox(I18n.msg("gui.dsload.clusters"), skin, "radio", pad5);
+        clusters = new OwnCheckBox(I18n.msg("gui.dsload.clusters"), skin, "radio", pad10);
         clusters.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (clusters.isChecked()) {
@@ -109,9 +109,9 @@ public class DatasetLoadDialog extends GenericDialog {
             return false;
         });
         clusters.setChecked(false);
-        content.add(clusters).left().padBottom(pad10).row();
+        content.add(clusters).left().padBottom(pad18).row();
 
-        variables = new OwnCheckBox(I18n.msg("gui.dsload.variable"), skin, "radio", pad5);
+        variables = new OwnCheckBox(I18n.msg("gui.dsload.variable"), skin, "radio", pad10);
         variables.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (variables.isChecked()) {
@@ -124,7 +124,7 @@ public class DatasetLoadDialog extends GenericDialog {
             return false;
         });
         variables.setChecked(false);
-        content.add(variables).left().padBottom(pad10 * 2f).row();
+        content.add(variables).left().padBottom(pad18 * 2f).row();
 
         new ButtonGroup<>(particles, stars, clusters, variables);
 
@@ -133,7 +133,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addStarsWidget(Table container) {
         OwnLabel starProps = new OwnLabel(I18n.msg("gui.dsload.stars.properties"), skin, "hud-subheader");
-        container.add(starProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+        container.add(starProps).colspan(2).left().padTop(pad20).padBottom(pad18).row();
 
         // Name
         addFileName(container);
@@ -145,8 +145,8 @@ public class DatasetLoadDialog extends GenericDialog {
         FloatValidator sclValidator = new FloatValidator(-100f, 100f);
         magnitudeScale = new OwnTextField("0.0", skin, sclValidator);
         magnitudeScale.setWidth(fieldWidth);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
-        container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad10).row();
+        container.add(new OwnLabel(I18n.msg("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad18).row();
 
         // Fade
         addFadeAttributes(container);
@@ -159,7 +159,7 @@ public class DatasetLoadDialog extends GenericDialog {
     private void addParticlesWidget(Table container) {
 
         OwnLabel particleProps = new OwnLabel(I18n.msg("gui.dsload.particles.properties"), skin, "hud-subheader");
-        container.add(particleProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+        container.add(particleProps).colspan(2).left().padTop(pad20).padBottom(pad18).row();
 
         // Name
         addFileName(container);
@@ -179,7 +179,7 @@ public class DatasetLoadDialog extends GenericDialog {
             }
             return false;
         });
-        container.add(GuiUtils.tooltipHg(colorNoise, "gui.dsload.color.noise.tooltip", skin)).colspan(2).left().padBottom(pad15).row();
+        container.add(GuiUtils.tooltipHg(colorNoise, "gui.dsload.color.noise.tooltip", skin)).colspan(2).left().padBottom(pad20).row();
 
         // Label color
         addLabelColor(container);
@@ -196,14 +196,14 @@ public class DatasetLoadDialog extends GenericDialog {
             }
             return false;
         });
-        container.add(particleSize).colspan(2).left().padBottom(pad10).row();
+        container.add(particleSize).colspan(2).left().padBottom(pad18).row();
 
         // Profile falloff
         FloatValidator falloffVal = new FloatValidator(0.3f, 200f);
         profileDecay = new OwnTextField("5.0", skin, falloffVal);
         profileDecay.setWidth(fieldWidth);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.profiledecay"), skin, titleWidth)).left().padRight(pad10).padBottom(pad15);
-        container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).left().padBottom(pad15).row();
+        container.add(new OwnLabel(I18n.msg("gui.dsload.profiledecay"), skin, titleWidth)).left().padRight(pad18).padBottom(pad20);
+        container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).left().padBottom(pad20).row();
 
         // Component type
         ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
@@ -211,8 +211,8 @@ public class DatasetLoadDialog extends GenericDialog {
         componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
         componentType.setSelected(ComponentType.Galaxies);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
-        container.add(componentType).left().padBottom(pad5).row();
+        container.add(new OwnLabel(I18n.msg("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
+        container.add(componentType).left().padBottom(pad10).row();
 
         // Fade
         addFadeAttributes(container);
@@ -220,7 +220,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addStarClustersWidget(Table container) {
         OwnLabel clustersProps = new OwnLabel(I18n.msg("gui.dsload.clusters.properties"), skin, "hud-subheader");
-        container.add(clustersProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+        container.add(clustersProps).colspan(2).left().padTop(pad20).padBottom(pad18).row();
 
         // Info
         String scInfoStr = I18n.msg("gui.dsload.clusters.info") + '\n';
@@ -231,7 +231,7 @@ public class DatasetLoadDialog extends GenericDialog {
         scInfo.setWidth(taWidth);
         scInfo.clearListeners();
 
-        container.add(scInfo).colspan(2).left().padTop(pad5).padBottom(pad10).row();
+        container.add(scInfo).colspan(2).left().padTop(pad10).padBottom(pad18).row();
 
         // Name
         addFileName(container);
@@ -248,8 +248,8 @@ public class DatasetLoadDialog extends GenericDialog {
         componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
         componentType.setSelected(ComponentType.Clusters);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
-        container.add(componentType).left().padBottom(pad5).row();
+        container.add(new OwnLabel(I18n.msg("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
+        container.add(componentType).left().padBottom(pad10).row();
 
         // Fade
         addFadeAttributes(container);
@@ -258,7 +258,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addVariableStarsWidget(Table container) {
         OwnLabel starProps = new OwnLabel(I18n.msg("gui.dsload.variable.properties"), skin, "hud-subheader");
-        container.add(starProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+        container.add(starProps).colspan(2).left().padTop(pad20).padBottom(pad18).row();
 
         // Info
         String scInfoStr = I18n.msg("gui.dsload.variable.info") + '\n';
@@ -269,7 +269,7 @@ public class DatasetLoadDialog extends GenericDialog {
         scInfo.setWidth(taWidth);
         scInfo.clearListeners();
 
-        container.add(scInfo).colspan(2).left().padTop(pad5).padBottom(pad10).row();
+        container.add(scInfo).colspan(2).left().padTop(pad10).padBottom(pad18).row();
 
         // Name
         addFileName(container);
@@ -281,8 +281,8 @@ public class DatasetLoadDialog extends GenericDialog {
         FloatValidator sclValidator = new FloatValidator(-100f, 100f);
         magnitudeScale = new OwnTextField("0.0", skin, sclValidator);
         magnitudeScale.setWidth(fieldWidth);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
-        container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad10).row();
+        container.add(new OwnLabel(I18n.msg("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad18).row();
 
         // Fade
         addFadeAttributes(container);
@@ -295,29 +295,29 @@ public class DatasetLoadDialog extends GenericDialog {
     private void addFileName(Table container) {
         dsName = new OwnTextField(fileName, skin);
         dsName.setWidth(fieldWidth);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.name"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
-        container.add(dsName).left().padBottom(pad10).row();
+        container.add(new OwnLabel(I18n.msg("gui.dsload.name"), skin, titleWidth)).left().padRight(pad18).padBottom(pad18);
+        container.add(dsName).left().padBottom(pad18).row();
     }
 
     private void addParticleColor(Table container) {
         particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
         particleColor.setNewColorRunnable(this::updateFrameBuffer);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
-        container.add(particleColor).size(cpSize).left().padBottom(pad5).row();
+        container.add(new OwnLabel(I18n.msg("gui.dsload.color"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
+        container.add(particleColor).size(cpSize).left().padBottom(pad10).row();
     }
 
     private void addLabelColor(Table container) {
         labelColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
-        container.add(new OwnLabel(I18n.msg("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
+        container.add(new OwnLabel(I18n.msg("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
         Table lc = new Table(skin);
         lc.add(labelColor).size(cpSize);
-        container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad5).row();
+        container.add(GuiUtils.tooltipHg(lc, "gui.dsload.color.label.tooltip", skin)).left().padBottom(pad10).row();
     }
 
     private void addFadeAttributes(Table container) {
 
         OwnLabel fadeLabel = new OwnLabel(I18n.msg("gui.dsload.fade"), skin, "hud-subheader");
-        container.add(fadeLabel).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+        container.add(fadeLabel).colspan(2).left().padTop(pad20).padBottom(pad18).row();
 
         // Info
         String ssInfoStr = I18n.msg("gui.dsload.fade.info") + '\n';
@@ -328,14 +328,14 @@ public class DatasetLoadDialog extends GenericDialog {
         fadeInfo.setWidth(taWidth);
         fadeInfo.clearListeners();
 
-        container.add(fadeInfo).colspan(2).left().padTop(pad5).padBottom(pad10).row();
+        container.add(fadeInfo).colspan(2).left().padTop(pad10).padBottom(pad18).row();
 
         // Fade in
-        fadeIn = new OwnCheckBox(I18n.msg("gui.dsload.fade.in"), skin, pad5);
-        container.add(fadeIn).left().padRight(pad10).padBottom(pad5);
+        fadeIn = new OwnCheckBox(I18n.msg("gui.dsload.fade.in"), skin, pad10);
+        container.add(fadeIn).left().padRight(pad18).padBottom(pad10);
 
         HorizontalGroup fadeInGroup = new HorizontalGroup();
-        fadeInGroup.space(pad5);
+        fadeInGroup.space(pad10);
         fadeInMin = new OwnTextField("0", skin);
         fadeInMax = new OwnTextField("10", skin);
         fadeInGroup.addActor(new OwnLabel("[", skin));
@@ -362,14 +362,14 @@ public class DatasetLoadDialog extends GenericDialog {
         fadeIn.setProgrammaticChangeEvents(true);
         fadeIn.setChecked(false);
 
-        container.add(fadeInGroup).left().padBottom(pad5).row();
+        container.add(fadeInGroup).left().padBottom(pad10).row();
 
         // Fade out
-        fadeOut = new OwnCheckBox(I18n.msg("gui.dsload.fade.out"), skin, pad5);
-        container.add(fadeOut).left().padRight(pad10).padBottom(pad5);
+        fadeOut = new OwnCheckBox(I18n.msg("gui.dsload.fade.out"), skin, pad10);
+        container.add(fadeOut).left().padRight(pad18).padBottom(pad10);
 
         HorizontalGroup fadeOutGroup = new HorizontalGroup();
-        fadeOutGroup.space(pad5);
+        fadeOutGroup.space(pad10);
         fadeOutMin = new OwnTextField("3000", skin);
         fadeOutMax = new OwnTextField("6000", skin);
         fadeOutGroup.addActor(new OwnLabel("[", skin));
@@ -409,7 +409,7 @@ public class DatasetLoadDialog extends GenericDialog {
         fadeOutMin.setValidator(fadeOutMinVal);
         fadeOutMax.setValidator(fadeOutMaxVal);
 
-        container.add(fadeOutGroup).left().padBottom(pad5).row();
+        container.add(fadeOutGroup).left().padBottom(pad10).row();
     }
 
     public DatasetOptions generateDatasetOptions() {

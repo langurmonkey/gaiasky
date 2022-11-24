@@ -248,11 +248,11 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         });
 
         bw = Math.max(landOn.getWidth(), landAt.getWidth());
-        bw += 3.2f;
+        bw += 6.0f;
 
-        goTo.setWidth(bw);
-        landOn.setWidth(bw);
-        landAt.setWidth(bw);
+        goTo.setSize(bw, bw);
+        landOn.setSize(bw, bw);
+        landAt.setSize(bw, bw);
 
         focusActionsGroup = new HorizontalGroup();
         focusActionsGroup.space(pad5);
@@ -412,7 +412,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 view.setEntity(v.getEntity());
             }
             currentFocus = view;
-            final int focusFieldMaxLength = 16;
+            final int focusFieldMaxLength = 13;
 
             // ID
             boolean cappedId = false;

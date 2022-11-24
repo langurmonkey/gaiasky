@@ -74,7 +74,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         buttonGroup.setMinCheckCount(1);
         buttonGroup.setMaxCheckCount(1);
 
-        content.add(buttonTable).top().left().padBottom(pad10).row();
+        content.add(buttonTable).top().left().padBottom(pad18).row();
         elementsCell = content.add().top().left();
 
         ComponentType[] visibilityEntities = ComponentType.values();
@@ -243,7 +243,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         // Buttons
         HorizontalGroup buttons = new HorizontalGroup();
-        buttons.space(pad5);
+        buttons.space(pad10);
         OwnTextIconButton selAll = new OwnTextIconButton("", skin, "audio");
         selAll.addListener(new OwnTextTooltip(I18n.msg("gui.select.all"), skin));
         selAll.pad(space2);
