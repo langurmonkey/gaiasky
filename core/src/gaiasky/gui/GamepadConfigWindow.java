@@ -10,17 +10,16 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.input.AbstractGamepadListener;
+import gaiasky.input.WindowGamepadListener;
 import gaiasky.util.Logger;
 import gaiasky.util.SysUtils;
 import gaiasky.util.Trio;
@@ -45,13 +44,13 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
     private Texture controller;
     // For each button/axis we have the texture, the location in pixels and the name
-    private Map<Gamepad, Trio<Texture, float[], String>> inputInfo;
-    private Map<Gamepad, OwnTextField> inputFields;
+    private Map<GamepadInput, Trio<Texture, float[], String>> inputInfo;
+    private Map<GamepadInput, OwnTextField> inputFields;
 
     private final String controllerName;
     private GamepadMappings mappings;
 
-    private Gamepad currGamepad;
+    private GamepadInput currGamepadInput;
     private OwnTextField currTextField, filename;
     private OwnLabel currentInput;
     private OwnSlider lsx, lsy, rsx, rsy, lts, rts, axisPower;
@@ -65,7 +64,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private static final int TYPE_AXIS = 1;
     private static final int TYPE_EITHER = 2;
 
-    private enum Gamepad {
+    private enum GamepadInput {
         A(TYPE_BUTTON),
         B(TYPE_BUTTON),
         X(TYPE_BUTTON),
@@ -92,7 +91,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         /**
          * @param type 0 = button, 1 = axis, 2 = either
          */
-        Gamepad(int type) {
+        GamepadInput(int type) {
             this.type = type;
         }
 
@@ -168,32 +167,32 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         inputFields = new HashMap<>();
         inputInfo = new HashMap<>();
         // Buttons
-        inputInfo.put(Gamepad.A, new Trio<>(a, new float[] { 310, -50 }, I18n.msg("gui.controller.action.primary")));
-        inputInfo.put(Gamepad.B, new Trio<>(b, new float[] { 397, -120 }, I18n.msg("gui.controller.action.back")));
-        inputInfo.put(Gamepad.X, new Trio<>(x, new float[] { 227, -120 }, I18n.msg("gui.controller.action.secondary")));
-        inputInfo.put(Gamepad.Y, new Trio<>(y, new float[] { 310, -190 }, I18n.msg("gui.controller.action.tertiary")));
+        inputInfo.put(GamepadInput.A, new Trio<>(a, new float[] { 310, -50 }, I18n.msg("gui.controller.action.primary")));
+        inputInfo.put(GamepadInput.B, new Trio<>(b, new float[] { 397, -120 }, I18n.msg("gui.controller.action.back")));
+        inputInfo.put(GamepadInput.X, new Trio<>(x, new float[] { 227, -120 }, I18n.msg("gui.controller.action.secondary")));
+        inputInfo.put(GamepadInput.Y, new Trio<>(y, new float[] { 310, -190 }, I18n.msg("gui.controller.action.tertiary")));
         // Left stick
-        inputInfo.put(Gamepad.LSTICK, new Trio<>(stick, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.click")));
-        inputInfo.put(Gamepad.LSTICK_H, new Trio<>(stickH, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.horizontal")));
-        inputInfo.put(Gamepad.LSTICK_V, new Trio<>(stickV, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.vertical")));
+        inputInfo.put(GamepadInput.LSTICK, new Trio<>(stick, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.click")));
+        inputInfo.put(GamepadInput.LSTICK_H, new Trio<>(stickH, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.horizontal")));
+        inputInfo.put(GamepadInput.LSTICK_V, new Trio<>(stickV, new float[] { -322, -122 }, I18n.msg("gui.controller.lstick.vertical")));
         // Right stick
-        inputInfo.put(Gamepad.RSTICK, new Trio<>(stick, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.click")));
-        inputInfo.put(Gamepad.RSTICK_H, new Trio<>(stickH, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.horizontal")));
-        inputInfo.put(Gamepad.RSTICK_V, new Trio<>(stickV, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.vertical")));
+        inputInfo.put(GamepadInput.RSTICK, new Trio<>(stick, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.click")));
+        inputInfo.put(GamepadInput.RSTICK_H, new Trio<>(stickH, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.horizontal")));
+        inputInfo.put(GamepadInput.RSTICK_V, new Trio<>(stickV, new float[] { 160, 50 }, I18n.msg("gui.controller.rstick.vertical")));
         // Dpad
-        inputInfo.put(Gamepad.DPAD_UP, new Trio<>(dPadU, new float[] { -155, 10 }, I18n.msg("gui.controller.dpad.up")));
-        inputInfo.put(Gamepad.DPAD_DOWN, new Trio<>(dPadD, new float[] { -155, 85 }, I18n.msg("gui.controller.dpad.down")));
-        inputInfo.put(Gamepad.DPAD_LEFT, new Trio<>(dPadL, new float[] { -194, 49 }, I18n.msg("gui.controller.dpad.left")));
-        inputInfo.put(Gamepad.DPAD_RIGHT, new Trio<>(dPadR, new float[] { -120, 49 }, I18n.msg("gui.controller.dpad.right")));
+        inputInfo.put(GamepadInput.DPAD_UP, new Trio<>(dPadU, new float[] { -155, 10 }, I18n.msg("gui.controller.dpad.up")));
+        inputInfo.put(GamepadInput.DPAD_DOWN, new Trio<>(dPadD, new float[] { -155, 85 }, I18n.msg("gui.controller.dpad.down")));
+        inputInfo.put(GamepadInput.DPAD_LEFT, new Trio<>(dPadL, new float[] { -194, 49 }, I18n.msg("gui.controller.dpad.left")));
+        inputInfo.put(GamepadInput.DPAD_RIGHT, new Trio<>(dPadR, new float[] { -120, 49 }, I18n.msg("gui.controller.dpad.right")));
         // Start/select
-        inputInfo.put(Gamepad.START, new Trio<>(startSelect, new float[] { 75, -170 }, I18n.msg("gui.controller.start")));
-        inputInfo.put(Gamepad.SELECT, new Trio<>(startSelect, new float[] { -75, -170 }, I18n.msg("gui.controller.select")));
+        inputInfo.put(GamepadInput.START, new Trio<>(startSelect, new float[] { 75, -170 }, I18n.msg("gui.controller.start")));
+        inputInfo.put(GamepadInput.SELECT, new Trio<>(startSelect, new float[] { -75, -170 }, I18n.msg("gui.controller.select")));
         // Bumpers
-        inputInfo.put(Gamepad.LB, new Trio<>(lb, new float[] { -322, -282 }, I18n.msg("gui.controller.lb")));
-        inputInfo.put(Gamepad.RB, new Trio<>(rb, new float[] { 322, -282 }, I18n.msg("gui.controller.rb")));
+        inputInfo.put(GamepadInput.LB, new Trio<>(lb, new float[] { -322, -282 }, I18n.msg("gui.controller.lb")));
+        inputInfo.put(GamepadInput.RB, new Trio<>(rb, new float[] { 322, -282 }, I18n.msg("gui.controller.rb")));
         // Triggers
-        inputInfo.put(Gamepad.LT, new Trio<>(lt, new float[] { -354, -265 }, I18n.msg("gui.controller.lt")));
-        inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[] { 354, -265 }, I18n.msg("gui.controller.rt")));
+        inputInfo.put(GamepadInput.LT, new Trio<>(lt, new float[] { -354, -265 }, I18n.msg("gui.controller.lt")));
+        inputInfo.put(GamepadInput.RT, new Trio<>(rt, new float[] { 354, -265 }, I18n.msg("gui.controller.rt")));
 
         // Park our own listener.
         defaultGamepadListener = false;
@@ -247,8 +246,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
         // Table with inputs and mappings
         Table inputTable = new Table(skin);
-        Gamepad[] gpds = Gamepad.values();
-        for (Gamepad gpd : gpds) {
+        GamepadInput[] gpds = GamepadInput.values();
+        for (GamepadInput gpd : gpds) {
             Trio<Texture, float[], String> t = inputInfo.get(gpd);
             inputTable.add(new OwnLabel(t.getThird() + ": ", skin, lw)).left().padBottom(pad10).padRight(pad18);
 
@@ -339,7 +338,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         content.pack();
     }
 
-    private String getMappingsValue(Gamepad gpd, GamepadMappings m) {
+    private String getMappingsValue(GamepadInput gpd, GamepadMappings m) {
         if (m == null)
             return none;
 
@@ -469,12 +468,12 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         return out;
     }
 
-    private void makeCurrent(Gamepad gp, OwnTextField tf) {
-        this.currGamepad = gp;
+    private void makeCurrent(GamepadInput gp, OwnTextField tf) {
+        this.currGamepadInput = gp;
         this.currTextField = tf;
     }
 
-    private void displayElement(Gamepad input) {
+    private void displayElement(GamepadInput input) {
         if (input != null) {
             Trio<Texture, float[], String> data = inputInfo.get(input);
             Image img = new Image(data.getFirst());
@@ -493,7 +492,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
      *
      * @return The array with the configuration.
      */
-    protected int[] getInput(Gamepad gp) {
+    protected int[] getInput(GamepadInput gp) {
         OwnTextField i = inputFields.get(gp);
         String text = i.getText();
         if (text.equalsIgnoreCase(none)) {
@@ -535,52 +534,52 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         cm.AXIS_VALUE_POW = axisPower.getValue();
 
         // Sticks
-        cm.AXIS_LSTICK_H = getInput(Gamepad.LSTICK_H)[0];
+        cm.AXIS_LSTICK_H = getInput(GamepadInput.LSTICK_H)[0];
         cm.AXIS_LSTICK_H_SENS = lsx.getValue();
-        cm.AXIS_LSTICK_V = getInput(Gamepad.LSTICK_V)[0];
+        cm.AXIS_LSTICK_V = getInput(GamepadInput.LSTICK_V)[0];
         cm.AXIS_LSTICK_V_SENS = lsy.getValue();
-        cm.BUTTON_LSTICK = getInput(Gamepad.LSTICK)[0];
-        cm.AXIS_RSTICK_H = getInput(Gamepad.RSTICK_H)[0];
+        cm.BUTTON_LSTICK = getInput(GamepadInput.LSTICK)[0];
+        cm.AXIS_RSTICK_H = getInput(GamepadInput.RSTICK_H)[0];
         cm.AXIS_RSTICK_H_SENS = rsx.getValue();
-        cm.AXIS_RSTICK_V = getInput(Gamepad.RSTICK_V)[0];
+        cm.AXIS_RSTICK_V = getInput(GamepadInput.RSTICK_V)[0];
         cm.AXIS_RSTICK_V_SENS = rsy.getValue();
-        cm.BUTTON_RSTICK = getInput(Gamepad.RSTICK)[0];
+        cm.BUTTON_RSTICK = getInput(GamepadInput.RSTICK)[0];
 
         // Buttons
-        cm.BUTTON_A = getInput(Gamepad.A)[0];
-        cm.BUTTON_B = getInput(Gamepad.B)[0];
-        cm.BUTTON_X = getInput(Gamepad.X)[0];
-        cm.BUTTON_Y = getInput(Gamepad.Y)[0];
-        cm.BUTTON_START = getInput(Gamepad.START)[0];
-        cm.BUTTON_SELECT = getInput(Gamepad.SELECT)[0];
+        cm.BUTTON_A = getInput(GamepadInput.A)[0];
+        cm.BUTTON_B = getInput(GamepadInput.B)[0];
+        cm.BUTTON_X = getInput(GamepadInput.X)[0];
+        cm.BUTTON_Y = getInput(GamepadInput.Y)[0];
+        cm.BUTTON_START = getInput(GamepadInput.START)[0];
+        cm.BUTTON_SELECT = getInput(GamepadInput.SELECT)[0];
 
         // Dpad
-        int[] dpu = getInput(Gamepad.DPAD_UP);
+        int[] dpu = getInput(GamepadInput.DPAD_UP);
         if (dpu[1] == TYPE_BUTTON)
             cm.BUTTON_DPAD_UP = dpu[0];
         else
             cm.AXIS_DPAD_V = dpu[0];
-        int[] dpd = getInput(Gamepad.DPAD_DOWN);
+        int[] dpd = getInput(GamepadInput.DPAD_DOWN);
         if (dpd[1] == TYPE_BUTTON)
             cm.BUTTON_DPAD_DOWN = dpd[0];
         else
             cm.AXIS_DPAD_V = dpd[0];
-        int[] dpl = getInput(Gamepad.DPAD_LEFT);
+        int[] dpl = getInput(GamepadInput.DPAD_LEFT);
         if (dpl[1] == TYPE_BUTTON)
             cm.BUTTON_DPAD_LEFT = dpl[0];
         else
             cm.AXIS_DPAD_H = dpl[0];
-        int[] dpr = getInput(Gamepad.DPAD_RIGHT);
+        int[] dpr = getInput(GamepadInput.DPAD_RIGHT);
         if (dpr[1] == TYPE_BUTTON)
             cm.BUTTON_DPAD_RIGHT = dpr[0];
         else
             cm.AXIS_DPAD_H = dpr[0];
 
         // Shoulder
-        cm.BUTTON_RB = getInput(Gamepad.RB)[0];
-        cm.BUTTON_LB = getInput(Gamepad.LB)[0];
+        cm.BUTTON_RB = getInput(GamepadInput.RB)[0];
+        cm.BUTTON_LB = getInput(GamepadInput.LB)[0];
 
-        int[] rt = getInput(Gamepad.RT);
+        int[] rt = getInput(GamepadInput.RT);
         if (rt[1] == TYPE_BUTTON)
             cm.BUTTON_RT = rt[0];
         else {
@@ -588,7 +587,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         }
         cm.AXIS_RT_SENS = rts.getValue();
 
-        int[] lt = getInput(Gamepad.LT);
+        int[] lt = getInput(GamepadInput.LT);
         if (lt[1] == TYPE_BUTTON)
             cm.BUTTON_LT = lt[0];
         else {
@@ -619,54 +618,54 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     /**
      * Listens to gamepad input events in order to configure the axes and buttons.
      */
-    private class GamepadConfigListener extends AbstractGamepadListener {
+    private class GamepadConfigListener extends WindowGamepadListener {
         boolean capturingAxis = false;
         long lastT = System.currentTimeMillis();
         long lastAxisT = System.currentTimeMillis();
-        long minDelayT = 300;
+        long minDelayT = 500;
         long minAxisT = 300;
         double[] axes = new double[40];
 
         public GamepadConfigListener(String mappingsFile) {
-            super(mappingsFile);
+            super(mappingsFile, me.stage, me);
         }
 
         public GamepadConfigListener(IGamepadMappings mappings) {
-            super(mappings);
+            super(mappings, me.stage, me);
         }
 
         @Override
-        public void connected(Controller controller) {
-
-        }
-
-        @Override
-        public void disconnected(Controller controller) {
-
-        }
-
-        @Override
+        // Prevent axis polling.
         public boolean pollAxis() {
-            return true;
+            return false;
         }
 
         @Override
+        // Prevent button polling.
         public boolean pollButtons() {
-            return true;
+            return false;
         }
 
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
-            super.buttonDown(controller, buttonCode);
-            Actor focus = stage.getKeyboardFocus();
-            if(focus instanceof Button && buttonCode == mappings.getButtonA()) {
-                // Press it!
-                focus.fire(new ChangeEvent());
-            } else {
-                if (currGamepad != null && currTextField != null && currGamepad.isButton() && System.currentTimeMillis() - lastT > minDelayT) {
-                    currTextField.setText(button + " " + buttonCode);
-                    jumpToNext();
-                    lastT = System.currentTimeMillis();
+            if (active.get()) {
+                addPressedKey(buttonCode);
+                if (currTextField == null) {
+                    // Not capturing.
+                    if (buttonCode == mappings.getButtonA()) {
+                        actionDown();
+                    } else if (buttonCode == mappings.getButtonB()) {
+                        back();
+                    } else if (buttonCode == mappings.getButtonSelect()) {
+                        select();
+                    }
+                } else {
+                    // Capturing.
+                    if (currGamepadInput != null && currGamepadInput.isButton() && System.currentTimeMillis() - lastT > minDelayT) {
+                        currTextField.setText(button + " " + buttonCode);
+                        jumpToNext();
+                        lastT = System.currentTimeMillis();
+                    }
                 }
                 currentInput.setText(button + " " + buttonCode);
             }
@@ -675,53 +674,65 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
         @Override
         public boolean buttonUp(Controller controller, int buttonCode) {
-            return super.buttonUp(controller, buttonCode);
+            if (active.get()) {
+                boolean b = super.buttonUp(controller, buttonCode);
+                currentInput.setText(button + " " + buttonCode);
+                return b;
+            }
+            return false;
         }
 
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
-            value = (float) applyZeroPoint(value);
-            if (currGamepad != null && currTextField != null && currGamepad.isAxis() && (System.currentTimeMillis() - lastT > minDelayT || capturingAxis)) {
-                if (!capturingAxis) {
-                    // Start capturing
-                    capturingAxis = true;
-                    lastAxisT = System.currentTimeMillis();
-                    axes[axisCode] += Math.abs(value);
-                } else {
-                    if (System.currentTimeMillis() - lastAxisT < minAxisT) {
-                        // Just note the new values
-                        axes[axisCode] += Math.abs(value);
-                    } else {
-                        // Finish
-                        axes[axisCode] += Math.abs(value);
+            if (active.get()) {
+                value = (float) applyZeroPoint(value);
+                if (value != 0 && currTextField != null) {
+                    // Capturing.
+                    long now = TimeUtils.millis();
+                    if (currGamepadInput != null && currGamepadInput.isAxis() && (now - lastT > minDelayT || capturingAxis)) {
+                        if (!capturingAxis) {
+                            // Start capturing
+                            capturingAxis = true;
+                            lastAxisT = now;
+                            axes[axisCode] += Math.abs(value);
+                        } else {
+                            if (now - lastAxisT < minAxisT) {
+                                // Just note the new values
+                                axes[axisCode] += Math.abs(value);
+                            } else {
+                                // Finish
+                                axes[axisCode] += Math.abs(value);
 
-                        // Look for largest
-                        double max = 0;
-                        int maxAxis = -1;
-                        for (int i = 0; i < axes.length; i++) {
-                            if (axes[i] > max) {
-                                max = axes[i];
-                                maxAxis = i;
+                                // Look for largest
+                                double max = 0;
+                                int maxAxis = -1;
+                                for (int i = 0; i < axes.length; i++) {
+                                    if (axes[i] > max) {
+                                        max = axes[i];
+                                        maxAxis = i;
+                                    }
+                                }
+                                axes = new double[40];
+
+                                currTextField.setText(axis + " " + maxAxis);
+                                jumpToNext();
+                                capturingAxis = false;
+                                lastT = now;
                             }
                         }
-                        axes = new double[40];
-
-                        currTextField.setText(axis + " " + maxAxis);
-                        jumpToNext();
-                        capturingAxis = false;
-                        lastT = System.currentTimeMillis();
                     }
+                    currentInput.setText(axis + " " + axisCode);
                 }
             }
-            currentInput.setText(axis + " " + axisCode);
             return false;
         }
 
         private void jumpToNext() {
-            if (currTextField != inputFields.get(Gamepad.values()[Gamepad.values().length - 1])) {
+            if (currTextField != inputFields.get(GamepadInput.values()[GamepadInput.values().length - 1])) {
                 currTextField.next(false);
             } else {
                 stage.setKeyboardFocus(acceptButton);
+                currTextField = null;
             }
         }
     }
