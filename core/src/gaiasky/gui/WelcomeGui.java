@@ -341,6 +341,7 @@ public class WelcomeGui extends AbstractGui {
         exitButton.setSpace(pad16);
         exitButton.align(Align.center);
         exitButton.setSize(bw * 0.5f, bh * 0.6f);
+        exitButton.addListener(new OwnTextTooltip(I18n.msg("context.quit"), skin, 10));
         exitButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 GaiaSky.postRunnable(Gdx.app::exit);
@@ -372,6 +373,23 @@ public class WelcomeGui extends AbstractGui {
 
         // Version line table
         Table topLeft = new VersionLineTable(skin);
+
+        // Screen mode button
+        Table screenMode = new Table(skin);
+        screenMode.setFillParent(true);
+        screenMode.top().right();
+        screenMode.pad(pad16);
+        OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
+        screenModeButton.addListener(new OwnTextTooltip(I18n.msg("gui.fullscreen"), skin, 10));
+        screenModeButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                Settings.settings.graphics.fullScreen.active = !Settings.settings.graphics.fullScreen.active;
+                EventManager.publish(Event.SCREEN_MODE_CMD, screenModeButton);
+                return true;
+            }
+            return false;
+        });
+        screenMode.add(screenModeButton);
 
         // Bottom icons
         OwnTextIconButton about = new OwnTextIconButton("", skin, "help");
@@ -410,6 +428,7 @@ public class WelcomeGui extends AbstractGui {
         // Add to button list.
         buttonList.add(preferences);
         buttonList.add(about);
+        buttonList.add(screenModeButton);
 
         HorizontalGroup bottomRight = new HorizontalGroup();
         bottomRight.space(pad18);
@@ -420,6 +439,7 @@ public class WelcomeGui extends AbstractGui {
 
         stage.addActor(center);
         stage.addActor(topLeft);
+        stage.addActor(screenMode);
         stage.addActor(bottomRight);
         stage.addActor(popupInterface);
 

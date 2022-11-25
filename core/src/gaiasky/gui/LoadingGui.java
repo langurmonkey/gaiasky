@@ -30,6 +30,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.math.BigInteger;
 
@@ -130,6 +131,7 @@ public class LoadingGui extends AbstractGui {
         screenMode.top().right();
         screenMode.pad(pad10);
         OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
+        screenModeButton.addListener(new OwnTextTooltip(I18n.msg("gui.fullscreen"), skin, 10));
         screenModeButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 settings.graphics.fullScreen.active = !settings.graphics.fullScreen.active;

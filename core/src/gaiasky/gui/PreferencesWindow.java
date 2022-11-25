@@ -1908,17 +1908,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     @Override
     public void touch() {
+        // Effects
         setSlider(bloomEffect, settings.postprocess.bloom.intensity);
         setSlider(unsharpMask, settings.postprocess.unsharpMask.factor);
-
         setSlider(tessQuality, (float) settings.scene.renderer.elevation.quality);
+
+        // Screen mode
+        boolean fullscreen = settings.graphics.fullScreen.active;
+        setCheckBox(fullScreen, fullscreen);
+        setCheckBox(windowed, !fullscreen);
+        enableComponents(!fullscreen, widthField, heightField);
+        enableComponents(fullscreen, fullScreenResolutions);
     }
 
     private void setSlider(OwnSliderPlus slider, float value) {
         slider.setProgrammaticChangeEvents(false);
         slider.setValue(value);
         slider.setProgrammaticChangeEvents(true);
+    }
 
+    private void setCheckBox(CheckBox cb, boolean checked) {
+        cb.setProgrammaticChangeEvents(false);
+        cb.setChecked(checked);
+        cb.setProgrammaticChangeEvents(true);
     }
 
     private void updateBackupValues() {
