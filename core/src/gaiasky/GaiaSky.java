@@ -200,7 +200,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui welcomeGui, welcomeGuiVR, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, controllerGui;
+    public IGui welcomeGui, welcomeGuiVR, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui;
 
     /**
      * List of GUIs
@@ -836,15 +836,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         stereoGui = new StereoGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
         stereoGui.initialize(assetManager, globalResources.getSpriteBatch());
 
-        controllerGui = new GamepadGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
-        controllerGui.initialize(assetManager, globalResources.getSpriteBatch());
+        gamepadGui = new GamepadGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+        gamepadGui.initialize(assetManager, globalResources.getSpriteBatch());
 
         if (guis != null) {
             guis.add(mainGui);
             guis.add(debugGui);
             guis.add(spacecraftGui);
             guis.add(stereoGui);
-            guis.add(controllerGui);
+            guis.add(gamepadGui);
         }
     }
 
@@ -878,8 +878,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         guiRegistry.registerGui(debugGui);
         guiRegistry.addProcessor(debugGui);
 
-        guiRegistry.registerGui(controllerGui);
-        guiRegistry.addProcessor(controllerGui);
+        guiRegistry.registerGui(gamepadGui);
+        guiRegistry.addProcessor(gamepadGui);
     }
 
     @Override

@@ -39,7 +39,7 @@ public class CrashGui extends AbstractGui {
         this.skin = skin;
         this.crash = crash;
         this.vr = vr;
-        this.hoffset = hoffset;
+        this.hOffset = hoffset;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class CrashGui extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
         if (vr) {
             vp.update(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
         } else {
@@ -55,7 +55,7 @@ public class CrashGui extends AbstractGui {
         }
 
         // Dialog
-        crashWindow = new CrashWindow(ui, skin, crash);
+        crashWindow = new CrashWindow(stage, skin, crash);
 
         rebuildGui();
 
@@ -71,15 +71,14 @@ public class CrashGui extends AbstractGui {
     }
 
     public void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
-            crashWindow.show(ui);
+        if (stage != null) {
+            stage.clear();
+            crashWindow.show(stage);
         }
     }
 
 
     private class CrashWindow extends GenericDialog {
-
         public CrashWindow(Stage ui, Skin skin, Throwable crash) {
             super(I18n.msg("gui.crash.title"), skin, ui);
 

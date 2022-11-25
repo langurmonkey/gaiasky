@@ -100,9 +100,9 @@ public interface IGui extends Disposable {
     /**
      * Sets the horizontal offset, for VR
      *
-     * @param hoffset The horizontal offset in pixels
+     * @param hOffset The horizontal offset in pixels
      */
-    void setHoffset(int hoffset);
+    void sethOffset(int hOffset);
 
     /**
      * Whether this GUI is to be used in VR mode

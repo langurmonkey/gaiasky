@@ -34,7 +34,7 @@ public class VRSelectionGui extends AbstractGui {
         float oh = Settings.settings.graphics.backBufferResolution[1];
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
 
         container = new Container<>();
         container.setFillParent(true);
@@ -53,7 +53,7 @@ public class VRSelectionGui extends AbstractGui {
         contents.add(progress);
 
         // Center
-        container.padRight(ow * 0.7f / 2f - hoffset);
+        container.padRight(ow * 0.7f / 2f - hOffset);
 
         container.setActor(contents);
 
@@ -69,10 +69,10 @@ public class VRSelectionGui extends AbstractGui {
 
     @Override
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
+        if (stage != null) {
+            stage.clear();
             if (container != null)
-                ui.addActor(container);
+                stage.addActor(container);
         }
     }
 

@@ -96,12 +96,12 @@ public class FullGui extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        this.ui = new Stage(vp, sb);
+        this.stage = new Stage(vp, sb);
         vp.update(graphics.getWidth(), graphics.getHeight(), true);
     }
 
     public void initialize(Stage ui) {
-        this.ui = ui;
+        this.stage = ui;
     }
 
     @Override
@@ -163,7 +163,7 @@ public class FullGui extends AbstractGui {
         interfaces.add(topInfoInterface);
 
         // MINIMAP
-        initializeMinimap(ui);
+        initializeMinimap(stage);
 
         // INPUT STATE
         runStateInterface = new RunStateInterface(skin, true);
@@ -179,10 +179,10 @@ public class FullGui extends AbstractGui {
         interfaces.add(popupNotificationsInterface);
 
         // LOAD PROGRESS INTERFACE
-        addLoadProgressInterface(ui);
+        addLoadProgressInterface(stage);
 
         // CUSTOM OBJECTS INTERFACE
-        customInterface = new CustomInterface(ui, skin, lock);
+        customInterface = new CustomInterface(stage, skin, lock);
         interfaces.add(customInterface);
 
         // MOUSE X/Y COORDINATES
@@ -213,12 +213,12 @@ public class FullGui extends AbstractGui {
                         if (versionNumber > Settings.settings.version.versionNumber) {
                             logger.info(I18n.msg("gui.newversion.available", Settings.settings.version.version, tagVersion));
                             // There's a new version!
-                            UpdatePopup newVersion = new UpdatePopup(tagVersion, ui, skin);
+                            UpdatePopup newVersion = new UpdatePopup(tagVersion, stage, skin);
                             newVersion.pack();
                             float ww = newVersion.getWidth();
                             float margin = 8f;
                             newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
-                            ui.addActor(newVersion);
+                            stage.addActor(newVersion);
                         } else {
                             // No new version
                             logger.info(I18n.msg("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
@@ -252,8 +252,8 @@ public class FullGui extends AbstractGui {
     }
 
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
+        if (stage != null) {
+            stage.clear();
             boolean collapsed;
             if (controlsWindow != null) {
                 collapsed = controlsWindow.isCollapsed();
@@ -261,42 +261,42 @@ public class FullGui extends AbstractGui {
                 if (collapsed)
                     controlsWindow.collapseInstant();
                 controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
-                ui.addActor(controlsWindow);
+                stage.addActor(controlsWindow);
             }
             if (ni != null) {
-                ui.addActor(ni);
+                stage.addActor(ni);
             }
             if (messagesInterface != null) {
-                ui.addActor(messagesInterface);
+                stage.addActor(messagesInterface);
             }
             if (fi != null) {
-                ui.addActor(fi);
+                stage.addActor(fi);
             }
             if (runStateInterface != null) {
-                ui.addActor(runStateInterface);
+                stage.addActor(runStateInterface);
             }
             if (ti != null) {
-                ui.addActor(ti);
+                stage.addActor(ti);
             }
             if (minimapInterface != null) {
-                ui.addActor(minimapInterface);
+                stage.addActor(minimapInterface);
             }
             if (loadProgressInterface != null) {
-                ui.addActor(loadProgressInterface);
+                stage.addActor(loadProgressInterface);
             }
             if (pointerXCoord != null && pointerYCoord != null) {
-                ui.addActor(pointerXCoord);
-                ui.addActor(pointerYCoord);
+                stage.addActor(pointerXCoord);
+                stage.addActor(pointerYCoord);
             }
             if (customInterface != null) {
                 customInterface.reAddObjects();
             }
             if (popupNotificationsInterface != null) {
-                ui.addActor(popupNotificationsInterface);
+                stage.addActor(popupNotificationsInterface);
             }
 
             /* CAPTURE SCROLL FOCUS */
-            ui.addListener(new EventListener() {
+            stage.addListener(new EventListener() {
 
                 @Override
                 public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
@@ -305,10 +305,10 @@ public class FullGui extends AbstractGui {
 
                         if (ie.getType() == Type.mouseMoved) {
                             Actor scrollPanelAncestor = getScrollPanelAncestor(ie.getTarget());
-                            ui.setScrollFocus(scrollPanelAncestor);
+                            stage.setScrollFocus(scrollPanelAncestor);
                         } else if (ie.getType() == Type.touchDown) {
                             if (ie.getTarget() instanceof TextField)
-                                ui.setKeyboardFocus(ie.getTarget());
+                                stage.setKeyboardFocus(ie.getTarget());
                         }
                     }
                     return false;
@@ -327,11 +327,11 @@ public class FullGui extends AbstractGui {
             });
 
             /* KEYBOARD FOCUS */
-            ui.addListener((event) -> {
+            stage.addListener((event) -> {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
                     if (ie.getType() == Type.touchDown && !ie.isHandled()) {
-                        ui.setKeyboardFocus(null);
+                        stage.setKeyboardFocus(null);
                     }
                 }
                 return false;
@@ -346,9 +346,9 @@ public class FullGui extends AbstractGui {
      * @return true if the focus was in the GUI, false otherwise.
      */
     public boolean cancelTouchFocus() {
-        if (ui.getScrollFocus() != null) {
-            ui.setScrollFocus(null);
-            ui.setKeyboardFocus(null);
+        if (stage.getScrollFocus() != null) {
+            stage.setScrollFocus(null);
+            stage.setKeyboardFocus(null);
             return true;
         }
         return false;
@@ -356,7 +356,7 @@ public class FullGui extends AbstractGui {
 
     @Override
     public void update(double dt) {
-        ui.act((float) dt);
+        stage.act((float) dt);
         for (IGuiInterface i : interfaces) {
             if (i.isOn())
                 i.update();
@@ -374,18 +374,18 @@ public class FullGui extends AbstractGui {
                 if (!w.isVisible())
                     w.setVisible(true);
             } else {
-                ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, ui, skin);
+                ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, stage, skin);
                 proceduralWindow.setName("procedural-window");
-                proceduralWindow.show(ui);
+                proceduralWindow.show(stage);
             }
             break;
         case SHOW_LAND_AT_LOCATION_ACTION:
             var target = (FocusView) data[0];
-            LandAtWindow landAtLocation = new LandAtWindow(target.getEntity(), ui, skin);
-            landAtLocation.show(ui);
+            LandAtWindow landAtLocation = new LandAtWindow(target.getEntity(), stage, skin);
+            landAtLocation.show(stage);
             break;
         case SHOW_PLAYCAMERA_ACTION:
-            FileChooser fc = new FileChooser(I18n.msg("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+            FileChooser fc = new FileChooser(I18n.msg("gui.camera.title"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
             fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
             fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
             fc.setAcceptText(I18n.msg("gui.camera.run"));
@@ -402,15 +402,15 @@ public class FullGui extends AbstractGui {
                 }
                 return false;
             });
-            fc.show(ui);
+            fc.show(stage);
             break;
         case SHOW_LOG_ACTION:
             if (logWindow == null) {
-                logWindow = new LogWindow(ui, skin);
+                logWindow = new LogWindow(stage, skin);
             }
             logWindow.update();
             if (!logWindow.isVisible() || !logWindow.hasParent())
-                logWindow.show(ui);
+                logWindow.show(stage);
             break;
         case UPDATE_WIKI_INFO_ACTION:
             if (wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()) {
@@ -422,12 +422,12 @@ public class FullGui extends AbstractGui {
         case SHOW_WIKI_INFO_ACTION:
             String searchName = (String) data[0];
             if (wikiInfoWindow == null) {
-                wikiInfoWindow = new WikiInfoWindow(ui, skin);
+                wikiInfoWindow = new WikiInfoWindow(stage, skin);
             }
             if (!wikiInfoWindow.isUpdating()) {
                 wikiInfoWindow.update(searchName);
                 if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
-                    wikiInfoWindow.show(ui);
+                    wikiInfoWindow.show(stage);
             }
             break;
         case UPDATE_ARCHIVE_VIEW_ACTION:
@@ -440,14 +440,14 @@ public class FullGui extends AbstractGui {
         case SHOW_ARCHIVE_VIEW_ACTION:
             FocusView starFocus = (FocusView) data[0];
             if (archiveViewWindow == null) {
-                archiveViewWindow = new ArchiveViewWindow(ui, skin);
+                archiveViewWindow = new ArchiveViewWindow(stage, skin);
             }
             archiveViewWindow.update(starFocus);
             if (!archiveViewWindow.isVisible() || !archiveViewWindow.hasParent())
-                archiveViewWindow.show(ui);
+                archiveViewWindow.show(stage);
             break;
         case REMOVE_KEYBOARD_FOCUS:
-            ui.setKeyboardFocus(null);
+            stage.setKeyboardFocus(null);
             break;
         case REMOVE_GUI_COMPONENT:
             String name = (String) data[0];
@@ -519,22 +519,22 @@ public class FullGui extends AbstractGui {
             float px = screenX / Settings.settings.program.ui.scale;
             float py = h - screenY / Settings.settings.program.ui.scale - 32f;
 
-            popup.showMenu(ui, px, py);
+            popup.showMenu(stage, px, py);
 
             break;
         case TOGGLE_MINIMAP:
             if (Settings.settings.program.minimap.inWindow) {
-                toggleMinimapWindow(ui);
+                toggleMinimapWindow(stage);
             } else {
-                toggleMinimapInterface(ui);
+                toggleMinimapInterface(stage);
             }
             break;
         case SHOW_MINIMAP_ACTION:
             boolean show = (Boolean) data[0];
             if (Settings.settings.program.minimap.inWindow) {
-                showMinimapWindow(ui, show);
+                showMinimapWindow(stage, show);
             } else {
-                showMinimapInterface(ui, show);
+                showMinimapInterface(stage, show);
             }
             break;
         default:
@@ -563,7 +563,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(Settings.getSuperShortApplicationName(), skin, ui, catalogManager);
+        controlsWindow = new ControlsWindow(Settings.getSuperShortApplicationName(), skin, stage, catalogManager);
         controlsWindow.setScene(scene);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();
@@ -644,7 +644,7 @@ public class FullGui extends AbstractGui {
         if (cool) {
             controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
             controlsWindow.recalculateSize();
-            if (ui.getHeight() < controlsWindow.getHeight()) {
+            if (stage.getHeight() < controlsWindow.getHeight()) {
                 // Collapse
                 controlsWindow.collapseInstant();
             }

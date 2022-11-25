@@ -11,7 +11,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -28,7 +27,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.gui.beans.*;
-import gaiasky.input.WindowGamepadListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -64,7 +62,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final DecimalFormat nf3;
 
-    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
+    private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameOutputMode, nShadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -74,7 +72,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction;
+    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, unsharpMask;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
@@ -114,8 +112,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Build UI.
         buildSuper();
-
-        gamepadListener = new WindowGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage, this);
 
         EventManager.instance.subscribe(this, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO);
     }
@@ -265,8 +261,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // VSYNC
         OwnLabel vsyncLabel = new OwnLabel(I18n.msg("gui.vsync"), skin);
         vsync = new OwnCheckBox("", skin);
+        vsync.setName("V-sync");
         vsync.setChecked(settings.graphics.vsync);
-        vsync.setColor(Color.YELLOW);
 
         // LIMIT FPS
         IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
@@ -334,7 +330,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                         OwnTextArea noticeHiRes = new OwnTextArea(infoString, skin, "info");
                         noticeHiRes.setDisabled(true);
                         noticeHiRes.setPrefRows(lines1 + 1);
-                        noticeHiRes.setWidth(600f);
+                        noticeHiRes.setWidth(1200f);
                         noticeHiRes.clearListeners();
                         noticeHiResCell.setActor(noticeHiRes);
                     }
@@ -385,10 +381,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // BLOOM
         OwnLabel bloomLabel = new OwnLabel(I18n.msg("gui.bloom"), skin, "default");
-        Slider bloomEffect = new OwnSliderPlus("", Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
+        bloomEffect = new OwnSliderPlus("", Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, skin);
         bloomEffect.setName("bloom effect");
         bloomEffect.setWidth(sliderWidth);
-        bloomEffect.setValue(settings.postprocess.bloom.intensity * 10f);
+        bloomEffect.setValue(settings.postprocess.bloom.intensity);
         bloomEffect.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.BLOOM_CMD, bloomEffect, bloomEffect.getValue());
@@ -399,13 +395,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // UNSHARP MASK
         OwnLabel unsharpMaskLabel = new OwnLabel(I18n.msg("gui.unsharpmask"), skin, "default");
-        Slider unsharpMaskFactor = new OwnSliderPlus("", Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
-        unsharpMaskFactor.setName("unsharp mask factor");
-        unsharpMaskFactor.setWidth(sliderWidth);
-        unsharpMaskFactor.setValue(settings.postprocess.unsharpMask.factor);
-        unsharpMaskFactor.addListener(event -> {
+        unsharpMask = new OwnSliderPlus("", Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
+        unsharpMask.setName("unsharp mask factor");
+        unsharpMask.setWidth(sliderWidth);
+        unsharpMask.setValue(settings.postprocess.unsharpMask.factor);
+        unsharpMask.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.UNSHARP_MASK_CMD, unsharpMaskFactor, unsharpMaskFactor.getValue());
+                EventManager.publish(Event.UNSHARP_MASK_CMD, unsharpMask, unsharpMask.getValue());
                 return true;
             }
             return false;
@@ -470,7 +466,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(bloomEffect).left().padBottom(pad10).row();
         graphics.add(unsharpMaskLabel).left().padRight(pad34).padBottom(pad10);
-        graphics.add(unsharpMaskFactor).left().padBottom(pad10).row();
+        graphics.add(unsharpMask).left().padBottom(pad10).row();
         graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(lensFlare).left().padBottom(pad10).row();
         graphics.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
@@ -1908,6 +1904,21 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         GenericDialog result = super.show(stage, action);
         updateBackupValues();
         return result;
+    }
+
+    @Override
+    public void touch() {
+        setSlider(bloomEffect, settings.postprocess.bloom.intensity);
+        setSlider(unsharpMask, settings.postprocess.unsharpMask.factor);
+
+        setSlider(tessQuality, (float) settings.scene.renderer.elevation.quality);
+    }
+
+    private void setSlider(OwnSliderPlus slider, float value) {
+        slider.setProgrammaticChangeEvents(false);
+        slider.setValue(value);
+        slider.setProgrammaticChangeEvents(true);
+
     }
 
     private void updateBackupValues() {

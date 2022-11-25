@@ -12,8 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.utils.Null;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.scene2d.OwnSlider.OwnSliderStyle;
 
 import java.text.DecimalFormat;
 import java.util.function.Function;
@@ -39,7 +43,7 @@ public class OwnSliderPlus extends Slider {
     private Function<Float, String> valueLabelTransform;
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin, String labelStyle) {
-        super(min, max, stepSize, false, skin, "big-horizontal");
+        super(min, max, stepSize, false, skin.get("big-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, mapMin, mapMax, labelStyle);
     }
@@ -49,25 +53,25 @@ public class OwnSliderPlus extends Slider {
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
-        super(min, max, stepSize, false, skin, "big-horizontal");
+        super(min, max, stepSize, false, skin.get("big-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style) {
-        super(min, max, stepSize, false, skin, style);
+        super(min, max, stepSize, false, skin.get(style, OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin) {
-        super(min, max, stepSize, vertical, skin, "big-horizontal");
+        super(min, max, stepSize, vertical, skin.get("big-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String labelStyleName) {
-        super(min, max, stepSize, vertical, skin, "big-horizontal");
+        super(min, max, stepSize, vertical, skin.get("big-horizontal", OwnSliderStyle.class));
         this.skin = skin;
         setUp(title, min, max, labelStyleName);
     }
@@ -100,7 +104,7 @@ public class OwnSliderPlus extends Slider {
             public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
                 if (actor == me) {
                     if (focused)
-                        me.setLabelColor(1, 1, 0, 1);
+                        me.setLabelColor(ColorUtils.gYellowC);
                     else
                         me.restoreLabelColor();
                 }
@@ -223,6 +227,22 @@ public class OwnSliderPlus extends Slider {
         }
     }
 
+    protected @Null Drawable getBackgroundDrawable() {
+        Drawable bg = super.getBackgroundDrawable();
+        if (hasKeyboardFocus() && !isDisabled()) {
+            bg = ((OwnSliderStyle) getStyle()).backgroundFocused;
+        }
+        return bg;
+    }
+
+    protected Drawable getKnobBeforeDrawable () {
+        Drawable knobBefore = super.getKnobBeforeDrawable();
+        if (hasKeyboardFocus() && !isDisabled()) {
+            knobBefore = ((OwnSliderStyle) getStyle()).knobBeforeFocused;
+        }
+        return knobBefore;
+    }
+
     @Override
     public void setDisabled(boolean disabled) {
         super.setDisabled(disabled);
@@ -233,6 +253,10 @@ public class OwnSliderPlus extends Slider {
     }
 
     private Color labelColorBackup;
+
+    public void setLabelColor(Color c) {
+       setLabelColor(c.r, c.g, c.b, c.a);
+    }
 
     public void setLabelColor(float r, float g, float b, float a) {
         if (this.titleLabel != null) {

@@ -30,7 +30,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     /**
      * The user interface stage
      */
-    protected Stage ui;
+    protected Stage stage;
     /**
      * The skin to use
      */
@@ -53,7 +53,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     /**
      * Horizontal offset, for VR
      */
-    protected int hoffset;
+    protected int hOffset;
 
     /**
      * Units per pixel, 1/uiScale
@@ -73,19 +73,19 @@ public abstract class AbstractGui implements IObserver, IGui {
 
     @Override
     public void update(double dt) {
-        ui.act((float) dt);
+        stage.act((float) dt);
     }
 
     @Override
     public void render(int rw, int rh) {
         synchronized (lock) {
-            ui.draw();
+            stage.draw();
         }
     }
 
     @Override
     public Stage getGuiStage() {
-        return ui;
+        return stage;
     }
 
     public String getName() {
@@ -98,8 +98,8 @@ public abstract class AbstractGui implements IObserver, IGui {
             for (IGuiInterface iface : interfaces)
                 iface.dispose();
 
-        if (ui != null)
-            ui.dispose();
+        if (stage != null)
+            stage.dispose();
         EventManager.instance.removeAllSubscriptions(this);
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractGui implements IObserver, IGui {
 
     @Override
     public void resizeImmediate(final int width, final int height) {
-        ui.getViewport().update(width, height, true);
+        stage.getViewport().update(width, height, true);
         rebuildGui();
     }
 
@@ -121,9 +121,9 @@ public abstract class AbstractGui implements IObserver, IGui {
 
     @Override
     public boolean cancelTouchFocus() {
-        if (ui.getKeyboardFocus() != null || ui.getScrollFocus() != null) {
-            ui.setScrollFocus(null);
-            ui.setKeyboardFocus(null);
+        if (stage.getKeyboardFocus() != null || stage.getScrollFocus() != null) {
+            stage.setScrollFocus(null);
+            stage.setKeyboardFocus(null);
             return true;
         }
         return false;
@@ -131,7 +131,7 @@ public abstract class AbstractGui implements IObserver, IGui {
 
     @Override
     public Actor findActor(String name) {
-        return ui.getRoot().findActor(name);
+        return stage.getRoot().findActor(name);
     }
 
     @Override
@@ -145,8 +145,8 @@ public abstract class AbstractGui implements IObserver, IGui {
     }
 
     @Override
-    public void setHoffset(int hoffset) {
-        this.hoffset = hoffset;
+    public void sethOffset(int hOffset) {
+        this.hOffset = hOffset;
     }
 
     @Override
@@ -161,8 +161,8 @@ public abstract class AbstractGui implements IObserver, IGui {
 
     public boolean updateUnitsPerPixel(float upp){
         this.unitsPerPixel = upp;
-        if(ui.getViewport() instanceof ScreenViewport){
-            ScreenViewport svp = (ScreenViewport) ui.getViewport();
+        if(stage.getViewport() instanceof ScreenViewport){
+            ScreenViewport svp = (ScreenViewport) stage.getViewport();
             svp.setUnitsPerPixel(this.unitsPerPixel);
             svp.update(graphics.getWidth(), graphics.getHeight(), true);
             return true;

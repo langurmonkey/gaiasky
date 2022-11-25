@@ -1,6 +1,5 @@
 package gaiasky.input;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.utils.IntSet;
@@ -9,15 +8,12 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.AbstractGamepadMappings;
-import gaiasky.gui.GamepadMappings;
 import gaiasky.gui.IGamepadMappings;
 import gaiasky.gui.IInputListener;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Contains some utils common to all gamepad listeners.
@@ -25,8 +21,9 @@ import java.nio.file.Path;
 public abstract class AbstractGamepadListener implements ControllerListener, IInputListener, IObserver {
     private static final Log logger = Logger.getLogger(AbstractGamepadListener.class);
 
+    protected static final float MIN_ZERO_POINT = 0.3f;
     protected static final long AXIS_EVT_DELAY = 250;
-    protected static final long AXIS_POLL_DELAY = 400;
+    protected static final long AXIS_POLL_DELAY = 250;
 
     protected static final long BUTTON_POLL_DELAY = 400;
 
@@ -34,6 +31,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     protected IGamepadMappings mappings;
     protected final EventManager em;
     protected final IntSet pressedKeys;
+    protected final AtomicBoolean active = new AtomicBoolean(true);
 
     protected long lastAxisEvtTime = 0, lastButtonPollTime = 0;
 
@@ -50,7 +48,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
 
     /** Zero-point function for the axes. **/
     protected double applyZeroPoint(double value) {
-        return Math.abs(value) >= mappings.getZeroPoint() ? value : 0;
+        return Math.abs(value) >= Math.max(mappings.getZeroPoint(), MIN_ZERO_POINT) ? value : 0;
     }
 
     public IGamepadMappings getMappings() {
@@ -60,7 +58,6 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     public void setMappings(IGamepadMappings mappings) {
         this.mappings = mappings;
     }
-
 
     public void addPressedKey(int keycode) {
         pressedKeys.add(keycode);
@@ -103,43 +100,56 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
-        addPressedKey(buttonCode);
+        if (active.get()) {
+            addPressedKey(buttonCode);
+        }
         return false;
     }
 
     @Override
     public boolean buttonUp(Controller controller, int buttonCode) {
-        removePressedKey(buttonCode);
+        if (active.get()) {
+            removePressedKey(buttonCode);
+        }
         return false;
     }
 
-    public abstract void pollAxis();
-    public abstract void pollButtons();
+    public abstract boolean pollAxis();
+
+    public abstract boolean pollButtons();
 
     @Override
     public void update() {
-        long now = TimeUtils.millis();
-        // AXIS POLL
-        if(now - lastAxisEvtTime > AXIS_POLL_DELAY) {
-            pollAxis();
-            lastAxisEvtTime = now;
-        }
+        if (active.get()) {
+            long now = TimeUtils.millis();
+            // AXIS POLL
+            if (now - lastAxisEvtTime > AXIS_POLL_DELAY) {
+                if (pollAxis()) {
+                    lastAxisEvtTime = now;
+                }
+            }
 
-        // BUTTON POLL
-        if(now - lastButtonPollTime > BUTTON_POLL_DELAY) {
-            pollButtons();
-            lastButtonPollTime = now;
+            // BUTTON POLL
+            if (now - lastButtonPollTime > BUTTON_POLL_DELAY) {
+                if (pollButtons()) {
+                    lastButtonPollTime = now;
+                }
+            }
         }
     }
 
     @Override
     public void activate() {
-
+        active.set(true);
     }
 
     @Override
     public void deactivate() {
+        active.set(false);
+    }
 
+    public boolean isActive() {
+        return active.get();
     }
 
     @Override

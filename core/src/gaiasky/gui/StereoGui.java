@@ -50,7 +50,7 @@ public class StereoGui extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
     }
 
     /**
@@ -110,7 +110,7 @@ public class StereoGui extends AbstractGui {
         buttonContainer.bottom().right().pad(0, 0, 5, 5);
 
         // CUSTOM MESSAGES
-        customInterface = new CustomInterface(ui, skin, lock);
+        customInterface = new CustomInterface(stage, skin, lock);
         interfaces.add(customInterface);
 
         /* ADD TO UI */
@@ -120,16 +120,16 @@ public class StereoGui extends AbstractGui {
 
     protected void rebuildGui() {
 
-        if (ui != null) {
-            ui.clear();
+        if (stage != null) {
+            stage.clear();
             if (notificationsOne != null) {
-                ui.addActor(notificationsOne);
+                stage.addActor(notificationsOne);
             }
             if (notificationsTwo != null) {
-                ui.addActor(notificationsTwo);
+                stage.addActor(notificationsTwo);
             }
             if (buttonContainer != null) {
-                ui.addActor(buttonContainer);
+                stage.addActor(buttonContainer);
             }
 
         }
@@ -142,9 +142,9 @@ public class StereoGui extends AbstractGui {
      * @return true if the focus was in the GUI, false otherwise.
      */
     public boolean cancelTouchFocus() {
-        if (ui.getScrollFocus() != null) {
-            ui.setScrollFocus(null);
-            ui.setKeyboardFocus(null);
+        if (stage.getScrollFocus() != null) {
+            stage.setScrollFocus(null);
+            stage.setKeyboardFocus(null);
             return true;
         }
         return false;
@@ -153,7 +153,7 @@ public class StereoGui extends AbstractGui {
     @Override
     public void update(double dt) {
         notificationsTwo.setX(notificationsTwo.getMessagesWidth() / 2);
-        ui.act((float) dt);
+        stage.act((float) dt);
     }
 
     @Override

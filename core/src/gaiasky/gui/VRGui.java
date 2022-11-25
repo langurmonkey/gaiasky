@@ -19,10 +19,10 @@ public class VRGui<T extends IGui> implements IGui {
         try {
             right = clazz.getDeclaredConstructor(Skin.class, Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             right.setVr(true);
-            right.setHoffset(-hOffset);
+            right.sethOffset(-hOffset);
             left = clazz.getDeclaredConstructor(Skin.class, Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             left.setVr(true);
-            left.setHoffset(hOffset);
+            left.sethOffset(hOffset);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
@@ -97,9 +97,9 @@ public class VRGui<T extends IGui> implements IGui {
     }
 
     @Override
-    public void setHoffset(int hoffset) {
-        right.setHoffset(hoffset);
-        left.setHoffset(hoffset);
+    public void sethOffset(int hOffset) {
+        right.sethOffset(hOffset);
+        left.sethOffset(hOffset);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class RenderGui extends AbstractGui {
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
         df = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
     }
 
@@ -68,10 +68,10 @@ public class RenderGui extends AbstractGui {
     }
 
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
-            ui.addActor(mainTable);
-            ui.addActor(messagesInterface);
+        if (stage != null) {
+            stage.clear();
+            stage.addActor(mainTable);
+            stage.addActor(messagesInterface);
         }
     }
 

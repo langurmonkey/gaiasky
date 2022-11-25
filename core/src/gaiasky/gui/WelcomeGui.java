@@ -101,14 +101,14 @@ public class WelcomeGui extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
 
         popupInterface = new PopupNotificationsInterface(skin);
         popupInterface.top().right();
         popupInterface.setFillParent(true);
 
         if (DataDescriptorUtils.dataLocationOldVersionDatasetsCheck()) {
-            var fsCheck = new DataLocationCheckWindow(I18n.msg("gui.dscheck.title"), skin, ui);
+            var fsCheck = new DataLocationCheckWindow(I18n.msg("gui.dscheck.title"), skin, stage);
             fsCheck.setAcceptRunnable(() -> {
                 // Clean old datasets in a thread in the background.
                 GaiaSky.instance.getExecutorService().execute(DataDescriptorUtils::cleanDataLocationOldDatasets);
@@ -116,7 +116,7 @@ public class WelcomeGui extends AbstractGui {
                 continueWelcomeGui();
             });
             fsCheck.setCancelRunnable(this::continueWelcomeGui);
-            fsCheck.show(ui);
+            fsCheck.show(stage);
         } else {
             continueWelcomeGui();
         }
@@ -126,9 +126,9 @@ public class WelcomeGui extends AbstractGui {
     private void continueWelcomeGui() {
         if (vrStatus.vrInitFailed()) {
             if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))
-                GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, ui));
+                GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, stage));
             else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
-                GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
+                GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, stage));
         } else if (Settings.settings.program.net.slave.active || GaiaSky.instance.isHeadless()) {
             // If we are a slave or running headless, data load can start
             gaiaSky();
@@ -165,16 +165,16 @@ public class WelcomeGui extends AbstractGui {
                 }
                 if (baseDataPresent()) {
                     // Go on all in
-                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, ui, this::buildWelcomeUI));
+                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, stage, this::buildWelcomeUI));
                 } else {
                     // Error and exit
                     logger.error(I18n.msg("gui.welcome.error.nobasedata"));
-                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, ui));
+                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, stage));
                 }
             }, null);
 
             /* CAPTURE SCROLL FOCUS */
-            ui.addListener(event -> {
+            stage.addListener(event -> {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
 
@@ -379,10 +379,10 @@ public class WelcomeGui extends AbstractGui {
         about.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (aboutWindow == null) {
-                    aboutWindow = new AboutWindow(ui, skin);
+                    aboutWindow = new AboutWindow(stage, skin);
                 }
                 if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
-                    aboutWindow.show(ui);
+                    aboutWindow.show(stage);
                 }
                 return true;
             }
@@ -395,10 +395,10 @@ public class WelcomeGui extends AbstractGui {
         preferences.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (preferencesWindow == null) {
-                    preferencesWindow = new PreferencesWindow(ui, skin, GaiaSky.instance.getGlobalResources(), true);
+                    preferencesWindow = new PreferencesWindow(stage, skin, GaiaSky.instance.getGlobalResources(), true);
                 }
                 if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
-                    preferencesWindow.show(ui);
+                    preferencesWindow.show(stage);
                 }
                 return true;
             }
@@ -418,10 +418,10 @@ public class WelcomeGui extends AbstractGui {
         bottomRight.setFillParent(true);
         bottomRight.bottom().right().pad(pad28);
 
-        ui.addActor(center);
-        ui.addActor(topLeft);
-        ui.addActor(bottomRight);
-        ui.addActor(popupInterface);
+        stage.addActor(center);
+        stage.addActor(topLeft);
+        stage.addActor(bottomRight);
+        stage.addActor(popupInterface);
 
         if (!baseDataPresent) {
             // Open dataset manager if base data is not there
@@ -432,7 +432,7 @@ public class WelcomeGui extends AbstractGui {
                 DatasetDesc baseData = serverDatasets.findDataset(Constants.DEFAULT_DATASET_KEY);
                 if (baseData != null && baseData.myVersion < baseData.serverVersion) {
                     // We have a base data update, show notice
-                    GenericDialog baseDataNotice = new GenericDialog(I18n.msg("gui.basedata.title"), skin, ui) {
+                    GenericDialog baseDataNotice = new GenericDialog(I18n.msg("gui.basedata.title"), skin, stage) {
 
                         @Override
                         protected void build() {
@@ -462,7 +462,7 @@ public class WelcomeGui extends AbstractGui {
                     };
                     baseDataNotice.setAcceptText(I18n.msg("gui.ok"));
                     baseDataNotice.buildSuper();
-                    baseDataNotice.show(ui);
+                    baseDataNotice.show(stage);
                 }
             }
         }
@@ -635,7 +635,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void addDatasetManagerWindow(DataDescriptor dd) {
         if (ddw == null) {
-            ddw = new DatasetManagerWindow(ui, skin, dd);
+            ddw = new DatasetManagerWindow(stage, skin, dd);
             ddw.setAcceptRunnable(() -> {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 savePreferences();
@@ -644,12 +644,12 @@ public class WelcomeGui extends AbstractGui {
         } else {
             ddw.refresh();
         }
-        ddw.show(ui);
+        ddw.show(stage);
     }
 
     public void clearGui() {
-        if (ui != null) {
-            ui.clear();
+        if (stage != null) {
+            stage.clear();
         }
         if (ddw != null) {
             ddw.remove();
@@ -664,7 +664,7 @@ public class WelcomeGui extends AbstractGui {
     @Override
     public void update(double dt) {
         super.update(dt);
-        if (gamepadListener != null) {
+        if (gamepadListener != null && gamepadListener.isActive()) {
             gamepadListener.update();
         }
     }
@@ -715,7 +715,7 @@ public class WelcomeGui extends AbstractGui {
     public void updateFocused() {
         if (buttonList != null && buttonList.size != 0) {
             Button actor = buttonList.get(currentSelected);
-            ui.setKeyboardFocus(actor);
+            stage.setKeyboardFocus(actor);
         }
     }
 
@@ -763,37 +763,48 @@ public class WelcomeGui extends AbstractGui {
         }
 
         @Override
-        public void pollAxis() {
+        public boolean pollAxis() {
             if (lastControllerUsed != null) {
                 float value = (float) applyZeroPoint(lastControllerUsed.getAxis(mappings.getAxisLstickV()));
                 if (value > 0) {
                     down();
+                    return true;
                 } else if (value < 0) {
                     up();
+                    return true;
                 }
             }
+            return false;
         }
 
         @Override
-        public void pollButtons() {
+        public boolean pollButtons() {
             if (pressedKeys.contains(mappings.getButtonDpadUp())) {
                 up();
+                return true;
             } else if (pressedKeys.contains(mappings.getButtonDpadDown())) {
                 down();
+                return true;
             }
+            return false;
         }
 
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
+            long now = TimeUtils.millis();
             addPressedKey(buttonCode);
             if (buttonCode == mappings.getButtonStart()) {
                 gaiaSky();
+                lastButtonPollTime = now;
             } else if (buttonCode == mappings.getButtonA()) {
                 fireChange();
+                lastButtonPollTime = now;
             } else if (buttonCode == mappings.getButtonDpadUp()) {
                 up();
+                lastButtonPollTime = now;
             } else if (buttonCode == mappings.getButtonDpadDown()) {
                 down();
+                lastButtonPollTime = now;
             }
             lastControllerUsed = controller;
             return true;

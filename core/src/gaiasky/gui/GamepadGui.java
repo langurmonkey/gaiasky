@@ -5,24 +5,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.input.AbstractGamepadListener;
+import gaiasky.input.GuiGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
@@ -30,15 +27,14 @@ import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
-import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.*;
+import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +52,7 @@ public class GamepadGui extends AbstractGui {
     private final List<Actor[][]> model;
     private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
-    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider;
+    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider;
     private OwnTextField searchField;
     private OwnLabel infoMessage;
 
@@ -67,7 +63,8 @@ public class GamepadGui extends AbstractGui {
     private Scene scene;
 
     private final EventManager em;
-    private final GUIControllerListener guiControllerListener;
+    private GamepadGuiListener gamepadListener;
+    private Set<ControllerListener> backupGamepadListeners;
     private final float pad5;
     private final float pad10;
     private final float pad20;
@@ -86,7 +83,6 @@ public class GamepadGui extends AbstractGui {
         model = new ArrayList<>();
         content = new Table(skin);
         menu = new Table(skin);
-        guiControllerListener = new GUIControllerListener(Settings.settings.controls.gamepad.mappingsFile);
         tabButtons = new ArrayList<>();
         tabContents = new ArrayList<>();
         pad5 = 8f;
@@ -95,6 +91,19 @@ public class GamepadGui extends AbstractGui {
         pad30 = 48;
         view = new FocusView();
         filterView = new FilterView();
+    }
+
+    @Override
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        // User interface
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        stage = new Stage(vp, sb);
+
+        gamepadListener = new GamepadGuiListener(this, Settings.settings.controls.gamepad.mappingsFile);
+
+        // Comment to hide this whole dialog and functionality
+        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED);
     }
 
     @Override
@@ -132,7 +141,6 @@ public class GamepadGui extends AbstractGui {
         searchField.setMessageText("Search...");
         searchField.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                ChangeEvent ie = (ChangeEvent) event;
                 if (!searchField.getText().equals(currentInputText) && !searchField.getText().isBlank()) {
                     // Process only if text changed
                     currentInputText = searchField.getText();
@@ -241,6 +249,11 @@ public class GamepadGui extends AbstractGui {
                     cameraFree.setProgrammaticChangeEvents(false);
                     cameraFree.setChecked(false);
                     cameraFree.setProgrammaticChangeEvents(true);
+                } else {
+                    em.post(Event.CAMERA_MODE_CMD, cameraFocus, CameraMode.FREE_MODE);
+                    cameraFree.setProgrammaticChangeEvents(false);
+                    cameraFree.setChecked(true);
+                    cameraFree.setProgrammaticChangeEvents(true);
                 }
                 return true;
             }
@@ -259,6 +272,12 @@ public class GamepadGui extends AbstractGui {
                     cameraFocus.setProgrammaticChangeEvents(false);
                     cameraFocus.setChecked(false);
                     cameraFocus.setProgrammaticChangeEvents(true);
+                } else {
+                    em.post(Event.CAMERA_MODE_CMD, cameraFree, CameraMode.FOCUS_MODE);
+                    cameraFocus.setProgrammaticChangeEvents(false);
+                    cameraFocus.setChecked(true);
+                    cameraFocus.setProgrammaticChangeEvents(true);
+
                 }
                 return true;
             }
@@ -451,7 +470,7 @@ public class GamepadGui extends AbstractGui {
                     }
                     return false;
                 });
-                Cell c = typesT.add(button).padBottom(buttonPadVert).left();
+                Cell<?> c = typesT.add(button).padBottom(buttonPadVert).left();
 
                 if ((i + 1) % visTableCols == 0) {
                     typesT.row();
@@ -504,14 +523,14 @@ public class GamepadGui extends AbstractGui {
                 if (event instanceof ChangeEvent) {
                     // Get currently selected mappings
                     GamepadMappings mappings = new GamepadMappings(controllerName, Path.of(Settings.settings.controls.gamepad.mappingsFile));
-                    GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, mappings, ui, skin);
+                    GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, mappings, stage, skin);
                     ccw.setAcceptRunnable(() -> {
                         if (ccw.savedFile != null) {
                             // File was saved, reload, select
                             EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, ccw.savedFile.toAbsolutePath().toString());
                         }
                     });
-                    ccw.show(ui);
+                    ccw.show(stage);
                     return true;
                 }
                 return false;
@@ -559,29 +578,44 @@ public class GamepadGui extends AbstractGui {
         updatePads(controlsT);
 
         // GRAPHICS
-        Actor[][] graphicsModel = new Actor[1][4];
+        Actor[][] graphicsModel = new Actor[1][5];
         model.add(graphicsModel);
 
         graphicsT = new Table(skin);
 
-        // Slider
-        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "header-raw");
+        // Bloom
+        bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        graphicsModel[0][0] = bloomSlider;
         bloomSlider.setWidth(ww);
         bloomSlider.setHeight(sh);
-        bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity * 10f);
+        bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity);
         bloomSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.BLOOM_CMD, bloomSlider, bloomSlider.getValue() / 10f);
+                EventManager.publish(Event.BLOOM_CMD, bloomSlider, bloomSlider.getValue());
                 return true;
             }
             return false;
         });
-        graphicsModel[0][0] = bloomSlider;
         graphicsT.add(bloomSlider).padBottom(pad10).row();
+
+        // Unsharp mask
+        unsharpMaskSlider = new OwnSliderPlus(I18n.msg("gui.unsharpmask"), Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        graphicsModel[0][1] = unsharpMaskSlider;
+        unsharpMaskSlider.setWidth(ww);
+        unsharpMaskSlider.setHeight(sh);
+        unsharpMaskSlider.setValue(Settings.settings.postprocess.unsharpMask.factor);
+        unsharpMaskSlider.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.UNSHARP_MASK_CMD, unsharpMaskSlider, unsharpMaskSlider.getValue());
+                return true;
+            }
+            return false;
+        });
+        graphicsT.add(unsharpMaskSlider).padBottom(pad10).row();
 
         // Lens flare
         flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
-        graphicsModel[0][1] = flareButton;
+        graphicsModel[0][2] = flareButton;
         flareButton.setWidth(ww);
         flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
         flareButton.addListener(event -> {
@@ -595,7 +629,7 @@ public class GamepadGui extends AbstractGui {
 
         // Star glow
         starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
-        graphicsModel[0][2] = starGlowButton;
+        graphicsModel[0][3] = starGlowButton;
         starGlowButton.setWidth(ww);
         starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
         starGlowButton.addListener(event -> {
@@ -609,7 +643,7 @@ public class GamepadGui extends AbstractGui {
 
         // Motion blur
         motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
-        graphicsModel[0][3] = motionBlurButton;
+        graphicsModel[0][4] = motionBlurButton;
         motionBlurButton.setWidth(ww);
         motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur.active);
         motionBlurButton.addListener(event -> {
@@ -859,26 +893,17 @@ public class GamepadGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager, SpriteBatch sb) {
-        // User interface
-        ScreenViewport vp = new ScreenViewport();
-        vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
-
-        // Comment to hide this whole dialog and functionality
-        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED);
-    }
-
-    @Override
     public void doneLoading(AssetManager assetManager) {
         rebuildGui();
-        ui.setKeyboardFocus(null);
+        stage.setKeyboardFocus(null);
     }
 
     @Override
     public void update(double dt) {
         super.update(dt);
-        this.guiControllerListener.update();
+        if (gamepadListener.isActive()) {
+            gamepadListener.update();
+        }
     }
 
     private ScrollPane container(Table t, float w, float h) {
@@ -985,7 +1010,7 @@ public class GamepadGui extends AbstractGui {
         if ((force || content.getParent() != null) && currentModel != null && currentModel.length != 0) {
             Actor actor = currentModel[fi][fj];
             if (actor instanceof Button || actor instanceof Slider) {
-                ui.setKeyboardFocus(actor);
+                stage.setKeyboardFocus(actor);
             }
         }
     }
@@ -1057,39 +1082,8 @@ public class GamepadGui extends AbstractGui {
         }
     }
 
-    public void touchDown() {
-        if (currentModel != null) {
-            Actor actor = currentModel[fi][fj];
-            if (actor instanceof Button) {
-                final Button b = (Button) actor;
-
-                InputEvent inputEvent = Pools.obtain(InputEvent.class);
-                inputEvent.setType(InputEvent.Type.touchDown);
-                b.fire(inputEvent);
-                Pools.free(inputEvent);
-            }
-        }
-
-    }
-
-    public void touchUp() {
-        if (currentModel != null) {
-            Actor actor = currentModel[fi][fj];
-            if (actor instanceof Button) {
-                final Button b = (Button) actor;
-
-                InputEvent inputEvent = Pools.obtain(InputEvent.class);
-                inputEvent.setType(InputEvent.Type.touchUp);
-                b.fire(inputEvent);
-                Pools.free(inputEvent);
-            }
-        }
-    }
-
     public void back() {
-        EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this, GaiaSky.instance.cameraManager.naturalCamera);
-        updateFocused();
-        ui.setKeyboardFocus(null);
+        EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this);
     }
 
     @Override
@@ -1097,30 +1091,10 @@ public class GamepadGui extends AbstractGui {
         // Empty by default
         switch (event) {
         case SHOW_CONTROLLER_GUI_ACTION -> {
-            NaturalCamera cam = (NaturalCamera) data[0];
-            if (content.isVisible() && content.getParent() != null) {
-                // Hide and remove
-                searchField.setText("");
-                content.setVisible(false);
-                content.remove();
-                ui.setKeyboardFocus(null);
-
-                // Remove GUI listener, add natural listener
-                cam.addGamepadListener();
-                removeControllerListener();
+            if (content.isVisible() && content.hasParent()) {
+                removeControllerGui();
             } else {
-                // Show
-                // Add and show
-                ui.addActor(content);
-                content.setVisible(true);
-                updateFocused();
-
-                // Remove natural listener, add GUI listener
-                cam.removeGamepadListener();
-                addControllerListener(cam);
-
-                // Close all open windows.
-                EventManager.publish(Event.CLOSE_ALL_GUI_WINDOWS_CMD, this);
+                addControllerGui();
             }
         }
         case TIME_STATE_CMD -> {
@@ -1136,155 +1110,185 @@ public class GamepadGui extends AbstractGui {
         }
     }
 
-    public boolean removeControllerGui(NaturalCamera cam) {
-        if (content.isVisible() && content.getParent() != null) {
-            // Hide and remove
+    public boolean removeControllerGui() {
+        // Hide and remove
+        if (content.isVisible() && content.hasParent()) {
+            searchField.setText("");
             content.setVisible(false);
             content.remove();
+            content.clear();
+            stage.setKeyboardFocus(null);
 
-            // Remove GUI listener, add natural listener
-            cam.addGamepadListener();
-            removeControllerListener();
+            removeGamepadListener();
             return true;
         }
         return false;
     }
 
-    private void addControllerListener(NaturalCamera cam) {
-        guiControllerListener.setCamera(cam);
-        guiControllerListener.setMappings(AbstractGamepadMappings.readGamepadMappings(Settings.settings.controls.gamepad.mappingsFile));
-        Settings.settings.controls.gamepad.addControllerListener(guiControllerListener);
-        guiControllerListener.activate();
+    public void addControllerGui() {
+        // Add and show
+        if (!content.isVisible() || !content.hasParent()) {
+            rebuildGui();
+            stage.addActor(content);
+            content.setVisible(true);
+            updateFocused();
+
+            addGamepadListener();
+
+            // Close all open windows.
+            EventManager.publish(Event.CLOSE_ALL_GUI_WINDOWS_CMD, this);
+        }
     }
 
-    private void removeControllerListener() {
-        Settings.settings.controls.gamepad.removeControllerListener(guiControllerListener);
-        guiControllerListener.deactivate();
+    private void addGamepadListener() {
+        if (gamepadListener != null) {
+            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            // Backup and clean
+            backupGamepadListeners = gamepadSettings.getControllerListeners();
+            gamepadSettings.removeAllControllerListeners();
+
+            // Add and activate.
+            gamepadSettings.addControllerListener(gamepadListener);
+        }
     }
 
-    private class GUIControllerListener extends AbstractGamepadListener {
-        private float rStickX = 0;
-        private final EventManager em;
-        private NaturalCamera cam;
+    private void removeGamepadListener() {
+        if (gamepadListener != null) {
+            GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
+            // Remove current listener
+            gamepadSettings.removeControllerListener(gamepadListener);
 
-        public GUIControllerListener(String mappingsFile) {
-            super(mappingsFile);
-            this.em = EventManager.instance;
+            // Restore backup.
+            gamepadSettings.setControllerListeners(backupGamepadListeners);
+            backupGamepadListeners = null;
         }
+    }
 
-        public void setCamera(NaturalCamera cam) {
-            this.cam = cam;
-        }
+    private static class GamepadGuiListener extends GuiGamepadListener {
+        private final GamepadGui gui;
 
-        @Override
-        public void connected(Controller controller) {
-
-        }
-
-        @Override
-        public void disconnected(Controller controller) {
-
-        }
-
-        @Override
-        public void pollAxis() {
-
-        }
-
-        @Override
-        public void pollButtons() {
-
-        }
-
-        @Override
-        public boolean buttonDown(Controller controller, int buttonCode) {
-            if (buttonCode == mappings.getButtonA()) {
-                touchDown();
-            }
-            return true;
+        public GamepadGuiListener(GamepadGui gui, String mappingsFile) {
+            super(mappingsFile, gui.stage);
+            this.gui = gui;
         }
 
         @Override
         public boolean buttonUp(Controller controller, int buttonCode) {
-            if (buttonCode == mappings.getButtonStart()) {
-                em.post(Event.SHOW_CONTROLLER_GUI_ACTION, this, cam);
-            } else if (buttonCode == mappings.getButtonB()) {
-                back();
-            } else if (buttonCode == mappings.getButtonA()) {
-                touchUp();
-            } else if (buttonCode == mappings.getButtonDpadUp()) {
-                up();
-            } else if (buttonCode == mappings.getButtonDpadDown()) {
-                down();
-            } else if (buttonCode == mappings.getButtonDpadLeft()) {
-                left();
-            } else if (buttonCode == mappings.getButtonDpadRight()) {
-                right();
-            } else if (buttonCode == mappings.getButtonRB()) {
-                tabRight();
-            } else if (buttonCode == mappings.getButtonLB()) {
-                tabLeft();
+            super.buttonUp(controller, buttonCode);
+            if (buttonCode == mappings.getButtonA()) {
+                actionUp();
+                return true;
             }
-
-            return true;
+            return false;
         }
 
         @Override
-        public boolean axisMoved(Controller controller, int axisCode, float value) {
-            value = (float) applyZeroPoint(value);
-            if (System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
-                // Event-based
-                if (axisCode == mappings.getAxisLstickH()) {
-                    // LEFT STICK horizontal - move horizontally
-                    if (value > 0) {
-                        right();
-                    } else {
-                        left();
+        public void actionDown() {
+            Actor target = stage.getKeyboardFocus();
+
+            if (target != null) {
+                if (target instanceof CheckBox) {
+                    // Check or uncheck.
+                    CheckBox cb = (CheckBox) target;
+                    if (!cb.isDisabled()) {
+                        cb.setChecked(!cb.isChecked());
                     }
-                } else if (axisCode == mappings.getAxisLstickV()) {
-                    // LEFT STICK vertical - move vertically
-                    if (value > 0) {
-                        down();
-                    } else {
-                        up();
-                    }
+                } else if (target instanceof Button) {
+                    // Touch-down event for buttons.
+                    final Button b = (Button) target;
+                    InputEvent inputEvent = Pools.obtain(InputEvent.class);
+                    inputEvent.setTarget(b);
+                    inputEvent.setType(InputEvent.Type.touchDown);
+                    b.fire(inputEvent);
+                    Pools.free(inputEvent);
+                } else {
+                    // Fire change event.
+                    ChangeEvent event = Pools.obtain(ChangeEvent.class);
+                    event.setTarget(target);
+                    target.fire(event);
+                    Pools.free(event);
                 }
-                lastAxisEvtTime = System.currentTimeMillis();
             }
-            // Poll
-            if (axisCode == mappings.getAxisRstickH()) {
-                // RIGHT STICK horizontal - slider up/down
-                rStickX = value;
-            }
-
-            return true;
         }
 
-        @Override
-        public void update() {
-            // Right stick moves slider
-            long now = TimeUtils.millis();
-            boolean update = now - lastAxisEvtTime > AXIS_POLL_DELAY;
-            if (rStickX != 0 && update) {
-                if (rStickX > 0) {
-                    sliderUp(0.05f);
-                } else if(rStickX < 0) {
-                    sliderDown(0.05f);
+        public void actionUp() {
+            Actor target = stage.getKeyboardFocus();
+
+            if (target != null) {
+                if (target instanceof Button) {
+                    // Touch-up event.
+                    final Button b = (Button) target;
+                    InputEvent inputEvent = Pools.obtain(InputEvent.class);
+                    inputEvent.setTarget(b);
+                    inputEvent.setType(InputEvent.Type.touchUp);
+                    b.fire(inputEvent);
+                    Pools.free(inputEvent);
                 }
-                lastAxisEvtTime = now;
             }
         }
 
         @Override
-        public void activate() {
+        public Group getContentContainer() {
+            return gui.content;
+        }
+
+        @Override
+        public void back() {
+            gui.back();
+        }
+
+        @Override
+        public void start() {
+            gui.back();
+        }
+
+        @Override
+        public void select() {
 
         }
 
         @Override
-        public void deactivate() {
-
+        public void tabLeft() {
+            gui.tabLeft();
         }
 
+        @Override
+        public void tabRight() {
+            gui.tabRight();
+        }
+
+        @Override
+        public void moveUp() {
+            gui.up();
+        }
+
+        @Override
+        public void moveDown() {
+            gui.down();
+        }
+
+        @Override
+        public void moveLeft() {
+            gui.left();
+        }
+
+        @Override
+        public void moveRight() {
+            gui.right();
+        }
+
+        @Override
+        public void rightStickVertical(float value) {
+        }
+
+        @Override
+        public void rightStickHorizontal(float value) {
+            if (value > 0) {
+                gui.sliderUp(0.05f);
+            } else if (value < 0) {
+                gui.sliderDown(0.05f);
+            }
+        }
     }
 
 }

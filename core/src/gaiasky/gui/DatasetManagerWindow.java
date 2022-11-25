@@ -159,9 +159,11 @@ public class DatasetManagerWindow extends GenericDialog {
         this.buttonMap[1] = new HashMap<>();
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
         this.selectionOrder = new ArrayList<>();
-
-        this.gamepadListener = new DatasetManagerGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
         this.dataLocation = dataLocation;
+
+        // Use our own gamepad listener.
+        this.defaultGamepadListener = false;
+        this.gamepadListener = new DatasetManagerGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage);
 
         setAcceptText(acceptText);
 
@@ -213,7 +215,7 @@ public class DatasetManagerWindow extends GenericDialog {
         content.add(tabGroup).center().expandX().row();
 
         // Create the tab content. Just using images here for simplicity.
-        Stack tabContent = new Stack();
+        tabStack = new Stack();
 
         // Content
         final Table contentAvail = new Table(skin);
@@ -225,10 +227,10 @@ public class DatasetManagerWindow extends GenericDialog {
         contentInstalled.pad(pad18);
 
         /* ADD ALL CONTENT */
-        tabContent.addActor(contentAvail);
-        tabContent.addActor(contentInstalled);
+        addTabContent(contentAvail);
+        addTabContent(contentInstalled);
 
-        content.add(tabContent).expand().fill().padBottom(pad34).row();
+        content.add(tabStack).expand().fill().padBottom(pad34).row();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state
@@ -1426,10 +1428,12 @@ public class DatasetManagerWindow extends GenericDialog {
             Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
             Actor target = selection.getSecond();
             stage.setKeyboardFocus(target);
-            // Move scroll
+            // Move scroll, select parent container button (dataset widget), and use its position.
             target = target.getParent();
-            int si = selectedIndex;
-            leftScroll.setScrollY(si * target.getHeight());
+            while(!(target instanceof Button)) {
+                target = target.getParent();
+            }
+            leftScroll.scrollTo(target.getX(), target.getY(), target.getWidth(), target.getHeight());
             // Update right pane
             GaiaSky.postRunnable(() -> reloadRightPane(right, selection.getFirst(), currentMode));
             selectedDataset[currentMode.ordinal()] = selection.getFirst();
@@ -1438,7 +1442,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private class DatasetManagerGamepadListener extends WindowGamepadListener {
 
-        public DatasetManagerGamepadListener(String mappingsFile) {
+        public DatasetManagerGamepadListener(String mappingsFile, Stage stage) {
             super(mappingsFile, stage, me);
         }
 

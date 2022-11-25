@@ -34,7 +34,7 @@ public class VRControllerInfoGui extends AbstractGui {
         float h = Settings.settings.graphics.backBufferResolution[1] / uis;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
 
         container = new Container<>();
         container.setFillParent(true);
@@ -51,7 +51,7 @@ public class VRControllerInfoGui extends AbstractGui {
         float tw = vrctrl_tex.getWidth() * texScale;
         float th = vrctrl_tex.getHeight() * texScale;
 
-        container.padLeft((w - tw) / 2f + hoffset);
+        container.padLeft((w - tw) / 2f + hOffset);
         container.padBottom((h - th) / 2f);
         container.setActor(contents);
         contents.setVisible(false);
@@ -73,10 +73,10 @@ public class VRControllerInfoGui extends AbstractGui {
 
     @Override
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
+        if (stage != null) {
+            stage.clear();
             if (container != null)
-                ui.addActor(container);
+                stage.addActor(container);
         }
     }
 

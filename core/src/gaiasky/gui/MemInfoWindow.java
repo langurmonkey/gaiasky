@@ -7,6 +7,8 @@ package gaiasky.gui;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import gaiasky.input.WindowGamepadListener;
+import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextArea;
@@ -16,14 +18,13 @@ import java.lang.management.MemoryPoolMXBean;
 
 public class MemInfoWindow extends GenericDialog {
 
-    public MemInfoWindow(Stage stg, Skin skin) {
-        super(I18n.msg("gui.help.meminfo"), skin, stg);
+    public MemInfoWindow(Stage stage, Skin skin) {
+        super(I18n.msg("gui.help.meminfo"), skin, stage);
 
         setCancelText(I18n.msg("gui.close"));
 
         // Build
         buildSuper();
-
     }
 
     @Override

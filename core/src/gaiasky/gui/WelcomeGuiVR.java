@@ -22,15 +22,15 @@ public class WelcomeGuiVR extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
 
         center = new Table();
         center.setFillParent(true);
         center.center();
-        if (hoffset > 0)
-            center.padLeft(hoffset);
-        else if (hoffset < 0)
-            center.padRight(-hoffset);
+        if (hOffset > 0)
+            center.padLeft(hOffset);
+        else if (hOffset < 0)
+            center.padRight(-hOffset);
         center.add(new OwnLabel("Please, check the window on your screen", skin, "main-title-s"));
 
         rebuildGui();
@@ -43,9 +43,9 @@ public class WelcomeGuiVR extends AbstractGui {
 
     @Override
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
-            ui.addActor(center);
+        if (stage != null) {
+            stage.clear();
+            stage.addActor(center);
         }
     }
 }

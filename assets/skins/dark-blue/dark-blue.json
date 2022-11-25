@@ -208,9 +208,9 @@
     },
     "yellow": {
       "a": 1,
-      "b": 0.04509,
-      "g": 0.81568,
-      "r": 0.95882
+      "b": 0.0,
+      "g": 0.733,
+      "r": 1.0
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable": {
@@ -730,6 +730,25 @@
       "hScrollKnob": "scrollbar-knob"
     }
   },
+  "gaiasky.util.scene2d.OwnSelectBox$OwnSelectBoxStyle": {
+    "default": {
+      "font": "ui-23",
+      "fontColor": "white",
+      "overFontColor": "highlight",
+      "disabledFontColor": "grey",
+      "background": "default-select",
+      "backgroundDisabled": "default-select-disabled",
+      "backgroundFocused": "default-select-focused",
+      "scrollStyle": "default",
+      "listStyle": {
+        "font": "ui-23",
+        "fontColorSelected": "white",
+        "fontColorUnselected": "white",
+        "selection": "default-select-selection",
+        "background": "dark-grey"
+      }
+    }
+  },
   "com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle": {
     "default": {
       "font": "ui-23",
@@ -774,13 +793,15 @@
       "stageBackground": "dialogDim"
     }
   },
-  "com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle": {
+  "gaiasky.util.scene2d.OwnSlider$OwnSliderStyle": {
     "default-horizontal": {
       "background": "default-slider",
+      "backgroundFocused": "default-slider-focused",
       "backgroundOver": "default-slider-over",
       "knob": "default-slider-knob",
       "knobOver": "default-slider-knob-over",
       "knobBefore": "default-slider-knob-before",
+      "knobBeforeFocused": "default-slider-knob-before-focused",
       "knobBeforeOver": "default-slider-knob-before-over"
     },
     "default-vertical": {
@@ -790,10 +811,12 @@
     },
     "big-horizontal": {
       "background": "big-slider",
+      "backgroundFocused": "big-slider-focused",
       "backgroundOver": "big-slider-over",
       "knob": "big-slider-knob",
       "knobOver": "big-slider-knob-over",
       "knobBefore": "big-slider-knob-before",
+      "knobBeforeFocused": "big-slider-knob-before-focused",
       "knobBeforeOver": "big-slider-knob-before-over"
     },
     "big-horizontal-arrow": {
@@ -1103,7 +1126,10 @@
       "checkboxOnOver": "check-on-over",
       "checkboxOver": "check-off-over",
       "checkboxOffDisabled": "check-off-disabled",
-      "focused": "check-on-over",
+      "focused": "check-off-focused",
+      "checkedFocused": "check-on-focused",
+      "focusedFontColor": "yellow",
+      "checkedFocusedFontColor": "yellow",
       "font": "ui-22",
       "fontColor": "white"
     },
@@ -1114,6 +1140,10 @@
       "checkboxOnOver": "check-on-over",
       "checkboxOver": "check-off-over",
       "checkboxOffDisabled": "check-off-disabled",
+      "focused": "check-off-focused",
+      "checkedFocused": "check-on-focused",
+      "focusedFontColor": "yellow",
+      "checkedFocusedFontColor": "yellow",
       "font": "ui-26",
       "fontColor": "white"
     },
@@ -1124,6 +1154,10 @@
       "checkboxOnOver": "check-on-over",
       "checkboxOver": "check-off-over",
       "checkboxOffDisabled": "check-off-disabled",
+      "focused": "check-off-focused",
+      "checkedFocused": "check-on-focused",
+      "focusedFontColor": "yellow",
+      "checkedFocusedFontColor": "yellow",
       "font": "ui-22",
       "fontColor": "theme"
     },
@@ -1134,6 +1168,10 @@
       "checkboxOnOver": "radio-on-over",
       "checkboxOver": "radio-off-over",
       "checkboxOffDisabled": "radio-off-disabled",
+      "focused": "radio-off-focused",
+      "checkedFocused": "radio-on-focused",
+      "focusedFontColor": "yellow",
+      "checkedFocusedFontColor": "yellow",
       "font": "ui-23",
       "fontColor": "white"
     }

@@ -332,7 +332,7 @@ public class GuiRegistry implements IObserver {
                     searchDialog.show(ui);
                 break;
             case SHOW_QUIT_ACTION:
-                if (!removeModeChangePopup() && !removeControllerGui()) {
+                if (!removeModeChangePopup() && !removeGamepadGui()) {
                     if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
                         // Release mouse if captured
                         GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
@@ -715,12 +715,12 @@ public class GuiRegistry implements IObserver {
         return result;
     }
 
-    public boolean removeControllerGui() {
+    public boolean removeGamepadGui() {
         for (int i = 0; i < guis.size; i++) {
             IGui gui = guis.get(i);
             if (gui instanceof GamepadGui) {
-                GamepadGui cgui = (GamepadGui) gui;
-                return cgui.removeControllerGui(GaiaSky.instance.cameraManager.naturalCamera);
+                GamepadGui gamepadGui = (GamepadGui) gui;
+                return gamepadGui.removeControllerGui();
             }
         }
         return false;

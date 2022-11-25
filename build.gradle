@@ -102,9 +102,9 @@ project(":core") {
 
     dependencies {
         // *****************************
-        // GENERATE SKINS (PackTextures)
+        // GENERATE SKINS (PackUITextures)
         // *****************************
-        //api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 
         // ************
         // REGULAR DEPS

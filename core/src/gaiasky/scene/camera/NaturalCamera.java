@@ -1174,12 +1174,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public void addGamepadListener() {
         Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
-        gamepadListener.activate();
     }
 
     public void removeGamepadListener() {
         Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
-        gamepadListener.deactivate();
     }
 
     public void setFocus(String focusName, Entity newFocus) {

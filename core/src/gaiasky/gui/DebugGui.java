@@ -30,7 +30,7 @@ public class DebugGui extends AbstractGui {
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        this.ui = new Stage(vp, sb);
+        this.stage = new Stage(vp, sb);
     }
 
     @Override
@@ -50,17 +50,17 @@ public class DebugGui extends AbstractGui {
 
     @Override
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
+        if (stage != null) {
+            stage.clear();
             if (debugInterface != null && di != null)
-                ui.addActor(di);
+                stage.addActor(di);
         }
     }
 
 
     @Override
     public void update(double dt) {
-        ui.act((float) dt);
+        stage.act((float) dt);
     }
 
     @Override

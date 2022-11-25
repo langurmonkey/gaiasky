@@ -5,23 +5,29 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Null;
 
 public class OwnSelectBox<T> extends SelectBox<T> {
 
     private float ownWidth = 0f, ownHeight = 0f;
 
-    public OwnSelectBox(com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle style) {
+    public OwnSelectBox(OwnSelectBoxStyle style) {
         super(style);
     }
 
     public OwnSelectBox(Skin skin, String styleName) {
-        super(skin, styleName);
+        super(skin.get(styleName, OwnSelectBoxStyle.class));
     }
 
     public OwnSelectBox(Skin skin) {
-        super(skin);
+        super(skin.get(OwnSelectBoxStyle.class));
     }
 
     @Override
@@ -59,6 +65,33 @@ public class OwnSelectBox<T> extends SelectBox<T> {
         } else {
             return super.getPrefHeight();
         }
+    }
+
+    protected @Null Drawable getBackgroundDrawable () {
+        Drawable bg = super.getBackgroundDrawable();
+        if(hasKeyboardFocus() && !isDisabled()) {
+            bg = ((OwnSelectBoxStyle)getStyle()).backgroundFocused;
+        }
+        return bg;
+    }
+
+    static public class OwnSelectBoxStyle extends SelectBoxStyle {
+
+        public @Null Drawable backgroundFocused;
+
+        public OwnSelectBoxStyle() {
+        }
+
+        public OwnSelectBoxStyle(BitmapFont font, Color fontColor, @Null Drawable background, ScrollPaneStyle scrollStyle,
+                ListStyle listStyle) {
+            super(font, fontColor, background, scrollStyle, listStyle);
+        }
+
+        public OwnSelectBoxStyle(OwnSelectBoxStyle style) {
+            super(style);
+            backgroundFocused = style.backgroundFocused;
+        }
+
     }
 
 }

@@ -87,7 +87,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         LB(TYPE_BUTTON),
         LT(TYPE_EITHER);
 
-        public int type;
+        public final int type;
 
         /**
          * @param type 0 = button, 1 = axis, 2 = either
@@ -195,8 +195,9 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         inputInfo.put(Gamepad.LT, new Trio<>(lt, new float[] { -354, -265 }, I18n.msg("gui.controller.lt")));
         inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[] { 354, -265 }, I18n.msg("gui.controller.rt")));
 
-        // Park our own
-        gamepadListener = new ConfigGamepadListener(mappings);
+        // Park our own listener.
+        defaultGamepadListener = false;
+        gamepadListener = new GamepadConfigListener(mappings);
 
         // Build UI
         buildSuper();
@@ -618,7 +619,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
     /**
      * Listens to gamepad input events in order to configure the axes and buttons.
      */
-    private class ConfigGamepadListener extends AbstractGamepadListener {
+    private class GamepadConfigListener extends AbstractGamepadListener {
         boolean capturingAxis = false;
         long lastT = System.currentTimeMillis();
         long lastAxisT = System.currentTimeMillis();
@@ -626,11 +627,11 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         long minAxisT = 300;
         double[] axes = new double[40];
 
-        public ConfigGamepadListener(String mappingsFile) {
+        public GamepadConfigListener(String mappingsFile) {
             super(mappingsFile);
         }
 
-        public ConfigGamepadListener(IGamepadMappings mappings) {
+        public GamepadConfigListener(IGamepadMappings mappings) {
             super(mappings);
         }
 
@@ -645,13 +646,13 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         }
 
         @Override
-        public void pollAxis() {
-
+        public boolean pollAxis() {
+            return true;
         }
 
         @Override
-        public void pollButtons() {
-
+        public boolean pollButtons() {
+            return true;
         }
 
         @Override

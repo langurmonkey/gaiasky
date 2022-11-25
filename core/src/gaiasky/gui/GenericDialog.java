@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.input.AbstractGamepadListener;
+import gaiasky.input.WindowGamepadListener;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.scene2d.CollapsibleWindow;
@@ -57,6 +58,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     private String acceptText = null, cancelText = null;
     private String acceptStyle = "default", cancelStyle = "default";
     protected boolean modal = true;
+    protected boolean defaultGamepadListener = true;
 
     protected float lastPosX = -1, lastPosY = -1;
 
@@ -78,7 +80,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected int selectedTab = 0;
 
     /** Actual actor for each tab. **/
-    protected Array<Actor> tabContents;
+    protected Array<Group> tabContents;
     /** Tab contents stack. **/
     protected Stack tabStack;
 
@@ -148,13 +150,14 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     /**
      * Add tab contents to the list of tabs.
+     *
      * @param tabContent The contents.
      */
-    protected void addTabContent(Actor tabContent) {
+    protected void addTabContent(Group tabContent) {
         if (tabStack == null) {
             tabStack = new Stack();
         }
-        if(tabContents == null) {
+        if (tabContents == null) {
             tabContents = new Array<>();
         }
         tabStack.add(tabContent);
@@ -166,7 +169,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * sets up the button group, which restricts the number of tabs that can be checked at once to one.
      */
     protected void setUpTabListeners() {
-        if(tabContents != null && tabButtons != null && tabButtons.size == tabContents.size) {
+        if (tabContents != null && tabButtons != null && tabButtons.size == tabContents.size) {
             // Let only one tab button be checked at a time
             ButtonGroup<Button> tabsGroup = new ButtonGroup<>();
             tabsGroup.setMinCheckCount(1);
@@ -323,11 +326,16 @@ public abstract class GenericDialog extends CollapsibleWindow {
             return false;
         });
 
-        // Build actual content
+        // Build actual content.
         build();
 
-        // Modal
+        // Modal.
         setModal(this.modal);
+
+        // Add default gamepad listener.
+        if (defaultGamepadListener) {
+            gamepadListener = new WindowGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage, this);
+        }
     }
 
     /**
@@ -400,6 +408,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
             addAction(action);
 
         addGamepadListener();
+        touch();
 
         if (this.modal)
             // Disable input
@@ -408,7 +417,13 @@ public abstract class GenericDialog extends CollapsibleWindow {
         return this;
     }
 
-    public Actor getActualContentContainer() {
+    /**
+     * Override this method to update the contents of this dialog before displaying it.
+     */
+    public void touch() {
+    }
+
+    public Group getActualContentContainer() {
         if (tabButtons != null && !tabButtons.isEmpty()) {
             return tabContents.get(selectedTab);
         } else {
@@ -565,7 +580,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
             // Add and activate.
             gamepadSettings.addControllerListener(gamepadListener);
-            gamepadListener.activate();
         }
     }
 
@@ -574,7 +588,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
             GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
             // Remove current listener
             gamepadSettings.removeControllerListener(gamepadListener);
-            gamepadListener.deactivate();
 
             // Restore backup.
             gamepadSettings.setControllerListeners(backupGamepadListeners);
@@ -617,7 +630,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (gamepadListener != null) {
+        if (gamepadListener != null && gamepadListener.isActive()) {
             gamepadListener.update();
         }
     }

@@ -121,7 +121,7 @@ public class SpacecraftGui extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
 
         indicatorw = 480f;
         indicatorh = 480f;
@@ -500,12 +500,12 @@ public class SpacecraftGui extends AbstractGui {
     }
 
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
-            ui.addActor(main);
+        if (stage != null) {
+            stage.clear();
+            stage.addActor(main);
 
             // CAPTURE SCROLL FOCUS
-            ui.addListener(new EventListener() {
+            stage.addListener(new EventListener() {
 
                 @Override
                 public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
@@ -514,10 +514,10 @@ public class SpacecraftGui extends AbstractGui {
 
                         if (ie.getType() == Type.mouseMoved) {
                             Actor scrollPanelAncestor = getScrollPanelAncestor(ie.getTarget());
-                            ui.setScrollFocus(scrollPanelAncestor);
+                            stage.setScrollFocus(scrollPanelAncestor);
                         } else if (ie.getType() == Type.touchDown) {
                             if (ie.getTarget() instanceof TextField)
-                                ui.setKeyboardFocus(ie.getTarget());
+                                stage.setKeyboardFocus(ie.getTarget());
                         }
                     }
                     return false;
@@ -540,7 +540,7 @@ public class SpacecraftGui extends AbstractGui {
     @Override
     public void render(int rw, int rh) {
         // Draw UI
-        ui.draw();
+        stage.draw();
 
         // Draw attitude indicator
         aiViewport.setCamera(aiCam);
@@ -600,7 +600,7 @@ public class SpacecraftGui extends AbstractGui {
 
     @Override
     public void resizeImmediate(final int width, final int height) {
-        ui.getViewport().update(width, height, true);
+        stage.getViewport().update(width, height, true);
         rebuildGui();
     }
 

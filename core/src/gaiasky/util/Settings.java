@@ -19,6 +19,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings;
 import gaiasky.gui.ModePopupInfo;
+import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
@@ -1228,6 +1229,13 @@ public class Settings {
                     Set<ControllerListener> cs = controllerListenersMap.get(controller);
                     cs.add(controllerListener);
                 }
+                activate(controllerListener);
+            }
+
+            private void activate(ControllerListener l) {
+                if (l instanceof AbstractGamepadListener) {
+                    ((AbstractGamepadListener) l).activate();
+                }
             }
 
             /**
@@ -1240,6 +1248,13 @@ public class Settings {
                 if (controllerListenersMap.containsKey(controller)) {
                     Set<ControllerListener> cs = controllerListenersMap.get(controller);
                     cs.remove(controllerListener);
+                    deactivate(controllerListener);
+                }
+            }
+
+            private void deactivate(ControllerListener l) {
+                if (l instanceof AbstractGamepadListener) {
+                    ((AbstractGamepadListener) l).deactivate();
                 }
             }
 
@@ -1307,6 +1322,7 @@ public class Settings {
                         if (s != null) {
                             for (ControllerListener cl : s) {
                                 controller.removeListener(cl);
+                                deactivate(cl);
                             }
                             s.clear();
                         }

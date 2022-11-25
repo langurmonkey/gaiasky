@@ -56,7 +56,7 @@ public class LoadingGui extends AbstractGui {
     public LoadingGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Integer hoffset, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.vr = vr;
-        this.hoffset = hoffset;
+        this.hOffset = hoffset;
         this.skin = skin;
     }
 
@@ -69,7 +69,7 @@ public class LoadingGui extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
         if (vr) {
             vp.update(settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], true);
         } else {
@@ -85,10 +85,10 @@ public class LoadingGui extends AbstractGui {
         }
         center.setFillParent(true);
         center.center();
-        if (hoffset > 0)
-            center.padLeft(hoffset);
-        else if (hoffset < 0)
-            center.padRight(-hoffset);
+        if (hOffset > 0)
+            center.padLeft(hOffset);
+        else if (hOffset < 0)
+            center.padRight(-hOffset);
 
 
         HorizontalGroup titleGroup = new HorizontalGroup();
@@ -211,13 +211,13 @@ public class LoadingGui extends AbstractGui {
     }
 
     public void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
-            ui.addActor(center);
-            ui.addActor(screenMode);
+        if (stage != null) {
+            stage.clear();
+            stage.addActor(center);
+            stage.addActor(screenMode);
             if(!vr) {
-                ui.addActor(bottomMiddle);
-                ui.addActor(topLeft);
+                stage.addActor(bottomMiddle);
+                stage.addActor(topLeft);
             }
         }
     }

@@ -34,12 +34,12 @@ public class VRInfoGui extends AbstractGui {
         float w = Settings.settings.graphics.backBufferResolution[1];
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, sb);
+        stage = new Stage(vp, sb);
 
         container = new Container<>();
         container.setFillParent(true);
         container.bottom().right();
-        container.padRight((w / 3f) - hoffset);
+        container.padRight((w / 3f) - hOffset);
         container.padBottom(h / 3f);
 
         contents = new Table();
@@ -86,10 +86,10 @@ public class VRInfoGui extends AbstractGui {
 
     @Override
     protected void rebuildGui() {
-        if (ui != null) {
-            ui.clear();
+        if (stage != null) {
+            stage.clear();
             if (container != null)
-                ui.addActor(container);
+                stage.addActor(container);
         }
     }
 

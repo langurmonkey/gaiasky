@@ -452,29 +452,15 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TOUCH_DOWN:
-            this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-            break;
-        case TOUCH_UP:
-            this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
-            break;
-        case TOUCH_DRAGGED:
-            this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
-            break;
-        case SCROLLED:
-            this.scrolled(0f, (float) data[0]);
-            break;
-        case KEY_DOWN:
-            this.keyDown((int) data[0]);
-            break;
-        case KEY_UP:
-            this.keyUp((int) data[0]);
-            break;
-        case SCENE_LOADED:
-            this.scene = (Scene) data[0];
-            break;
-        default:
-            break;
+        case TOUCH_DOWN -> this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+        case TOUCH_UP -> this.touchUp((int) data[0], (int) data[1], (int) data[2], (int) data[3]);
+        case TOUCH_DRAGGED -> this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
+        case SCROLLED -> this.scrolled(0f, (float) data[0]);
+        case KEY_DOWN -> this.keyDown((int) data[0]);
+        case KEY_UP -> this.keyUp((int) data[0]);
+        case SCENE_LOADED -> this.scene = (Scene) data[0];
+        default -> {
+        }
         }
     }
 

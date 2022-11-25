@@ -46,9 +46,17 @@ bg-clear
   orig: 2, 2
   offset: 0, 0
   index: -1
+big-slider-focused
+  rotate: false
+  xy: 119, 344
+  size: 11, 27
+  split: 0, 0, 0, 0
+  orig: 11, 27
+  offset: 0, 0
+  index: -1
 big-slider
   rotate: false
-  xy: 1008, 480
+  xy: 119, 344
   size: 11, 27
   split: 0, 0, 0, 0
   orig: 11, 27
@@ -75,6 +83,13 @@ big-slider-knob-before
   orig: 24, 27
   offset: 0, 0
   index: -1
+big-slider-knob-before-focused
+  rotate: false
+  xy: 116, 313
+  size: 24, 27
+  orig: 24, 27
+  offset: 0, 0
+  index: -1
 big-slider-knob-before-over
   rotate: false
   xy: 116, 313
@@ -91,7 +106,7 @@ big-slider-knob-over
   index: -1
 big-slider-over
   rotate: false
-  xy: 119, 344
+  xy: 1008, 480
   size: 11, 27
   split: 0, 0, 0, 0
   orig: 11, 27
@@ -204,6 +219,13 @@ check-off-disabled
   orig: 19, 19
   offset: 0, 0
   index: -1
+check-off-focused
+  rotate: false
+  xy: 444, 259
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
 check-off-over
   rotate: false
   xy: 444, 259
@@ -221,6 +243,13 @@ check-on
 check-on-disabled
   rotate: false
   xy: 842, 159
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+check-on-focused
+  rotate: false
+  xy: 865, 159
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -394,7 +423,15 @@ default-scroll
   orig: 32, 32
   offset: 0, 0
   index: -1
-default-select
+default-select-disabled
+  rotate: false
+  xy: 816, 392
+  size: 37, 29
+  split: 3, 18, 3, 3
+  orig: 37, 29
+  offset: 0, 0
+  index: -1
+default-select-focused
   rotate: false
   xy: 857, 392
   size: 37, 29
@@ -402,9 +439,9 @@ default-select
   orig: 37, 29
   offset: 0, 0
   index: -1
-default-select-disabled
+default-select
   rotate: false
-  xy: 816, 392
+  xy: 857, 392
   size: 37, 29
   split: 3, 18, 3, 3
   orig: 37, 29
@@ -426,9 +463,25 @@ default-slider
   orig: 11, 18
   offset: 0, 0
   index: -1
-default-slider-knob
+default-slider-focused
   rotate: false
   xy: 915, 311
+  size: 11, 18
+  split: 0, 0, 0, 0
+  orig: 11, 18
+  offset: 0, 0
+  index: -1
+default-slider-over
+  rotate: false
+  xy: 915, 311
+  size: 11, 18
+  split: 0, 0, 0, 0
+  orig: 11, 18
+  offset: 0, 0
+  index: -1
+default-slider-knob
+  rotate: false
+  xy: 306, 263
   size: 11, 18
   orig: 11, 18
   offset: 0, 0
@@ -436,6 +489,13 @@ default-slider-knob
 default-slider-knob-before
   rotate: false
   xy: 439, 328
+  size: 24, 18
+  orig: 24, 18
+  offset: 0, 0
+  index: -1
+default-slider-knob-before-focused
+  rotate: false
+  xy: 116, 291
   size: 24, 18
   orig: 24, 18
   offset: 0, 0
@@ -456,16 +516,8 @@ default-slider-knob-before-vertical
   index: -1
 default-slider-knob-over
   rotate: false
-  xy: 306, 263
-  size: 11, 18
-  orig: 11, 18
-  offset: 0, 0
-  index: -1
-default-slider-over
-  rotate: false
   xy: 396, 239
   size: 11, 18
-  split: 0, 0, 0, 0
   orig: 11, 18
   offset: 0, 0
   index: -1
@@ -2716,6 +2768,13 @@ radio-off-disabled
   orig: 19, 19
   offset: 0, 0
   index: -1
+radio-off-focused
+  rotate: false
+  xy: 949, 156
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
 radio-off-over
   rotate: false
   xy: 949, 156
@@ -2733,6 +2792,13 @@ radio-on
 radio-on-disabled
   rotate: false
   xy: 995, 146
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+radio-on-focused
+  rotate: false
+  xy: 369, 148
   size: 19, 19
   orig: 19, 19
   offset: 0, 0

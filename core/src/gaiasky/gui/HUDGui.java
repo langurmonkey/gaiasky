@@ -185,7 +185,7 @@ public class HUDGui implements IGui {
     }
 
     @Override
-    public void setHoffset(int hoffset) {
+    public void sethOffset(int hOffset) {
     }
 
     @Override

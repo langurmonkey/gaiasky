@@ -29,13 +29,13 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
     }
 
     @Override
-    public void pollAxis() {
-
+    public boolean pollAxis() {
+        return false;
     }
 
     @Override
-    public void pollButtons() {
-
+    public boolean pollButtons() {
+        return false;
     }
 
     @Override
