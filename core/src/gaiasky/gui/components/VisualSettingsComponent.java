@@ -187,6 +187,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
 
                     float br = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
                     float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
+                    float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
                     float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
                     float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(0)).floatValue();
                     float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
@@ -198,6 +199,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                     EventManager m = EventManager.instance;
                     m.post(Event.STAR_BRIGHTNESS_CMD, resetDefaults, br);
                     m.post(Event.STAR_BRIGHTNESS_POW_CMD, resetDefaults, pow);
+                    m.post(Event.STAR_GLOW_FACTOR_CMD, resetDefaults, glo);
                     m.post(Event.STAR_POINT_SIZE_CMD, resetDefaults, ss);
                     m.post(Event.STAR_BASE_LEVEL_CMD, resetDefaults, pam);
                     m.post(Event.AMBIENT_LIGHT_CMD, resetDefaults, amb);
