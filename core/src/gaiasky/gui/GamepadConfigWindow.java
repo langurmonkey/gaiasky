@@ -627,11 +627,11 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         double[] axes = new double[40];
 
         public GamepadConfigListener(String mappingsFile) {
-            super(mappingsFile, me.stage, me);
+            super(mappingsFile, me);
         }
 
         public GamepadConfigListener(IGamepadMappings mappings) {
-            super(mappings, me.stage, me);
+            super(mappings, me);
         }
 
         @Override

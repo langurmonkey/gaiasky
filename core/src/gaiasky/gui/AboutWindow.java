@@ -22,7 +22,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
-import gaiasky.input.WindowGamepadListener;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -61,8 +60,6 @@ public class AboutWindow extends GenericDialog {
 
         // Build
         buildSuper();
-
-        gamepadListener = new WindowGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage, this);
 
     }
 

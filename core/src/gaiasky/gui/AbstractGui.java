@@ -24,44 +24,44 @@ import gaiasky.render.ComponentTypes.ComponentType;
 public abstract class AbstractGui implements IObserver, IGui {
 
     /**
-     * Graphics instance
+     * Graphics instance.
      */
     protected Graphics graphics;
     /**
-     * The user interface stage
+     * The user interface stage.
      */
     protected Stage stage;
     /**
-     * The skin to use
+     * The skin to use.
      */
     protected Skin skin;
     /**
-     * The GUI interfaces, if any
+     * The GUI interfaces, if any.
      */
     protected Array<IGuiInterface> interfaces;
 
     /**
-     * The name of this GUI
+     * The name of this GUI.
      */
     protected String name;
 
     /**
-     * Whether we're in VR mode
+     * Whether we're in VR mode.
      */
     protected boolean vr;
 
     /**
-     * Horizontal offset, for VR
+     * Horizontal offset, for VR.
      */
     protected int hOffset;
 
     /**
-     * Units per pixel, 1/uiScale
-     * This only works with a screen viewport
+     * Units per pixel, 1/uiScale.
+     * This only works with a screen viewport.
      */
     protected float unitsPerPixel = 1;
 
-    /** Lock for sync **/
+    /** Lock for sync. **/
     protected Object lock;
 
     public AbstractGui(Graphics graphics, Float unitsPerPixel) {

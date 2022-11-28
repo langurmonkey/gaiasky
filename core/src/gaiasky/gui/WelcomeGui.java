@@ -8,6 +8,7 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
@@ -21,7 +22,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -34,8 +38,9 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.input.AbstractGamepadListener;
-import gaiasky.util.*;
+import gaiasky.input.GuiKbdListener;
 import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
@@ -79,6 +84,7 @@ public class WelcomeGui extends AbstractGui {
     private int currentSelected = 0;
 
     private PopupNotificationsInterface popupInterface;
+    private WelcomeGuiKbdListener kbdListener;
     private final WelcomeGuiGamepadListener gamepadListener;
 
     /**
@@ -101,7 +107,8 @@ public class WelcomeGui extends AbstractGui {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        stage = new Stage(vp, sb);
+        this.stage = new Stage(vp, sb);
+        this.kbdListener = new WelcomeGuiKbdListener(stage);
 
         popupInterface = new PopupNotificationsInterface(skin);
         popupInterface.top().right();
@@ -198,7 +205,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWelcomeUI() {
-        addControllerListener();
+        addOwnListeners();
         buttonList = new Array<>();
         serverDatasets = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;
         reloadLocalDatasets();
@@ -512,7 +519,7 @@ public class WelcomeGui extends AbstractGui {
      */
     private void gaiaSky() {
         EventManager.instance.removeAllSubscriptions(this);
-        removeControllerListener();
+        removeOwnListeners();
         ensureBaseDataEnabled(serverDatasets);
 
         if (popupInterface != null) {
@@ -684,6 +691,9 @@ public class WelcomeGui extends AbstractGui {
     @Override
     public void update(double dt) {
         super.update(dt);
+        if (kbdListener != null && kbdListener.isActive()) {
+            kbdListener.update();
+        }
         if (gamepadListener != null && gamepadListener.isActive()) {
             gamepadListener.update();
         }
@@ -718,18 +728,30 @@ public class WelcomeGui extends AbstractGui {
         }
     }
 
-    private void addControllerListener() {
-        GaiaSky.postRunnable(() -> {
+    private void addOwnListeners() {
+        if (kbdListener != null) {
+            var multiplexer = (InputMultiplexer) Gdx.input.getInputProcessor();
+            multiplexer.addProcessor(0, kbdListener);
+            kbdListener.activate();
+        }
+
+        if (gamepadListener != null) {
             Settings.settings.controls.gamepad.addControllerListener(gamepadListener);
             gamepadListener.activate();
-        });
+        }
     }
 
-    private void removeControllerListener() {
-        GaiaSky.postRunnable(() -> {
+    private void removeOwnListeners() {
+        if (kbdListener != null) {
+            var multiplexer = (InputMultiplexer) Gdx.input.getInputProcessor();
+            multiplexer.removeProcessor(kbdListener);
+            kbdListener.deactivate();
+        }
+
+        if (gamepadListener != null) {
             Settings.settings.controls.gamepad.removeControllerListener(gamepadListener);
             gamepadListener.deactivate();
-        });
+        }
     }
 
     public void updateFocused() {
@@ -761,6 +783,46 @@ public class WelcomeGui extends AbstractGui {
             b.fire(event);
             Pools.free(event);
         }
+    }
+
+    private class WelcomeGuiKbdListener extends GuiKbdListener {
+
+        protected WelcomeGuiKbdListener(Stage stage) {
+            super(stage);
+        }
+
+        @Override
+        public void close() {
+            GaiaSky.postRunnable(Gdx.app::exit);
+        }
+
+        @Override
+        public void accept() {
+            gaiaSky();
+        }
+
+        @Override
+        public void select() {
+        }
+
+        @Override
+        public void tabLeft() {
+        }
+
+        @Override
+        public void tabRight() {
+        }
+
+        @Override
+        public void moveUp() {
+            up();
+        }
+
+        @Override
+        public void moveDown() {
+            down();
+        }
+
     }
 
     /**

@@ -163,7 +163,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Use our own gamepad listener.
         this.defaultGamepadListener = false;
-        this.gamepadListener = new DatasetManagerGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage);
+        this.gamepadListener = new DatasetManagerGamepadListener(Settings.settings.controls.gamepad.mappingsFile);
 
         setAcceptText(acceptText);
 
@@ -1442,8 +1442,8 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private class DatasetManagerGamepadListener extends WindowGamepadListener {
 
-        public DatasetManagerGamepadListener(String mappingsFile, Stage stage) {
-            super(mappingsFile, stage, me);
+        public DatasetManagerGamepadListener(String mappingsFile) {
+            super(mappingsFile, me);
         }
 
         @Override

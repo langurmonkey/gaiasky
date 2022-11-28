@@ -2,7 +2,6 @@ package gaiasky.input;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import gaiasky.gui.GenericDialog;
 import gaiasky.gui.IGamepadMappings;
 
@@ -13,13 +12,13 @@ public class WindowGamepadListener extends GuiGamepadListener {
 
     private final GenericDialog dialog;
 
-    public WindowGamepadListener(String mappingsFile, Stage stage, GenericDialog dialog) {
-        super(mappingsFile, stage);
+    public WindowGamepadListener(String mappingsFile, GenericDialog dialog) {
+        super(mappingsFile, dialog.getStage());
         this.dialog = dialog;
     }
 
-    public WindowGamepadListener(IGamepadMappings mappings, Stage stage, GenericDialog dialog) {
-        super(mappings, stage);
+    public WindowGamepadListener(IGamepadMappings mappings, GenericDialog dialog) {
+        super(mappings, dialog.getStage());
         this.dialog = dialog;
     }
 

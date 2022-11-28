@@ -43,42 +43,52 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public void update() {
+    public boolean pollKeys() {
         float keySensitivity = 3e-1f;
         // Run mode
         float multiplier = isKeyPressed(Keys.SHIFT_LEFT) ? 3f : 1f;
         double minTranslateUnits = 1e-5;
+        boolean result = false;
         if (anyPressed(Keys.W, Keys.A, Keys.S, Keys.D)) {
             camera.vel.setZero();
             if (anyPressed(Keys.Q, Keys.E, Keys.SPACE, Keys.C)) {
                 camera.setGamepadInput(false);
             }
+            result = true;
         }
 
         if (isKeyPressed(Keys.W)) {
-            camera.forward(1f * keySensitivity * multiplier, minTranslateUnits);
+            camera.forward(keySensitivity * multiplier, minTranslateUnits);
+            result = true;
         } else if (isKeyPressed(Keys.S)) {
-            camera.forward(-1f * keySensitivity * multiplier, minTranslateUnits);
+            camera.forward(-keySensitivity * multiplier, minTranslateUnits);
+            result = true;
         }
 
         if (isKeyPressed(Keys.D)) {
-            camera.strafe(1f * keySensitivity * multiplier, minTranslateUnits);
-        } else if (isKeyPressed(Keys.A)) {
-            camera.strafe(-1f * keySensitivity * multiplier, minTranslateUnits);
+            camera.strafe(keySensitivity * multiplier, minTranslateUnits);
+            result = true;
+        }else if (isKeyPressed(Keys.A)) {
+            camera.strafe(-keySensitivity * multiplier, minTranslateUnits);
+            result = true;
         }
 
         if (isKeyPressed(Keys.Q)) {
-            camera.addRoll(1f * keySensitivity, true);
+            camera.addRoll(keySensitivity, true);
+            result = true;
         } else if (isKeyPressed(Keys.E)) {
-            camera.addRoll(-1f * keySensitivity, true);
+            camera.addRoll(-keySensitivity, true);
+            result = true;
         }
 
         if (isKeyPressed(Keys.SPACE)) {
-            camera.vertical(1f * keySensitivity * multiplier, minTranslateUnits);
+            camera.vertical(keySensitivity * multiplier, minTranslateUnits);
+            result = true;
         } else if (isKeyPressed(Keys.C)) {
-            camera.vertical(-1f * keySensitivity * multiplier, minTranslateUnits);
+            camera.vertical(-keySensitivity * multiplier, minTranslateUnits);
+            result = true;
         }
-
+        return result;
     }
 
     @Override
@@ -88,11 +98,12 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public void activate() {
+        super.activate();
         GaiaSky.postRunnable(() -> {
             camera.setDiverted(true);
-            // Capture mouse
+            // Capture mouse.
             setMouseCapture(true);
-            // Unfocus
+            // Unfocus camera.
             GaiaSky.instance.mainGui.getGuiStage().unfocusAll();
 
             ModePopupInfo mpi = new ModePopupInfo();
@@ -116,6 +127,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public void deactivate() {
+        super.deactivate();
         // Release mouse
         setMouseCapture(false);
         EventManager.publish(Event.MODE_POPUP_CMD, this, null, "gamemode");
@@ -148,36 +160,40 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        float dt = Gdx.graphics.getDeltaTime() * 2e2f;
-        float x = screenX;
-        float y = screenY;
-        float mouseXSensitivity = 1f / dt;
-        float mouseYSensitivity = -1f / dt;
-        if (!prevValid) {
-            updatePreviousMousePosition(x, y);
-            prevValid = true;
-        }
-        float limit = 17f;
-        dx = MathUtils.clamp(lowPass(mouseXSensitivity * (x - prevX), dx, 14f), -limit, limit);
-        dy = MathUtils.clamp(lowPass(mouseYSensitivity * (y - prevY), dy, 14f), -limit, limit);
-        camera.addYaw(dx, true);
-        camera.addPitch(dy, true);
+        if (isActive()) {
+            float dt = Gdx.graphics.getDeltaTime() * 2e2f;
+            float mouseXSensitivity = 1f / dt;
+            float mouseYSensitivity = -1f / dt;
+            if (!prevValid) {
+                updatePreviousMousePosition((float) screenX, (float) screenY);
+                prevValid = true;
+            }
+            float limit = 17f;
+            dx = MathUtils.clamp(lowPass(mouseXSensitivity * ((float) screenX - prevX), dx, 14f), -limit, limit);
+            dy = MathUtils.clamp(lowPass(mouseYSensitivity * ((float) screenY - prevY), dy, 14f), -limit, limit);
+            camera.addYaw(dx, true);
+            camera.addPitch(dy, true);
 
-        updatePreviousMousePosition(x, y);
-        camera.setGamepadInput(false);
-        return true;
+            updatePreviousMousePosition((float) screenX, (float) screenY);
+            camera.setGamepadInput(false);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean touchUp(float x, float y, int pointer, int button) {
-        if (button == Input.Buttons.RIGHT) {
-            int w = Gdx.graphics.getWidth();
-            int h = Gdx.graphics.getHeight();
-            Gdx.input.setCursorPosition(w / 2, h / 2);
-            prevX = w / 2;
-            prevY = h / 2;
+        if (isActive()) {
+            if (button == Input.Buttons.RIGHT) {
+                int w = Gdx.graphics.getWidth();
+                int h = Gdx.graphics.getHeight();
+                Gdx.input.setCursorPosition(w / 2, h / 2);
+                prevX = w / 2;
+                prevY = h / 2;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     private void setMouseCapture(boolean state) {
@@ -196,12 +212,8 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case MOUSE_CAPTURE_CMD:
-            setMouseCapture((Boolean) data[0]);
-            break;
-        case MOUSE_CAPTURE_TOGGLE:
-            toggleMouseCapture();
-            break;
+        case MOUSE_CAPTURE_CMD -> setMouseCapture((Boolean) data[0]);
+        case MOUSE_CAPTURE_TOGGLE -> toggleMouseCapture();
         }
     }
 }

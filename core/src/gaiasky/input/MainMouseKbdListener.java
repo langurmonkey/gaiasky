@@ -121,11 +121,14 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
         @Override
         public boolean zoom(float initialDistance, float distance) {
-            float newZoom = distance - initialDistance;
-            float amount = newZoom - previousZoom;
-            previousZoom = newZoom;
-            float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
-            return inputListener.zoom(amount / (Math.min(w, h)));
+            if (inputListener.isActive()) {
+                float newZoom = distance - initialDistance;
+                float amount = newZoom - previousZoom;
+                previousZoom = newZoom;
+                float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
+                return inputListener.zoom(amount / (Math.min(w, h)));
+            }
+            return false;
         }
 
         @Override
@@ -241,145 +244,154 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (Settings.settings.runtime.inputEnabled) {
-            touched |= (1 << pointer);
-            multiTouch = !MathUtils.isPowerOfTwo(touched);
-            if (multiTouch)
-                this.button = -1;
-            else if (this.button < 0) {
-                startX = screenX;
-                startY = screenY;
-                gesture.set(startX, startY);
-                this.button = button;
-            }
-            if (button == Buttons.RIGHT) {
-                // Select keyframes.
-                if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected())) {
-                    FocusView hit;
-                    keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
-                    if (keyframeBeingDragged) {
-                        // FOCUS_MODE, do not center.
-                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit.getEntity(), false);
-                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, false);
+        if (isActive()) {
+            if (Settings.settings.runtime.inputEnabled) {
+                touched |= (1 << pointer);
+                multiTouch = !MathUtils.isPowerOfTwo(touched);
+                if (multiTouch)
+                    this.button = -1;
+                else if (this.button < 0) {
+                    startX = screenX;
+                    startY = screenY;
+                    gesture.set(startX, startY);
+                    this.button = button;
+                }
+                if (button == Buttons.RIGHT) {
+                    // Select keyframes.
+                    if (!(anyPressed(Keys.ALT_LEFT, Keys.SHIFT_LEFT, Keys.CONTROL_LEFT) && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected())) {
+                        FocusView hit;
+                        keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
+                        if (keyframeBeingDragged) {
+                            // FOCUS_MODE, do not center.
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit.getEntity(), false);
+                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, false);
+                        }
                     }
                 }
             }
+            camera.setGamepadInput(false);
+            return super.touchDown(screenX, screenY, pointer, button);
         }
-        camera.setGamepadInput(false);
-        return super.touchDown(screenX, screenY, pointer, button);
+        return false;
     }
 
     @Override
     public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
-        EventManager.publish(Event.INPUT_EVENT, this, button);
-        if (Settings.settings.runtime.inputEnabled) {
-            touched &= ~(1 << pointer);
-            multiTouch = !MathUtils.isPowerOfTwo(touched);
-            if (button == this.button && button == leftMouseButton) {
-                final long currentTime = TimeUtils.millis();
-                final long lastLeftTime = lastClickTime;
+        if (isActive()) {
+            EventManager.publish(Event.INPUT_EVENT, this, button);
+            if (Settings.settings.runtime.inputEnabled) {
+                touched &= ~(1 << pointer);
+                multiTouch = !MathUtils.isPowerOfTwo(touched);
+                if (button == this.button && button == leftMouseButton) {
+                    final long currentTime = TimeUtils.millis();
+                    final long lastLeftTime = lastClickTime;
 
-                GaiaSky.postRunnable(() -> {
-                    // 5% of width pixels distance.
-                    if (!Settings.settings.scene.camera.cinematic || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
-                        boolean stopped = camera.stopMovement();
-                        boolean focusRemoved = GaiaSky.instance.mainGui != null && GaiaSky.instance.mainGui.cancelTouchFocus();
-                        boolean doubleClick = currentTime - lastLeftTime < doubleClickTime;
-                        gesture.set(0, 0);
+                    GaiaSky.postRunnable(() -> {
+                        // 5% of width pixels distance.
+                        if (!Settings.settings.scene.camera.cinematic || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
+                            boolean stopped = camera.stopMovement();
+                            boolean focusRemoved = GaiaSky.instance.mainGui != null && GaiaSky.instance.mainGui.cancelTouchFocus();
+                            boolean doubleClick = currentTime - lastLeftTime < doubleClickTime;
+                            gesture.set(0, 0);
 
-                        if (doubleClick && !stopped && !focusRemoved) {
-                            // Select star, if any
-                            Entity hit = getBestHit(screenX, screenY);
-                            if (hit != null) {
-                                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
-                                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+                            if (doubleClick && !stopped && !focusRemoved) {
+                                // Select star, if any
+                                Entity hit = getBestHit(screenX, screenY);
+                                if (hit != null) {
+                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
+                                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+                                }
                             }
                         }
-                    }
-                });
-                dragDx = 0;
-                dragDy = 0;
-                lastClickTime = currentTime;
-            } else if (button == this.button && button == rightMouseButton) {
-                if (keyframeBeingDragged) {
-                    keyframeBeingDragged = false;
-                } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
-                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
-                    Objects.requireNonNull(getKeyframesPathObject()).unselect();
-                } else {
-                    // Ensure Octants observed property is computed
-                    GaiaSky.postRunnable(() -> {
-                        // 5% of width pixels distance
-                        if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && !Settings.settings.program.modeStereo.active) {
-                            // Stop
-                            camera.setYaw(0);
-                            camera.setPitch(0);
-
-                            // Right click, context menu
-                            Entity hit = getBestHit(screenX, screenY);
-                            EventManager.publish(Event.POPUP_MENU_FOCUS, this, hit, screenX, screenY);
-                        }
                     });
-                    camera.setHorizontal(0);
-                    camera.setVertical(0);
+                    dragDx = 0;
+                    dragDy = 0;
+                    lastClickTime = currentTime;
+                } else if (button == this.button && button == rightMouseButton) {
+                    if (keyframeBeingDragged) {
+                        keyframeBeingDragged = false;
+                    } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
+                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+                        Objects.requireNonNull(getKeyframesPathObject()).unselect();
+                    } else {
+                        // Ensure Octants observed property is computed
+                        GaiaSky.postRunnable(() -> {
+                            // 5% of width pixels distance
+                            if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && !Settings.settings.program.modeStereo.active) {
+                                // Stop
+                                camera.setYaw(0);
+                                camera.setPitch(0);
+
+                                // Right click, context menu
+                                Entity hit = getBestHit(screenX, screenY);
+                                EventManager.publish(Event.POPUP_MENU_FOCUS, this, hit, screenX, screenY);
+                            }
+                        });
+                        camera.setHorizontal(0);
+                        camera.setVertical(0);
+                    }
                 }
+
+                // Remove keyboard focus from GUI elements
+                EventManager.instance.notify(Event.REMOVE_KEYBOARD_FOCUS, this);
+
+                this.button = -1;
             }
-
-            // Remove keyboard focus from GUI elements
-            EventManager.instance.notify(Event.REMOVE_KEYBOARD_FOCUS, this);
-
-            this.button = -1;
+            camera.setGamepadInput(false);
+            return super.touchUp(screenX, screenY, pointer, button);
         }
-        camera.setGamepadInput(false);
-        return super.touchUp(screenX, screenY, pointer, button);
+        return false;
     }
 
     protected boolean processDrag(int screenX, int screenY, double deltaX, double deltaY, int button) {
-        boolean accel = Settings.settings.scene.camera.cinematic;
-        if (accel) {
-            dragDx = deltaX;
-            dragDy = deltaY;
-        } else {
-            currentDrag.set((float) deltaX, (float) deltaY);
-            // Check orientation of last vs current
-            if (Math.abs(currentDrag.angleDeg(lastDrag)) > 90) {
-                // Reset
-                dragDx = 0;
-                dragDy = 0;
-            }
-
-            dragDx = lowPass(dragDx, deltaX * noAccelFactor, noAccelSmoothing);
-            dragDy = lowPass(dragDy, deltaY * noAccelFactor, noAccelSmoothing);
-            // Update last drag
-            lastDrag.set(currentDrag);
-        }
-
-        if (button == leftMouseButton) {
-            if (isKeyPressed(rollKey)) {
-                if (dragDx != 0)
-                    camera.addRoll(dragDx, accel);
+        if (isActive()) {
+            boolean accel = Settings.settings.scene.camera.cinematic;
+            if (accel) {
+                dragDx = deltaX;
+                dragDy = deltaY;
             } else {
-                camera.addRotateMovement(dragDx, dragDy, false, accel);
-            }
-        } else if (button == rightMouseButton) {
-            if (keyframeBeingDragged || (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT, Keys.ALT_LEFT))) {
-                // Drag keyframe
-                dragKeyframe(screenX, screenY, dragDx, dragDy);
-            } else {
-                if (camera.getMode().isFree()) {
-                    // Strafe (pan)
-                    camera.setHorizontal(-dragDx * 5f);
-                    camera.setVertical(-dragDy * 5f);
-                } else {
-                    // Look around
-                    camera.addRotateMovement(dragDx, dragDy, true, accel);
+                currentDrag.set((float) deltaX, (float) deltaY);
+                // Check orientation of last vs current
+                if (Math.abs(currentDrag.angleDeg(lastDrag)) > 90) {
+                    // Reset
+                    dragDx = 0;
+                    dragDy = 0;
                 }
+
+                dragDx = lowPass(dragDx, deltaX * noAccelFactor, noAccelSmoothing);
+                dragDy = lowPass(dragDy, deltaY * noAccelFactor, noAccelSmoothing);
+                // Update last drag
+                lastDrag.set(currentDrag);
             }
-        } else if (button == middleMouseButton) {
-            if (dragDx != 0)
-                camera.addForwardForce(dragDx);
+
+            if (button == leftMouseButton) {
+                if (isKeyPressed(rollKey)) {
+                    if (dragDx != 0)
+                        camera.addRoll(dragDx, accel);
+                } else {
+                    camera.addRotateMovement(dragDx, dragDy, false, accel);
+                }
+            } else if (button == rightMouseButton) {
+                if (keyframeBeingDragged || (getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT, Keys.ALT_LEFT))) {
+                    // Drag keyframe
+                    dragKeyframe(screenX, screenY, dragDx, dragDy);
+                } else {
+                    if (camera.getMode().isFree()) {
+                        // Strafe (pan)
+                        camera.setHorizontal(-dragDx * 5f);
+                        camera.setVertical(-dragDy * 5f);
+                    } else {
+                        // Look around
+                        camera.addRotateMovement(dragDx, dragDy, true, accel);
+                    }
+                }
+            } else if (button == middleMouseButton) {
+                if (dragDx != 0)
+                    camera.addForwardForce(dragDx);
+            }
+            camera.setGamepadInput(false);
+            return false;
         }
-        camera.setGamepadInput(false);
         return false;
     }
 
@@ -389,23 +401,28 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (Settings.settings.runtime.inputEnabled) {
-            boolean result = super.touchDragged(screenX, screenY, pointer);
-            if (result || this.button < 0)
-                return result;
-            final double deltaX = (screenX - startX) / Gdx.graphics.getWidth();
-            final double deltaY = (startY - screenY) / Gdx.graphics.getHeight();
-            startX = screenX;
-            startY = screenY;
-            return processDrag(screenX, screenY, deltaX, deltaY, button);
+        if(isActive()) {
+            if (Settings.settings.runtime.inputEnabled) {
+                boolean result = super.touchDragged(screenX, screenY, pointer);
+                if (result || this.button < 0)
+                    return result;
+                final double deltaX = (screenX - startX) / Gdx.graphics.getWidth();
+                final double deltaY = (startY - screenY) / Gdx.graphics.getHeight();
+                startX = screenX;
+                startY = screenY;
+                return processDrag(screenX, screenY, deltaX, deltaY, button);
+            }
+            return false;
         }
         return false;
     }
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        if (Settings.settings.runtime.inputEnabled) {
-            return zoom(amountY * scrollFactor);
+        if(isActive()) {
+            if (Settings.settings.runtime.inputEnabled) {
+                return zoom(amountY * scrollFactor);
+            }
         }
         return false;
     }
@@ -418,35 +435,33 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     }
 
     @Override
-    public void update() {
+    public boolean pollKeys() {
+        boolean result = false;
         if (isKeyPressed(Keys.UP)) {
             camera.addForwardForce(1.0f);
+            result = true;
         }
         if (isKeyPressed(Keys.DOWN)) {
             camera.addForwardForce(-1.0f);
+            result = true;
         }
         if (isKeyPressed(Keys.RIGHT)) {
-            if (camera.getMode().isFocus())
+            if (camera.getMode().isFocus()) {
                 camera.addHorizontal(-1.0f, true);
-            else
+            } else {
                 camera.addYaw(1.0f, true);
+            }
+            result = true;
         }
         if (isKeyPressed(Keys.LEFT)) {
-            if (camera.getMode().isFocus())
+            if (camera.getMode().isFocus()) {
                 camera.addHorizontal(1.0f, true);
-            else
+            } else {
                 camera.addYaw(-1.0f, true);
+            }
+            result = true;
         }
-    }
-
-    @Override
-    public void activate() {
-
-    }
-
-    @Override
-    public void deactivate() {
-
+        return result;
     }
 
     @Override

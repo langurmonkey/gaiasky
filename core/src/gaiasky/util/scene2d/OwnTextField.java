@@ -189,4 +189,16 @@ public class OwnTextField extends TextField {
         }
     }
 
+    @Override
+    public void moveCursor(boolean forward, boolean jump) {
+        super.moveCursor(forward, jump);
+    }
+
+    public void goHome (boolean jump) {
+        cursor = 0;
+    }
+
+    public void goEnd (boolean jump) {
+        cursor = text.length();
+    }
 }

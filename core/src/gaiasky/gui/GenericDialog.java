@@ -5,7 +5,10 @@
 
 package gaiasky.gui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
@@ -19,10 +22,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.input.AbstractGamepadListener;
+import gaiasky.input.AbstractMouseKbdListener;
 import gaiasky.input.WindowGamepadListener;
+import gaiasky.input.WindowKbdListener;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.scene2d.CollapsibleWindow;
@@ -30,6 +36,7 @@ import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.Separator;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
@@ -58,6 +65,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     private String acceptText = null, cancelText = null;
     private String acceptStyle = "default", cancelStyle = "default";
     protected boolean modal = true;
+    protected boolean defaultMouseKbdListener = true;
     protected boolean defaultGamepadListener = true;
 
     protected float lastPosX = -1, lastPosY = -1;
@@ -70,6 +78,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected Runnable acceptRunnable, cancelRunnable;
 
     private Actor previousKeyboardFocus, previousScrollFocus;
+
+    // Specific mouse/keyboard listener, if any.
+    protected AbstractMouseKbdListener mouseKbdListener;
 
     // The gamepad listener for this window, if any.
     protected AbstractGamepadListener gamepadListener;
@@ -332,9 +343,13 @@ public abstract class GenericDialog extends CollapsibleWindow {
         // Modal.
         setModal(this.modal);
 
+        // Add default mouse/kdb listener
+        if (defaultMouseKbdListener) {
+            mouseKbdListener = new WindowKbdListener(this);
+        }
         // Add default gamepad listener.
         if (defaultGamepadListener) {
-            gamepadListener = new WindowGamepadListener(Settings.settings.controls.gamepad.mappingsFile, stage, this);
+            gamepadListener = new WindowGamepadListener(Settings.settings.controls.gamepad.mappingsFile, this);
         }
     }
 
@@ -353,7 +368,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
             acceptRunnable.run();
         }
         if (close) {
-            removeGamepadListener();
+            removeOwnListeners();
             me.hide();
         }
     }
@@ -366,7 +381,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (cancelRunnable != null) {
             cancelRunnable.run();
         }
-        removeGamepadListener();
+        removeOwnListeners();
         me.hide();
     }
 
@@ -407,7 +422,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (action != null)
             addAction(action);
 
-        addGamepadListener();
+        addOwnListeners();
         touch();
 
         if (this.modal)
@@ -496,7 +511,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         } else
             remove();
 
-        removeGamepadListener();
+        removeOwnListeners();
 
         if (this.modal)
             // Enable input
@@ -568,10 +583,28 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
     }
 
+    // Backup active mouse/keyboard listeners before entering this dialog.
+    protected Set<AbstractMouseKbdListener> backupMouseKbdListeners = new HashSet<>();
     // Backup of the gamepad listeners present before entering this dialog.
     protected Set<ControllerListener> backupGamepadListeners = null;
 
-    private void addGamepadListener() {
+    private void addOwnListeners() {
+        if (mouseKbdListener != null) {
+            var inputProcessor = Gdx.input.getInputProcessor();
+            if (inputProcessor instanceof InputMultiplexer) {
+                InputMultiplexer inputMultiplexer = (InputMultiplexer) inputProcessor;
+                for (var processor : inputMultiplexer.getProcessors()) {
+                    if (processor instanceof AbstractMouseKbdListener) {
+                        var abstractMouseKbdListener = (AbstractMouseKbdListener) processor;
+                        if (abstractMouseKbdListener.isActive()) {
+                            abstractMouseKbdListener.deactivate();
+                            backupMouseKbdListeners.add(abstractMouseKbdListener);
+                        }
+                    }
+                }
+                inputMultiplexer.addProcessor(0, mouseKbdListener);
+            }
+        }
         if (gamepadListener != null) {
             GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
             // Backup and clean
@@ -583,7 +616,18 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
     }
 
-    private void removeGamepadListener() {
+    private void removeOwnListeners() {
+        if (mouseKbdListener != null) {
+            var inputProcessor = Gdx.input.getInputProcessor();
+            if (inputProcessor instanceof InputMultiplexer) {
+                InputMultiplexer inputMultiplexer = (InputMultiplexer) inputProcessor;
+                inputMultiplexer.removeProcessor(mouseKbdListener);
+                for (var abstractMouseKbdListener : backupMouseKbdListeners) {
+                    abstractMouseKbdListener.activate();
+                }
+                backupMouseKbdListeners.clear();
+            }
+        }
         if (gamepadListener != null) {
             GamepadSettings gamepadSettings = Settings.settings.controls.gamepad;
             // Remove current listener
@@ -633,6 +677,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
         if (gamepadListener != null && gamepadListener.isActive()) {
             gamepadListener.update();
         }
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 
 }

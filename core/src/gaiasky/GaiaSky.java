@@ -470,7 +470,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         welcomeGui = new WelcomeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, skipWelcome, vrStatus);
         welcomeGui.initialize(assetManager, globalResources.getSpriteBatch());
-        Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
+        inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(welcomeGui.getGuiStage());
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (settings.runtime.openVr) {
             welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, (int) (settings.graphics.backBufferResolution[0] / 2f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
@@ -629,8 +631,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         scene.prepareUpdateSystems(sceneRenderer);
 
         // Initialize input multiplexer to handle various input processors.
+        inputMultiplexer.clear();
         guiRegistry = new GuiRegistry(this.globalResources.getSkin(), this.scene, this.catalogManager);
-        inputMultiplexer = new InputMultiplexer();
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
