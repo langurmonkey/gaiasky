@@ -6,17 +6,17 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.gui.GenericDialog;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.Link;
-import gaiasky.util.scene2d.OwnImageButton;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 
 public class GuiUtils {
 
@@ -201,4 +201,122 @@ public class GuiUtils {
         return getTooltipHorizontalGroup(actor, I18n.msg(key), 12.8f, skin);
     }
 
+    /**
+     * Moves the slider up or down by the given percentage.
+     *
+     * @param up      Whether to move it up.
+     * @param percent The percentage in [0,1].
+     * @param slider  The slider to move.
+     */
+    public static void sliderMove(boolean up, float percent, OwnSliderPlus slider) {
+        float max = slider.getMaxValue();
+        float min = slider.getMinValue();
+        float val = slider.getValue();
+        float inc = (max - min) * percent;
+        slider.setValue(MathUtils.clamp(val + (up ? inc : -inc), min, max));
+    }
+
+    /**
+     * Gets the first scroll pane contained in the given actor by
+     * traversing it recursively, if it exists.
+     *
+     * @param actor The container actor.
+     *
+     * @return The first scroll pane found, or null if none is found.
+     */
+    public static ScrollPane getScrollPaneIn(Actor actor) {
+        if (actor instanceof ScrollPane) {
+            return (ScrollPane) actor;
+        } else if (actor instanceof WidgetGroup) {
+            var group = (WidgetGroup) actor;
+            var children = group.getChildren();
+            for (var child : children) {
+                ScrollPane scroll;
+                if ((scroll = getScrollPaneIn(child)) != null) {
+                    return scroll;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get all the input widgets in the given container actor by traversing it
+     * recursively.
+     *
+     * @param actor The actor.
+     * @param list  The list with all the input widgets in the actor.
+     *
+     * @return The input list.
+     */
+    public static Array<Actor> getInputWidgets(Actor actor, Array<Actor> list) {
+        if (actor != null) {
+            if (isInputWidget(actor) && isNotDisabled(actor) && !isTooltipWidget(actor)) {
+                list.add(actor);
+            } else if (actor instanceof WidgetGroup) {
+                getInputWidgetsInGroup((WidgetGroup) actor, list);
+            }
+        }
+        return list;
+    }
+
+    private static void getInputWidgetsInGroup(WidgetGroup actor, Array<Actor> list) {
+        var children = actor.getChildren();
+        for (var child : children) {
+            getInputWidgets(child, list);
+        }
+    }
+
+    /**
+     * Check if the given actor is an input widget.
+     *
+     * @param actor The actor.
+     *
+     * @return True if the actor is an input widget.
+     */
+    public static boolean isInputWidget(Actor actor) {
+        return actor instanceof SelectBox ||
+                actor instanceof TextField ||
+                actor instanceof Button ||
+                actor instanceof Slider;
+    }
+
+    /**
+     * Check if the given actor is a tooltip widget.
+     *
+     * @param actor The actor.
+     *
+     * @return True if the actor is a tooltip widget.
+     */
+    public static boolean isTooltipWidget(Actor actor) {
+        return actor instanceof OwnImageButton && ((OwnImageButton) actor).getStyle().imageUp.toString().contains("tooltip");
+    }
+
+    /**
+     * Check if the actor is not disabled.
+     *
+     * @param actor The actor.
+     *
+     * @return True if the actor is not disabled.
+     */
+    public static boolean isNotDisabled(Actor actor) {
+        return !(actor instanceof Disableable) || !((Disableable) actor).isDisabled();
+    }
+
+    /**
+     * Check if the actor currently has a change listener attached.
+     *
+     * @param actor The actor.
+     *
+     * @return True if the actor has a change listener.
+     */
+    public static boolean hasChangeListener(Actor actor) {
+        var listeners = actor.getListeners();
+        for (var listener : listeners) {
+            if (listener instanceof ChangeListener) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

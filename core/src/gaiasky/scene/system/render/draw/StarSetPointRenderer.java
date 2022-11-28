@@ -68,7 +68,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
         utils = new ParticleUtils();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_BASE_LEVEL_CMD, Event.GPU_DISPOSE_STAR_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -266,7 +266,7 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
+        case STAR_BASE_LEVEL_CMD -> opacityLimits[0] = (float) data[0];
         case GPU_DISPOSE_STAR_GROUP -> {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);

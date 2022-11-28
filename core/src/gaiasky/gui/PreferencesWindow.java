@@ -1728,7 +1728,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.serverDataDescriptor != null || DataDescriptor.localDataDescriptor != null) {
                     DataDescriptor dd = DataDescriptor.serverDataDescriptor != null ? DataDescriptor.serverDataDescriptor : DataDescriptor.localDataDescriptor;
-                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
+                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, I18n.msg("gui.save"));
                     ddw.setModal(true);
                     ddw.show(stage);
                 } else {

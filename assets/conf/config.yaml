@@ -94,33 +94,36 @@ scene:
     # 17 - 1000 pc/s
     # 18 - No limit
     speedLimitIndex: 18
-    # Camera speed multiplier
+    # Camera speed multiplier.
     speed: 10.0
-    # Camera turn velocity
+    # Camera turn velocity.
     turn: 3000.0
-    # Camera rotation
+    # Camera rotation.
     rotate: 5000.0
-    # Field of view in degrees
+    # Field of view in degrees.
     fov: 45.0
     # Cinematic camera
     cinematic: false
     # Target on in free mode. This scales the velocity of the camera according
-    # to the distance to the closest object
+    # to the distance to the closest object.
     targetMode: true
-    # Focus lock configuration, when camera is in focus mode
+    # Focus lock configuration, when camera is in focus mode.
     focusLock:
-      # Lock camera position to focus position
+      # Lock camera position to focus position.
       position: true
-      # Lock camera position to focus orientation
+      # Lock camera position to focus orientation.
       orientation: false
-  # Star settings
+  # Star settings.
   star:
-    # Star brightness factor
+    # Star brightness factor.
     brightness: 2.0
-    # Modulate the brightness of stars with this power
+    # Modulate the brightness of stars with this power.
     power: 0.75
-    # Size scaling of stars
+    # Size scaling of stars.
     pointSize: 8.2
+    # Control the glow amount when close to stars.
+    # Should be set rather low, i.e., in [0.01, 0.5].
+    glowFactor: 0.06
     # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png
     # 1 - horizontal spike
     # 2 - god rays

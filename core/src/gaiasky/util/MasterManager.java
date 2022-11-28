@@ -120,7 +120,7 @@ public class MasterManager implements IObserver {
         http = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 
         // Subscribe to events that need to be broadcast
-        EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_MIN_OPACITY_CMD, Event.STAR_POINT_SIZE_CMD, Event.DISPOSE);
+        EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BASE_LEVEL_CMD, Event.STAR_POINT_SIZE_CMD, Event.DISPOSE);
     }
 
     /**
@@ -299,7 +299,7 @@ public class MasterManager implements IObserver {
                 i++;
             }
             break;
-        case STAR_MIN_OPACITY_CMD:
+        case STAR_BASE_LEVEL_CMD:
             float opacity = (float) data[0];
             String sop = Float.toString(opacity);
             i = 0;

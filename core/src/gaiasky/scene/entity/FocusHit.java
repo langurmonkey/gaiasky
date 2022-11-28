@@ -195,8 +195,8 @@ public class FocusHit {
 
     private double computeHitSolidAngleStar(FocusView view, float fovFactor) {
         double solidAngle = view.getSolidAngle();
-        if (solidAngle > Constants.THRESHOLD_DOWN / fovFactor && solidAngle < Constants.THRESHOLD_UP / fovFactor) {
-            return 20f * Constants.THRESHOLD_DOWN / fovFactor;
+        if (solidAngle > Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor && solidAngle < Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP / fovFactor) {
+            return 20f * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor;
         }
         return solidAngle;
     }

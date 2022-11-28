@@ -7,7 +7,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.beust.jcommander.internal.Sets;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -481,6 +480,11 @@ public class Settings {
             public float brightness;
             public float power;
             public float pointSize;
+            /**
+             * When close to the stars, this factor controls the amount of glow.
+             * It should be set rather low, i.e., in [0.01,0.2].
+             **/
+            public double glowFactor = 0.06;
             @JsonIgnore private float pointSizeBak;
             public float[] opacity;
             public int textureIndex;
@@ -488,7 +492,7 @@ public class Settings {
             public ThresholdSettings threshold;
 
             public StarSettings() {
-                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD, Event.STAR_MIN_OPACITY_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
+                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD, Event.STAR_BASE_LEVEL_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.BILLBOARD_TEXTURE_IDX_CMD);
             }
 
             @JsonIgnore
@@ -566,7 +570,7 @@ public class Settings {
                 case STAR_POINT_SIZE_RESET_CMD:
                     this.pointSize = pointSizeBak;
                     break;
-                case STAR_MIN_OPACITY_CMD:
+                case STAR_BASE_LEVEL_CMD:
                     opacity[0] = (float) data[0];
                     break;
                 case STAR_GROUP_BILLBOARD_CMD:
@@ -585,6 +589,9 @@ public class Settings {
                     break;
                 case STAR_BRIGHTNESS_POW_CMD:
                     power = (float) data[0];
+                    break;
+                case STAR_GLOW_FACTOR_CMD:
+                    glowFactor = (float) data[0];
                     break;
                 }
             }

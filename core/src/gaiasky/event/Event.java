@@ -1187,9 +1187,13 @@ public enum Event {
      **/
     STAR_BRIGHTNESS_POW_CMD,
     /**
+     * Contains the star glow factor.
+     **/
+    STAR_GLOW_FACTOR_CMD,
+    /**
      * Minimum star opacity. Contains the opacity in [0,1].
      **/
-    STAR_MIN_OPACITY_CMD,
+    STAR_BASE_LEVEL_CMD,
     /**
      * Set a new value for the star point size.
      **/

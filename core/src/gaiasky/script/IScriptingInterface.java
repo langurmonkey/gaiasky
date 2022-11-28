@@ -1011,6 +1011,14 @@ public interface IScriptingInterface {
     void setStarBrightnessPower(float power);
 
     /**
+     * Sets the star glow factor level value. This controls the amount of glow light
+     * when the camera is close to stars. Must be between {@link Constants#MIN_STAR_GLOW_FACTOR} and {@link Constants#MAX_STAR_GLOW_FACTOR}.
+     * Default is 0.06.
+     * @param glowFactor The new glow factor value.
+     */
+    void setStarGlowFactor(float glowFactor);
+
+    /**
      * Gets the current star size value in pixels.
      *
      * @return The size value, in pixels.
@@ -2209,11 +2217,20 @@ public interface IScriptingInterface {
     void setMotionBlur(boolean state);
 
     /**
-     * Enables or disables the star glow effect.
+     * Enables or disables the stars glowing over objects.
      *
      * @param state Activate (true) or deactivate (false).
+     * @deprecated Use {@link #setStarGlowOverObjects(boolean)} instead.
      */
+    @Deprecated
     void setStarGlow(boolean state);
+
+    /**
+     * Enables or disables stars' light glowing and spilling over closer objects.
+     *
+     * @param state Enable (true) or disable (false).
+     */
+    void setStarGlowOverObjects(boolean state);
 
     /**
      * Sets the strength value for the bloom effect.

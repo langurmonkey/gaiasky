@@ -187,7 +187,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         panes.put(visibilityComponent.getClass().getSimpleName(), visibility);
 
         /* ----LIGHTING GROUP---- */
-        VisualEffectsComponent visualSettingsComponent = new VisualEffectsComponent(skin, ui);
+        VisualSettingsComponent visualSettingsComponent = new VisualSettingsComponent(skin, ui);
         visualSettingsComponent.initialize();
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.lighting");

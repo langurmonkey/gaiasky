@@ -1015,6 +1015,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    @Override
+    public void setStarGlowFactor(float glowFactor) {
+        if (checkNum(glowFactor, 0.001, 5, "glow-factor")) {
+            em.post(Event.STAR_GLOW_FACTOR_CMD, this, glowFactor);
+        }
+    }
+
     public void setStarBrightness(final int brightness) {
         setStarBrightness((float) brightness);
     }
@@ -1051,7 +1058,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarMinOpacity(float minOpacity) {
         if (checkNum(minOpacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
-            EventManager.publish(Event.STAR_MIN_OPACITY_CMD, this, minOpacity);
+            EventManager.publish(Event.STAR_BASE_LEVEL_CMD, this, minOpacity);
     }
 
     public void setMinStarOpacity(float minOpacity) {
@@ -2673,6 +2680,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStarGlow(boolean state) {
+        setStarGlowOverObjects(state);
+    }
+
+    @Override
+    public void setStarGlowOverObjects(boolean state) {
         postRunnable(() -> em.post(Event.LIGHT_GLOW_CMD, this, state));
     }
 

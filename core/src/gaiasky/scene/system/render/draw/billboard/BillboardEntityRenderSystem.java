@@ -18,6 +18,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 
 public class BillboardEntityRenderSystem implements IObserver {
@@ -29,14 +30,14 @@ public class BillboardEntityRenderSystem implements IObserver {
 
     private final ParticleUtils utils;
 
-    protected float thpointTimesFovfactor;
-    protected float thupOverFovfactor;
-    protected float thdownOverFovfactor;
+    protected float solidAngleThresholdTopOverFovFactor;
+    protected float solidAngleThresholdBottomOverFovFactor;
     protected float fovFactor;
 
     public BillboardEntityRenderSystem() {
         utils = new ParticleUtils();
         EventManager.instance.subscribe(this, Event.FOV_CHANGE_NOTIFICATION);
+        initRenderAttributes();
     }
 
     private void initRenderAttributes() {
@@ -45,10 +46,8 @@ public class BillboardEntityRenderSystem implements IObserver {
         } else {
             fovFactor = 1f;
         }
-        Settings settings = Settings.settings;
-        thpointTimesFovfactor = (float) settings.scene.star.threshold.point;
-        thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
-        thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
+        solidAngleThresholdTopOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP / fovFactor;
+        solidAngleThresholdBottomOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor;
     }
 
     public float getRenderSizeBillboardGalaxy(ICamera camera, Body body, ModelScaffolding scaffolding) {
@@ -81,21 +80,21 @@ public class BillboardEntityRenderSystem implements IObserver {
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
 
-    private void renderCloseupStar(StarSet set, Highlight highlight, DatasetDescription desc, int idx, float fovFactor, Vector3d cPosD, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, double thUpOverFovFactor, double thDownOverFovFactor, float alpha) {
+    private void renderCloseUpStar(StarSet set, Highlight highlight, DatasetDescription desc, int idx, float fovFactor, Vector3d cPosD, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, float alpha) {
         if (utils.filter(idx, set, desc) && set.isVisible(idx)) {
             IParticleRecord star = set.pointData.get(idx);
             double varScl = utils.getVariableSizeScaling(set, idx);
 
-            double sizeOriginal = set.getSize(idx);
-            double size = sizeOriginal * varScl;
-            double radius = size * Constants.STAR_SIZE_FACTOR;
+            double size = set.getSize(idx);
+            double sizeVar = size * varScl;
+            double radius = sizeVar * Constants.STAR_SIZE_FACTOR;
             Vector3d starPos = set.fetchPosition(star, cPosD, D31, set.currDeltaYears);
             double distToCamera = starPos.len();
-            double viewAngle = (sizeOriginal * Constants.STAR_SIZE_FACTOR / distToCamera) / fovFactor;
+            double solidAngle = (size * Constants.STAR_SIZE_FACTOR / distToCamera);
 
             Color.abgr8888ToColor(c, utils.getColor(idx, set, highlight));
-            if (viewAngle >= thPointTimesFovFactor) {
-                double fuzzySize = getRenderSizeStarSet(sizeOriginal, radius, distToCamera, viewAngle, thDownOverFovFactor, thUpOverFovFactor);
+            if (solidAngle >= thPointTimesFovFactor) {
+                double fuzzySize = getRenderSizeStarSet(size, radius, distToCamera, solidAngle);
 
                 Vector3 pos = starPos.put(F31);
                 shader.setUniformf("u_pos", pos);
@@ -103,7 +102,7 @@ public class BillboardEntityRenderSystem implements IObserver {
 
                 shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
                 shader.setUniformf("u_distance", (float) distToCamera);
-                shader.setUniformf("u_apparent_angle", (float) (viewAngle * Settings.settings.scene.star.pointSize));
+                shader.setUniformf("u_apparent_angle", (float) (solidAngle * Settings.settings.scene.star.pointSize));
                 shader.setUniformf("u_radius", (float) radius);
 
                 // Sprite.render
@@ -113,17 +112,18 @@ public class BillboardEntityRenderSystem implements IObserver {
         }
     }
 
-    public double getRenderSizeStarSet(double size, double radius, double distToCamera, double viewAngle, double thDown, double thUp) {
+    public double getRenderSizeStarSet(double size, double radius, double distToCamera, double viewAngle) {
         double computedSize = size;
-        if (viewAngle > thDown) {
-            double dist = distToCamera;
-            if (viewAngle > thUp) {
-                dist = radius / Constants.THRESHOLD_UP;
+        if (viewAngle > solidAngleThresholdBottomOverFovFactor) {
+            double dist;
+            if (viewAngle > solidAngleThresholdTopOverFovFactor) {
+                dist = radius / Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP;
+            }else {
+               dist = distToCamera / fovFactor;
             }
-            computedSize = (size * (dist / radius) * Constants.THRESHOLD_DOWN);
+            computedSize = (size * (dist / radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM);
         }
-        // Change the factor at the end here to control the stray light of stars
-        computedSize *= Settings.settings.scene.star.pointSize * 0.4;
+        computedSize *= Settings.settings.scene.star.pointSize * Settings.settings.scene.star.glowFactor;
 
         return computedSize;
     }
@@ -140,15 +140,13 @@ public class BillboardEntityRenderSystem implements IObserver {
          */
 
         // Star set
-        double thPointTimesFovFactor = Settings.settings.scene.star.threshold.point * camera.getFovFactor();
-        double thUpOverFovFactor = Constants.THRESHOLD_UP / camera.getFovFactor();
-        double thDownOverFovFactor = Constants.THRESHOLD_DOWN / camera.getFovFactor();
+
+        double thPointTimesFovFactor = Settings.settings.scene.star.threshold.point * fovFactor;
         double innerRad = 0.006 + Settings.settings.scene.star.pointSize * 0.008;
         alpha = alpha * base.opacity;
-        float fovFactor = camera.getFovFactor();
 
         // GENERAL UNIFORMS
-        shader.setUniformf("u_thpoint", (float) thPointTimesFovFactor);
+        shader.setUniformf("u_th_angle_point", (float) thPointTimesFovFactor);
         // Light glow always disabled with star groups
         shader.setUniformi("u_lightScattering", 0);
         shader.setUniformf("u_inner_rad", (float) innerRad);
@@ -157,11 +155,11 @@ public class BillboardEntityRenderSystem implements IObserver {
         boolean focusRendered = false;
         int n = Math.min(Settings.settings.scene.star.group.numBillboard, set.pointData.size());
         for (int i = 0; i < n; i++) {
-            renderCloseupStar(set, highlight, desc, set.active[i], fovFactor, set.cPosD, shader, mesh, thPointTimesFovFactor, thUpOverFovFactor, thDownOverFovFactor, alpha);
+            renderCloseUpStar(set, highlight, desc, set.active[i], fovFactor, set.cPosD, shader, mesh, thPointTimesFovFactor, alpha);
             focusRendered = focusRendered || set.active[i] == set.focusIndex;
         }
         if (set.focus != null && !focusRendered) {
-            renderCloseupStar(set, highlight, desc, set.focusIndex, fovFactor, set.cPosD, shader, mesh, thPointTimesFovFactor, thUpOverFovFactor, thDownOverFovFactor, alpha);
+            renderCloseUpStar(set, highlight, desc, set.focusIndex, fovFactor, set.cPosD, shader, mesh, thPointTimesFovFactor, alpha);
         }
     }
 
@@ -170,15 +168,18 @@ public class BillboardEntityRenderSystem implements IObserver {
             // Stars, particles
             boolean star = Mapper.hip.has(entity);
             extra.computedSize = body.size;
-            if (body.solidAngle > thdownOverFovfactor) {
-                double dist = body.distToCamera;
-                if (body.solidAngle > thupOverFovfactor) {
-                    dist = (float) extra.radius / Constants.THRESHOLD_UP;
+
+            if (body.solidAngle > solidAngleThresholdBottomOverFovFactor) {
+                double dist;
+                if (body.solidAngle > solidAngleThresholdTopOverFovFactor) {
+                    dist = (float) extra.radius / Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP;
+                } else {
+                    dist = body.distToCamera / fovFactor;
                 }
-                extra.computedSize *= (dist / extra.radius) * Constants.THRESHOLD_DOWN;
+                extra.computedSize *= (dist / extra.radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM;
             }
 
-            extra.computedSize *= Settings.settings.scene.star.pointSize * (star ? 0.1f : 0.2f / Constants.DISTANCE_SCALE_FACTOR);
+            extra.computedSize *= Settings.settings.scene.star.pointSize * (star ? Settings.settings.scene.star.glowFactor : 0.2 / Constants.DISTANCE_SCALE_FACTOR);
             return (float) (extra.computedSize * extra.primitiveRenderScale);
         } else if (Mapper.fade.has(entity)) {
             // Regular billboards
@@ -227,14 +228,14 @@ public class BillboardEntityRenderSystem implements IObserver {
         float[] color = isModel ? body.color : celestial.colorPale;
 
         // Alpha channel:
-        // - particles: alpha * opacity
         // - models:    alpha * (1 - fadeOpacity)
-        float a = scaffolding != null ? alpha * (1f - scaffolding.fadeOpacity) : alpha * base.opacity;
+        // - particles: alpha * opacity
+        float a = extra == null ? alpha * (1f - scaffolding.fadeOpacity) : alpha * base.opacity;
         shader.setUniformf("u_color", color[0], color[1], color[2], a);
         shader.setUniformf("u_inner_rad", (float) celestial.innerRad);
         shader.setUniformf("u_distance", (float) body.distToCamera);
         shader.setUniformf("u_apparent_angle", (float) body.solidAngleApparent);
-        shader.setUniformf("u_thpoint", (float) sa.thresholdPoint * camera.getFovFactor());
+        shader.setUniformf("u_th_angle_point", (float) sa.thresholdPoint * fovFactor);
         shader.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
 
         // Whether light scattering is enabled or not
@@ -275,8 +276,8 @@ public class BillboardEntityRenderSystem implements IObserver {
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.FOV_CHANGE_NOTIFICATION) {
             fovFactor = (Float) data[1];
-            thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
-            thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
+            solidAngleThresholdTopOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP / fovFactor;
+            solidAngleThresholdBottomOverFovFactor = (float) Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM / fovFactor;
         }
     }
 }

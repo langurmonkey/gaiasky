@@ -58,7 +58,7 @@ public class VariableSetRenderer extends PointCloudTriRenderSystem implements IO
         cmap = new Colormap();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_BASE_LEVEL_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.BILLBOARD_TEXTURE_IDX_CMD);
     }
 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
@@ -248,7 +248,7 @@ public class VariableSetRenderer extends PointCloudTriRenderSystem implements IO
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD -> {
+        case STAR_BASE_LEVEL_CMD -> {
             triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);
             triComponent.touchStarParameters(getShaderProgram());
         }

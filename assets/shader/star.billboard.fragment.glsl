@@ -7,7 +7,6 @@ uniform float u_radius;
 uniform float u_apparent_angle;
 uniform float u_inner_rad;
 uniform float u_time;
-uniform float u_thpoint;
 // Distance in u to the star
 uniform float u_distance;
 // Whether light scattering is enabled or not
@@ -75,18 +74,17 @@ vec4 draw() {
     if (level >= 1.0) {
         // We are far away from the star
         level = u_distance / (u_radius * rays_const);
-        float light_level = smoothstep(u_thpoint, u_thpoint * 1.4, u_apparent_angle);
 
         if (u_lightScattering == 1) {
             // Light scattering, simple star
             float core = core(dist, u_inner_rad);
-            float light = light(dist, light_decay) * light_level;
+            float light = light(dist, light_decay);
             return (v_color + (core * 5.0)) * (light + core) * v_color.a;
         } else {
             // No light scattering, star rays
             level = min(level, 1.0);
             float corona = starTexture(v_uv);
-            float light = light(dist, light_decay * 2.0) * light_level;
+            float light = light(dist, light_decay * 2.0);
             float core = core(dist, u_inner_rad);
 
             return (v_color + core) * (corona * (1.0 - level) + light + core) * v_color.a;

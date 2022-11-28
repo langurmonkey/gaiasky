@@ -1,20 +1,17 @@
 package gaiasky.input;
 
 import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.gui.IGamepadMappings;
-import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.GuiUtils;
 import gaiasky.util.scene2d.OwnSliderPlus;
 
 public abstract class GuiGamepadListener extends AbstractGamepadListener {
@@ -222,7 +219,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
 
     public void moveFocusVertical(boolean up) {
         var focus = stage.getKeyboardFocus();
-        var inputWidgets = getInputWidgets(getContentContainer(), new Array<>());
+        var inputWidgets = GuiUtils.getInputWidgets(getContentContainer(), new Array<>());
         if (!inputWidgets.isEmpty()) {
             var index = inputWidgets.indexOf(focus, true);
             if (index < 0) {
@@ -264,7 +261,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
                 sb.setSelectedIndex(index);
             } else {
                 // Move scroll.
-                var scroll = getScrollPaneIn(getContentContainer());
+                var scroll = GuiUtils.getScrollPaneIn(getContentContainer());
                 if (scroll != null) {
                     scroll.setScrollY(scroll.getScrollY() + 150 * value);
                 }
@@ -284,82 +281,8 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
         Actor focus = stage.getKeyboardFocus();
         if (focus instanceof OwnSliderPlus) {
             OwnSliderPlus s = (OwnSliderPlus) focus;
-            sliderMove(value > 0, 0.05f, s);
+            GuiUtils.sliderMove(value > 0, 0.05f, s);
         }
-    }
-
-    /**
-     * Moves the slider up or down by the given percentage.
-     *
-     * @param up      Whether to move it up.
-     * @param percent The percentage in [0,1].
-     * @param slider  The slider to move.
-     */
-    public void sliderMove(boolean up, float percent, OwnSliderPlus slider) {
-        float max = slider.getMaxValue();
-        float min = slider.getMinValue();
-        float val = slider.getValue();
-        float inc = (max - min) * percent;
-        slider.setValue(MathUtils.clamp(val + (up ? inc : -inc), min, max));
-    }
-
-    protected ScrollPane getScrollPaneIn(Actor actor) {
-        if (actor instanceof ScrollPane) {
-            return (ScrollPane) actor;
-        } else if (actor instanceof WidgetGroup) {
-            var group = (WidgetGroup) actor;
-            var children = group.getChildren();
-            for (var child : children) {
-                ScrollPane scroll;
-                if ((scroll = getScrollPaneIn(child)) != null) {
-                    return scroll;
-                }
-            }
-        }
-        return null;
-    }
-
-    protected Array<Actor> getInputWidgets(Actor actor, Array<Actor> list) {
-        if (actor != null) {
-            if (isInputWidget(actor) && isNotDisabled(actor) && !isTooltipWidget(actor)) {
-                list.add(actor);
-            } else if (actor instanceof WidgetGroup) {
-                getInputWidgetsInGroup((WidgetGroup) actor, list);
-            }
-        }
-        return list;
-    }
-
-    private void getInputWidgetsInGroup(WidgetGroup actor, Array<Actor> list) {
-        var children = actor.getChildren();
-        for (var child : children) {
-            getInputWidgets(child, list);
-        }
-    }
-
-    protected boolean isInputWidget(Actor actor) {
-        return actor instanceof SelectBox ||
-                actor instanceof TextField ||
-                actor instanceof Button ||
-                actor instanceof Slider;
-    }
-
-    protected boolean isTooltipWidget(Actor actor) {
-        return actor instanceof OwnImageButton && ((OwnImageButton) actor).getStyle().imageUp.toString().contains("tooltip");
-    }
-
-    protected boolean isNotDisabled(Actor actor) {
-        return !(actor instanceof Disableable) || !((Disableable) actor).isDisabled();
-    }
-
-    protected boolean hasChangeListener(Actor actor) {
-        var listeners = actor.getListeners();
-        for (var listener : listeners) {
-            if (listener instanceof ChangeListener) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

@@ -30,25 +30,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class VisualEffectsComponent extends GuiComponent implements IObserver {
-    private static final Logger.Log logger = Logger.getLogger(VisualEffectsComponent.class);
+public class VisualSettingsComponent extends GuiComponent implements IObserver {
+    private static final Logger.Log logger = Logger.getLogger(VisualSettingsComponent.class);
 
-    private OwnSliderPlus starBrightness, starBrightnessPower, starSize, starMinOpacity;
+    private OwnSliderPlus starBrightness, starBrightnessPower, starGlowFactor, starSize, starBaseLevel;
     private OwnSliderPlus ambientLight, labelSize, lineWidth, elevMult;
 
     boolean flag = true;
 
     boolean hackProgrammaticChangeEvents = true;
 
-    public VisualEffectsComponent(Skin skin, Stage stage) {
+    public VisualSettingsComponent(Skin skin, Stage stage) {
         super(skin, stage);
     }
 
-    @SuppressWarnings("unchecked")
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
         /* Star brightness */
-        starBrightness = new OwnSliderPlus(I18n.msg("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
+        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
+        starBrightness.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.info"), skin));
         starBrightness.setName("star brightness");
         starBrightness.setWidth(contentWidth);
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
@@ -61,7 +61,8 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star brightness power */
-        starBrightnessPower = new OwnSliderPlus(I18n.msg("gui.starbrightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
+        starBrightnessPower = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
+        starBrightnessPower.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
         starBrightnessPower.setName("star brightness power");
         starBrightnessPower.setWidth(contentWidth);
         starBrightnessPower.setMappedValue(Settings.settings.scene.star.power);
@@ -73,8 +74,23 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        /* Star glow factor */
+        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR, Constants.SLIDER_STEP_TINY * 0.1f, skin);
+        starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
+        starGlowFactor.setName("star glow factor");
+        starGlowFactor.setWidth(contentWidth);
+        starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
+        starGlowFactor.addListener(event -> {
+            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+                EventManager.publish(Event.STAR_GLOW_FACTOR_CMD, starGlowFactor, starGlowFactor.getValue());
+                return true;
+            }
+            return false;
+        });
+
         /* Star size */
         starSize = new OwnSliderPlus(I18n.msg("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
+        starSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
         starSize.setName("star size");
         starSize.setWidth(contentWidth);
         starSize.setMappedValue(Settings.settings.scene.star.pointSize);
@@ -87,13 +103,14 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Star min opacity */
-        starMinOpacity = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
-        starMinOpacity.setName("star min opacity");
-        starMinOpacity.setWidth(contentWidth);
-        starMinOpacity.setMappedValue(Settings.settings.scene.star.opacity[0]);
-        starMinOpacity.addListener(event -> {
+        starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
+        starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
+        starBaseLevel.setName("star base level");
+        starBaseLevel.setWidth(contentWidth);
+        starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
+        starBaseLevel.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.publish(Event.STAR_MIN_OPACITY_CMD, starMinOpacity, starMinOpacity.getMappedValue());
+                EventManager.publish(Event.STAR_BASE_LEVEL_CMD, starBaseLevel, starBaseLevel.getMappedValue());
                 return true;
             }
             return false;
@@ -163,7 +180,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             if (event instanceof ChangeEvent) {
                 // Read defaults from internal settings file
                 try {
-                    Path confFolder = Settings.settings.assetsPath("conf");
+                    Path confFolder = Settings.assetsPath("conf");
                     Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr));
                     Yaml yaml = new Yaml();
                     Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
@@ -182,7 +199,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
                     m.post(Event.STAR_BRIGHTNESS_CMD, resetDefaults, br);
                     m.post(Event.STAR_BRIGHTNESS_POW_CMD, resetDefaults, pow);
                     m.post(Event.STAR_POINT_SIZE_CMD, resetDefaults, ss);
-                    m.post(Event.STAR_MIN_OPACITY_CMD, resetDefaults, pam);
+                    m.post(Event.STAR_BASE_LEVEL_CMD, resetDefaults, pam);
                     m.post(Event.AMBIENT_LIGHT_CMD, resetDefaults, amb);
                     m.post(Event.LABEL_SIZE_CMD, resetDefaults, ls);
                     m.post(Event.LINE_WIDTH_CMD, resetDefaults, lw);
@@ -202,8 +219,9 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         lightingGroup.space(pad9);
         lightingGroup.addActor(starBrightness);
         lightingGroup.addActor(starBrightnessPower);
+        lightingGroup.addActor(starGlowFactor);
         lightingGroup.addActor(starSize);
-        lightingGroup.addActor(starMinOpacity);
+        lightingGroup.addActor(starBaseLevel);
         lightingGroup.addActor(ambientLight);
         lightingGroup.addActor(lineWidth);
         lightingGroup.addActor(labelSize);
@@ -212,7 +230,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
         component = lightingGroup;
 
-        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_MIN_OPACITY_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
     }
 
     @Override
@@ -242,27 +260,35 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
                 hackProgrammaticChangeEvents = true;
             }
             break;
-        case STAR_MIN_OPACITY_CMD:
-            if (source != starMinOpacity) {
-                Float minopacity = (Float) data[0];
+        case STAR_GLOW_FACTOR_CMD:
+            if (source != starGlowFactor) {
+                Float glowFactor = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
-                starMinOpacity.setMappedValue(minopacity);
+                starGlowFactor.setMappedValue(glowFactor);
+                hackProgrammaticChangeEvents = true;
+            }
+            break;
+        case STAR_BASE_LEVEL_CMD:
+            if (source != starBaseLevel) {
+                Float baseLevel = (Float) data[0];
+                hackProgrammaticChangeEvents = false;
+                starBaseLevel.setMappedValue(baseLevel);
                 hackProgrammaticChangeEvents = true;
             }
             break;
         case LABEL_SIZE_CMD:
             if (source != labelSize) {
-                Float newsize = (Float) data[0];
+                Float newLabelSize = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
-                labelSize.setMappedValue(newsize);
+                labelSize.setMappedValue(newLabelSize);
                 hackProgrammaticChangeEvents = true;
             }
             break;
         case LINE_WIDTH_CMD:
             if (source != lineWidth) {
-                Float newwidth = (Float) data[0];
+                Float newWidth = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
-                lineWidth.setMappedValue(newwidth);
+                lineWidth.setMappedValue(newWidth);
                 hackProgrammaticChangeEvents = true;
             }
             break;

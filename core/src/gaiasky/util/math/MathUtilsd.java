@@ -350,7 +350,7 @@ public final class MathUtilsd {
     }
 
     public static double lerp(double x, double y, double a) {
-        return x * (1 - a) + y * a;
+        return x * (1.0 - a) + y * a;
     }
 
     /**
