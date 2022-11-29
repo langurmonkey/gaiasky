@@ -2,6 +2,7 @@ package gaiasky.input;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.GenericDialog;
 import gaiasky.gui.IGamepadMappings;
 
@@ -32,8 +33,12 @@ public class WindowGamepadListener extends GuiGamepadListener {
     }
 
     @Override
-    public Group getContentContainer() {
-        return dialog.getActualContentContainer();
+    public Array<Group> getContentContainers() {
+        var a = new Array<Group>(3);
+        a.add(dialog.getCurrentContentContainer());
+        a.add(dialog.getBottmGroup());
+        a.add(dialog.getButtonsGroup());
+        return a;
     }
 
     @Override

@@ -217,6 +217,24 @@ public class GuiUtils {
     }
 
     /**
+     * Moves the selection of the given select box up or down.
+     *
+     * @param up        Whether to move up (true) or down (false).
+     * @param jump      If true, the selection is moved all the way up or down.
+     * @param selectBox The select box.
+     */
+    public static void selectBoxMoveSelection(boolean up, boolean jump, SelectBox<?> selectBox) {
+        var index = selectBox.getSelectedIndex();
+        if (jump) {
+            index = up ? 0 : selectBox.getItems().size - 1;
+        } else {
+            index = up ? Math.max(index - 1, 0) : (index + 1) % selectBox.getItems().size;
+        }
+        // Select.
+        selectBox.setSelectedIndex(index);
+    }
+
+    /**
      * Gets the first scroll pane contained in the given actor by
      * traversing it recursively, if it exists.
      *
@@ -238,6 +256,13 @@ public class GuiUtils {
             }
         }
         return null;
+    }
+
+    public static Array<Actor> getInputWidgets(Array<? extends Actor> actors, Array<Actor> list) {
+        for (var actor : actors) {
+            getInputWidgets(actor, list);
+        }
+        return list;
     }
 
     /**

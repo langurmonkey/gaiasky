@@ -161,8 +161,10 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
         return false;
     }
 
-    public Group getContentContainer() {
-        return stage.getRoot();
+    public Array<Group> getContentContainers() {
+        var a = new Array<Group>(1);
+        a.add(stage.getRoot());
+        return a;
     }
 
     /**
@@ -219,7 +221,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
 
     public void moveFocusVertical(boolean up) {
         var focus = stage.getKeyboardFocus();
-        var inputWidgets = GuiUtils.getInputWidgets(getContentContainer(), new Array<>());
+        var inputWidgets = GuiUtils.getInputWidgets(getContentContainers(), new Array<>());
         if (!inputWidgets.isEmpty()) {
             var index = inputWidgets.indexOf(focus, true);
             if (index < 0) {
@@ -248,20 +250,14 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
      */
     public void rightStickVertical(float value) {
         if (value != 0) {
-            if (stage.getKeyboardFocus() instanceof SelectBox) {
+            var focus = stage.getKeyboardFocus();
+            if (focus instanceof SelectBox) {
                 // Up/down in select box.
-                SelectBox<?> sb = (SelectBox<?>) stage.getKeyboardFocus();
-                int index = sb.getSelectedIndex();
-                if (value < 0) {
-                    index = Math.max(index - 1, 0);
-                } else if (value > 0) {
-                    index = (index + 1) % sb.getItems().size;
-                }
-                // Select.
-                sb.setSelectedIndex(index);
+                var selectBox = (SelectBox<?>) stage.getKeyboardFocus();
+                GuiUtils.selectBoxMoveSelection(value < 0, false, selectBox);
             } else {
                 // Move scroll.
-                var scroll = GuiUtils.getScrollPaneIn(getContentContainer());
+                var scroll = GuiUtils.getScrollPaneIn(getContentContainers().get(0));
                 if (scroll != null) {
                     scroll.setScrollY(scroll.getScrollY() + 150 * value);
                 }
@@ -280,8 +276,11 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
     public void rightStickHorizontal(float value) {
         Actor focus = stage.getKeyboardFocus();
         if (focus instanceof OwnSliderPlus) {
-            OwnSliderPlus s = (OwnSliderPlus) focus;
-            GuiUtils.sliderMove(value > 0, 0.05f, s);
+            var slider = (OwnSliderPlus) focus;
+            GuiUtils.sliderMove(value > 0, 0.05f, slider);
+        } else if (focus instanceof SelectBox) {
+            var selectBox = (SelectBox<?>) stage.getKeyboardFocus();
+            GuiUtils.selectBoxMoveSelection(value < 0, false, selectBox);
         }
     }
 

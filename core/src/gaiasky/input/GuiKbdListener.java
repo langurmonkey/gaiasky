@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
@@ -79,6 +79,9 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
             } else if (keycode == Keys.END) {
                 moveEnd();
                 return true;
+            } else if (keycode == Keys.ALT_LEFT || keycode == Keys.ALT_RIGHT) {
+                select();
+                return true;
             }
         }
         return false;
@@ -96,8 +99,10 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
         return false;
     }
 
-    public Group getContentContainer() {
-        return stage.getRoot();
+    public Array<Group> getContentContainers() {
+        var a = new Array<Group>(1);
+        a.add(stage.getRoot());
+        return a;
     }
 
     public abstract void close();
@@ -144,8 +149,11 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
             var textField = (OwnTextField) focus;
             textField.moveCursor(!left, false);
         } else if (focus instanceof OwnSliderPlus) {
-            OwnSliderPlus s = (OwnSliderPlus) focus;
-            GuiUtils.sliderMove(!left, 0.05f, s);
+            var slider = (OwnSliderPlus) focus;
+            GuiUtils.sliderMove(!left, 0.05f, slider);
+        } else if (focus instanceof SelectBox) {
+            var selectBox = (SelectBox<?>) focus;
+            GuiUtils.selectBoxMoveSelection(left, false, selectBox);
         }
     }
 
@@ -157,6 +165,9 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
         } else if (focus instanceof OwnSliderPlus) {
             OwnSliderPlus s = (OwnSliderPlus) focus;
             GuiUtils.sliderMove(false, 1.0f, s);
+        } else if (focus instanceof SelectBox) {
+            var selectBox = (SelectBox<?>) focus;
+            GuiUtils.selectBoxMoveSelection(true, true, selectBox);
         }
     }
 
@@ -168,6 +179,9 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
         } else if (focus instanceof OwnSliderPlus) {
             OwnSliderPlus s = (OwnSliderPlus) focus;
             GuiUtils.sliderMove(true, 1.0f, s);
+        } else if (focus instanceof SelectBox) {
+            var selectBox = (SelectBox<?>) focus;
+            GuiUtils.selectBoxMoveSelection(false, true, selectBox);
         }
     }
 
@@ -187,7 +201,7 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
 
     public void moveFocusVertical(boolean up) {
         var focus = stage.getKeyboardFocus();
-        var inputWidgets = GuiUtils.getInputWidgets(getContentContainer(), new Array<>());
+        var inputWidgets = GuiUtils.getInputWidgets(getContentContainers(), new Array<>());
         if (!inputWidgets.isEmpty()) {
             var index = inputWidgets.indexOf(focus, true);
             if (index < 0) {

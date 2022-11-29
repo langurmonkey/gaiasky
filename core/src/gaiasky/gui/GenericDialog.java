@@ -29,6 +29,7 @@ import gaiasky.input.AbstractGamepadListener;
 import gaiasky.input.AbstractMouseKbdListener;
 import gaiasky.input.WindowGamepadListener;
 import gaiasky.input.WindowKbdListener;
+import gaiasky.util.GuiUtils;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.scene2d.CollapsibleWindow;
@@ -425,6 +426,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
         addOwnListeners();
         touch();
 
+        // Focus first
+        focusFirstInputWidget();
+
         if (this.modal)
             // Disable input
             EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
@@ -438,12 +442,20 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public void touch() {
     }
 
-    public Group getActualContentContainer() {
+    public Group getCurrentContentContainer() {
         if (tabButtons != null && !tabButtons.isEmpty()) {
             return tabContents.get(selectedTab);
         } else {
             return content;
         }
+    }
+
+    public Group getBottmGroup() {
+        return bottom;
+    }
+
+    public Group getButtonsGroup() {
+        return buttonGroup;
     }
 
     /**
@@ -642,8 +654,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public void tabRight() {
         if (tabButtons != null) {
             selectedTab = (selectedTab + 1) % tabButtons.size;
-            Button tab = tabButtons.get(selectedTab);
             tabButtons.get(selectedTab).setChecked(true);
+            focusFirstInputWidget();
         }
     }
 
@@ -654,6 +666,14 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 selectedTab = tabButtons.size - 1;
             }
             tabButtons.get(selectedTab).setChecked(true);
+            focusFirstInputWidget();
+        }
+    }
+
+    public void focusFirstInputWidget(){
+        var inputWidgets = GuiUtils.getInputWidgets(getCurrentContentContainer(), new Array<>());
+        if (!inputWidgets.isEmpty()) {
+            stage.setKeyboardFocus(inputWidgets.get(0));
         }
     }
 

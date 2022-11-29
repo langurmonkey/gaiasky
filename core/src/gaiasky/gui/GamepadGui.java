@@ -1228,8 +1228,10 @@ public class GamepadGui extends AbstractGui {
         }
 
         @Override
-        public Group getContentContainer() {
-            return gui.content;
+        public Array<Group> getContentContainers() {
+            var a = new Array<Group>(1);
+            a.add(gui.content);
+            return a;
         }
 
         @Override
