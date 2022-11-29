@@ -409,19 +409,13 @@ public class KeyBindings {
         addAction(new ProgramAction("action.expandcollapse.pane/gui.visibility", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisibilityComponent"), noCleanMode));
 
         // Expand/collapse visual effects pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisualEffectsComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisualSettingsComponent"), noCleanMode));
 
         // Expand/collapse datasets pane
         addAction(new ProgramAction("action.expandcollapse.pane/gui.dataset.title", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "DatasetsComponent"), noCleanMode));
 
-        // Expand/collapse objects pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.objects", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "ObjectsComponent"), noCleanMode));
-
         // Expand/collapse bookmarks pane
         addAction(new ProgramAction("action.expandcollapse.pane/gui.bookmarks", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "BookmarksComponent"), noCleanMode));
-
-        // Expand/collapse music pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.music", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "MusicComponent"), noCleanMode));
 
         // Toggle mouse capture
         addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.publish(Event.MOUSE_CAPTURE_TOGGLE, this)));

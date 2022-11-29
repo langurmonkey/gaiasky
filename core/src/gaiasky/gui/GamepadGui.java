@@ -31,11 +31,15 @@ import gaiasky.util.*;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -52,7 +56,7 @@ public class GamepadGui extends AbstractGui {
     private final List<Actor[][]> model;
     private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
-    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider;
+    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
     private OwnTextField searchField;
     private OwnLabel infoMessage;
 
@@ -72,6 +76,7 @@ public class GamepadGui extends AbstractGui {
     private String currentInputText = "";
     private final FocusView view;
     private final FilterView filterView;
+    boolean hackProgrammaticChangeEvents = true;
 
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
@@ -104,6 +109,7 @@ public class GamepadGui extends AbstractGui {
 
         // Comment to hide this whole dialog and functionality
         EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED);
+        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
     }
 
     @Override
@@ -117,7 +123,7 @@ public class GamepadGui extends AbstractGui {
         model.clear();
 
         float w = 1440f;
-        float h = 640f;
+        float h = 740f;
         // Widget width
         float ww = 400f;
         float wh = 64f;
@@ -578,14 +584,29 @@ public class GamepadGui extends AbstractGui {
         updatePads(controlsT);
 
         // GRAPHICS
-        Actor[][] graphicsModel = new Actor[1][5];
+        Actor[][] graphicsModel = new Actor[2][6];
         model.add(graphicsModel);
 
         graphicsT = new Table(skin);
 
+        // Star brightness
+        starBrightness = new OwnSliderPlus(I18n.msg("gui.star.brightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin, "header-raw");
+        graphicsModel[0][0] = starBrightness;
+        starBrightness.setWidth(ww);
+        starBrightness.setHeight(sh);
+        starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
+        starBrightness.addListener(event -> {
+            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+                EventManager.publish(Event.STAR_BRIGHTNESS_CMD, starBrightness, starBrightness.getMappedValue());
+                return true;
+            }
+            return false;
+        });
+        graphicsT.add(starBrightness).padBottom(pad10).padRight(pad20);
+
         // Bloom
         bloomSlider = new OwnSliderPlus(I18n.msg("gui.bloom"), Constants.MIN_BLOOM, Constants.MAX_BLOOM, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-        graphicsModel[0][0] = bloomSlider;
+        graphicsModel[1][0] = bloomSlider;
         bloomSlider.setWidth(ww);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity);
@@ -598,9 +619,25 @@ public class GamepadGui extends AbstractGui {
         });
         graphicsT.add(bloomSlider).padBottom(pad10).row();
 
+        // Magnitude multiplier
+        magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        graphicsModel[0][1] = magnitudeMultiplier;
+        magnitudeMultiplier.addListener(new OwnTextTooltip(I18n.msg("gui.star.brightness.pow.info"), skin));
+        magnitudeMultiplier.setWidth(ww);
+        magnitudeMultiplier.setHeight(sh);
+        magnitudeMultiplier.setMappedValue(Settings.settings.scene.star.power);
+        magnitudeMultiplier.addListener(event -> {
+            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, magnitudeMultiplier, magnitudeMultiplier.getValue());
+                return true;
+            }
+            return false;
+        });
+        graphicsT.add(magnitudeMultiplier).padBottom(pad10).padRight(pad20);
+
         // Unsharp mask
         unsharpMaskSlider = new OwnSliderPlus(I18n.msg("gui.unsharpmask"), Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
-        graphicsModel[0][1] = unsharpMaskSlider;
+        graphicsModel[1][1] = unsharpMaskSlider;
         unsharpMaskSlider.setWidth(ww);
         unsharpMaskSlider.setHeight(sh);
         unsharpMaskSlider.setValue(Settings.settings.postprocess.unsharpMask.factor);
@@ -613,9 +650,25 @@ public class GamepadGui extends AbstractGui {
         });
         graphicsT.add(unsharpMaskSlider).padBottom(pad10).row();
 
+        // Star glow factor
+        starGlowFactor = new OwnSliderPlus(I18n.msg("gui.star.glowfactor"), Constants.MIN_STAR_GLOW_FACTOR, Constants.MAX_STAR_GLOW_FACTOR, Constants.SLIDER_STEP_TINY * 0.1f, false, skin, "header-raw");
+        graphicsModel[0][2] = starGlowFactor;
+        starGlowFactor.addListener(new OwnTextTooltip(I18n.msg("gui.star.glowfactor.info"), skin));
+        starGlowFactor.setWidth(ww);
+        starGlowFactor.setHeight(sh);
+        starGlowFactor.setMappedValue(Settings.settings.scene.star.glowFactor);
+        starGlowFactor.addListener(event -> {
+            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+                EventManager.publish(Event.STAR_GLOW_FACTOR_CMD, starGlowFactor, starGlowFactor.getValue());
+                return true;
+            }
+            return false;
+        });
+        graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad20);
+
         // Lens flare
         flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
-        graphicsModel[0][2] = flareButton;
+        graphicsModel[1][2] = flareButton;
         flareButton.setWidth(ww);
         flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
         flareButton.addListener(event -> {
@@ -627,9 +680,25 @@ public class GamepadGui extends AbstractGui {
         });
         graphicsT.add(flareButton).padBottom(pad10).row();
 
+        // Point size
+        pointSize = new OwnSliderPlus(I18n.msg("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        graphicsModel[0][3] = pointSize;
+        pointSize.setWidth(ww);
+        pointSize.setHeight(sh);
+        pointSize.addListener(new OwnTextTooltip(I18n.msg("gui.star.size.info"), skin));
+        pointSize.setMappedValue(Settings.settings.scene.star.pointSize);
+        pointSize.addListener(event -> {
+            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+                EventManager.publish(Event.STAR_POINT_SIZE_CMD, pointSize, pointSize.getMappedValue());
+                return true;
+            }
+            return false;
+        });
+        graphicsT.add(pointSize).padBottom(pad10).padRight(pad20);
+
         // Star glow
         starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
-        graphicsModel[0][3] = starGlowButton;
+        graphicsModel[1][3] = starGlowButton;
         starGlowButton.setWidth(ww);
         starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
         starGlowButton.addListener(event -> {
@@ -641,9 +710,25 @@ public class GamepadGui extends AbstractGui {
         });
         graphicsT.add(starGlowButton).padBottom(pad10).row();
 
+        // Base star level
+        starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+        graphicsModel[0][4] = starBaseLevel;
+        starBaseLevel.addListener(new OwnTextTooltip(I18n.msg("gui.star.opacity"), skin));
+        starBaseLevel.setWidth(ww);
+        starBaseLevel.setHeight(sh);
+        starBaseLevel.setMappedValue(Settings.settings.scene.star.opacity[0]);
+        starBaseLevel.addListener(event -> {
+            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+                EventManager.publish(Event.STAR_BASE_LEVEL_CMD, starBaseLevel, starBaseLevel.getMappedValue());
+                return true;
+            }
+            return false;
+        });
+        graphicsT.add(starBaseLevel).padBottom(pad10).padRight(pad20);
+
         // Motion blur
         motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
-        graphicsModel[0][4] = motionBlurButton;
+        graphicsModel[1][4] = motionBlurButton;
         motionBlurButton.setWidth(ww);
         motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur.active);
         motionBlurButton.addListener(event -> {
@@ -653,7 +738,54 @@ public class GamepadGui extends AbstractGui {
             }
             return false;
         });
-        graphicsT.add(motionBlurButton);
+        graphicsT.add(motionBlurButton).padBottom(pad10).row();
+
+        /* Reset defaults */
+        OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
+        graphicsModel[0][5] = resetDefaults;
+        resetDefaults.align(Align.center);
+        resetDefaults.setWidth(ww);
+        resetDefaults.addListener(new OwnTextTooltip(I18n.msg("gui.resetdefaults.tooltip"), skin));
+        resetDefaults.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                // Read defaults from internal settings file
+                try {
+                    Path confFolder = Settings.assetsPath("conf");
+                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr));
+                    Yaml yaml = new Yaml();
+                    Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
+
+                    float br = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
+                    float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
+                    float glo = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("glowFactor")).floatValue();
+                    float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
+                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(0)).floatValue();
+                    float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
+                    float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
+                    float lw = ((Double) ((Map<String, Object>) conf.get("scene")).get("lineWidth")).floatValue();
+                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get("multiplier")).floatValue();
+
+                    // Events
+                    EventManager m = EventManager.instance;
+                    m.post(Event.STAR_BRIGHTNESS_CMD, resetDefaults, br);
+                    m.post(Event.STAR_BRIGHTNESS_POW_CMD, resetDefaults, pow);
+                    m.post(Event.STAR_GLOW_FACTOR_CMD, resetDefaults, glo);
+                    m.post(Event.STAR_POINT_SIZE_CMD, resetDefaults, ss);
+                    m.post(Event.STAR_BASE_LEVEL_CMD, resetDefaults, pam);
+                    m.post(Event.AMBIENT_LIGHT_CMD, resetDefaults, amb);
+                    m.post(Event.LABEL_SIZE_CMD, resetDefaults, ls);
+                    m.post(Event.LINE_WIDTH_CMD, resetDefaults, lw);
+                    m.post(Event.ELEVATION_MULTIPLIER_CMD, resetDefaults, em);
+
+                } catch (IOException e) {
+                    logger.error(e, "Error loading default configuration file");
+                }
+
+                return true;
+            }
+            return false;
+        });
+        graphicsT.add(resetDefaults);
 
         tabContents.add(container(graphicsT, w, h));
         updatePads(graphicsT);
@@ -1105,6 +1237,46 @@ public class GamepadGui extends AbstractGui {
             timeStartStop.setProgrammaticChangeEvents(true);
         }
         case SCENE_LOADED -> this.scene = (Scene) data[0];
+        case STAR_POINT_SIZE_CMD -> {
+            if (source != pointSize) {
+                hackProgrammaticChangeEvents = false;
+                float newSize = (float) data[0];
+                pointSize.setMappedValue(newSize);
+                hackProgrammaticChangeEvents = true;
+            }
+        }
+        case STAR_BRIGHTNESS_CMD -> {
+            if (source != starBrightness) {
+                Float brightness = (Float) data[0];
+                hackProgrammaticChangeEvents = false;
+                starBrightness.setMappedValue(brightness);
+                hackProgrammaticChangeEvents = true;
+            }
+        }
+        case STAR_BRIGHTNESS_POW_CMD -> {
+            if (source != magnitudeMultiplier) {
+                Float pow = (Float) data[0];
+                hackProgrammaticChangeEvents = false;
+                magnitudeMultiplier.setMappedValue(pow);
+                hackProgrammaticChangeEvents = true;
+            }
+        }
+        case STAR_GLOW_FACTOR_CMD -> {
+            if (source != starGlowFactor) {
+                Float glowFactor = (Float) data[0];
+                hackProgrammaticChangeEvents = false;
+                starGlowFactor.setMappedValue(glowFactor);
+                hackProgrammaticChangeEvents = true;
+            }
+        }
+        case STAR_BASE_LEVEL_CMD -> {
+            if (source != starBaseLevel) {
+                Float baseLevel = (Float) data[0];
+                hackProgrammaticChangeEvents = false;
+                starBaseLevel.setMappedValue(baseLevel);
+                hackProgrammaticChangeEvents = true;
+            }
+        }
         default -> {
         }
         }

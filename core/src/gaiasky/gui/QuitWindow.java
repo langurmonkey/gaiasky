@@ -41,6 +41,8 @@ public class QuitWindow extends GenericDialog {
         doNotAsk.setChecked(false);
 
         bottom.add(doNotAsk).right().row();
+
+        stage.setKeyboardFocus(acceptButton);
     }
 
     @Override
