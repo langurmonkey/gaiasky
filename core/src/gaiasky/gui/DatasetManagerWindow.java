@@ -29,6 +29,7 @@ import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.input.WindowGamepadListener;
+import gaiasky.input.WindowKbdListener;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -160,6 +161,10 @@ public class DatasetManagerWindow extends GenericDialog {
         this.currentDownloads = Collections.synchronizedMap(new HashMap<>());
         this.selectionOrder = new ArrayList<>();
         this.dataLocation = dataLocation;
+
+        // Use our keyboard listener.
+        this.defaultMouseKbdListener = false;
+        this.mouseKbdListener = new DatasetManagerKbdListener(this);
 
         // Use our own gamepad listener.
         this.defaultGamepadListener = false;
@@ -1440,6 +1445,22 @@ public class DatasetManagerWindow extends GenericDialog {
         }
     }
 
+    private class DatasetManagerKbdListener extends WindowKbdListener {
+
+        public DatasetManagerKbdListener(GenericDialog dialog) {
+            super(dialog);
+        }
+
+        @Override
+        public void moveUp() {
+            up();
+        }
+
+        @Override
+        public void moveDown() {
+            down();
+        }
+    }
     private class DatasetManagerGamepadListener extends WindowGamepadListener {
 
         public DatasetManagerGamepadListener(String mappingsFile) {
