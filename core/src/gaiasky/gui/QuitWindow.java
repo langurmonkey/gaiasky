@@ -8,6 +8,8 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
@@ -42,7 +44,13 @@ public class QuitWindow extends GenericDialog {
 
         bottom.add(doNotAsk).right().row();
 
-        stage.setKeyboardFocus(acceptButton);
+        var task = new Task() {
+            @Override
+            public void run() {
+                stage.setKeyboardFocus(acceptButton);
+            }
+        };
+        Timer.schedule(task, 0.5f);
     }
 
     @Override

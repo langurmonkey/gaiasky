@@ -21,6 +21,7 @@ import gaiasky.gui.ModePopupInfo;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.ControlsSettings.*;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
@@ -1361,9 +1362,13 @@ public class Settings {
                 Array<Controller> controllers = Controllers.getControllers();
                 if (!controllers.isEmpty()) {
                     Controller c = controllers.get(0);
-                    return new HashSet<>(controllerListenersMap.get(c));
+                    if (controllerListenersMap.containsKey(c) && controllerListenersMap.get(c) != null) {
+                        return new HashSet<>(controllerListenersMap.get(c));
+                    } else {
+                        return new HashSet<>();
+                    }
                 }
-                return null;
+                return new HashSet<>();
             }
 
             @Override

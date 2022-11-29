@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class I18nStatus {
     private static final Log logger = Logger.getLogger(I18nStatus.class);
 
-    private static CLIArgs cliArgs;
     private static class CLIArgs {
         @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
         @Parameter(names = { "-s", "--show-untranslated" }, description = "Show untranslated keys for each language.", order = 1) private boolean showUntranslated = false;
@@ -38,7 +37,7 @@ public class I18nStatus {
     }
 
     public static void main(String[] args) {
-        cliArgs = new CLIArgs();
+        CLIArgs cliArgs = new CLIArgs();
         JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
         jc.setProgramName("translationstatus");
         try {

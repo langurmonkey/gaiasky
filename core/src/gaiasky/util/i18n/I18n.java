@@ -75,7 +75,6 @@ public class I18n {
         // Objects
         try {
             I18n.objects = I18NBundle.createBundle(objects, locale, "UTF-8");
-            found = found && true;
         } catch (MissingResourceException e) {
             logger.info(e.getLocalizedMessage());
             // Use default locale - en_GB
@@ -85,7 +84,7 @@ public class I18n {
             } catch (Exception e2) {
                 logger.error(e);
             }
-            found = found && false;
+            found = false;
         }
 
         return found;
