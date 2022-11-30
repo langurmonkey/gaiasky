@@ -70,7 +70,7 @@ public class I18nFormatter {
                 boolean has = props1.getProperty((String) key) != null;
                 if (has) {
                     // Substitute value
-                    String val = TextUtils.escape(props1.getProperty((String) key));
+                    String val = props1.getProperty((String) key);
                     outputProperties.setProperty((String) key, val);
                 } else {
                     // Use default (English), commented

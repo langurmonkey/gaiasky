@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import gaiasky.gui.KeyBindings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
+import gaiasky.util.scene2d.OwnImage;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
 
@@ -14,11 +15,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 
+/**
+ * <p>
+ * Generates sytle-aware tips from a series of strings in the i18n bundle files.
+ * Each tip is a sequence of strings, or groups, separated by '|'. For example,
+ * 'first part|second part|third part' is a tip with three groups, processed separately.
+ * Each group optionally defines the label style to use by prefixing '%%', followed by the
+ * style name. For instance, '%%mono-big here is a text' would print 'here is a text' using the
+ * label style 'mono-big'.
+ * </p><p>
+ * Additionally, styles can be followed by an action ID, which is converted to the keyboard mappings.
+ * For instance, '%%mono-big action.close' would print 'Esc' in the 'mono-big' label style. The
+ * key mappings are separated by '+' and given each a style separately.
+ * </p><p>
+ * Additionally, groups can also define images stored in the default skin
+ * as drawables. To include an image, use the prefix '$$', followed by the identifier of the
+ * image to include. For example, use '$$gamepad-a' to include an image of the A gamepad button.
+ * Images need to live in their own group. The rest of the content of the group is ignored.
+ * </p>
+ * <p>
+ * An example of a full tip would be:
+ * </p>
+ * <ul><li>
+ * "You can use|%%key-big Enter|or|$$gamepad-start|to perform an action."
+ * </li></ul>
+ */
 public class TipsGenerator {
     private static final int MAX_KEYS = 100;
 
     private final Skin skin;
-    private final List<String[]> tips;
+    private final List<TipPart[]> tips;
     private final int[] sequence;
     private int currentIndex = 0;
 
@@ -35,33 +61,46 @@ public class TipsGenerator {
                 for (String line : lines) {
                     String[] tokens = line.split("\\|");
                     int n = tokens.length;
-                    String[] tip = new String[n];
+                    TipPart[] parts = new TipPart[n];
                     for (int i = 0; i < n; i++) {
-                        String style = "";
-                        String text = tokens[i];
-                        if (tokens[i].startsWith("%%")) {
-                            int idx = text.indexOf(" ");
-                            text = tokens[i].substring(idx + 1);
-                            style = tokens[i].substring(0, idx) + " ";
-                        }
-                        if (text.isBlank()) {
-                            tip[i] = null;
+                        var part = new TipPart();
+                        var token = tokens[i].strip();
+                        if (token.startsWith("$$")) {
+                            // Drawable.
+                            int idx = token.indexOf(" ");
+                            if (idx < 0) {
+                                idx = token.length();
+                            }
+                            part.drawable = token.substring(2, idx).strip();
+                            parts[i] = part;
                         } else {
-                            String keys = kb.getStringKeys(text);
-                            if (keys == null)
-                                tip[i] = style + text;
-                            else
-                                tip[i] = style + keys;
+                            // Text with optional style.
+                            if (token.startsWith("%%")) {
+                                // Custom style.
+                                int idx = token.indexOf(" ");
+                                if (idx < 0) {
+                                    idx = token.length();
+                                }
+                                part.style = token.substring(2, idx).strip();
+                                part.text = token.substring(idx + 1).strip();
+                            } else {
+                                part.text = token.strip();
+                            }
+                            // Check keyboard mappings.
+                            if (!part.text.isBlank()) {
+                                String keys = kb.getStringKeys(part.text);
+                                if (keys != null) {
+                                    part.text = keys;
+                                }
+                            }
                         }
+                        parts[i] = part;
                     }
-                    tips.add(tip);
+                    tips.add(parts);
                 }
             } catch (MissingResourceException e) {
                 // Skip
             }
-        }
-        if (this.tips.isEmpty()) {
-            fallback();
         }
 
         int n = this.tips.size();
@@ -79,55 +118,42 @@ public class TipsGenerator {
         }
     }
 
-    private void fallback() {
-        this.tips.add(new String[] { "Use", "0", "to switch to free camera mode" });
-        this.tips.add(new String[] { null, "double-click", "on any object to select it" });
-        this.tips.add(new String[] { "Press", "u", "to open and close the controls window" });
-        this.tips.add(new String[] { "Press", "f", "to search for any object by name" });
-        this.tips.add(new String[] { "Press", "/", "to search for any object by name" });
-        this.tips.add(new String[] { "Press", "ctrl", "k", "to enter panorama mode" });
-    }
-
     public void newTip(WidgetGroup tip) {
-        String[] l = tips.get(sequence[currentIndex]);
+        TipPart[] l = tips.get(sequence[currentIndex]);
         addTip(tip, l);
         currentIndex = (currentIndex + 1) % tips.size();
     }
 
-    private void addTip(WidgetGroup g, String[] tip) {
+    private void addTip(WidgetGroup g, TipPart[] tip) {
         float pad5 = 8f;
         float pad2 = 3.2f;
         g.clear();
 
-        for (String part : tip) {
+        for (TipPart part : tip) {
             if (part == null) {
                 continue;
             }
-            boolean def = true;
-            String style = "main-title-s";
-            String text = part;
-            if (part.startsWith("%%")) {
-                int idx = text.indexOf(" ");
-                text = part.substring(idx + 1);
-                style = part.substring(2, idx);
-                def = false;
-            }
-            if (skin.has(style, Label.LabelStyle.class)) {
-                OwnLabel label = new OwnLabel(text, skin, style);
-                if (def) {
-                    label.setColor(0.5f, 0.5f, 0.5f, 1f);
-                    g.addActor(label);
+            if (part.drawable != null && !part.drawable.isBlank()) {
+                var drawable = skin.getDrawable(part.drawable);
+                if (drawable != null) {
+                    OwnImage image = new OwnImage(drawable);
+                    g.addActor(image);
                 }
+            } else if (skin.has(part.style, Label.LabelStyle.class)) {
+                // Simple styled label.
+                OwnLabel label = new OwnLabel(part.text, skin, part.style);
+                label.setColor(0.5f, 0.5f, 0.5f, 1f);
                 g.addActor(label);
-            } else if (skin.has(style, TextButton.TextButtonStyle.class)) {
-                String[] keys = text.split("\\+");
+            } else if (skin.has(part.style, TextButton.TextButtonStyle.class)) {
+                // Probably key mappings.
+                String[] keys = part.text.split("\\+");
                 int n = keys.length;
                 for (int i = 0; i < n; i++) {
                     String t = keys[i];
                     if (I18n.hasMessage("key." + keys[i])) {
                         t = I18n.msg("key." + keys[i]);
                     }
-                    OwnTextButton button = new OwnTextButton(t, skin, style);
+                    OwnTextButton button = new OwnTextButton(t, skin, part.style);
                     button.pad(pad2, pad5, pad2, pad5);
                     g.addActor(button);
                     if (i < n - 1) {
@@ -137,6 +163,29 @@ public class TipsGenerator {
                     }
                 }
             }
+        }
+    }
+
+    private static class TipPart {
+        public String style = "main-title-s";
+        public String text;
+        public String drawable;
+
+        public TipPart() {
+        }
+
+        public TipPart(String text) {
+            this.text = text;
+        }
+
+        public TipPart(String text, String style) {
+            this.text = text;
+            this.style = style;
+        }
+
+        @Override
+        public String toString() {
+            return drawable != null ? "D-" + drawable : "%%" + style + " " + text;
         }
     }
 }

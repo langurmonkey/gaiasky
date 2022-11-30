@@ -35,7 +35,6 @@ public class TextUtils {
                 .replace("\n", "\\n")
                 .replace("\r", "\\r")
                 .replace("\f", "\\f")
-                .replace("\'", "\\'")
                 .replace("\"", "\\\"");
     }
 

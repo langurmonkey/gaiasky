@@ -152,7 +152,7 @@ public class LoadingGui extends AbstractGui {
 
     }
 
-    private final long tipTime = 4000;
+    private final long tipTime = 2000;
     private long funnyTextTime = 1400;
 
     @Override
