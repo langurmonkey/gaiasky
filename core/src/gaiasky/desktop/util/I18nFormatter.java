@@ -8,6 +8,7 @@ package gaiasky.desktop.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.properties.CommentedProperties;
 
@@ -15,9 +16,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Format i18n bundle files according to a reference file.
@@ -63,18 +62,20 @@ public class I18nFormatter {
             isr1.close();
 
             // Output properties, same as p0
-            CommentedProperties op = props0.clone();
+            CommentedProperties outputProperties = props0.clone();
 
+            Map<String, String> missing = new HashMap<>();
             Set<Object> keys = props0.keySet();
             for (Object key : keys) {
                 boolean has = props1.getProperty((String) key) != null;
                 if (has) {
                     // Substitute value
-                    String val = props1.getProperty((String) key);
-                    op.setProperty((String) key, val);
+                    String val = TextUtils.escape(props1.getProperty((String) key));
+                    outputProperties.setProperty((String) key, val);
                 } else {
+                    // Use default (English), commented
                     System.err.println("Property not found: " + key);
-                    op.remove(key);
+                    missing.put((String) key, TextUtils.escape(props0.getProperty((String) key)));
                 }
             }
 
@@ -86,7 +87,7 @@ public class I18nFormatter {
             FileOutputStream fos1 = new FileOutputStream(outFile, true);
             PrintStream ps = new PrintStream(fos1, true, StandardCharsets.UTF_8);
             // Store with BOM
-            op.store(ps, "\uFEFF");
+            outputProperties.store(ps, "\uFEFF", "UTF-8", missing);
             ps.close();
 
             System.out.println("File written to " + outFile.getAbsolutePath());

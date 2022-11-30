@@ -50,7 +50,7 @@ public class QuitWindow extends GenericDialog {
                 stage.setKeyboardFocus(acceptButton);
             }
         };
-        Timer.schedule(task, 0.5f);
+        Timer.schedule(task, 0.2f);
     }
 
     @Override

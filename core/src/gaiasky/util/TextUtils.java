@@ -21,6 +21,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TextUtils {
 
+    /**
+     * Escape a give String to make it safe to be printed or stored.
+     *
+     * @param s The input String.
+     *
+     * @return The output String.
+     **/
+    public static String escape(String s) {
+        return s.replace("\\", "\\\\")
+                .replace("\t", "\\t")
+                .replace("\b", "\\b")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\f", "\\f")
+                .replace("\'", "\\'")
+                .replace("\"", "\\\"");
+    }
+
     public static String surroundBrackets(String in) {
         return surround(in, "[", "]");
     }
@@ -748,7 +766,7 @@ public class TextUtils {
      * the given target length.
      */
     public static String padString(String str, int length, char padChar) {
-        if(str.length() >= length) {
+        if (str.length() >= length) {
             return str;
         } else {
             return String.format("%1$" + length + "s", str).replace(' ', padChar);

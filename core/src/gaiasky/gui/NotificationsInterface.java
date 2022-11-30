@@ -312,7 +312,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
             case SCREEN_NOTIFICATION_CMD:
                 String title = (String) data[0];
                 String[] msgs = (String[]) data[1];
-                float time = (Float) data[2];
 
                 // Log to output
                 addMessage(title);

@@ -8,6 +8,7 @@ package gaiasky.util.properties;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -46,7 +47,7 @@ public class CommentedProperties extends java.util.Properties {
             int pos = 0;
 
             // Skip BOM character
-            if(!line.isEmpty() && line.charAt(0) == '\uFEFF') {
+            if (!line.isEmpty() && line.charAt(0) == '\uFEFF') {
                 pos++;
             }
 
@@ -213,18 +214,7 @@ public class CommentedProperties extends java.util.Properties {
         store(out, header, "UTF-8");
     }
 
-    /**
-     * Write the properties to the specified OutputStream.
-     * <p>
-     * Overloads the store method in Properties so we can put back comment
-     * and blank lines.
-     *
-     * @param out      The OutputStream to write to.
-     * @param header   Ignored, here for compatibility w/ Properties.
-     * @param encoding The encoding of the file
-     * @throws IOException If the creation of the writer fails.
-     */
-    public void store(OutputStream out, String header, String encoding) throws IOException {
+    public void store(OutputStream out, String header, String encoding, Map<String, String> missing) throws IOException {
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(out, encoding));
 
         // We ignore the header, because if we prepend a commented header
@@ -243,11 +233,19 @@ public class CommentedProperties extends java.util.Properties {
             String key = keyData.get(i);
             if (key.length() > 0) { // This is a 'property' line, so rebuild it
                 String k = saveConvert(key, true, false);
-                if(get(key) != null) {
+                if (get(key) != null && (missing == null || !missing.containsKey(key))) {
                     String val = saveConvert((String) get(key), false, false);
                     writer.println(k + '=' + val);
-                }else{
-                    writer.println('#' + k + '=');
+                } else {
+                    if (missing == null || missing.isEmpty()) {
+                        writer.println('#' + k + '=');
+                    } else {
+                        if (missing.containsKey(key)) {
+                            writer.println('#' + k + '=' + missing.get(key));
+                        } else {
+                            writer.println('#' + k + '=');
+                        }
+                    }
                 }
             } else { // was a blank or comment line, so just restore it
                 writer.println(line);
@@ -260,18 +258,42 @@ public class CommentedProperties extends java.util.Properties {
         if (!keys.isEmpty()) {
             writer.println("# Remaining new properties");
             for (String key : keys) {
-                if (key.length() > 0){
+                if (key.length() > 0) {
                     String k = saveConvert(key, true, false);
-                    if(get(key) != null) {
+                    if (get(key) != null && (missing == null || !missing.containsKey(key))) {
                         String val = saveConvert((String) get(key), false, false);
                         writer.println(k + '=' + val);
-                    }else{
-                        writer.println('#' + k + '=');
+                    } else {
+                        if (missing == null || missing.isEmpty()) {
+                            writer.println('#' + k + '=');
+                        } else {
+                            if (missing.containsKey(key)) {
+                                writer.println('#' + k + '=' + missing.get(key));
+                            } else {
+                                writer.println('#' + k + '=');
+                            }
+                        }
                     }
                 }
             }
         }
         writer.flush();
+    }
+
+    /**
+     * Write the properties to the specified OutputStream.
+     * <p>
+     * Overloads the store method in Properties so we can put back comment
+     * and blank lines.
+     *
+     * @param out      The OutputStream to write to.
+     * @param header   Ignored, here for compatibility w/ Properties.
+     * @param encoding The encoding of the file
+     *
+     * @throws IOException If the creation of the writer fails.
+     */
+    public void store(OutputStream out, String header, String encoding) throws IOException {
+        store(out, header, encoding, null);
     }
 
     private String saveConvert(String var1, boolean var2, boolean var3) {
@@ -344,7 +366,7 @@ public class CommentedProperties extends java.util.Properties {
         return var6.toString();
     }
 
-    private static final char[] hexDigit = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    private static final char[] hexDigit = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
     private static char toHex(int var0) {
         return hexDigit[var0 & 15];
@@ -370,32 +392,32 @@ public class CommentedProperties extends java.util.Properties {
         for (int i = 0; i < size; i++) {
             char c = str.charAt(i);
             switch (c) {
-                case '\n':
-                    buffer.append("\\n");
-                    break;
-                case '\r':
-                    buffer.append("\\r");
-                    break;
-                case '\t':
-                    buffer.append("\\t");
-                    break;
-                case ' ':
-                    buffer.append(head ? "\\ " : " ");
-                    break;
-                case '\\':
-                case '!':
-                case '#':
-                case '=':
-                case ':':
-                    buffer.append('\\').append(c);
-                    break;
-                default:
-                    if (c < ' ' || c > '~') {
-                        String hex = Integer.toHexString(c);
-                        buffer.append("\\u0000", 0, 6 - hex.length());
-                        buffer.append(hex);
-                    } else
-                        buffer.append(c);
+            case '\n':
+                buffer.append("\\n");
+                break;
+            case '\r':
+                buffer.append("\\r");
+                break;
+            case '\t':
+                buffer.append("\\t");
+                break;
+            case ' ':
+                buffer.append(head ? "\\ " : " ");
+                break;
+            case '\\':
+            case '!':
+            case '#':
+            case '=':
+            case ':':
+                buffer.append('\\').append(c);
+                break;
+            default:
+                if (c < ' ' || c > '~') {
+                    String hex = Integer.toHexString(c);
+                    buffer.append("\\u0000", 0, 6 - hex.length());
+                    buffer.append(hex);
+                } else
+                    buffer.append(c);
             }
             if (c != ' ')
                 head = key;
