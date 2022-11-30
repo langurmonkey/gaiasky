@@ -88,11 +88,27 @@ $  cp objects.properties assets/i18n/objects_vi_VN.properties
 
 Now you are ready to start translating! Once you are done, create a merge request and we'll merge your file into the main repository after making sure everything is alright.
 
-#### Tips strings
+#### Tip strings
 
 The loading screen of Gaia Sky displays tips on the general working of the program at the bottom.
 
 These tips are in the main properties bundle, under the keys `tip.n`, where `n` is a number from 0 to 100. They are optional and have a special format. They can have up to three regions separated by `|`. Each region may start with a style definition, using the special string `%%`. Additionally, actions `action.*` are converted to their bound keys automatically.
+
+These tips are defined in the `gsbundle[lang].properties` files, under the keys `tip.[index]`.
+
+Each tip is a sequence of strings, or groups, separated by the character `|`. For example,
+`first group|second group|third group` is a tip with three groups, processed separately.
+Each group optionally defines the label style to use by prefixing `%%`, followed by the
+style name. For instance, `%%mono-big here is a text` would print `here is a text` using the
+label style `mono-big`.
+Additionally, styles can be followed by an action ID, which is converted to the keyboard mappings.
+For instance, `%%mono-big action.close` would print :guilabel:`Esc` in the `mono-big` label style. The
+key mappings are separated by `+` and given each a style separately.
+
+Additionally, groups can also define images stored in the default skin
+as drawables. To include an image, use the prefix `$$`, followed by the identifier of the
+image to include. For example, use `$$gamepad-a` to include an image of the A gamepad button.
+Images need to live in their own group. The rest of the content of the group is ignored.
 
 #### Funny strings
 
@@ -129,42 +145,38 @@ You can pass CLI arguments to the application via Java like this:
 gradlew core:runTranslationStatus --args='-s -u'
 ```
 
-The status of the different translations as of 2022-03-31 is as follows.
+The status of the different translations as of 2022-11-30 is as follows.
 
 ```commandline
-Total keys: 1195
-
-Spanish (Spain) (es_ES)
-Translated: 629/1195
-52.64%
-
-Slovenian (Slovenia) (sl_SI)
-Translated: 392/1195
-32.8%
-
-French (France) (fr_FR)
-Translated: 489/1195
-40.92%
-
-Russian (Russia) (ru_RU)
-Translated: 809/1195
-67.7%
+Total keys: 1413
 
 Catalan (ca)
-Translated: 1195/1195
+Translated: 1413/1413
 100.0%
 
-Bulgarian (Bulgaria) (bg_BG)
-Translated: 1193/1195
-99.83%
+Spanish (Spain) (es_ES)
+Translated: 1413/1413
+100.0%
 
 German (Germany) (de_DE)
-Translated: 600/1195
-50.21%
+Translated: 578/1413
+40.91%
 
-English (United States) (en_US)
-Translated: 11/1195
-0.92%
+French (France) (fr_FR)
+Translated: 450/1413
+31.85%
+
+Slovenian (Slovenia) (sl_SI)
+Translated: 359/1413
+25.41%
+
+Bulgarian (Bulgaria) (bg_BG)
+Translated: 1344/1413
+95.12%
+
+Russian (Russia) (ru_RU)
+Translated: 758/1413
+53.64%
 ```
 
 You can contribute to those, or you can create a new translation for another language. Adding new translations is as easy as submitting a pull request. Translation files should go in the [i18n](assets/i18n) folder.
@@ -175,13 +187,13 @@ First, copy the default [gsbundle.properties](assets/i18n/gsbundle.properties) f
 
 ### Formatting properties files
 
-The default English properties file has lots of comments, which sometimes are not kept with some i18n editors. You can recover the comments by running our `I18nFormatter`.
+The default English properties file has lots of comments, which sometimes are not kept with some i18n editors. You can recover the comments in your translation file (for `language_code` and `country_code`) by running our `I18nFormatter`:
 
 ```commandline
 gradlew core:runI18nFormatter --args="gsbundle.properties gsbundle_<lang_code>[<_country_code>].properties"
 ```
 
-This produces a new file in the root of the project with the contents of your language file formatted using the format in the first specified file.
+This updates your translation file with the undetected keys from the base English file, and includes all comments.
 
 ### Data
 
