@@ -80,10 +80,10 @@ In order to add a new translation, just copy the default files and use the code 
 
 For example, if you want to create a translation for Vietnamese (Vietnam), with language code `vi_VN`, copy the default English files to the Vietnamese like this:
 
-```commandline
-$  cd assets/i18n
-$  cp gsbundle.properties assets/i18n/gsbundle_vi_VN.properties
-$  cp objects.properties assets/i18n/objects_vi_VN.properties
+```bash
+cd assets/i18n
+cp gsbundle.properties assets/i18n/gsbundle_vi_VN.properties
+cp objects.properties assets/i18n/objects_vi_VN.properties
 ```
 
 Now you are ready to start translating! Once you are done, create a merge request and we'll merge your file into the main repository after making sure everything is alright.
@@ -118,7 +118,7 @@ The loading screen of Gaia Sky displays funny sentences which are automatically 
 
 Right now we have translation files for Bulgarian, English (UK and US), German, French, Catalan, Spanish and Slovenian. The level of completion varies from language to language. You can compute it by running:
 
-```commandline
+```bash
 gradlew core:runTranslationStatus
 ```
 
@@ -141,13 +141,13 @@ Usage: translationstatus [options]
 
 You can pass CLI arguments to the application via Java like this:
 
-```commandline
+```bash
 gradlew core:runTranslationStatus --args='-s -u'
 ```
 
 The status of the different translations as of 2022-11-30 is as follows.
 
-```commandline
+```
 Total keys: 1413
 
 Catalan (ca)
@@ -189,7 +189,7 @@ First, copy the default [gsbundle.properties](assets/i18n/gsbundle.properties) f
 
 The default English properties file has lots of comments, which sometimes are not kept with some i18n editors. You can recover the comments in your translation file (for `language_code` and `country_code`) by running our `I18nFormatter`:
 
-```commandline
+```bash
 gradlew core:runI18nFormatter --args="gsbundle.properties gsbundle_<lang_code>[<_country_code>].properties"
 ```
 
