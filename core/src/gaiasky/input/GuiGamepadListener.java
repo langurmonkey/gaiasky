@@ -250,17 +250,20 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
      */
     public void rightStickVertical(float value) {
         if (value != 0) {
-            var focus = stage.getKeyboardFocus();
-            if (focus instanceof SelectBox) {
-                // Up/down in select box.
-                var selectBox = (SelectBox<?>) stage.getKeyboardFocus();
-                GuiUtils.selectBoxMoveSelection(value < 0, false, selectBox);
-            } else {
-                // Move scroll.
-                var scroll = GuiUtils.getScrollPaneIn(getContentContainers().get(0));
-                if (scroll != null) {
-                    scroll.setScrollY(scroll.getScrollY() + 150 * value);
-                }
+            rightStickVertical(stage.getKeyboardFocus(), value);
+        }
+    }
+
+    protected void rightStickVertical(Actor focus, float value) {
+        if (focus instanceof SelectBox) {
+            // Up/down in select box.
+            var selectBox = (SelectBox<?>) stage.getKeyboardFocus();
+            GuiUtils.selectBoxMoveSelection(value < 0, false, selectBox);
+        } else {
+            // Move scroll.
+            var scroll = GuiUtils.getScrollPaneIn(getContentContainers().get(0));
+            if (scroll != null) {
+                scroll.setScrollY(scroll.getScrollY() + 150 * value);
             }
         }
     }
@@ -274,7 +277,10 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
      * @param value The axis value.
      */
     public void rightStickHorizontal(float value) {
-        Actor focus = stage.getKeyboardFocus();
+        rightStickHorizontal(stage.getKeyboardFocus(), value);
+    }
+
+    protected void rightStickHorizontal(Actor focus, float value) {
         if (focus instanceof OwnSliderPlus) {
             var slider = (OwnSliderPlus) focus;
             GuiUtils.sliderMove(value > 0, 0.05f, slider);

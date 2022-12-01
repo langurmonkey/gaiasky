@@ -352,20 +352,22 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case CAMERA_MODE_CMD:
-            // Update camera mode selection
-            final CameraMode mode = (CameraMode) data[0];
-            Array<CameraComboBoxBean> cModes = cameraMode.getItems();
-            CameraComboBoxBean selected = null;
-            for (CameraComboBoxBean ccbb : cModes) {
-                if (ccbb.mode == mode) {
-                    selected = ccbb;
-                    break;
+            if (source != cameraMode) {
+                // Update camera mode selection
+                final var mode = (CameraMode) data[0];
+                var cModes = cameraMode.getItems();
+                CameraComboBoxBean selected = null;
+                for (var cameraModeBean : cModes) {
+                    if (cameraModeBean.mode == mode) {
+                        selected = cameraModeBean;
+                        break;
+                    }
                 }
-            }
-            if (selected != null) {
-                cameraMode.getSelection().setProgrammaticChangeEvents(false);
-                cameraMode.setSelected(selected);
-                cameraMode.getSelection().setProgrammaticChangeEvents(true);
+                if (selected != null) {
+                    cameraMode.getSelection().setProgrammaticChangeEvents(false);
+                    cameraMode.setSelected(selected);
+                    cameraMode.getSelection().setProgrammaticChangeEvents(true);
+                }
             }
             break;
         case ROTATION_SPEED_CMD:

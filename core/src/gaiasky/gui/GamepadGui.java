@@ -8,7 +8,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -19,14 +19,15 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.beans.CameraComboBoxBean;
 import gaiasky.input.GuiGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.view.FilterView;
-import gaiasky.scene.view.FocusView;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.view.FilterView;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.i18n.I18n;
@@ -37,10 +38,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * GUI that is operated with a game controller and optimized for that purpose.
@@ -54,7 +53,8 @@ public class GamepadGui extends AbstractGui {
     private OwnTextButton searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     // Contains a matrix (column major) of actors for each tab
     private final List<Actor[][]> model;
-    private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
+    private OwnSelectBox<CameraComboBoxBean> cameraMode;
+    private OwnTextButton cameraCinematic;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
     private OwnTextField searchField;
@@ -108,7 +108,7 @@ public class GamepadGui extends AbstractGui {
         gamepadListener = new GamepadGuiListener(this, Settings.settings.controls.gamepad.mappingsFile);
 
         // Comment to hide this whole dialog and functionality
-        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED);
+        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD);
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
     }
 
@@ -243,56 +243,36 @@ public class GamepadGui extends AbstractGui {
         camT.setSize(w, h);
         CameraManager cm = GaiaSky.instance.getCameraManager();
 
-        // Focus
-        cameraFocus = new OwnTextButton(CameraMode.FOCUS_MODE.toStringI18n(), skin, "toggle-big");
-        cameraModel[0][0] = cameraFocus;
-        cameraFocus.setWidth(ww);
-        cameraFocus.setChecked(cm.getMode().isFocus());
-        cameraFocus.addListener(event -> {
+        // Camera mode
+        final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
+        final int cameraModes = CameraMode.values().length;
+        final CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
+        for (int i = 0; i < cameraModes; i++) {
+            cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
+        }
+        cameraMode = new OwnSelectBox<>(skin, "big");
+        cameraModel[0][0] = cameraMode;
+        cameraMode.setWidth(ww);
+        cameraMode.setItems(cameraOptions);
+        cameraMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                if (cameraFocus.isChecked()) {
-                    em.post(Event.CAMERA_MODE_CMD, cameraFocus, CameraMode.FOCUS_MODE);
-                    cameraFree.setProgrammaticChangeEvents(false);
-                    cameraFree.setChecked(false);
-                    cameraFree.setProgrammaticChangeEvents(true);
-                } else {
-                    em.post(Event.CAMERA_MODE_CMD, cameraFocus, CameraMode.FREE_MODE);
-                    cameraFree.setProgrammaticChangeEvents(false);
-                    cameraFree.setChecked(true);
-                    cameraFree.setProgrammaticChangeEvents(true);
-                }
+                CameraComboBoxBean selection = cameraMode.getSelected();
+                CameraMode mode = selection.mode;
+
+                EventManager.publish(Event.CAMERA_MODE_CMD, cameraMode, mode);
                 return true;
             }
             return false;
         });
-
-        // Free
-        cameraFree = new OwnTextButton(CameraMode.FREE_MODE.toStringI18n(), skin, "toggle-big");
-        cameraModel[0][1] = cameraFree;
-        cameraFree.setWidth(ww);
-        cameraFree.setChecked(cm.getMode().isFree());
-        cameraFree.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (cameraFree.isChecked()) {
-                    em.post(Event.CAMERA_MODE_CMD, cameraFree, CameraMode.FREE_MODE);
-                    cameraFocus.setProgrammaticChangeEvents(false);
-                    cameraFocus.setChecked(false);
-                    cameraFocus.setProgrammaticChangeEvents(true);
-                } else {
-                    em.post(Event.CAMERA_MODE_CMD, cameraFree, CameraMode.FOCUS_MODE);
-                    cameraFocus.setProgrammaticChangeEvents(false);
-                    cameraFocus.setChecked(true);
-                    cameraFocus.setProgrammaticChangeEvents(true);
-
-                }
-                return true;
-            }
-            return false;
-        });
+        VerticalGroup modeGroup = new VerticalGroup();
+        modeGroup.columnLeft().left();
+        modeGroup.pad(pad5);
+        modeGroup.addActor(modeLabel);
+        modeGroup.addActor(cameraMode);
 
         // Cinematic
         cameraCinematic = new OwnTextButton(I18n.msg("gui.camera.cinematic"), skin, "toggle-big");
-        cameraModel[0][2] = cameraCinematic;
+        cameraModel[0][1] = cameraCinematic;
         cameraCinematic.setWidth(ww);
         cameraCinematic.setChecked(Settings.settings.scene.camera.cinematic);
         cameraCinematic.addListener(event -> {
@@ -366,13 +346,13 @@ public class GamepadGui extends AbstractGui {
             return false;
         });
 
-        camT.add(cameraFocus).padBottom(pad10).padRight(pad30);
+        camT.add(modeGroup).padBottom(pad10).padRight(pad30);
         camT.add(fovSlider).padBottom(pad10).row();
 
-        camT.add(cameraFree).padBottom(pad10).padRight(pad30);
+        camT.add(cameraCinematic).padBottom(pad10).padRight(pad30);
         camT.add(camSpeedSlider).padBottom(pad10).row();
 
-        camT.add(cameraCinematic).padBottom(pad10).padRight(pad30);
+        camT.add().padBottom(pad10).padRight(pad30);
         camT.add(camRotSlider).padBottom(pad10).row();
 
         camT.add().padBottom(pad10).padRight(pad30);
@@ -1141,7 +1121,7 @@ public class GamepadGui extends AbstractGui {
     public void updateFocused(boolean force) {
         if ((force || content.getParent() != null) && currentModel != null && currentModel.length != 0) {
             Actor actor = currentModel[fi][fj];
-            if (actor instanceof Button || actor instanceof Slider) {
+            if (GuiUtils.isInputWidget(actor)) {
                 stage.setKeyboardFocus(actor);
             }
         }
@@ -1181,23 +1161,8 @@ public class GamepadGui extends AbstractGui {
         updateFocused();
     }
 
-    public void sliderUp(float percent) {
-        sliderMove(true, percent);
-    }
-
-    public void sliderDown(float percent) {
-        sliderMove(false, percent);
-    }
-
-    public void sliderMove(boolean up, float percent) {
-        if (currentModel != null && currentModel[fi][fj] != null && currentModel[fi][fj] instanceof OwnSliderPlus) {
-            OwnSliderPlus s = (OwnSliderPlus) currentModel[fi][fj];
-            float max = s.getMaxValue();
-            float min = s.getMinValue();
-            float val = s.getValue();
-            float inc = (max - min) * percent;
-            s.setValue(MathUtils.clamp(val + (up ? inc : -inc), min, max));
-        }
+    private Actor getFocusedActor() {
+        return currentModel != null ? currentModel[fi][fj] : null;
     }
 
     private int update(int val, int inc, int len) {
@@ -1222,6 +1187,7 @@ public class GamepadGui extends AbstractGui {
     public void notify(final Event event, Object source, final Object... data) {
         // Empty by default
         switch (event) {
+        case SCENE_LOADED -> this.scene = (Scene) data[0];
         case SHOW_CONTROLLER_GUI_ACTION -> {
             if (content.isVisible() && content.hasParent()) {
                 removeControllerGui();
@@ -1236,7 +1202,25 @@ public class GamepadGui extends AbstractGui {
             timeStartStop.setText(on ? "Stop time" : "Start time");
             timeStartStop.setProgrammaticChangeEvents(true);
         }
-        case SCENE_LOADED -> this.scene = (Scene) data[0];
+        case CAMERA_MODE_CMD -> {
+            if (source != cameraMode) {
+                // Update camera mode selection
+                final var mode = (CameraMode) data[0];
+                var cModes = cameraMode.getItems();
+                CameraComboBoxBean selected = null;
+                for (var cameraModeBean : cModes) {
+                    if (cameraModeBean.mode == mode) {
+                        selected = cameraModeBean;
+                        break;
+                    }
+                }
+                if (selected != null) {
+                    cameraMode.getSelection().setProgrammaticChangeEvents(false);
+                    cameraMode.setSelected(selected);
+                    cameraMode.getSelection().setProgrammaticChangeEvents(true);
+                }
+            }
+        }
         case STAR_POINT_SIZE_CMD -> {
             if (source != pointSize) {
                 hackProgrammaticChangeEvents = false;
@@ -1453,15 +1437,12 @@ public class GamepadGui extends AbstractGui {
 
         @Override
         public void rightStickVertical(float value) {
+            super.rightStickVertical(gui.getFocusedActor(), value);
         }
 
         @Override
         public void rightStickHorizontal(float value) {
-            if (value > 0) {
-                gui.sliderUp(0.05f);
-            } else if (value < 0) {
-                gui.sliderDown(0.05f);
-            }
+            super.rightStickHorizontal(gui.getFocusedActor(), value);
         }
     }
 

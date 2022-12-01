@@ -747,6 +747,23 @@
         "selection": "default-select-selection",
         "background": "dark-grey"
       }
+    },
+    "big": {
+      "font": "title-23",
+      "fontColor": "white",
+      "overFontColor": "highlight",
+      "disabledFontColor": "grey",
+      "background": "default-select",
+      "backgroundDisabled": "default-select-disabled",
+      "backgroundFocused": "default-select-focused",
+      "scrollStyle": "default",
+      "listStyle": {
+        "font": "title-23",
+        "fontColorSelected": "white",
+        "fontColorUnselected": "white",
+        "selection": "default-select-selection",
+        "background": "dark-grey"
+      }
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle": {
