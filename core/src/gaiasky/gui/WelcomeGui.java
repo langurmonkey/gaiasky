@@ -754,25 +754,27 @@ public class WelcomeGui extends AbstractGui {
         }
     }
 
-    public void updateFocused() {
+    public boolean updateFocused() {
         if (buttonList != null && buttonList.size != 0) {
             Button actor = buttonList.get(currentSelected);
             stage.setKeyboardFocus(actor);
+            return true;
         }
+        return false;
     }
 
-    private void up() {
+    private boolean up() {
         if (currentSelected == 0) {
             currentSelected = buttonList.size - 1;
         } else {
             currentSelected = (currentSelected - 1) % buttonList.size;
         }
-        updateFocused();
+        return updateFocused();
     }
 
-    private void down() {
+    private boolean down() {
         currentSelected = (currentSelected + 1) % buttonList.size;
-        updateFocused();
+        return updateFocused();
     }
 
     public void fireChange() {
@@ -792,35 +794,40 @@ public class WelcomeGui extends AbstractGui {
         }
 
         @Override
-        public void close() {
+        public boolean close() {
             GaiaSky.postRunnable(Gdx.app::exit);
+            return true;
         }
 
         @Override
-        public void accept() {
+        public boolean accept() {
             gaiaSky();
+            return true;
         }
 
         @Override
-        public void select() {
+        public boolean select() {
+            return false;
         }
 
         @Override
-        public void tabLeft() {
+        public boolean tabLeft() {
+            return false;
         }
 
         @Override
-        public void tabRight() {
+        public boolean tabRight() {
+            return false;
         }
 
         @Override
-        public void moveUp() {
-            up();
+        public boolean moveUp() {
+            return up();
         }
 
         @Override
-        public void moveDown() {
-            down();
+        public boolean moveDown() {
+            return down();
         }
 
     }

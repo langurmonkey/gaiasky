@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
+import gaiasky.gui.beans.ComponentTypeBean;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -28,7 +29,7 @@ public class DatasetLoadDialog extends GenericDialog {
     public OwnTextField dsName, magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
     public OwnSliderPlus particleSize, colorNoise;
     public ColorPicker particleColor, labelColor;
-    public OwnSelectBox<ComponentType> componentType;
+    public OwnSelectBox<ComponentTypeBean> componentType;
 
     private final String fileName;
 
@@ -206,11 +207,18 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(GuiUtils.tooltipHg(profileDecay, "gui.dsload.profiledecay.tooltip", skin)).left().padBottom(pad20).row();
 
         // Component type
-        ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
+        ComponentTypeBean[] componentTypes = new ComponentTypeBean[] {
+                new ComponentTypeBean(ComponentType.Others),
+                new ComponentTypeBean(ComponentType.Stars),
+                new ComponentTypeBean(ComponentType.Galaxies),
+                new ComponentTypeBean(ComponentType.Clusters),
+                new ComponentTypeBean(ComponentType.Asteroids),
+                new ComponentTypeBean(ComponentType.Locations)
+        };
         componentType = new OwnSelectBox<>(skin);
         componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
-        componentType.setSelected(ComponentType.Galaxies);
+        componentType.setSelectedIndex(2);
         container.add(new OwnLabel(I18n.msg("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
         container.add(componentType).left().padBottom(pad10).row();
 
@@ -243,11 +251,18 @@ public class DatasetLoadDialog extends GenericDialog {
         addLabelColor(container);
 
         // Component type
-        ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
+        ComponentTypeBean[] componentTypes = new ComponentTypeBean[] {
+                new ComponentTypeBean(ComponentType.Others),
+                new ComponentTypeBean(ComponentType.Stars),
+                new ComponentTypeBean(ComponentType.Galaxies),
+                new ComponentTypeBean(ComponentType.Clusters),
+                new ComponentTypeBean(ComponentType.Asteroids),
+                new ComponentTypeBean(ComponentType.Locations)
+        };
         componentType = new OwnSelectBox<>(skin);
         componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
-        componentType.setSelected(ComponentType.Clusters);
+        componentType.setSelectedIndex(3);
         container.add(new OwnLabel(I18n.msg("gui.dsload.ct"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
         container.add(componentType).left().padBottom(pad10).row();
 
@@ -420,7 +435,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.magnitudeScale = magnitudeScale.getDoubleValue(0);
         } else if (particles.isChecked()) {
             datasetOptions.type = DatasetLoadType.PARTICLES;
-            datasetOptions.ct = componentType.getSelected();
+            datasetOptions.ct = componentType.getSelected().ct;
             datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
@@ -428,7 +443,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * datasetOptions.particleSize) };
         } else if (clusters.isChecked()) {
             datasetOptions.type = DatasetLoadType.CLUSTERS;
-            datasetOptions.ct = componentType.getSelected();
+            datasetOptions.ct = componentType.getSelected().ct;
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
         } else if (variables.isChecked()) {
             datasetOptions.type = DatasetLoadType.VARIABLES;

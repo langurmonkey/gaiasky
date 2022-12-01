@@ -104,8 +104,6 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                     } else {
                         info(null, null);
                     }
-                    if (GaiaSky.instance.getICamera() instanceof NaturalCamera)
-                        ((NaturalCamera) GaiaSky.instance.getICamera()).getCurrentMouseKbdListener().removePressedKey(ie.getKeyCode());
 
                     if (ie.getKeyCode() == Keys.ESCAPE) {
                         // Lose focus

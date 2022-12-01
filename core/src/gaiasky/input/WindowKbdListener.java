@@ -1,6 +1,5 @@
 package gaiasky.input;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.GenericDialog;
@@ -24,31 +23,35 @@ public class WindowKbdListener extends GuiKbdListener {
     }
 
     @Override
-    public void close() {
-        dialog.closeCancel();
+    public boolean close() {
+        return dialog.closeCancel();
     }
 
     @Override
-    public void accept() {
+    public boolean accept() {
+        return false;
     }
 
     @Override
-    public void select() {
+    public boolean select() {
         var target = stage.getKeyboardFocus();
         if (target != dialog.acceptButton && dialog.acceptButton != null) {
             stage.setKeyboardFocus(dialog.acceptButton);
+            return true;
         } else if (target != dialog.cancelButton && dialog.cancelButton != null) {
             stage.setKeyboardFocus(dialog.cancelButton);
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void tabLeft() {
-        dialog.tabLeft();
+    public boolean tabLeft() {
+        return dialog.tabLeft();
     }
 
     @Override
-    public void tabRight() {
-        dialog.tabRight();
+    public boolean tabRight() {
+        return dialog.tabRight();
     }
 }

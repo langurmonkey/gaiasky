@@ -1415,20 +1415,20 @@ public class DatasetManagerWindow extends GenericDialog {
         scroll[1][1] = 0f;
     }
 
-    private void up() {
+    private boolean up() {
         selectedIndex = selectedIndex - 1;
         if (selectedIndex < 0) {
             selectedIndex = selectionOrder.size() - 1;
         }
-        updateSelection();
+        return updateSelection();
     }
 
-    private void down() {
+    private boolean down() {
         selectedIndex = (selectedIndex + 1) % selectionOrder.size();
-        updateSelection();
+        return updateSelection();
     }
 
-    private void updateSelection() {
+    private boolean updateSelection() {
         if (selectedIndex >= 0 && selectedIndex < selectionOrder.size()) {
             Pair<DatasetDesc, Actor> selection = selectionOrder.get(selectedIndex);
             Actor target = selection.getSecond();
@@ -1442,7 +1442,9 @@ public class DatasetManagerWindow extends GenericDialog {
             // Update right pane
             GaiaSky.postRunnable(() -> reloadRightPane(right, selection.getFirst(), currentMode));
             selectedDataset[currentMode.ordinal()] = selection.getFirst();
+            return true;
         }
+        return false;
     }
 
     private class DatasetManagerKbdListener extends WindowKbdListener {
@@ -1452,13 +1454,13 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
         @Override
-        public void moveUp() {
-            up();
+        public boolean moveUp() {
+            return up();
         }
 
         @Override
-        public void moveDown() {
-            down();
+        public boolean moveDown() {
+            return down();
         }
     }
     private class DatasetManagerGamepadListener extends WindowGamepadListener {

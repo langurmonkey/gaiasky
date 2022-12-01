@@ -362,7 +362,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     /**
      * Closes the window with the accept action
      */
-    public void closeAccept() {
+    public boolean closeAccept() {
         // Exit
         boolean close = accept();
         if (acceptRunnable != null) {
@@ -372,18 +372,20 @@ public abstract class GenericDialog extends CollapsibleWindow {
             removeOwnListeners();
             me.hide();
         }
+        return close;
     }
 
     /**
      * Closes the window with the cancel action
      */
-    public void closeCancel() {
+    public boolean closeCancel() {
         cancel();
         if (cancelRunnable != null) {
             cancelRunnable.run();
         }
         removeOwnListeners();
         me.hide();
+        return true;
     }
 
     /**
@@ -651,15 +653,17 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
     }
 
-    public void tabRight() {
+    public boolean tabRight() {
         if (tabButtons != null) {
             selectedTab = (selectedTab + 1) % tabButtons.size;
             tabButtons.get(selectedTab).setChecked(true);
             focusFirstInputWidget();
+            return true;
         }
+        return false;
     }
 
-    public void tabLeft() {
+    public boolean tabLeft() {
         if (tabButtons != null) {
             selectedTab = selectedTab - 1;
             if (selectedTab < 0) {
@@ -667,7 +671,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
             }
             tabButtons.get(selectedTab).setChecked(true);
             focusFirstInputWidget();
+            return true;
         }
+        return false;
     }
 
     public void focusFirstInputWidget(){

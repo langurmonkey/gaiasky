@@ -31,6 +31,7 @@ package gaiasky.render;
 
 import gaiasky.util.i18n.I18n;
 
+import java.io.Serial;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ import java.util.MissingResourceException;
  * BitSet with some added functionality
  */
 public class ComponentTypes extends BitSet {
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
     public static final int CT_SIZE = 32;
 
     public enum ComponentType {

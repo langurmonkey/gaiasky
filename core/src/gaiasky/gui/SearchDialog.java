@@ -6,6 +6,7 @@
 package gaiasky.gui;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -124,12 +125,14 @@ public class SearchDialog extends GenericDialog {
                         removeCandidates();
                         me.remove();
                         return true;
-                    } else if (code == Keys.UP && matchingSize > 0) {
+                    } else if (code == Keys.TAB && Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && matchingSize > 0) {
                         cIdx = cIdx - 1 < 0 ? matchingSize - 1 : cIdx - 1;
                         selectMatch();
-                    } else if (code == Keys.DOWN && matchingSize > 0) {
+                        return true;
+                    } else if (code == Keys.TAB && !Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) && matchingSize > 0) {
                         cIdx = (cIdx + 1) % matchingSize;
                         selectMatch();
+                        return true;
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
                         if (suggestions) {
@@ -199,13 +202,12 @@ public class SearchDialog extends GenericDialog {
                                 cancelTasks();
                                 removeCandidates();
                             }
+                            return true;
                         }
                     } else {
                         removeCandidates();
+                        return true;
                     }
-
-                    if (GaiaSky.instance.getICamera() instanceof NaturalCamera)
-                        ((NaturalCamera) GaiaSky.instance.getICamera()).getCurrentMouseKbdListener().removePressedKey(ie.getKeyCode());
                 }
             }
             return false;
@@ -223,17 +225,13 @@ public class SearchDialog extends GenericDialog {
     public boolean accept() {
         cancelTasks();
         removeCandidates();
-        stage.unfocusAll();
         info(null);
         return true;
     }
 
     @Override
     public void cancel() {
-        cancelTasks();
-        removeCandidates();
-        stage.unfocusAll();
-        info(null);
+        // Unused
     }
 
     private void cancelTasks() {
