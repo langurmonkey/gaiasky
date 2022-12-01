@@ -852,7 +852,7 @@ public class WelcomeGui extends AbstractGui {
         }
 
         @Override
-        public boolean pollAxis() {
+        public boolean pollAxes() {
             if (lastControllerUsed != null) {
                 float value = (float) applyZeroPoint(lastControllerUsed.getAxis(mappings.getAxisLstickV()));
                 if (value > 0) {
@@ -868,10 +868,10 @@ public class WelcomeGui extends AbstractGui {
 
         @Override
         public boolean pollButtons() {
-            if (pressedKeys.contains(mappings.getButtonDpadUp())) {
+            if (isKeyPressed(mappings.getButtonDpadUp())) {
                 up();
                 return true;
-            } else if (pressedKeys.contains(mappings.getButtonDpadDown())) {
+            } else if (isKeyPressed(mappings.getButtonDpadDown())) {
                 down();
                 return true;
             }
@@ -881,7 +881,6 @@ public class WelcomeGui extends AbstractGui {
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
             long now = TimeUtils.millis();
-            addPressedKey(buttonCode);
             if (buttonCode == mappings.getButtonStart()) {
                 gaiaSky();
                 lastButtonPollTime = now;
@@ -901,7 +900,6 @@ public class WelcomeGui extends AbstractGui {
 
         @Override
         public boolean buttonUp(Controller controller, int buttonCode) {
-            removePressedKey(buttonCode);
             lastControllerUsed = controller;
             return true;
         }

@@ -28,8 +28,8 @@ public class MainGamepadListener extends AbstractGamepadListener {
 
     @Override
     public boolean buttonDown(Controller controller, final int buttonCode) {
-        super.buttonDown(controller, buttonCode);
         if (active.get()) {
+            super.buttonDown(controller, buttonCode);
             logger.debug("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
             if (buttonCode == mappings.getButtonX()) {
@@ -68,8 +68,8 @@ public class MainGamepadListener extends AbstractGamepadListener {
 
     @Override
     public boolean buttonUp(Controller controller, int buttonCode) {
-        super.buttonUp(controller, buttonCode);
         if (active.get()) {
+            super.buttonUp(controller, buttonCode);
             logger.debug("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
             cam.setGamepadInput(true);
         }
@@ -79,6 +79,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
     @Override
     public boolean axisMoved(Controller controller, int axisCode, float value) {
         if (active.get()) {
+            super.axisMoved(controller, axisCode, value);
             logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
 
             boolean treated = false;
@@ -126,8 +127,9 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 treated = true;
             }
 
-            if (treated)
+            if (treated) {
                 cam.setGamepadInput(true);
+            }
 
             return treated;
         }
@@ -135,7 +137,7 @@ public class MainGamepadListener extends AbstractGamepadListener {
     }
 
     @Override
-    public boolean pollAxis() {
+    public boolean pollAxes() {
         return false;
     }
 

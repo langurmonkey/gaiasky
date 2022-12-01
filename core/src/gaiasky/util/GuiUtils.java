@@ -258,6 +258,33 @@ public class GuiUtils {
         return null;
     }
 
+    /**
+     * If the given actor has a scroll pane ancestor, this method makes sure that
+     * the actor is visible by moving the scroll position if required.
+     *
+     * @param actor The actor.
+     *
+     * @return True if the scroll needed to be moved.
+     */
+    public static boolean ensureScrollVisible(Actor actor) {
+        if (actor != null) {
+            Actor parent = actor.getParent();
+            float x = actor.getX();
+            float y = actor.getY();
+            while(parent != null && !(parent instanceof ScrollPane)) {
+                x += parent.getX();
+                y += parent.getY();
+                parent = parent.getParent();
+            }
+            if(parent != null) {
+                var scrollPane = (ScrollPane) parent;
+                scrollPane.scrollTo(x, y, actor.getWidth(), actor.getHeight());
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Array<Actor> getInputWidgets(Array<? extends Actor> actors, Array<Actor> list) {
         for (var actor : actors) {
             getInputWidgets(actor, list);

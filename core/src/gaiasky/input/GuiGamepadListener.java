@@ -30,7 +30,6 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
         long now = TimeUtils.millis();
-        super.buttonDown(controller, buttonCode);
         if (buttonCode == mappings.getButtonA()) {
             actionDown();
             lastButtonPollTime = now;
@@ -67,11 +66,6 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
         }
         lastControllerUsed = controller;
         return true;
-    }
-
-    @Override
-    public boolean buttonUp(Controller controller, int buttonCode) {
-        return super.buttonUp(controller, buttonCode);
     }
 
     @Override
@@ -117,7 +111,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
     }
 
     @Override
-    public boolean pollAxis() {
+    public boolean pollAxes() {
         if (lastControllerUsed != null) {
             float valueLV = (float) applyZeroPoint(lastControllerUsed.getAxis(mappings.getAxisLstickV()));
             if (valueLV > 0) {
@@ -236,6 +230,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
                 index = (index + 1) % inputWidgets.size;
             }
             stage.setKeyboardFocus(inputWidgets.get(index));
+            GuiUtils.ensureScrollVisible(inputWidgets.get(index));
         }
     }
 

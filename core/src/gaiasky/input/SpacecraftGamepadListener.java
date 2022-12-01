@@ -29,7 +29,7 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
     }
 
     @Override
-    public boolean pollAxis() {
+    public boolean pollAxes() {
         return false;
     }
 
@@ -56,8 +56,6 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
         logger.debug("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
         cam.setGamepadInput(true);
-
-        addPressedKey(buttonCode);
 
         SpacecraftView sc = cam.getSpacecraftView();
         if (buttonCode == mappings.getButtonRB()) {
@@ -106,8 +104,6 @@ public class SpacecraftGamepadListener extends AbstractGamepadListener {
             EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
         }
         cam.setGamepadInput(true);
-
-        removePressedKey(buttonCode);
 
         lastController = controller;
         return true;

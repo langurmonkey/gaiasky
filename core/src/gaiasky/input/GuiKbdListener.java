@@ -208,6 +208,7 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
                 index = (index + 1) % inputWidgets.size;
             }
             stage.setKeyboardFocus(inputWidgets.get(index));
+            GuiUtils.ensureScrollVisible(inputWidgets.get(index));
             return true;
         }
         return false;

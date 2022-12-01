@@ -2,7 +2,6 @@ package gaiasky.input;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
-import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -30,7 +29,6 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     protected Controller lastControllerUsed = null;
     protected IGamepadMappings mappings;
     protected final EventManager em;
-    protected final IntSet pressedKeys;
     protected final AtomicBoolean active = new AtomicBoolean(true);
 
     protected long lastAxisEvtTime = 0, lastButtonPollTime = 0;
@@ -42,7 +40,6 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     public AbstractGamepadListener(IGamepadMappings mappings) {
         this.mappings = mappings;
         this.em = EventManager.instance;
-        this.pressedKeys = new IntSet();
         em.subscribe(this, Event.RELOAD_CONTROLLER_MAPPINGS);
     }
 
@@ -59,29 +56,64 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         this.mappings = mappings;
     }
 
-    public void addPressedKey(int keycode) {
-        pressedKeys.add(keycode);
+    @Override
+    public boolean buttonDown(Controller controller, int buttonCode) {
+        if (isActive()) {
+            lastControllerUsed = controller;
+        }
+        return false;
     }
 
-    public void removePressedKey(int keycode) {
-        pressedKeys.remove(keycode);
+    @Override
+    public boolean buttonUp(Controller controller, int buttonCode) {
+        if (isActive()) {
+            lastControllerUsed = controller;
+        }
+        return false;
     }
 
-    public boolean isKeyPressed(int keycode) {
-        return pressedKeys.contains(keycode);
+    @Override
+    public boolean axisMoved(Controller controller, int axisCode, float value) {
+        if (isActive()) {
+            lastControllerUsed = controller;
+        }
+        return false;
     }
 
     /**
-     * Returns true if any of the keys are pressed
+     * Checks whether the button with the given code is pressed in the last controller used.
      *
-     * @param keys The keys to test
+     * @param buttonCode The button code.
      *
-     * @return True if any is pressed
+     * @return Whether the button is pressed in the last controller used.
      */
-    public boolean anyPressed(int... keys) {
-        for (int k : keys) {
-            if (pressedKeys.contains(k))
+    public boolean isKeyPressed(int buttonCode) {
+        return isKeyPressed(lastControllerUsed, buttonCode);
+    }
+
+    public boolean isKeyPressed(Controller controller, int buttonCode) {
+        return controller != null ? controller.getButton(buttonCode) : false;
+    }
+
+    /**
+     * Returns true if any of the buttons are pressed in the last controller used.
+     *
+     * @param buttonCodes The buttons to test.
+     *
+     * @return True if any of the given buttons is pressed.
+     */
+    public boolean anyPressed(int... buttonCodes) {
+        return anyPressed(lastControllerUsed, buttonCodes);
+    }
+
+    public boolean anyPressed(Controller controller, int... buttonCodes) {
+        if (controller == null) {
+            return false;
+        }
+        for (int buttonCode : buttonCodes) {
+            if (isKeyPressed(controller, buttonCode)) {
                 return true;
+            }
         }
         return false;
     }
@@ -98,23 +130,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
         em.post(Event.CONTROLLER_DISCONNECTED_INFO, this, controller.getName());
     }
 
-    @Override
-    public boolean buttonDown(Controller controller, int buttonCode) {
-        if (active.get()) {
-            addPressedKey(buttonCode);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean buttonUp(Controller controller, int buttonCode) {
-        if (active.get()) {
-            removePressedKey(buttonCode);
-        }
-        return false;
-    }
-
-    public abstract boolean pollAxis();
+    public abstract boolean pollAxes();
 
     public abstract boolean pollButtons();
 
@@ -122,14 +138,14 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     public void update() {
         if (active.get()) {
             long now = TimeUtils.millis();
-            // AXIS POLL
+            // AXES POLL
             if (now - lastAxisEvtTime > AXIS_POLL_DELAY) {
-                if (pollAxis()) {
+                if (pollAxes()) {
                     lastAxisEvtTime = now;
                 }
             }
 
-            // BUTTON POLL
+            // BUTTONS POLL
             if (now - lastButtonPollTime > BUTTON_POLL_DELAY) {
                 if (pollButtons()) {
                     lastButtonPollTime = now;

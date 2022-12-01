@@ -636,7 +636,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
         @Override
         // Prevent axis polling.
-        public boolean pollAxis() {
+        public boolean pollAxes() {
             return false;
         }
 
@@ -649,7 +649,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
             if (active.get()) {
-                addPressedKey(buttonCode);
+                super.buttonDown(controller, buttonCode);
                 if (currTextField == null) {
                     // Not capturing.
                     if (buttonCode == mappings.getButtonA()) {
@@ -668,16 +668,16 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                     }
                 }
                 currentInput.setText(button + " " + buttonCode);
+                return true;
             }
-            return true;
+            return false;
         }
 
         @Override
         public boolean buttonUp(Controller controller, int buttonCode) {
             if (active.get()) {
-                boolean b = super.buttonUp(controller, buttonCode);
+                super.buttonUp(controller, buttonCode);
                 currentInput.setText(button + " " + buttonCode);
-                return b;
             }
             return false;
         }
@@ -685,6 +685,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
             if (active.get()) {
+                super.axisMoved(controller, axisCode, value);
                 value = (float) applyZeroPoint(value);
                 if (value != 0 && currTextField != null) {
                     // Capturing.
@@ -722,6 +723,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                         }
                     }
                     currentInput.setText(axis + " " + axisCode);
+                    return true;
                 }
             }
             return false;
