@@ -2,9 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.scene.Mapper;
-import gaiasky.util.Settings;
-import gaiasky.util.math.MathUtilsd;
 
 /**
  * Updates single particles and star objects.

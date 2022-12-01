@@ -5,9 +5,9 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
-import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
 

@@ -2,9 +2,9 @@ package gaiasky.scene.system.render.draw.text;
 
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Render;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
+import gaiasky.scene.component.Render;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;

@@ -17,7 +17,6 @@ import gaiasky.script.ScriptingServer;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
-import gaiasky.util.screenshot.ScreenshotsManager;
 
 public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSkyLoaderParameters> {
 

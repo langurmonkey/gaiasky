@@ -21,7 +21,6 @@ import gaiasky.gui.ModePopupInfo;
 import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings.ControlsSettings.*;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;

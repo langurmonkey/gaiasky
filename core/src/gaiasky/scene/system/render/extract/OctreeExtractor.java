@@ -4,11 +4,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.Octree;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.OctreeObjectView;
-import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.tree.OctreeNode;
 

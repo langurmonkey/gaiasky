@@ -8,16 +8,12 @@ import gaiasky.data.group.DatasetOptions;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
-import gaiasky.scene.api.IFocus;
+import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
-import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.Constants;
-import gaiasky.util.camera.Proximity;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 
 import java.util.List;

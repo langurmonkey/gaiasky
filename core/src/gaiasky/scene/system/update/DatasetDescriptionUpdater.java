@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.Scene;
 import gaiasky.scene.component.tag.TagNoProcess;
 
 public class DatasetDescriptionUpdater extends AbstractUpdateSystem {

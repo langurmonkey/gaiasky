@@ -2,7 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import gaiasky.scene.Mapper;
 
 public class BillboardUpdater extends AbstractUpdateSystem {
     public BillboardUpdater(Family family, int priority) {

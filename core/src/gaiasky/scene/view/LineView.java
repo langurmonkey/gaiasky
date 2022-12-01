@@ -6,12 +6,12 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.ILineRenderable;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Line;
 import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
-import gaiasky.scene.camera.ICamera;
 
 /**
  * An entity view that implements the {@link ILineRenderable} methods.

@@ -7,14 +7,15 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import java.util.List;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.shape.ShapeEntityRenderSystem;
-import gaiasky.scene.camera.ICamera;
+
+import java.util.List;
 
 /**
  * System that renders shapes through a {@link com.badlogic.gdx.graphics.glutils.ShapeRenderer}

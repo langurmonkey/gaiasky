@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.LocationMark;
-import gaiasky.scene.camera.ICamera;
 
 public class LocUpdater extends AbstractUpdateSystem {
 

@@ -3,8 +3,8 @@ package gaiasky.input;
 import com.badlogic.gdx.Input.Keys;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scene.camera.SpacecraftCamera;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Settings;
 
 /**

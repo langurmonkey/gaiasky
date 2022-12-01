@@ -5,18 +5,18 @@
 
 package gaiasky.scene.system.render.draw;
 
-import java.util.List;
-
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
-import gaiasky.scene.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;
+
+import java.util.List;
 
 /**
  * Renders model objects with tessellation shaders.

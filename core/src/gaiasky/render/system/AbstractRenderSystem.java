@@ -7,17 +7,14 @@ package gaiasky.render.system;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector3;
-
-import java.util.List;
-
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.SysUtils;
@@ -26,6 +23,7 @@ import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Comparator;
+import java.util.List;
 
 public abstract class AbstractRenderSystem implements IRenderSystem {
 

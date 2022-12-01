@@ -1,7 +1,5 @@
 package gaiasky.scene.record;
 
-import gaiasky.scene.record.ModelComponent;
-
 /**
  * Definition of a spacecraft with its parameters, model, etc.
  */

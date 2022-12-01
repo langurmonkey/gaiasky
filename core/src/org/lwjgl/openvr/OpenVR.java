@@ -5,15 +5,19 @@
  */
 package org.lwjgl.openvr;
 
-import org.lwjgl.system.*;
-import java.nio.*;
-import java.util.function.*;
 import com.beust.jcommander.internal.Nullable;
-import org.lwjgl.*;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.system.Library;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.Platform;
+
+import java.nio.IntBuffer;
+import java.util.function.LongFunction;
 
 import static org.lwjgl.openvr.VR.*;
-import static org.lwjgl.system.MemoryStack.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
 
 /** Exclude the initialization of some modules that do not play well
  *  with OpenComposite. */

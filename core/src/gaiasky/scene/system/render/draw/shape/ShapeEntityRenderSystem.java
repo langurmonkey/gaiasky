@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IShapeRenderable;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.view.RenderView;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.view.RenderView;
 
 public class ShapeEntityRenderSystem extends RenderView implements IShapeRenderable {
 

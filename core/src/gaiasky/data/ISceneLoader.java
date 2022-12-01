@@ -6,7 +6,6 @@
 package gaiasky.data;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Scene;
 import uk.ac.starlink.util.DataSource;

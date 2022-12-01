@@ -3,8 +3,8 @@ package gaiasky.scene.entity;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.component.Base;
 import gaiasky.scene.api.IFocus;
+import gaiasky.scene.component.Base;
 
 /**
  * This class contains the implementation of {@link IFocus#isFocusActive()}.

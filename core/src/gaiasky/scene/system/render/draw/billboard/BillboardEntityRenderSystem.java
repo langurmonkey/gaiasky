@@ -9,16 +9,15 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.view.BillboardView;
-import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 
 public class BillboardEntityRenderSystem implements IObserver {

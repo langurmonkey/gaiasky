@@ -10,8 +10,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.event.IObserver;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 

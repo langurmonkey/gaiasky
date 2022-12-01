@@ -2,7 +2,6 @@ package gaiasky.scene.system.initialize;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.AssetBean;
@@ -14,10 +13,10 @@ import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
-import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 
 public class ShapeInitializer extends AbstractInitSystem {
     public ShapeInitializer(boolean setUp, Family family, int priority) {

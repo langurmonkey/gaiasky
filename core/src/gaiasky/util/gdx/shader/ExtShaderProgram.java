@@ -22,7 +22,6 @@ import gaiasky.util.i18n.I18n;
 
 import java.lang.StringBuilder;
 import java.nio.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * <p>

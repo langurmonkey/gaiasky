@@ -4,12 +4,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.DatasetDescription;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.entity.ParticleUtils;
-import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 

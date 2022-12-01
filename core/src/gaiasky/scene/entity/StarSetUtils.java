@@ -9,13 +9,13 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
+import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.camera.CameraManager;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.StarSet;
 import gaiasky.scene.system.initialize.BaseInitializer;
 import gaiasky.scene.system.initialize.ParticleSetInitializer;
-import gaiasky.scene.camera.CameraManager;
-import gaiasky.scene.camera.CameraManager.CameraMode;
-import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Constants;
 
 import java.util.List;

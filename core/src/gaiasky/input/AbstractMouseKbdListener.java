@@ -7,7 +7,6 @@ package gaiasky.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.gui.IInputListener;
 import gaiasky.scene.camera.ICamera;

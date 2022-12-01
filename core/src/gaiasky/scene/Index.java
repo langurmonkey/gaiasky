@@ -1,10 +1,10 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
-import gaiasky.scene.component.*;
-import gaiasky.scene.view.PositionView;
-import gaiasky.scene.record.Position;
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.scene.component.*;
+import gaiasky.scene.record.Position;
+import gaiasky.scene.view.PositionView;
 import gaiasky.util.Logger;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.tree.IPosition;

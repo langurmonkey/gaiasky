@@ -5,8 +5,8 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.view.VertsView;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.view.VertsView;
 import gaiasky.util.math.Vector3d;
 
 public class KeyframeUpdater extends AbstractUpdateSystem {

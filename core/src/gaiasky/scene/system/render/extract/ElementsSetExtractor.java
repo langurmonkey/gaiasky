@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Family;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.Mapper;
-import gaiasky.scene.system.render.SceneRenderer;
 
 public class ElementsSetExtractor extends AbstractExtractSystem {
 

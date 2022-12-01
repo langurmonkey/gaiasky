@@ -11,7 +11,6 @@ import gaiasky.scene.system.ParallelSystem;
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.logging.ConsoleHandler;

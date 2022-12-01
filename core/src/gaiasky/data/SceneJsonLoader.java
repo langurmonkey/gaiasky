@@ -19,7 +19,6 @@ import gaiasky.util.i18n.I18n;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -9,7 +9,6 @@ import gaiasky.render.api.IRenderable;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Base;
-import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.LabelView;
 
 import java.util.List;

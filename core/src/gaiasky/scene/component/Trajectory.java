@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
-import gaiasky.scene.Mapper;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;

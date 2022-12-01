@@ -16,7 +16,6 @@ import gaiasky.util.i18n.I18n;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class DatasetDesc {
     private final Log logger = Logger.getLogger(DatasetDesc.class);

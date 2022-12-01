@@ -2,11 +2,10 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
-import gaiasky.render.BlendMode;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
-import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.record.ModelComponent;
+import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Consumers.Consumer10;
 import gaiasky.util.gdx.IntModelBatch;
 

@@ -4,13 +4,13 @@ import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Model;
 import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scene.component.MotorEngine;
-import gaiasky.scene.view.SpacecraftView;
 import gaiasky.scene.record.MachineDefinition;
-import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Constants;
 import gaiasky.util.math.MathUtilsd;
 

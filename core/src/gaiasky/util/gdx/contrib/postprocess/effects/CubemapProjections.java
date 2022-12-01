@@ -10,9 +10,7 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.CubemapProjectionsFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Fisheye effect
