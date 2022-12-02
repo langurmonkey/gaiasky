@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaiasky.GaiaSky;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.contrib.postprocess.filters.LevelsFilter;
@@ -31,6 +32,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implements brightness, contrast, hue and saturation levels, plus
@@ -41,7 +43,6 @@ public final class Levels extends PostProcessorEffect {
     private int lumaLodLevels;
     private LevelsFilter levels;
     private final Luma luma;
-    private final Copy copy;
 
     private float lumaMax = 0.9f, lumaAvg = 0.09f;
     private float currLumaMax = -1f, currLumaAvg = -1f;
@@ -53,7 +54,6 @@ public final class Levels extends PostProcessorEffect {
     public Levels() {
         levels = new LevelsFilter();
         luma = new Luma();
-        copy = new Copy();
 
         // Compute number of lod levels based on LUMA_SIZE
         int size = LUMA_SIZE;
@@ -63,9 +63,9 @@ public final class Levels extends PostProcessorEffect {
             lumaLodLevels++;
         }
 
-        GLFrameBuffer.FrameBufferBuilder fbb = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
-        fbb.addColorTextureAttachment(GL30.GL_RGB16F, GL30.GL_RGB, GL30.GL_FLOAT);
-        lumaBuffer = new GaiaSkyFrameBuffer(fbb, 0);
+        GLFrameBuffer.FrameBufferBuilder builder = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
+        builder.addColorTextureAttachment(Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGB16F, GL30.GL_RGB, GL30.GL_FLOAT);
+        lumaBuffer = new GaiaSkyFrameBuffer(builder, 0);
         lumaBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.MipMapLinearLinear);
 
         luma.setImageSize(LUMA_SIZE, LUMA_SIZE);
@@ -180,14 +180,13 @@ public final class Levels extends PostProcessorEffect {
         if (levels.isToneMappingAuto()) {
             // Compute luminance texture and use it to work out max and avg luminance
             computeLumaValuesCPU(src);
-            //copy.setInput(lumaBuffer).setOutput(dest).render();
         }
         // Actual levels
         levels.setInput(src).setOutput(dest).render();
 
     }
 
-    private void lowPassFilter() {
+    private void lowPassFilter(float baseLuma, float topLuma) {
         // Slowly move towards target luma values
         if (currLumaAvg < 0) {
             currLumaAvg = lumaAvg;
@@ -195,49 +194,65 @@ public final class Levels extends PostProcessorEffect {
         } else {
             float dt = Gdx.graphics.getDeltaTime();
             // Low pass filter
-            float smoothingAvg = .1f;
-            float smoothingMax = .1f;
+            float smoothingAvg = .2f;
+            float smoothingMax = .2f;
             currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothingAvg;
             currLumaMax += dt * (lumaMax - currLumaMax) / smoothingMax;
-            levels.setAvgMaxLuma(Math.max(currLumaAvg, 0.08f), Math.min(currLumaMax, 1.0f));
+            // Run in main thread
+            GaiaSky.postRunnable(() -> levels.setAvgMaxLuma(Math.max(currLumaAvg, baseLuma), Math.min(currLumaMax, topLuma)));
         }
     }
 
+    /** Is the compute max/avg process running? **/
+    private final AtomicBoolean processRunning = new AtomicBoolean(false);
+    private long lastFrame = -Long.MAX_VALUE;
+
     private void computeLumaValuesCPU(FrameBuffer src) {
-        // Every 4th frame
-        if (GaiaSky.instance.frames % 4 == 0) {
+        // Launch process every 4th frame
+        if (!processRunning.get() && GaiaSky.instance.frames - lastFrame >= 4) {
+            processRunning.set(true);
             // Render as is
             luma.enableProgramLuma();
             luma.setInput(src).setOutput(lumaBuffer).render();
-
             lumaBuffer.getColorBufferTexture().bind();
 
             // Get texture as is and compute avg/max in CPU - use with reinhardToneMapping()
-            //GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
-            //computeMaxAvg(pixels);
+            //GL30.glGenerateMipmap(lumaBuffer.getColorBufferTexture().glTarget);
+            //GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, Math.min(3, lumaLodLevels - 1), GL30.GL_RGB, GL30.GL_FLOAT, pixels);
+            GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
 
-            // Generate mipmap to get average - use with autoExposureToneMapping()
-            GL30.glGenerateMipmap(lumaBuffer.getColorBufferTexture().glTarget);
-            GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, lumaLodLevels - 1, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
-            lumaAvg = pixels.get(0);
-            // Ugly hack, but works
-            lumaMax = GaiaSky.instance.getICamera().getPos().lend() * Constants.U_TO_PC > 10000 ? lumaAvg * 5000f : lumaAvg * 30f;
+            // Launch asynchronously.
+            GaiaSky.instance.getExecutorService().execute(() -> {
+                computeMaxAvg(pixels);
+                if (!Double.isNaN(lumaAvg) && !Double.isNaN(lumaMax)) {
+                    lowPassFilter(0.0f, 2.0f);
+                }
+                processRunning.set(false);
+            });
 
-            if (!Double.isNaN(lumaAvg) && !Double.isNaN(lumaMax)) {
-                lowPassFilter();
-            }
+            // Generate mip-map to get average - use with autoExposureToneMapping()
+            //GL30.glGenerateMipmap(lumaBuffer.getColorBufferTexture().glTarget);
+            //GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, lumaLodLevels - 1, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
+            //lumaAvg = pixels.get(0);
+            //// Ugly hack, but works
+            //lumaMax = GaiaSky.instance.getICamera().getPos().lend() * Constants.U_TO_PC > 10000 ? lumaAvg * 5000f : lumaAvg * 30f;
+            //if (!Double.isNaN(lumaAvg) && !Double.isNaN(lumaMax)) {
+            //    lowPassFilter(0.08f, 1.0f);
+            //}
+            lastFrame = GaiaSky.instance.frames;
         }
     }
 
     private void computeMaxAvg(FloatBuffer buff) {
         buff.rewind();
         double avg = 0;
-        double max = -Double.MIN_VALUE;
+        double max = -Double.MAX_VALUE;
         int i = 1;
         while (buff.hasRemaining()) {
             double v = buff.get();
 
             // Skip g, b, a
+            buff.get();
             buff.get();
             buff.get();
 
@@ -263,7 +278,7 @@ public final class Levels extends PostProcessorEffect {
         luma.enableProgramMax();
         lumaMax = renderLumaMipMap(src);
 
-        lowPassFilter();
+        lowPassFilter(0.08f, 1.0f);
     }
 
     private float renderLumaMipMap(FrameBuffer src) {

@@ -15,61 +15,21 @@ uniform float u_gamma = 2.2;
 
 #ifdef toneMappingExposure
 uniform float u_exposure = 2.5;
-#endif //toneMappingExposure
+#endif//toneMappingExposure
 
 #ifdef toneMappingAuto
 uniform float u_avgLuma, u_maxLuma;
 
-float luminance(vec3 color){
-    return dot(color, vec3(0.2126, 0.7152, 0.0722));
-}
-
-/// <summary>
-/// Convert an sRGB pixel into a CIE xyY (xy = chroma, Y = luminance).
-/// <summary>
-vec3 RGB2xyY (vec3 rgb)
-{
-    const mat3 RGB2XYZ = mat3(0.4124, 0.3576, 0.1805,
-    0.2126, 0.7152, 0.0722,
-    0.0193, 0.1192, 0.9505);
-    vec3 XYZ = RGB2XYZ * rgb;
-
-    // XYZ to xyY
-    return vec3(XYZ.x / (XYZ.x + XYZ.y + XYZ.z),
-    XYZ.y / (XYZ.x + XYZ.y + XYZ.z),
-    XYZ.y);
-}
-
-/// <summary>
-/// Convert a CIE xyY value into sRGB.
-/// <summary>
-vec3 xyY2RGB (vec3 xyY)
-{
-    // xyY to XYZ
-    vec3 XYZ = vec3((xyY.z / xyY.y) * xyY.x,
-    xyY.z,
-    (xyY.z / xyY.y) * (1.0 - xyY.x - xyY.y));
-
-    const mat3 XYZ2RGB = mat3(3.2406, -1.5372, -0.4986,
-    -0.9689, 1.8758, 0.0415,
-    0.0557, -0.2040, 1.0570);
-
-    return XYZ2RGB * XYZ;
-}
+#include shader/lib_luma.glsl
 
 // Reinhard tone mapping using average and maximum luminosity of previous frame
 vec3 reinhardToneMapping(vec3 pixelColor, float scale){
-    float lwhite = u_maxLuma * u_maxLuma;
-    float luma = luminance(pixelColor);
+    float white = u_maxLuma * u_maxLuma;
+    float L = (scale / u_avgLuma) * luma(pixelColor);
+    float Ld = (L * (1.0 + L / white)) / (1.0 + L);
 
-    float L = (scale / u_avgLuma) * luma;
-    float Ld = (L * (1.0 + L / lwhite)) / (1.0 + L);
-
-    // Ld is in luminance space, so apply the scale factor to the xyY converted
-    // values from RGB space, then convert back from xyY to RGB.
-    vec3 xyY = RGB2xyY(pixelColor);
-    xyY.z *= Ld;
-    return xyY2RGB(xyY);
+    pixelColor *= clamp(Ld / L, 0.0, 3.0);
+    return pixelColor;
 }
 
 // Automatic exposure compensation
@@ -78,7 +38,7 @@ vec3 autoExposureToneMapping(vec3 pixelColor){
     return vec3(1.0 - exp2(-pixelColor * exposure));
 }
 
-#endif //toneMappingAuto
+#endif//toneMappingAuto
 
 #ifdef toneMappingACES
 vec3 ACESToneMapping(vec3 pixelColor){
@@ -89,27 +49,32 @@ vec3 ACESToneMapping(vec3 pixelColor){
     const float e = 0.14f;
     return clamp((pixelColor * (a * pixelColor + b))/(pixelColor * (c * pixelColor + d) + e), 0.0, 1.0);
 }
-#endif //toneMappingACES
+#endif//toneMappingACES
 
 #ifdef toneMappingFilmic
 vec3 filmicToneMapping(vec3 pixelColor){
-    pixelColor = max(vec3(0.0f), pixelColor - vec3(0.004f));
-    return (pixelColor * (6.2f * pixelColor + 0.5f)) / (pixelColor * (6.2f * pixelColor + 1.7f) + 0.06f);
+    pixelColor = max(vec3(0.0), pixelColor - vec3(0.004));
+    return (pixelColor * (6.2 * pixelColor + 0.5)) / (pixelColor * (6.2 * pixelColor + 1.7) + 0.06);
 }
-#endif //toneMappingFilmic
+#endif//toneMappingFilmic
 
 #ifdef toneMappingUncharted
 vec3 unchartedToneMapping(vec3 pixelColor){
-    const float A = 0.15f;
-    const float B = 0.50f;
-    const float C = 0.10f;
-    const float D = 0.20f;
-    const float E = 0.02f;
-    const float F = 0.30f;
-    const float W = 11.2f;
-    return ((pixelColor * (A * pixelColor + C * B) + D * E) / (pixelColor * ( A * pixelColor + B) + D * F)) - E / F;
+    const float A = 0.15;
+    const float B = 0.50;
+    const float C = 0.10;
+    const float D = 0.20;
+    const float E = 0.02;
+    const float F = 0.30;
+    const float W = 11.2;
+    float exposure = 2.0;
+    pixelColor *= exposure;
+    pixelColor = ((pixelColor * (A * pixelColor + C * B) + D * E) / (pixelColor * (A * pixelColor + B) + D * F)) - E / F;
+    float white = ((W * (A * W + C * B) + D * E) / (W * (A * W + B) + D * F)) - E / F;
+    pixelColor /= white;
+    return pixelColor;
 }
-#endif //toneMappingUncharted
+#endif//toneMappingUncharted
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
@@ -153,28 +118,28 @@ void main() {
 
     // HDR tone mapping
     #ifdef toneMappingAuto
-    pixelColor = reinhardToneMapping(pixelColor, 0.2);
+    pixelColor = reinhardToneMapping(pixelColor, 0.01);
     //pixelColor = autoExposureToneMapping(pixelColor);
-    #endif //toneMappingAuto
+    #endif//toneMappingAuto
 
     #ifdef toneMappingExposure
     pixelColor = 1.0 - exp2(-pixelColor * u_exposure);
-    #endif //toneMappingExposure
+    #endif//toneMappingExposure
 
     #ifdef toneMappingACES
     pixelColor = ACESToneMapping(pixelColor);
-    #endif //toneMappingACES
+    #endif//toneMappingACES
 
     #ifdef toneMappingFilmic
     pixelColor = filmicToneMapping(pixelColor);
-    #endif //toneMappingFilmic
+    #endif//toneMappingFilmic
 
     #ifdef toneMappingUncharted
     pixelColor = unchartedToneMapping(pixelColor);
-    #endif //toneMappingUncharted
+    #endif//toneMappingUncharted
 
 
-    // Gamma correction
+    // Gamma correction.
     pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));
 
     // Final color
