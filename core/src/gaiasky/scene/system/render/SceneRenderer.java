@@ -628,6 +628,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     public void clearScreen() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        if (Settings.settings.graphics.useSRGB) {
+            Gdx.gl.glEnable(GL30.GL_FRAMEBUFFER_SRGB);
+        }
     }
 
     private void renderShadowMapCandidates(List<Entity> candidates, int shadowNRender, ICamera camera) {

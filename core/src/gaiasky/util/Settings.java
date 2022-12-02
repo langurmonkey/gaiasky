@@ -27,6 +27,8 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapPr
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.update.VersionChecker;
+import org.apache.commons.math3.analysis.function.Add;
+import org.lwjgl.opengl.GL30;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +48,10 @@ import java.util.*;
 public class Settings {
     private static final Log logger = Logger.getLogger(Settings.class);
 
-    // Assets location for this instance of Gaia Sky
-    // macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the getAbsolutePath() part
+    /**
+     * Assets location for this instance of Gaia Sky.
+     * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the {@link File#getAbsolutePath()} call.
+     **/
     public static final String ASSETS_LOC = (new File(System.getProperty("assets.location") != null ? System.getProperty("assets.location") : ".")).getAbsolutePath();
 
     public static Path assetsPath(String relativeAssetsLoc) {
@@ -297,10 +301,19 @@ public class Settings {
         @JsonIgnore public int[] backBufferResolution;
         public float celestialSphereIndexOfRefraction;
         public boolean dynamicResolution;
-        // This controls the dynamic resolution levels available as back buffer scales.
-        // Add more items to add more levels.
+        /**
+         * This controls the dynamic resolution levels available as back buffer scales.
+         * Add more items to add more levels.
+         **/
         @JsonIgnore final public double[] dynamicResolutionScale = new double[] { 1f, 0.85f, 0.75f };
+        /** Whether to output to the main display. */
         public boolean screenOutput;
+        /**
+         * Use the sRGB color space as a frame buffer format. Only supported by OpenGL 3.2 and above.
+         * If this is activated, the internal format {@link GL30#GL_SRGB8_ALPHA8} is used only
+         * when safe graphics mode is not active.
+         *  **/
+        public boolean useSRGB = false;
 
         public GraphicsSettings() {
             EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD, Event.BACKBUFFER_SCALE_CMD, Event.INDEXOFREFRACTION_CMD);
@@ -784,7 +797,9 @@ public class Settings {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ProgramSettings implements IObserver {
         public boolean safeMode;
-        // Flag to mark whether safe mode is activated via command line argument
+        /**
+         * Flag to mark whether safe mode is activated via command line argument.
+         */
         @JsonIgnore public boolean safeModeFlag;
         public boolean debugInfo;
         public boolean offlineMode;

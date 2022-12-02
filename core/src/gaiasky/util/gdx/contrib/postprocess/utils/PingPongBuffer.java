@@ -20,6 +20,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -136,8 +137,7 @@ public final class PingPongBuffer {
 
     private static void addColorRenderTarget(FrameBufferBuilder builder, Format pixmapFormat, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
-            //addFloatRenderTarget(builder, GL30.GL_RGBA16F);
-            addFloatRenderTarget(builder, GL30.GL_RGBA16F);
+            addFloatRenderTarget(builder, Settings.settings.graphics.useSRGB ? GL30.GL_SRGB8_ALPHA8 : GL30.GL_RGBA16F);
         } else {
             addColorRenderTarget(builder, pixmapFormat);
         }
