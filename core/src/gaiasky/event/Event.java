@@ -856,10 +856,6 @@ public enum Event {
     RENDER_FRAME_BUFFER,
 
     /**
-     * Issues the command to render a screenshot.
-     **/
-    RENDER_SCREENSHOT,
-    /**
      * Resumes background data loading thread, if it exists and it is paused.
      **/
     RESUME_BACKGROUND_LOADING,

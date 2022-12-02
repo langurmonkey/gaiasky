@@ -44,7 +44,7 @@ public final class PostProcessor implements Disposable {
     public static PostProcessor currentPostProcessor;
 
     private static PipelineState pipelineState = null;
-    private static Format fbFormat;
+    private static Format pixmapFormat;
     private final PingPongBuffer composite;
     private TextureWrap compositeWrapU;
     private TextureWrap compositeWrapV;
@@ -83,19 +83,19 @@ public final class PostProcessor implements Disposable {
     public PostProcessor(RenderType rt, int fboWidth, int fboHeight, boolean useDepth, boolean useAlphaChannel, boolean use32Bits, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer, TextureWrap u, TextureWrap v) {
         if (use32Bits) {
             if (useAlphaChannel) {
-                fbFormat = Format.RGBA8888;
+                pixmapFormat = Format.RGBA8888;
             } else {
-                fbFormat = Format.RGB888;
+                pixmapFormat = Format.RGB888;
             }
         } else {
             if (useAlphaChannel) {
-                fbFormat = Format.RGBA4444;
+                pixmapFormat = Format.RGBA4444;
             } else {
-                fbFormat = Format.RGB565;
+                pixmapFormat = Format.RGB565;
             }
         }
 
-        composite = newPingPongBuffer(fboWidth, fboHeight, fbFormat, useDepth, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer);
+        composite = newPingPongBuffer(fboWidth, fboHeight, pixmapFormat, useDepth, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer);
         setBufferTextureWrap(u, v);
 
         pipelineState = new PipelineState();
@@ -126,8 +126,8 @@ public final class PostProcessor implements Disposable {
      * <p>
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
-    public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
-        PingPongBuffer buffer = new PingPongBuffer(width, height, frameBufferFormat, hasDepth, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer);
+    public static PingPongBuffer newPingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
+        PingPongBuffer buffer = new PingPongBuffer(width, height, pixmapFormat, hasDepth, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer);
         buffers.add(buffer);
         return buffer;
     }
@@ -242,7 +242,7 @@ public final class PostProcessor implements Disposable {
      * Format will be valid after construction and NOT early!
      */
     public static Format getFramebufferFormat() {
-        return fbFormat;
+        return pixmapFormat;
     }
 
     /** Sets the color that will be used to clear the buffer. */

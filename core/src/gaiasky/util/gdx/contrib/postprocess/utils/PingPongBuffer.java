@@ -58,12 +58,8 @@ public final class PingPongBuffer {
     private GaiaSkyFrameBuffer ownedResult, ownedSource;
     private int ownedW, ownedH;
 
-    public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
-        this(width, height, frameBufferFormat, hasDepth, true, false, false, false);
-    }
-
     /** Creates a new ping-pong buffer and owns the resources. */
-    public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
+    public PingPongBuffer(int width, int height, Format pixmapFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
         ownResources = true;
 
         // BUFFER USED FOR THE ACTUAL RENDERING:
@@ -74,12 +70,12 @@ public final class PingPongBuffer {
         //      3: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
         //      4: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
         // 1 DEPTH TEXTURE ATTACHMENT
-        ownedMain = createMainFrameBuffer(width, height, hasDepth, hasVelocity, hasNormal, hasReflectionMask, frameBufferFormat, preventFloatBuffer);
+        ownedMain = createMainFrameBuffer(width, height, hasDepth, hasVelocity, hasNormal, hasReflectionMask, pixmapFormat, preventFloatBuffer);
 
         // EXTRA BUFFER:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
-        addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        addColorRenderTarget(frameBufferBuilder, pixmapFormat, preventFloatBuffer);
         ownedExtra = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
 
         // Buffer the scene is rendered to is actually the second
@@ -138,28 +134,29 @@ public final class PingPongBuffer {
 
     }
 
-    private static void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf, boolean preventFloatBuffer) {
+    private static void addColorRenderTarget(FrameBufferBuilder builder, Format pixmapFormat, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
-            addFloatRenderTarget(fbb, GL30.GL_RGBA16F);
+            //addFloatRenderTarget(builder, GL30.GL_RGBA16F);
+            addFloatRenderTarget(builder, GL30.GL_RGBA16F);
         } else {
-            addColorRenderTarget(fbb, fbf);
+            addColorRenderTarget(builder, pixmapFormat);
         }
     }
 
-    private static void addFloatRenderTarget(FrameBufferBuilder fbb, int internalFormat) {
-        fbb.addFloatAttachment(internalFormat, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+    private static void addFloatRenderTarget(FrameBufferBuilder builder, int internalFormat) {
+        builder.addFloatAttachment(internalFormat, GL30.GL_RGBA, GL30.GL_FLOAT, true);
     }
 
-    private static void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf) {
-        fbb.addBasicColorTextureAttachment(fbf);
+    private static void addColorRenderTarget(FrameBufferBuilder builder, Format pixmapFormat) {
+        builder.addBasicColorTextureAttachment(pixmapFormat);
     }
 
-    private static void addDepthRenderTarget(FrameBufferBuilder fbb, boolean preventFloatBuffer) {
+    private static void addDepthRenderTarget(FrameBufferBuilder builder, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
             // 24 bit depth buffer texture
-            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT24, GL20.GL_FLOAT);
+            builder.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT24, GL20.GL_FLOAT);
         } else {
-            fbb.addBasicDepthRenderBuffer();
+            builder.addBasicDepthRenderBuffer();
         }
     }
 

@@ -51,6 +51,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
@@ -130,6 +131,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     // Light glow pre-render
     private FrameBuffer glowFb;
     private LightPositionUpdater lpu;
+    /**
+     * Frame buffer map. Holds frame buffers for different resolutions, usually used
+     * in screenshots and frame capture.
+     */
+    private Map<Integer, FrameBuffer> frameBufferMap;
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
@@ -158,6 +164,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     @Override
     public void initialize(AssetManager manager) {
+        // Frame buffer map
+        frameBufferMap = new HashMap<>();
         // Initialize the render assets.
         renderAssets.initialize(manager);
 
@@ -616,6 +624,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 }
             }
         }
+    }
+
+    public void clearScreen() {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
     private void renderShadowMapCandidates(List<Entity> candidates, int shadowNRender, ICamera camera) {
@@ -1234,4 +1246,16 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
+    public FrameBuffer getFrameBuffer(final int w, final int h) {
+        final int key = getKey(w, h);
+        if (!frameBufferMap.containsKey(key)) {
+            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, true, Format.RGB888, true);
+            frameBufferMap.put(key, fb);
+        }
+        return frameBufferMap.get(key);
+    }
+
+    private int getKey(final int w, final int h) {
+        return 31 * h + w;
+    }
 }

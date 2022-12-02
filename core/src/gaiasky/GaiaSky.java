@@ -38,7 +38,6 @@ import gaiasky.gui.*;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.MainPostProcessor;
-import gaiasky.render.api.IMainRenderer;
 import gaiasky.render.api.IPostProcessor;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
@@ -58,7 +57,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.ds.GaiaSkyExecutorService;
-import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.loader.*;
 import gaiasky.util.gdx.loader.is.GzipInputStreamProvider;
@@ -98,7 +96,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * The main class. Holds all the entities manages the update/draw cycle and all
  * other top-level functions of Gaia Sky.
  */
-public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
+public class GaiaSky implements ApplicationListener, IObserver {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
     /**
@@ -177,7 +175,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public long frames;
 
-    private Map<Integer, FrameBuffer> frameBufferMap;
 
     private GuiRegistry guiRegistry;
 
@@ -373,9 +370,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
         logger.info(I18n.msg("notif.info.maxattribs", GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
 
-        // Frame buffer map
-        frameBufferMap = new HashMap<>();
-
         // Disable all kinds of input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
 
@@ -421,9 +415,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Init global resources -- Can't be postponed!
         this.globalResources = new GlobalResources(assetManager);
 
-        // Initialize screenshots manager
-        new ScreenshotsManager(globalResources);
-
         // Catalog manager
         this.catalogManager = new CatalogManager();
 
@@ -448,12 +439,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // GUI
         guis = new ArrayList<>(3);
 
-        // Post-processor
+        // Post-processor.
         postProcessor = new MainPostProcessor(null);
 
-        // Scene renderer
+        // Scene renderer.
         sceneRenderer = new SceneRenderer(vrContext, globalResources);
         sceneRenderer.initialize(assetManager);
+
+        // Screenshots and frame output manager.
+        new ScreenshotsManager(this, sceneRenderer, globalResources);
 
         // Load various assets
         assetManager.load("gaiasky-assets", GaiaSkyAssets.class, new GaiaSkyLoaderParameters(this, noScripting));
@@ -965,7 +959,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     /**
-     * Renders the scene
+     * Updates and renders the scene.
      **/
     private final Runnable runnableRender = () -> {
 
@@ -985,12 +979,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             /*
              * FRAME OUTPUT
              */
-            EventManager.publish(Event.RENDER_FRAME, this, this);
-
-            /*
-             * SCREENSHOT OUTPUT - simple|advanced mode
-             */
-            EventManager.publish(Event.RENDER_SCREENSHOT, this, this);
+            EventManager.publish(Event.RENDER_FRAME, this);
 
             /*
              * SCREEN OUTPUT
@@ -1006,14 +995,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 int w = (int) (tw * settings.graphics.backBufferScale);
                 int h = (int) (th * settings.graphics.backBufferScale);
                 /* RENDER THE SCENE */
-                preRenderScene();
+                sceneRenderer.clearScreen();
 
                 if (settings.runtime.openVr) {
-                    renderSgr(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null, postProcessor.getPostProcessBean(RenderType.screen));
+                    sceneRenderer.render(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null, postProcessor.getPostProcessBean(RenderType.screen));
                 } else {
                     PostProcessBean ppb = postProcessor.getPostProcessBean(RenderType.screen);
                     if (ppb != null)
-                        renderSgr(cameraManager, t, w, h, tw, th, null, ppb);
+                        sceneRenderer.render(cameraManager, t, w, h, tw, th, null, ppb);
                 }
 
                 // Render the GUI, setting the viewport
@@ -1279,14 +1268,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
     }
 
-    public void preRenderScene() {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-    }
-
-    public void renderSgr(final ICamera camera, final double t, final int width, final int height, final int tw, final int th, final FrameBuffer frameBuffer, final PostProcessBean ppb) {
-        sceneRenderer.render(camera, t, width, height, tw, th, frameBuffer, ppb);
-    }
-
     private long lastResizeTime = Long.MAX_VALUE;
     private int resizeWidth, resizeHeight;
 
@@ -1365,18 +1346,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         gui.render(graphics.getWidth(), graphics.getHeight());
     }
 
-    public FrameBuffer getFrameBuffer(final int w, final int h) {
-        final int key = getKey(w, h);
-        if (!frameBufferMap.containsKey(key)) {
-            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, true, Format.RGB888, true);
-            frameBufferMap.put(key, fb);
-        }
-        return frameBufferMap.get(key);
-    }
-
-    private int getKey(final int w, final int h) {
-        return 31 * h + w;
-    }
 
     public HashMap<VRDevice, Entity> getVRDeviceToModel() {
         return vrDeviceToModel;
