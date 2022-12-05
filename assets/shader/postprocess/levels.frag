@@ -13,6 +13,8 @@ uniform float u_saturation = 1.0;
 uniform float u_hue = 1.0;
 uniform float u_gamma = 2.2;
 
+#include shader/lib_luma.glsl
+
 #ifdef toneMappingExposure
 uniform float u_exposure = 2.5;
 #endif//toneMappingExposure
@@ -20,7 +22,7 @@ uniform float u_exposure = 2.5;
 #ifdef toneMappingAuto
 uniform float u_avgLuma, u_maxLuma;
 
-#include shader/lib_luma.glsl
+#include shader/lib_math.glsl
 
 // Reinhard tone mapping using average and maximum luminosity of previous frame
 vec3 reinhardToneMapping(vec3 pixelColor, float scale){
@@ -28,8 +30,7 @@ vec3 reinhardToneMapping(vec3 pixelColor, float scale){
     float L = (scale / u_avgLuma) * luma(pixelColor);
     float Ld = (L * (1.0 + L / white)) / (1.0 + L);
 
-    pixelColor *= clamp(Ld / L, 0.0, 3.0);
-    return pixelColor;
+    return pixelColor * lint(Ld / L, 0.0, 4.0, 0.2, 2.0);
 }
 
 // Automatic exposure compensation
@@ -137,7 +138,6 @@ void main() {
     #ifdef toneMappingUncharted
     pixelColor = unchartedToneMapping(pixelColor);
     #endif//toneMappingUncharted
-
 
     // Gamma correction.
     pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));

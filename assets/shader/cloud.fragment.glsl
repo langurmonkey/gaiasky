@@ -79,8 +79,6 @@ void main() {
     float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0);
     fragColor = vec4(cloudColor, cloud.a) * opacity;
 
-    fragColor = clamp(fragColor, 0.0, 1.0);
-
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
     #ifdef ssrFlag

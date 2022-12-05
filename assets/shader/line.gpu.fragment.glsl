@@ -36,7 +36,7 @@ void main() {
     } else {
         trail = 1.0;
     }
-    trail = clamp((1.0 / (1.0 - u_trailMap)) * (trail - u_trailMap), 0.0, 1.0);
+    trail = (1.0 / (1.0 - u_trailMap)) * (trail - u_trailMap);
     fragColor = vec4(v_col.rgb * u_alpha * trail, 1.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 

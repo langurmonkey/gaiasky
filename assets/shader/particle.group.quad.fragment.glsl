@@ -26,7 +26,6 @@ layout (location = 0) out vec4 fragColor;
 
 float programmatic(float dist) {
     return 1.0 - pow(abs(sin(PI * dist / 2.0)), u_falloff);
-    //return pow(abs(1.0 - dist), u_falloff) * 1.5 + (1.0 - dist) * 0.075;
 }
 
 void main() {

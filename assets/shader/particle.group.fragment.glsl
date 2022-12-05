@@ -2,13 +2,16 @@
 
 #include shader/lib_logdepthbuff.glsl
 
+// UNIFORMS
 uniform float u_ar;
 uniform float u_falloff;
 uniform float u_zfar;
 uniform float u_k;
 
+// INPUT
 in vec4 v_col;
 
+// OUTPUT
 layout (location = 0) out vec4 fragColor;
 
 #define PI 3.1415927
@@ -29,8 +32,9 @@ void main() {
     vec2 uv = vec2(gl_PointCoord.x, gl_PointCoord.y);
     uv.y = uv.y * u_ar;
     float dist = distance(vec2(0.5, 0.5 * u_ar), uv) * 2.0;
-    if(dist > 1.0)
+    if(dist > 1.0) {
         discard;
+    }
 
     float profile = programmatic(dist);
 

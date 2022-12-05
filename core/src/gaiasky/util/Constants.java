@@ -278,7 +278,7 @@ public class Constants {
     public static final float MIN_SATURATION = 0.0f;
     public static final float MAX_SATURATION = 2.0f;
 
-    public static final float MIN_GAMMA = 0.0f;
+    public static final float MIN_GAMMA = 0.001f;
     public static final float MAX_GAMMA = 3.0f;
 
     public static final float MIN_EXPOSURE = 0.0f;

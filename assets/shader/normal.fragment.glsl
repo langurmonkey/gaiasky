@@ -508,7 +508,6 @@ void main() {
         fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
     #endif
 
-    fragColor.rgb = clamp(fragColor.rgb, 0.0, 1.0);
     if (fragColor.a <= 0.0) {
         discard;
     }
