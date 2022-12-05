@@ -50,6 +50,8 @@ public class MainGamepadListener extends AbstractGamepadListener {
                 em.post(Event.TIME_STATE_CMD, this, true);
             } else if (buttonCode == mappings.getButtonStart()) {
                 em.post(Event.SHOW_CONTROLLER_GUI_ACTION, this, cam);
+            } else if (buttonCode == mappings.getButtonSelect()) {
+                em.post(Event.SHOW_QUIT_ACTION, this);
             } else if (buttonCode == mappings.getButtonRstick()) {
                 if (cam.getMode().isFocus()) {
                     // Set free

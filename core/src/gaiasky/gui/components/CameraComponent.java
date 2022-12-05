@@ -80,6 +80,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         if (!Settings.settings.runtime.openVr) {
             final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
+            button3d.setChecked(Settings.settings.program.modeStereo.active);
             final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
@@ -102,6 +103,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
             final Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
+            buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
             final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
@@ -126,6 +128,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
             buttonCubemap.setProgrammaticChangeEvents(false);
+            buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
             final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
             buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
@@ -150,6 +153,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             final Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
             buttonOrthosphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
             buttonOrthosphere.setProgrammaticChangeEvents(false);
+            buttonOrthosphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
             final String hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere");
             buttonOrthosphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
             buttonOrthosphere.setName("orthosphere");
@@ -342,15 +346,15 @@ public class CameraComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case CAMERA_CINEMATIC_CMD:
+        case CAMERA_CINEMATIC_CMD -> {
             final boolean gui = source == cinematic;
             if (!gui) {
                 cinematic.setProgrammaticChangeEvents(false);
                 cinematic.setChecked((Boolean) data[0]);
                 cinematic.setProgrammaticChangeEvents(true);
             }
-            break;
-        case CAMERA_MODE_CMD:
+        }
+        case CAMERA_MODE_CMD -> {
             if (source != cameraMode) {
                 // Update camera mode selection
                 final var mode = (CameraMode) data[0];
@@ -368,62 +372,60 @@ public class CameraComponent extends GuiComponent implements IObserver {
                     cameraMode.getSelection().setProgrammaticChangeEvents(true);
                 }
             }
-            break;
-        case ROTATION_SPEED_CMD:
+        }
+        case ROTATION_SPEED_CMD -> {
             if (source != rotateSpeed) {
                 float value = (Float) data[0];
                 fieldLock = true;
                 rotateSpeed.setMappedValue(value);
                 fieldLock = false;
             }
-            break;
-        case CAMERA_SPEED_CMD:
+        }
+        case CAMERA_SPEED_CMD -> {
             if (source != cameraSpeed) {
                 final float value = (Float) data[0];
                 fieldLock = true;
                 cameraSpeed.setMappedValue(value);
                 fieldLock = false;
             }
-            break;
-
-        case TURNING_SPEED_CMD:
+        }
+        case TURNING_SPEED_CMD -> {
             if (source != turnSpeed) {
                 final float value = (Float) data[0];
                 fieldLock = true;
                 turnSpeed.setMappedValue(value);
                 fieldLock = false;
             }
-            break;
-        case SPEED_LIMIT_CMD:
+        }
+        case SPEED_LIMIT_CMD -> {
             if (source != cameraSpeedLimit) {
                 final int value = (Integer) data[0];
                 cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(false);
                 cameraSpeedLimit.setSelectedIndex(value);
                 cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(true);
             }
-            break;
-        case ORIENTATION_LOCK_CMD:
+        }
+        case ORIENTATION_LOCK_CMD -> {
             if (source != orientationLock) {
                 final boolean lock = (Boolean) data[1];
                 orientationLock.setProgrammaticChangeEvents(false);
                 orientationLock.setChecked(lock);
                 orientationLock.setProgrammaticChangeEvents(true);
             }
-            break;
-        case STEREOSCOPIC_CMD:
+        }
+        case FOV_CHANGE_NOTIFICATION -> {
+            fovFlag = false;
+            fieldOfView.setValue(Settings.settings.scene.camera.fov);
+            fovFlag = true;
+        }
+        case STEREOSCOPIC_CMD -> {
             if (source != button3d && !Settings.settings.runtime.openVr) {
                 button3d.setProgrammaticChangeEvents(false);
                 button3d.setChecked((boolean) data[0]);
                 button3d.setProgrammaticChangeEvents(true);
             }
-            break;
-        case FOV_CHANGE_NOTIFICATION:
-            fovFlag = false;
-            fieldOfView.setValue(Settings.settings.scene.camera.fov);
-            fovFlag = true;
-            break;
-        case CUBEMAP_CMD:
-
+        }
+        case CUBEMAP_CMD -> {
             if (!Settings.settings.runtime.openVr) {
                 final CubemapProjection proj = (CubemapProjection) data[1];
                 final boolean enable = (boolean) data[0];
@@ -443,11 +445,10 @@ public class CameraComponent extends GuiComponent implements IObserver {
                     buttonOrthosphere.setProgrammaticChangeEvents(true);
                     fieldOfView.setDisabled(enable);
                 }
-
             }
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
 
     }
