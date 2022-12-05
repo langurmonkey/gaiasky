@@ -106,13 +106,16 @@ void main() {
     // Apply contrast
     pixelColor = ((pixelColor - 0.5) * max(u_contrast, 0.0)) + 0.5;
 
-    vec3 hsv = rgb2hsv(pixelColor);
-    // Apply saturation
-    hsv.y *= u_saturation;
-    // Apply hue
-    hsv.x *= u_hue;
+    if (u_saturation != 1.0 || u_hue != 1.0) {
+        vec3 hsv = rgb2hsv(pixelColor);
+        // Apply saturation
+        hsv.y *= u_saturation;
+        // Apply hue
+        hsv.x *= u_hue;
 
-    pixelColor = hsv2rgb(hsv);
+        pixelColor = hsv2rgb(hsv);
+        pixelColor.r = 1.0;
+    }
 
     // Apply brightness
     pixelColor += u_brightness;
