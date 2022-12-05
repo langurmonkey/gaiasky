@@ -81,8 +81,7 @@ in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
 
 
-vec3 rgb2hsv(vec3 c)
-{
+vec3 rgb2hsv(vec3 c) {
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
     vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
     vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
@@ -92,8 +91,7 @@ vec3 rgb2hsv(vec3 c)
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
-vec3 hsv2rgb(vec3 c)
-{
+vec3 hsv2rgb(vec3 c) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
@@ -103,22 +101,21 @@ vec3 hsv2rgb(vec3 c)
 void main() {
     vec3 pixelColor = texture(u_texture0, v_texCoords).rgb;
 
-    // Apply contrast
-    pixelColor = ((pixelColor - 0.5) * max(u_contrast, 0.0)) + 0.5;
+    // Apply brightness and contrast
+    pixelColor = ((pixelColor + u_brightness - 0.5) * max(u_contrast, 0.0)) + 0.5;
 
     if (u_saturation != 1.0 || u_hue != 1.0) {
+        // Convert to HSV (hue, saturation, brightness).
         vec3 hsv = rgb2hsv(pixelColor);
+
         // Apply saturation
         hsv.y *= u_saturation;
         // Apply hue
         hsv.x *= u_hue;
 
+        // Back to RGB
         pixelColor = hsv2rgb(hsv);
-        pixelColor.r = 1.0;
     }
-
-    // Apply brightness
-    pixelColor += u_brightness;
 
     // HDR tone mapping
     #ifdef toneMappingAuto
