@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -32,6 +33,7 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
     private final ShaderProgram[] programs;
     private final Vector2 viewport;
     private float planetariumAperture, planetariumAngle, celestialSphereIndexOfRefraction;
+    private CubemapProjection projection;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -95,7 +97,8 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
      *
      * @param proj Cubemap projection
      */
-    public void setProjection(CubemapProjections.CubemapProjection proj) {
+    public void setProjection(CubemapProjection proj) {
+        this.projection = proj;
         switch (proj) {
         case EQUIRECTANGULAR -> {
             super.program = programs[0];
@@ -128,6 +131,10 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         default -> {
         }
         }
+    }
+
+    public CubemapProjection getProjection() {
+        return this.projection;
     }
 
     public void setSides(FrameBuffer xpositive, FrameBuffer xnegative, FrameBuffer ypositive, FrameBuffer ynegative, FrameBuffer zpositive, FrameBuffer znegative) {

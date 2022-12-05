@@ -31,13 +31,13 @@ import java.util.Map;
  */
 public abstract class RenderModeCubemap extends RenderModeAbstract {
 
-    protected Vector3 aux1, aux2, aux3, dirBak, upBak, dirUpCrs;
+    protected Vector3 aux1, aux2, aux3, dirEffective, upEffective, dirBackup, upBackup, dirUpCrs;
     protected StretchViewport stretchViewport;
     // Frame buffers for each side of the cubemap
     protected Map<Integer, FrameBuffer> frameBufferCubeMap;
 
     // Backup of fov value
-    protected float fovBak;
+    protected float fovBackup;
 
     private final Mosaic mosaic;
 
@@ -46,13 +46,17 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
     // Flags
     protected boolean zPosFlag, zNegFlag, xPosFlag, xNegFlag, yPosFlag, yNegFlag;
 
+    protected float angleFromZenith = 0;
+
     protected RenderModeCubemap() {
         super();
         aux1 = new Vector3();
         aux3 = new Vector3();
         aux2 = new Vector3();
-        dirBak = new Vector3();
-        upBak = new Vector3();
+        dirEffective = new Vector3();
+        dirBackup = new Vector3();
+        upEffective = new Vector3();
+        upBackup = new Vector3();
         dirUpCrs = new Vector3();
         stretchViewport = new StretchViewport(Gdx.graphics.getHeight(), Gdx.graphics.getHeight());
 
@@ -70,13 +74,24 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
 
     protected void renderCubemapSides(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, PostProcessBean ppb) {
         PerspectiveCamera cam = camera.getCamera();
+        // Original direction and up (untouched by angleFromZenith)
+        dirBackup.set(cam.direction);
+        upBackup.set(cam.direction);
 
-        // Backup fov, direction and up
-        fovBak = cam.fieldOfView;
-        dirBak.set(cam.direction);
-        upBak.set(cam.up);
+        // Backup fov, direction and up.
+        fovBackup = cam.fieldOfView;
+        dirEffective.set(cam.direction);
+        upEffective.set(cam.up);
+
         // dirUpCrs <- dir X up
-        dirUpCrs.set(dirBak).crs(upBak).nor().scl(-1f);
+        dirUpCrs.set(cam.direction).crs(cam.up).nor().scl(-1f);
+
+        // Apply angle from zenith to dirBak and upBak.
+        if (angleFromZenith != 0) {
+            // Rotate direction and up around dirUpCrs.
+            dirEffective.rotate(dirUpCrs, -angleFromZenith);
+            upEffective.rotate(dirUpCrs, -angleFromZenith);
+        }
 
         EventManager.publish(Event.FOV_CHANGED_CMD, this, 90f);
 
@@ -99,8 +114,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // RIGHT +X
             rc.cubemapSide = CubemapSide.SIDE_RIGHT;
 
-            cam.up.set(upBak);
-            cam.direction.set(dirBak).rotate(cam.up, -90);
+            cam.up.set(upEffective);
+            cam.direction.set(dirEffective).rotate(cam.up, -90);
             cam.update();
 
             renderFace(xPosFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -110,8 +125,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // LEFT -X
             rc.cubemapSide = CubemapSide.SIDE_LEFT;
 
-            cam.up.set(upBak);
-            cam.direction.set(dirBak).rotate(cam.up, 90);
+            cam.up.set(upEffective);
+            cam.direction.set(dirEffective).rotate(cam.up, 90);
             cam.update();
 
             renderFace(xNegFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -121,8 +136,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // UP +Y
             rc.cubemapSide = CubemapSide.SIDE_UP;
 
-            cam.direction.set(dirBak).rotate(dirUpCrs,  90);
-            cam.up.set(upBak).rotate(dirUpCrs, 90);
+            cam.direction.set(dirEffective).rotate(dirUpCrs, 90);
+            cam.up.set(upEffective).rotate(dirUpCrs, 90);
             cam.update();
 
             renderFace(yPosFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -132,8 +147,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // DOWN -Y
             rc.cubemapSide = CubemapSide.SIDE_DOWN;
 
-            cam.direction.set(dirBak).rotate(dirUpCrs, -90);
-            cam.up.set(upBak).rotate(dirUpCrs, -90);
+            cam.direction.set(dirEffective).rotate(dirUpCrs, -90);
+            cam.up.set(upEffective).rotate(dirUpCrs, -90);
             cam.update();
 
             renderFace(yNegFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -143,8 +158,8 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // FRONT +Z
             rc.cubemapSide = CubemapSide.SIDE_FRONT;
 
-            cam.direction.set(dirBak);
-            cam.up.set(upBak);
+            cam.direction.set(dirEffective);
+            cam.up.set(upEffective);
             cam.update();
 
             renderFace(zPosFb, camera, sgr, ppb, rw, rh, wh, t);
@@ -154,16 +169,16 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
             // BACK -Z
             rc.cubemapSide = CubemapSide.SIDE_BACK;
 
-            cam.up.set(upBak);
-            cam.direction.set(dirBak).rotate(upBak, -180);
+            cam.up.set(upEffective);
+            cam.direction.set(dirEffective).rotate(upEffective, -180);
             cam.update();
 
             renderFace(zNegFb, camera, sgr, ppb, rw, rh, wh, t);
         }
 
         // Restore camera parameters
-        cam.direction.set(dirBak);
-        cam.up.set(upBak);
+        cam.direction.set(dirBackup);
+        cam.up.set(upBackup);
 
         rc.cubemapSide = CubemapSide.SIDE_NONE;
     }
@@ -176,7 +191,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
         // Restore fov
-        EventManager.publish(Event.FOV_CHANGED_CMD, this, fovBak);
+        EventManager.publish(Event.FOV_CHANGED_CMD, this, fovBackup);
     }
 
     protected void renderFace(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {

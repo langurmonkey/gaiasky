@@ -74,7 +74,9 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         // using planetarium mode and the aperture is <= 180 by
         // skipping the -Z direction (back). We manipulate
         // the cameras before rendering instead.
-        cubemapEffect.setPlanetariumAngle(planetariumAngle);
+
+        //cubemapEffect.setPlanetariumAngle(planetariumAngle);
+        this.angleFromZenith = planetariumAngle;
     }
 
     private void setPlanetariumAperture(float planetariumAperture) {

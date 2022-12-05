@@ -855,7 +855,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-
             break;
         case STEREOSCOPIC_CMD:
             updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);

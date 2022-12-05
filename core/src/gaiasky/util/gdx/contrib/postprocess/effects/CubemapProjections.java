@@ -114,4 +114,8 @@ public final class CubemapProjections extends PostProcessorEffect {
         filter.setProjection(projection);
     }
 
+    public CubemapProjection getProjection() {
+        return filter.getProjection();
+    }
+
 }
