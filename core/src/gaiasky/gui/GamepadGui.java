@@ -122,8 +122,8 @@ public class GamepadGui extends AbstractGui {
         tabContents.clear();
         model.clear();
 
-        float w = 1440f;
-        float h = 740f;
+        float w = Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
+        float h = Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
         // Widget width
         float ww = 400f;
         float wh = 64f;
@@ -901,7 +901,7 @@ public class GamepadGui extends AbstractGui {
         padTable.setBackground("table-border");
         menu.pack();
         padTable.add(menu).left();
-        contentCell = padTable.add();
+        contentCell = padTable.add().center();
 
         content.add(padTable);
 
@@ -1020,7 +1020,7 @@ public class GamepadGui extends AbstractGui {
 
     private ScrollPane container(Table t, float w, float h) {
         OwnScrollPane c = new OwnScrollPane(t, skin, "minimalist-nobg");
-        t.top();
+        t.center();
         c.setFadeScrollBars(true);
         c.setForceScroll(false, false);
         c.setSize(w, h);

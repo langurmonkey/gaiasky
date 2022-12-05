@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
@@ -276,9 +277,8 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
     }
 
     protected void rightStickHorizontal(Actor focus, float value) {
-        if (focus instanceof OwnSliderPlus) {
-            var slider = (OwnSliderPlus) focus;
-            GuiUtils.sliderMove(value > 0, 0.05f, slider);
+        if (focus instanceof Slider) {
+            GuiUtils.sliderMove(value > 0, 0.05f, (Slider) focus);
         } else if (focus instanceof SelectBox) {
             var selectBox = (SelectBox<?>) stage.getKeyboardFocus();
             GuiUtils.selectBoxMoveSelection(value < 0, false, selectBox);

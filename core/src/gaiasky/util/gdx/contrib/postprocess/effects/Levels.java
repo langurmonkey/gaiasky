@@ -48,12 +48,19 @@ public final class Levels extends PostProcessorEffect {
     private float currLumaMax = -1f, currLumaAvg = -1f;
     private final FrameBuffer lumaBuffer;
 
+    /** Is the max/avg process running? **/
+    private final AtomicBoolean processRunning;
+    private long lastFrame;
+
     /**
      * Creates the effect
      */
     public Levels() {
         levels = new LevelsFilter();
         luma = new Luma();
+
+        processRunning = new AtomicBoolean(false);
+        lastFrame = -10;
 
         // Compute number of lod levels based on LUMA_SIZE
         int size = LUMA_SIZE;
@@ -198,14 +205,15 @@ public final class Levels extends PostProcessorEffect {
             float smoothingMax = .2f;
             currLumaAvg += dt * (lumaAvg - currLumaAvg) / smoothingAvg;
             currLumaMax += dt * (lumaMax - currLumaMax) / smoothingMax;
-            // Run in main thread
-            GaiaSky.postRunnable(() -> levels.setAvgMaxLuma(Math.max(currLumaAvg, baseLuma), Math.min(currLumaMax, topLuma)));
         }
+        // Run in main thread
+        GaiaSky.postRunnable(() -> {
+            if (levels != null) {
+                levels.setAvgMaxLuma(Math.max(currLumaAvg, baseLuma), Math.min(currLumaMax, topLuma));
+            }
+            processRunning.set(false);
+        });
     }
-
-    /** Is the compute max/avg process running? **/
-    private final AtomicBoolean processRunning = new AtomicBoolean(false);
-    private long lastFrame = -Long.MAX_VALUE;
 
     private void computeLumaValuesCPU(FrameBuffer src) {
         // Launch process every 4th frame
@@ -226,8 +234,9 @@ public final class Levels extends PostProcessorEffect {
                 computeMaxAvg(pixels);
                 if (!Double.isNaN(lumaAvg) && !Double.isNaN(lumaMax)) {
                     lowPassFilter(0.0f, 2.0f);
+                } else {
+                    processRunning.set(false);
                 }
-                processRunning.set(false);
             });
 
             // Generate mip-map to get average - use with autoExposureToneMapping()
@@ -258,13 +267,15 @@ public final class Levels extends PostProcessorEffect {
 
             if (!Double.isNaN(v)) {
                 avg = avg + (v - avg) / (i + 1);
-                max = v > max ? v : max;
+                max = Math.max(v, max);
                 i++;
             }
         }
 
-        // Avoid very bright images by setting a minimum maximum luminosity
-        lumaMax = (float) max;
+        // Weigh the maximum with how far from it the mean value is.
+        double frac = Math.min(1.0, 8.0 * (1.0 - ((max - avg) / max)));
+
+        lumaMax = (float) (max * frac);
         lumaAvg = (float) avg;
         buff.clear();
     }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
@@ -136,9 +137,8 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
 
     private boolean moveHorizontal(boolean left) {
         Actor focus = stage.getKeyboardFocus();
-        if (focus instanceof OwnSliderPlus) {
-            var slider = (OwnSliderPlus) focus;
-            GuiUtils.sliderMove(!left, 0.05f, slider);
+        if (focus instanceof Slider) {
+            GuiUtils.sliderMove(!left, 0.05f, (Slider) focus);
             return true;
         } else if (focus instanceof SelectBox) {
             var selectBox = (SelectBox<?>) focus;
@@ -150,9 +150,8 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
 
     public boolean moveHome() {
         Actor focus = stage.getKeyboardFocus();
-        if (focus instanceof OwnSliderPlus) {
-            OwnSliderPlus s = (OwnSliderPlus) focus;
-            GuiUtils.sliderMove(false, 1.0f, s);
+        if (focus instanceof Slider) {
+            GuiUtils.sliderMove(false, 1.0f, (Slider) focus);
             return true;
         } else if (focus instanceof SelectBox) {
             var selectBox = (SelectBox<?>) focus;
@@ -164,9 +163,8 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
 
     public boolean moveEnd() {
         Actor focus = stage.getKeyboardFocus();
-        if (focus instanceof OwnSliderPlus) {
-            OwnSliderPlus s = (OwnSliderPlus) focus;
-            GuiUtils.sliderMove(true, 1.0f, s);
+        if (focus instanceof Slider) {
+            GuiUtils.sliderMove(true, 1.0f, (Slider) focus);
             return true;
         } else if (focus instanceof SelectBox) {
             var selectBox = (SelectBox<?>) focus;

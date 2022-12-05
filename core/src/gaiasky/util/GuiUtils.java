@@ -208,7 +208,7 @@ public class GuiUtils {
      * @param percent The percentage in [0,1].
      * @param slider  The slider to move.
      */
-    public static void sliderMove(boolean up, float percent, OwnSliderPlus slider) {
+    public static void sliderMove(boolean up, float percent, Slider slider) {
         float max = slider.getMaxValue();
         float min = slider.getMinValue();
         float val = slider.getValue();
