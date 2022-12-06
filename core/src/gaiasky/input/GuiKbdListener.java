@@ -1,6 +1,7 @@
 package gaiasky.input;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -37,41 +38,25 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
     }
 
     @Override
-    public boolean keyUp(int keycode) {
+    public boolean keyUp(final int keycode) {
         if (isActive()) {
             long now = TimeUtils.millis();
             super.keyUp(keycode);
             lastPollTime = now;
 
-            if (keycode == Keys.UP) {
-                // Focus up.
-                return moveUp();
-            } else if (keycode == Keys.DOWN) {
-                // Focus down.
-                return moveDown();
-            } else if (keycode == Keys.RIGHT) {
-                return moveRight();
-            } else if (keycode == Keys.LEFT) {
-                return moveLeft();
-            } else if (keycode == Keys.TAB && !isKeyPressed(Keys.SHIFT_LEFT)) {
-                // Tab right.
-                return tabRight();
-            } else if (keycode == Keys.TAB && isKeyPressed(Keys.SHIFT_LEFT)) {
-                // Tab left.
-                return tabLeft();
-            } else if (keycode == Keys.ENTER) {
-                // Action down.
-                return actionDown();
-            } else if (keycode == Keys.ESCAPE) {
-                // Close (cancel) dialog.
-                return close();
-            } else if (keycode == Keys.HOME) {
-                return moveHome();
-            } else if (keycode == Keys.END) {
-                return moveEnd();
-            } else if (keycode == Keys.ALT_LEFT || keycode == Keys.ALT_RIGHT) {
-                return select();
-            }
+            return switch(keycode) {
+                case Keys.UP -> moveUp();
+                case Keys.DOWN -> moveDown();
+                case Keys.LEFT -> moveLeft();
+                case Keys.TAB ->
+                    !isKeyPressed(Keys.SHIFT_LEFT) ? tabRight() : tabLeft();
+                case Keys.ENTER -> actionDown();
+                case Keys.ESCAPE -> close();
+                case Keys.HOME -> moveHome();
+                case Keys.END -> moveEnd();
+                case Keys.ALT_LEFT, Keys.ALT_RIGHT -> select();
+                default -> false;
+            };
         }
         return false;
     }

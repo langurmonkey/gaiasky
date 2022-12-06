@@ -840,6 +840,8 @@ public enum Event {
      * Removes the keyboard focus in the GUI.
      **/
     REMOVE_KEYBOARD_FOCUS,
+    /** Issues the command to clean pressed keys in KebyoardInputController. **/
+    CLEAN_PRESSED_KEYS,
 
     /**
      * Removes a previously added message or image. Contains the id.

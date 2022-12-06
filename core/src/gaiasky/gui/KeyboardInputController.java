@@ -10,16 +10,18 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.gui.KeyBindings.ProgramAction;
 import gaiasky.util.Settings;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
  * This input inputListener connects the input events with the key binding actions
  */
-public class KeyboardInputController extends InputAdapter {
+public class KeyboardInputController extends InputAdapter implements IObserver {
 
     public KeyBindings mappings;
     /** Holds the pressed keys at any moment **/
@@ -33,6 +35,7 @@ public class KeyboardInputController extends InputAdapter {
         pressedKeys = new HashSet<>();
         KeyBindings.initialize();
         mappings = KeyBindings.instance;
+        EventManager.instance.subscribe(this, Event.CLEAN_PRESSED_KEYS);
     }
 
     @Override
@@ -70,10 +73,19 @@ public class KeyboardInputController extends InputAdapter {
     /**
      * Makes sure all unpressed special keys are not on the pressed keys list.
      */
-    private void cleanSpecial(){
-        for (int special : KeyBindings.SPECIAL){
+    private void cleanSpecial() {
+        for (int special : KeyBindings.SPECIAL) {
             if (!input.isKeyPressed(special))
                 pressedKeys.remove(special);
+        }
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (Objects.requireNonNull(event) == Event.CLEAN_PRESSED_KEYS) {
+            if (pressedKeys != null) {
+                pressedKeys.clear();
+            }
         }
     }
 }

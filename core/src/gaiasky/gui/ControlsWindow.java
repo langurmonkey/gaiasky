@@ -262,6 +262,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         load.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, load);
+                uncheck(load);
             }
             return false;
         });
@@ -273,6 +274,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         preferences.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_PREFERENCES_ACTION, preferences);
+                uncheck(preferences);
             }
             return false;
         });
@@ -283,6 +285,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         showLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_LOG_ACTION, showLog);
+                uncheck(showLog);
             }
             return false;
         });
@@ -294,6 +297,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         about.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_ABOUT_ACTION, about);
+                uncheck(about);
             }
             return false;
         });
@@ -304,6 +308,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         quit.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.publish(Event.SHOW_QUIT_ACTION, quit);
+                uncheck(quit);
             }
             return false;
         });
@@ -364,6 +369,12 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         pack();
         recalculateSize();
+    }
+
+    private void uncheck(Button b) {
+        b.setProgrammaticChangeEvents(false);
+        b.setChecked(false);
+        b.setProgrammaticChangeEvents(true);
     }
 
     public void recalculateSize() {
@@ -481,11 +492,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     }
 
     public CollapsiblePane getCollapsiblePane(String name) {
-        if (panes.containsKey(name)) {
-            return panes.get(name);
-        } else {
-            return null;
-        }
+        return panes.getOrDefault(name, null);
     }
 
 }

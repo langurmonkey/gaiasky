@@ -55,13 +55,13 @@ public class SearchDialog extends GenericDialog {
     private final Scene scene;
     // Matching nodes
     private final SortedSet<String> matching;
-    private Array<OwnLabel> matchingLabels;
+    private final Array<OwnLabel> matchingLabels;
     private Table candidates;
-    private FocusView view;
-    private FilterView filterView;
+    private final FocusView view;
+    private final FilterView filterView;
     private int cIdx = -1;
-    private Vector2 aux;
-    private boolean suggestions;
+    private final Vector2 aux;
+    private final boolean suggestions;
 
     private final Array<Task> tasks;
 
