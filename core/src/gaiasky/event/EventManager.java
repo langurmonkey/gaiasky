@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.scene.entity.EntityRadio;
+import gaiasky.util.screenshot.ScreenshotsManager;
 
 import java.util.*;
 

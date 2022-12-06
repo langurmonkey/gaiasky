@@ -18,6 +18,7 @@ import gaiasky.render.api.IPostProcessor.RenderType;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.OneTimeRunnable;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ImageFormat;
 import gaiasky.util.i18n.I18n;
@@ -28,7 +29,6 @@ import java.util.Date;
 public class ScreenshotsManager implements IObserver {
 
     private static final String SCREENSHOT_FILENAME = "screenshot";
-
 
     private final GaiaSky gaiaSky;
     private final SceneRenderer sceneRenderer;
@@ -66,22 +66,22 @@ public class ScreenshotsManager implements IObserver {
     }
 
     public void renderScreenshot(final int width, final int height, final String directory) {
-            final Settings settings = Settings.settings;
-            String file = null;
-            String filename = getCurrentTimeStamp() + "_" + SCREENSHOT_FILENAME;
-            switch (settings.screenshot.mode) {
-            case SIMPLE -> file = ImageRenderer.renderToImageGl20(directory, filename, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), settings.screenshot.format, settings.screenshot.quality);
-            case ADVANCED -> {
-                // Do not resize post processor
-                GaiaSky.instance.resizeImmediate(width, height, false, true, false, true);
-                file = renderToImage(sceneRenderer, gaiaSky.getCameraManager(), gaiaSky.getT(), gaiaSky.getPostProcessor().getPostProcessBean(RenderType.screenshot), width, height, directory, filename, screenshotRenderer, settings.screenshot.format, settings.screenshot.quality);
-                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false, true);
-            }
-            }
-            if (file != null) {
-                EventManager.publish(Event.SCREENSHOT_INFO, this, file);
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.screenshot", file));
-            }
+        final Settings settings = Settings.settings;
+        String file = null;
+        String filename = getCurrentTimeStamp() + "_" + SCREENSHOT_FILENAME;
+        switch (settings.screenshot.mode) {
+        case SIMPLE -> file = ImageRenderer.renderToImageGl20(directory, filename, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), settings.screenshot.format, settings.screenshot.quality);
+        case ADVANCED -> {
+            // Do not resize post processor
+            GaiaSky.instance.resizeImmediate(width, height, false, true, false, true);
+            file = renderToImage(sceneRenderer, gaiaSky.getCameraManager(), gaiaSky.getT(), gaiaSky.getPostProcessor().getPostProcessBean(RenderType.screenshot), width, height, directory, filename, screenshotRenderer, settings.screenshot.format, settings.screenshot.quality);
+            GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false, true);
+        }
+        }
+        if (file != null) {
+            EventManager.publish(Event.SCREENSHOT_INFO, this, file);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.screenshot", file));
+        }
 
     }
 
@@ -95,12 +95,19 @@ public class ScreenshotsManager implements IObserver {
 
     /**
      * Posts a runnable that renders a screenshot after the current update-render cycle.
-     * @param width The width of the screenshot.
-     * @param height The height of the screenshot.
+     *
+     * @param width     The width of the screenshot.
+     * @param height    The height of the screenshot.
      * @param directory The directory to save the screenshot.
      */
     public void takeScreenshot(int width, int height, String directory) {
-        GaiaSky.postRunnable(()-> renderScreenshot(width, height, directory));
+        var process = new OneTimeRunnable("screenshot-cmd") {
+            @Override
+            protected void process() {
+                renderScreenshot(width, height, directory);
+            }
+        };
+        process.post();
     }
 
     /**
