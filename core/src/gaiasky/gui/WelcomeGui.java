@@ -148,7 +148,7 @@ public class WelcomeGui extends AbstractGui {
                 Task notification = new Task() {
                     @Override
                     public void run() {
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Detected " + Controllers.getControllers().size + " gamepad(s)!\nSome functions in Gaia Sky may require a keyboard and mouse.", 10f);
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.welcome.gamepad.notification",  Controllers.getControllers().size), 10f);
                     }
                 };
                 Timer.schedule(notification, 2);

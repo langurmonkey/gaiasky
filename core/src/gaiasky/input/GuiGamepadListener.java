@@ -66,6 +66,7 @@ public abstract class GuiGamepadListener extends AbstractGamepadListener {
             lastButtonPollTime = now;
         }
         lastControllerUsed = controller;
+
         return true;
     }
 

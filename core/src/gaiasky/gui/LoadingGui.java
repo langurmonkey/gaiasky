@@ -32,8 +32,6 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
-import java.math.BigInteger;
-
 /**
  * Displays the loading screen.
  */
@@ -45,8 +43,6 @@ public class LoadingGui extends AbstractGui {
     private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
     private HorizontalGroup tip;
-    private BigInteger m1, m2;
-    private long i;
     private long lastFunnyTime;
     private long lastTipTime;
 
@@ -103,9 +99,6 @@ public class LoadingGui extends AbstractGui {
         // Funny text
         loadingTextGenerator = new LoadingTextGenerator();
         lastFunnyTime = 0;
-        i = -1;
-        m1 = BigInteger.ZERO;
-        m2 = BigInteger.ZERO;
         spin = new OwnLabel("0", skin, "main-title-xs");
         spin.setColor(skin.getColor("theme"));
 
@@ -171,25 +164,6 @@ public class LoadingGui extends AbstractGui {
         }
     }
 
-    /**
-     * Return the i fibonacci number
-     **/
-    private void fibonacci() {
-        i++;
-        BigInteger next;
-        if (i == 0l) {
-            next = BigInteger.ZERO;
-        } else if (i == 1l) {
-            next = BigInteger.ONE;
-        } else {
-            next = m1.add(m2);
-        }
-        m2 = m1;
-        m1 = next;
-
-        spin.setText(next.toString());
-    }
-
     private void randomFunnyText() {
         if (Settings.settings.runtime.openVr) {
             spin.setText(I18n.msg("gui.loading"));
@@ -200,12 +174,6 @@ public class LoadingGui extends AbstractGui {
                 spin.setText(I18n.msg("gui.loading"));
             }
         }
-    }
-
-    private void reset() {
-        i = 0l;
-        m1 = BigInteger.ZERO;
-        m2 = BigInteger.ZERO;
     }
 
     @Override
