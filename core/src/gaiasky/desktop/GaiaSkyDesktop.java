@@ -372,12 +372,12 @@ public class GaiaSkyDesktop implements IObserver {
         }
         // Color, Depth, stencil buffers, MSAA.
         cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
-
+        
         // Compute base UI scale.
         if (reinitializeUIScale) {
             // Height linear interpolation:
             // min:HD -> max:5K
-            s.program.ui.scale = MathUtilsd.lint(s.graphics.resolution[1], 720, 2880, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+            s.program.ui.scale = MathUtilsd.lint(s.graphics.resolution[1], 600, 2680, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
             logger.info("UI scale re-initialized to " + s.program.ui.scale);
         }
 

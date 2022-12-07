@@ -1284,6 +1284,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
             if (renderBatch != null)
                 renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+
+            Settings.settings.graphics.resolution[0] = width;
+            Settings.settings.graphics.resolution[1] = height;
         }
     }
 
