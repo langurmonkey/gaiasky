@@ -179,12 +179,6 @@ Translated: 758/1413
 53.64%
 ```
 
-You can contribute to those, or you can create a new translation for another language. Adding new translations is as easy as submitting a pull request. Translation files should go in the [i18n](assets/i18n) folder.
-First, copy the default [gsbundle.properties](assets/i18n/gsbundle.properties) file and use it as a template. The translation files must have the format:
-
-`gsbundle_<language_code>[<_country_code>].properties`
-
-
 ### Formatting properties files
 
 The default English properties file has lots of comments, which sometimes are not kept with some i18n editors. You can recover the comments in your translation file (for `language_code` and `country_code`) by running our `I18nFormatter`:
