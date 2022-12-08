@@ -99,7 +99,7 @@ You can also download the **data packs manually** [here](https://gaia.ari.uni-he
 
 ##  4. Documentation and help
 
-The most up-to-date documentation of Gaia Sky is always [hosted at gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
+The most up-to-date documentation of Gaia Sky is always hosted at [gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
 
 ### 4.1. Documentation submodule
 
@@ -114,7 +114,7 @@ The documentation project will be checked out in the `docs/` folder.
 
 ##  5. Copyright and licensing information
 
-This software is published and distributed under the MPL 2.0 (Mozilla Public License 2.0). You can find the [full license text here](/LICENSE.md) or visiting https://opensource.org/licenses/MPL-2.0.
+This software is published and distributed under the MPL 2.0 (Mozilla Public License 2.0). You can find the [full license text here](LICENSE.md) or visiting [opensource.org/licenses/MPL-2.0](https://opensource.org/licenses/MPL-2.0).
 
 ##  6. Contact information
 
@@ -122,7 +122,7 @@ The main webpage of the project is [zah.uni-heidelberg.de/gaia/outreach/gaiasky]
 
 ##  7. Acknowledgements
 
-The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](/ACKNOWLEDGEMENTS.md) file.
+The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md) file.
 
 ##  8. Gaia Sky VR
 
