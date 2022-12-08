@@ -214,8 +214,8 @@
 
 
 <a name="3.2.0"></a>
-## [3.2.0](https://codeberg.org/gaiasky/gaiasky/tree/3.1.6) (2022-06-07).
-[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.6...3.2.0).
+## [3.2.0](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc16) (2022-06-07)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc16...3.2.0)
 
 ### Bug Fixes
 - make sure direction and up vectors are orthogonal in camera transition call.
@@ -224,46 +224,297 @@
 - empty tips may crash Gaia Sky at startup.
 - 'add scene graph object' event missing source object. Fixes [#400](https://codeberg.org/gaiasky/gaiasky/issues/400).
 - remove phase of pi radians in default-model orbital elements.
+
+### Features
+- add number of samples to orbit objects.
+- add popup notice when opening the keyframes window if component 'others' is not visible.
+- add full screen bit depth and refresh rate to fully qualify selected full screen modes.
+
+
+<a name="3.2.0-rc16"></a>
+## [3.2.0-rc16](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc15) (2022-05-16)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc15...3.2.0-rc16)
+
+### Bug Fixes
 - regression with libgdx 1.11.0 that caused vertical tooltips.
+
+### Build System
+- force safe graphics mode on M1 macOS.
+- add aarch64 JRE to macOS bundle for M1 machines. Move to macOS single bundle archive from deprecated old single bundle.
+- downgrade jamepad to 2.0.14.2 as the newer 2.0.20.0 does not work with ARM macs.
+
+
+<a name="3.2.0-rc15"></a>
+## [3.2.0-rc15](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc14) (2022-05-12)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc14...3.2.0-rc15)
+
+### Bug Fixes
 - null-check settings in crash reporter.
+
+### Build System
+- upgrade to libgdx 1.11.0 and LWJGL 3.3.1 --- this adds M1 Mac support.
+
+### Features
+- improve layout and information of crash window.
+
+
+<a name="3.2.0-rc14"></a>
+## [3.2.0-rc14](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc13) (2022-04-29)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc13...3.2.0-rc14)
+
+### Bug Fixes
 - workaround for libgdx backslash bug in asset manager. Fixes [#398](https://codeberg.org/gaiasky/gaiasky/issues/398).
 - hide system cursor correctly with GLFW until libgdx 1.10.1 is released.
 - use minimum width for debug interface to prevent dynamic resizing depending on content.
+
+### Build System
+- use default GC (G1) in favor of Shenandoah (only LTS).
+
+### Code Refactoring
+- flatten object hierarchy by removing some classes, merging their functionality upwards.
+- abstract attitude loading system, remove gaia class, use heliotropic satellite.
+- add `I18nFormatter` to reformat i18n files.
+- remove useless number formatting infrastructure.
+- remove old date formatting infrastructure (desktop, html, mobile) in favor of a direct approach.
+
+### Features
+- add notice when there are no datasets.
+
+
+<a name="3.2.0-rc13"></a>
+## [3.2.0-rc13](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc12) (2022-04-19)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc12...3.2.0-rc13)
+
+### Bug Fixes
 - correctly update label text when setting `SliderPlus` values.
 - correctly shut down background worker and manager threads so that JVM can finish gently.
 - add default values for orbit line and point colors.
 - configure crash window size with same code as regular window.
+
+### Build System
+- remove run tasks, use '--args' gradle argument instead.
+- sign Windows packages with self-sigend certificate.
+- add Linux archive for itch.io.
+- add Windows archive to `install4j` template for uploading to itch.io.
+
+### Code Refactoring
+- move update process to runnable, protect render lists from outer access.
+- improve service thread implementation.
+- move tips and funny texts to main bundle, add some dangling hardcoded strings to bundle, enable translation of keyboard keys.
+- move all text from -v flag to i18n keys.
+- remove some warnings, clean up code.
+- rename some packages and move some code around.
+
+### Documentation
+- update contributing document to reflect new objects file.
+
+### Features
+- add cyrillic characters to `main-font`, `font2d` and `font3d` fonts.
+- new API call: `setDatasetPointSizeMultiplier(String, Double)`.
+- enable translation of object names, and add first translation files for most common objects like planets, constellations, etc.
+- add scaffolding to translate welcome tips and funny sentences. Add Catalan translation for those.
+- complete catalan translation file, add neat options to translation status utility.
+- add buttons to launch preferences dialog and to quit at the bottom right of the welcome screen.
+- add translation status code and task, update catalan translation file.
+- add offline mode, activated in configuration file.
+
+### Performance Improvements
+- separate UI reload from localized name updates.
+
+
+<a name="3.2.0-rc12"></a>
+## [3.2.0-rc12](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc11) (2022-03-22)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc11...3.2.0-rc12)
+
+### Bug Fixes
 - set argument of pericenter to zero when the epoch is not the reference epoch in the SSO converter for DR3.
 - compute mu automatically if period is set in orbital elements.
+
+### Code Refactoring
+- use bit mask instead of 64-bit integer as attributes mask so that we can register more than 64 attributes. Add proper 3-component specular color to materials. Add diffuse cubemaps for models and clouds. Fix a number of shader issues.
+- rename `u_environmentCubemap` to `u_diffuseCubemap` in shaders.
+- rename setting `data::skyboxLocation` to `data::reflectionSkyboxLocation`.
+
+### Features
+- add meshes as datasets, connect dataset visibility to per-object visibility controls for meshes.
+- add specular, normal, emissive, metallic, roughness and height cubemap support to default and tessellation shaders.
+- add cubemap diffuse texturing capability to models.
+
+
+<a name="3.2.0-rc11"></a>
+## [3.2.0-rc11](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc10) (2022-03-14)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc10...3.2.0-rc11)
+
+### Code Refactoring
+- remove unused id from components, fix skybox orientation.
+
+### Features
+- implement the use of cubemaps in skyboxes. Fix cubemap reflection directions.
+- asteroids get full dataset controls (except for colormaps) like highlighting, coloring and sizing.
+- add catalog info goodies to asteroids catalogs.
+
+
+<a name="3.2.0-rc10"></a>
+## [3.2.0-rc10](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc09) (2022-03-11)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc09...3.2.0-rc10)
+
+### Bug Fixes
 - some data paths using forward slashes '/' instead of '\' on Windows.
-- big refactor that fixes the runtime activation and deactivation of both motion blur and ssr. Lots of little fixes and improvements to the render system.
+- big refactor that fixes the runtime activation and deactivation of both motion blur and SSR. Lots of little fixes and improvements to the render system.
 - add VR offset to reflection view direction.
 - VR controller info positioning, settings crash.
+
+### Code Refactoring
+- move double array to util package.
+
+### Features
+- add asteroids/sso catalog types.
+
+### Performance Improvements
+- improve performance of orbital elements particles by treating them as whole groups in the CPU using new model object and renderer.
+
+
+<a name="3.2.0-rc09"></a>
+## [3.2.0-rc09](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc08) (2022-03-08)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc08...3.2.0-rc09)
+
+### Code Refactoring
+- old Milky Way renderer converted to general-purpose billboard group infrastructure to enable representation of any quad-based point data.
+
+
+<a name="3.2.0-rc08"></a>
+## [3.2.0-rc08](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc07) (2022-03-07)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc07...3.2.0-rc08)
+
+### Bug Fixes
 - add null-checks for some OpenVR properties (required by Oculus 2). Add VR information in crash reporter. Fixes [#393](https://codeberg.org/gaiasky/gaiasky/issues/393) (again).
-- wrong scale factor in orbital elements-based orbits in VR.
+
+
+<a name="3.2.0-rc07"></a>
+## [3.2.0-rc07](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc06) (2022-03-04)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc06...3.2.0-rc07)
+
+### Bug Fixes
+- wrong scale factor in orbital elementss-based orbits in VR.
 - update `VRControllerRole` values from `ETrackedControllerRole` from SteamVR spec. Fixes [#393](https://codeberg.org/gaiasky/gaiasky/issues/393).
 - broken `setObjectVisibility()` API call. Fixes [#391](https://codeberg.org/gaiasky/gaiasky/issues/391).
 - escape path before sending SAMP metadata. Fixes [#392](https://codeberg.org/gaiasky/gaiasky/issues/392).
 - regression adding bookmarks. Fixes [#390](https://codeberg.org/gaiasky/gaiasky/issues/390).
 - directional lights from stars still applied when stars are made invisible.
 - restrict the rendering of pointer guides and cross-hairs in stereo and cubemap modes.
+
+### Code Refactoring
+- remove unused and obsolete jython fix.
+- improve shader combination and lookup (from ssr branch).
+
+### Features
+- expose SSR to preferences dialog, experimental section.
+- screen space reflections Merge branch 'ssr'.
+
+
+<a name="3.2.0-rc06"></a>
+## [3.2.0-rc06](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc05) (2022-02-23)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc05...3.2.0-rc06)
+
+### Bug Fixes
 - improve check box layout in preferences dialog.
 - focus info interface width jitters when moving in free mode on occasions.
 - Gaia FOV modes with triangle-based stars.
+
+### Features
+- add new red-blue anaglyph profile mode, additionally to the pre-existing red-cyan.
+- add proxy configuration directly in Gaia Sky's config file.
+- add dynamic resolution checkbox to preferences dialog.
+- finish dynamic resolution implementation with an arbitrary number of levels.
+
+
+<a name="3.2.0-rc05"></a>
+## [3.2.0-rc05](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc04) (2022-02-15)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc04...3.2.0-rc05)
+
+### Bug Fixes
 - highlight dataset API call.
 - particle dataset loading default size limits when using tris.
 - issues with dataset loading via scripting.
 - improve error handling in dataset manager.
 - Julian date algorithm.
 - prevent repeated entries in search suggestions.
+
+### Code Refactoring
+- add source object to events by default.
+
+### Features
+- expand/collapse panes by clicking on title.
+- add collapsible entry and use it for datasets in datasets component.
+- add context menu to dataset items in dataset component.
+- add GUI control to edit object fade time [ms].
+- improve layout and UX of datasets component.
+- add roughness texture and value to normal shader, enable mipmaps in skybox.
+- add popup notifications for certain important actions and events. These popup notifications can be closed by clicking on them, and they stay on screen for 8 seconds by default.
+- additional API call to load star datasets.
+- save session log file to.
+- add API call to set label colors.
+- enable label colors for all objects. Always defaults to white.
+- add method to inject transformation matrix directly into orbit, add change of basis matrix creation utility.
+- allow spherical coordinates in `StaticCoordinates`, additional fixes.
+- add background thread count and pool size to debug information.
+
+
+<a name="3.2.0-rc04"></a>
+## [3.2.0-rc04](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc03) (2022-01-26)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc03...3.2.0-rc04)
+
+### Bug Fixes
 - dataset manager path handling on Windows.
-- initial VR GUI distance.
+
+
+<a name="3.2.0-rc03"></a>
+## [3.2.0-rc03](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc02) (2022-01-25)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc02...3.2.0-rc03)
+
+### Bug Fixes
+- initial VR gui distance.
 - lighting bug when multiple stars cast a light on an object.
+
+### Features
+- new 'force label visibility' flag for model objects. This flag causes the label of the object to always be rendered, regardless of the solid angle and other constraints. The flag is controlled by new button at the top of the focus information pane (bottom-right) and via two new scripting API calls.
+- simplify loading mechanism by joining catalog files with object files. No distinction is necessary anymore, for all of them work in the same way and are loaded by the same entities.
+- add file list and scroll pane to dataset information in dataset manager.
+- add pixel lighting shading to meshes.
+
+
+<a name="3.2.0-rc02"></a>
+## [3.2.0-rc02](https://codeberg.org/gaiasky/gaiasky/tree/3.2.0-rc01) (2022-01-18)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.2.0-rc01...3.2.0-rc02)
+
+### Bug Fixes
 - set encoding of i18n files to UTF-8, update formatting.
 - layout of version line table.
 - regression in apparent magnitude resource bundle key.
 - effective temperature array initialization bug in STIL loader.
-- add notice whenever a `default-data` update is available. Fixes [#384](https://codeberg.org/gaiasky/gaiasky/issues/384).
+- add notice whenever a `default-data` update is available.
+
+### Build System
+- update gradlew version.
+- update install4j script to latest version, use bundled JRE for .deb, upgrade to Java 17.
+
+### Features
+- updated the Bulgarian translation.
+- improve layout of welcome and loading GUIs.
+- redesign dataset manager. The old download manager/catalog selection duo is phased out in favor of the new dataset manager. This is more usable and less confusing, while allowing for parallel downloads.
+- update splash.
+- add camera distance from Sun in the camera section of the focus information pane.
+- update welcome GUI background image.
+
+### Merge Requests
+- Merge branch 'new-dataset-manager'.
+
+
+<a name="3.2.0-rc01"></a>
+## [3.2.0-rc01](https://codeberg.org/gaiasky/gaiasky/tree/3.1.6) (2021-12-17)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.1.6...3.2.0-rc01)
+
+### Bug Fixes
 - crosshair in cubemap, planetarium, stereo and VR modes.
 - remove usage of deprecated Java APIs.
 - do not add objects that already exist (have same names and same type) to scene graph.
@@ -281,20 +532,9 @@
 - rename old configuration files after conversion to new format.
 - time offset (6711 yr) in Moon's position lookup.
 - fix star clusters fade between model and billboard.
-- color picker listener stops working after first click. Fixes [#379](https://codeberg.org/gaiasky/gaiasky/issues/379).
+- color picker listener stops working after first click.
 
 ### Build System
-- force safe graphics mode on M1 macOS.
-- add aarch64 JRE to macOS bundle for M1 machines. Move to macOS single bundle archive from deprecated old single bundle.
-- downgrade jamepad to 2.0.14.2 as the newer 2.0.20.0 does not work with ARM macs.
-- upgrade to libgdx 1.11.0 and LWJGL 3.3.1 --- this adds M1 Mac support.
-- use default GC (G1) in favor of Shenandoah (only LTS).
-- remove run tasks, use `--args` gradle argument instead.
-- sign Windows packages with self-sigend certificate.
-- add Linux archive for itch.io.
-- add Windows archive to install4j template for uploading to itch.io.
-- update gradlew version.
-- update install4j script to latest version, use bundled JRE for .deb, upgrade to Java 17.
 - remove old run targets.
 - remove deprecated features from build files.
 - update gradle wrapper version to 7.3.
@@ -304,82 +544,7 @@
 - automatically generate release notes during build.
 - update appimage JDK version to `16.0.2+7`.
 
-### Code Refactoring
-- flatten object hierarchy by removing some classes, merging their functionality upwards.
-- abstract attitude loading system, remove gaia class, use heliotropic satellite.
-- add `I18nFormatter` to reformat i18n files.
-- remove useless number formatting infrastructure.
-- remove old date formatting infrastructure (desktop, html, mobile) in favor of a direct approach.
-- move update process to runnable, protect render lists from outer access.
-- improve service thread implementation.
-- move tips and funny texts to main bundle, add some dangling hardcoded strings to bundle, enable translation of keyboard keys.
-- move all text from -v flag to i18n keys.
-- remove some warnings, clean up code.
-- rename some packages and move some code around.
-- use bit mask instead of 64-bit integer as attributes mask so that we can register more than 64 attributes. Add proper 3-component specular color to materials. Add diffuse cubemaps for models and clouds. Fix a number of shader issues.
-- rename `u_environmentCubemap` to `u_diffuseCubemap` in shaders.
-- rename setting `data::skyboxLocation` to `data::reflectionSkyboxLocation`.
-- remove unused id from components, fix skybox orientation.
-- move double array to util package.
-- old milky way renderer converted to general-purpose billboard group infrastructure to enable representation of any quad-based point data.
-- remove unused and obsolete jython fix.
-- improve shader combination and lookup (from ssr branch).
-- add source object to events by default.
-
-### Documentation
-- update contributing document to reflect new objects file.
-
 ### Features
-- add number of samples to orbit objects.
-- add popup notice when opening the keyframes window if component 'others' is not visible.
-- add full screen bit depth and refresh rate to fully qualify selected full screen modes.
-- improve layout and information of crash window.
-- add notice when there are no datasets.
-- add cyrillic characters to `main-font`, `font2d` and `font3d` fonts.
-- new API call: `setDatasetPointSizeMultiplier(String, Double)`.
-- enable translation of object names, and add first translation files for most common objects like planets, constellations, etc.
-- add scaffolding to translate welcome tips and funny sentences. Add Catalan translation for those.
-- complete catalan translation file, add neat options to translation status utility.
-- add buttons to launch preferences dialog and to quit at the bottom right of the welcome screen.
-- add translation status code and task, update catalan translation file.
-- add offline mode, activated in configuration file.
-- add meshes as datasets, connect dataset visibility to per-object visibility controls for meshes.
-- add specular, normal, emissive, metallic, roughness and height cubemap support to default and tessellation shaders.
-- add cubemap diffuse texturing capability to models.
-- implement the use of cubemaps in skyboxes. Fix cubemap reflection directions.
-- asteroids get full dataset controls (except for colormaps) like highlighting, coloring and sizing.
-- add catalog info goodies to asteroids catalogs.
-- add asteroids/sso catalog types.
-- expose SSR to preferences dialog, experimental section.
-- screen space reflections Merge branch 'ssr'.
-- add new red-blue anaglyph profile mode, additionally to the pre-existing red-cyan.
-- add proxy configuration directly in Gaia Sky's config file.
-- add dynamic resolution checkbox to preferences dialog.
-- finish dynamic resolution implementation with an arbitrary number of levels.
-- expand/collapse panes by clicking on title.
-- add collapsible entry and use it for datasets in datasets component.
-- add context menu to dataset items in dataset component.
-- add GUI control to edit object fade time [ms].
-- improve layout and UX of datasets component.
-- add roughness texture and value to normal shader, enable mipmaps in skybox.
-- add popup notifications for certain important actions and events. These popup notifications can be closed by clicking on them, and they stay on screen for 8 seconds by default.
-- additional API call to load star datasets.
-- save session log file to.
-- add API call to set label colors.
-- enable label colors for all objects. Always defaults to white.
-- add method to inject transformation matrix directly into orbit, add change of basis matrix creation utility.
-- allow spherical coordinates in StaticCoordinates, additional fixes.
-- add background thread count and pool size to debug information.
-- new 'force label visibility' flag for model objects. This flag causes the label of the object to always be rendered, regardless of the solid angle and other constraints. The flag is controlled by new button at the top of the focus information pane (bottom-right) and via two new scripting API calls.
-- simplify loading mechanism by joining catalog files with object files. No distinction is necessary anymore, for all of them work in the same way and are loaded by the same entities.
-- add file list and scroll pane to dataset information in dataset manager.
-- add pixel lighting shading to meshes.
-- updated the Bulgarian translation.
-- improve layout of welcome and loading GUIs.
-- redesign dataset manager. The old download manager/catalog selection duo is phased out in favor of the new dataset manager. This is more usable and less confusing, while allowing for parallel downloads.
-- update splash.
-- add camera distance from Sun in the camera section of the focus information pane.
-- update welcome GUI background image.
 - new non-constant-density fog shader which approximates physical fog much better than before.
 - add an arbitrary number of load progress bars.
 - enable loading internal JSON descriptor files from UI.
@@ -395,8 +560,6 @@
 - add `--headless` flag to run in headless mode (hidden window).
 - add API calls to configure and take screenshots.
 - get Gaia Sky ready for star systems with proper orbits.
-- add `--headless` flag to run in headless mode (hidden window).
-- add API calls to configure and take screenshots.
 - add individual size scale factor to star/particle group datasets.
 - improve mode switching dialogs with a few goodies and QOL updates.
 - implement mosaic cubemaps, quad-based star group renderer.
@@ -411,12 +574,10 @@
 - improve bookmarks, add missing i18n keys Fixes [#380](https://codeberg.org/gaiasky/gaiasky/issues/380).
 - shapes (spheres, cones, cylinders, etc.) of arbitrary sizes can now be added around any object, with the possibility of tracking the object's size. This is an extension of [#378](https://codeberg.org/gaiasky/gaiasky/issues/378) which includes many more options plus an API entry point.
 - add shapes around objects Fixes [#378](https://codeberg.org/gaiasky/gaiasky/issues/378).
-- add setting to select preferred units (ly/pc) [#377](https://codeberg.org/gaiasky/gaiasky/issues/377).
+- add setting to select preferred units (ly/pc).
 - add the possibility to track objects.
 
 ### Performance Improvements
-- separate UI reload from localized name updates.
-- improve performance of orbital elements particles by treating them as whole groups in the CPU using new model object and renderer.
 - initially size index hash maps to avoid resize operations.
 
 ### Style
@@ -424,9 +585,7 @@
 - organize imports in whole codebase.
 
 ### Merge Requests
-- Merge branch 'new-dataset-manager'
-- Merge branch 'points-triangles'
-
+- Merge branch 'points-triangles'.
 
 <a name="3.1.6"></a>
 ## [3.1.6](https://codeberg.org/gaiasky/gaiasky/tree/3.1.5) (2021-09-22).
