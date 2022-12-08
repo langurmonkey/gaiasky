@@ -1,5 +1,6 @@
+#ifndef GLSL_LIB_NORMAL
+#define GLSL_LIB_NORMAL
 // Including this file requires lib_luma.glsl
-
 struct Normal {
     float t, b, r, l, tl, bl, br, tr;
 };
@@ -46,4 +47,4 @@ Normal partialNormalMap(sampler2D tex, vec2 texCoords) {
 vec2 normalMap(sampler2D tex, vec2 texCoords) {
     return regular(partialNormalMap(tex, texCoords));
 }
-
+#endif

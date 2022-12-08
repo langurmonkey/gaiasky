@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_CUBEMAP
+#define GLSL_LIB_CUBEMAP
+
 #ifndef PI
 #define PI 3.141592653589793238462643383
 #endif // PI
@@ -11,3 +14,4 @@ vec3 UVtoXYZ(vec2 tc) {
 
     return cubemaptc;
 }
+#endif

@@ -9,9 +9,12 @@ uniform float u_coordEnabled;
 uniform float u_trailMap;
 uniform float u_coordPos;
 uniform float u_period;
+uniform float u_lineWidth;
+uniform float u_blendFactor;
 
 in vec4 v_col;
 in float v_coord;
+in vec2 v_lineCenter;
 
 layout (location = 0) out vec4 fragColor;
 
@@ -37,7 +40,22 @@ void main() {
         trail = 1.0;
     }
     trail = (1.0 / (1.0 - u_trailMap)) * (trail - u_trailMap);
-    fragColor = vec4(v_col.rgb * u_alpha * trail, 1.0);
+
+    vec4 col = v_col;
+    float a = 1.0;
+    if (u_lineWidth > 0.0) {
+        // We do aliasing here!
+        float d = length(v_lineCenter - gl_FragCoord.xy);
+        float w = u_lineWidth;
+        if (d > w) {
+            col *= 0.0;
+            a = 0.0;
+        } else {
+            col.rgb *= pow((w - d) / w, u_blendFactor);
+        }
+    }
+
+    fragColor = vec4(col.rgb * u_alpha * trail, a);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     #ifdef ssrFlag

@@ -9,9 +9,11 @@ uniform mat4 u_projView;
 uniform vec3 u_parentPos;
 uniform float u_pointSize;
 uniform float u_vrScale;
+uniform vec2 u_viewport;
 
 out vec4 v_col;
 out float v_coord;
+out vec2 v_lineCenter;
 
 #include shader/lib_geometry.glsl
 
@@ -48,6 +50,11 @@ void main() {
     // Position
     vec4 gpos = u_projView * pos;
     gl_Position = gpos;
+
+    // Line center
+    vec3 ndc = gpos.xyz / gpos.w; //perspective divide/normalize
+    vec2 viewportCoord = ndc.xy * 0.5 + 0.5; //ndc is -1 to 1 in GL. scale for 0 to 1
+    v_lineCenter = viewportCoord * u_viewport;
 
     #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);

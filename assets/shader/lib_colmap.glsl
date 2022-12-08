@@ -1,6 +1,6 @@
+#ifndef GLSL_LIB_COLMAP
+#define GLSL_LIB_COLMAP
 // Input value must be normalized for all color maps.
-
-
 // Blues - Red channel
 float colormap_blues_red(float x) {
     if (x < 0.8724578971287745) {
@@ -396,3 +396,4 @@ vec3 colormap(int cmap, float value, vec2 minmax){
     }
     return colormap(cmap, clamp(x, 0.0, 1.0));
 }
+#endif

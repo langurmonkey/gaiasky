@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_SAMPLEHEIGHT
+#define GLSL_LIB_SAMPLEHEIGHT
+
 #include shader/lib_noise.glsl
 vec4 sampleHeight(sampler2D tex, vec2 tc){
     if (u_heightSize.x < 0.0){
@@ -17,3 +20,4 @@ vec4 sampleHeight(sampler2D tex, vec2 tc){
         return vec4(vec3(1.0) - texture(tex, tc).rgb, 1.0);
     }
 }
+#endif

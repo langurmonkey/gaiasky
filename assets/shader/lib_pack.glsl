@@ -1,3 +1,5 @@
+#ifndef GLSL_LIB_PACK
+#define GLSL_LIB_PACK
 const float c_precision = 128.0;
 const float c_precisionp1 = c_precision + 1.0;
 
@@ -29,3 +31,4 @@ vec3 unpack3(float value) {
     color.b = floor(value / (c_precisionp1 * c_precisionp1)) / c_precision;
     return color;
 }
+#endif

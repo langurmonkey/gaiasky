@@ -1,3 +1,6 @@
+#ifndef GLSL_LIB_GEOMETRY
+#define GLSL_LIB_GEOMETRY
+
 #ifndef PI
 #define PI 3.141592653589793238462643383
 #endif // PI
@@ -58,3 +61,4 @@ vec4 billboard_quaternion(vec3 dir, vec3 up) {
     q.z = (right.y - up.x) * w4;
     return q;
 }
+#endif

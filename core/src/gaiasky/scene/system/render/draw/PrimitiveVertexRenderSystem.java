@@ -47,6 +47,9 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
     protected int coordOffset;
     protected final VertsView vertsView;
 
+    /** Enable method with aliasing in the fragment shader. **/
+    protected final boolean shaderAliasMethod = false;
+
     public PrimitiveVertexRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(sceneRenderer, rg, alphas, shaders);
         this.lines = lines;
@@ -65,9 +68,14 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
     @Override
     protected void initShaderProgram() {
         if (isLine()) {
-            Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
-            Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
-            Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
+            if (shaderAliasMethod) {
+                Gdx.gl.glDisable(GL30.GL_LINE_SMOOTH);
+                Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
+            } else {
+                Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
+                Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
+                Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
+            }
         } else if (isPoint()) {
             Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
             Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -102,12 +110,10 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (isLine()) {
-            // Enable GL_LINE_SMOOTH
-            Gdx.gl20.glEnable(GL11.GL_LINE_SMOOTH);
-            Gdx.gl.glHint(GL20.GL_NICEST, GL11.GL_LINE_SMOOTH_HINT);
-            // Enable GL_LINE_WIDTH
-            Gdx.gl20.glEnable(GL20.GL_LINE_WIDTH);
+            initShaderProgram();
         }
+        ExtShaderProgram shaderProgram = getShaderProgram();
+        shaderProgram.begin();
 
         this.camera = camera;
         renderables.forEach(r -> {
@@ -180,17 +186,23 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             /*
              * RENDER
              */
-            ExtShaderProgram shaderProgram = getShaderProgram();
-
-            shaderProgram.begin();
 
             var trajectory = Mapper.trajectory.get(render.entity);
 
             // Regular.
-            if (isLine())
-                Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * Settings.settings.scene.lineWidth);
-            if (isPoint())
+            if (isLine()) {
+                if (shaderAliasMethod) {
+                    Gdx.gl.glLineWidth(10f);
+                    shaderProgram.setUniformf("u_lineWidth", renderable.getPrimitiveSize() * Settings.settings.scene.lineWidth * 4f);
+                    shaderProgram.setUniformf("u_viewport", rc.w(), rc.h());
+                    shaderProgram.setUniformf("u_blendFactor", 2.0f);
+                } else {
+                    Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * Settings.settings.scene.lineWidth);
+                    shaderProgram.setUniformf("u_lineWidth", -1f);
+                }
+            } else {
                 shaderProgram.setUniformf("u_pointSize", renderable.getPrimitiveSize());
+            }
 
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -199,7 +211,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             shaderProgram.setUniformf("u_trailMap", trajectory != null ? trajectory.trailMap : 0.0f);
             shaderProgram.setUniformf("u_coordPos", trajectory != null ? (float) trajectory.coord : 1f);
             shaderProgram.setUniformf("u_period", trajectory != null && trajectory.oc != null ? (float) trajectory.oc.period : 0f);
-            Entity parent  = renderable.getParentEntity();
+            Entity parent = renderable.getParentEntity();
             if (parent != null) {
                 Vector3d urp = Mapper.attitude.has(parent) ? Mapper.attitude.get(parent).nonRotatedPos : null;
                 if (urp != null)
@@ -212,8 +224,8 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             addEffectsUniforms(shaderProgram, camera);
             curr.mesh.render(shaderProgram, renderable.getGlPrimitive());
 
-            shaderProgram.end();
         });
+        shaderProgram.end();
     }
 
     private void coord(float value) {

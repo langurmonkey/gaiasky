@@ -1,3 +1,5 @@
+#ifndef GLSL_LIB_PBR
+#define GLSL_LIB_PBR
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a = roughness*roughness;
@@ -35,3 +37,4 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 // ----------------------------------------------------------------------------
+#endif
