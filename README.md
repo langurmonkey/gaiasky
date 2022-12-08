@@ -28,11 +28,12 @@ This file contains the following sections:
 1. [Installation instructions and requirements](#1-installation-instructions-and-requirements)
 2. [Pre-built packages](#2-pre-built-packages)
 3. [Running from source](#3-running-from-source-repository)
-4. [Documentation and help](#4-documentation-and-help)
-5. [Copyright and licensing information](#5-copyright-and-licensing-information)
-6. [Contact information](#6-contact-information)
-7. [Credits and acknowledgements](#7-acknowledgements)
-8. [Gaia Sky VR](#8-gaia-sky-vr)
+4. [Gaia Sky VR](#4-gaia-sky-vr)
+5. [Documentation and help](#5-documentation-and-help)
+6. [Copyright and licensing information](#6-copyright-and-licensing-information)
+7. [Contact information](#7-contact-information)
+8. [Contributing](#8-contributing)
+9. [Credits and acknowledgements](#9-acknowledgements)
 
 ##  1. Installation instructions and requirements
 
@@ -96,12 +97,22 @@ As of version `2.1.0`, Gaia Sky offers an automated way to download all data pac
 
 You can also download the **data packs manually** [here](https://gaia.ari.uni-heidelberg.de/gaiasky/repository/).
 
+##  4. Gaia Sky VR
 
-##  4. Documentation and help
+You can run Gaia Sky in VR with Valve's OpenVR with the `-vr` flag.
+
+```console
+gaiasky -vr
+```
+
+More information on how to make the VR version work properly in the [VR.md](VR.md) file.
+
+
+##  5. Documentation and help
 
 The most up-to-date documentation of Gaia Sky is always hosted at [gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
 
-### 4.1. Documentation submodule
+### 5.1. Documentation submodule
 
 In order to add the documentation submodule to the project, do:
 
@@ -112,25 +123,19 @@ git submodule update
 
 The documentation project will be checked out in the `docs/` folder.
 
-##  5. Copyright and licensing information
+##  6. Copyright and licensing information
 
 This software is published and distributed under the MPL 2.0 (Mozilla Public License 2.0). You can find the [full license text here](LICENSE.md) or visiting [opensource.org/licenses/MPL-2.0](https://opensource.org/licenses/MPL-2.0).
 
-##  6. Contact information
+##  7. Contact information
 
 The main webpage of the project is [zah.uni-heidelberg.de/gaia/outreach/gaiasky](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky). There you can find the latest versions and the latest information on Gaia Sky.
 
-##  7. Acknowledgements
+##  8. Contributing
+
+Find information about contributing translations, code or ideas in the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+##  9. Acknowledgements
 
 The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md) file.
-
-##  8. Gaia Sky VR
-
-You can run Gaia Sky in VR with Valve's OpenVR with the `-vr` flag.
-
-```console
-gaiasky -vr
-```
-
-More information on how to make the VR version work properly in the [VR.md](VR.md) file.
 
