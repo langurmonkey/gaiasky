@@ -511,8 +511,13 @@ public class FullGui extends AbstractGui {
             int screenX = Gdx.input.getX();
             int screenY = Gdx.input.getY();
 
-            view.setEntity(candidate);
-            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, view, catalogManager, scene);
+            FocusView focusView = null;
+            if(candidate != null) {
+                view.setEntity(candidate);
+                focusView = view;
+            }
+
+            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, focusView, catalogManager, scene);
 
             int h = (int) getGuiStage().getHeight();
 

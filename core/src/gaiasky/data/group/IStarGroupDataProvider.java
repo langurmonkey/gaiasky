@@ -19,31 +19,33 @@ import java.util.Set;
 public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
     LongMap<float[]> getColors();
 
-
     /**
      * Loads the data applying a factor using a memory mapped file for improved speed.
      *
-     * @param file   The file to load
-     * @param factor Factor to apply to the positions
-     * @return Array of particle beans
+     * @param file   The file to load.
+     * @param factor Factor to apply to the positions.
+     *
+     * @return The array of particle records.
      */
     List<IParticleRecord> loadDataMapped(String file, double factor);
 
     /**
      * Loads the data applying a factor.
      *
-     * @param file   The file to load
-     * @param factor Factor to apply to the positions
-     * @return Array of particle beans
+     * @param file   The file to load.
+     * @param factor Factor to apply to the positions.
+     *
+     * @return The array of particle records.
      */
     List<IParticleRecord> loadData(String file, double factor);
 
     /**
      * Loads the data applying a factor.
      *
-     * @param is     Input stream to load the data from
-     * @param factor Factor to apply to the positions
-     * @return Array of particle beans
+     * @param is     Input stream to load the data from.
+     * @param factor Factor to apply to the positions.
+     *
+     * @return The array of particle records.
      */
     List<IParticleRecord> loadData(InputStream is, double factor);
 
@@ -56,7 +58,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * </p>
      * <code>pllx_err &lt; pllx * pllxErrFactor</code>
      *
-     * @param parallaxErrorFactor The percentage value of parallax errors with respect to parallax
+     * @param parallaxErrorFactor The percentage value of parallax errors with respect to parallax.
      */
     void setParallaxErrorFactorFaint(double parallaxErrorFactor);
 
@@ -69,7 +71,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * </p>
      * <code>pllx_err &lt; pllx * pllxErrFactor</code>
      *
-     * @param parallaxErrorFactor The percentage value of parallax errors with respect to parallax
+     * @param parallaxErrorFactor The percentage value of parallax errors with respect to parallax.
      */
     void setParallaxErrorFactorBright(double parallaxErrorFactor);
 
@@ -81,63 +83,66 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
 
     /**
      * Sets the zero point of the parallax as an addition to the parallax
-     * values, in [mas]
+     * values, in [mas].
      *
-     * @param parallaxZeroPoint The parallax zero point
+     * @param parallaxZeroPoint The parallax zero point.
      */
     void setParallaxZeroPoint(double parallaxZeroPoint);
 
     /**
      * Sets the flag to apply magnitude and color corrections for extinction and
-     * reddening
+     * reddening.
      *
-     * @param magCorrections Whether to apply the corrections
+     * @param magCorrections Whether to apply the corrections.
      */
     void setMagCorrections(boolean magCorrections);
 
     /**
-     * Set location of additional columns file or directory
-     * @param additionalFile File or directory with additional columns per sourceId
+     * Set location of additional columns file or directory.
+     *
+     * @param additionalFile File or directory with additional columns per sourceId.
      */
     void setAdditionalFiles(String additionalFile);
 
     /**
-     * Sets the RUWE criteria. RUWE file must have been set
+     * Sets the RUWE criteria. RUWE file must have been set.
      *
-     * @param RUWE The criteria (usually 1.4)
+     * @param RUWE The criteria (usually 1.4).
      */
     void setRUWECap(double RUWE);
 
     /**
-     * Sets a distance cap. Stars beyond this distance will not be loaded
+     * Sets a distance cap. Stars beyond this distance will not be loaded.
      *
-     * @param distCap The distance cap, in parsecs
+     * @param distCap The distance cap, in parsecs.
      */
     void setDistanceCap(double distCap);
 
     /**
-     * Gets the star counts per magnitude
+     * Gets the star counts per magnitude.
      **/
     long[] getCountsPerMag();
 
-
     /**
      * Adds a set with all the ids which will be loaded regardless of any other
-     * conditions (i.e. parallax error thresholds)
-     * @param ids The ids that must be loaded
+     * conditions (i.e. parallax error thresholds).
+     *
+     * @param ids The ids that must be loaded.
      */
-    void setMustLoadIds(Set<Long>ids);
+    void setMustLoadIds(Set<Long> ids);
 
     /**
      * List of column names, separated by commas, indicating the position of each
-     * field to load
-     * @param columns The column name list
+     * field to load.
+     *
+     * @param columns The column name list.
      */
     void setColumns(String columns);
 
     /**
-     * Set the preferred output format version, if applicable
-     * @param version The version number
+     * Set the preferred output format version, if applicable.
+     *
+     * @param version The version number.
      */
     void setOutputFormatVersion(int version);
 }
