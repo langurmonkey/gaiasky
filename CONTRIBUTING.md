@@ -197,6 +197,6 @@ This updates your translation file with the undetected keys from the base Englis
 
 ### Data
 
-Contributing data files is always welcome. Have a look at the current data files in the [data](assets/data) folder, most of them should be pretty self-explanatory. Also, you might want to have a look at the documentation on [data files and format](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/Data-catalogs-formats.html).
+Contributing data files is always welcome. Have a look at the data files for other datasets in our [data repository](https://gaia.ari.uni-heidelberg.de/gaiasky/repository/). Also, you might want to have a look at the [dataset format documentation in the official docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html).
 
 
