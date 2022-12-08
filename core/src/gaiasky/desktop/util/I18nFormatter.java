@@ -67,10 +67,10 @@ public class I18nFormatter {
             Map<String, String> missing = new HashMap<>();
             Set<Object> keys = props0.keySet();
             for (Object key : keys) {
-                boolean has = props1.getProperty((String) key) != null;
-                if (has) {
+                var originalVal = props0.getProperty((String) key);
+                var val = props1.getProperty((String) key);
+                if (val != null && !val.equals(originalVal)) {
                     // Substitute value
-                    String val = props1.getProperty((String) key);
                     outputProperties.setProperty((String) key, val);
                 } else {
                     // Use default (English), commented

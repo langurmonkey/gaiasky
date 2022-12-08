@@ -480,9 +480,9 @@ public class FullGui extends AbstractGui {
                 Integer x = (Integer) data[4];
                 Integer y = (Integer) data[5];
 
-                pointerXCoord.setText("RA/".concat(nf.format(ra)).concat("°"));
+                pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.ra", nf.format(ra)));
                 pointerXCoord.setPosition(x / uiScale, 1.6f);
-                pointerYCoord.setText("DEC/".concat(nf.format(dec)).concat("°"));
+                pointerYCoord.setText(I18n.msg("gui.focusinfo.pointer.dec", nf.format(dec)));
                 pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
             }
             break;
@@ -495,9 +495,9 @@ public class FullGui extends AbstractGui {
                 Integer x = (Integer) data[2];
                 Integer y = (Integer) data[3];
 
-                pointerXCoord.setText("Lon/".concat(nf.format(lon)).concat("°"));
+                pointerXCoord.setText(I18n.msg("gui.focusinfo.pointer.lon", nf.format(lon)));
                 pointerXCoord.setPosition(x / uiScale, 1.6f);
-                pointerYCoord.setText("Lat/".concat(nf.format(lat)).concat("°"));
+                pointerYCoord.setText(I18n.msg("gui.focusinfo.pointer.lat", nf.format(lat)));
                 pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
             }
             break;
