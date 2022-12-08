@@ -21,7 +21,7 @@
 {{ range .CommitGroups -}}
 ### {{ .Title }}
 {{ range .Commits -}}
-- {{ .Subject }} {{ if .Refs -}} {{ range .Refs }}{{ if .Action }}[#{{ .Ref }}]({{ $.Info.RepositoryURL }}/issues/{{ .Ref }}) {{ end }}{{end}}{{ end }}
+- {{ .Subject }} 
 {{ end }}
 {{ end -}}
 

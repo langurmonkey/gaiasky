@@ -1,16 +1,39 @@
 #!/bin/bash
 
-# This script generates the CHANGELOG.md file and appends the old-style 
-# change log since a given version in order to have old logs in the 
-# same format and style
+# This script generates a changelog file for a given tag.
+# This needs to be prepended to the CHANGELOG.md file in the root of the project.
 
 # Utils dir, with a relative path core/utils/ to the root gaiasky directory
 UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-GSDIR=`realpath $UTILSDIR/../../../`
+if [ -z "$GS" ]; then
+  GSDIR=`realpath $UTILSDIR/../../../`
+else
+  GSDIR="$GS"
+fi
+
+if [[ $# -lt 1 ]]; then
+    echo "Usage: $0 VERSION [OUTPUT]"
+    echo
+    echo "$0: Must provide a version (tag) number and optionally an output file."
+    exit -1
+fi
+
+if [[ $# -eq 2 ]]; then
+  OUTPUT=$2
+else
+  unset OUTPUT
+fi
+  
+# The current tag
+CURRENT_TAG=$1
 
 # Use regexp to only include full versions (e.g. exclude release candidates)
-git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 3.3.0..
-cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-321.md > $GSDIR/CHANGELOG.md
-rm $GSDIR/temp.md
+if [ -z "$var" ]; then
+  # Print to stdout
+  git-chglog -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml $CURRENT_TAG
+else
+  # Print to output file
+  git-chglog -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml -o $OUTPUT $CURRENT_TAG
+fi
 
-echo "Changelog generated to $GSDIR/CHANGELOG.md"
+echo "Changelog generated to $OUTPUT"
