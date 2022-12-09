@@ -93,39 +93,40 @@ public class MainGamepadListener extends AbstractGamepadListener {
             double val = Math.signum(value) * Math.pow(Math.abs(value), mappings.getAxisValuePower());
 
             if (axisCode == mappings.getAxisLstickH()) {
+                double valMapped = val * mappings.getAxisLstickHSensitivity();
                 if (cam.getMode().isFocus()) {
-                    cam.setRoll(val * 1e-2 * mappings.getAxisLstickHSensitivity());
+                    cam.setRoll(valMapped * 1.0e-1);
                 } else {
                     // Use this for lateral movement
-                    cam.setHorizontal(val * mappings.getAxisLstickHSensitivity());
+                    cam.setHorizontal(valMapped);
                 }
                 treated = true;
             } else if (axisCode == mappings.getAxisLstickV()) {
                 cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
                 treated = true;
             } else if (axisCode == mappings.getAxisRstickH()) {
-                double valr = (Settings.settings.controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
+                double valMapped = (Settings.settings.controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
                 if (cam.getMode().isFocus()) {
-                    cam.setHorizontal(valr * 0.1);
+                    cam.setHorizontal(valMapped * 2.0e-2);
                 } else {
-                    cam.setYaw(valr * 3e-2);
+                    cam.setYaw(valMapped * 1.0e-1);
                 }
                 treated = true;
             } else if (axisCode == mappings.getAxisRstickV()) {
-                double valr = (Settings.settings.controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
+                double valMapped = (Settings.settings.controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
                 if (cam.getMode().isFocus()) {
-                    cam.setVertical(valr * 0.1);
+                    cam.setVertical(valMapped * 2.0e-2);
                 } else {
-                    cam.setPitch(valr * 3e-2);
+                    cam.setPitch(valMapped * 1.0e-1);
                 }
                 treated = true;
             } else if (axisCode == mappings.getAxisRT()) {
-                double valr = val * 1e-1 * mappings.getAxisRTSensitivity();
-                cam.setRoll(valr);
+                double valMapped = val * 1.0e-1 * mappings.getAxisRTSensitivity();
+                cam.setRoll(valMapped);
                 treated = true;
             } else if (axisCode == mappings.getAxisLT()) {
-                double valr = val * 1e-1 * mappings.getAxisLTSensitivity();
-                cam.setRoll(-valr);
+                double valMapped = val * 1.0e-1 * mappings.getAxisLTSensitivity();
+                cam.setRoll(-valMapped);
                 treated = true;
             }
 
