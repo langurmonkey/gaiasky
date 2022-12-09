@@ -197,7 +197,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
                     shaderProgram.setUniformf("u_viewport", rc.w(), rc.h());
                     shaderProgram.setUniformf("u_blendFactor", 2.0f);
                 } else {
-                    Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * Settings.settings.scene.lineWidth);
+                    Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * Settings.settings.scene.lineWidth * 2f);
                     shaderProgram.setUniformf("u_lineWidth", -1f);
                 }
             } else {

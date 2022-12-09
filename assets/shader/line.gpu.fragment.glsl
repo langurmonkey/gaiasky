@@ -20,7 +20,7 @@ layout (location = 0) out vec4 fragColor;
 
 #ifdef ssrFlag
 #include shader/lib_ssr.frag.glsl
-#endif // ssrFlag
+#endif// ssrFlag
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
@@ -41,26 +41,28 @@ void main() {
     }
     trail = (1.0 / (1.0 - u_trailMap)) * (trail - u_trailMap);
 
+    if (u_alpha<= 0.0 || trail <= 0.0) {
+        discard;
+    }
+
     vec4 col = v_col;
-    float a = 1.0;
     if (u_lineWidth > 0.0) {
         // We do aliasing here!
         float d = length(v_lineCenter - gl_FragCoord.xy);
         float w = u_lineWidth;
         if (d > w) {
-            col *= 0.0;
-            a = 0.0;
+            discard;
         } else {
             col.rgb *= pow((w - d) / w, u_blendFactor);
         }
     }
 
-    fragColor = vec4(col.rgb * u_alpha * trail, a);
+    fragColor = vec4(col.rgb * u_alpha * trail, 1.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     #ifdef ssrFlag
     ssrBuffers();
-    #endif // ssrFlag
+    #endif// ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer();
