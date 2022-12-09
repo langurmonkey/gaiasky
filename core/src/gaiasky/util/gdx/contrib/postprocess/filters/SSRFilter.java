@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2012 bmanuel
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -25,6 +9,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * Screen space reflections filter.
  */
 public class SSRFilter extends Filter3<SSRFilter> {
+
     private final Vector2 zfark;
     private Matrix4 frustumCorners, combined, projection, invProjection, view, invView;
 
@@ -64,6 +49,7 @@ public class SSRFilter extends Filter3<SSRFilter> {
             return this.elementSize;
         }
     }
+
     public SSRFilter() {
         super(ShaderLoader.fromFile("raymarching/screenspace", "ssr"));
         this.zfark = new Vector2();
@@ -102,10 +88,16 @@ public class SSRFilter extends Filter3<SSRFilter> {
     }
 
     public void setView(Matrix4 view) {
-        this.view.set(view);
-        setParam(Param.View, this.view);
-        this.invView.set(view).inv();
-        setParam(Param.InvView, this.invView);
+        if (view != null) {
+            try {
+                this.view.set(view);
+                setParam(Param.View, this.view);
+                this.invView.set(view).inv();
+                setParam(Param.InvView, this.invView);
+            } catch (RuntimeException e) {
+                logger.debug(e);
+            }
+        }
     }
 
     public void setZfarK(float zfar, float k) {

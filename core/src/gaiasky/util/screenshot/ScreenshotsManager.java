@@ -51,6 +51,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     public void renderFrame() {
+        gaiaSky.getCameraManager().backupCamera();
         final Settings settings = Settings.settings;
         if (settings.frame.active) {
             switch (settings.frame.mode) {
@@ -63,9 +64,11 @@ public class ScreenshotsManager implements IObserver {
             }
             }
         }
+        gaiaSky.getCameraManager().restoreCamera();
     }
 
-    public void renderScreenshot(final int width, final int height, final String directory) {
+    private void renderScreenshot(final int width, final int height, final String directory) {
+        gaiaSky.getCameraManager().backupCamera();
         final Settings settings = Settings.settings;
         String file = null;
         String filename = getCurrentTimeStamp() + "_" + SCREENSHOT_FILENAME;
@@ -82,7 +85,7 @@ public class ScreenshotsManager implements IObserver {
             EventManager.publish(Event.SCREENSHOT_INFO, this, file);
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.screenshot", file));
         }
-
+        gaiaSky.getCameraManager().restoreCamera();
     }
 
     public void renderCurrentFrameBuffer(String folder, String file, int w, int h) {

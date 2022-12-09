@@ -161,6 +161,39 @@ public class CameraManager implements ICamera, IObserver {
      **/
     protected Vector3d velocity, velocityNormalized;
 
+    public static class BackupProjectionCamera {
+        float near, far, fov;
+        Vector3 position, direction, up;
+        float viewportWidth, viewportHeight;
+
+        public BackupProjectionCamera(PerspectiveCamera cam) {
+            this.near = cam.near;
+            this.far = cam.far;
+            this.fov = cam.fieldOfView;
+            this.position = new Vector3(cam.position);
+            this.direction = new Vector3(cam.direction);
+            this.up = new Vector3(cam.up);
+            this.viewportHeight = cam.viewportHeight;
+            this.viewportWidth = cam.viewportWidth;
+        }
+
+        public void restore(PerspectiveCamera cam) {
+            if (position != null && direction != null && up != null) {
+                cam.near = near;
+                cam.far = far;
+                cam.fieldOfView = fov;
+                cam.position.set(position);
+                cam.direction.set(direction);
+                cam.up.set(up);
+                cam.viewportWidth = viewportWidth;
+                cam.viewportHeight = viewportHeight;
+                cam.update();
+            }
+        }
+    }
+
+    private BackupProjectionCamera backupCamera;
+
     public CameraManager(AssetManager manager, CameraMode mode, boolean vr, GlobalResources globalResources) {
         // Initialize Cameras
         this.naturalCamera = new NaturalCamera(manager, this, vr, globalResources.getSpriteShader(), globalResources.getShapeShader());
@@ -304,6 +337,17 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public void setGamepadInput(boolean state) {
         current.setGamepadInput(state);
+    }
+
+    public void backupCamera() {
+        backupCamera = new BackupProjectionCamera(current.getCamera());
+    }
+
+    public void restoreCamera() {
+        if (backupCamera != null) {
+            backupCamera.restore(current.getCamera());
+            backupCamera = null;
+        }
     }
 
     /**

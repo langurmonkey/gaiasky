@@ -652,7 +652,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Subscribe to events
         EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD,
-                Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE,
+                Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD,
                 Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
                 Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE);
@@ -1502,13 +1502,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             if (cubemapMode) {
                 resetDynamicResolution();
             }
-
-            break;
-        case SCREENSHOT_SIZE_UPDATE:
-        case FRAME_SIZE_UPDATE:
-            //GaiaSky.postRunnable(() -> {
-            //clearFrameBufferMap();
-            //});
             break;
         case SCENE_ADD_OBJECT_CMD:
             final Entity toAdd = (Entity) data[0];

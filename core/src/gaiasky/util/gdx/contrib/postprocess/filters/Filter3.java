@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2012 bmanuel
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -23,12 +7,16 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenQuad3;
 
-/** The base class for any single-pass filter. */
-
-@SuppressWarnings("unchecked")
+/**
+ * The base class for any single-pass filter.
+ * Uses a {@link FullscreenQuad3}, in contrast to a regular {@link Filter}.
+ */
 public abstract class Filter3<T> {
+    protected static final Log logger = Logger.getLogger(Filter3.class);
 
     public interface Parameter {
         String mnemonic();
@@ -42,7 +30,6 @@ public abstract class Filter3<T> {
     protected static final int u_texture1 = 1;
     protected static final int u_texture2 = 2;
     protected static final int u_texture3 = 3;
-    protected static final int u_texture4 = 4;
 
     protected Texture inputTexture = null;
     protected FrameBuffer inputBuffer = null;
@@ -74,10 +61,11 @@ public abstract class Filter3<T> {
 
     /**
      * Caution, disposes of the current program and updates it with the new one. Run synchronously after render().
+     *
      * @param program The new shader program.
      */
-    public void updateProgram(ShaderProgram program){
-        if(this.program != null){
+    public void updateProgram(ShaderProgram program) {
+        if (this.program != null) {
             this.program.dispose();
         }
         this.program = program;
@@ -101,35 +89,30 @@ public abstract class Filter3<T> {
     protected void setParam(Parameter param, int value) {
         program.bind();
         program.setUniformi(param.mnemonic(), value);
-
     }
 
     // float
     protected void setParam(Parameter param, float value) {
         program.bind();
         program.setUniformf(param.mnemonic(), value);
-
     }
 
     // vec2
     protected void setParam(Parameter param, Vector2 value) {
         program.bind();
         program.setUniformf(param.mnemonic(), value);
-
     }
 
     // vec3
     protected void setParam(Parameter param, Vector3 value) {
         program.bind();
         program.setUniformf(param.mnemonic(), value);
-
     }
 
     // mat3
     protected T setParam(Parameter param, Matrix3 value) {
         program.bind();
         program.setUniformMatrix(param.mnemonic(), value);
-
         return (T) this;
     }
 
@@ -137,7 +120,6 @@ public abstract class Filter3<T> {
     protected T setParam(Parameter param, Matrix4 value) {
         program.bind();
         program.setUniformMatrix(param.mnemonic(), value);
-
         return (T) this;
     }
 
@@ -146,21 +128,11 @@ public abstract class Filter3<T> {
         program.bind();
 
         switch (param.arrayElementSize()) {
-        case 4:
-            program.setUniform4fv(param.mnemonic(), values, offset, length);
-            break;
-        case 3:
-            program.setUniform3fv(param.mnemonic(), values, offset, length);
-            break;
-        case 2:
-            program.setUniform2fv(param.mnemonic(), values, offset, length);
-            break;
-        default:
-        case 1:
-            program.setUniform1fv(param.mnemonic(), values, offset, length);
-            break;
+        case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
+        case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
+        case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
+        case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
         }
-
 
         return (T) this;
     }
@@ -222,11 +194,11 @@ public abstract class Filter3<T> {
 
     // mat4
     protected T setParams(Parameter param, Matrix4 value) {
-            if (!programBegan) {
-                programBegan = true;
-                program.bind();
-            }
-            program.setUniformMatrix(param.mnemonic(), value);
+        if (!programBegan) {
+            programBegan = true;
+            program.bind();
+        }
+        program.setUniformMatrix(param.mnemonic(), value);
         return (T) this;
     }
 
@@ -238,19 +210,10 @@ public abstract class Filter3<T> {
         }
 
         switch (param.arrayElementSize()) {
-        case 4:
-            program.setUniform4fv(param.mnemonic(), values, offset, length);
-            break;
-        case 3:
-            program.setUniform3fv(param.mnemonic(), values, offset, length);
-            break;
-        case 2:
-            program.setUniform2fv(param.mnemonic(), values, offset, length);
-            break;
-        default:
-        case 1:
-            program.setUniform1fv(param.mnemonic(), values, offset, length);
-            break;
+        case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
+        case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
+        case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
+        case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
         }
 
         return (T) this;
@@ -259,7 +222,6 @@ public abstract class Filter3<T> {
     /** Should be called after any one or more setParams method calls. */
     protected void endParams() {
         if (programBegan) {
-
             programBegan = false;
         }
     }
@@ -283,6 +245,5 @@ public abstract class Filter3<T> {
 
         program.bind();
         quad.render(program);
-
     }
 }

@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2012 bmanuel
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -26,8 +10,6 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenQuad;
 
 /** The base class for any single-pass filter. */
-
-@SuppressWarnings("unchecked")
 public abstract class Filter<T> {
 
     public interface Parameter {
@@ -73,10 +55,11 @@ public abstract class Filter<T> {
 
     /**
      * Caution, disposes of the current program and updates it with the new one. Run synchronously after render().
+     *
      * @param program The new shader program.
      */
-    public void updateProgram(ShaderProgram program){
-        if(this.program != null){
+    public void updateProgram(ShaderProgram program) {
+        if (this.program != null) {
             this.program.dispose();
         }
         this.program = program;
@@ -139,19 +122,10 @@ public abstract class Filter<T> {
         program.bind();
 
         switch (param.arrayElementSize()) {
-        case 4:
-            program.setUniform4fv(param.mnemonic(), values, offset, length);
-            break;
-        case 3:
-            program.setUniform3fv(param.mnemonic(), values, offset, length);
-            break;
-        case 2:
-            program.setUniform2fv(param.mnemonic(), values, offset, length);
-            break;
-        default:
-        case 1:
-            program.setUniform1fv(param.mnemonic(), values, offset, length);
-            break;
+        case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
+        case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
+        case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
+        case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
         }
 
         return (T) this;
@@ -230,19 +204,10 @@ public abstract class Filter<T> {
         }
 
         switch (param.arrayElementSize()) {
-        case 4:
-            program.setUniform4fv(param.mnemonic(), values, offset, length);
-            break;
-        case 3:
-            program.setUniform3fv(param.mnemonic(), values, offset, length);
-            break;
-        case 2:
-            program.setUniform2fv(param.mnemonic(), values, offset, length);
-            break;
-        default:
-        case 1:
-            program.setUniform1fv(param.mnemonic(), values, offset, length);
-            break;
+        case 4 -> program.setUniform4fv(param.mnemonic(), values, offset, length);
+        case 3 -> program.setUniform3fv(param.mnemonic(), values, offset, length);
+        case 2 -> program.setUniform2fv(param.mnemonic(), values, offset, length);
+        case 1 -> program.setUniform1fv(param.mnemonic(), values, offset, length);
         }
 
         return (T) this;

@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2012 bmanuel
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.contrib.postprocess.utils;
 
 import com.badlogic.gdx.Gdx;
@@ -26,7 +10,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 /**
- * Encapsulates a framebuffer with the ability to ping-pong between two buffers.
+ * Encapsulates a frame buffer with the ability to ping-pong between two buffers.
  * <p>
  * Upon {@link #begin()} the buffer is reset to a known initial state, this is
  * usually done just before the first usage of the buffer.
@@ -42,6 +26,7 @@ import org.lwjgl.opengl.GL30;
  * OpenGL context is lost, {@link #rebind()} should be called.
  *
  * @author bmanuel
+ * @author tsagrista
  */
 public final class PingPongBuffer {
     private GaiaSkyFrameBuffer buffer1, buffer2;
