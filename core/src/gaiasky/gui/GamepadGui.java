@@ -259,6 +259,7 @@ public class GamepadGui extends AbstractGui {
         cameraModel[0][0] = cameraMode;
         cameraMode.setWidth(ww);
         cameraMode.setItems(cameraOptions);
+        cameraMode.setSelectedIndex(cm.getMode().ordinal());
         cameraMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 CameraComboBoxBean selection = cameraMode.getSelected();
