@@ -63,7 +63,7 @@ public class Scene {
 
     /** Number of actual objects in the scene. **/
     private int numberObjects = -1;
-    private Vector3b aux3b = new Vector3b();
+    private final Vector3b aux3b = new Vector3b();
 
     public Scene() {
     }
@@ -423,7 +423,7 @@ public class Scene {
      *
      * @param entity The entity to update.
      */
-    public void extractEntity(Entity entity, float deltaTime) {
+    public void extractEntity(Entity entity) {
         if (extractors != null) {
             for (AbstractExtractSystem system : extractors) {
                 if (system.getFamily().matches(entity)) {
@@ -490,59 +490,6 @@ public class Scene {
      */
     public void update(ITimeFrameProvider time) {
         engine.update((float) time.getDt());
-    }
-
-    /**
-     * Enables the given groups of systems.
-     *
-     * @param systemBags An array with the system bags to enable.
-     */
-    public void enableSystems(Set<EntitySystem>... systemBags) {
-        setEnabled(true, systemBags);
-    }
-
-    /**
-     * Disables the given groups of systems.
-     *
-     * @param systemBags An array with the system bags to disable.
-     */
-    public void disableSystems(Set<EntitySystem>... systemBags) {
-        setEnabled(false, systemBags);
-    }
-
-    /**
-     * Enables or disables a group of system bags.
-     *
-     * @param enabled    The enabled status.
-     * @param systemBags The array of groups of systems to enable or disable.
-     */
-    public void setEnabled(boolean enabled, Set<EntitySystem>... systemBags) {
-        for (Set<EntitySystem> systemBag : systemBags) {
-            if (systemBag != null) {
-                for (EntitySystem system : systemBag) {
-                    if (enabled) {
-                        engine.addSystem(system);
-                    } else {
-                        engine.removeSystem(system);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Enables or disables a given group of systems.
-     *
-     * @param enabled The enabled status.
-     * @param systems The group of systems to enable or disable.
-     */
-    public void setEnabled(boolean enabled, Set<EntitySystem> systems) {
-        for (EntitySystem system : systems)
-            if (enabled) {
-                engine.addSystem(system);
-            } else {
-                engine.removeSystem(system);
-            }
     }
 
     public void insert(Entity entity, boolean addToIndex) {
@@ -648,17 +595,6 @@ public class Scene {
 
     /**
      * Returns focus entities matching the given string by name, to a maximum
-     * of 10 results.
-     *
-     * @param name    The name.
-     * @param results The set where the results are to be stored.
-     */
-    public void findMatchingFocusEntity(String name, SortedSet<String> results) {
-        index.matchingFocusableNodes(name, results, 10, null);
-    }
-
-    /**
-     * Returns focus entities matching the given string by name, to a maximum
      * of <code>maxResults</code>.
      *
      * @param name       The name.
@@ -760,7 +696,7 @@ public class Scene {
          */
         for (Component component : entity.getComponents()) {
             if (component instanceof ICopy) {
-                ICopy iCopy = (ICopy) component;
+                var iCopy = (ICopy) component;
                 Component componentCopy = iCopy.getCopy(engine);
                 copy.add(componentCopy);
             } else {

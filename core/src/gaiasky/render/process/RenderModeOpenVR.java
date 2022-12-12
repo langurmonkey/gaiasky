@@ -201,7 +201,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
                 // Length from headset to controller
                 auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
                 if (model.model.instance != null) {
-                    scene.extractEntity(controller, 0f);
+                    scene.extractEntity(controller);
                 }
             }
 
