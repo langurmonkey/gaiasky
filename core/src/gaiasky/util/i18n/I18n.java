@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 
 /**
- * Manages the i18n (internationalization) system
+ * Manages the i18n (internationalization) system.
  */
 public class I18n {
     private static final Log logger = Logger.getLogger(I18n.class);

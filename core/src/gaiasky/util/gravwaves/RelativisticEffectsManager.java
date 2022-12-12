@@ -33,14 +33,14 @@ public class RelativisticEffectsManager implements IObserver {
     private final Vector3 unitz;
 
     /*
-     * RELATIVISTIC ABERRATION
+     * Relativistic aberration.
      */
     private final Vector3 screenCoords;
     /** Aux matrices **/
     private final Matrix3 eplus;
 
     /*
-     * GRAVITATIONAL WAVES
+     * Gravitational waves.
      */
     private final Matrix3 etimes;
     private final Matrix3 auxm1;

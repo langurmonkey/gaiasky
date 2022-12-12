@@ -37,11 +37,11 @@ public class CatalogManager implements IObserver {
     }
 
     /**
-     * Gets the CatalogInfo with the given name, if any
+     * Gets the CatalogInfo with the given name, if any.
      *
-     * @param dsName The name of the dataset
+     * @param dsName The name of the dataset.
      *
-     * @return The CatalogInfo object, null if it does not exist
+     * @return The CatalogInfo object, null if it does not exist.
      */
     public CatalogInfo get(String dsName) {
         return ciMap.get(dsName);
@@ -78,7 +78,7 @@ public class CatalogManager implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case CATALOG_ADD:
+        case CATALOG_ADD -> {
             CatalogInfo ci = (CatalogInfo) data[0];
             boolean addToSg = (Boolean) data[1];
             if (addToSg) {
@@ -101,8 +101,9 @@ public class CatalogManager implements IObserver {
             // Add to map and list
             ciMap.put(key, ci);
             cis.add(ci);
-            break;
-        case CATALOG_REMOVE:
+        }
+        case CATALOG_REMOVE -> {
+            CatalogInfo ci;
             String dsName = (String) data[0];
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
@@ -111,8 +112,10 @@ public class CatalogManager implements IObserver {
                 ciMap.remove(dsName);
                 cis.remove(ci);
             }
-            break;
-        case CATALOG_VISIBLE:
+        }
+        case CATALOG_VISIBLE -> {
+            CatalogInfo ci;
+            String dsName;
             dsName = (String) data[0];
             boolean visible = (Boolean) data[1];
             if (ciMap.containsKey(dsName)) {
@@ -122,8 +125,9 @@ public class CatalogManager implements IObserver {
                 ci.setVisibility(visible);
                 logger.info(I18n.msg("notif.visibility." + (visible ? "on" : "off"), ci.name));
             }
-            break;
-        case CATALOG_HIGHLIGHT:
+        }
+        case CATALOG_HIGHLIGHT -> {
+            CatalogInfo ci;
             ci = (CatalogInfo) data[0];
             boolean highlight = (Boolean) data[1];
             if (ci != null) {
@@ -134,8 +138,10 @@ public class CatalogManager implements IObserver {
                 else
                     logger.info(I18n.msg("notif.highlight.off", ci.name));
             }
-            break;
-        case CATALOG_POINT_SIZE_SCALING_CMD:
+        }
+        case CATALOG_POINT_SIZE_SCALING_CMD -> {
+            CatalogInfo ci;
+            String dsName;
             dsName = (String) data[0];
             double scaling = (Double) data[1];
             if (ciMap.containsKey(dsName)) {
@@ -145,9 +151,7 @@ public class CatalogManager implements IObserver {
                     hl.pointscaling = (float) scaling;
                 }
             }
-            break;
-        default:
-            break;
+        }
         }
     }
 }
