@@ -63,11 +63,11 @@ public class GaiaSkyDesktop implements IObserver {
      */
     public static final int SOURCE_VERSION = 30301;
     private static boolean REST_ENABLED = false;
-    private static boolean JAVA_VERSION_FLAG = false;
+
+    /** Running with an unsupported Java version. **/
+    private static boolean JAVA_VERSION_PROBLEM_FLAG = false;
 
     private static final String REQUIRED_JAVA_VERSION = "15";
-
-    private static CLIArgs cliArgs;
 
     private static final int DEFAULT_OPENGL_MAJOR = 4;
     private static final int DEFAULT_OPENGL_MINOR = 1;
@@ -79,6 +79,8 @@ public class GaiaSkyDesktop implements IObserver {
     private static final int MIN_GLSL_MAJOR = 3;
     private static final int MIN_GLSL_MINOR = 3;
     private static final String MIN_GLSL = MIN_GLSL_MAJOR + "." + MIN_GLSL_MINOR;
+
+    private static CLIArgs cliArgs;
 
     /**
      * Program CLI arguments.
@@ -400,7 +402,7 @@ public class GaiaSkyDesktop implements IObserver {
                     logger.error(I18n.msg("error.dispose"), e1);
                 }
             }
-            if (!JAVA_VERSION_FLAG) {
+            if (!JAVA_VERSION_PROBLEM_FLAG) {
                 if (gs != null && !gs.windowCreated) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
                     logger.error(I18n.msg("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
@@ -671,7 +673,7 @@ public class GaiaSkyDesktop implements IObserver {
             out.println("You are using Java " + jv + ", which is unsupported by Gaia Sky");
             out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
             out.println("===============================================================");
-            JAVA_VERSION_FLAG = true;
+            JAVA_VERSION_PROBLEM_FLAG = true;
         }
     }
 

@@ -56,7 +56,7 @@ This is the Gaia Sky source repository. We recommend using the [pre-built packag
 
 In order to compile and run Gaia Sky from source, you need the following installed in your system:
 
-- `JDK15+`
+- `JDK`, latest LTS version recommended
 - `git`
 
 First, clone the [Gaia Sky repository](https://codeberg.org/gaiasky/gaiasky):
@@ -72,13 +72,13 @@ cd gaiasky
 ./gaiasky
 ```
 
-On Windows, open PowerShell, make sure your `$JAVA_HOME` environment variable points to a valid JDK15+ installation, and run:
+On Windows, open PowerShell, make sure your `$JAVA_HOME` environment variable points to a valid JDK installation, and run:
 
 ```batchfile
 .\gradlew.bat core:run
 ```
 
-Et voilà ! The bleeding edge Gaia Sky is running in your machine.
+Et voilà! The bleeding edge Gaia Sky is running in your machine.
 
 
 ### 3.1 CLI arguments
