@@ -651,7 +651,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD,
+        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD,
                 Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD,
                 Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
@@ -789,7 +789,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             EventManager.publish(Event.GO_TO_OBJECT_CMD, this);
             if (settings.runtime.openVr) {
                 // Free mode by default in VR
-                EventManager.instance.postDelayed(Event.CAMERA_MODE_CMD, this, 1000L, CameraMode.FREE_MODE);
+                EventManager.publishDelayed(Event.CAMERA_MODE_CMD, this, 1000L, CameraMode.FREE_MODE);
             }
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
@@ -889,9 +889,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     @Override
     public void dispose() {
         // Stop
-        if (running != null) {
-            running.set(false);
-        }
+        running.set(false);
 
         // Revert back-buffer resolution
         if (dynamicResolutionLevel > 0 && settings.graphics.backBufferScale == settings.graphics.dynamicResolutionScale[0]) {
@@ -1112,16 +1110,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     // Has the application crashed?
-    private AtomicBoolean crashed = new AtomicBoolean(false);
+    private final AtomicBoolean crashed = new AtomicBoolean(false);
     // Running state
-    private AtomicBoolean running = new AtomicBoolean(true);
+    private final AtomicBoolean running = new AtomicBoolean(true);
 
     public void setCrashed(boolean crashed) {
         this.crashed.set(crashed);
-    }
-
-    public boolean isCrashed() {
-        return crashed.get();
     }
 
     @Override
@@ -1154,7 +1148,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 Lwjgl3WindowConfiguration config = new Lwjgl3WindowConfiguration();
                 config.setWindowPosition(0, 0);
                 config.setWindowedMode(graphics.getWidth(), graphics.getHeight());
-                config.setTitle(settings.APPLICATION_NAME + " - External view");
+                config.setTitle(Settings.APPLICATION_NAME + " - External view");
                 config.useVsync(false);
                 config.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
                 gaiaSkyView = new GaiaSkyView(globalResources.getSkin(), globalResources.getSpriteShader());
@@ -1332,7 +1326,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             cameraManager.resize(width, height);
         } catch (Exception e) {
             logger.error(e);
-            // TODO This try-catch block is a provisional fix for Windows, as GLFW crashes when minimizing with lwjgl 3.2.3 and libgdx 1.9.10
         }
     }
 
@@ -1412,15 +1405,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case LOAD_DATA_CMD:
-            // Init components that need assets in data folder
+        case LOAD_DATA_CMD -> { // Init components that need assets in data folder
             reinitialiseGUI1();
             postProcessor.initialize(assetManager);
 
             // Initialise loading screen
             loadingGui = new LoadingGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, false);
             loadingGui.initialize(assetManager, globalResources.getSpriteBatch());
-
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
             // Also VR
@@ -1428,7 +1419,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 loadingGuiVR = new VRGui<>(LoadingGui.class, (int) (settings.graphics.backBufferResolution[0] / 4f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
             }
-
             this.updateRenderProcess = runnableLoadingGui;
 
             // Load scene
@@ -1443,23 +1433,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
                 assetManager.load(sceneName, Scene.class, new SceneLoaderParameters(dataFilesToLoad));
             }
-            break;
-        case TOGGLE_AMBIENT_LIGHT:
-            // TODO No better place to put this??
-            ModelComponent.toggleAmbientLight((Boolean) data[1]);
-            break;
-        case AMBIENT_LIGHT_CMD:
-            ModelComponent.setAmbientLight((float) data[0]);
-            break;
-        case RECORD_CAMERA_CMD:
+        }
+        case RECORD_CAMERA_CMD -> {
             if (data != null && data.length > 0) {
                 camRecording = (Boolean) data[0];
             } else {
                 camRecording = !camRecording;
             }
-            break;
-        case CAMERA_MODE_CMD:
-            // Register/unregister GUI
+        }
+        case CAMERA_MODE_CMD -> { // Register/unregister GUI
             final CameraMode mode = (CameraMode) data[0];
             if (settings.program.modeStereo.isStereoHalfViewport()) {
                 guiRegistry.change(stereoGui);
@@ -1468,8 +1450,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
             } else {
                 guiRegistry.change(mainGui);
             }
-            break;
-        case STEREOSCOPIC_CMD:
+        }
+        case STEREOSCOPIC_CMD -> {
             final boolean stereoMode = (Boolean) data[0];
             if (stereoMode && guiRegistry.current != stereoGui) {
                 guiRegistry.change(stereoGui);
@@ -1496,14 +1478,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
             } else {
                 EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
             }
-            break;
-        case CUBEMAP_CMD:
+        }
+        case CUBEMAP_CMD -> {
             boolean cubemapMode = (Boolean) data[0];
             if (cubemapMode) {
                 resetDynamicResolution();
             }
-            break;
-        case SCENE_ADD_OBJECT_CMD:
+        }
+        case SCENE_ADD_OBJECT_CMD -> {
             final Entity toAdd = (Entity) data[0];
             boolean addToIndex = data.length == 1 || (Boolean) data[1];
             if (scene != null) {
@@ -1515,8 +1497,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     }
                 });
             }
-            break;
-        case SCENE_ADD_OBJECT_NO_POST_CMD:
+        }
+        case SCENE_ADD_OBJECT_NO_POST_CMD -> {
+            boolean addToIndex;
             final Entity toAddPost = (Entity) data[0];
             addToIndex = data.length == 1 || (Boolean) data[1];
             if (scene != null) {
@@ -1526,8 +1509,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     logger.error(e);
                 }
             }
-            break;
-        case SCENE_REMOVE_OBJECT_CMD:
+        }
+        case SCENE_REMOVE_OBJECT_CMD -> {
             Entity toRemove = null;
             if (data[0] instanceof String) {
                 toRemove = scene.getEntity((String) data[0]);
@@ -1551,8 +1534,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     });
                 }
             }
-            break;
-        case SCENE_REMOVE_OBJECT_NO_POST_CMD:
+        }
+        case SCENE_REMOVE_OBJECT_NO_POST_CMD -> {
+            Entity toRemove;
             toRemove = null;
             if (data[0] instanceof String) {
                 toRemove = scene.getEntity((String) data[0]);
@@ -1569,47 +1553,41 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     scene.remove(toRemove, removeFromIndex);
                 }
             }
-            break;
-        case SCENE_RELOAD_NAMES_CMD:
-            postRunnable(() -> {
-                scene.updateLocalizedNames();
-            });
-            break;
-        case UI_SCALE_CMD:
+        }
+        case SCENE_RELOAD_NAMES_CMD -> postRunnable(() -> {
+            scene.updateLocalizedNames();
+        });
+        case UI_SCALE_CMD -> {
             if (guis != null) {
                 float uiScale = (Float) data[0];
                 for (IGui gui : guis) {
                     gui.updateUnitsPerPixel(1f / uiScale);
                 }
             }
-            break;
-        case HOME_CMD:
-            goHome();
-            break;
-        case PARK_RUNNABLE:
+        }
+        case HOME_CMD -> goHome();
+        case PARK_RUNNABLE -> {
             String key = (String) data[0];
             final Runnable updateRunnable = (Runnable) data[1];
             parkUpdateRunnable(key, updateRunnable);
-            break;
-        case PARK_CAMERA_RUNNABLE:
+        }
+        case PARK_CAMERA_RUNNABLE -> {
+            String key;
             key = (String) data[0];
             final Runnable cameraRunnable = (Runnable) data[1];
             parkCameraRunnable(key, cameraRunnable);
-            break;
-        case UNPARK_RUNNABLE:
+        }
+        case UNPARK_RUNNABLE -> {
+            String key;
             key = (String) data[0];
             removeRunnable(key);
-            break;
-        case RESET_RENDERER:
+        }
+        case RESET_RENDERER -> {
             if (sceneRenderer != null) {
                 sceneRenderer.resetRenderSystemFlags();
             }
-            break;
-        case SCENE_FORCE_UPDATE:
-            touchSceneGraph();
-            break;
-        default:
-            break;
+        }
+        case SCENE_FORCE_UPDATE -> touchSceneGraph();
         }
 
     }

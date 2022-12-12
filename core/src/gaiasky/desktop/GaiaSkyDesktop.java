@@ -90,7 +90,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
 
-        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiart = false;
+        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiArt = false;
 
         @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2) private boolean skipWelcome = false;
 
@@ -204,7 +204,7 @@ public class GaiaSkyDesktop implements IObserver {
             // -v or --version
             if (cliArgs.version) {
                 out.println(Settings.getShortApplicationName());
-                if (cliArgs.asciiart) {
+                if (cliArgs.asciiArt) {
                     BufferedReader ascii = new BufferedReader(new InputStreamReader(Gdx.files.internal("icon/gsascii.txt").read()));
                     out.println();
                     String line;
@@ -535,7 +535,7 @@ public class GaiaSkyDesktop implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case SCENE_LOADED:
+        case SCENE_LOADED -> {
             if (REST_ENABLED) {
                 /*
                  * Notify REST server that GUI is loaded and everything should be in a
@@ -547,8 +547,8 @@ public class GaiaSkyDesktop implements IObserver {
                     logger.error(e);
                 }
             }
-            break;
-        case DISPOSE:
+        }
+        case DISPOSE -> {
             if (REST_ENABLED) {
                 /* Shutdown REST server thread on termination */
                 try {
@@ -557,11 +557,10 @@ public class GaiaSkyDesktop implements IObserver {
                     logger.error(e);
                 }
             }
-            break;
-        default:
-            break;
         }
-
+        default -> {
+        }
+        }
     }
 
     /**

@@ -60,7 +60,7 @@ public class ConsoleLogger implements IObserver {
     }
 
     public void subscribe() {
-        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.TOGGLE_AMBIENT_LIGHT, Event.FOV_CHANGE_NOTIFICATION, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD);
+        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.FOV_CHANGE_NOTIFICATION, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD);
     }
 
     public void unsubscribe() {
@@ -160,7 +160,6 @@ public class ConsoleLogger implements IObserver {
             break;
         case FOCUS_LOCK_CMD:
         case ORIENTATION_LOCK_CMD:
-        case TOGGLE_AMBIENT_LIGHT:
         case OCTREE_PARTICLE_FADE_CMD:
             addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
             break;

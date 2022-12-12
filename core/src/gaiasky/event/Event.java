@@ -1294,11 +1294,6 @@ public enum Event {
     TIME_WARP_CHANGED_INFO,
 
     /**
-     * Contains the name of the check box and a boolean
-     **/
-    TOGGLE_AMBIENT_LIGHT,
-
-    /**
      * Toggles the collapsed state of a GUI pane. Contains its name
      */
     TOGGLE_EXPANDCOLLAPSE_PANE_CMD,

@@ -19,6 +19,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.event.Observer;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.render.BlendMode;
 import gaiasky.scene.camera.ICamera;
@@ -56,6 +57,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     static {
         ambient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
+        // Ambient light watcher.
+        var observer = new Observer() {
+            @Override
+            public void notify(Event event, Object source, Object... data) {
+                if (event == Event.AMBIENT_LIGHT_CMD) {
+                    ModelComponent.setAmbientLight((float) data[0]);
+                }
+            }
+        };
+        EventManager.instance.subscribe(observer, Event.AMBIENT_LIGHT_CMD);
     }
 
     public static void toggleAmbientLight(boolean on) {

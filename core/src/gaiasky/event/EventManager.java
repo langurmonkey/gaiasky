@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.scene.entity.EntityRadio;
-import gaiasky.util.screenshot.ScreenshotsManager;
 
 import java.util.*;
 
@@ -40,8 +39,6 @@ public class EventManager implements IObserver {
 
     /** Singleton pattern **/
     public static final EventManager instance = new EventManager();
-
-    private static final long START = TimeUtils.millis();
 
     /** Holds a priority queue for each time frame **/
     private final Map<TimeFrame, PriorityQueue<Telegram>> queues;
@@ -149,25 +146,13 @@ public class EventManager implements IObserver {
                 while (it.hasNext()) {
                     IObserver obs = it.next();
                     if (obs instanceof EntityRadio) {
-                        EntityRadio radio = (EntityRadio) obs;
+                        var radio = (EntityRadio) obs;
                         if (radio.getEntity() == entity) {
                             it.remove();
                         }
                     }
                 }
             }
-        }
-
-    }
-
-    /**
-     * Unregister all the listeners for the specified message code.
-     *
-     * @param msg The message code.
-     */
-    public void clearSubscriptions(Event msg) {
-        synchronized (subscriptions) {
-            subscriptions.remove(msg.ordinal());
         }
     }
 
@@ -275,13 +260,6 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Returns the current time in milliseconds.
-     */
-    public static long getCurrentTime() {
-        return TimeUtils.millis() - START;
-    }
-
-    /**
      * Dispatches any telegrams with a timestamp that has expired. Any
      * dispatched telegrams are removed from the queue.
      * <p>
@@ -323,18 +301,6 @@ public class EventManager implements IObserver {
     public boolean hasSubscriptors(Event event) {
         Set<IObserver> scr = subscriptions.get(event.ordinal());
         return scr != null && !scr.isEmpty();
-    }
-
-    public boolean isSubscribedToAny(IObserver o) {
-        Set<Integer> keys = subscriptions.keySet();
-
-        for (int key : keys) {
-            Set<IObserver> set = subscriptions.get(key);
-            if (set.contains(o)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean isSubscribedTo(IObserver o, Event event) {
