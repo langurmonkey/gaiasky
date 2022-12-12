@@ -15,14 +15,6 @@ public abstract class AbstractInitSystem extends IteratingSystem implements Enti
     protected Log logger;
 
     protected Engine engineBackup;
-
-    private enum InitializerMode {
-        /** The initialization stage happens at the beginning, right after the entity has been created. **/
-        INIT,
-        /** The set-up stage happens after all assets and resources have been loaded. **/
-        SETUP
-    }
-
     private InitializerMode mode;
 
     public AbstractInitSystem(boolean setUp, Family family, int priority) {
@@ -69,5 +61,12 @@ public abstract class AbstractInitSystem extends IteratingSystem implements Enti
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         this.engineBackup = engine;
+    }
+
+    private enum InitializerMode {
+        /** The initialization stage happens at the beginning, right after the entity has been created. **/
+        INIT,
+        /** The set-up stage happens after all assets and resources have been loaded. **/
+        SETUP
     }
 }

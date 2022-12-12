@@ -61,6 +61,7 @@ public final class AnaglyphEffect extends PostProcessorEffect {
      *     <li>0 - red/blue</li>
      *     <li>1 - red/cyan</li>
      * </ul>
+     *
      * @param mode The mode.
      */
     public void setAnaglyphMode(int mode) {

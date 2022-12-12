@@ -5,13 +5,13 @@
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,339 +38,367 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
 import gaiasky.util.gdx.shader.attribute.Attributes;
 
-/** @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does
- *         not manage the ShaderPogram, you are still responsible for disposing the ExtShaderProgram. */
+/**
+ * @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does
+ * not manage the ShaderPogram, you are still responsible for disposing the ExtShaderProgram.
+ */
 public abstract class BaseIntShader implements IntShader {
-	public interface Validator {
-		/** @return True if the input is valid for the renderable, false otherwise. */
-		boolean validate (final BaseIntShader shader, final int inputID, final IntRenderable renderable);
-	}
+    private final Array<String> uniforms = new Array<>();
+    private final Array<Validator> validators = new Array<>();
+    private final Array<Setter> setters = new Array<>();
+    private final IntArray globalUniforms = new IntArray();
+    private final IntArray localUniforms = new IntArray();
+    private final IntIntMap attributes = new IntIntMap();
+    private final IntArray tempArray = new IntArray();
+    private final Attributes combinedAttributes = new Attributes();
+    public ExtShaderProgram program;
+    public RenderContext context;
+    public Camera camera;
+    private int[] locations;
+    private IntMesh currentMesh;
 
-	public interface Setter {
-		/** @return True if the uniform only has to be set once per render call, false if the uniform must be set for each renderable. */
-		boolean isGlobal (final BaseIntShader shader, final int inputID);
+    /**
+     * Register an uniform which might be used by this shader. Only possible prior to the call to init().
+     *
+     * @return The ID of the uniform to use in this shader.
+     */
+    public int register(final String alias, final Validator validator, final Setter setter) {
+        if (locations != null)
+            throw new GdxRuntimeException("Cannot register an uniform after initialization");
+        final int existing = getUniformID(alias);
+        if (existing >= 0) {
+            validators.set(existing, validator);
+            setters.set(existing, setter);
+            return existing;
+        }
+        uniforms.add(alias);
+        validators.add(validator);
+        setters.add(setter);
+        return uniforms.size - 1;
+    }
 
-		void set (final BaseIntShader shader, final int inputID, final IntRenderable renderable, final Attributes combinedAttributes);
-	}
+    public int register(final String alias, final Validator validator) {
+        return register(alias, validator, null);
+    }
 
-	public abstract static class GlobalSetter implements Setter {
-		@Override
-		public boolean isGlobal (final BaseIntShader shader, final int inputID) {
-			return true;
-		}
-	}
+    public int register(final String alias, final Setter setter) {
+        return register(alias, null, setter);
+    }
 
-	public abstract static class LocalSetter implements Setter {
-		@Override
-		public boolean isGlobal (final BaseIntShader shader, final int inputID) {
-			return false;
-		}
-	}
+    public int register(final String alias) {
+        return register(alias, null, null);
+    }
 
-	public static class Uniform implements Validator {
-		public final String alias;
-		public final Bits materialMask;
-		public final Bits environmentMask;
-		public final Bits overallMask;
+    public int register(final Uniform uniform, final Setter setter) {
+        return register(uniform.alias, uniform, setter);
+    }
 
-		public Uniform (final String alias, final Bits materialMask, final Bits environmentMask, final Bits overallMask) {
-			this.alias = alias;
-			this.materialMask = materialMask;
-			this.environmentMask = environmentMask;
-			this.overallMask = overallMask;
-		}
+    public int register(final Uniform uniform) {
+        return register(uniform, null);
+    }
 
-		public Uniform (final String alias, final Bits materialMask, final Bits environmentMask) {
-			this(alias, materialMask, environmentMask, Bits.empty(128));
-		}
+    /** @return the ID of the input or negative if not available. */
+    public int getUniformID(final String alias) {
+        final int n = uniforms.size;
+        for (int i = 0; i < n; i++)
+            if (uniforms.get(i).equals(alias))
+                return i;
+        return -1;
+    }
 
-		public Uniform (final String alias, final int overallIndex) {
-			this(alias, Bits.empty(128), Bits.empty(128), Bits.indexes(overallIndex));
-		}
+    /** @return The input at the specified id. */
+    public String getUniformAlias(final int id) {
+        return uniforms.get(id);
+    }
 
-		public Uniform (final String alias) {
-			this(alias, Bits.empty(128), Bits.empty(128));
-		}
+    /** Initialize this shader, causing all registered uniforms/attributes to be fetched. */
+    public void init(final ExtShaderProgram program, final IntRenderable renderable) {
+        if (locations != null)
+            throw new GdxRuntimeException("Already initialized");
+        if (!program.isCompiled())
+            throw new GdxRuntimeException(program.getLog());
+        this.program = program;
 
-		public boolean validate (final BaseIntShader shader, final int inputID, final IntRenderable renderable) {
-			final Bits matFlags = (renderable != null && renderable.material != null) ? renderable.material.getMask() : Bits.empty();
-			final Bits envFlags = (renderable != null && renderable.environment != null) ? renderable.environment.getMask() : Bits.empty();
-			return ((matFlags.copy().and(materialMask)).equals(materialMask)) && ((envFlags.copy().and(environmentMask)).equals(environmentMask))
-				&& (((matFlags.copy().or(envFlags)).and(overallMask)).equals(overallMask));
-		}
-	}
+        final int n = uniforms.size;
+        locations = new int[n];
+        for (int i = 0; i < n; i++) {
+            final String input = uniforms.get(i);
+            final Validator validator = validators.get(i);
+            final Setter setter = setters.get(i);
+            if (validator != null && !validator.validate(this, i, renderable))
+                locations[i] = -1;
+            else {
+                locations[i] = program.fetchUniformLocation(input, false);
+                if (locations[i] >= 0 && setter != null) {
+                    if (setter.isGlobal(this, i))
+                        globalUniforms.add(i);
+                    else
+                        localUniforms.add(i);
+                }
+            }
+            if (locations[i] < 0) {
+                validators.set(i, null);
+                setters.set(i, null);
+            }
+        }
+        if (renderable != null) {
+            final VertexAttributes attrs = renderable.meshPart.mesh.getVertexAttributes();
+            final int c = attrs.size();
+            for (int i = 0; i < c; i++) {
+                final VertexAttribute attr = attrs.get(i);
+                final int location = program.getAttributeLocation(attr.alias);
+                if (location >= 0)
+                    attributes.put(attr.getKey(), location);
+            }
+        }
+    }
 
-	private final Array<String> uniforms = new Array<>();
-	private final Array<Validator> validators = new Array<>();
-	private final Array<Setter> setters = new Array<>();
-	private int[] locations;
-	private final IntArray globalUniforms = new IntArray();
-	private final IntArray localUniforms = new IntArray();
-	private final IntIntMap attributes = new IntIntMap();
+    @Override
+    public void begin(Camera camera, RenderContext context) {
+        this.camera = camera;
+        this.context = context;
+        program.begin();
+        currentMesh = null;
+        for (int u, i = 0; i < globalUniforms.size; ++i)
+            if (setters.get(u = globalUniforms.get(i)) != null)
+                setters.get(u).set(this, u, null, null);
+    }
 
-	public ExtShaderProgram program;
-	public RenderContext context;
-	public Camera camera;
-	private IntMesh currentMesh;
+    private final int[] getAttributeLocations(final VertexAttributes attrs) {
+        tempArray.clear();
+        final int n = attrs.size();
+        for (int i = 0; i < n; i++) {
+            tempArray.add(attributes.get(attrs.get(i).getKey(), -1));
+        }
+        tempArray.shrink();
+        return tempArray.items;
+    }
 
-	/** Register an uniform which might be used by this shader. Only possible prior to the call to init().
-	 * @return The ID of the uniform to use in this shader. */
-	public int register (final String alias, final Validator validator, final Setter setter) {
-		if (locations != null) throw new GdxRuntimeException("Cannot register an uniform after initialization");
-		final int existing = getUniformID(alias);
-		if (existing >= 0) {
-			validators.set(existing, validator);
-			setters.set(existing, setter);
-			return existing;
-		}
-		uniforms.add(alias);
-		validators.add(validator);
-		setters.add(setter);
-		return uniforms.size - 1;
-	}
+    @Override
+    public void render(IntRenderable renderable) {
+        if (renderable.worldTransform.det3x3() == 0)
+            return;
+        combinedAttributes.clear();
+        if (renderable.environment != null)
+            combinedAttributes.set(renderable.environment);
+        if (renderable.material != null)
+            combinedAttributes.set(renderable.material);
+        render(renderable, combinedAttributes);
+    }
 
-	public int register (final String alias, final Validator validator) {
-		return register(alias, validator, null);
-	}
+    public void render(IntRenderable renderable, final Attributes combinedAttributes) {
+        for (int u, i = 0; i < localUniforms.size; ++i)
+            if (setters.get(u = localUniforms.get(i)) != null)
+                setters.get(u).set(this, u, renderable, combinedAttributes);
+        if (currentMesh != renderable.meshPart.mesh) {
+            if (currentMesh != null)
+                currentMesh.unbind(program, tempArray.items);
+            currentMesh = renderable.meshPart.mesh;
+            currentMesh.bind(program, getAttributeLocations(renderable.meshPart.mesh.getVertexAttributes()));
+        }
+        renderMesh(program, renderable.meshPart);
+    }
 
-	public int register (final String alias, final Setter setter) {
-		return register(alias, null, setter);
-	}
+    /**
+     * If necessary, override
+     *
+     * @param program
+     * @param meshPart
+     */
+    public void renderMesh(ExtShaderProgram program, IntMeshPart meshPart) {
+        meshPart.mesh.render(program, meshPart.primitiveType, meshPart.offset, meshPart.size, false);
+    }
 
-	public int register (final String alias) {
-		return register(alias, null, null);
-	}
+    @Override
+    public void end() {
+        if (currentMesh != null) {
+            currentMesh.unbind(program, tempArray.items);
+            currentMesh = null;
+        }
+        program.end();
+    }
 
-	public int register (final Uniform uniform, final Setter setter) {
-		return register(uniform.alias, uniform, setter);
-	}
+    @Override
+    public void dispose() {
+        program = null;
+        uniforms.clear();
+        validators.clear();
+        setters.clear();
+        localUniforms.clear();
+        globalUniforms.clear();
+        locations = null;
+    }
 
-	public int register (final Uniform uniform) {
-		return register(uniform, null);
-	}
+    /** Whether this IntShader instance implements the specified uniform, only valid after a call to init(). */
+    public final boolean has(final int inputID) {
+        return inputID >= 0 && inputID < locations.length && locations[inputID] >= 0;
+    }
 
-	/** @return the ID of the input or negative if not available. */
-	public int getUniformID (final String alias) {
-		final int n = uniforms.size;
-		for (int i = 0; i < n; i++)
-			if (uniforms.get(i).equals(alias)) return i;
-		return -1;
-	}
+    public final int loc(final int inputID) {
+        return (inputID >= 0 && inputID < locations.length) ? locations[inputID] : -1;
+    }
 
-	/** @return The input at the specified id. */
-	public String getUniformAlias (final int id) {
-		return uniforms.get(id);
-	}
+    public final boolean set(final int uniform, final Matrix4 value) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformMatrix(locations[uniform], value);
+        return true;
+    }
 
-	/** Initialize this shader, causing all registered uniforms/attributes to be fetched. */
-	public void init (final ExtShaderProgram program, final IntRenderable renderable) {
-		if (locations != null) throw new GdxRuntimeException("Already initialized");
-		if (!program.isCompiled())
-			throw new GdxRuntimeException(program.getLog());
-		this.program = program;
+    public final boolean set(final int uniform, final Matrix3 value) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformMatrix(locations[uniform], value);
+        return true;
+    }
 
-		final int n = uniforms.size;
-		locations = new int[n];
-		for (int i = 0; i < n; i++) {
-			final String input = uniforms.get(i);
-			final Validator validator = validators.get(i);
-			final Setter setter = setters.get(i);
-			if (validator != null && !validator.validate(this, i, renderable))
-				locations[i] = -1;
-			else {
-				locations[i] = program.fetchUniformLocation(input, false);
-				if (locations[i] >= 0 && setter != null) {
-					if (setter.isGlobal(this, i))
-						globalUniforms.add(i);
-					else
-						localUniforms.add(i);
-				}
-			}
-			if (locations[i] < 0) {
-				validators.set(i, null);
-				setters.set(i, null);
-			}
-		}
-		if (renderable != null) {
-			final VertexAttributes attrs = renderable.meshPart.mesh.getVertexAttributes();
-			final int c = attrs.size();
-			for (int i = 0; i < c; i++) {
-				final VertexAttribute attr = attrs.get(i);
-				final int location = program.getAttributeLocation(attr.alias);
-				if (location >= 0) attributes.put(attr.getKey(), location);
-			}
-		}
-	}
+    public final boolean set(final int uniform, final Vector3 value) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformf(locations[uniform], value);
+        return true;
+    }
 
-	@Override
-	public void begin (Camera camera, RenderContext context) {
-		this.camera = camera;
-		this.context = context;
-		program.begin();
-		currentMesh = null;
-		for (int u, i = 0; i < globalUniforms.size; ++i)
-			if (setters.get(u = globalUniforms.get(i)) != null) setters.get(u).set(this, u, null, null);
-	}
+    public final boolean set(final int uniform, final Vector2 value) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformf(locations[uniform], value);
+        return true;
+    }
 
-	private final IntArray tempArray = new IntArray();
+    public final boolean set(final int uniform, final Color value) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformf(locations[uniform], value);
+        return true;
+    }
 
-	private final int[] getAttributeLocations (final VertexAttributes attrs) {
-		tempArray.clear();
-		final int n = attrs.size();
-		for (int i = 0; i < n; i++) {
-			tempArray.add(attributes.get(attrs.get(i).getKey(), -1));
-		}
-		tempArray.shrink();
-		return tempArray.items;
-	}
+    public final boolean set(final int uniform, final float value) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformf(locations[uniform], value);
+        return true;
+    }
 
-	private final Attributes combinedAttributes = new Attributes();
+    public final boolean set(final int uniform, final float v1, final float v2) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformf(locations[uniform], v1, v2);
+        return true;
+    }
 
-	@Override
-	public void render (IntRenderable renderable) {
-		if (renderable.worldTransform.det3x3() == 0) return;
-		combinedAttributes.clear();
-		if (renderable.environment != null) combinedAttributes.set(renderable.environment);
-		if (renderable.material != null) combinedAttributes.set(renderable.material);
-		render(renderable, combinedAttributes);
-	}
+    public final boolean set(final int uniform, final float v1, final float v2, final float v3) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformf(locations[uniform], v1, v2, v3);
+        return true;
+    }
 
-	public void render (IntRenderable renderable, final Attributes combinedAttributes) {
-		for (int u, i = 0; i < localUniforms.size; ++i)
-			if (setters.get(u = localUniforms.get(i)) != null) setters.get(u).set(this, u, renderable, combinedAttributes);
-		if (currentMesh != renderable.meshPart.mesh) {
-			if (currentMesh != null) currentMesh.unbind(program, tempArray.items);
-			currentMesh = renderable.meshPart.mesh;
-			currentMesh.bind(program, getAttributeLocations(renderable.meshPart.mesh.getVertexAttributes()));
-		}
-		renderMesh(program, renderable.meshPart);
-	}
+    public final boolean set(final int uniform, final float v1, final float v2, final float v3, final float v4) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformf(locations[uniform], v1, v2, v3, v4);
+        return true;
+    }
 
-	/**
-	 * If necessary, override
-	 * @param program
-	 * @param meshPart
-	 */
-	public void renderMesh(ExtShaderProgram program, IntMeshPart meshPart){
-		meshPart.mesh.render(program, meshPart.primitiveType, meshPart.offset, meshPart.size, false);
-	}
+    public final boolean set(final int uniform, final int value) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformi(locations[uniform], value);
+        return true;
+    }
 
-	@Override
-	public void end () {
-		if (currentMesh != null) {
-			currentMesh.unbind(program, tempArray.items);
-			currentMesh = null;
-		}
-		program.end();
-	}
+    public final boolean set(final int uniform, final int v1, final int v2) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformi(locations[uniform], v1, v2);
+        return true;
+    }
 
-	@Override
-	public void dispose () {
-		program = null;
-		uniforms.clear();
-		validators.clear();
-		setters.clear();
-		localUniforms.clear();
-		globalUniforms.clear();
-		locations = null;
-	}
+    public final boolean set(final int uniform, final int v1, final int v2, final int v3) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformi(locations[uniform], v1, v2, v3);
+        return true;
+    }
 
-	/** Whether this IntShader instance implements the specified uniform, only valid after a call to init(). */
-	public final boolean has (final int inputID) {
-		return inputID >= 0 && inputID < locations.length && locations[inputID] >= 0;
-	}
+    public final boolean set(final int uniform, final int v1, final int v2, final int v3, final int v4) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformi(locations[uniform], v1, v2, v3, v4);
+        return true;
+    }
 
-	public final int loc (final int inputID) {
-		return (inputID >= 0 && inputID < locations.length) ? locations[inputID] : -1;
-	}
+    public final boolean set(final int uniform, final TextureDescriptor textureDesc) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformi(locations[uniform], context.textureBinder.bind(textureDesc));
+        return true;
+    }
 
-	public final boolean set (final int uniform, final Matrix4 value) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformMatrix(locations[uniform], value);
-		return true;
-	}
+    public final boolean set(final int uniform, final GLTexture texture) {
+        if (locations[uniform] < 0)
+            return false;
+        program.setUniformi(locations[uniform], context.textureBinder.bind(texture));
+        return true;
+    }
 
-	public final boolean set (final int uniform, final Matrix3 value) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformMatrix(locations[uniform], value);
-		return true;
-	}
+    public interface Validator {
+        /** @return True if the input is valid for the renderable, false otherwise. */
+        boolean validate(final BaseIntShader shader, final int inputID, final IntRenderable renderable);
+    }
 
-	public final boolean set (final int uniform, final Vector3 value) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformf(locations[uniform], value);
-		return true;
-	}
+    public interface Setter {
+        /** @return True if the uniform only has to be set once per render call, false if the uniform must be set for each renderable. */
+        boolean isGlobal(final BaseIntShader shader, final int inputID);
 
-	public final boolean set (final int uniform, final Vector2 value) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformf(locations[uniform], value);
-		return true;
-	}
+        void set(final BaseIntShader shader, final int inputID, final IntRenderable renderable, final Attributes combinedAttributes);
+    }
 
-	public final boolean set (final int uniform, final Color value) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformf(locations[uniform], value);
-		return true;
-	}
+    public abstract static class GlobalSetter implements Setter {
+        @Override
+        public boolean isGlobal(final BaseIntShader shader, final int inputID) {
+            return true;
+        }
+    }
 
-	public final boolean set (final int uniform, final float value) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformf(locations[uniform], value);
-		return true;
-	}
+    public abstract static class LocalSetter implements Setter {
+        @Override
+        public boolean isGlobal(final BaseIntShader shader, final int inputID) {
+            return false;
+        }
+    }
 
-	public final boolean set (final int uniform, final float v1, final float v2) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformf(locations[uniform], v1, v2);
-		return true;
-	}
+    public static class Uniform implements Validator {
+        public final String alias;
+        public final Bits materialMask;
+        public final Bits environmentMask;
+        public final Bits overallMask;
 
-	public final boolean set (final int uniform, final float v1, final float v2, final float v3) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformf(locations[uniform], v1, v2, v3);
-		return true;
-	}
+        public Uniform(final String alias, final Bits materialMask, final Bits environmentMask, final Bits overallMask) {
+            this.alias = alias;
+            this.materialMask = materialMask;
+            this.environmentMask = environmentMask;
+            this.overallMask = overallMask;
+        }
 
-	public final boolean set (final int uniform, final float v1, final float v2, final float v3, final float v4) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformf(locations[uniform], v1, v2, v3, v4);
-		return true;
-	}
+        public Uniform(final String alias, final Bits materialMask, final Bits environmentMask) {
+            this(alias, materialMask, environmentMask, Bits.empty(128));
+        }
 
-	public final boolean set (final int uniform, final int value) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformi(locations[uniform], value);
-		return true;
-	}
+        public Uniform(final String alias, final int overallIndex) {
+            this(alias, Bits.empty(128), Bits.empty(128), Bits.indexes(overallIndex));
+        }
 
-	public final boolean set (final int uniform, final int v1, final int v2) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformi(locations[uniform], v1, v2);
-		return true;
-	}
+        public Uniform(final String alias) {
+            this(alias, Bits.empty(128), Bits.empty(128));
+        }
 
-	public final boolean set (final int uniform, final int v1, final int v2, final int v3) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformi(locations[uniform], v1, v2, v3);
-		return true;
-	}
-
-	public final boolean set (final int uniform, final int v1, final int v2, final int v3, final int v4) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformi(locations[uniform], v1, v2, v3, v4);
-		return true;
-	}
-
-	public final boolean set (final int uniform, final TextureDescriptor textureDesc) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformi(locations[uniform], context.textureBinder.bind(textureDesc));
-		return true;
-	}
-
-	public final boolean set (final int uniform, final GLTexture texture) {
-		if (locations[uniform] < 0) return false;
-		program.setUniformi(locations[uniform], context.textureBinder.bind(texture));
-		return true;
-	}
+        public boolean validate(final BaseIntShader shader, final int inputID, final IntRenderable renderable) {
+            final Bits matFlags = (renderable != null && renderable.material != null) ? renderable.material.getMask() : Bits.empty();
+            final Bits envFlags = (renderable != null && renderable.environment != null) ? renderable.environment.getMask() : Bits.empty();
+            return ((matFlags.copy().and(materialMask)).equals(materialMask)) && ((envFlags.copy().and(environmentMask)).equals(environmentMask))
+                    && (((matFlags.copy().or(envFlags)).and(overallMask)).equals(overallMask));
+        }
+    }
 }

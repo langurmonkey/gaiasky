@@ -47,6 +47,7 @@ public abstract class PointCloudQuadRenderer extends PointCloudRenderSystem impl
     /**
      * Adds the indices to make two triangles into
      * a quad, given the four vertices in vertPos.
+     *
      * @param current The current mesh.
      */
     protected void quadIndices(MeshData current) {

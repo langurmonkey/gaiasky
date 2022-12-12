@@ -24,7 +24,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL30;
@@ -39,12 +39,12 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
     private final Vector3 aux1f;
     private final Vector3d aux1, aux2, aux5;
     private final Vector3b aux1b;
-    private int sizeOffset, tOffset;
     private final ComponentTypes ct;
     private final Vector3[] positions;
     private final Vector3[] additional;
     private final Vector3d[] camPositions;
     private final long baseTime;
+    private int sizeOffset, tOffset;
 
     public ParticleEffectsRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super(sceneRenderer, rg, alphas, programs);
@@ -95,15 +95,15 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
             return 1;
         } else if (cspeed <= 1.0) {
             // lint(1..0.5)
-            return MathUtilsd.lint(cspeed, 0.4, 1.0, 1.0, 0.5);
+            return MathUtilsDouble.lint(cspeed, 0.4, 1.0, 1.0, 0.5);
         } else if (cspeed <= 2.0) {
             // lint(0.5..0.3)
-            return MathUtilsd.lint(cspeed, 1.0, 2.0, 0.5, 0.3);
+            return MathUtilsDouble.lint(cspeed, 1.0, 2.0, 0.5, 0.3);
         } else if (cspeed <= 3.0) {
             return 0.3;
         } else {
             // lint(0.3..0.1)
-            return MathUtilsd.lint(cspeed, 3, 5, 0.3, 0.1);
+            return MathUtilsDouble.lint(cspeed, 3, 5, 0.3, 0.1);
         }
     }
 

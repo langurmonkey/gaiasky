@@ -6,7 +6,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Settings;
 
-public class TitleExtractor extends AbstractExtractSystem{
+public class TitleExtractor extends AbstractExtractSystem {
     public TitleExtractor(Family family, int priority) {
         super(family, priority);
     }

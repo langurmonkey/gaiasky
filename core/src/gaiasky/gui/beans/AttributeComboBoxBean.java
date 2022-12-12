@@ -11,13 +11,13 @@ public class AttributeComboBoxBean {
     public String name;
     public IAttribute attr;
 
-    public AttributeComboBoxBean(IAttribute attr){
+    public AttributeComboBoxBean(IAttribute attr) {
         this.attr = attr;
         this.name = attr.toString();
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return name;
     }
 }

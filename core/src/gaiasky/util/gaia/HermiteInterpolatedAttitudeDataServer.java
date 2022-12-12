@@ -18,7 +18,6 @@ import gaiasky.util.math.Quaterniond;
  * for any given time using cubic Hermite interpolation
  *
  * @author Lennart Lindegren
- *
  */
 public abstract class HermiteInterpolatedAttitudeDataServer extends
         NumericalAttitudeDataServer<IAttitude> {
@@ -29,10 +28,8 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
     /**
      * Constructor for a given start time and mission length
      *
-     * @param tStart
-     *            start time of the valid attitude interval
-     * @param tLength
-     *            length of the valid attitude interval
+     * @param tStart  start time of the valid attitude interval
+     * @param tLength length of the valid attitude interval
      */
     public HermiteInterpolatedAttitudeDataServer(long tStart, Duration tLength) {
         long tEnd = tStart + tLength.asNanoSecs();
@@ -46,18 +43,19 @@ public abstract class HermiteInterpolatedAttitudeDataServer extends
 
     /**
      * @see gaiasky.util.gaia.NumericalAttitudeDataServer#initialize()
-     *
-     *      This method will compute the attitude and attitude rate at discrete
-     *      points and store in the arrays tNs, qX, rateX, etc
+     * <p>
+     * This method will compute the attitude and attitude rate at discrete
+     * points and store in the arrays tNs, qX, rateX, etc
      */
     @Override
     public abstract void initialize() throws RuntimeException;
 
     /**
-     * @see gaiasky.util.gaia.BaseAttitudeDataServer#getAttitude(long)
-     *
      * @param t - the time elapsed since the epoch of J2010 in ns (TCB)
+     *
      * @return attitude for the given time
+     *
+     * @see gaiasky.util.gaia.BaseAttitudeDataServer#getAttitude(long)
      */
     @Override
     public IAttitude getAttitudeNative(final long t) throws RuntimeException {

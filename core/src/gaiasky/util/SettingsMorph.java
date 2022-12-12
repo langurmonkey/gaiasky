@@ -25,7 +25,7 @@ import gaiasky.util.Settings.SceneSettings.RendererSettings.ShadowSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.GroupSettings;
 import gaiasky.util.Settings.SceneSettings.StarSettings.ThresholdSettings;
 import gaiasky.util.camera.rec.CameraKeyframeManager.PathType;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;
 
 import java.io.FileInputStream;
@@ -151,7 +151,7 @@ public class SettingsMorph {
         }
         // Make paths relative to $data/
         data.dataFiles = new ArrayList<>(dataFiles.size());
-        for(String dataFile : dataFiles) {
+        for (String dataFile : dataFiles) {
             Path dataLocation = Path.of(Settings.settings.data.location);
             String relative = dataLocation.toUri().relativize(new java.io.File(dataFile).toURI()).getPath();
             String f = Constants.DATA_LOCATION_TOKEN + relative;
@@ -244,7 +244,7 @@ public class SettingsMorph {
 
         // Postprocess
         var postprocess = new PostprocessSettings();
-        postprocess.antialias =  Antialias.getFromCode(i32("postprocess.antialiasing", p));
+        postprocess.antialias = Antialias.getFromCode(i32("postprocess.antialiasing", p));
         postprocess.bloom = new BloomSettings();
         postprocess.bloom.intensity = f32("postprocess.bloom.intensity", p);
         postprocess.unsharpMask = new UnsharpMaskSettings();
@@ -311,7 +311,7 @@ public class SettingsMorph {
         program.scriptsLocation = str("program.scriptlocation", p);
         program.ui = new UiSettings();
         program.ui.theme = str("program.ui.theme", p);
-        program.ui.scale = MathUtilsd.lint(f32("program.ui.scale", p),Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+        program.ui.scale = MathUtilsDouble.lint(f32("program.ui.scale", p), Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
         program.exitConfirmation = bool("program.exit.confirmation", p);
         program.locale = str("program.locale", p);
         program.update = new UpdateSettings();
@@ -330,8 +330,8 @@ public class SettingsMorph {
         controls.gamepad.invertY = bool("controls.invert.y", p);
         String blacklist = str("controls.blacklist", p);
         controls.gamepad.blacklist = GlobalResources.parseWhitespaceSeparatedList(blacklist);
-        if(controls.gamepad.blacklist == null)
-            controls.gamepad.blacklist = new String[]{};
+        if (controls.gamepad.blacklist == null)
+            controls.gamepad.blacklist = new String[] {};
         s.controls = controls;
 
         // Spacecraft
@@ -359,7 +359,6 @@ public class SettingsMorph {
         }
         return ScreenshotMode.valueOf(value.toUpperCase());
     }
-
 
     private static float[] arr(final String key, final Properties properties) {
         var arr = str(key, properties);

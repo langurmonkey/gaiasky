@@ -7,13 +7,13 @@ package gaiasky.util.gdx.shader;
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,12 +35,297 @@ import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 
 public class AtmosphereShader extends BaseIntShader {
+    /** Material attributes which are not required but always supported. */
+    private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
+    private final static Attributes tmpAttributes = new Attributes();
+    /** @deprecated Replaced by {@link Config#defaultCullFace} Set to 0 to disable culling */
+    @Deprecated
+    public static int defaultCullFace = GL20.GL_BACK;
+    /** @deprecated Replaced by {@link Config#defaultDepthFunc} Set to 0 to disable depth test */
+    @Deprecated
+    public static int defaultDepthFunc = GL20.GL_LEQUAL;
+    protected static Bits implementedFlags = Bits.indexes(BlendingAttribute.Type, TextureAttribute.Diffuse, ColorAttribute.Diffuse, ColorAttribute.Specular, FloatAttribute.Shininess);
+    private static String defaultVertexShader = null;
+    private static String defaultFragmentShader = null;
+    // Global uniforms
+    public final int u_projTrans;
+    public final int u_viewTrans;
+    public final int u_projViewTrans;
+    public final int u_cameraPosition;
+    public final int u_cameraDirection;
+    public final int u_cameraUp;
+    public final int u_cameraNearFar;
+    public final int u_cameraK;
+    // Object uniforms
+    public final int u_worldTrans;
+    public final int u_viewWorldTrans;
+    public final int u_projViewWorldTrans;
+    public final int u_normalMatrix;
+    // Material uniforms
+    public final int fAlpha;
+    public final int fCameraHeight;
+    public final int fOuterRadius;
+    public final int fInnerRadius;
+    public final int fKrESun;
+    public final int fKmESun;
+    public final int fKr4PI;
+    public final int fKm4PI;
+    public final int fScale;
+    public final int fScaleDepth;
+    public final int fScaleOverScaleDepth;
+    public final int nSamples;
+    public final int g;
+    public final int v3PlanetPos;
+    public final int v3LightPos;
+    public final int v3CameraPos;
+    public final int v3InvWavelength;
+    // Special relativity
+    public final int u_vc;
+    public final int u_velDir;
+    // Gravitational waves
+    public final int u_hterms;
+    public final int u_gw;
+    public final int u_gwmat3;
+    public final int u_ts;
+    public final int u_omgw;
+    /** The attributes that this shader supports */
+    protected final Bits attributesMask;
+    protected final Config config;
+    private final long vertexMask;
+    Material currentMaterial;
+    /** The renderable used to create this shader, invalid after the call to init */
+    private IntRenderable renderable;
+    public AtmosphereShader(final IntRenderable renderable, final Config config) {
+        this(renderable, config, createPrefix(renderable));
+    }
+    public AtmosphereShader(final IntRenderable renderable, final Config config, final String prefix) {
+        this(renderable, config, prefix, config.vertexShader != null ? config.vertexShader : getDefaultVertexShader(), config.fragmentShader != null ? config.fragmentShader : getDefaultFragmentShader());
+    }
+    public AtmosphereShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
+        this(renderable, config, new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+    }
+
+    public AtmosphereShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
+        final Attributes attributes = combineAttributes(renderable);
+        this.config = config;
+        this.program = shaderProgram;
+        this.renderable = renderable;
+        attributesMask = attributes.getMask().copy().or(optionalAttributes);
+        vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked();
+
+        if (!config.ignoreUnimplemented && (!implementedFlags.copy().or(attributesMask).equals(attributesMask)))
+            throw new GdxRuntimeException("Some attributes not implemented yet (" + attributesMask + ")");
+
+        // Global uniforms
+        u_projTrans = register(Inputs.projTrans, Setters.projTrans);
+        u_viewTrans = register(Inputs.viewTrans, Setters.viewTrans);
+        u_projViewTrans = register(Inputs.projViewTrans, Setters.projViewTrans);
+        u_cameraPosition = register(Inputs.cameraPosition, Setters.cameraPosition);
+        u_cameraDirection = register(Inputs.cameraDirection, Setters.cameraDirection);
+        u_cameraUp = register(Inputs.cameraUp, Setters.cameraUp);
+        u_cameraNearFar = register(DefaultIntShader.Inputs.cameraNearFar, DefaultIntShader.Setters.cameraNearFar);
+        u_cameraK = register(DefaultIntShader.Inputs.cameraK, DefaultIntShader.Setters.cameraK);
+
+        // Object uniforms
+        u_worldTrans = register(Inputs.worldTrans, Setters.worldTrans);
+        u_viewWorldTrans = register(Inputs.viewWorldTrans, Setters.viewWorldTrans);
+        u_projViewWorldTrans = register(Inputs.projViewWorldTrans, Setters.projViewWorldTrans);
+        u_normalMatrix = register(Inputs.normalMatrix, Setters.normalMatrix);
+
+        fAlpha = register(Inputs.alpha, Setters.alpha);
+        fCameraHeight = register(Inputs.cameraHeight, Setters.cameraHeight);
+        fOuterRadius = register(Inputs.outerRadius, Setters.outerRadius);
+        fInnerRadius = register(Inputs.innerRadius, Setters.innerRadius);
+        fKrESun = register(Inputs.krESun, Setters.krESun);
+        fKmESun = register(Inputs.kmESun, Setters.kmESun);
+        fKr4PI = register(Inputs.kr4PI, Setters.kr4PI);
+        fKm4PI = register(Inputs.km4PI, Setters.km4PI);
+        fScale = register(Inputs.scale, Setters.scale);
+        fScaleDepth = register(Inputs.scaleDepth, Setters.scaleDepth);
+        fScaleOverScaleDepth = register(Inputs.scaleOverScaleDepth, Setters.scaleOverScaleDepth);
+        nSamples = register(Inputs.nSamples, Setters.nSamples);
+
+        g = register(Inputs.g, Setters.g);
+
+        v3PlanetPos = register(Inputs.planetPos, Setters.planetPos);
+        v3CameraPos = register(Inputs.cameraPos, Setters.cameraPos);
+        v3LightPos = register(Inputs.lightPos, Setters.lightPos);
+        v3InvWavelength = register(Inputs.invWavelength, Setters.invWavelength);
+
+        u_vc = register(Inputs.vc, Setters.vc);
+        u_velDir = register(Inputs.velDir, Setters.velDir);
+
+        u_hterms = register(Inputs.hterms, Setters.hterms);
+        u_gw = register(Inputs.gw, Setters.gw);
+        u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
+        u_ts = register(Inputs.ts, Setters.ts);
+        u_omgw = register(Inputs.omgw, Setters.omgw);
+
+    }
+
+    public static String getDefaultVertexShader() {
+        if (defaultVertexShader == null)
+            defaultVertexShader = Gdx.files.internal("shader/atm.vertex.glsl").readString();
+        return defaultVertexShader;
+    }
+
+    public static String getDefaultFragmentShader() {
+        if (defaultFragmentShader == null)
+            defaultFragmentShader = Gdx.files.internal("shader/atm.fragment.glsl").readString();
+        return defaultFragmentShader;
+    }
+
+    // TODO: Perhaps move responsibility for combining attributes to IntRenderableProvider?
+    private static final Attributes combineAttributes(final IntRenderable renderable) {
+        tmpAttributes.clear();//
+        if (renderable.environment != null)
+            tmpAttributes.set(renderable.environment);
+        if (renderable.material != null)
+            tmpAttributes.set(renderable.material);
+        return tmpAttributes;
+    }
+
+    private static final Bits combineAttributeMasks(final IntRenderable renderable) {
+        Bits mask = Bits.empty();
+        if (renderable.environment != null)
+            mask.or(renderable.environment.getMask());
+        if (renderable.material != null)
+            mask.or(renderable.material.getMask());
+        return mask;
+    }
+
+    public static String createPrefix(final IntRenderable renderable) {
+        final Attributes attributes = combineAttributes(renderable);
+        String prefix = "";
+        if (attributes.has(AtmosphereAttribute.KmESun))
+            prefix += "#define atmosphericScattering\n";
+        // Atmosphere ground only if camera height is set
+        if (attributes.has(FloatAttribute.Vc))
+            prefix += "#define relativisticEffects\n";
+        // Gravitational waves
+        if (attributes.has(FloatAttribute.Omgw))
+            prefix += "#define gravitationalWaves\n";
+        return prefix;
+    }
+
+    @Override
+    public void init() {
+        final ExtShaderProgram program = this.program;
+        this.program = null;
+        init(program, renderable);
+        renderable = null;
+
+    }
+
+    @Override
+    public boolean canRender(final IntRenderable renderable) {
+        final Bits renderableMask = combineAttributeMasks(renderable);
+        return attributesMask.equals(renderableMask.or(optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked());
+    }
+
+    @Override
+    public int compareTo(IntShader other) {
+        if (other == null)
+            return -1;
+        if (other == this)
+            return 0;
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof AtmosphereShader) && equals((AtmosphereShader) obj);
+    }
+
+    public boolean equals(AtmosphereShader obj) {
+        return (obj == this);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public void begin(final Camera camera, final RenderContext context) {
+        super.begin(camera, context);
+
+    }
+
+    @Override
+    public void render(final IntRenderable renderable) {
+        if (!renderable.material.has(BlendingAttribute.Type))
+            context.setBlending(false, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        bindMaterial(renderable);
+        super.render(renderable);
+    }
+
+    @Override
+    public void end() {
+        currentMaterial = null;
+        super.end();
+    }
+
+    protected void bindMaterial(final IntRenderable renderable) {
+        if (currentMaterial == renderable.material)
+            return;
+
+        int cullFace = config.defaultCullFace == -1 ? defaultCullFace : config.defaultCullFace;
+        int depthFunc = config.defaultDepthFunc == -1 ? defaultDepthFunc : config.defaultDepthFunc;
+        float depthRangeNear = 0f;
+        float depthRangeFar = 1f;
+        boolean depthMask = true;
+
+        currentMaterial = renderable.material;
+        for (final Attribute attr : currentMaterial) {
+            final int t = attr.index;
+            if (BlendingAttribute.is(t)) {
+                context.setBlending(true, ((BlendingAttribute) attr).sourceFunction, ((BlendingAttribute) attr).destFunction);
+            } else if (attr.has(IntAttribute.CullFace))
+                cullFace = ((IntAttribute) attr).value;
+            else if (attr.has(DepthTestAttribute.Type)) {
+                DepthTestAttribute dta = (DepthTestAttribute) attr;
+                depthFunc = dta.depthFunc;
+                depthRangeNear = dta.depthRangeNear;
+                depthRangeFar = dta.depthRangeFar;
+                depthMask = dta.depthMask;
+            } else if (!config.ignoreUnimplemented)
+                throw new GdxRuntimeException("Unknown material attribute: " + attr.toString());
+        }
+
+        context.setCullFace(cullFace);
+        context.setDepthTest(depthFunc, depthRangeNear, depthRangeFar);
+        context.setDepthMask(depthMask);
+    }
+
+    @Override
+    public void dispose() {
+        program.dispose();
+        super.dispose();
+    }
+
+    public int getDefaultCullFace() {
+        return config.defaultCullFace == -1 ? defaultCullFace : config.defaultCullFace;
+    }
+
+    public void setDefaultCullFace(int cullFace) {
+        config.defaultCullFace = cullFace;
+    }
+
+    public int getDefaultDepthFunc() {
+        return config.defaultDepthFunc == -1 ? defaultDepthFunc : config.defaultDepthFunc;
+    }
+
+    public void setDefaultDepthFunc(int depthFunc) {
+        config.defaultDepthFunc = depthFunc;
+    }
+
     public static class Config {
         /** The uber vertex shader to use, null to use the default vertex shader. */
         public String vertexShader = null;
         /** The uber fragment shader to use, null to use the default fragment shader. */
         public String fragmentShader = null;
-        /** */
+        /**  */
         public boolean ignoreUnimplemented = true;
         /** Set to 0 to disable culling, -1 to inherit from {@link AtmosphereShader#defaultCullFace} */
         public int defaultCullFace = -1;
@@ -171,13 +456,13 @@ public class AtmosphereShader extends BaseIntShader {
         };
         public final static Setter cameraNearFar = new GlobalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, shader.camera.near, shader.camera.far);
             }
         };
         public final static Setter cameraK = new GlobalSetter() {
             @Override
-            public void set (BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, Constants.getCameraK());
             }
         };
@@ -526,305 +811,6 @@ public class AtmosphereShader extends BaseIntShader {
             }
         };
 
-    }
-
-    private static String defaultVertexShader = null;
-
-    public static String getDefaultVertexShader() {
-        if (defaultVertexShader == null)
-            defaultVertexShader = Gdx.files.internal("shader/atm.vertex.glsl").readString();
-        return defaultVertexShader;
-    }
-
-    private static String defaultFragmentShader = null;
-
-    public static String getDefaultFragmentShader() {
-        if (defaultFragmentShader == null)
-            defaultFragmentShader = Gdx.files.internal("shader/atm.fragment.glsl").readString();
-        return defaultFragmentShader;
-    }
-
-    protected static Bits implementedFlags = Bits.indexes(BlendingAttribute.Type, TextureAttribute.Diffuse, ColorAttribute.Diffuse, ColorAttribute.Specular, FloatAttribute.Shininess);
-
-    /** @deprecated Replaced by {@link Config#defaultCullFace} Set to 0 to disable culling */
-    @Deprecated
-    public static int defaultCullFace = GL20.GL_BACK;
-    /** @deprecated Replaced by {@link Config#defaultDepthFunc} Set to 0 to disable depth test */
-    @Deprecated
-    public static int defaultDepthFunc = GL20.GL_LEQUAL;
-
-    // Global uniforms
-    public final int u_projTrans;
-    public final int u_viewTrans;
-    public final int u_projViewTrans;
-    public final int u_cameraPosition;
-    public final int u_cameraDirection;
-    public final int u_cameraUp;
-    public final int u_cameraNearFar;
-    public final int u_cameraK;
-    // Object uniforms
-    public final int u_worldTrans;
-    public final int u_viewWorldTrans;
-    public final int u_projViewWorldTrans;
-    public final int u_normalMatrix;
-    // Material uniforms
-    public final int fAlpha;
-    public final int fCameraHeight;
-    public final int fOuterRadius;
-    public final int fInnerRadius;
-    public final int fKrESun;
-    public final int fKmESun;
-    public final int fKr4PI;
-    public final int fKm4PI;
-    public final int fScale;
-    public final int fScaleDepth;
-    public final int fScaleOverScaleDepth;
-
-    public final int nSamples;
-
-    public final int g;
-
-    public final int v3PlanetPos;
-    public final int v3LightPos;
-    public final int v3CameraPos;
-    public final int v3InvWavelength;
-
-    // Special relativity
-    public final int u_vc;
-    public final int u_velDir;
-    // Gravitational waves
-    public final int u_hterms;
-    public final int u_gw;
-    public final int u_gwmat3;
-    public final int u_ts;
-    public final int u_omgw;
-
-    /** The renderable used to create this shader, invalid after the call to init */
-    private IntRenderable renderable;
-    /** The attributes that this shader supports */
-    protected final Bits attributesMask;
-    private final long vertexMask;
-    protected final Config config;
-    /** Material attributes which are not required but always supported. */
-    private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
-
-    public AtmosphereShader(final IntRenderable renderable, final Config config) {
-        this(renderable, config, createPrefix(renderable));
-    }
-
-    public AtmosphereShader(final IntRenderable renderable, final Config config, final String prefix) {
-        this(renderable, config, prefix, config.vertexShader != null ? config.vertexShader : getDefaultVertexShader(), config.fragmentShader != null ? config.fragmentShader : getDefaultFragmentShader());
-    }
-
-    public AtmosphereShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
-        this(renderable, config, new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
-    }
-
-    public AtmosphereShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
-        final Attributes attributes = combineAttributes(renderable);
-        this.config = config;
-        this.program = shaderProgram;
-        this.renderable = renderable;
-        attributesMask = attributes.getMask().copy().or(optionalAttributes);
-        vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked();
-
-        if (!config.ignoreUnimplemented && (!implementedFlags.copy().or(attributesMask).equals(attributesMask)))
-            throw new GdxRuntimeException("Some attributes not implemented yet (" + attributesMask + ")");
-
-        // Global uniforms
-        u_projTrans = register(Inputs.projTrans, Setters.projTrans);
-        u_viewTrans = register(Inputs.viewTrans, Setters.viewTrans);
-        u_projViewTrans = register(Inputs.projViewTrans, Setters.projViewTrans);
-        u_cameraPosition = register(Inputs.cameraPosition, Setters.cameraPosition);
-        u_cameraDirection = register(Inputs.cameraDirection, Setters.cameraDirection);
-        u_cameraUp = register(Inputs.cameraUp, Setters.cameraUp);
-        u_cameraNearFar = register(DefaultIntShader.Inputs.cameraNearFar, DefaultIntShader.Setters.cameraNearFar);
-        u_cameraK = register(DefaultIntShader.Inputs.cameraK, DefaultIntShader.Setters.cameraK);
-
-        // Object uniforms
-        u_worldTrans = register(Inputs.worldTrans, Setters.worldTrans);
-        u_viewWorldTrans = register(Inputs.viewWorldTrans, Setters.viewWorldTrans);
-        u_projViewWorldTrans = register(Inputs.projViewWorldTrans, Setters.projViewWorldTrans);
-        u_normalMatrix = register(Inputs.normalMatrix, Setters.normalMatrix);
-
-        fAlpha = register(Inputs.alpha, Setters.alpha);
-        fCameraHeight = register(Inputs.cameraHeight, Setters.cameraHeight);
-        fOuterRadius = register(Inputs.outerRadius, Setters.outerRadius);
-        fInnerRadius = register(Inputs.innerRadius, Setters.innerRadius);
-        fKrESun = register(Inputs.krESun, Setters.krESun);
-        fKmESun = register(Inputs.kmESun, Setters.kmESun);
-        fKr4PI = register(Inputs.kr4PI, Setters.kr4PI);
-        fKm4PI = register(Inputs.km4PI, Setters.km4PI);
-        fScale = register(Inputs.scale, Setters.scale);
-        fScaleDepth = register(Inputs.scaleDepth, Setters.scaleDepth);
-        fScaleOverScaleDepth = register(Inputs.scaleOverScaleDepth, Setters.scaleOverScaleDepth);
-        nSamples = register(Inputs.nSamples, Setters.nSamples);
-
-        g = register(Inputs.g, Setters.g);
-
-        v3PlanetPos = register(Inputs.planetPos, Setters.planetPos);
-        v3CameraPos = register(Inputs.cameraPos, Setters.cameraPos);
-        v3LightPos = register(Inputs.lightPos, Setters.lightPos);
-        v3InvWavelength = register(Inputs.invWavelength, Setters.invWavelength);
-
-        u_vc = register(Inputs.vc, Setters.vc);
-        u_velDir = register(Inputs.velDir, Setters.velDir);
-
-        u_hterms = register(Inputs.hterms, Setters.hterms);
-        u_gw = register(Inputs.gw, Setters.gw);
-        u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
-        u_ts = register(Inputs.ts, Setters.ts);
-        u_omgw = register(Inputs.omgw, Setters.omgw);
-
-    }
-
-    @Override
-    public void init() {
-        final ExtShaderProgram program = this.program;
-        this.program = null;
-        init(program, renderable);
-        renderable = null;
-
-    }
-
-    private final static Attributes tmpAttributes = new Attributes();
-
-    // TODO: Perhaps move responsibility for combining attributes to IntRenderableProvider?
-    private static final Attributes combineAttributes(final IntRenderable renderable) {
-        tmpAttributes.clear();//
-        if (renderable.environment != null)
-            tmpAttributes.set(renderable.environment);
-        if (renderable.material != null)
-            tmpAttributes.set(renderable.material);
-        return tmpAttributes;
-    }
-
-    private static final Bits combineAttributeMasks(final IntRenderable renderable) {
-        Bits mask = Bits.empty();
-        if (renderable.environment != null)
-            mask.or(renderable.environment.getMask());
-        if (renderable.material != null)
-            mask.or(renderable.material.getMask());
-        return mask;
-    }
-
-    public static String createPrefix(final IntRenderable renderable) {
-        final Attributes attributes = combineAttributes(renderable);
-        String prefix = "";
-        if (attributes.has(AtmosphereAttribute.KmESun))
-            prefix += "#define atmosphericScattering\n";
-        // Atmosphere ground only if camera height is set
-        if (attributes.has(FloatAttribute.Vc))
-            prefix += "#define relativisticEffects\n";
-        // Gravitational waves
-        if (attributes.has(FloatAttribute.Omgw))
-            prefix += "#define gravitationalWaves\n";
-        return prefix;
-    }
-
-    @Override
-    public boolean canRender(final IntRenderable renderable) {
-        final Bits renderableMask = combineAttributeMasks(renderable);
-        return attributesMask.equals(renderableMask.or(optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked());
-    }
-
-    @Override
-    public int compareTo(IntShader other) {
-        if (other == null)
-            return -1;
-        if (other == this)
-            return 0;
-        return 0;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return (obj instanceof AtmosphereShader) && equals((AtmosphereShader) obj);
-    }
-
-    public boolean equals(AtmosphereShader obj) {
-        return (obj == this);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public void begin(final Camera camera, final RenderContext context) {
-        super.begin(camera, context);
-
-    }
-
-    @Override
-    public void render(final IntRenderable renderable) {
-        if (!renderable.material.has(BlendingAttribute.Type))
-            context.setBlending(false, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        bindMaterial(renderable);
-        super.render(renderable);
-    }
-
-    @Override
-    public void end() {
-        currentMaterial = null;
-        super.end();
-    }
-
-    Material currentMaterial;
-
-    protected void bindMaterial(final IntRenderable renderable) {
-        if (currentMaterial == renderable.material)
-            return;
-
-        int cullFace = config.defaultCullFace == -1 ? defaultCullFace : config.defaultCullFace;
-        int depthFunc = config.defaultDepthFunc == -1 ? defaultDepthFunc : config.defaultDepthFunc;
-        float depthRangeNear = 0f;
-        float depthRangeFar = 1f;
-        boolean depthMask = true;
-
-        currentMaterial = renderable.material;
-        for (final Attribute attr : currentMaterial) {
-            final int t = attr.index;
-            if (BlendingAttribute.is(t)) {
-                context.setBlending(true, ((BlendingAttribute) attr).sourceFunction, ((BlendingAttribute) attr).destFunction);
-            } else if (attr.has(IntAttribute.CullFace))
-                cullFace = ((IntAttribute) attr).value;
-            else if (attr.has(DepthTestAttribute.Type)) {
-                DepthTestAttribute dta = (DepthTestAttribute) attr;
-                depthFunc = dta.depthFunc;
-                depthRangeNear = dta.depthRangeNear;
-                depthRangeFar = dta.depthRangeFar;
-                depthMask = dta.depthMask;
-            } else if (!config.ignoreUnimplemented)
-                throw new GdxRuntimeException("Unknown material attribute: " + attr.toString());
-        }
-
-        context.setCullFace(cullFace);
-        context.setDepthTest(depthFunc, depthRangeNear, depthRangeFar);
-        context.setDepthMask(depthMask);
-    }
-
-    @Override
-    public void dispose() {
-        program.dispose();
-        super.dispose();
-    }
-
-    public int getDefaultCullFace() {
-        return config.defaultCullFace == -1 ? defaultCullFace : config.defaultCullFace;
-    }
-
-    public void setDefaultCullFace(int cullFace) {
-        config.defaultCullFace = cullFace;
-    }
-
-    public int getDefaultDepthFunc() {
-        return config.defaultDepthFunc == -1 ? defaultDepthFunc : config.defaultDepthFunc;
-    }
-
-    public void setDefaultDepthFunc(int depthFunc) {
-        config.defaultDepthFunc = depthFunc;
     }
 
 }

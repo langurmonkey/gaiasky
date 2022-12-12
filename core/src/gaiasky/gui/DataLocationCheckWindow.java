@@ -25,8 +25,8 @@ public class DataLocationCheckWindow extends GenericDialog {
 
         setCancelButtonColors(Color.RED, Color.RED);
 
-
     }
+
     @Override
     protected void build() {
 

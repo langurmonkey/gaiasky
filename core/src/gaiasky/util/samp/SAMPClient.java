@@ -44,12 +44,11 @@ import java.util.logging.Level;
  */
 public class SAMPClient implements IObserver {
     private static final Log logger = Logger.getLogger(SAMPClient.class);
-
+    private final CatalogManager catalogManager;
     private HubConnector conn;
     private TwoWayHashmap<String, Entity> idToNode;
     private Map<String, String> idToUrl;
     private boolean preventProgrammaticEvents = false;
-    private final CatalogManager catalogManager;
 
     public SAMPClient(final CatalogManager catalogManager) {
         super();

@@ -18,19 +18,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Contains some utils common to all gamepad listeners.
  */
 public abstract class AbstractGamepadListener implements ControllerListener, IInputListener, IObserver {
-    private static final Log logger = Logger.getLogger(AbstractGamepadListener.class);
-
     protected static final float MIN_ZERO_POINT = 0.3f;
     protected static final long AXIS_EVT_DELAY = 250;
     protected static final long AXIS_POLL_DELAY = 250;
-
     protected static final long BUTTON_POLL_DELAY = 400;
-
-    protected Controller lastControllerUsed = null;
-    protected IGamepadMappings mappings;
+    private static final Log logger = Logger.getLogger(AbstractGamepadListener.class);
     protected final EventManager em;
     protected final AtomicBoolean active = new AtomicBoolean(true);
-
+    protected Controller lastControllerUsed = null;
+    protected IGamepadMappings mappings;
     protected long lastAxisEvtTime = 0, lastButtonPollTime = 0;
 
     public AbstractGamepadListener(String mappingsFile) {

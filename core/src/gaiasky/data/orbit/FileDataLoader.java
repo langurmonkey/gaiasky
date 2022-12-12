@@ -49,7 +49,7 @@ public class FileDataLoader {
                          * Z -> -X
                          * X -> Y
                          * Y -> Z
-                        */
+                         */
                         Vector3d pos = new Vector3d(parsed(tokens[1]), parsed(tokens[2]), parsed(tokens[3]));
                         pos.mul(transform);
                         orbitData.x.add(pos.x);

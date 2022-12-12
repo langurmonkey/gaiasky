@@ -13,7 +13,6 @@ public class VariableRecord extends ParticleRecord {
     public double[] variTimes;
     public double period;
 
-
     public VariableRecord(double[] dataD, float[] dataF, int nVari, double period, float[] variMags, double[] variTimes, Long id, String[] names, ObjectDoubleMap<UCD> extra) {
         super(dataD, dataF, id, names, extra);
         this.nVari = nVari;

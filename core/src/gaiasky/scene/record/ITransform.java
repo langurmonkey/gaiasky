@@ -13,5 +13,6 @@ import gaiasky.util.math.Matrix4d;
  */
 public interface ITransform {
     void apply(Matrix4 mat);
+
     void apply(Matrix4d mat);
 }

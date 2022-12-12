@@ -21,10 +21,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import gaiasky.GaiaSky;
-import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.contrib.postprocess.filters.LevelsFilter;
 import gaiasky.util.gdx.contrib.postprocess.filters.Luma;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
@@ -40,16 +38,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class Levels extends PostProcessorEffect {
     private static final int LUMA_SIZE = 500;
-    private int lumaLodLevels;
-    private LevelsFilter levels;
     private final Luma luma;
-
-    private float lumaMax = 0.9f, lumaAvg = 0.09f;
-    private float currLumaMax = -1f, currLumaAvg = -1f;
     private final FrameBuffer lumaBuffer;
-
     /** Is the max/avg process running? **/
     private final AtomicBoolean processRunning;
+    FloatBuffer pixels = BufferUtils.createFloatBuffer(LUMA_SIZE * LUMA_SIZE * 3);
+    private int lumaLodLevels;
+    private LevelsFilter levels;
+    private float lumaMax = 0.9f, lumaAvg = 0.09f;
+    private float currLumaMax = -1f, currLumaAvg = -1f;
     private long lastFrame;
 
     /**
@@ -177,8 +174,6 @@ public final class Levels extends PostProcessorEffect {
     public void rebind() {
         levels.rebind();
     }
-
-    FloatBuffer pixels = BufferUtils.createFloatBuffer(LUMA_SIZE * LUMA_SIZE * 3);
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {

@@ -25,23 +25,17 @@ import java.nio.file.Path;
 public class CameraKeyframeManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CameraKeyframeManager.class);
     /**
-     * Singleton
-     **/
-    public static CameraKeyframeManager instance;
-
-    /**
      * Separator for keyframes files
      **/
     private static final String ksep = ",";
-
     /**
      * Separator for camera files
      **/
     private static final String sep = " ";
-
-    public static void initialize() {
-        instance = new CameraKeyframeManager();
-    }
+    /**
+     * Singleton
+     **/
+    public static CameraKeyframeManager instance;
 
     public CameraKeyframeManager() {
         super();
@@ -49,8 +43,8 @@ public class CameraKeyframeManager implements IObserver {
         EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT);
     }
 
-    public enum PathType {
-        LINEAR, SPLINE
+    public static void initialize() {
+        instance = new CameraKeyframeManager();
     }
 
     private Pathd<Vector3d> getPath(Vector3d[] data, PathType pathType) {
@@ -107,7 +101,7 @@ public class CameraKeyframeManager implements IObserver {
             try {
                 Files.delete(f);
             } catch (IOException e) {
-               logger.error(e);
+                logger.error(e);
             }
         }
         BufferedWriter os = null;
@@ -186,9 +180,9 @@ public class CameraKeyframeManager implements IObserver {
     public void exportKeyframesFile(Array<Keyframe> keyframes, String fileName) {
         Path f = SysUtils.getDefaultCameraDir().resolve(fileName);
         if (Files.exists(f)) {
-            try{
+            try {
                 Files.delete(f);
-            }catch(IOException e){
+            } catch (IOException e) {
                 logger.error(e);
             }
         }
@@ -218,7 +212,6 @@ public class CameraKeyframeManager implements IObserver {
 
             Vector3d aux = new Vector3d();
 
-
             /** Current position in the spline. Coincides with the control points **/
             double splineIdx = 0d;
             /** Step length between control points **/
@@ -230,7 +223,6 @@ public class CameraKeyframeManager implements IObserver {
             double splinePosIdx = 0d;
             /** Step length in between control positions **/
             double splinePosStep = 1d / (currentPosSpline.nPoints - 1);
-
 
             for (int i = 1; i < keyframes.size; i++) {
                 Keyframe k0 = keyframes.get(i - 1);
@@ -276,7 +268,7 @@ public class CameraKeyframeManager implements IObserver {
                 splinePosIdx += splinePosStep;
 
                 // If k1 is seam and not last and we're doing splines, jump to next spline
-                if (k1.seam && i < keyframes.size -1 && Settings.settings.camrecorder.keyframe.position == PathType.SPLINE) {
+                if (k1.seam && i < keyframes.size - 1 && Settings.settings.camrecorder.keyframe.position == PathType.SPLINE) {
                     currentPosSpline = posSplines[++k];
                     splinePosIdx = 0;
                     splinePosStep = 1d / (currentPosSpline.nPoints - 1);
@@ -339,19 +331,24 @@ public class CameraKeyframeManager implements IObserver {
     public void notify(final Event event, Object source, final Object... data) {
 
         switch (event) {
-            case KEYFRAMES_FILE_SAVE:
-                Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
-                String fileName = (String) data[1];
-                saveKeyframesFile(keyframes, fileName);
-                break;
-            case KEYFRAMES_EXPORT:
-                keyframes = (Array<Keyframe>) data[0];
-                fileName = (String) data[1];
-                exportKeyframesFile(keyframes, fileName);
-                break;
-            default:
-                break;
+        case KEYFRAMES_FILE_SAVE:
+            Array<Keyframe> keyframes = (Array<Keyframe>) data[0];
+            String fileName = (String) data[1];
+            saveKeyframesFile(keyframes, fileName);
+            break;
+        case KEYFRAMES_EXPORT:
+            keyframes = (Array<Keyframe>) data[0];
+            fileName = (String) data[1];
+            exportKeyframesFile(keyframes, fileName);
+            break;
+        default:
+            break;
         }
+    }
+
+    public enum PathType {
+        LINEAR,
+        SPLINE
     }
 
     class PathPart {

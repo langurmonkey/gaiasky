@@ -6,7 +6,7 @@
 package gaiasky.desktop.util;
 
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Scanner;
@@ -26,8 +26,8 @@ public class EqGalTest {
         Vector3d posGal = new Vector3d(pos);
         posGal.mul(Coordinates.eqToGal());
         Vector3d posGalSph = Coordinates.cartesianToSpherical(posGal, new Vector3d());
-        double l = posGalSph.x * MathUtilsd.radiansToDegrees;
-        double b = posGalSph.y * MathUtilsd.radiansToDegrees;
+        double l = posGalSph.x * MathUtilsDouble.radiansToDegrees;
+        double b = posGalSph.y * MathUtilsDouble.radiansToDegrees;
 
         System.out.println("Galactic coordinates - l: " + l + ", b: " + b);
     }

@@ -13,7 +13,7 @@ public class PointParticleRecord implements IParticleRecord {
 
     private double[] data;
 
-    public PointParticleRecord(double[] data){
+    public PointParticleRecord(double[] data) {
         this.data = data;
     }
 
@@ -196,7 +196,7 @@ public class PointParticleRecord implements IParticleRecord {
 
     @Override
     public double[] rgb() {
-        return data.length >= 7 ? new double[]{data[4], data[5], data[6]} : null;
+        return data.length >= 7 ? new double[] { data[4], data[5], data[6] } : null;
     }
 
     @Override

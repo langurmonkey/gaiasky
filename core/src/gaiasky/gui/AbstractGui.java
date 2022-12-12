@@ -159,9 +159,9 @@ public abstract class AbstractGui implements IObserver, IGui {
         return true;
     }
 
-    public boolean updateUnitsPerPixel(float upp){
+    public boolean updateUnitsPerPixel(float upp) {
         this.unitsPerPixel = upp;
-        if(stage.getViewport() instanceof ScreenViewport){
+        if (stage.getViewport() instanceof ScreenViewport) {
             ScreenViewport svp = (ScreenViewport) stage.getViewport();
             svp.setUnitsPerPixel(this.unitsPerPixel);
             svp.update(graphics.getWidth(), graphics.getHeight(), true);

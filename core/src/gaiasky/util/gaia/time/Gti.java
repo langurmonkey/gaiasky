@@ -64,12 +64,10 @@ public class Gti implements Comparable<Gti> {
     /**
      * Constructor taking both start and end times.
      *
-     * @param start
-     *            the time defining the beginning of the object validity.
-     * @param end
-     *            the time defining the end of the object validity.
-     * @throws RuntimeException
-     *             Start is later than end
+     * @param start the time defining the beginning of the object validity.
+     * @param end   the time defining the end of the object validity.
+     *
+     * @throws RuntimeException Start is later than end
      */
     public Gti(final long start, final long end) throws RuntimeException {
         if (start > end) {
@@ -87,8 +85,8 @@ public class Gti implements Comparable<Gti> {
      * an end, but we have to also consider that both may have start/end times
      * only.
      *
-     * @param t
-     *            the GTI Object to be compared with
+     * @param t the GTI Object to be compared with
+     *
      * @return boolean
      */
     @SuppressWarnings("unchecked")
@@ -116,6 +114,7 @@ public class Gti implements Comparable<Gti> {
      * order to choose the bucket we don't need more than one second accuracy.
      *
      * @return int
+     *
      * @see Object#hashCode()
      */
     @Override
@@ -139,19 +138,10 @@ public class Gti implements Comparable<Gti> {
     }
 
     /**
-     * Return the start time.
-     *
-     * @return the time defining the beginning of the object validity
-     */
-    public long getStart() {
-        return this.start;
-    }
-
-    /**
      * Set the end time
      *
-     * @param end
-     *            the time defining the end of the object validity
+     * @param end the time defining the end of the object validity
+     *
      * @throws RuntimeException
      */
     public void setEnd(final long end) throws RuntimeException {
@@ -164,10 +154,19 @@ public class Gti implements Comparable<Gti> {
     }
 
     /**
+     * Return the start time.
+     *
+     * @return the time defining the beginning of the object validity
+     */
+    public long getStart() {
+        return this.start;
+    }
+
+    /**
      * Set the start time
      *
-     * @param start
-     *            the time defining the beginning of the object validity
+     * @param start the time defining the beginning of the object validity
+     *
      * @throws RuntimeException
      */
     public void setStart(final long start) throws RuntimeException {
@@ -196,8 +195,8 @@ public class Gti implements Comparable<Gti> {
      * </ul>
      * of the GTI
      *
-     * @param time
-     *            instant to check
+     * @param time instant to check
+     *
      * @return true if inside
      */
     public boolean isInside(final long time) {
@@ -209,8 +208,8 @@ public class Gti implements Comparable<Gti> {
      * less than Y. If X and Y start at the same time, X is les than Y if it
      * ends before Y If X and Y are the same X is not less than Y
      *
-     * @param i
-     *            GTI to test
+     * @param i GTI to test
+     *
      * @return true if this GTI is earlier than the GTI passed in.
      */
     public boolean isLessThan(final Gti i) {
@@ -224,8 +223,6 @@ public class Gti implements Comparable<Gti> {
     // Can re-enable this annotation once we go to Java 6
 
     /**
-     *
-     *
      * @param o
      *
      * @return int
@@ -246,6 +243,7 @@ public class Gti implements Comparable<Gti> {
 
     /**
      * Return a useful string representation
+     *
      * @return String
      */
     @Override

@@ -13,25 +13,12 @@ import java.util.Map;
 
 public class Logger {
 
-    public enum LoggerLevel {
-        ERROR(0),
-        WARN(1),
-        INFO(2),
-        DEBUG(3);
-
-        public int val;
-
-        LoggerLevel(int val) {
-            this.val = val;
-        }
-
-        public int getVal() {
-            return val;
-        }
-
-    }
-
+    private static final Map<String, Log> logObjects;
     public static LoggerLevel level = LoggerLevel.INFO;
+
+    static {
+        logObjects = new HashMap<>();
+    }
 
     private static void error(Throwable t, String tag) {
         if (inLevel(LoggerLevel.ERROR))
@@ -98,6 +85,7 @@ public class Logger {
      *
      * @param arr The array
      * @param n   Number of elements to remove from beginning
+     *
      * @return The resulting array
      */
     private static Object[] removeFirstN(Object[] arr, int n) {
@@ -128,12 +116,6 @@ public class Logger {
         return l.getVal() <= level.getVal();
     }
 
-    private static final Map<String, Log> logObjects;
-
-    static {
-        logObjects = new HashMap<>();
-    }
-
     /**
      * Returns default logger
      *
@@ -147,6 +129,7 @@ public class Logger {
      * Gets the logger for the particular class
      *
      * @param clazz The class
+     *
      * @return The logger
      */
     public static Log getLogger(Class<?> clazz) {
@@ -157,6 +140,7 @@ public class Logger {
      * Gets a logger for an arbitary string tag
      *
      * @param tag The tag
+     *
      * @return The logger
      */
     public static Log getLogger(String tag) {
@@ -167,6 +151,24 @@ public class Logger {
             logObjects.put(tag, log);
             return log;
         }
+    }
+
+    public enum LoggerLevel {
+        ERROR(0),
+        WARN(1),
+        INFO(2),
+        DEBUG(3);
+
+        public int val;
+
+        LoggerLevel(int val) {
+            this.val = val;
+        }
+
+        public int getVal() {
+            return val;
+        }
+
     }
 
     public static class Log {

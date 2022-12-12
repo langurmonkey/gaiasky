@@ -12,10 +12,10 @@ import gaiasky.util.gaia.time.GtiList;
 /**
  * This abstract class defines the fields and implements the methods that any
  * numerically defined attitude need in addition to those in the superclass.
- * 
- * @author Lennart Lindegren
+ *
  * @param <A> type of Attitude this server is serving
- * 
+ *
+ * @author Lennart Lindegren
  */
 public abstract class NumericalAttitudeDataServer<A extends IAttitude> extends BaseAttitudeDataServer<A> {
     //	protected boolean initialized = false;
@@ -27,15 +27,16 @@ public abstract class NumericalAttitudeDataServer<A extends IAttitude> extends B
 
     /**
      * Any numerical attitude needs to be initialized
+     *
      * @throws RuntimeException initialization fails
      */
     public abstract void initialize();
 
     /**
      * Check if the there is a valid attitude at a given time
-     * 
-     * @param t
-     *            time
+     *
+     * @param t time
+     *
      * @return true if the attitude is valid for time t
      */
     public boolean isValid(long t) {
@@ -47,7 +48,7 @@ public abstract class NumericalAttitudeDataServer<A extends IAttitude> extends B
      * this may not be the same as the times for which an attitude is defined in
      * the input data; an implementation may censor time periods, for example
      * when the attitude uncertainty is higher than a defined threshold.
-     * 
+     *
      * @return the set of attitude Good Time Intervals
      */
     public GtiList getGtis() {

@@ -28,13 +28,13 @@ public class ShadowMapImpl implements ShadowMap {
         return trans;
     }
 
+    public void setProjViewTrans(Matrix4 mat) {
+        this.trans.set(mat);
+    }
+
     @Override
     public TextureDescriptor<Texture> getDepthMap() {
         return td;
-    }
-
-    public void setProjViewTrans(Matrix4 mat) {
-        this.trans.set(mat);
     }
 
     public void setDepthMap(Texture tex) {

@@ -27,7 +27,7 @@ import java.io.Serializable;
 
 /**
  * A finite number of revolutions
- *
+ * <p>
  * There are two implementations provided of the conversions methods one as
  * object interface, where an object of the current class has to be
  * instantiated. The other implementation is provided as static class methods.
@@ -47,11 +47,64 @@ public class Revs extends ConcreteDuration implements Serializable {
     /**
      * Construct object
      *
-     * @param revs
-     *            number of revs
+     * @param revs number of revs
      */
     public Revs(final double revs) {
         value = revs;
+    }
+
+    /**
+     * @param revs The time in revs to convert.
+     *
+     * @return revs expressed in nanosecs
+     */
+    public static long asNanoSecs(final double revs) {
+        return Math.round(revs * Duration.NS_PER_REV);
+    }
+
+    /**
+     * @param revs The time in revs to convert.
+     *
+     * @return revs expressed in secs
+     */
+    public static double asSecs(final double revs) {
+        return revs * Duration.SECS_PER_REV;
+    }
+
+    /**
+     * @param revs The time in revs to convert
+     *
+     * @return revs expressed in mins
+     */
+    public static double asMins(final double revs) {
+        return revs * Duration.MINS_PER_REV;
+    }
+
+    /**
+     * @param revs Time in hours to convert
+     *
+     * @return hours expressed in revs.
+     */
+    public static double asHours(final double revs) {
+        return revs * Duration.HOURS_PER_REV;
+    }
+
+    /**
+     * @param revs Time in revs to convert.
+     *
+     * @return revs expressed in days
+     */
+    public static double asDays(final double revs) {
+        return revs / Duration.REVS_PER_DAY;
+    }
+
+    /**
+     * @param revs Time in revolutions to convert.
+     *
+     * @return revs expressed in JulianYears
+     */
+    public static double asJulianYears(final double revs) {
+        return revs / Duration.REVS_PER_JULIAN_YEAR;
     }
 
     /**
@@ -73,29 +126,11 @@ public class Revs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param revs
-     *            The time in revs to convert.
-     * @return revs expressed in nanosecs
-     */
-    public static long asNanoSecs(final double revs) {
-        return Math.round(revs * Duration.NS_PER_REV);
-    }
-
-    /**
      * @see Duration#asSecs()
      */
     @Override
     public double asSecs() {
         return value * Duration.SECS_PER_REV;
-    }
-
-    /**
-     * @param revs
-     *            The time in revs to convert.
-     * @return revs expressed in secs
-     */
-    public static double asSecs(final double revs) {
-        return revs * Duration.SECS_PER_REV;
     }
 
     /**
@@ -107,29 +142,11 @@ public class Revs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param revs
-     *            The time in revs to convert
-     * @return revs expressed in mins
-     */
-    public static double asMins(final double revs) {
-        return revs * Duration.MINS_PER_REV;
-    }
-
-    /**
      * @see Duration#asHours()
      */
     @Override
     public double asHours() {
         return value * Duration.HOURS_PER_REV;
-    }
-
-    /**
-     * @param revs
-     *            Time in hours to convert
-     * @return hours expressed in revs.
-     */
-    public static double asHours(final double revs) {
-        return revs * Duration.HOURS_PER_REV;
     }
 
     /**
@@ -149,29 +166,11 @@ public class Revs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param revs
-     *            Time in revs to convert.
-     * @return revs expressed in days
-     */
-    public static double asDays(final double revs) {
-        return revs / Duration.REVS_PER_DAY;
-    }
-
-    /**
      * @see Duration#asJulianYears()
      */
     @Override
     public double asJulianYears() {
         return value / Duration.REVS_PER_JULIAN_YEAR;
-    }
-
-    /**
-     * @param revs
-     *            Time in revolutions to convert.
-     * @return revs expressed in JulianYears
-     */
-    public static double asJulianYears(final double revs) {
-        return revs / Duration.REVS_PER_JULIAN_YEAR;
     }
 
     /**

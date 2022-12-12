@@ -26,11 +26,11 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
     private final float[] uraf;
     private final float[] nepf;
     private final float[] jupf;
-    private FocusView sat, ura, nep, jup;
     private final Color jupc;
     private final Color satc;
     private final Color nepc;
     private final Color urac;
+    private FocusView sat, ura, nep, jup;
 
     public OuterSolarSystemMinimapScale() {
         super();

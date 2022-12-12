@@ -151,6 +151,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
      *
      * @param units The value in whatever units
      * @param side  Side/2 of minimap
+     *
      * @return Pixel coordinate
      */
     protected int u2Px(double units, float side) {
@@ -233,10 +234,9 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
         sr.setColor(camc);
         sr.circle(cx, cy, 6f);
 
-
     }
 
-    public void dispose(){
+    public void dispose() {
     }
 
 }

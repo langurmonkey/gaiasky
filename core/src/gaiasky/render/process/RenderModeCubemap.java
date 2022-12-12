@@ -31,16 +31,13 @@ import java.util.Map;
  */
 public abstract class RenderModeCubemap extends RenderModeAbstract {
 
+    private final Mosaic mosaic;
     protected Vector3 aux1, aux2, aux3, dirEffective, upEffective, dirBackup, upBackup, dirUpCrs;
     protected StretchViewport stretchViewport;
     // Frame buffers for each side of the cubemap
     protected Map<Integer, FrameBuffer> frameBufferCubeMap;
-
     // Backup of fov value
     protected float fovBackup;
-
-    private final Mosaic mosaic;
-
     // Frame buffers
     protected FrameBuffer zPosFb, zNegFb, xPosFb, xNegFb, yPosFb, yNegFb;
     // Flags

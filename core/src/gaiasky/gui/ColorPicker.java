@@ -91,14 +91,14 @@ public class ColorPicker extends ColorPickerAbstract {
 
     /** A color picker dialog **/
     private class ColorPickerDialog extends GenericDialog {
-        private float[] color, colorBak;
         private final DecimalFormat nf;
+        private final ColorPickerDialog cpd;
+        private float[] color, colorBak;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
         private Image newColorImage;
         private boolean changeEvents = true;
-        private final ColorPickerDialog cpd;
 
         public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.msg("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);

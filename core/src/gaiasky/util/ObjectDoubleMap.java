@@ -46,13 +46,6 @@ import java.util.NoSuchElementException;
 @SuppressWarnings("unchecked")
 public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
     public int size;
-
-    K[] keyTable;
-    double[] valueTable;
-
-    float loadFactor;
-    int threshold;
-
     /**
      * Used by {@link #place(Object)} to bit shift the upper bits of a {@code long} into a usable range (&gt;= 0 and &lt;=
      * {@link #mask}). The shift can be negative, which is convenient to match the number of bits in mask: if mask is a 7-bit
@@ -64,14 +57,16 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
      * {@link #place(Object)} is overridden.
      */
     protected int shift;
-
     /**
      * A bitmask used to confine hashcodes to the size of the table. Must be all 1 bits in its low positions, ie a power of two
      * minus 1. If {@link #place(Object)} is overriden, this can be used instead of {@link #shift} to isolate usable bits of a
      * hash.
      */
     protected int mask;
-
+    K[] keyTable;
+    double[] valueTable;
+    float loadFactor;
+    int threshold;
     Entries entries1, entries2;
     Values values1, values2;
     Keys keys1, keys2;
@@ -110,6 +105,14 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
         valueTable = new double[tableSize];
     }
 
+    /** Creates a new map identical to the specified map. */
+    public ObjectDoubleMap(ObjectDoubleMap<? extends K> map) {
+        this((int) Math.floor(map.keyTable.length * map.loadFactor), map.loadFactor);
+        System.arraycopy(map.keyTable, 0, keyTable, 0, map.keyTable.length);
+        System.arraycopy(map.valueTable, 0, valueTable, 0, map.valueTable.length);
+        size = map.size;
+    }
+
     static int tableSize(int capacity, float loadFactor) {
         if (capacity < 0) {
             throw new IllegalArgumentException("capacity must be >= 0: " + capacity);
@@ -121,14 +124,6 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
                 return tableSize;
             }
         }
-    }
-
-    /** Creates a new map identical to the specified map. */
-    public ObjectDoubleMap(ObjectDoubleMap<? extends K> map) {
-        this((int) Math.floor(map.keyTable.length * map.loadFactor), map.loadFactor);
-        System.arraycopy(map.keyTable, 0, keyTable, 0, map.keyTable.length);
-        System.arraycopy(map.valueTable, 0, valueTable, 0, map.valueTable.length);
-        size = map.size;
     }
 
     /**
@@ -579,9 +574,8 @@ public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
     }
 
     static private class MapIterator<K> {
-        public boolean hasNext;
-
         final ObjectDoubleMap<K> map;
+        public boolean hasNext;
         int nextIndex, currentIndex;
         boolean valid = true;
 

@@ -13,10 +13,11 @@ public class WelcomeGuiVR extends AbstractGui {
 
     private Table center;
 
-    public WelcomeGuiVR(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr){
+    public WelcomeGuiVR(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }
+
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface

@@ -25,10 +25,8 @@ public class MachineDefinition {
     /** Drag in [0,1] **/
     private double drag;
 
-
-    public MachineDefinition(){
+    public MachineDefinition() {
     }
-
 
     public String getName() {
         return name;
@@ -103,7 +101,7 @@ public class MachineDefinition {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return getName();
     }
 }

@@ -15,36 +15,19 @@ import gaiasky.util.math.Vector3d;
  * @version $Id: Epsl.java 373288 2014-06-24 10:35:37Z pbalm $
  */
 public class Epsl extends AnalyticalAttitudeDataServer {
-    /**
-     * Ecliptic pole scanning has two modes: PRECEDING (revolving phase angle =
-     * 0) and FOLLOWING (revolving phase angle = 180 deg). PRECEDING mean that
-     * the spin axis of Gaia precedes the Sun by the solar aspect angle (45 deg)
-     * on the ecliptic.
-     */
-    public enum Mode {
-        /** preceding scanning mode */
-        PRECEDING,
-        /** following scanning mode */
-        FOLLOWING
-    }
-
-    /** The current mode **/
-    private final Mode currentMode;
-
     /** The unit vector towards the North Ecliptic Pole, expressed in ICRS **/
     static final Vector3d NECLP = new Vector3d(-Math.sin(OBLIQUITY_RAD), Math.cos(OBLIQUITY_RAD), 0.0);
     static final Vector3d[] xyz = new Vector3d[] { new Vector3d(), new Vector3d(), new Vector3d() };
-
+    /** The current mode **/
+    private final Mode currentMode;
     /** Auxiliary vector **/
     private Vector3d spinVector;
-
     /**
      * The spin phase becomes a continuous function of time when represented as
      * omega + TWO_PI * omegaRevs:
      */
     private double omega;
     private int omegaRevs;
-
     /**
      * Default constructor (uses Mode = PRECEDING):
      */
@@ -56,8 +39,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
     /**
      * Constructor that allows to initialize preceding or following EPSL:
      *
-     * @param mode
-     *            PRECEDING or FOLLOWING
+     * @param mode PRECEDING or FOLLOWING
      */
     public Epsl(Mode mode) {
         currentMode = mode;
@@ -65,10 +47,11 @@ public class Epsl extends AnalyticalAttitudeDataServer {
     }
 
     /**
-     * @see gaiasky.util.gaia.BaseAttitudeDataServer#getAttitude(long)
-     *
      * @param t - the time elapsed since the epoch of J2010 in ns (TCB)
+     *
      * @return attitude for the given time
+     *
+     * @see gaiasky.util.gaia.BaseAttitudeDataServer#getAttitude(long)
      */
     @Override
     public synchronized IAttitude getAttitudeNative(long t) {
@@ -154,5 +137,18 @@ public class Epsl extends AnalyticalAttitudeDataServer {
      */
     public double getOmegaMod4Pi() {
         return omega + (omegaRevs % 2) * TWO_PI;
+    }
+
+    /**
+     * Ecliptic pole scanning has two modes: PRECEDING (revolving phase angle =
+     * 0) and FOLLOWING (revolving phase angle = 180 deg). PRECEDING mean that
+     * the spin axis of Gaia precedes the Sun by the solar aspect angle (45 deg)
+     * on the ecliptic.
+     */
+    public enum Mode {
+        /** preceding scanning mode */
+        PRECEDING,
+        /** following scanning mode */
+        FOLLOWING
     }
 }

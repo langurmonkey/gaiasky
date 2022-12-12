@@ -55,12 +55,12 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public void setDirection(Vector3d dir) {
+    public Vector3d getDirection() {
+        return null;
     }
 
     @Override
-    public Vector3d getDirection() {
-        return null;
+    public void setDirection(Vector3d dir) {
     }
 
     @Override

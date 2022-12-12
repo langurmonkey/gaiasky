@@ -10,16 +10,11 @@ package gaiasky.util.ucd;
  */
 public class UCD {
 
-    enum UCDType {
-        POS, PHOT, STAT, PHYS, META, ARITH, EM, OBS, SPECT, SRC, TIME, INSTR, VARI, UNKNOWN, MISSING
-    }
-
     public String originalucd, converted, colname, unit;
     public String[][] ucd;
     public String[] ucdstrings;
     public UCDType type;
     public int index;
-
     public UCD(String originalucd, String colname, String unit, int index) {
         super();
 
@@ -28,7 +23,7 @@ public class UCD {
         this.unit = unit;
         if (originalucd != null && !originalucd.isEmpty()) {
             this.originalucd = originalucd;
-            // Convert UCD1 to 
+            // Convert UCD1 to
             this.converted = originalucd.toLowerCase().replace("_", ".");
 
             this.ucdstrings = this.converted.split(";");
@@ -61,13 +56,33 @@ public class UCD {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UCD ucd = (UCD) o;
         return index == ucd.index &&
                 originalucd.equals(ucd.originalucd) &&
                 colname.equals(ucd.colname) &&
                 unit.equals(ucd.unit);
+    }
+
+    enum UCDType {
+        POS,
+        PHOT,
+        STAT,
+        PHYS,
+        META,
+        ARITH,
+        EM,
+        OBS,
+        SPECT,
+        SRC,
+        TIME,
+        INSTR,
+        VARI,
+        UNKNOWN,
+        MISSING
     }
 
 }

@@ -27,25 +27,16 @@ import gaiasky.util.gdx.shader.provider.ShaderProgramProvider.ShaderProgramParam
  * Centralizes the creation and loading of render assets: shaders, fonts, batch objects, etc.
  */
 public class RenderAssets {
+    /**
+     * Shader name parts.
+     */
+    public static final String SUFFIX_SSR = "SSR";
+    public static final String SUFFIX_VELBUFF = "Velbuff";
+    public static final String SUFFIX_REL = "Rel";
+    public static final String SUFFIX_GRAV = "Grav";
+    public static final String SUFFIX_COLMAP = "Colmap";
     private static final Log logger = Logger.getLogger(RenderAssets.class);
-
     private final GlobalResources globalResources;
-    private AssetDescriptor<ExtShaderProgram>[]
-            starGroupDesc,
-            particleGroupDesc,
-            variableGroupDesc,
-            particleEffectDesc,
-            orbitElemDesc,
-            pointDesc,
-            lineDesc,
-            lineQuadDesc,
-            lineGpuDesc,
-            billboardGroupDesc,
-            starPointDesc,
-            galDesc,
-            spriteDesc,
-            starBillboardDesc;
-
     public ExtShaderProgram distanceFieldFontShader;
     public ExtShaderProgram[]
             starBillboardShaders,
@@ -62,7 +53,6 @@ public class RenderAssets {
             variableGroupShaders,
             starPointShaders,
             orbitElemShaders;
-
     public IntModelBatch
             mbVertexLighting,
             mbVertexLightingAdditive,
@@ -82,22 +72,26 @@ public class RenderAssets {
             mbSkybox,
             mbAtmosphere,
             mbCloud;
-
     public BitmapFont
             font2d,
             font3d,
             fontTitles;
-
     public ExtSpriteBatch spriteBatch, fontBatch;
-
-    /**
-     * Shader name parts.
-     */
-    public static final String SUFFIX_SSR = "SSR";
-    public static final String SUFFIX_VELBUFF = "Velbuff";
-    public static final String SUFFIX_REL = "Rel";
-    public static final String SUFFIX_GRAV = "Grav";
-    public static final String SUFFIX_COLMAP = "Colmap";
+    private AssetDescriptor<ExtShaderProgram>[]
+            starGroupDesc,
+            particleGroupDesc,
+            variableGroupDesc,
+            particleEffectDesc,
+            orbitElemDesc,
+            pointDesc,
+            lineDesc,
+            lineQuadDesc,
+            lineGpuDesc,
+            billboardGroupDesc,
+            starPointDesc,
+            galDesc,
+            spriteDesc,
+            starBillboardDesc;
 
     public RenderAssets(final GlobalResources globalResources) {
         this.globalResources = globalResources;

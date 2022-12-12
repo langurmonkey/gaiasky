@@ -44,12 +44,12 @@ public class Archetype {
     }
 
     public Entity createEntity() {
-        
+
         Entity entity = engine.createEntity();
         addComponentsRecursive(entity);
 
         // Set archetype reference.
-        if(Mapper.base.has(entity)) {
+        if (Mapper.base.has(entity)) {
             Mapper.base.get(entity).archetype = this;
         }
 
@@ -101,6 +101,7 @@ public class Archetype {
      * Checks whether the given entity matches this archetype.
      *
      * @param entity The entity.
+     *
      * @return True if the entity is of this archetype (has the same components), false otherwise.
      */
     public boolean matches(Entity entity) {

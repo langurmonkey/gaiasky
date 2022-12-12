@@ -5,16 +5,16 @@
 
 package gaiasky.util.validator;
 
-public abstract class CallbackValidator implements IValidator{
+public abstract class CallbackValidator implements IValidator {
 
     private Runnable isValidCallback, isInvalidCallback;
     private IValidator parent;
 
-    public CallbackValidator(){
+    public CallbackValidator() {
         super();
     }
 
-    public CallbackValidator(IValidator parent){
+    public CallbackValidator(IValidator parent) {
         super();
         this.parent = parent;
     }
@@ -43,14 +43,14 @@ public abstract class CallbackValidator implements IValidator{
             isInvalidCallback.run();
     }
 
-    public IValidator getParent(){
+    public IValidator getParent() {
         return parent;
     }
 
     @Override
-    public boolean validate(String value){
+    public boolean validate(String value) {
         boolean valid = validateLocal(value);
-        if(valid)
+        if (valid)
             runIsValidCallback();
         else
             runIsInvalidCallback();

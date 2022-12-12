@@ -26,6 +26,7 @@ import java.util.stream.IntStream;
  * Contains the parameters and functions for procedural elevation
  */
 public class NoiseComponent extends NamedComponent {
+    final int N_GEN = Settings.settings.performance.getNumberOfThreads();
     public double[] scale = new double[] { 1.0, 1.0, 1.0 };
     public double power = 1.0;
     public int octaves = 4;
@@ -35,7 +36,6 @@ public class NoiseComponent extends NamedComponent {
     public BasisType type = BasisType.SIMPLEX;
     public FractalType fractalType = FractalType.RIDGEMULTI;
     public long seed = 0L;
-
     // Parallel processing, since noise modules are not thread-safe
     private Module[] baseNoise, secondaryNoise;
 
@@ -79,8 +79,6 @@ public class NoiseComponent extends NamedComponent {
 
         return scaleDomain;
     }
-
-    final int N_GEN = Settings.settings.performance.getNumberOfThreads();
 
     private void initNoise(long seed, boolean secondary) {
         baseNoise = new Module[N_GEN];

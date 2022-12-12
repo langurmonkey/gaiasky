@@ -37,16 +37,14 @@ public class TimeComponent extends GuiComponent implements IObserver {
     private final DateTimeFormatter dfDate;
     private final DateTimeFormatter dfEra;
     private final DateTimeFormatter dfTime;
-
+    // Warp steps per side + 0, 0.125, 0.250, 0.5
+    private final int warpSteps = Constants.WARP_STEPS + 4;
     protected OwnLabel date;
     protected OwnLabel time;
     protected ImageButton plus, minus;
     protected OwnTextIconButton dateEdit;
     protected DateDialog dateDialog;
     protected OwnSliderPlus warp;
-
-    // Warp steps per side + 0, 0.125, 0.250, 0.5
-    private final int warpSteps = Constants.WARP_STEPS + 4;
     protected double[] timeWarpVector;
     // Guard to know when to fire warp events
     protected boolean warpGuard = false;

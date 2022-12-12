@@ -29,9 +29,8 @@ import java.util.*;
  */
 public class IndividualVisibilityWindow extends GenericDialog implements IObserver {
 
-    protected float space8, space4, space2;
-
     protected final Scene scene;
+    protected float space8, space4, space2;
     protected Cell<?> elementsCell;
     // Component type currently selected
     protected String currentComponentType = null;

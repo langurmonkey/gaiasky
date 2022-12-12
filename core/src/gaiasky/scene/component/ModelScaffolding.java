@@ -64,6 +64,7 @@ public class ModelScaffolding implements Component {
     public void setShadowValues(double[] shadowMapValues) {
         this.shadowMapValues = shadowMapValues;
     }
+
     public void setShadowvalues(double[] shadowMapValues) {
         this.setShadowValues(shadowMapValues);
     }
@@ -71,8 +72,9 @@ public class ModelScaffolding implements Component {
     public void setSizeScaleFactor(Double sizescalefactor) {
         this.sizeScaleFactor = sizescalefactor.floatValue();
     }
+
     public void setSizescalefactor(Double sizescalefactor) {
-        this.setSizeScaleFactor(sizescalefactor); 
+        this.setSizeScaleFactor(sizescalefactor);
     }
 
     public void setRandomize(String[] randomize) {
@@ -89,14 +91,17 @@ public class ModelScaffolding implements Component {
             this.seed.add((long) s);
         }
     }
+
     public void setRandomize(String randomize) {
         this.randomize = Arrays.asList(randomize);
     }
+
     public void setRefPlane(String refplane) {
         this.refPlane = refplane;
         this.refPlaneTransform = refplane + "toequatorial";
         this.inverseRefPlaneTransform = "equatorialto" + refplane;
     }
+
     public void setRefplane(String refplane) {
         this.setRefPlane(refplane);
     }
@@ -104,16 +109,19 @@ public class ModelScaffolding implements Component {
     public void setLocVaMultiplier(Double locvamultiplier) {
         this.locVaMultiplier = locvamultiplier.floatValue();
     }
+
     public void setLocvamultiplier(Double locvamultiplier) {
-        this.setLocVaMultiplier(locvamultiplier); 
+        this.setLocVaMultiplier(locvamultiplier);
     }
 
     public void setLocThOverFactor(Double locthoverfactor) {
         this.setLocThresholdLabel(locthoverfactor);
     }
+
     public void setLocthoverfactor(Double locthoverfactor) {
         this.setLocThresholdLabel(locthoverfactor);
     }
+
     public void setLocThresholdLabel(Double val) {
         this.locThresholdLabel = val.floatValue();
     }

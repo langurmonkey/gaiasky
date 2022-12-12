@@ -15,7 +15,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -30,12 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GraphUpdater extends AbstractUpdateSystem {
     private static final Logger.Log logger = Logger.getLogger(GraphUpdater.class);
-
-    private ICamera camera;
     private final ITimeFrameProvider time;
+    int processed = 0, lastProcessed;
+    private ICamera camera;
     private Vector3d D31;
     private Vector3b B31;
-
     private SpacecraftView view;
 
     /**
@@ -54,8 +53,6 @@ public class GraphUpdater extends AbstractUpdateSystem {
     public void setCamera(ICamera camera) {
         this.camera = camera;
     }
-
-    int processed = 0, lastProcessed;
 
     protected void processEntity(Entity entity, float deltaTime) {
         processed = 0;
@@ -208,10 +205,10 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
     private void updateFadeOpacity(Base base, Fade fade) {
         if (fade.fadeIn != null) {
-            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, fade.fadeInMap.x, fade.fadeInMap.y);
+            base.opacity *= MathUtilsDouble.lint(fade.currentDistance, fade.fadeIn.x, fade.fadeIn.y, fade.fadeInMap.x, fade.fadeInMap.y);
         }
         if (fade.fadeOut != null) {
-            base.opacity *= MathUtilsd.lint(fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, fade.fadeOutMap.x, fade.fadeOutMap.y);
+            base.opacity *= MathUtilsDouble.lint(fade.currentDistance, fade.fadeOut.x, fade.fadeOut.y, fade.fadeOutMap.x, fade.fadeOutMap.y);
         }
     }
 
@@ -223,7 +220,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             return base.visible ? 1 : 0;
 
         // Fading
-        float fadeOpacity = MathUtilsd.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
+        float fadeOpacity = MathUtilsDouble.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
         if (!base.visible) {
             fadeOpacity = 1 - fadeOpacity;
         }
@@ -268,13 +265,13 @@ public class GraphUpdater extends AbstractUpdateSystem {
             if (engine.leveling) {
                 // No velocity, we just stop Euler angle motions
                 if (engine.yawv != 0) {
-                    engine.yawp = -Math.signum(engine.yawv) * MathUtilsd.clamp(Math.abs(engine.yawv), 0, 1);
+                    engine.yawp = -Math.signum(engine.yawv) * MathUtilsDouble.clamp(Math.abs(engine.yawv), 0, 1);
                 }
                 if (engine.pitchv != 0) {
-                    engine.pitchp = -Math.signum(engine.pitchv) * MathUtilsd.clamp(Math.abs(engine.pitchv), 0, 1);
+                    engine.pitchp = -Math.signum(engine.pitchv) * MathUtilsDouble.clamp(Math.abs(engine.pitchv), 0, 1);
                 }
                 if (engine.rollv != 0) {
-                    engine.rollp = -Math.signum(engine.rollv) * MathUtilsd.clamp(Math.abs(engine.rollv), 0, 1);
+                    engine.rollp = -Math.signum(engine.rollv) * MathUtilsDouble.clamp(Math.abs(engine.rollv), 0, 1);
                 }
                 if (Math.abs(engine.yawv) < 1e-3 && Math.abs(engine.pitchv) < 1e-3 && Math.abs(engine.rollv) < 1e-3) {
                     engine.setYawPower(0);

@@ -28,15 +28,12 @@ import java.util.List;
  */
 public class FocusHit {
 
-    private FilterView filter;
-
     private final Vector3 F31 = new Vector3();
-
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D33 = new Vector3d();
-
     private final Vector3b B31 = new Vector3b();
+    private FilterView filter;
 
     public FocusHit() {
         filter = new FilterView();
@@ -200,6 +197,7 @@ public class FocusHit {
         }
         return solidAngle;
     }
+
     public void addHitCoordinateStar(FocusView view, int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits) {
         addHitCoordinateCelestial(view, screenX, screenY, w, h, pixelDist, Settings.settings.scene.star.brightness * 1e3f, this::computeHitSolidAngleStar, camera, hits);
     }

@@ -59,7 +59,7 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
         }
 
         if (!trajectory.onlyBody) {
-            if(Mapper.tagHeliotropic.has(entity)) {
+            if (Mapper.tagHeliotropic.has(entity)) {
                 // Heliotropic orbit.
                 updateLocalTransformHeliotropic(GaiaSky.instance.time.getTime(), graph, trajectory);
             } else {
@@ -95,8 +95,8 @@ public class TrajectoryUpdater extends AbstractUpdateSystem {
                 localTransformD.mul(parentGraph.orientation);
 
             }
-            if(trajectory.model.isExtrasolar()) {
-               localTransformD.rotate(0, 1, 0, 90);
+            if (trajectory.model.isExtrasolar()) {
+                localTransformD.rotate(0, 1, 0, 90);
             }
         } else if (trajectory.oc != null) {
             OrbitComponent oc = trajectory.oc;

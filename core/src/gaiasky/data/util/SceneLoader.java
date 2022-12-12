@@ -41,7 +41,7 @@ public class SceneLoader extends AsynchronousAssetLoader<Scene, SceneLoaderParam
         Array<String> filePaths = new Array<>(parameter.files);
         Path dataFolder = Paths.get(Settings.settings.data.location);
         File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> name != null && name.startsWith("autoload-") && name.endsWith(".json"));
-        Objects.requireNonNull(autoloadFiles, "Your data folder does not point to a valid directory: " + dataFolder) ;
+        Objects.requireNonNull(autoloadFiles, "Your data folder does not point to a valid directory: " + dataFolder);
         for (File autoloadFile : autoloadFiles) {
             filePaths.add(autoloadFile.getAbsolutePath().replace("\\\\", "/"));
         }

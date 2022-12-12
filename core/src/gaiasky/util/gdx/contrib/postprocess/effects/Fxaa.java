@@ -45,7 +45,8 @@ public final class Fxaa extends Antialiasing {
 
     /**
      * Updates the FXAA quality setting.
-     * @param quality      The quality in [0,1,2], from worst to best
+     *
+     * @param quality The quality in [0,1,2], from worst to best
      */
     public void updateQuality(int quality) {
         fxaaFilter.updateQuality(quality);

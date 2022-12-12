@@ -43,41 +43,6 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
      */
     private Texture additionalTexture;
 
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture("u_texture0", 0),
-        TextureDepth("u_texture1", 0),
-        TextureAdditional("u_texture2", 0),
-        Time("u_time", 1),
-        Viewport("u_viewport", 2),
-        ZfarK("u_zfark", 2),
-        Pos("u_pos", 3),
-        InvView("u_invView", 16),
-        Combined("u_modelView", 16),
-        FrustumCorners("u_frustumCorners", 16),
-        Additional("u_additional", 4);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
-
-
     /**
      * Creates a filter with the given viewport size
      *
@@ -204,5 +169,39 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
             depthTexture.bind(u_texture1);
         if (additionalTexture != null)
             additionalTexture.bind(u_texture2);
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture("u_texture0", 0),
+        TextureDepth("u_texture1", 0),
+        TextureAdditional("u_texture2", 0),
+        Time("u_time", 1),
+        Viewport("u_viewport", 2),
+        ZfarK("u_zfark", 2),
+        Pos("u_pos", 3),
+        InvView("u_invView", 16),
+        Combined("u_modelView", 16),
+        FrustumCorners("u_frustumCorners", 16),
+        Additional("u_additional", 4);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

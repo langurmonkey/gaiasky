@@ -16,7 +16,7 @@ import gaiasky.util.math.Matrix4d;
 /**
  * Updates background models and UV grids.
  */
-public class BackgroundUpdater extends AbstractUpdateSystem  {
+public class BackgroundUpdater extends AbstractUpdateSystem {
 
     public BackgroundUpdater(Family family, int priority) {
         super(family, priority);
@@ -39,7 +39,8 @@ public class BackgroundUpdater extends AbstractUpdateSystem  {
         var transform = Mapper.transform.get(entity);
         var model = Mapper.model.get(entity);
 
-        String transformName = transform.transformName;;
+        String transformName = transform.transformName;
+        ;
         Matrix4 localTransform = graph.localTransform;
 
         localTransform.idt();

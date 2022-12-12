@@ -53,7 +53,7 @@ public class OwnScrollPane extends ScrollPane {
         setFocusModeListener();
     }
 
-    private void setFocusModeListener(){
+    private void setFocusModeListener() {
         // FOCUS_MODE listener
         addListener((e) -> {
             if (e instanceof InputEvent) {
@@ -69,7 +69,7 @@ public class OwnScrollPane extends ScrollPane {
         });
     }
 
-    public void setExpand(boolean expand){
+    public void setExpand(boolean expand) {
         this.expand = expand;
     }
 

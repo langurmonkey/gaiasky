@@ -15,14 +15,13 @@ public class ModePopupInfo {
     public Array<Pair<String[], String>> mappings;
     public String warn;
 
-
-    public void initMappings(){
-        if(mappings == null){
+    public void initMappings() {
+        if (mappings == null) {
             mappings = new Array();
         }
     }
 
-    public void addMapping(String action, String... keys){
+    public void addMapping(String action, String... keys) {
         initMappings();
         mappings.add(new Pair<>(keys, action));
     }

@@ -20,11 +20,9 @@ import gaiasky.util.math.Vector3d;
 
 public class SpacecraftView extends BaseView implements ISpacecraft {
     private static final Log logger = Logger.getLogger(SpacecraftView.class);
-
+    private final Vector3d D31 = new Vector3d();
     public MotorEngine engine;
     public Coordinates coord;
-
-    private final Vector3d D31 = new Vector3d();
 
     @Override
     protected void entityCheck(Entity entity) {
@@ -164,21 +162,7 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
     public double getYawPower() {
         return engine.yawp;
     }
-    public double getPitchPower() {
-        return engine.pitchp;
-    }
-    public double getRollPower() {
-        return engine.rollp;
-    }
 
-    /**
-     * Sets the current engine power
-     *
-     * @param currentEnginePower The power in [-1..1]
-     */
-    public void setCurrentEnginePower(double currentEnginePower) {
-        engine.setCurrentEnginePower(currentEnginePower);
-    }
     /**
      * Sets the current yaw power
      *
@@ -186,6 +170,10 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
      */
     public void setYawPower(double yawp) {
         engine.setYawPower(yawp);
+    }
+
+    public double getPitchPower() {
+        return engine.pitchp;
     }
 
     /**
@@ -197,6 +185,10 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
         engine.setPitchPower(pitchp);
     }
 
+    public double getRollPower() {
+        return engine.rollp;
+    }
+
     /**
      * Sets the current roll power
      *
@@ -204,6 +196,15 @@ public class SpacecraftView extends BaseView implements ISpacecraft {
      */
     public void setRollPower(double rollp) {
         engine.setRollPower(rollp);
+    }
+
+    /**
+     * Sets the current engine power
+     *
+     * @param currentEnginePower The power in [-1..1]
+     */
+    public void setCurrentEnginePower(double currentEnginePower) {
+        engine.setCurrentEnginePower(currentEnginePower);
     }
 
     public void stopAllMovement() {

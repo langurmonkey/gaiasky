@@ -8,57 +8,82 @@ import gaiasky.util.ucd.UCD;
 public interface IParticleRecord {
 
     double[] rawDoubleData();
+
     float[] rawFloatData();
 
     double x();
+
     double y();
+
     double z();
+
     void setPos(double x, double y, double z);
+
     Vector3d pos(Vector3d aux);
 
     double pmx();
+
     double pmy();
+
     double pmz();
+
     void setVelocityVector(double vx, double vy, double vz);
 
     String[] names();
+
     String namesConcat();
+
     boolean hasName(String candidate);
+
     boolean hasName(String candidate, boolean matchCase);
+
     void setNames(String... names);
+
     void setName(String name);
+
     void addName(String name);
+
     void addNames(String... names);
 
     float appmag();
+
     float absmag();
+
     void setMag(float appmag, float absmag);
 
     boolean hasCol();
+
     float col();
+
     void setCol(float col);
+
     double[] rgb();
 
     float size();
+
     void setSize(float size);
 
     double radius();
 
     void setId(long id);
+
     long id();
 
     void setHip(int hip);
+
     int hip();
 
     float mualpha();
+
     float mudelta();
+
     float radvel();
+
     void setProperMotion(float mualpha, float mudelta, float radvel);
 
-
     OctreeNode octant();
-    void setOctant(OctreeNode octant);
 
+    void setOctant(OctreeNode octant);
 
     /**
      * Distance in internal units. Beware, does the computation on the fly.
@@ -117,9 +142,14 @@ public interface IParticleRecord {
     double b();
 
     boolean hasExtra();
+
     boolean hasExtra(String name);
+
     boolean hasExtra(UCD ucd);
+
     double getExtra(String name);
+
     double getExtra(UCD ucd);
+
     Keys<UCD> extraKeys();
 }

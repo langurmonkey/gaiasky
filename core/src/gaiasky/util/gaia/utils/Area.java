@@ -10,8 +10,8 @@ public interface Area {
     /**
      * Determine the minimum angle between a great circle and the Area boundary
      *
-     * @param spinAxisPlace
-     *            great circle pole given as a Place
+     * @param spinAxisPlace great circle pole given as a Place
+     *
      * @return minimum angle [rad]
      */
     double altitude(Place spinAxisPlace);
@@ -19,8 +19,8 @@ public interface Area {
     /**
      * Determine whether a given Place is within the Area
      *
-     * @param p
-     *            the Place
+     * @param p the Place
+     *
      * @return true if p is within the Area
      */
     boolean contains(Place p);

@@ -19,7 +19,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 public class LocalGroup2MinimapScale extends AbstractMinimapScale {
@@ -71,7 +71,7 @@ public class LocalGroup2MinimapScale extends AbstractMinimapScale {
     }
 
     private Vector3d get(double raDeg, double decDeg, double distMpc) {
-        return Coordinates.sphericalToCartesian(MathUtilsd.degRad * raDeg, MathUtilsd.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
+        return Coordinates.sphericalToCartesian(MathUtilsDouble.degRad * raDeg, MathUtilsDouble.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
     }
 
     @Override

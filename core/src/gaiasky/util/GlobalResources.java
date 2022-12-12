@@ -28,7 +28,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
@@ -53,30 +53,24 @@ import java.util.stream.Stream;
  */
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
-
+    private static final Vector3d aux = new Vector3d();
+    private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
+    // Global all-purpose sprite batch
+    private final SpriteBatch spriteBatch;
+    private final ExtShaderProgram extSpriteShader;
+    // Sprite batch using int indices
+    private final ExtSpriteBatch extSpriteBatch;
     private AssetManager manager;
     private ShaderProgram shapeShader;
     private ShaderProgram spriteShader;
-
-    // Global all-purpose sprite batch
-    private final SpriteBatch spriteBatch;
     private SpriteBatch spriteBatchVR;
-
-    private final ExtShaderProgram extSpriteShader;
-
-    // Sprite batch using int indices
-    private final ExtSpriteBatch extSpriteBatch;
-
     // Cursors
     private Cursor linkCursor;
     private Cursor resizeXCursor;
     private Cursor resizeYCursor;
     private Cursor emptyCursor;
-
     // The global skin
     private Skin skin;
-
-    private static final Vector3d aux = new Vector3d();
 
     public GlobalResources(AssetManager manager) {
         this.manager = manager;
@@ -103,43 +97,6 @@ public class GlobalResources {
 
         reloadDataFiles();
         updateSkin();
-    }
-
-    public void reloadDataFiles() {
-        // Star group textures
-        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/star.jpg"), Texture.class);
-        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/lut.jpg"), Texture.class);
-    }
-
-    public void updateSkin() {
-        initCursors();
-        FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
-        if (!fh.exists()) {
-            // Default to dark-green
-            logger.info("User interface theme '" + Settings.settings.program.ui.theme + "' not found, using 'dark-green' instead");
-            Settings.settings.program.ui.theme = "dark-green";
-            fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
-        }
-        setSkin(new Skin(fh));
-        ObjectMap<String, BitmapFont> fonts = getSkin().getAll(BitmapFont.class);
-        for (String key : fonts.keys()) {
-            fonts.get(key).getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        }
-    }
-
-    private void initCursors() {
-        // Create skin right now, it is needed.
-        if (Settings.settings.program.ui.scale > 0.8) {
-            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0));
-            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16));
-            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16));
-        } else {
-            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link.png")), 4, 0));
-            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8));
-            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8));
-        }
-        setEmptyCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-empty.png")), 0, 5));
-
     }
 
     public static void doneLoading(AssetManager manager) {
@@ -457,7 +414,7 @@ public class GlobalResources {
 
     /** Gets the angle in degrees between the two vectors **/
     public static float angle2d(Vector3 v1, Vector3 v2) {
-        return (float) (MathUtilsd.radiansToDegrees * FastMath.atan2(v2.y - v1.y, v2.x - v1.x));
+        return (float) (MathUtilsDouble.radiansToDegrees * FastMath.atan2(v2.y - v1.y, v2.x - v1.x));
     }
 
     public static synchronized Vector3d applyRelativisticAberration(Vector3d pos, ICamera cam) {
@@ -696,8 +653,6 @@ public class GlobalResources {
         throw new RuntimeException("Cubemap side '" + TextUtils.arrayToStr(sideSuffixes) + "' not found in folder: " + baseLocation);
     }
 
-    private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
-
     public static synchronized String getGLExtensions() {
         String extensions = Gdx.gl.glGetString(GL30.GL_EXTENSIONS);
         if (extensions == null || extensions.isEmpty()) {
@@ -734,7 +689,7 @@ public class GlobalResources {
             // Enable defines.
             for (int bit = 0; bit < n; bit++) {
                 int idx = (n - 1) - bit;
-                if(bin.charAt(idx) == '1') {
+                if (bin.charAt(idx) == '1') {
                     // Enable define at bit position.
                     defines.append(values[bit]);
                 }
@@ -824,6 +779,43 @@ public class GlobalResources {
         } else {
             return String.format("%1$.0f %2$s", years, I18n.msg("gui.unit.year"));
         }
+
+    }
+
+    public void reloadDataFiles() {
+        // Star group textures
+        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/star.jpg"), Texture.class);
+        manager.load(Settings.settings.data.dataFile(Constants.DATA_LOCATION_TOKEN + "tex/base/lut.jpg"), Texture.class);
+    }
+
+    public void updateSkin() {
+        initCursors();
+        FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
+        if (!fh.exists()) {
+            // Default to dark-green
+            logger.info("User interface theme '" + Settings.settings.program.ui.theme + "' not found, using 'dark-green' instead");
+            Settings.settings.program.ui.theme = "dark-green";
+            fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
+        }
+        setSkin(new Skin(fh));
+        ObjectMap<String, BitmapFont> fonts = getSkin().getAll(BitmapFont.class);
+        for (String key : fonts.keys()) {
+            fonts.get(key).getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        }
+    }
+
+    private void initCursors() {
+        // Create skin right now, it is needed.
+        if (Settings.settings.program.ui.scale > 0.8) {
+            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0));
+            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16));
+            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16));
+        } else {
+            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link.png")), 4, 0));
+            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8));
+            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8));
+        }
+        setEmptyCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-empty.png")), 0, 5));
 
     }
 

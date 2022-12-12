@@ -46,6 +46,17 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
         this.fragmentFileSuffix = fragmentFileSuffix;
     }
 
+    static public String getShaderCode(String prefix, String code) {
+        code = code.trim();
+        if (code.startsWith("#version") && !prefix.isEmpty()) {
+            int firstLineEnd = code.indexOf('\n') + 1;
+            String versionStr = code.substring(0, firstLineEnd);
+            return versionStr + prefix + code.substring(firstLineEnd);
+        } else {
+            return prefix + code;
+        }
+    }
+
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, ShaderProgramParameter parameter) {
         return null;
@@ -95,17 +106,6 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
         }
 
         return shaderProgram;
-    }
-
-    static public String getShaderCode(String prefix, String code) {
-        code = code.trim();
-        if (code.startsWith("#version") && !prefix.isEmpty()) {
-            int firstLineEnd = code.indexOf('\n') + 1;
-            String versionStr = code.substring(0, firstLineEnd);
-            return versionStr + prefix + code.substring(firstLineEnd);
-        } else {
-            return prefix + code;
-        }
     }
 
     static public class ShaderProgramParameter extends AssetLoaderParameters<ExtShaderProgram> {

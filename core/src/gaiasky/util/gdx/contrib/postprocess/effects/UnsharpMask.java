@@ -37,9 +37,10 @@ public final class UnsharpMask extends PostProcessorEffect {
 
     /**
      * The sharpen factor. 0 to disable, 1 is default.
+     *
      * @param sf The sharpen factor
      */
-    public void setSharpenFactor(float sf){
+    public void setSharpenFactor(float sf) {
         filter.setSharpenFactor(sf);
     }
 

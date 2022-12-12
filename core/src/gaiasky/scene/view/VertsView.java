@@ -22,14 +22,13 @@ import gaiasky.util.math.Vector3d;
  */
 public class VertsView extends BaseView implements IGPUVertsRenderable {
 
+    private final TrajectoryUtils utils;
     /** The verts component . **/
     private Verts verts;
     /** The graph component. **/
     private GraphNode graph;
     /** The trajectory component (if any). **/
     private Trajectory trajectory;
-
-    private final TrajectoryUtils utils;
 
     public VertsView() {
         super();
@@ -126,13 +125,13 @@ public class VertsView extends BaseView implements IGPUVertsRenderable {
     }
 
     @Override
-    public void setPrimitiveSize(float size) {
-        verts.primitiveSize = size;
+    public float getPrimitiveSize() {
+        return verts.primitiveSize;
     }
 
     @Override
-    public float getPrimitiveSize() {
-        return verts.primitiveSize;
+    public void setPrimitiveSize(float size) {
+        verts.primitiveSize = size;
     }
 
     @Override

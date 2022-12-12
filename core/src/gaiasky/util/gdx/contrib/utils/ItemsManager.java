@@ -23,8 +23,8 @@ import java.util.Iterator;
 
 public class ItemsManager<T extends Disposable> implements Iterable<T>, Disposable {
     private static final int ItemNotFound = -1;
-    private final Array<T> items = new Array<T>();
     protected final Array<Boolean> owned = new Array<Boolean>();
+    private final Array<T> items = new Array<T>();
 
     @Override
     public void dispose() {

@@ -33,7 +33,7 @@ import gaiasky.util.Settings.*;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.screenshot.ImageRenderer;
@@ -61,7 +61,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final Array<OwnLabel> labels;
 
     private final DecimalFormat nf3;
-
+    private final GlobalResources globalResources;
+    private final Settings settings;
+    // This flag is active when the dialog is called from the welcome screen
+    private final boolean welcomeScreen;
     private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameOutputMode, nShadows, distUnitsSelect;
@@ -79,18 +82,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnLabel tessQualityLabel;
     private Cell<?> noticeHiResCell;
     private Table controllersTable;
-
     // Backup values
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
     private boolean lensflareBak, lightGlowBak, debugInfoBak;
     private ReprojectionMode reprojectionBak;
-
-    private final GlobalResources globalResources;
-    private final Settings settings;
-
-    // This flag is active when the dialog is called from the welcome screen
-    private final boolean welcomeScreen;
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
         this(stage, skin, globalResources, false);
@@ -267,7 +263,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // LIMIT FPS
         IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
         double limitFps = settings.graphics.fpsLimit == 0 ? 60 : settings.graphics.fpsLimit;
-        this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsd.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitFpsValidator);
+        this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsDouble.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitFpsValidator);
         this.maxFpsInput.setDisabled(settings.graphics.fpsLimit == 0);
 
         OwnLabel maxFpsLabel = new OwnLabel(I18n.msg("gui.limitfps"), skin);
@@ -586,10 +582,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Slider brightness = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         brightness.setName("brightness");
         brightness.setWidth(sliderWidth);
-        brightness.setValue(MathUtilsd.lint(settings.postprocess.levels.brightness, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        brightness.setValue(MathUtilsDouble.lint(settings.postprocess.levels.brightness, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
         brightness.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.BRIGHTNESS_CMD, brightness, MathUtilsd.lint(brightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS), true);
+                EventManager.publish(Event.BRIGHTNESS_CMD, brightness, MathUtilsDouble.lint(brightness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS), true);
                 return true;
             }
             return false;
@@ -603,10 +599,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Slider contrast = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         contrast.setName("contrast");
         contrast.setWidth(sliderWidth);
-        contrast.setValue(MathUtilsd.lint(settings.postprocess.levels.contrast, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        contrast.setValue(MathUtilsDouble.lint(settings.postprocess.levels.contrast, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
         contrast.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.CONTRAST_CMD, contrast, MathUtilsd.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST), true);
+                EventManager.publish(Event.CONTRAST_CMD, contrast, MathUtilsDouble.lint(contrast.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CONTRAST, Constants.MAX_CONTRAST), true);
                 return true;
             }
             return false;
@@ -620,10 +616,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Slider hue = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         hue.setName("hue");
         hue.setWidth(sliderWidth);
-        hue.setValue(MathUtilsd.lint(settings.postprocess.levels.hue, Constants.MIN_HUE, Constants.MAX_HUE, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        hue.setValue(MathUtilsDouble.lint(settings.postprocess.levels.hue, Constants.MIN_HUE, Constants.MAX_HUE, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
         hue.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.HUE_CMD, hue, MathUtilsd.lint(hue.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_HUE, Constants.MAX_HUE), true);
+                EventManager.publish(Event.HUE_CMD, hue, MathUtilsDouble.lint(hue.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_HUE, Constants.MAX_HUE), true);
                 return true;
             }
             return false;
@@ -637,10 +633,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Slider saturation = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         saturation.setName("saturation");
         saturation.setWidth(sliderWidth);
-        saturation.setValue(MathUtilsd.lint(settings.postprocess.levels.saturation, Constants.MIN_SATURATION, Constants.MAX_SATURATION, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
+        saturation.setValue(MathUtilsDouble.lint(settings.postprocess.levels.saturation, Constants.MIN_SATURATION, Constants.MAX_SATURATION, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
         saturation.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SATURATION_CMD, saturation, MathUtilsd.lint(saturation.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SATURATION, Constants.MAX_SATURATION), true);
+                EventManager.publish(Event.SATURATION_CMD, saturation, MathUtilsDouble.lint(saturation.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SATURATION, Constants.MAX_SATURATION), true);
                 return true;
             }
             return false;
@@ -1152,7 +1148,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lodTransitions = new OwnSliderPlus("", Constants.MIN_SLIDER, Constants.MAX_SLIDER, 0.1f, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG, skin);
         lodTransitions.setDisplayValueMapped(true);
         lodTransitions.setWidth(sliderWidth);
-        lodTransitions.setMappedValue(settings.scene.octree.threshold[0] * MathUtilsd.radDeg);
+        lodTransitions.setMappedValue(settings.scene.octree.threshold[0] * MathUtilsDouble.radDeg);
 
         OwnImageButton lodTooltip = new OwnImageButton(skin, "tooltip");
         lodTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.lod.thresholds.info"), skin));
@@ -2233,7 +2229,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.performance.multithreading = multithreadCb.isChecked();
 
         settings.scene.octree.fade = lodFadeCb.isChecked();
-        settings.scene.octree.threshold[0] = MathUtilsd.lint(lodTransitions.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG) * (float) MathUtilsd.degRad;
+        settings.scene.octree.threshold[0] = MathUtilsDouble.lint(lodTransitions.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_LOD_TRANS_ANGLE_DEG, Constants.MAX_LOD_TRANS_ANGLE_DEG) * (float) MathUtilsDouble.degRad;
         // Here we use a 0.4 rad between the thresholds
         settings.scene.octree.threshold[1] = settings.scene.octree.fade ? settings.scene.octree.threshold[0] + 0.4f : settings.scene.octree.threshold[0];
 

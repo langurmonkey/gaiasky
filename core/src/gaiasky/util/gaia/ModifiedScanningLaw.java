@@ -48,69 +48,67 @@ public class ModifiedScanningLaw {
     // is not consistent with the ScanningLaw transformation from
     // ecliptic to equatorial coordinates.
     protected static Vector3d eclPole = new Vector3d(0.0, 0.0, 1.0).rotate(obliquity * Nature.TO_DEG, 0, 0, 1);
-
+    /**
+     * The sun object is used to calculate the longitude and longitude rate of
+     * the nominal sun. Mathematically, it should give exactly the same
+     * longitude as used by NSL.
+     */
+    private final NslSun sun = new NslSun();
+    /**
+     * The Nsl37 object is used for default initialization of the MSL.
+     */
+    private final Nsl37 nsl = new Nsl37();
     /**
      * Reference epoch to which the reference scan parameters refer
      */
     protected long refEpoch;
-
     /**
      * Precession rate (K) in [rev/yr].
      */
     protected double precRate;
-
     /**
      * Inertial scanning speed (omega_z) given either as a period in [ns] or as
      * a rate in [deg/hour] = [arcsec/s].
      */
     protected long scanPerNs;
     protected double scanRate;
-
     /**
      * The uniform speed of the z-axis in solar motion units (S) for the nominal
      * scaning law [dimensionless]
      */
     protected double sNom;
-
     /**
      * Reference solar longitude (at the reference epoch) [rad]
      */
     protected double lSunRef;
-
     /**
      * Reference heliotropic spin phase (at the reference epoch) [rad]
      */
     protected double omegaRef;
-
     /**
      * Reference heliotropic revolving phase (at the reference epoch) [rad]
      */
     protected double nuRef;
-
     /**
      * Current time in [ns] from 2010.0
      */
     protected long tNow;
-
     /**
      * Current value of the solar longitude [rad] and rate of solar longitude
      * [rad/day]
      */
     protected double lSun;
     protected double lSunDot;
-
     /**
      * Current value of the solar aspect angle (revolving angle) [rad] and the
      * quaternion representing a rotation by 90-xi about Y axis
      */
     protected double xi;
     protected double sinXi, cosXi;
-
     /**
      * Current value of the heliotropic revolving phase [rad]
      */
     protected double nu;
-
     /**
      * Current value of the heliotropic spin phase Omega [rad]. For good
      * numerical precision, this is kept as an angle in the range [0, 2*pi]. The
@@ -120,44 +118,26 @@ public class ModifiedScanningLaw {
      */
     protected double omega;
     protected int omegaRevs;
-
     /**
      * Have computed quantities been properly initialized?
      */
     protected boolean initialized;
-
     /**
      * The starting time for the integration as GaiaTime and [ns] from J2010.0
      */
     protected long tBeg;
     protected long tBegNs;
-
     /**
      * Value of the revolving phase at tBeg
      */
     protected double nuBeg;
-
     /**
      * Value of the spin phase at tBeg
      */
     protected double deltaOmegaBeg;
     protected int omegaRevsBeg;
-
     /** Additional fields used by numerical scanning laws */
     protected double deltaOmega, deltaOmegaDot, omegaDot, nuDot;
-
-    /**
-     * The sun object is used to calculate the longitude and longitude rate of
-     * the nominal sun. Mathematically, it should give exactly the same
-     * longitude as used by NSL.
-     */
-    private final NslSun sun = new NslSun();
-
-    /**
-     * The Nsl37 object is used for default initialization of the MSL.
-     */
-    private final Nsl37 nsl = new Nsl37();
-
     /**
      * Variables for the Runge-Kutta integrator
      */
@@ -182,20 +162,6 @@ public class ModifiedScanningLaw {
     protected Vector3d[] refDir;
     protected long unit, dt;
     protected ComplexArea[] highDensityAreas;
-
-    /**
-     * There are three modes of scanning, enumerated by the ScanState: NOMINAL =
-     * running as in NSL, MODIFIED = running at reduced precession speed,
-     * TRANSITION = the precession speed is ramping up or down between the
-     * NOMINAL and MODIFIED states. The attitude may have discontinuous second
-     * derivatives when changing from one ScanState to another.
-     */
-    public enum ScanState {
-        NOMINAL,
-        TRANSITION,
-        MODIFIED
-    }
-
     protected ScanState status;
 
     /**
@@ -327,42 +293,6 @@ public class ModifiedScanningLaw {
     }
 
     /**
-     * Set the reference epoch to which the reference heliotropic angles refer
-     *
-     * @param refEpoch
-     *
-     * @throws RuntimeException
-     */
-    public void setRefEpoch(long refEpoch) throws RuntimeException {
-        if (refEpoch > tBeg) {
-            throw new RuntimeException("Reference epoch for MSL cannot be later than the starting time");
-        }
-        this.refEpoch = refEpoch;
-        initialized = false;
-    }
-
-    /**
-     * Set the precession rate for the underlying NSL
-     *
-     * @param precRate (target) precession rate in [rev/yr]
-     */
-    public void setPrecRate(double precRate) {
-        this.precRate = precRate;
-        initialized = false;
-    }
-
-    /**
-     * Set the scan rates for the underlying NSL
-     *
-     * @param scanRate (target) scan rate in [arcsec/s]
-     */
-    public void setScanRate(double scanRate) {
-        this.scanRate = scanRate;
-        scanPerNs = new Secs((360.0 * 3600.0) / scanRate).asNanoSecs();
-        initialized = false;
-    }
-
-    /**
      * Set the reference heliotropic angles (at refEpoch) to other values than
      * the default values obtained with the contructor
      *
@@ -388,23 +318,12 @@ public class ModifiedScanningLaw {
     }
 
     /**
-     * Set the reference heliotropic angle nu (at refEpoch)
+     * Get current time step in Runge-Kutta integrator
      *
-     * @param refNu value of revolving phase (nu) at refEpoch [rad]
+     * @return time step [ns]
      */
-    public void setRefNu(double refNu) {
-        nuRef = refNu;
-        initialized = false;
-    }
-
-    /**
-     * Set the reference heliotropic angle Omega (at refEpoch)
-     *
-     * @param refOmega value of spin phase (omega) at refEpoch [rad]
-     */
-    public void setRefOmega(double refOmega) {
-        omegaRef = refOmega;
-        initialized = false;
+    public long getMaxInternalTimeStep() {
+        return dt;
     }
 
     /**
@@ -414,15 +333,6 @@ public class ModifiedScanningLaw {
      */
     public void setMaxInternalTimeStep(long stepNs) {
         dt = stepNs;
-    }
-
-    /**
-     * Get current time step in Runge-Kutta integrator
-     *
-     * @return time step [ns]
-     */
-    public long getMaxInternalTimeStep() {
-        return dt;
     }
 
     /**
@@ -475,6 +385,15 @@ public class ModifiedScanningLaw {
     }
 
     /**
+     * Get a list of high-density areas that have been set
+     *
+     * @return
+     */
+    public ComplexArea[] getHighDensityAreas() {
+        return highDensityAreas;
+    }
+
+    /**
      * Set the region of the sky that is to be considered as "high density"
      *
      * @param areas high density area
@@ -490,15 +409,6 @@ public class ModifiedScanningLaw {
             }
         }
         initialized = false;
-    }
-
-    /**
-     * Get a list of high-density areas that have been set
-     *
-     * @return
-     */
-    public ComplexArea[] getHighDensityAreas() {
-        return highDensityAreas;
     }
 
     /**
@@ -649,15 +559,6 @@ public class ModifiedScanningLaw {
         return deltaOmegaDot;
     }
 
-    // /**
-    // * Check whether the latest call to derivn gave a reduced z axis speed
-    // *
-    // * @return true if reduced
-    // */
-    // public boolean isReduced() {
-    // return dn.reduced;
-    // }
-
     /**
      * Get current speed of z axis in solar motion units
      *
@@ -708,12 +609,46 @@ public class ModifiedScanningLaw {
     }
 
     /**
+     * Set the reference epoch to which the reference heliotropic angles refer
+     *
+     * @param refEpoch
+     *
+     * @throws RuntimeException
+     */
+    public void setRefEpoch(long refEpoch) throws RuntimeException {
+        if (refEpoch > tBeg) {
+            throw new RuntimeException("Reference epoch for MSL cannot be later than the starting time");
+        }
+        this.refEpoch = refEpoch;
+        initialized = false;
+    }
+
+    // /**
+    // * Check whether the latest call to derivn gave a reduced z axis speed
+    // *
+    // * @return true if reduced
+    // */
+    // public boolean isReduced() {
+    // return dn.reduced;
+    // }
+
+    /**
      * Get reference value of nu
      *
      * @return value of nu at refEpoch [rad]
      */
     public double getRefNu() {
         return nuRef;
+    }
+
+    /**
+     * Set the reference heliotropic angle nu (at refEpoch)
+     *
+     * @param refNu value of revolving phase (nu) at refEpoch [rad]
+     */
+    public void setRefNu(double refNu) {
+        nuRef = refNu;
+        initialized = false;
     }
 
     /**
@@ -726,6 +661,16 @@ public class ModifiedScanningLaw {
     }
 
     /**
+     * Set the reference heliotropic angle Omega (at refEpoch)
+     *
+     * @param refOmega value of spin phase (omega) at refEpoch [rad]
+     */
+    public void setRefOmega(double refOmega) {
+        omegaRef = refOmega;
+        initialized = false;
+    }
+
+    /**
      * Get the precession rate of the underlying NSL
      *
      * @return precession rate in [rev/yr]
@@ -735,12 +680,33 @@ public class ModifiedScanningLaw {
     }
 
     /**
+     * Set the precession rate for the underlying NSL
+     *
+     * @param precRate (target) precession rate in [rev/yr]
+     */
+    public void setPrecRate(double precRate) {
+        this.precRate = precRate;
+        initialized = false;
+    }
+
+    /**
      * Get the (target) scan rate
      *
      * @return scan rate in [arcsec/s]
      */
     public double getScanRate() {
         return scanRate;
+    }
+
+    /**
+     * Set the scan rates for the underlying NSL
+     *
+     * @param scanRate (target) scan rate in [arcsec/s]
+     */
+    public void setScanRate(double scanRate) {
+        this.scanRate = scanRate;
+        scanPerNs = new Secs((360.0 * 3600.0) / scanRate).asNanoSecs();
+        initialized = false;
     }
 
     /**
@@ -755,6 +721,122 @@ public class ModifiedScanningLaw {
         omega = deltaOmega + TWO_PI * fractionalPeriod;
         adjustOmega();
         omegaDot = scanRate * TWO_PI / 15.0 + deltaOmegaDot;
+    }
+
+    /**
+     * Integrate the MSL forward in time by an arbitrary step.
+     * <p>
+     * Since the numerical implementation of Scanning Law integrates a
+     * differential equation, the only way to advance the scanning is to
+     * integrate from the current time (t) to the desired time (tNs), provided
+     * that tNs >= t. Otherwise, start from the initial conditions and integrate
+     * up to tNs.
+     *
+     * @see ModifiedScanningLaw#stepForward(long)
+     */
+    public ModifiedScanningLaw advanceScanningTo(long newTimeNs) {
+        if (newTimeNs >= tNow) {
+            stepForward(newTimeNs - tNow);
+        } else {
+            initialized = false;
+            stepForward(newTimeNs - tBegNs);
+        }
+        return this;
+    }
+
+    /**
+     * Adjusts the spin phase (omega) and the number of spin revolutions
+     * (omegaRevs) so that 0 <= omega < 2*pi
+     */
+    protected void adjustOmega() {
+        if (omega >= TWO_PI) {
+            int n = (int) (omega / TWO_PI);
+            omega -= n * TWO_PI;
+            omegaRevs += n;
+        } else if (omega < 0) {
+            int n = 1 + (int) (-omega / TWO_PI);
+            omega += n * TWO_PI;
+            omegaRevs -= n;
+        }
+    }
+
+    /**
+     * Calculates a smooth transition of kappa from a nominal value (kappaN) to
+     * the reduced value (kappaR), depending on the variable x, which must be in
+     * the range from 0 to 1.
+     * <p>
+     * x = 0 returns kappa = kappaR, x = 1 returns kappaN.
+     *
+     * @param x
+     * @param kappaN value for x = 1
+     * @param kappaR value for x = 0
+     * @param tf     type of transition function
+     *
+     * @return
+     */
+    protected double transitionKappa(double x, double kappaN, double kappaR, TransitionFunction tf) {
+        double kappa = 0.0;
+        switch (tf) {
+        case LINEAR:
+            kappa = kappaR * (1.0 - x) + kappaN * x;
+            break;
+        case COSINE:
+            kappa = 0.5 * ((kappaN + kappaR) - (kappaN - kappaR) * Math.cos(Math.PI * x));
+            break;
+        case SQUAREROOT:
+            kappa = Math.sqrt((1 - x) * kappaR * kappaR + x * kappaN * kappaN);
+            break;
+        case FANCY:
+            double p;
+            if (x < 0.5) {
+                p = x * x * (3 - 2 * x);
+            } else {
+                p = 1 - (1 - x) * (1 - x) * (1 + 2 * x);
+            }
+            kappa = Math.sqrt((1 - p) * kappaR * kappaR + p * kappaN * kappaN);
+            break;
+        }
+        return kappa;
+    }
+
+    /**
+     * The sigmoid function provides a smooth transition from 0 (for x << 0) to
+     * 1 (for x >> 0)
+     *
+     * @param x
+     *
+     * @return
+     */
+    protected double sigmoid(double x) {
+        double e = Math.exp(x);
+        return (1 + (e - 1 / e) / (e + 1 / e)) / 2;
+    }
+
+    /**
+     * There are three modes of scanning, enumerated by the ScanState: NOMINAL =
+     * running as in NSL, MODIFIED = running at reduced precession speed,
+     * TRANSITION = the precession speed is ramping up or down between the
+     * NOMINAL and MODIFIED states. The attitude may have discontinuous second
+     * derivatives when changing from one ScanState to another.
+     */
+    public enum ScanState {
+        NOMINAL,
+        TRANSITION,
+        MODIFIED
+    }
+
+    /**
+     * Enumerates the various transition functions tested. Used as an argument
+     * in transitionKappa().
+     *
+     * @author lennartlindegren
+     * @version $Id$
+     */
+    protected enum TransitionFunction {
+        LINEAR,
+        SQUAREROOT,
+        COSINE,
+        FANCY
     }
 
     /**
@@ -837,108 +919,5 @@ public class ModifiedScanningLaw {
 
             return dydt;
         }
-    }
-
-    /**
-     * Integrate the MSL forward in time by an arbitrary step.
-     * <p>
-     * Since the numerical implementation of Scanning Law integrates a
-     * differential equation, the only way to advance the scanning is to
-     * integrate from the current time (t) to the desired time (tNs), provided
-     * that tNs >= t. Otherwise, start from the initial conditions and integrate
-     * up to tNs.
-     *
-     * @see ModifiedScanningLaw#stepForward(long)
-     */
-    public ModifiedScanningLaw advanceScanningTo(long newTimeNs) {
-        if (newTimeNs >= tNow) {
-            stepForward(newTimeNs - tNow);
-        } else {
-            initialized = false;
-            stepForward(newTimeNs - tBegNs);
-        }
-        return this;
-    }
-
-    /**
-     * Adjusts the spin phase (omega) and the number of spin revolutions
-     * (omegaRevs) so that 0 <= omega < 2*pi
-     */
-    protected void adjustOmega() {
-        if (omega >= TWO_PI) {
-            int n = (int) (omega / TWO_PI);
-            omega -= n * TWO_PI;
-            omegaRevs += n;
-        } else if (omega < 0) {
-            int n = 1 + (int) (-omega / TWO_PI);
-            omega += n * TWO_PI;
-            omegaRevs -= n;
-        }
-    }
-
-    /**
-     * Enumerates the various transition functions tested. Used as an argument
-     * in transitionKappa().
-     *
-     * @author lennartlindegren
-     * @version $Id$
-     */
-    protected enum TransitionFunction {
-        LINEAR,
-        SQUAREROOT,
-        COSINE,
-        FANCY
-    }
-
-    /**
-     * Calculates a smooth transition of kappa from a nominal value (kappaN) to
-     * the reduced value (kappaR), depending on the variable x, which must be in
-     * the range from 0 to 1.
-     * <p>
-     * x = 0 returns kappa = kappaR, x = 1 returns kappaN.
-     *
-     * @param x
-     * @param kappaN value for x = 1
-     * @param kappaR value for x = 0
-     * @param tf     type of transition function
-     *
-     * @return
-     */
-    protected double transitionKappa(double x, double kappaN, double kappaR, TransitionFunction tf) {
-        double kappa = 0.0;
-        switch (tf) {
-        case LINEAR:
-            kappa = kappaR * (1.0 - x) + kappaN * x;
-            break;
-        case COSINE:
-            kappa = 0.5 * ((kappaN + kappaR) - (kappaN - kappaR) * Math.cos(Math.PI * x));
-            break;
-        case SQUAREROOT:
-            kappa = Math.sqrt((1 - x) * kappaR * kappaR + x * kappaN * kappaN);
-            break;
-        case FANCY:
-            double p;
-            if (x < 0.5) {
-                p = x * x * (3 - 2 * x);
-            } else {
-                p = 1 - (1 - x) * (1 - x) * (1 + 2 * x);
-            }
-            kappa = Math.sqrt((1 - p) * kappaR * kappaR + p * kappaN * kappaN);
-            break;
-        }
-        return kappa;
-    }
-
-    /**
-     * The sigmoid function provides a smooth transition from 0 (for x << 0) to
-     * 1 (for x >> 0)
-     *
-     * @param x
-     *
-     * @return
-     */
-    protected double sigmoid(double x) {
-        double e = Math.exp(x);
-        return (1 + (e - 1 / e) / (e + 1 / e)) / 2;
     }
 }

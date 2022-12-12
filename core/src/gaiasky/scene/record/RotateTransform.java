@@ -13,19 +13,20 @@ public class RotateTransform implements ITransform {
     double[] axis;
     /** Rotation angle [deg]. **/
     double angle;
-    
-    public void apply(Matrix4 mat){
+
+    public void apply(Matrix4 mat) {
         mat.rotate((float) axis[0], (float) axis[1], (float) axis[2], (float) angle);
     }
-    public void apply(Matrix4d mat){
+
+    public void apply(Matrix4d mat) {
         mat.rotate(axis[0], axis[1], axis[2], angle);
     }
 
-    public void setAxis(double[] axis){
+    public void setAxis(double[] axis) {
         this.axis = axis;
     }
-    
-    public void setAngle(Double angle){
+
+    public void setAngle(Double angle) {
         this.angle = angle;
     }
 }

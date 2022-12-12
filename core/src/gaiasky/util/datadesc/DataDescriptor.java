@@ -37,6 +37,7 @@ public class DataDescriptor {
      * Finds the dataset with the given name in the dataset descriptor list.
      *
      * @param name The name of the dataset
+     *
      * @return The dataset descriptor or null if it was not found
      */
     public DatasetDesc findDataset(String name) {
@@ -46,10 +47,12 @@ public class DataDescriptor {
         }
         return null;
     }
+
     /**
      * Finds the dataset with the given key in the dataset descriptor list.
      *
      * @param key The key of the dataset
+     *
      * @return The dataset descriptor or null if it was not found
      */
     public DatasetDesc findDatasetByKey(String key) {
@@ -65,6 +68,7 @@ public class DataDescriptor {
      * data folder.
      *
      * @param name The dataset name.
+     *
      * @return True if the dataset is present, false otherwise.
      */
     public boolean datasetPresent(String name) {
@@ -79,6 +83,7 @@ public class DataDescriptor {
      * Finds the dataset with the given descriptor file in the dataset descriptor list.
      *
      * @param descriptorFile The filename of the descriptor file.
+     *
      * @return The dataset descriptor or null if it was not found.
      */
     public DatasetDesc findDatasetByDescriptor(Path descriptorFile) throws IOException {

@@ -25,12 +25,12 @@ public class ScreenModeCmd implements IObserver {
 
     public static ScreenModeCmd instance;
 
-    public static void initialize() {
-        ScreenModeCmd.instance = new ScreenModeCmd();
-    }
-
     private ScreenModeCmd() {
         EventManager.instance.subscribe(this, Event.SCREEN_MODE_CMD);
+    }
+
+    public static void initialize() {
+        ScreenModeCmd.instance = new ScreenModeCmd();
     }
 
     @Override

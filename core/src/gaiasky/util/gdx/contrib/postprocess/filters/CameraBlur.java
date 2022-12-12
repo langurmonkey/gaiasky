@@ -25,37 +25,8 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  */
 public final class CameraBlur extends Filter<CameraBlur> {
 
-    private Texture velocityTexture = null;
     private final Vector2 viewport = new Vector2();
-
-    public enum Param implements Parameter {
-        // @formatter:off
-        InputScene("u_texture0", 0),
-        VelocityMap("u_texture1", 0),
-        BlurMaxSamples("u_blurSamplesMax", 0),
-        BlurScale("u_blurScale", 0),
-        VelocityScale("u_velScale", 0),
-        Viewport("u_viewport", 0);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String m, int elementSize) {
-            this.mnemonic = m;
-            this.elementSize = elementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
+    private Texture velocityTexture = null;
 
     public CameraBlur() {
         super(ShaderLoader.fromFile("screenspace", "camerablur"));
@@ -96,5 +67,34 @@ public final class CameraBlur extends Filter<CameraBlur> {
         rebind();
         inputTexture.bind(u_texture0);
         velocityTexture.bind(u_texture1);
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        InputScene("u_texture0", 0),
+        VelocityMap("u_texture1", 0),
+        BlurMaxSamples("u_blurSamplesMax", 0),
+        BlurScale("u_blurScale", 0),
+        VelocityScale("u_velScale", 0),
+        Viewport("u_viewport", 0);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String m, int elementSize) {
+            this.mnemonic = m;
+            this.elementSize = elementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

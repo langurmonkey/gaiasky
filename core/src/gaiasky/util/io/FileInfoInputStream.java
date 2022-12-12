@@ -22,7 +22,7 @@ public class FileInfoInputStream extends FileInputStream {
         super(file);
     }
 
-    public long getBytesRead(){
+    public long getBytesRead() {
         return bytesRead;
     }
 

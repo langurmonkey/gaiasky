@@ -31,7 +31,7 @@ public class OwnTextField extends TextField {
     private Color regularColor;
     private Color errorColor;
 
-    public OwnTextField (@Null String text, Skin skin) {
+    public OwnTextField(@Null String text, Skin skin) {
         super(text, new TextFieldStyle(skin.get(TextFieldStyle.class)));
         this.skin = skin;
     }
@@ -194,11 +194,11 @@ public class OwnTextField extends TextField {
         super.moveCursor(forward, jump);
     }
 
-    public void goHome (boolean jump) {
+    public void goHome(boolean jump) {
         cursor = 0;
     }
 
-    public void goEnd (boolean jump) {
+    public void goEnd(boolean jump) {
         cursor = text.length();
     }
 }

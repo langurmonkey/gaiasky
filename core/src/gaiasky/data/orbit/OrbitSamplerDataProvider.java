@@ -35,8 +35,9 @@ import java.util.Date;
  * used to load orbit data by the {@link OrbitRefresher} daemon.
  */
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
-    private static boolean writeData = false;
     private static final String writeDataPath = "/tmp/";
+    private static boolean writeData = false;
+    private final Vector3b ecl = new Vector3b();
     PointCloudData data;
 
     public static void main(String[] args) {
@@ -79,8 +80,6 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         }
 
     }
-
-    private final Vector3b ecl = new Vector3b();
 
     @Override
     public void load(String file, OrbitDataLoaderParameters parameter) {

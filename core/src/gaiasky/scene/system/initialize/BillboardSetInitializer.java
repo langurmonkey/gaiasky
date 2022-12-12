@@ -21,7 +21,6 @@ import java.util.List;
 
 public class BillboardSetInitializer extends AbstractInitSystem {
 
-
     private final Vector3d D31;
 
     public BillboardSetInitializer(boolean setUp, Family family, int priority) {
@@ -73,7 +72,6 @@ public class BillboardSetInitializer extends AbstractInitSystem {
         var coord = Mapper.coordinates.get(entity);
         var transform = Mapper.transform.get(entity);
         var set = Mapper.billboardSet.get(entity);
-
 
         // Set static coordinates to position
         coord.coordinates.getEquatorialCartesianCoordinates(null, body.pos);

@@ -19,14 +19,13 @@ import java.util.List;
  * for each of those.
  */
 public class PointCloudData {
+    private final Vector3d v0;
+    private final Vector3d v1;
     // Values of x, y, z in world coordinates
     public List<Double> x, y, z;
     public List<Instant> time;
     // Period in days
     public double period = -1;
-
-    private final Vector3d v0;
-    private final Vector3d v1;
     private Instant start, end;
 
     public PointCloudData() {
@@ -125,12 +124,13 @@ public class PointCloudData {
      * Loads the data point at the index in the vector in the Orbit reference
      * system.
      *
-     * @param v The vector to load the data into.
+     * @param v     The vector to load the data into.
      * @param index The data index.
      */
     public void loadPoint(Vector3d v, int index) {
         v.set(x.get(index), y.get(index), z.get(index));
     }
+
     public void loadPoint(Vector3b v, int index) {
         v.set(x.get(index), y.get(index), z.get(index));
     }
@@ -182,7 +182,6 @@ public class PointCloudData {
         return getStart().toEpochMilli();
     }
 
-
     public Instant getEnd() {
         if (end == null) {
             end = time.get(time.size() - 1);
@@ -194,12 +193,11 @@ public class PointCloudData {
         return getEnd().toEpochMilli();
     }
 
-
     /**
      * Loads the data point at the index in the vector in the world reference
      * system.
      *
-     * @param v The vector to store the result.
+     * @param v     The vector to store the result.
      * @param index The index of the point to load.
      */
     public void loadPointF(Vector3 v, int index) {
@@ -212,11 +210,13 @@ public class PointCloudData {
      *
      * @param v       The vector to store the result.
      * @param instant The time as an instant.
+     *
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, Instant instant) {
         return loadPoint(v, instant.toEpochMilli());
     }
+
     public boolean loadPoint(Vector3b v, Instant instant) {
         return loadPoint(v, instant.toEpochMilli());
     }
@@ -227,6 +227,7 @@ public class PointCloudData {
      *
      * @param v      The vector
      * @param timeMs The time in milliseconds
+     *
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, long timeMs) {
@@ -252,6 +253,7 @@ public class PointCloudData {
         }
         return true;
     }
+
     public boolean loadPoint(Vector3b v, long timeMs) {
         // Data is sorted
         int idx = binarySearch(time, timeMs);
@@ -296,6 +298,7 @@ public class PointCloudData {
      * Gets the bounding indices for the given date. If the date is out of range, it wraps.
      *
      * @param instant The date
+     *
      * @return The two indices
      */
     public int getIndex(Instant instant) {

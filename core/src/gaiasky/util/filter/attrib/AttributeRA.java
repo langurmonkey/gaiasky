@@ -13,10 +13,12 @@ public class AttributeRA extends AttributeAbstract implements IAttribute {
     public double get(IParticleRecord bean) {
         return bean.ra();
     }
-    public String getUnit(){
+
+    public String getUnit() {
         return I18n.msg("gui.unit.deg");
     }
-    public String toString(){
+
+    public String toString() {
         return I18n.msg("gui.attrib.ra") + " (" + I18n.msg("gui.focusinfo.alpha") + ")";
     }
 }

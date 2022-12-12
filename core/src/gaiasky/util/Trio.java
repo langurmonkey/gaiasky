@@ -7,12 +7,13 @@ package gaiasky.util;
 
 /**
  * Simple impelementation of a trio of objects.
+ *
  * @param <A> First type
  * @param <B> Second type
  * @param <C> Third type
  */
 public class Trio<A, B, C> {
-    
+
     private A first;
     private B second;
     private C third;
@@ -36,15 +37,14 @@ public class Trio<A, B, C> {
         if (other instanceof Trio) {
             Trio otherTrio = (Trio) other;
             return ((this.first == null && otherTrio.first == null) || this.first.equals(otherTrio.first)) &&
-                    ((this.second == null && otherTrio.second == null) || this.second.equals(otherTrio.second)) && 
-                    ((this.third == null && otherTrio.third == null) || this.third.equals(otherTrio.third)); 
+                    ((this.second == null && otherTrio.second == null) || this.second.equals(otherTrio.second)) &&
+                    ((this.third == null && otherTrio.third == null) || this.third.equals(otherTrio.third));
         }
 
         return false;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "(" + first + ", " + second + ", " + third + ")";
     }
 
@@ -63,14 +63,13 @@ public class Trio<A, B, C> {
     public void setSecond(B second) {
         this.second = second;
     }
-    
+
     public C getThird() {
         return third;
     }
-    
+
     public void setThird(C third) {
         this.third = third;
     }
-    
 
 }

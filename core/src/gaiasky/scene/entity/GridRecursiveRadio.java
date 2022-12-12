@@ -24,7 +24,6 @@ public class GridRecursiveRadio extends EntityRadio {
                 var transform = Mapper.transform.get(entity);
                 var gr = Mapper.gridRec.get(entity);
 
-
                 if (ct.equals(ComponentType.Equatorial)) {
                     // Activate equatorial
                     transform.setTransformName(null);

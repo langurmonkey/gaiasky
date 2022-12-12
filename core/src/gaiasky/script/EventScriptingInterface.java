@@ -91,20 +91,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private final AssetManager manager;
     // Reference to the catalog manager
     private final CatalogManager catalogManager;
-    private LruCache<String, Texture> textures;
-
     // Auxiliary vectors
     private final Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
     private final Vector3b aux3b1, aux3b2, aux3b3;
     private final Vector2d aux2d1;
-
     private final Set<AtomicBoolean> stops;
-
-    private TrajectoryUtils trajectoryUtils;
     private final FocusView focusView;
     private final VertsView vertsView;
-
+    private LruCache<String, Texture> textures;
+    private TrajectoryUtils trajectoryUtils;
     private Scene scene;
+    private int inputCode = -1;
+    private int cTransSeq = 0;
 
     public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
         this.em = EventManager.instance;
@@ -342,11 +340,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraPosition(final double[] position) {
-        setCameraPosition(position, false);
-    }
-
-    @Override
     public void setCameraPosition(double x, double y, double z) {
         setCameraPosition(new double[] { x, y, z });
     }
@@ -354,10 +347,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraPosition(double x, double y, double z, boolean immediate) {
         setCameraPosition(new double[] { x, y, z }, immediate);
-    }
-
-    public void setCameraPosition(final List<?> vec) {
-        setCameraPosition(dArray(vec));
     }
 
     public void setCameraPosition(final List<?> vec, boolean immediate) {
@@ -391,12 +380,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraDirection(final double[] direction) {
-        setCameraDirection(direction, false);
+    public void setCameraPosition(final double[] position) {
+        setCameraPosition(position, false);
     }
 
-    public void setCameraDirection(final List<?> dir) {
-        setCameraDirection(dArray(dir));
+    public void setCameraPosition(final List<?> vec) {
+        setCameraPosition(dArray(vec));
     }
 
     public void setCameraDirection(final List<?> dir, final boolean immediate) {
@@ -425,12 +414,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setCameraUp(final double[] up) {
-        setCameraUp(up, false);
+    public void setCameraDirection(final double[] direction) {
+        setCameraDirection(direction, false);
     }
 
-    public void setCameraUp(final List<?> up) {
-        setCameraUp(dArray(up));
+    public void setCameraDirection(final List<?> dir) {
+        setCameraDirection(dArray(dir));
     }
 
     public void setCameraUp(final List<?> up, final boolean immediate) {
@@ -456,6 +445,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public double[] getCameraUp() {
         Vector3d camUp = GaiaSky.instance.cameraManager.getUp();
         return new double[] { camUp.x, camUp.y, camUp.z };
+    }
+
+    @Override
+    public void setCameraUp(final double[] up) {
+        setCameraUp(up, false);
+    }
+
+    public void setCameraUp(final List<?> up) {
+        setCameraUp(dArray(up));
     }
 
     @Override
@@ -534,9 +532,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public double getCameraSpeed() {
+        return GaiaSky.instance.cameraManager.getSpeed();
+    }
+
+    @Override
     public void setCameraSpeed(final float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED), false));
+            postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this, MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED), false));
         }
     }
 
@@ -545,14 +548,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public double getCameraSpeed() {
-        return GaiaSky.instance.cameraManager.getSpeed();
-    }
-
-    @Override
     public void setCameraRotationSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
+            postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this, MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
         }
     }
 
@@ -572,7 +570,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraTurningSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed")) {
-            postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
+            postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this, MathUtilsDouble.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
         }
     }
 
@@ -843,7 +841,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this, MathUtilsd.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR)));
+        postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this, MathUtilsDouble.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR)));
     }
 
     @Override
@@ -874,13 +872,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setProperMotionsMaxNumber(long maxNumber) {
-        Settings.settings.scene.star.group.numVelocityVector = (int) maxNumber;
+    public long getProperMotionsMaxNumber() {
+        return Settings.settings.scene.star.group.numVelocityVector;
     }
 
     @Override
-    public long getProperMotionsMaxNumber() {
-        return Settings.settings.scene.star.group.numVelocityVector;
+    public void setProperMotionsMaxNumber(long maxNumber) {
+        Settings.settings.scene.star.group.numVelocityVector = (int) maxNumber;
     }
 
     @Override
@@ -927,15 +925,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setSimulationTime(final long time) {
-        if (checkNum(time, 1, Long.MAX_VALUE, "time"))
-            em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
-    }
-
-    @Override
     public long getSimulationTime() {
         ITimeFrameProvider time = GaiaSky.instance.time;
         return time.getTime().toEpochMilli();
+    }
+
+    @Override
+    public void setSimulationTime(final long time) {
+        if (checkNum(time, 1, Long.MAX_VALUE, "time"))
+            em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
     }
 
     @Override
@@ -1003,12 +1001,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setStarBrightness(final float brightness) {
-        if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness"))
-            em.post(Event.STAR_BRIGHTNESS_CMD, this, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS));
-    }
-
-    @Override
     public void setStarBrightnessPower(float power) {
         if (checkFinite(power, "brightness-pow")) {
             em.post(Event.STAR_BRIGHTNESS_POW_CMD, this, power);
@@ -1022,13 +1014,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    @Override
+    public float getStarBrightness() {
+        return (float) MathUtilsDouble.lint(Settings.settings.scene.star.brightness, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+    }
+
+    @Override
+    public void setStarBrightness(final float brightness) {
+        if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness"))
+            em.post(Event.STAR_BRIGHTNESS_CMD, this, MathUtilsDouble.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS));
+    }
+
     public void setStarBrightness(final int brightness) {
         setStarBrightness((float) brightness);
     }
 
     @Override
-    public float getStarBrightness() {
-        return (float) MathUtilsd.lint(Settings.settings.scene.star.brightness, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+    public float getStarSize() {
+        return MathUtilsDouble.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override
@@ -1042,17 +1045,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public float getStarSize() {
-        return MathUtilsd.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-    }
-
-    @Override
     public float getStarMinOpacity() {
-        return MathUtilsd.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
-    }
-
-    public float getMinStarOpacity() {
-        return getStarMinOpacity();
+        return MathUtilsDouble.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override
@@ -1061,8 +1055,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             EventManager.publish(Event.STAR_BASE_LEVEL_CMD, this, minOpacity);
     }
 
+    public float getMinStarOpacity() {
+        return getStarMinOpacity();
+    }
+
     public void setMinStarOpacity(float minOpacity) {
         setStarMinOpacity(minOpacity);
+    }
+
+    public void setMinStarOpacity(int opacity) {
+        setMinStarOpacity((float) opacity);
     }
 
     @Override
@@ -1170,10 +1172,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void takeScreenshot() {
         saveScreenshot();
-    }
-
-    public void setMinStarOpacity(int opacity) {
-        setMinStarOpacity((float) opacity);
     }
 
     @Override
@@ -1526,7 +1524,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+                    em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
                     // Save cinematic
                     boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -1699,7 +1697,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 if (Mapper.atmosphere.has(entity)) {
                     NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
-                    double targetAngle = 35 * MathUtilsd.degRad;
+                    double targetAngle = 35 * MathUtilsDouble.degRad;
                     if (focusView.getSolidAngle() > targetAngle) {
                         // Zoom out
                         while (focusView.getSolidAngle() > targetAngle && (stop == null || !stop.get())) {
@@ -1719,11 +1717,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     // Save turn speed, set it to 50
                     double turnSpeedBak = Settings.settings.scene.camera.turn;
-                    em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED));
+                    em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsDouble.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED));
 
                     // Save rotation speed, set it to 20
                     double rotationSpeedBak = Settings.settings.scene.camera.rotate;
-                    em.post(Event.ROTATION_SPEED_CMD, this, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED));
+                    em.post(Event.ROTATION_SPEED_CMD, this, (float) MathUtilsDouble.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED));
 
                     // Save cinematic
                     boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -2043,8 +2041,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         inputCode = -1;
     }
 
-    private int inputCode = -1;
-
     @Override
     public int getScreenWidth() {
         return Gdx.graphics.getWidth();
@@ -2213,85 +2209,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         runCameraPath(file, false);
     }
 
-    class CameraTransitionRunnable implements Runnable {
-        NaturalCamera cam;
-        double seconds;
-        double elapsed, start;
-        double[] targetPos, targetDir, targetUp;
-        Pathd<Vector3d> posl, dirl, upl;
-
-        Runnable end;
-        final Object lock;
-
-        final Vector3d D31, D32, D33;
-
-        /**
-         * A runnable that interpolates the camera state (position, direction, up) to the new given state
-         * in the specified number of seconds.
-         *
-         * @param cam     The camera to use.
-         * @param pos     The final position.
-         * @param dir     The final direction.
-         * @param up      The final up vector.
-         * @param seconds The number of seconds to complete the transition.
-         * @param end     An optional runnable that is executed when the transition has completed.
-         */
-        public CameraTransitionRunnable(NaturalCamera cam, double[] pos, double[] dir, double[] up, double seconds, Runnable end) {
-            this.cam = cam;
-            this.targetPos = pos;
-            this.targetDir = dir;
-            this.targetUp = up;
-            this.seconds = seconds;
-            this.start = GaiaSky.instance.getT();
-            this.elapsed = 0;
-            this.end = end;
-            this.lock = new Object();
-
-            // Set up interpolation.
-            posl = getPathd(cam.getPos().tov3d(aux3d3), pos);
-            dirl = getPathd(cam.getDirection(), dir);
-            upl = getPathd(cam.getUp(), up);
-
-            // Aux
-            D31 = new Vector3d();
-            D32 = new Vector3d();
-            D33 = new Vector3d();
-        }
-
-        private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
-            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
-            return new Lineard<>(points);
-        }
-
-        @Override
-        public void run() {
-            // Update elapsed time
-            elapsed = GaiaSky.instance.getT() - start;
-
-            // Interpolation variable
-            double alpha = MathUtilsd.clamp(elapsed / seconds, 0.0, 0.99999999999999);
-
-            // Set camera state
-            cam.setPos(posl.valueAt(D31, alpha));
-            cam.setDirection(dirl.valueAt(D31, alpha).nor());
-            Vector3d up = upl.valueAt(D31, alpha);
-            Vector3d right = D32.set(cam.direction).crs(up);
-            cam.setUp(right.crs(cam.direction).nor());
-
-            // Finish if needed
-            if (elapsed >= seconds) {
-                // On end, run runnable if present, otherwise notify lock
-                if (end != null) {
-                    end.run();
-                } else {
-                    synchronized (lock) {
-                        lock.notify();
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds) {
         cameraTransition(internalUnitsToKilometres(camPos), camDir, camUp, seconds, true);
@@ -2321,8 +2238,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
         cameraTransition(camPos, camDir, camUp, (double) seconds);
     }
-
-    private int cTransSeq = 0;
 
     @Override
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
@@ -3922,5 +3837,82 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         }
         return true;
+    }
+
+    class CameraTransitionRunnable implements Runnable {
+        final Object lock;
+        final Vector3d D31, D32, D33;
+        NaturalCamera cam;
+        double seconds;
+        double elapsed, start;
+        double[] targetPos, targetDir, targetUp;
+        Pathd<Vector3d> posl, dirl, upl;
+        Runnable end;
+
+        /**
+         * A runnable that interpolates the camera state (position, direction, up) to the new given state
+         * in the specified number of seconds.
+         *
+         * @param cam     The camera to use.
+         * @param pos     The final position.
+         * @param dir     The final direction.
+         * @param up      The final up vector.
+         * @param seconds The number of seconds to complete the transition.
+         * @param end     An optional runnable that is executed when the transition has completed.
+         */
+        public CameraTransitionRunnable(NaturalCamera cam, double[] pos, double[] dir, double[] up, double seconds, Runnable end) {
+            this.cam = cam;
+            this.targetPos = pos;
+            this.targetDir = dir;
+            this.targetUp = up;
+            this.seconds = seconds;
+            this.start = GaiaSky.instance.getT();
+            this.elapsed = 0;
+            this.end = end;
+            this.lock = new Object();
+
+            // Set up interpolation.
+            posl = getPathd(cam.getPos().tov3d(aux3d3), pos);
+            dirl = getPathd(cam.getDirection(), dir);
+            upl = getPathd(cam.getUp(), up);
+
+            // Aux
+            D31 = new Vector3d();
+            D32 = new Vector3d();
+            D33 = new Vector3d();
+        }
+
+        private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
+            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
+            return new Lineard<>(points);
+        }
+
+        @Override
+        public void run() {
+            // Update elapsed time
+            elapsed = GaiaSky.instance.getT() - start;
+
+            // Interpolation variable
+            double alpha = MathUtilsDouble.clamp(elapsed / seconds, 0.0, 0.99999999999999);
+
+            // Set camera state
+            cam.setPos(posl.valueAt(D31, alpha));
+            cam.setDirection(dirl.valueAt(D31, alpha).nor());
+            Vector3d up = upl.valueAt(D31, alpha);
+            Vector3d right = D32.set(cam.direction).crs(up);
+            cam.setUp(right.crs(cam.direction).nor());
+
+            // Finish if needed
+            if (elapsed >= seconds) {
+                // On end, run runnable if present, otherwise notify lock
+                if (end != null) {
+                    end.run();
+                } else {
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                }
+            }
+        }
     }
 }

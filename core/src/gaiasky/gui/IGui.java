@@ -23,7 +23,7 @@ public interface IGui extends Disposable {
      * for loading
      *
      * @param assetManager The asset manager to load the resources with
-     * @param batch The sprite batch to use for this GUI's stage
+     * @param batch        The sprite batch to use for this GUI's stage
      */
     void initialize(AssetManager assetManager, SpriteBatch batch);
 

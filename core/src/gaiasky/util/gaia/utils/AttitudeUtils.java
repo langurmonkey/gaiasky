@@ -29,7 +29,7 @@ import gaiasky.util.Logger;
  * Class with static utility methods to deal with B-splines.
  *
  * @author Uwe Lammers and David Hobbs modified from original AttitudeUtils
- *         class by hsiddiqu
+ * class by hsiddiqu
  * @version $Id: AttitudeUtils.java 206987 2011-11-17 15:51:06Z dhobbs $
  */
 public class AttitudeUtils {
@@ -37,25 +37,22 @@ public class AttitudeUtils {
     /**
      * In the non-decreasing sequence xa[0:n-1], finds the left index such that
      * xa[left] &lt;= x &lt; xa[left+1]
-     *
+     * <p>
      * If x &lt; xa[0] the method returns left = -1. If x &gt;= xa[n-1] the
      * method returns left = n-1 (the last valid index to the array). These are
      * the logical extensions of the basic condition when x is outside the
      * interval defined by the array - formally they could be derived by putting
      * xa[-1] = -inf and xa[n] = +inf.
-     *
+     * <p>
      * This implementation of findLeftIndex uses an estimation method which
      * assumes that the intervals have the same or similar length to speed up
      * the search, this method is faster than the bisection one at least when
      * there aren't many gaps and the time intervals are identical or similar.
      *
+     * @param x           value to find the left index for
+     * @param xa          array of spline knot times
+     * @param splineOrder order of the spline
      *
-     * @param x
-     *            value to find the left index for
-     * @param xa
-     *            array of spline knot times
-     * @param splineOrder
-     *            order of the spline
      * @return The left index
      **/
     public static int findLeftIndex(final long x, final long[] xa, int splineOrder) {
@@ -103,12 +100,10 @@ public class AttitudeUtils {
      * between xa[left] and xa[left+1] also in the case when x is exactly equal
      * to the last point in the array.
      *
-     * @param x
-     *            value to find the left index for
-     * @param xa
-     *            array of spline knot times
-     * @param splineOrder
-     *            order of the spline
+     * @param x           value to find the left index for
+     * @param xa          array of spline knot times
+     * @param splineOrder order of the spline
+     *
      * @return left index
      **/
     public static int findLeftIndexVar(final long x, final long[] xa, int splineOrder) {
@@ -126,32 +121,31 @@ public class AttitudeUtils {
      * Variant of findLeftIndex to be used for BSpline interpolation. In general
      * the value of left is determined such that * xa[left] and xa[left+1] exist
      * * xa[left+1] - xa[left] &gt; 0 * xa[left] &lt;= x &lt; xa[left+1]
-     *
+     * <p>
      * More specific, this means that
-     *
+     * <p>
      * if x &gt; xa[xa.length - 1], then the BSpline cannot be evaluated so -1
      * is returned.
-     *
+     * <p>
      * if x == xa[xa.length-1] then left is determined such that left is the
      * largest value for which xa[left] &lt; xa[xa.length-n] for the largest
      * value of n &gt; 0 for which xa[xa.length-n] == xa[xa.length-1].
-     *
+     * <p>
      * for all xa[0] &lt; x &lt; xa[xa.length-1] left is determined such that
      * xa[left] &lt;= x &lt; xa[left+1]. If then xa[left] == xa[left-1] &lt;= x
      * then n is determined to be the smallest value for which xa[left-n] &lt;
      * xa[left] and then left - n is returned.
-     *
+     * <p>
      * if xa[left] &lt;= x and left == 0, then n is determined to be the largest
      * value for which xa[left] == xa[left+n] and then left + n is returned.
-     *
+     * <p>
      * if x &lt; xa[0], then the BSpline cannot be evaluated so -1 is returned.
-     *
+     * <p>
      * For more info see the discussion in Mantis 27523.
      *
-     * @param x
-     *            value to find the left index for
-     * @param xa
-     *            array of spline knot times
+     * @param x  value to find the left index for
+     * @param xa array of spline knot times
+     *
      * @return left index
      **/
     public static int findLeftIndexBSpline(final long x, final long[] xa) {
@@ -207,19 +201,18 @@ public class AttitudeUtils {
     /**
      * In the non-decreasing sequence xa[0:n-1], finds the left index such that
      * xa[left] &lt;= x &lt; xa[left+1]
-     *
+     * <p>
      * If x &lt; xa[0] the method returns left = -1. If x &gt;= xa[n-1] the
      * method returns left = n-1 (the last valid index to the array). These are
      * the logical extensions of the basic condition when x is outside the
      * interval defined by the array - formally they could be derived by putting
      * xa[-1] = -inf and xa[n] = +inf.
-     *
+     * <p>
      * This method uses a straight bisection method to locate the left index.
      *
-     * @param xa
-     *            array with knot times
-     * @param x
-     *            value to find the left index for
+     * @param xa array with knot times
+     * @param x  value to find the left index for
+     *
      * @return left index
      */
     public static int findLeftIndexBisection(final long x, final long[] xa) {
@@ -253,10 +246,9 @@ public class AttitudeUtils {
      * between xa[left] and xa[left+1] also in the case when x is exactly equal
      * to the last point in the array.
      *
-     * @param x
-     *            value to find the left index for
-     * @param xa
-     *            array of spline knot times
+     * @param x  value to find the left index for
+     * @param xa array of spline knot times
+     *
      * @return left index
      **/
     public static int findLeftIndexBisectionVar(final long x, final long[] xa) {
@@ -273,19 +265,18 @@ public class AttitudeUtils {
     /**
      * In the non-decreasing sequence xa[0:n-1], finds the left index such that
      * xa[left] &lt;= x &lt; xa[left+1]
-     *
+     * <p>
      * If x &lt; xa[0] the method returns left = -1. If x &gt;= xa[n-1] the
      * method returns left = n-1 (the last valid index to the array). These are
      * the logical extensions of the basic condition when x is outside the
      * interval defined by the array - formally they could be derived by putting
      * xa[-1] = -inf and xa[n] = +inf.
-     *
+     * <p>
      * This method uses a straight bisection method to locate the left index.
      *
-     * @param xa
-     *            array with knot times
-     * @param x
-     *            value to find the left index for
+     * @param xa array with knot times
+     * @param x  value to find the left index for
+     *
      * @return left index
      */
     public static int findLeftIndexBisection(final int x, final int[] xa) {
@@ -319,10 +310,9 @@ public class AttitudeUtils {
      * between xa[left] and xa[left+1] also in the case when x is exactly equal
      * to the last point in the array.
      *
-     * @param x
-     *            value to find the left index for
-     * @param xa
-     *            array of spline knot times
+     * @param x  value to find the left index for
+     * @param xa array of spline knot times
+     *
      * @return left index
      **/
     public static int findLeftIndexBisectionVar(final int x, final int[] xa) {
@@ -350,22 +340,16 @@ public class AttitudeUtils {
      * The order of the spline is set by the parameter ATT_SPLINE_ORDER (=4 for
      * cubic)
      *
-     * @param tau
-     *            knot sequence
-     * @param x
-     *            point at which the B-splines should be evaluated
-     * @param splineOrder
-     *            order of the spline
-     * @param leftIndex
-     *            integer chosen (usually) such that tau(leftIndex) &lt;= x &lt;
-     *            tau(leftIndex+1) (left can be found by
-     *            {@link #findLeftIndex(long, long[], int)}
-     * @param b0
-     *            values of the cubic B-splines at point {@code x}
-     * @param b1
-     *            first derivatives (wrt x) of the B-splines at point {@code x}
-     * @throws RuntimeException
-     *             if input is inconsistent
+     * @param tau         knot sequence
+     * @param x           point at which the B-splines should be evaluated
+     * @param splineOrder order of the spline
+     * @param leftIndex   integer chosen (usually) such that tau(leftIndex) &lt;= x &lt;
+     *                    tau(leftIndex+1) (left can be found by
+     *                    {@link #findLeftIndex(long, long[], int)}
+     * @param b0          values of the cubic B-splines at point {@code x}
+     * @param b1          first derivatives (wrt x) of the B-splines at point {@code x}
+     *
+     * @throws RuntimeException if input is inconsistent
      */
     public static void calcBsplines(final long x, final long[] tau, int splineOrder, final int leftIndex, final double[] b0, final double[] b1) throws RuntimeException {
         /*
@@ -423,7 +407,7 @@ public class AttitudeUtils {
      * quaternions E.g. double[] angleDiff = new
      * Quaternion(q1).smallAngularDifference(new Quaternion(q2)); using double
      * arrays
-     *
+     * <p>
      * Compute the angular differences about the principal axes of two
      * body-triads represented by two quaternions. This calculation comes from
      * SAG-LL-30 where an inertial rotation vector between to attitudes
@@ -433,10 +417,9 @@ public class AttitudeUtils {
      * the angular difference is too large and a warning is then logged. Note
      * this is a static utility.
      *
-     * @param q0
-     *            First quaternion
-     * @param q1
-     *            Second quaternion
+     * @param q0 First quaternion
+     * @param q1 Second quaternion
+     *
      * @return Array of length 3 with angle between principal axes
      */
     @Deprecated
@@ -468,17 +451,13 @@ public class AttitudeUtils {
      * Insert one or more knots in a knot sequence with a certain multiplicity
      * This will redefine a larger knot sequence of the same duration
      *
-     * @param oldKnots
-     *            The initial array of knot times
-     * @param tInsert
-     *            The array of knot insert times
-     * @param multiplicity
-     *            The multiplicity of the inserted knots
-     * @param splineOrder
-     *            spline order
-     * @return knots The updated knot times, including inserted knots of
-     *         multiplicity
+     * @param oldKnots     The initial array of knot times
+     * @param tInsert      The array of knot insert times
+     * @param multiplicity The multiplicity of the inserted knots
+     * @param splineOrder  spline order
      *
+     * @return knots The updated knot times, including inserted knots of
+     * multiplicity
      */
     public static long[] insertKnots(long[] oldKnots, long[] tInsert, int multiplicity, int splineOrder) {
 
@@ -512,17 +491,14 @@ public class AttitudeUtils {
      * their starting values. These zero values need to be replaced by a fit or
      * updated values.
      *
-     * @param old
-     *            The initial array of knot times The initial array of spline
-     *            coefficients
-     * @param tInsert
-     *            The array of knot insert times
-     * @param multiplicity
-     *            The multiplicity of the inserted knots
-     * @return knots The updated knot times, including inserted knots of
-     *         multiplicity The updated spline coefficients, including inserted
-     *         splines at knots of multiplicity
+     * @param old          The initial array of knot times The initial array of spline
+     *                     coefficients
+     * @param tInsert      The array of knot insert times
+     * @param multiplicity The multiplicity of the inserted knots
      *
+     * @return knots The updated knot times, including inserted knots of
+     * multiplicity The updated spline coefficients, including inserted
+     * splines at knots of multiplicity
      */
     public static KnotsAndSplines insertKnotsAndSplines(KnotsAndSplines old, long[] tInsert, int multiplicity, int splineOrder) {
 
@@ -564,19 +540,14 @@ public class AttitudeUtils {
      * will redefine a larger array of the same duration. This is designed to
      * work with a knot sequence.
      *
-     * @param oldElements
-     *            The initial array at of elements at knot times
-     * @param knots
-     *            The knot sequence which is not changed
-     * @param tInsert
-     *            The array of insert times
-     * @param multiplicity
-     *            The multiplicity of the inserted elements
-     * @param splineOrder
-     *            spline order
-     * @return elements The updated elements including inserted knots of
-     *         multiplicity
+     * @param oldElements  The initial array at of elements at knot times
+     * @param knots        The knot sequence which is not changed
+     * @param tInsert      The array of insert times
+     * @param multiplicity The multiplicity of the inserted elements
+     * @param splineOrder  spline order
      *
+     * @return elements The updated elements including inserted knots of
+     * multiplicity
      */
     public static double[] insertElements(double[] oldElements, long[] knots, long[] tInsert, int multiplicity, int splineOrder) {
 
@@ -608,13 +579,12 @@ public class AttitudeUtils {
      * Utility class for manipulating knots and splines together
      */
     public static class KnotsAndSplines {
+        public long[] knots;
+        public double[][] splines;
         public KnotsAndSplines(long[] knots, double[][] splines) {
             this.knots = knots;
             this.splines = splines;
         }
-
-        public long[] knots;
-        public double[][] splines;
     }
 
 }

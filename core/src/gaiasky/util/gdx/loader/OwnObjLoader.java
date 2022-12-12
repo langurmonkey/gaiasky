@@ -50,23 +50,10 @@ import java.io.InputStreamReader;
 
 public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameters> {
     public static boolean logWarning = false;
-
-    public static class ObjLoaderParameters extends IntModelLoader.IntModelParameters {
-        public boolean flipV;
-
-        public ObjLoaderParameters() {
-        }
-
-        public ObjLoaderParameters(boolean flipV) {
-            this.flipV = flipV;
-        }
-    }
-
     final FloatArray verts = new FloatArray(300);
     final FloatArray norms = new FloatArray(300);
     final FloatArray uvs = new FloatArray(200);
     final Array<Group> groups = new Array<>(10);
-
     final InputStreamProvider isp;
 
     public OwnObjLoader() {
@@ -312,6 +299,17 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             return size + idx;
         else
             return idx - 1;
+    }
+
+    public static class ObjLoaderParameters extends IntModelLoader.IntModelParameters {
+        public boolean flipV;
+
+        public ObjLoaderParameters() {
+        }
+
+        public ObjLoaderParameters(boolean flipV) {
+            this.flipV = flipV;
+        }
     }
 
     private class Group {

@@ -50,15 +50,15 @@ public class VertexBufferObjectInstanced implements IntVertexData {
     final VertexAttributes instanceAttributes;
     final FloatBuffer bufferGlobal;
     final ByteBuffer byteBufferGlobal;
-    int globalBufferHandle;
     final FloatBuffer bufferInstance;
     final ByteBuffer byteBufferInstance;
-    int instanceBufferHandle;
     final boolean isStatic;
     final int usage;
+    int globalBufferHandle;
+    int instanceBufferHandle;
     boolean isDirtyGlobal = false;
-	boolean isDirtyInstance = false;
-	boolean isBoundGlobal = false;
+    boolean isDirtyInstance = false;
+    boolean isBoundGlobal = false;
     boolean isBoundInstance = false;
     int meshVAO = -1;
     IntArray cachedLocationsGlobal = new IntArray();
@@ -175,7 +175,7 @@ public class VertexBufferObjectInstanced implements IntVertexData {
         isBoundGlobal = true;
 
         // Instance attributes
-		bindAttributes(shader, locations, instanceAttributes, instanceBufferHandle, cachedLocationsInstance, 1);
+        bindAttributes(shader, locations, instanceAttributes, instanceBufferHandle, cachedLocationsInstance, 1);
         isDirtyInstance = bindData(gl, instanceBufferHandle, isDirtyInstance, bufferInstance, byteBufferInstance);
         isBoundInstance = true;
 
@@ -223,7 +223,7 @@ public class VertexBufferObjectInstanced implements IntVertexData {
             }
         }
 
-        for(int i =0; i < numAttributes; i++) {
+        for (int i = 0; i < numAttributes; i++) {
             VertexAttribute attribute = attributes.get(i);
             if (locations == null) {
                 cachedLocations.add(shader.getAttributeLocation(attribute.alias));
@@ -304,12 +304,12 @@ public class VertexBufferObjectInstanced implements IntVertexData {
         globalBufferHandle = 0;
         BufferUtils.disposeUnsafeByteBuffer(byteBufferGlobal);
 
-		gl.glDeleteBuffer(instanceBufferHandle);
-		instanceBufferHandle = 0;
-		BufferUtils.disposeUnsafeByteBuffer(byteBufferInstance);
+        gl.glDeleteBuffer(instanceBufferHandle);
+        instanceBufferHandle = 0;
+        BufferUtils.disposeUnsafeByteBuffer(byteBufferInstance);
 
-		deleteVAO();
-	}
+        deleteVAO();
+    }
 
     private void createVAO() {
         tmpHandle.clear();

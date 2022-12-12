@@ -20,6 +20,9 @@ import java.util.Set;
 
 public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
+    // Offset and count per renderable, if needed
+    private final Map<IRenderable, Integer> offsets;
+    private final Map<IRenderable, Integer> counts;
     protected int meshIdx;
     protected Array<MeshData> meshes;
     protected MeshData curr;
@@ -27,62 +30,23 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     protected float[] tempVerts;
     // Auxiliary array that holds indices temporarily
     protected int[] tempIndices;
-
     // Renderables that are already in the GPU
     protected Set<IRenderable> inGpu;
-    // Offset and count per renderable, if needed
-    private final Map<IRenderable, Integer> offsets;
-    private final Map<IRenderable, Integer> counts;
 
-    public static class MeshData {
-
-        public IntMesh mesh;
-
-        public int colorOffset;
-
-        public int vertexIdx;
-        // Size of each vertex in number of entries in array. Multiply by array type
-        // size to get vertex size in bytes.
-        public int vertexSize;
-
-        // Vertex array, this usually is just a reference to an external temp array
-        public float[] vertices;
-        public int instanceIdx;
-        public int instanceSize;
-        public float[] instance;
-
-        public int indexIdx;
-        protected int indexVert;
-        protected int[] indices;
-        public int numVertices;
-        public int capacity;
-
-        public void clear() {
-            instanceIdx = 0;
-            vertexIdx = 0;
-            indexIdx = 0;
-            indexVert = 0;
-            numVertices = 0;
-        }
-
-        public void dispose() {
-            if (mesh != null)
-                mesh.dispose();
-            vertices = null;
-            indices = null;
-        }
+    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+        this(sceneRenderer, rg, alphas, programs, -1);
     }
 
-    protected static class OwnUsage {
-        public static final int Size = 512;
-        public static final int NumVariablePoints = 1024;
-        public static final int VariableMagnitudes = 2048;
-        public static final int VariableTimes = 4096;
-        public static final int ObjectPosition = 8192;
-        public static final int ProperMotion = 16384;
-        public static final int Additional = 20000;
-        public static final int OrbitElems1 = 21000;
-        public static final int OrbitElems2 = 22000;
+    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
+        super(sceneRenderer, rg, alphas, programs);
+        initShaderProgram();
+        initVertices();
+        meshIdx = 0;
+        if (tempVertsSize > 0)
+            tempVerts = new float[tempVertsSize];
+        inGpu = new HashSet<>();
+        offsets = new HashMap<>();
+        counts = new HashMap<>();
     }
 
     /**
@@ -132,22 +96,6 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         } catch (IndexOutOfBoundsException e) {
             // Nothing
         }
-    }
-
-    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
-        this(sceneRenderer, rg, alphas, programs, -1);
-    }
-
-    protected ImmediateModeRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
-        super(sceneRenderer, rg, alphas, programs);
-        initShaderProgram();
-        initVertices();
-        meshIdx = 0;
-        if (tempVertsSize > 0)
-            tempVerts = new float[tempVertsSize];
-        inGpu = new HashSet<>();
-        offsets = new HashMap<>();
-        counts = new HashMap<>();
     }
 
     protected abstract void initVertices();
@@ -257,6 +205,57 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
         curr.vertexIdx += curr.vertexSize;
         curr.numVertices++;
+    }
+
+    public static class MeshData {
+
+        public IntMesh mesh;
+
+        public int colorOffset;
+
+        public int vertexIdx;
+        // Size of each vertex in number of entries in array. Multiply by array type
+        // size to get vertex size in bytes.
+        public int vertexSize;
+
+        // Vertex array, this usually is just a reference to an external temp array
+        public float[] vertices;
+        public int instanceIdx;
+        public int instanceSize;
+        public float[] instance;
+
+        public int indexIdx;
+        public int numVertices;
+        public int capacity;
+        protected int indexVert;
+        protected int[] indices;
+
+        public void clear() {
+            instanceIdx = 0;
+            vertexIdx = 0;
+            indexIdx = 0;
+            indexVert = 0;
+            numVertices = 0;
+        }
+
+        public void dispose() {
+            if (mesh != null)
+                mesh.dispose();
+            vertices = null;
+            indices = null;
+        }
+    }
+
+    protected static class OwnUsage {
+        public static final int Size = 512;
+        public static final int NumVariablePoints = 1024;
+        public static final int VariableMagnitudes = 2048;
+        public static final int VariableTimes = 4096;
+        public static final int ObjectPosition = 8192;
+        public static final int ProperMotion = 16384;
+        public static final int Additional = 20000;
+        public static final int OrbitElems1 = 21000;
+        public static final int OrbitElems2 = 22000;
     }
 
 }

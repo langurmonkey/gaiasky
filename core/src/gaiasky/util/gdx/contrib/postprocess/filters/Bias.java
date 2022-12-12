@@ -9,6 +9,31 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 public final class Bias extends Filter<Bias> {
     private float bias;
 
+    public Bias() {
+        super(ShaderLoader.fromFile("screenspace", "bias"));
+        rebind();
+    }
+
+    public float getBias() {
+        return bias;
+    }
+
+    public void setBias(float bias) {
+        this.bias = bias;
+        setParam(Param.Bias, this.bias);
+    }
+
+    @Override
+    protected void onBeforeRender() {
+        inputTexture.bind(u_texture0);
+    }
+
+    @Override
+    public void rebind() {
+        setParams(Param.Texture, u_texture0);
+        setBias(this.bias);
+    }
+
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
@@ -32,30 +57,5 @@ public final class Bias extends Filter<Bias> {
         public int arrayElementSize() {
             return this.elementSize;
         }
-    }
-
-    public Bias() {
-        super(ShaderLoader.fromFile("screenspace", "bias"));
-        rebind();
-    }
-
-    public void setBias(float bias) {
-        this.bias = bias;
-        setParam(Param.Bias, this.bias);
-    }
-
-    public float getBias() {
-        return bias;
-    }
-
-    @Override
-    protected void onBeforeRender() {
-        inputTexture.bind(u_texture0);
-    }
-
-    @Override
-    public void rebind() {
-        setParams(Param.Texture, u_texture0);
-        setBias(this.bias);
     }
 }

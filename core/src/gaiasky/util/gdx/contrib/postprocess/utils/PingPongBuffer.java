@@ -29,18 +29,16 @@ import org.lwjgl.opengl.GL30;
  * @author tsagrista
  */
 public final class PingPongBuffer {
-    private GaiaSkyFrameBuffer buffer1, buffer2;
+    public final boolean ownResources;
+    // save/restore state
+    private final GaiaSkyFrameBuffer ownedMain, ownedExtra;
     public Texture texture1, texture2, textureDepth, textureVel, textureNormal, textureReflectionMap;
     public int width, height;
-    public final boolean ownResources;
-
+    private GaiaSkyFrameBuffer buffer1, buffer2;
     // internal state
     private Texture texResult, texSrc;
     private GaiaSkyFrameBuffer bufResult, bufSrc;
     private boolean writeState, pending1, pending2;
-
-    // save/restore state
-    private final GaiaSkyFrameBuffer ownedMain, ownedExtra;
     private GaiaSkyFrameBuffer ownedResult, ownedSource;
     private int ownedW, ownedH;
 

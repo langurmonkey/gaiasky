@@ -37,14 +37,14 @@ public class CollapsibleEntry extends OwnButton {
     public void collapse() {
         contentCell.setActor(null);
         me.pack();
-        if(collapseRunnable != null)
+        if (collapseRunnable != null)
             collapseRunnable.run();
     }
 
     public void expand() {
         contentCell.setActor(content);
         me.pack();
-        if(expandRunnable != null)
+        if (expandRunnable != null)
             expandRunnable.run();
     }
 
@@ -71,9 +71,9 @@ public class CollapsibleEntry extends OwnButton {
             }
             return false;
         });
-        title.addListener(new ClickListener(){
+        title.addListener(new ClickListener() {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if(event.getButton() == Buttons.LEFT){
+                if (event.getButton() == Buttons.LEFT) {
                     boolean checked = collapse.isChecked();
                     if (checked) {
                         collapse();
@@ -100,7 +100,7 @@ public class CollapsibleEntry extends OwnButton {
         });
     }
 
-    public void setExpandRunnable(Runnable r){
+    public void setExpandRunnable(Runnable r) {
         expandRunnable = r;
     }
 

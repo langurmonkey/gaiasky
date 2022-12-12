@@ -14,10 +14,12 @@ public class AttributeDistance extends AttributeAbstract implements IAttribute {
     public double get(IParticleRecord bean) {
         return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
     }
-    public String getUnit(){
+
+    public String getUnit() {
         return I18n.msg("gui.unit.pc");
     }
-    public String toString(){
+
+    public String toString() {
         return I18n.msg("gui.attrib.distsun");
     }
 }

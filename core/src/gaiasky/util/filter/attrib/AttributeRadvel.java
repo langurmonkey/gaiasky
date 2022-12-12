@@ -13,10 +13,12 @@ public class AttributeRadvel extends AttributeAbstract implements IAttribute {
     public double get(IParticleRecord bean) {
         return bean.radvel();
     }
-    public String getUnit(){
+
+    public String getUnit() {
         return I18n.msg("gui.unit.kms");
     }
-    public String toString(){
+
+    public String toString() {
         return I18n.msg("gui.attrib.radvel");
     }
 }

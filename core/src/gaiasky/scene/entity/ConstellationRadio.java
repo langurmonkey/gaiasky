@@ -27,7 +27,7 @@ public class ConstellationRadio extends EntityRadio {
 
     public void setUp(Scene scene) {
         var constel = Mapper.constel.get(entity);
-        synchronized(constel) {
+        synchronized (constel) {
             if (!constel.allLoaded) {
                 int nPairs = constel.ids.size;
                 Map<Integer, IPosition> hipMap = scene.index().getHipMap();

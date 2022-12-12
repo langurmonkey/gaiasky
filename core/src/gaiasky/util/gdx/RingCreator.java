@@ -7,7 +7,7 @@ package gaiasky.util.gdx;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 /**
  * Helper generic class to create rings.
@@ -23,13 +23,11 @@ public class RingCreator extends ModelCreator {
 
     /**
      * Creates a new ring with the given parameters.
-     * 
-     * @param innerRadius
-     *            The inner radius length.
-     * @param outerRadius
-     *            The outer radius length.
-     * @param flipNormals
-     *            Whether to flip normals or not.
+     *
+     * @param innerRadius The inner radius length.
+     * @param outerRadius The outer radius length.
+     * @param flipNormals Whether to flip normals or not.
+     *
      * @return This ring creator, for chaining
      */
     public RingCreator create(int divisions, float innerRadius, float outerRadius, boolean flipNormals) {
@@ -38,13 +36,11 @@ public class RingCreator extends ModelCreator {
 
     /**
      * Creates a new ring with the given parameters
-     * 
-     * @param innerRadius
-     *            The inner radius length
-     * @param outerRadius
-     *            The outer radius length
-     * @param flipNormals
-     *            Whether to flip normals or not
+     *
+     * @param innerRadius The inner radius length
+     * @param outerRadius The outer radius length
+     * @param flipNormals Whether to flip normals or not
+     *
      * @return This ring creator, for chaining
      */
     public RingCreator create(int divisions, float innerRadius, float outerRadius, boolean flipNormals, float startAngle, float endAngle) {
@@ -81,7 +77,7 @@ public class RingCreator extends ModelCreator {
     }
 
     protected void addUV(Vector3 p, float angle) {
-        float u = MathUtilsd.lint(angle, startAngle, endAngle, 0, 1);
+        float u = MathUtilsDouble.lint(angle, startAngle, endAngle, 0, 1);
         float v = equals(p.len(), innerRadius) ? 0 : 1f;
 
         uv.add(new Vector2(u, v));

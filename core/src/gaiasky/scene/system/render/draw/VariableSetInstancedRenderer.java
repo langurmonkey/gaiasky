@@ -39,17 +39,14 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
  * Renders variable star sets using instancing via billboards with geometry (quads as two triangles).
  */
 public class VariableSetInstancedRenderer extends InstancedRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(VariableSetInstancedRenderer.class);
-
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;
-
+    protected static final Log logger = Logger.getLogger(VariableSetInstancedRenderer.class);
     private final Vector3 aux1;
-    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, starPosOffset;
     private final Colormap cmap;
-
-    private StarSetQuadComponent triComponent;
     private final ParticleUtils utils;
+    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, starPosOffset;
+    private StarSetQuadComponent triComponent;
 
     public VariableSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);

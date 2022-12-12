@@ -33,7 +33,7 @@ public class AttitudeLoader extends AsynchronousAssetLoader<IAttitudeServer, Att
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, AttitudeLoaderParameters parameter) {
         try {
             String className = parameter.loaderClass;
-            if(className == null || className.isBlank()) {
+            if (className == null || className.isBlank()) {
                 logger.error("Attitude loader class name is null or blank");
                 throw new RuntimeException("Attitude loader class name is null or blank");
             }
@@ -58,9 +58,10 @@ public class AttitudeLoader extends AsynchronousAssetLoader<IAttitudeServer, Att
 
     static public class AttitudeLoaderParameters extends AssetLoaderParameters<IAttitudeServer> {
 
+        public String loaderClass;
+
         public AttitudeLoaderParameters(String loaderClass) {
             this.loaderClass = loaderClass;
         }
-        public String loaderClass;
     }
 }

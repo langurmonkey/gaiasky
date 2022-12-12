@@ -33,7 +33,7 @@ import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.camera.rec.CamRecorder;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathManager;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import org.yaml.snakeyaml.Yaml;
 
 import java.awt.*;
@@ -49,8 +49,6 @@ import java.util.Map;
  * Main class for the Gaia Sky desktop and VR launcher.
  */
 public class GaiaSkyDesktop implements IObserver {
-    private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
-
     /*
      * Source version, used to enable or disable datasets.
      * This is usually tag where each number is allocated 2 digits.
@@ -62,55 +60,32 @@ public class GaiaSkyDesktop implements IObserver {
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
     public static final int SOURCE_VERSION = 30301;
-    private static boolean REST_ENABLED = false;
-
-    /** Running with an unsupported Java version. **/
-    private static boolean JAVA_VERSION_PROBLEM_FLAG = false;
-
+    private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
     private static final String REQUIRED_JAVA_VERSION = "15";
-
     private static final int DEFAULT_OPENGL_MAJOR = 4;
     private static final int DEFAULT_OPENGL_MINOR = 1;
     private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
-
     private static final int MIN_OPENGL_MAJOR = 3;
     private static final int MIN_OPENGL_MINOR = 2;
     private static final String MIN_OPENGL = MIN_OPENGL_MAJOR + "." + MIN_OPENGL_MINOR;
     private static final int MIN_GLSL_MAJOR = 3;
     private static final int MIN_GLSL_MINOR = 3;
     private static final String MIN_GLSL = MIN_GLSL_MAJOR + "." + MIN_GLSL_MINOR;
-
+    private static boolean REST_ENABLED = false;
+    /** Running with an unsupported Java version. **/
+    private static boolean JAVA_VERSION_PROBLEM_FLAG = false;
     private static CLIArgs cliArgs;
-
     /**
-     * Program CLI arguments.
-     */
-    private static class CLIArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+     * UTF-8 output stream printer.
+     **/
+    private static PrintStream out;
+    // Force re-computing the UI scale.
+    private boolean reinitializeUIScale = false;
+    private GaiaSky gs;
 
-        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
-
-        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiArt = false;
-
-        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2) private boolean skipWelcome = false;
-
-        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
-
-        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5) private String assetsLocation = null;
-
-        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6) private boolean vr = false;
-
-        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
-
-        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8) private boolean noScriptingServer = false;
-
-        @Parameter(names = { "-d", "--debug" }, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9) private boolean debug = false;
-
-        @Parameter(names = { "-g", "--gpudebug" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10) private boolean debugGpu = false;
-
-        @Parameter(names = { "-l", "--headless" }, description = "Use headless (windowless) mode, for servers.", order = 11) private boolean headless = false;
-
-        @Parameter(names = { "--safemode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12) private boolean safeMode = false;
+    public GaiaSkyDesktop() {
+        super();
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.DISPOSE);
     }
 
     /**
@@ -122,11 +97,6 @@ public class GaiaSkyDesktop implements IObserver {
     private static void printUsage(JCommander jc) {
         jc.usage();
     }
-
-    /**
-     * UTF-8 output stream printer.
-     **/
-    private static PrintStream out;
 
     /**
      * Main method.
@@ -266,19 +236,139 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    // Force re-computing the UI scale.
-    private boolean reinitializeUIScale = false;
+    private static void checkLogger(final ConsoleLogger consoleLogger) {
+        EventManager.instance.clearAllSubscriptions();
+        consoleLogger.subscribe();
+    }
 
-    public GaiaSkyDesktop() {
-        super();
-        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.DISPOSE);
+    /**
+     * Initialises the configuration file. Tries to load first the file in
+     * <code>$GS_CONFIG_DIR/config.yaml</code>. Checks the
+     * <code>version</code> key and compares it with the version in
+     * the default configuration file of this release
+     * to determine whether the config file must be overwritten.
+     *
+     * @return True if the configuration file has been initialized or
+     * overwritten with the default one, false otherwise.
+     *
+     * @throws IOException If the file fails to be written successfully.
+     */
+    private static boolean initConfigFile(final boolean vr) throws IOException {
+        // Use user folder
+        Path userFolderConfFile = SysUtils.getConfigDir().resolve(SettingsManager.getConfigFileName(vr));
+
+        // Internal config
+        Path confFolder = Settings.assetsPath("conf");
+        Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(vr));
+
+        boolean overwrite = false;
+        boolean userConfExists = Files.exists(userFolderConfFile);
+        if (userConfExists) {
+            Yaml yaml = new Yaml();
+            Map<String, Object> userProps = yaml.load(Files.newInputStream(userFolderConfFile));
+            int internalVersion = 0;
+            if (Files.exists(internalFolderConfFile)) {
+                Map<String, Object> internalProps = yaml.load(Files.newInputStream(internalFolderConfFile));
+                internalVersion = (Integer) internalProps.get("configVersion");
+            }
+
+            // Check latest version
+            if (!userProps.containsKey("configVersion")) {
+                out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
+                overwrite = true;
+            } else if ((Integer) userProps.get("configVersion") < internalVersion) {
+                out.println("Properties file version mismatch, overwriting with new version: found " + userProps.get("version") + ", required " + internalVersion);
+                overwrite = true;
+            }
+        } else {
+            // No user configuration exists, try to morph the old configuration into the new one
+            try {
+                Path propertiesFile = SysUtils.getConfigDir().resolve(vr ? "global.vr.properties" : "global.properties");
+                if (Files.exists(propertiesFile)) {
+                    out.println("Old properties file detected!");
+                    out.println("    -> Converting " + propertiesFile + " to " + userFolderConfFile);
+                    SettingsMorph.morphSettings(propertiesFile, userFolderConfFile);
+                    // Move old properties file so that they are not converted on the next run
+                    Files.move(propertiesFile, SysUtils.getConfigDir().resolve(vr ? "global.vr.properties.old" : "global.properties.old"));
+                    userConfExists = true;
+                } else {
+                    // Old configuration not found!
+                    out.println("Failed updating old global.properties file into new config.yaml: Old configuration file not found");
+                }
+            } catch (Exception e) {
+                // Failed!
+            }
+        }
+
+        if (overwrite || !userConfExists) {
+            // Copy file
+            if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
+                // Running released package
+                GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
+            } else {
+                logger.warn("Configuration folder does not exist: " + confFolder);
+            }
+        }
+        String props = userFolderConfFile.toAbsolutePath().toString();
+        System.setProperty("properties.file", props);
+
+        return overwrite || !userConfExists;
+    }
+
+    /**
+     * Checks whether the REST server dependencies are in the classpath.
+     *
+     * @return True if REST dependencies are loaded.
+     */
+    private static boolean checkRestDependenciesInClasspath() {
+        try {
+            Class.forName("spark.Spark");
+            Class.forName("gaiasky.rest.RESTServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            // my class isn't there!
+            return false;
+        }
+    }
+
+    /**
+     * Checks for incompatibilities between the java version and the OS. Prints the necessary warnings for known issues.
+     */
+    private static void javaVersionCheck() {
+        double jv = SysUtils.getJavaVersion();
+        boolean linux = SysUtils.isLinux();
+        boolean gnome = SysUtils.checkGnome();
+        if (jv >= 10 && linux && gnome) {
+            out.println("======================================= WARNING ========================================");
+            out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n" + "This version may crash. If it does, comment out the property\n" + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
+            out.println("========================================================================================");
+            out.println();
+        }
+
+        if (jv < 9) {
+            out.println("========================== ERROR ==============================");
+            out.println("You are using Java " + jv + ", which is unsupported by Gaia Sky");
+            out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
+            out.println("===============================================================");
+            JAVA_VERSION_PROBLEM_FLAG = true;
+        }
+    }
+
+    /**
+     * Checks for experimental features and issues warnings
+     */
+    private static void experimentalCheck() {
+        if (cliArgs.externalView) {
+            out.println("============================ WARNING ================================");
+            out.println("The -e/--externalview feature is experimental and may cause problems!");
+            out.println("=====================================================================");
+            out.println();
+        }
     }
 
     private void init() {
         launchMainApp();
     }
-
-    private GaiaSky gs;
 
     public void launchMainApp() {
         ConsoleLogger consoleLogger = new ConsoleLogger();
@@ -374,12 +464,12 @@ public class GaiaSkyDesktop implements IObserver {
         }
         // Color, Depth, stencil buffers, MSAA.
         cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
-        
+
         // Compute base UI scale.
         if (reinitializeUIScale) {
             // Height linear interpolation:
             // min:HD -> max:5K
-            s.program.ui.scale = MathUtilsd.lint(s.graphics.resolution[1], 600, 2680, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+            s.program.ui.scale = MathUtilsDouble.lint(s.graphics.resolution[1], 600, 2680, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
             logger.info("UI scale re-initialized to " + s.program.ui.scale);
         }
 
@@ -527,11 +617,6 @@ public class GaiaSkyDesktop implements IObserver {
         this.reinitializeUIScale = b;
     }
 
-    private static void checkLogger(final ConsoleLogger consoleLogger) {
-        EventManager.instance.clearAllSubscriptions();
-        consoleLogger.subscribe();
-    }
-
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
@@ -564,127 +649,33 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     /**
-     * Initialises the configuration file. Tries to load first the file in
-     * <code>$GS_CONFIG_DIR/config.yaml</code>. Checks the
-     * <code>version</code> key and compares it with the version in
-     * the default configuration file of this release
-     * to determine whether the config file must be overwritten.
-     *
-     * @return True if the configuration file has been initialized or
-     * overwritten with the default one, false otherwise.
-     *
-     * @throws IOException If the file fails to be written successfully.
+     * Program CLI arguments.
      */
-    private static boolean initConfigFile(final boolean vr) throws IOException {
-        // Use user folder
-        Path userFolderConfFile = SysUtils.getConfigDir().resolve(SettingsManager.getConfigFileName(vr));
+    private static class CLIArgs {
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
 
-        // Internal config
-        Path confFolder = Settings.assetsPath("conf");
-        Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(vr));
+        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
 
-        boolean overwrite = false;
-        boolean userConfExists = Files.exists(userFolderConfFile);
-        if (userConfExists) {
-            Yaml yaml = new Yaml();
-            Map<String, Object> userProps = yaml.load(Files.newInputStream(userFolderConfFile));
-            int internalVersion = 0;
-            if (Files.exists(internalFolderConfFile)) {
-                Map<String, Object> internalProps = yaml.load(Files.newInputStream(internalFolderConfFile));
-                internalVersion = (Integer) internalProps.get("configVersion");
-            }
+        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiArt = false;
 
-            // Check latest version
-            if (!userProps.containsKey("configVersion")) {
-                out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
-                overwrite = true;
-            } else if ((Integer) userProps.get("configVersion") < internalVersion) {
-                out.println("Properties file version mismatch, overwriting with new version: found " + userProps.get("version") + ", required " + internalVersion);
-                overwrite = true;
-            }
-        } else {
-            // No user configuration exists, try to morph the old configuration into the new one
-            try {
-                Path propertiesFile = SysUtils.getConfigDir().resolve(vr ? "global.vr.properties" : "global.properties");
-                if (Files.exists(propertiesFile)) {
-                    out.println("Old properties file detected!");
-                    out.println("    -> Converting " + propertiesFile + " to " + userFolderConfFile);
-                    SettingsMorph.morphSettings(propertiesFile, userFolderConfFile);
-                    // Move old properties file so that they are not converted on the next run
-                    Files.move(propertiesFile, SysUtils.getConfigDir().resolve(vr ? "global.vr.properties.old" : "global.properties.old"));
-                    userConfExists = true;
-                } else {
-                    // Old configuration not found!
-                    out.println("Failed updating old global.properties file into new config.yaml: Old configuration file not found");
-                }
-            } catch (Exception e) {
-                // Failed!
-            }
-        }
+        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2) private boolean skipWelcome = false;
 
-        if (overwrite || !userConfExists) {
-            // Copy file
-            if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
-                // Running released package
-                GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
-            } else {
-                logger.warn("Configuration folder does not exist: " + confFolder);
-            }
-        }
-        String props = userFolderConfFile.toAbsolutePath().toString();
-        System.setProperty("properties.file", props);
+        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
 
-        return overwrite || !userConfExists;
-    }
+        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5) private String assetsLocation = null;
 
-    /**
-     * Checks whether the REST server dependencies are in the classpath.
-     *
-     * @return True if REST dependencies are loaded.
-     */
-    private static boolean checkRestDependenciesInClasspath() {
-        try {
-            Class.forName("spark.Spark");
-            Class.forName("gaiasky.rest.RESTServer");
-            return true;
-        } catch (ClassNotFoundException e) {
-            // my class isn't there!
-            return false;
-        }
-    }
+        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6) private boolean vr = false;
 
-    /**
-     * Checks for incompatibilities between the java version and the OS. Prints the necessary warnings for known issues.
-     */
-    private static void javaVersionCheck() {
-        double jv = SysUtils.getJavaVersion();
-        boolean linux = SysUtils.isLinux();
-        boolean gnome = SysUtils.checkGnome();
-        if (jv >= 10 && linux && gnome) {
-            out.println("======================================= WARNING ========================================");
-            out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n" + "This version may crash. If it does, comment out the property\n" + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
-            out.println("========================================================================================");
-            out.println();
-        }
+        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
 
-        if (jv < 9) {
-            out.println("========================== ERROR ==============================");
-            out.println("You are using Java " + jv + ", which is unsupported by Gaia Sky");
-            out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
-            out.println("===============================================================");
-            JAVA_VERSION_PROBLEM_FLAG = true;
-        }
-    }
+        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8) private boolean noScriptingServer = false;
 
-    /**
-     * Checks for experimental features and issues warnings
-     */
-    private static void experimentalCheck() {
-        if (cliArgs.externalView) {
-            out.println("============================ WARNING ================================");
-            out.println("The -e/--externalview feature is experimental and may cause problems!");
-            out.println("=====================================================================");
-            out.println();
-        }
+        @Parameter(names = { "-d", "--debug" }, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9) private boolean debug = false;
+
+        @Parameter(names = { "-g", "--gpudebug" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10) private boolean debugGpu = false;
+
+        @Parameter(names = { "-l", "--headless" }, description = "Use headless (windowless) mode, for servers.", order = 11) private boolean headless = false;
+
+        @Parameter(names = { "--safemode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12) private boolean safeMode = false;
     }
 }

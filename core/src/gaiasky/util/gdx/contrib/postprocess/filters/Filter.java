@@ -12,25 +12,16 @@ import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenQuad;
 /** The base class for any single-pass filter. */
 public abstract class Filter<T> {
 
-    public interface Parameter {
-        String mnemonic();
-
-        int arrayElementSize();
-    }
-
     protected static final FullscreenQuad quad = new FullscreenQuad();
-
     protected static final int u_texture0 = 0;
     protected static final int u_texture1 = 1;
     protected static final int u_texture2 = 2;
     protected static final int u_texture3 = 3;
-
     protected Texture inputTexture = null;
     protected FrameBuffer inputBuffer = null;
     protected FrameBuffer outputBuffer = null;
     protected ShaderProgram program;
     private boolean programBegan = false;
-
     public Filter(ShaderProgram program) {
         this.program = program;
     }
@@ -72,18 +63,18 @@ public abstract class Filter<T> {
 
     public abstract void rebind();
 
+    // int
+    protected void setParam(Parameter param, int value) {
+        program.bind();
+        program.setUniformi(param.mnemonic(), value);
+    }
+
     /*
      * Sets the parameter to the specified value for this filter. This is for
      * one-off operations since the shader is being bound and unbound once per
      * call: for a batch-ready version of this function see and use setParams
      * instead.
      */
-
-    // int
-    protected void setParam(Parameter param, int value) {
-        program.bind();
-        program.setUniformi(param.mnemonic(), value);
-    }
 
     // float
     protected void setParam(Parameter param, float value) {
@@ -239,5 +230,11 @@ public abstract class Filter<T> {
 
         program.bind();
         quad.render(program);
+    }
+
+    public interface Parameter {
+        String mnemonic();
+
+        int arrayElementSize();
     }
 }

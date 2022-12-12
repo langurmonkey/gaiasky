@@ -6,7 +6,7 @@
 package gaiasky.util.gaia.utils;
 
 import gaiasky.util.Nature;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Quaterniond;
 
 public class Interpolator {
@@ -17,20 +17,14 @@ public class Interpolator {
      * Static method for cubic Hermite interpolation between two points, given
      * their values and derivatives.
      *
-     * @param x
-     *            desired abscissa (normally between x0 and x1)
-     * @param x0
-     *            abscissa of first point
-     * @param y0
-     *            function value at x0
-     * @param yp0
-     *            first derivative at x0
-     * @param x1
-     *            abscissa of second point
-     * @param y1
-     *            function value at x1
-     * @param yp1
-     *            derivative at x1
+     * @param x   desired abscissa (normally between x0 and x1)
+     * @param x0  abscissa of first point
+     * @param y0  function value at x0
+     * @param yp0 first derivative at x0
+     * @param x1  abscissa of second point
+     * @param y1  function value at x1
+     * @param yp1 derivative at x1
+     *
      * @return array with interpolated function value at x and its derivative
      */
     public static double[] hermite3(final double x, final double x0, final double y0, final double yp0, final double x1, final double y1, final double yp1) {
@@ -46,7 +40,7 @@ public class Interpolator {
     }
 
     public static double[] linear(final double x, final double x0, final double y0, final double x1, final double y1) {
-        double y = MathUtilsd.lint(x, x0, x1, y0, y1);
+        double y = MathUtilsDouble.lint(x, x0, x1, y0, y1);
         double yprima = (y1 - y0) / (x1 - x0);
         return new double[] { y, yprima };
     }
@@ -55,38 +49,33 @@ public class Interpolator {
      * Static method for computing the average attitude quaternion over a finite
      * time interval ta &lt;= t &lt;= tb, using cubic Hermite interpolation, as
      * well as the average time derivative
-     *
+     * <p>
      * It is assumed that ta &lt;= tb. If tb-ta is less than dtMin then no
      * average is computed but the instantaneous (interpolated) values at the
      * instant (ta+tb)/2 are returned instead.
-     *
+     * <p>
      * The times ta, tb, t[] are in [days] from some arbitrary but common
      * origin. Time derivatives are in [1/day].
-     *
+     * <p>
      * The lengths of the array arguments must be: t.length &gt;= 2, q.length
      * &gt;= t.length, qDot-length &gt;= t.length. No check is made of these
      * conditions.
-     *
+     * <p>
      * The argument indx is such that t[indx] is not far from ta and tb. It must
      * be in the range 0 &lt;= indx &lt;= t.length-2
      *
-     * @param ta
-     *            start time of the averaging interval
-     * @param tb
-     *            end time of the averaging interval
-     * @param t
-     *            array array of increasing times encompassing the averaging
-     *            interval (i.e., t[0] &lt;= ta and tb &lt;= t[t.length-1])
-     * @param indx
-     *            an index in the array t[] that is a suitable starting point
-     *            for locating ta and tb in the array
-     * @param q
-     *            array of attitude quaternions at times t[]
-     * @param qDot
-     *            array of attitude quaternion rates [1/timeUnit] at times t[]
+     * @param ta   start time of the averaging interval
+     * @param tb   end time of the averaging interval
+     * @param t    array array of increasing times encompassing the averaging
+     *             interval (i.e., t[0] &lt;= ta and tb &lt;= t[t.length-1])
+     * @param indx an index in the array t[] that is a suitable starting point
+     *             for locating ta and tb in the array
+     * @param q    array of attitude quaternions at times t[]
+     * @param qDot array of attitude quaternion rates [1/timeUnit] at times t[]
+     *
      * @return array containing the average attitude quaternion as the first
-     *         element and the average attitude quaternion rate [1/timeUnit] as
-     *         the second element
+     * element and the average attitude quaternion rate [1/timeUnit] as
+     * the second element
      */
     public static Quaterniond[] qHermiteAverage(final double ta, final double tb, final double[] t, final int indx, final Quaterniond[] q, final Quaterniond[] qDot) {
 
@@ -123,35 +112,20 @@ public class Interpolator {
     }
 
     /**
-     * Kind of interpolation: for derivative, value or integral
-     *
-     * @author lennartlindegren
-     * @version $Id: Interpolator.java 374850 2014-07-01 16:04:16Z pbalm $
-     */
-    public enum Kind {
-        DER, VAL, INT
-    }
-
-    /**
      * Evaluates the quaternion derivative, value or integral at point tx, using
      * Hermite interpolation in t[], q[], qDot[]. left is such that t[left]
      * &lt;= tx &lt; t[left+1]. Kind = DER returns the derivative at tx, VAL
      * returns the value at tx, and INT returns the integral from t[left] to tx.
      *
-     * @param tx
-     *            time at which the derivative, value or integral is evaluated
-     * @param t
-     *            array of times (length &gt;= 2)
-     * @param q
-     *            array of quaternions
-     * @param qDot
-     *            array of quaternion derivatives
-     * @param left
-     *            index in t, q and qDot susch that t[left] &lt;= tx &lt;
-     *            t[left+1]
-     * @param kind
-     *            which kind of result is returned (derivative, value or
-     *            integral)
+     * @param tx   time at which the derivative, value or integral is evaluated
+     * @param t    array of times (length &gt;= 2)
+     * @param q    array of quaternions
+     * @param qDot array of quaternion derivatives
+     * @param left index in t, q and qDot susch that t[left] &lt;= tx &lt;
+     *             t[left+1]
+     * @param kind which kind of result is returned (derivative, value or
+     *             integral)
+     *
      * @return The quaternion
      */
     public static Quaterniond qEval(double tx, double[] t, Quaterniond[] q, Quaterniond[] qDot, int left, Kind kind) {
@@ -189,8 +163,8 @@ public class Interpolator {
      *
      * @param ta
      * @param t
-     * @param indx
-     *            starting index
+     * @param indx starting index
+     *
      * @return The left index
      */
     public static int getLeft(double ta, double[] t, int indx) {
@@ -208,8 +182,8 @@ public class Interpolator {
      *
      * @param ta
      * @param t
-     * @param indx
-     *            starting index
+     * @param indx starting index
+     *
      * @return The left index
      */
     public static int getLeftVar(double ta, double[] t, int indx) {
@@ -224,6 +198,7 @@ public class Interpolator {
      * interpolating polynomials a0(x), a1(x), b0(x), b1(x) [DRO-012, Eq. (8)]
      *
      * @param x
+     *
      * @return double array containing a0, a1, b0, b1 at x
      */
     protected static double[] interPolVal(double x) {
@@ -239,8 +214,8 @@ public class Interpolator {
      * For normalized argument x (between 0 and 1), calculate the derivatives
      * ap0(x), ap1(x), bp0(x), bp1(x) of the four interpolating polynomials
      *
-     * @param x
-     *            The value
+     * @param x The value
+     *
      * @return double array containing ap0, ap1, bp0, bp1 at x
      */
     protected static double[] interPolDer(double x) {
@@ -254,11 +229,11 @@ public class Interpolator {
     /**
      * For normalized argument x (between 0 and 1), calculate the integrals
      * A0(x), A1(x), B0(x), B1(x) of the interpolating polynomials
-     *
+     * <p>
      * A0(x) = int_0^x a0(y)*dy (etc)
      *
-     * @param x
-     *            The value
+     * @param x The value
+     *
      * @return double array containing A0, A1, B0, B1 at x
      */
     protected static double[] interPolInt(double x) {
@@ -274,22 +249,21 @@ public class Interpolator {
     /**
      * In the non-decreasing sequence xa[0:n-1], finds the left index such that
      * xa[left] &lt;= x &lt; xa[left+1]
-     *
+     * <p>
      * If x &lt; xa[0] the method returns -1 if x &gt;= xa[n-1], the last index
      * to the array (n-1) is returned
-     *
+     * <p>
      * Uses a straight bisection method to locate the left index.
      *
-     * @param xa
-     *            - array of non-decreasing values
-     * @param xaLength
-     *            - ???
-     * @param x
-     *            - value to locate
+     * @param xa       - array of non-decreasing values
+     * @param xaLength - ???
+     * @param x        - value to locate
+     *
      * @return left index
+     *
      * @deprecated Mantis 14225, deprecated August 2, 2012. Use
-     *             {@link AttitudeUtils#findLeftIndex(long, long[], int)}.
-     *             Remove by GT 18.0.
+     * {@link AttitudeUtils#findLeftIndex(long, long[], int)}.
+     * Remove by GT 18.0.
      */
     @Deprecated
     public static int findLeftIndex(final long[] xa, final int xaLength, final long x) {
@@ -316,6 +290,18 @@ public class Interpolator {
         }
 
         return kLo;
+    }
+
+    /**
+     * Kind of interpolation: for derivative, value or integral
+     *
+     * @author lennartlindegren
+     * @version $Id: Interpolator.java 374850 2014-07-01 16:04:16Z pbalm $
+     */
+    public enum Kind {
+        DER,
+        VAL,
+        INT
     }
 
 }

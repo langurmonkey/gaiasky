@@ -34,16 +34,14 @@ import java.util.Map;
  * The datasets pane in the controls window
  */
 public class DatasetsComponent extends GuiComponent implements IObserver {
-    private VerticalGroup group;
     private final float pad = 4.8f;
-
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColorPickerAbstract> colorMap;
     private final Map<String, DatasetPreferencesWindow> prefsMap;
     private final Map<String, OwnSliderPlus> scalingMap;
     private final CatalogManager catalogManager;
-
+    private VerticalGroup group;
     private OwnLabel noDatasetsLabel = null;
 
     public DatasetsComponent(final Skin skin, final Stage stage, final CatalogManager catalogManager) {

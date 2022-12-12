@@ -77,11 +77,11 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
     }
 
     static public class GaiaSkyLoaderParameters extends AssetLoaderParameters<GaiaSkyAssets> {
+        public boolean noScripting;
+        public GaiaSky gaiaSky;
         public GaiaSkyLoaderParameters(GaiaSky gaiaSky, boolean noScripting) {
             this.gaiaSky = gaiaSky;
             this.noScripting = noScripting;
         }
-        public boolean noScripting;
-        public GaiaSky gaiaSky;
     }
 }

@@ -54,15 +54,16 @@ import java.nio.*;
  * @author mzechner
  */
 public class ExtShaderProgram implements Disposable {
-    private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
-
     /** Default name for position attributes. **/
     public static final String POSITION_ATTRIBUTE = "a_position";
     /** Default name for color attributes. **/
     public static final String COLOR_ATTRIBUTE = "a_color";
     /** Default name for texture coordinates attributes, append texture unit number. **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
-
+    final static IntBuffer intbuf = BufferUtils.newIntBuffer(1);
+    private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
+    /** The list of currently available shaders. **/
+    private final static ObjectMap<Application, Array<ExtShaderProgram>> shaders = new ObjectMap<>();
     /** Flag indicating whether attributes & uniforms must be present at all times. **/
     public static boolean pedantic = true;
     /**
@@ -70,68 +71,48 @@ public class ExtShaderProgram implements Disposable {
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependVertexCode = "";
-
     /**
      * Code that is always added to every fragment shader code, typically used to inject a #version line. Note that this is added
      * as-is, you should include a newline (`\n`) if needed.
      */
     public static String prependFragmentCode = "";
-
-    /** The list of currently available shaders. **/
-    private final static ObjectMap<Application, Array<ExtShaderProgram>> shaders = new ObjectMap<>();
-
+    IntBuffer params = BufferUtils.newIntBuffer(1);
+    IntBuffer type = BufferUtils.newIntBuffer(1);
     /** The log. **/
     private String log = "";
-
     /** The shader name, if any. **/
     private String name;
-
     /** Whether this program compiled successfully. **/
     private boolean isCompiled;
     /** Whether lazy loading is activated for this shader. **/
     private boolean isLazy;
-
     /** Uniform lookup. **/
     private ObjectIntMap<String> uniforms;
-
     /** Uniform types. **/
     private ObjectIntMap<String> uniformTypes;
-
     /** Uniform sizes. **/
     private ObjectIntMap<String> uniformSizes;
-
     /** Uniform names. **/
     private String[] uniformNames;
-
     /** Attribute lookup. **/
     private ObjectIntMap<String> attributes;
-
     /** Attribute types. **/
     private ObjectIntMap<String> attributeTypes;
-
     /** Attribute sizes. **/
     private ObjectIntMap<String> attributeSizes;
-
     /** Attribute names. **/
     private String[] attributeNames;
-
     /** Program handle. **/
     private int program;
-
     /** Vertex shader handle. **/
     private int vertexShaderHandle;
-
     /** Fragment shader handle. **/
     private int fragmentShaderHandle;
-
     /** Vertex shader source. **/
     private String vertexShaderSource;
-
     /** Fragment shader source. **/
     private String fragmentShaderSource;
-
     private String vertexShaderFile, fragmentShaderFile;
-
     /** Whether this shader was invalidated. **/
     private boolean invalidated;
 
@@ -191,6 +172,46 @@ public class ExtShaderProgram implements Disposable {
 
     public ExtShaderProgram(FileHandle vertexShader, FileHandle fragmentShader) {
         this(vertexShader.readString(), fragmentShader.readString());
+    }
+
+    /**
+     * Invalidates all shaders so the next time they are used new handles are generated
+     *
+     * @param app
+     */
+    public static void invalidateAllShaderPrograms(Application app) {
+        if (Gdx.gl20 == null)
+            return;
+
+        Array<ExtShaderProgram> shaderArray = shaders.get(app);
+        if (shaderArray == null)
+            return;
+
+        for (int i = 0; i < shaderArray.size; i++) {
+            shaderArray.get(i).invalidated = true;
+            shaderArray.get(i).checkManaged();
+        }
+    }
+
+    public static void clearAllShaderPrograms(Application app) {
+        shaders.remove(app);
+    }
+
+    public static String getManagedStatus() {
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        builder.append("Managed shaders/app: { ");
+        for (Application app : shaders.keys()) {
+            builder.append(shaders.get(app).size);
+            builder.append(" ");
+        }
+        builder.append("}");
+        return builder.toString();
+    }
+
+    /** @return the number of managed shader programs currently loaded */
+    public static int getNumManagedShaderPrograms() {
+        return shaders.get(Gdx.app).size;
     }
 
     private void initializeLocalAssets() {
@@ -317,8 +338,6 @@ public class ExtShaderProgram implements Disposable {
 
         return program;
     }
-
-    final static IntBuffer intbuf = BufferUtils.newIntBuffer(1);
 
     /**
      * @return the log info for the shader compilation and program linking stage. The shader needs to be bound for this method to
@@ -873,46 +892,6 @@ public class ExtShaderProgram implements Disposable {
     }
 
     /**
-     * Invalidates all shaders so the next time they are used new handles are generated
-     *
-     * @param app
-     */
-    public static void invalidateAllShaderPrograms(Application app) {
-        if (Gdx.gl20 == null)
-            return;
-
-        Array<ExtShaderProgram> shaderArray = shaders.get(app);
-        if (shaderArray == null)
-            return;
-
-        for (int i = 0; i < shaderArray.size; i++) {
-            shaderArray.get(i).invalidated = true;
-            shaderArray.get(i).checkManaged();
-        }
-    }
-
-    public static void clearAllShaderPrograms(Application app) {
-        shaders.remove(app);
-    }
-
-    public static String getManagedStatus() {
-        StringBuilder builder = new StringBuilder();
-        int i = 0;
-        builder.append("Managed shaders/app: { ");
-        for (Application app : shaders.keys()) {
-            builder.append(shaders.get(app).size);
-            builder.append(" ");
-        }
-        builder.append("}");
-        return builder.toString();
-    }
-
-    /** @return the number of managed shader programs currently loaded */
-    public static int getNumManagedShaderPrograms() {
-        return shaders.get(Gdx.app).size;
-    }
-
-    /**
      * Sets the given attribute
      *
      * @param name   the name of the attribute
@@ -926,9 +905,6 @@ public class ExtShaderProgram implements Disposable {
         int location = fetchAttributeLocation(name);
         gl.glVertexAttrib4f(location, value1, value2, value3, value4);
     }
-
-    IntBuffer params = BufferUtils.newIntBuffer(1);
-    IntBuffer type = BufferUtils.newIntBuffer(1);
 
     private void fetchUniforms() {
         params.clear();

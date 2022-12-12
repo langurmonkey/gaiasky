@@ -95,11 +95,18 @@ public class RESTServer {
     /* Class variables: */
 
     /**
+     * REST server static files location.
+     */
+    private static final String rest_static_location = Settings.ASSETS_LOC + "/rest-static";
+    /**
+     * Logger
+     */
+    private static final Log logger = Logger.getLogger(RESTServer.class);
+    /**
      * "Shutdown already triggered" flag. {@link Spark#stop()} can be called multiple times
      * (multiple events), but only processed once.
      */
     private static boolean shutdownTriggered = false;
-
     /**
      * Activated flag. Calling API methods generally requires the GUI to be fully
      * started and all objects initialized, indicated by the "activated" flag. This
@@ -107,23 +114,11 @@ public class RESTServer {
      * externally once the GUI is ready.
      */
     private static boolean activated = false;
-
     /**
      * REST server port. TCP port the server is listening on. It is set on
      * initialization.
      */
     private static Integer port = -1;
-
-    /**
-     * REST server static files location.
-     */
-    private static final String rest_static_location = Settings.ASSETS_LOC + "/rest-static";
-
-    /**
-     * Logger
-     */
-    private static final Log logger = Logger.getLogger(RESTServer.class);
-
     /**
      * Name to method map
      */

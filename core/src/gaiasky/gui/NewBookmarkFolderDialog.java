@@ -32,6 +32,7 @@ public class NewBookmarkFolderDialog extends GenericDialog {
         // Pack
         pack();
     }
+
     public void build() {
         // Info message
         IValidator val = new FolderValidator();
@@ -43,12 +44,13 @@ public class NewBookmarkFolderDialog extends GenericDialog {
     }
 
     @Override
-    public boolean accept(){
+    public boolean accept() {
         stage.unfocusAll();
         return true;
     }
+
     @Override
-    public void cancel(){
+    public void cancel() {
         stage.unfocusAll();
     }
 

@@ -29,11 +29,10 @@ public class MinimapWidget implements Disposable {
     private final FrameBuffer sfb;
     private final TextureWidget topProjection;
     private final TextureWidget sideProjection;
+    private final Vector3d aux3d;
+    private final Array<IMinimapScale> scales;
     int side, side2;
     int sideShort, sideShort2;
-    private final Vector3d aux3d;
-
-    private final Array<IMinimapScale> scales;
     private IMinimapScale current;
 
     public MinimapWidget(final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
@@ -128,6 +127,6 @@ public class MinimapWidget implements Disposable {
             return null;
     }
 
-    public void dispose(){
+    public void dispose() {
     }
 }

@@ -32,7 +32,7 @@ public class FilterRule {
         return comparator.evaluate(attribute.get(bean), value);
     }
 
-    public FilterRule copy(){
+    public FilterRule copy() {
         FilterRule cpy = new FilterRule(comparator.toString(), attribute, value);
         return cpy;
     }
@@ -40,7 +40,8 @@ public class FilterRule {
     public double getValue() {
         return value;
     }
-    public void setValue(double value){
+
+    public void setValue(double value) {
         this.value = value;
     }
 
@@ -48,7 +49,7 @@ public class FilterRule {
         return comparator;
     }
 
-    public void setComparator(IComparator comp){
+    public void setComparator(IComparator comp) {
         this.comparator = comp;
     }
 
@@ -56,7 +57,7 @@ public class FilterRule {
         return attribute;
     }
 
-    public void setAttribute(IAttribute attr){
+    public void setAttribute(IAttribute attr) {
         this.attribute = attr;
     }
 
@@ -82,6 +83,7 @@ public class FilterRule {
     public interface IComparator {
 
         boolean evaluate(double val1, double val2);
+
         String toString();
 
     }
@@ -91,8 +93,9 @@ public class FilterRule {
         public boolean evaluate(double val1, double val2) {
             return val1 >= val2;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return ">=";
         }
     }
@@ -102,8 +105,9 @@ public class FilterRule {
         public boolean evaluate(double val1, double val2) {
             return val1 > val2;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return ">";
         }
     }
@@ -113,8 +117,9 @@ public class FilterRule {
         public boolean evaluate(double val1, double val2) {
             return val1 <= val2;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return "<=";
         }
     }
@@ -124,8 +129,9 @@ public class FilterRule {
         public boolean evaluate(double val1, double val2) {
             return val1 < val2;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return "<";
         }
     }
@@ -135,8 +141,9 @@ public class FilterRule {
         public boolean evaluate(double val1, double val2) {
             return val1 == val2;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return "==";
         }
     }
@@ -146,8 +153,9 @@ public class FilterRule {
         public boolean evaluate(double val1, double val2) {
             return val1 != val2;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return "!=";
         }
     }

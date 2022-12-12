@@ -45,52 +45,25 @@ import java.util.ArrayList;
  */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
-
-    private Skin skin;
-
-    private PreferencesWindow preferencesWindow;
-    private AboutWindow aboutWindow;
-    private SearchDialog searchDialog;
-
-    /**
-     * Keyframes window
-     **/
-    private KeyframesWindow keyframesWindow;
-
-    /**
-     * Individual visibility
-     */
-    private IndividualVisibilityWindow indVisWindow;
-
-    /**
-     * Mode change info popup
-     */
-    public Table modeChangeInfoPopup;
-
-    /** Task to remove the information pop-up. **/
-    private Task removePopup;
-
-    /**
-     * Last open location
-     */
-    private Path lastOpenLocation;
-
-    /* Slave config window */
-    private SlaveConfigWindow slaveConfigWindow;
-
     /** Scene reference. **/
     protected final Scene scene;
-
     /**
      * Registered GUI array
      **/
     private final Array<IGui> guis;
-
     /**
      * Render lock object
      */
     private final Object renderLock = new Object();
-
+    /**
+     * The catalog manager
+     */
+    private final CatalogManager catalogManager;
+    private final FocusView view;
+    /**
+     * Mode change info popup
+     */
+    public Table modeChangeInfoPopup;
     /**
      * Current GUI object
      **/
@@ -99,18 +72,30 @@ public class GuiRegistry implements IObserver {
      * Previous GUI object, if any
      **/
     public IGui previous;
-
+    private Skin skin;
+    private PreferencesWindow preferencesWindow;
+    private AboutWindow aboutWindow;
+    private SearchDialog searchDialog;
+    /**
+     * Keyframes window
+     **/
+    private KeyframesWindow keyframesWindow;
+    /**
+     * Individual visibility
+     */
+    private IndividualVisibilityWindow indVisWindow;
+    /** Task to remove the information pop-up. **/
+    private Task removePopup;
+    /**
+     * Last open location
+     */
+    private Path lastOpenLocation;
+    /* Slave config window */
+    private SlaveConfigWindow slaveConfigWindow;
     /**
      * Global input multiplexer
      **/
     private InputMultiplexer inputMultiplexer = null;
-
-    /**
-     * The catalog manager
-     */
-    private final CatalogManager catalogManager;
-
-    private final FocusView view;
 
     /**
      * Create new GUI registry object.
@@ -126,12 +111,12 @@ public class GuiRegistry implements IObserver {
         EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
     }
 
-    public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
-        this.inputMultiplexer = inputMultiplexer;
-    }
-
     public InputMultiplexer getInputMultiplexer() {
         return this.inputMultiplexer;
+    }
+
+    public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
+        this.inputMultiplexer = inputMultiplexer;
     }
 
     /**

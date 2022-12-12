@@ -48,12 +48,80 @@ import gaiasky.util.gdx.shader.Material;
  * @author Xoppa
  */
 public class IntModelBuilder {
+    /** The mesh builders created between begin and end */
+    private final Array<IntIntMeshBuilder> builders = new Array<>();
     /** The model currently being build */
     private IntModel model;
     /** The node currently being build */
     private IntNode node;
-    /** The mesh builders created between begin and end */
-    private final Array<IntIntMeshBuilder> builders = new Array<>();
+
+    /**
+     * Resets the references to {@link Material}s, {@link IntMesh}es and
+     * {@link IntMeshPart}s within the model to the ones used within it's nodes.
+     * This will make the model responsible for disposing all referenced meshes.
+     */
+    public static void rebuildReferences(final IntModel model) {
+        model.materials.clear();
+        model.meshes.clear();
+        model.meshParts.clear();
+        for (final IntNode node : model.nodes)
+            rebuildReferences(model, node);
+    }
+
+    private static void rebuildReferences(final IntModel model, final IntNode node) {
+        for (final IntNodePart mpm : node.parts) {
+            if (!model.materials.contains(mpm.material, true))
+                model.materials.add(mpm.material);
+            if (!model.meshParts.contains(mpm.meshPart, true)) {
+                model.meshParts.add(mpm.meshPart);
+                if (!model.meshes.contains(mpm.meshPart.mesh, true))
+                    model.meshes.add(mpm.meshPart.mesh);
+                model.manageDisposable(mpm.meshPart.mesh);
+            }
+        }
+        Iterable<IntNode> nodeIter = node.getChildren();
+        for (final IntNode child : nodeIter)
+            rebuildReferences(model, child);
+    }
+
+    // Old code below this line, as for now still useful for testing.
+    @Deprecated
+    public static IntModel createFromMesh(final IntMesh mesh, int primitiveType, final Material material) {
+        return createFromMesh(mesh, 0, mesh.getNumIndices(), primitiveType, material);
+    }
+
+    @Deprecated
+    public static IntModel createFromMesh(final IntMesh mesh, int indexOffset, int vertexCount, int primitiveType, final Material material) {
+        IntModel result = new IntModel();
+        IntMeshPart meshPart = new IntMeshPart();
+        meshPart.id = "part1";
+        meshPart.offset = indexOffset;
+        meshPart.size = vertexCount;
+        meshPart.primitiveType = primitiveType;
+        meshPart.mesh = mesh;
+
+        IntNodePart partMaterial = new IntNodePart();
+        partMaterial.material = material;
+        partMaterial.meshPart = meshPart;
+        IntNode node = new IntNode();
+        node.id = "node1";
+        node.parts.add(partMaterial);
+
+        result.meshes.add(mesh);
+        result.materials.add(material);
+        result.nodes.add(node);
+        result.meshParts.add(meshPart);
+        result.manageDisposable(mesh);
+        return result;
+    }
+
+    @Deprecated
+    public static IntModel createFromMesh(final float[] vertices, final VertexAttribute[] attributes, final int[] indices, int primitiveType, final Material material) {
+        final IntMesh mesh = new IntMesh(false, vertices.length, indices.length, attributes);
+        mesh.setVertices(vertices);
+        mesh.setIndices(indices);
+        return createFromMesh(mesh, 0, indices.length, primitiveType, material);
+    }
 
     private IntIntMeshBuilder getBuilder(final VertexAttributes attributes) {
         for (final IntIntMeshBuilder mb : builders)
@@ -227,6 +295,7 @@ public class IntModelBuilder {
      * @param attributes bitwise mask of the
      *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *                   Position, Color, Normal and TextureCoordinates is supported.
+     *
      * @return The {@link IntMeshPartBuilder} you can use to build the IntMeshPart.
      */
     public IntMeshPartBuilder part(final String id, int primitiveType, final Bits attributes, final Material material) {
@@ -507,74 +576,6 @@ public class IntModelBuilder {
         begin();
         part("capsule", primitiveType, attributes, material).capsule(radius, height, divisions);
         return end();
-    }
-
-    /**
-     * Resets the references to {@link Material}s, {@link IntMesh}es and
-     * {@link IntMeshPart}s within the model to the ones used within it's nodes.
-     * This will make the model responsible for disposing all referenced meshes.
-     */
-    public static void rebuildReferences(final IntModel model) {
-        model.materials.clear();
-        model.meshes.clear();
-        model.meshParts.clear();
-        for (final IntNode node : model.nodes)
-            rebuildReferences(model, node);
-    }
-
-    private static void rebuildReferences(final IntModel model, final IntNode node) {
-        for (final IntNodePart mpm : node.parts) {
-            if (!model.materials.contains(mpm.material, true))
-                model.materials.add(mpm.material);
-            if (!model.meshParts.contains(mpm.meshPart, true)) {
-                model.meshParts.add(mpm.meshPart);
-                if (!model.meshes.contains(mpm.meshPart.mesh, true))
-                    model.meshes.add(mpm.meshPart.mesh);
-                model.manageDisposable(mpm.meshPart.mesh);
-            }
-        }
-        Iterable<IntNode> nodeIter = node.getChildren();
-        for (final IntNode child : nodeIter)
-            rebuildReferences(model, child);
-    }
-
-    // Old code below this line, as for now still useful for testing.
-    @Deprecated
-    public static IntModel createFromMesh(final IntMesh mesh, int primitiveType, final Material material) {
-        return createFromMesh(mesh, 0, mesh.getNumIndices(), primitiveType, material);
-    }
-
-    @Deprecated
-    public static IntModel createFromMesh(final IntMesh mesh, int indexOffset, int vertexCount, int primitiveType, final Material material) {
-        IntModel result = new IntModel();
-        IntMeshPart meshPart = new IntMeshPart();
-        meshPart.id = "part1";
-        meshPart.offset = indexOffset;
-        meshPart.size = vertexCount;
-        meshPart.primitiveType = primitiveType;
-        meshPart.mesh = mesh;
-
-        IntNodePart partMaterial = new IntNodePart();
-        partMaterial.material = material;
-        partMaterial.meshPart = meshPart;
-        IntNode node = new IntNode();
-        node.id = "node1";
-        node.parts.add(partMaterial);
-
-        result.meshes.add(mesh);
-        result.materials.add(material);
-        result.nodes.add(node);
-        result.meshParts.add(meshPart);
-        result.manageDisposable(mesh);
-        return result;
-    }
-
-    @Deprecated
-    public static IntModel createFromMesh(final float[] vertices, final VertexAttribute[] attributes, final int[] indices, int primitiveType, final Material material) {
-        final IntMesh mesh = new IntMesh(false, vertices.length, indices.length, attributes);
-        mesh.setVertices(vertices);
-        mesh.setIndices(indices);
-        return createFromMesh(mesh, 0, indices.length, primitiveType, material);
     }
 
     /**

@@ -68,24 +68,19 @@ public class WelcomeGui extends AbstractGui {
 
     private final VRStatus vrStatus;
     private final boolean skipWelcome;
-
+    private final WelcomeGuiGamepadListener gamepadListener;
     protected DatasetManagerWindow ddw;
     private AboutWindow aboutWindow;
     private PreferencesWindow preferencesWindow;
-
     private FileHandle dataDescriptor;
-
     private boolean downloadError = false;
     private Texture bgTex;
     private DataDescriptor serverDatasets;
     private DataDescriptor localDatasets;
-
     private Array<Button> buttonList;
     private int currentSelected = 0;
-
     private PopupNotificationsInterface popupInterface;
     private WelcomeGuiKbdListener kbdListener;
-    private final WelcomeGuiGamepadListener gamepadListener;
 
     /**
      * Creates an initial GUI
@@ -148,7 +143,7 @@ public class WelcomeGui extends AbstractGui {
                 Task notification = new Task() {
                     @Override
                     public void run() {
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.welcome.gamepad.notification",  Controllers.getControllers().size), 10f);
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.welcome.gamepad.notification", Controllers.getControllers().size), 10f);
                     }
                 };
                 Timer.schedule(notification, 2);

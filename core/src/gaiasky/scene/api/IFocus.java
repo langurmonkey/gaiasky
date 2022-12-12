@@ -22,6 +22,7 @@ public interface IFocus {
 
     /**
      * Whether this focus object actually contains a focus.
+     *
      * @return True if the focus is not set, false otherwise.
      */
     boolean isEmpty();
@@ -127,6 +128,7 @@ public interface IFocus {
      * @return The first star ancestor.
      */
     Entity getFirstStarAncestorEntity();
+
     IFocus getFirstStarAncestor();
 
     /**
@@ -333,6 +335,7 @@ public interface IFocus {
      * @param hits      The list where to add the element.
      */
     void addHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<IFocus> hits);
+
     void addEntityHitCoordinate(int screenX, int screenY, int w, int h, int pixelDist, NaturalCamera camera, Array<Entity> hits);
 
     /**
@@ -344,6 +347,7 @@ public interface IFocus {
      * @param hits   The list where the focus is to be added.
      */
     void addHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits);
+
     void addEntityHitRay(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<Entity> hits);
 
     /**
@@ -396,6 +400,7 @@ public interface IFocus {
     float[] getColor();
 
     boolean isForceLabel();
+
     boolean isForceLabel(String name);
 
 }

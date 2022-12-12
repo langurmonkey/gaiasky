@@ -24,6 +24,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HiddenHelperUser implements IObserver {
 
     private static HiddenHelperUser hhu;
+    private final Array<HelperTask> currentTasks;
+    private long lastCommandTime;
+    private Scene scene;
+    private FocusView view;
+
+    private HiddenHelperUser() {
+        super();
+        currentTasks = new Array<>(false, 5);
+        lastCommandTime = -1;
+        view = new FocusView();
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.NAVIGATE_TO_OBJECT, Event.LAND_ON_OBJECT, Event.LAND_AT_LOCATION_OF_OBJECT, Event.INPUT_EVENT);
+    }
 
     public static HiddenHelperUser instance() {
         if (hhu == null)
@@ -33,22 +45,6 @@ public class HiddenHelperUser implements IObserver {
 
     public static void initialize() {
         instance();
-    }
-
-    private final Array<HelperTask> currentTasks;
-
-    private long lastCommandTime;
-
-    private Scene scene;
-
-    private FocusView view;
-
-    private HiddenHelperUser() {
-        super();
-        currentTasks = new Array<>(false, 5);
-        lastCommandTime = -1;
-        view = new FocusView();
-        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.NAVIGATE_TO_OBJECT, Event.LAND_ON_OBJECT, Event.LAND_AT_LOCATION_OF_OBJECT, Event.INPUT_EVENT);
     }
 
     @Override

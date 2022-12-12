@@ -35,8 +35,6 @@ public final class PortableFloatMap {
      */
     public boolean bigEndian;
 
-
-
     /**
      * Constructs a blank Portable FloatMap image.
      */
@@ -48,6 +46,7 @@ public final class PortableFloatMap {
      * Constructs a PFM image by reading from the specified file. All 5 fields are set to values from the file.
      *
      * @param file the file to read from
+     *
      * @throws NullPointerException     if the file is {@code null}
      * @throws IllegalArgumentException if the file data does not represent a valid PFM file
      * @throws IOException              if an I/O exception occurred
@@ -66,6 +65,7 @@ public final class PortableFloatMap {
      * Otherwise if the file format is detected to be invalid or an I/O exception occurs, then an undetermined number of bytes will have been read.</p>
      *
      * @param in the input stream to read from
+     *
      * @throws NullPointerException     if the stream is {@code null}
      * @throws IllegalArgumentException if the stream data does not represent a valid PFM file
      * @throws IOException              if an I/O exception occurred
@@ -78,6 +78,18 @@ public final class PortableFloatMap {
 
 
     /*---- Methods ----*/
+
+    private static String readLine(InputStream in) throws IOException {
+        byte[] buf = new byte[100];
+        for (int i = 0; i < buf.length; i++) {
+            int b = in.read();
+            if (b == '\n' || b == -1)
+                return new String(buf, 0, i, StandardCharsets.US_ASCII);
+            else
+                buf[i] = (byte) b;
+        }
+        throw new IllegalArgumentException("Line too long");
+    }
 
     private void read(InputStream in) throws IOException {
         // Parse file magic header line
@@ -127,6 +139,7 @@ public final class PortableFloatMap {
      * Writes this PFM image to the specified file.
      *
      * @param file the file to write to
+     *
      * @throws NullPointerException     if the file or mode or pixel array is {@code null}
      * @throws IllegalStateException    if the width or height is zero/negative, or the pixel array is not exactly the expected length
      * @throws IllegalArgumentException if the width, height, and mode imply a pixel array length that exceeds {@code Integer.MAX_VALUE}
@@ -144,6 +157,7 @@ public final class PortableFloatMap {
      * Writes this PFM image to the specified output stream.
      *
      * @param out the output stream to write to
+     *
      * @throws NullPointerException     if the stream or mode or pixel array is {@code null}
      * @throws IllegalStateException    if the width or height is zero/negative, or the pixel array is not exactly the expected length
      * @throws IllegalArgumentException if the width, height, and mode imply a pixel array length that exceeds {@code Integer.MAX_VALUE}
@@ -208,18 +222,6 @@ public final class PortableFloatMap {
             throw new IllegalArgumentException("Dimensions are too large to make a pixel array");
         else
             return width * height * channels;  // Guaranteed to not overflow
-    }
-
-    private static String readLine(InputStream in) throws IOException {
-        byte[] buf = new byte[100];
-        for (int i = 0; i < buf.length; i++) {
-            int b = in.read();
-            if (b == '\n' || b == -1)
-                return new String(buf, 0, i, StandardCharsets.US_ASCII);
-            else
-                buf[i] = (byte) b;
-        }
-        throw new IllegalArgumentException("Line too long");
     }
 
     public enum Mode {

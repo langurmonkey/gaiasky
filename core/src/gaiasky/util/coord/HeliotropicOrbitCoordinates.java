@@ -28,7 +28,7 @@ public class HeliotropicOrbitCoordinates extends AbstractOrbitCoordinates {
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
         boolean inRange = getData().loadPoint(out, date);
-        if(!inRange) {
+        if (!inRange) {
             return null;
         }
         // Rotate by solar longitude, and convert to equatorial.

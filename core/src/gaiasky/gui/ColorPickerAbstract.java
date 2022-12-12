@@ -35,6 +35,12 @@ public abstract class ColorPickerAbstract extends Image {
         return color;
     }
 
+    public void setPickedColor(float[] rgba) {
+        initColor();
+        System.arraycopy(rgba, 0, this.color, 0, rgba.length);
+        super.setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+    }
+
     public double[] getPickedColorDouble() {
         double[] c = new double[color.length];
         for (int i = 0; i < color.length; i++)
@@ -49,11 +55,5 @@ public abstract class ColorPickerAbstract extends Image {
         color[2] = b;
         color[3] = a;
         super.setColor(r, g, b, a);
-    }
-
-    public void setPickedColor(float[] rgba) {
-        initColor();
-        System.arraycopy(rgba, 0, this.color, 0, rgba.length);
-        super.setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
     }
 }

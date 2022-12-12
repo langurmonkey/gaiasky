@@ -22,6 +22,12 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * Controls levels of brightness and contrast
  */
 public final class LevelsFilter extends Filter<LevelsFilter> {
+    private final ShaderProgram programRegular;
+    private final ShaderProgram programToneMappingExposure;
+    private final ShaderProgram programToneMappingAuto;
+    private final ShaderProgram programToneMappingACES;
+    private final ShaderProgram programToneMappingUncharted;
+    private final ShaderProgram programToneMappingFilmic;
     private float brightness = 0.0f;
     private float contrast = 1.0f;
     private float saturation = 1.0f;
@@ -29,45 +35,6 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     private float gamma = 1.0f;
     private float exposure = 1.0f;
     private float avgLuma, maxLuma;
-
-    private final ShaderProgram programRegular;
-    private final ShaderProgram programToneMappingExposure;
-    private final ShaderProgram programToneMappingAuto;
-    private final ShaderProgram programToneMappingACES;
-    private final ShaderProgram programToneMappingUncharted;
-    private final ShaderProgram programToneMappingFilmic;
-
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture("u_texture0", 0),
-        Brightness("u_brightness", 0),
-        Contrast("u_contrast", 0),
-        Saturation("u_saturation", 0),
-        Hue("u_hue", 0),
-        Exposure("u_exposure", 0),
-        AvgLuma("u_avgLuma", 0),
-        MaxLuma("u_maxLuma", 0),
-        Gamma("u_gamma", 0);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
 
     public LevelsFilter() {
         super(ShaderLoader.fromFile("screenspace", "levels"));
@@ -172,11 +139,11 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         rebind();
     }
 
-    public boolean isToneMappingAuto(){
+    public boolean isToneMappingAuto() {
         return this.program == programToneMappingAuto;
     }
 
-    public void disableToneMapping(){
+    public void disableToneMapping() {
         this.program = programRegular;
         rebind();
     }
@@ -203,5 +170,37 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture("u_texture0", 0),
+        Brightness("u_brightness", 0),
+        Contrast("u_contrast", 0),
+        Saturation("u_saturation", 0),
+        Hue("u_hue", 0),
+        Exposure("u_exposure", 0),
+        AvgLuma("u_avgLuma", 0),
+        MaxLuma("u_maxLuma", 0),
+        Gamma("u_gamma", 0);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

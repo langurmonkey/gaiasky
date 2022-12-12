@@ -15,7 +15,7 @@ public class AttributeColorRed extends AttributeAbstract implements IAttribute {
         return I18n.msg("gui.attrib.color.unit");
     }
 
-    public String toString(){
+    public String toString() {
         return I18n.msg("gui.attrib.color.red");
     }
 }

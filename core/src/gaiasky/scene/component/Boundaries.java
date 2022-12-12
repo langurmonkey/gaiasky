@@ -18,7 +18,7 @@ public class Boundaries implements Component {
 
     public void setBoundaries(double[][][] ids) {
         this.boundaries = new ArrayList<>(ids.length);
-        for(double[][] dd : ids) {
+        for (double[][] dd : ids) {
             List<Vector3d> ii = new ArrayList<>(dd.length);
             for (double[] v : dd) {
                 Vector3d vec = new Vector3d(v);
@@ -30,7 +30,7 @@ public class Boundaries implements Component {
 
     public void setBoundariesEquatorial(double[][][] ids) {
         this.boundaries = new ArrayList<>(ids.length);
-        for(double[][] dd : ids) {
+        for (double[][] dd : ids) {
             List<Vector3d> ii = new ArrayList<>(dd.length);
             for (double[] v : dd) {
                 // Convert equatorial coordinates to cartesian with a default radius.

@@ -5,6 +5,7 @@ public class Functions {
     public interface Function2<One, Two, R> {
         R apply(One one, Two two);
     }
+
     @FunctionalInterface
     public interface Function3<One, Two, Three, R> {
         R apply(One one, Two two, Three three);

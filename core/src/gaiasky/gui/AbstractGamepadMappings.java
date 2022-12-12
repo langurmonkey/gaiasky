@@ -7,7 +7,7 @@ package gaiasky.gui;
 
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,6 +57,20 @@ public abstract class AbstractGamepadMappings implements IGamepadMappings {
 
     public int BUTTON_LSTICK = -1;
     public int BUTTON_RSTICK = -1;
+
+    public static IGamepadMappings readGamepadMappings(String mappingsFile) {
+        IGamepadMappings mappings = null;
+        final Path mappingsPath = Path.of(mappingsFile);
+        if (Files.exists(mappingsPath)) {
+            mappings = new GamepadMappings(null, mappingsPath);
+        } else {
+            Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
+            if (Files.exists(internalMappings)) {
+                mappings = new GamepadMappings(null, internalMappings);
+            }
+        }
+        return mappings;
+    }
 
     @Override
     public double getZeroPoint() {
@@ -169,66 +183,52 @@ public abstract class AbstractGamepadMappings implements IGamepadMappings {
     }
 
     @Override
-    public int getButtonRT(){
+    public int getButtonRT() {
         return BUTTON_RT;
     }
 
     @Override
-    public int getButtonRB(){
+    public int getButtonRB() {
         return BUTTON_RB;
     }
 
     @Override
-    public int getButtonLT(){
+    public int getButtonLT() {
         return BUTTON_LT;
     }
 
     @Override
-    public int getButtonLB(){
+    public int getButtonLB() {
         return BUTTON_LB;
     }
 
     @Override
     public double getAxisLstickHSensitivity() {
-        return MathUtilsd.clamp(AXIS_LSTICK_H_SENS, 0.01, 100.0);
+        return MathUtilsDouble.clamp(AXIS_LSTICK_H_SENS, 0.01, 100.0);
     }
 
     @Override
     public double getAxisRstickHSensitivity() {
-        return MathUtilsd.clamp(AXIS_RSTICK_H_SENS, 0.01, 100.0);
+        return MathUtilsDouble.clamp(AXIS_RSTICK_H_SENS, 0.01, 100.0);
     }
 
     @Override
     public double getAxisRstickVSensitivity() {
-        return MathUtilsd.clamp(AXIS_RSTICK_V_SENS, 0.01, 100.0);
+        return MathUtilsDouble.clamp(AXIS_RSTICK_V_SENS, 0.01, 100.0);
     }
 
     @Override
     public double getAxisLstickVSensitivity() {
-        return MathUtilsd.clamp(AXIS_LSTICK_V_SENS, 0.01, 100.0);
+        return MathUtilsDouble.clamp(AXIS_LSTICK_V_SENS, 0.01, 100.0);
     }
 
     @Override
     public double getAxisRTSensitivity() {
-        return MathUtilsd.clamp(AXIS_RT_SENS, 0.01, 100.0);
+        return MathUtilsDouble.clamp(AXIS_RT_SENS, 0.01, 100.0);
     }
 
     @Override
     public double getAxisLTSensitivity() {
-        return MathUtilsd.clamp(AXIS_LT_SENS, 0.01, 100.0);
-    }
-
-    public static IGamepadMappings readGamepadMappings(String mappingsFile) {
-        IGamepadMappings mappings = null;
-        final Path mappingsPath = Path.of(mappingsFile);
-        if (Files.exists(mappingsPath)) {
-            mappings = new GamepadMappings(null, mappingsPath);
-        } else {
-            Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
-            if (Files.exists(internalMappings)) {
-                mappings = new GamepadMappings(null, internalMappings);
-            }
-        }
-        return mappings;
+        return MathUtilsDouble.clamp(AXIS_LT_SENS, 0.01, 100.0);
     }
 }

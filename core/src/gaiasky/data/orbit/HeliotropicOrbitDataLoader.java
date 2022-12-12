@@ -24,6 +24,13 @@ import java.util.Calendar;
 
 public class HeliotropicOrbitDataLoader {
     static Log logger = Logger.getLogger(HeliotropicOrbitDataLoader.class);
+    int count = 0;
+    // Maximum time between accepted samples
+    long maxMsSep = (long) (12d * Nature.H_TO_MS);
+    public HeliotropicOrbitDataLoader() {
+        super();
+
+    }
 
     public static void main(String[] args) {
         HeliotropicOrbitDataLoader l = new HeliotropicOrbitDataLoader();
@@ -57,15 +64,6 @@ public class HeliotropicOrbitDataLoader {
         }
     }
 
-    int count = 0;
-    // Maximum time between accepted samples
-    long maxMsSep = (long) (12d * Nature.H_TO_MS);
-
-    public HeliotropicOrbitDataLoader() {
-        super();
-
-    }
-
     /**
      * Loads the data in the input stream and transforms it into Cartesian
      * <b>ecliptic</b> coordinates. The reference system of the data goes as
@@ -88,6 +86,7 @@ public class HeliotropicOrbitDataLoader {
      * </ul>
      *
      * @param data The input stream with the data to load
+     *
      * @throws Exception
      */
     public PointCloudData load(InputStream data) throws Exception {
@@ -162,6 +161,7 @@ public class HeliotropicOrbitDataLoader {
      *
      * @param pos Position vector
      * @param t   Time
+     *
      * @return Vector3 with the position in the heliotropic reference frame
      */
     protected Vector3d correctSunLongitude(final Vector3d pos, Instant t) {
@@ -174,6 +174,7 @@ public class HeliotropicOrbitDataLoader {
      * @param pos    Position vector
      * @param t      Time
      * @param origin The origin angle
+     *
      * @return Vector3 with the position in the heliotropic reference frame
      */
     protected Vector3d correctSunLongitude(final Vector3d pos, Instant t, float origin) {

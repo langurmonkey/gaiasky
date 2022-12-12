@@ -160,7 +160,7 @@ public class Proximity {
     }
 
     private byte getType(IFocus f) {
-        if (f instanceof FocusView && Mapper.hip.has(((FocusView)f).getEntity())) {
+        if (f instanceof FocusView && Mapper.hip.has(((FocusView) f).getEntity())) {
             return TYPE_STAR;
         } else {
             return TYPE_OTHER;

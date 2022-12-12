@@ -36,7 +36,6 @@ import com.badlogic.gdx.utils.SnapshotArray;
 /**
  * @author Kotcrab
  * @author langurmonkey
- *
  */
 public class ContextMenu extends Table {
     private static final Vector2 tmpVector = new Vector2();
@@ -188,7 +187,7 @@ public class ContextMenu extends Table {
         if (children.size == 0)
             return;
         int startIndex = activeItem == null ? 0 : children.indexOf(activeItem, true) + 1;
-        for (int i = startIndex;; i++) {
+        for (int i = startIndex; ; i++) {
             if (i >= children.size)
                 i = 0;
             Actor actor = children.get(i);
@@ -204,7 +203,7 @@ public class ContextMenu extends Table {
         if (children.size == 0)
             return;
         int startIndex = children.indexOf(activeItem, true) - 1;
-        for (int i = startIndex;; i--) {
+        for (int i = startIndex; ; i--) {
             if (i == -1)
                 i = children.size - 1;
             Actor actor = children.get(i);
@@ -246,6 +245,7 @@ public class ContextMenu extends Table {
     /**
      * Returns input listener that can be added to scene2d actor. When mouse button is pressed on that actor,
      * menu will be displayed
+     *
      * @param mouseButton from {@link Buttons}
      */
     public InputListener getDefaultInputListener(final int mouseButton) {
@@ -276,9 +276,10 @@ public class ContextMenu extends Table {
 
     /**
      * Shows menu as given stage coordinates
+     *
      * @param stage stage instance that this menu is being added to
-     * @param x stage x position
-     * @param y stage y position
+     * @param x     stage x position
+     * @param y     stage y position
      */
     public void showMenu(Stage stage, float x, float y) {
         setPosition(x, y - getHeight());
@@ -290,6 +291,7 @@ public class ContextMenu extends Table {
 
     /**
      * Shows menu below (or above if not enough space) given actor.
+     *
      * @param stage stage instance that this menu is being added to
      * @param actor used to get calculate menu position in stage, menu will be displayed above or below it
      */
@@ -363,13 +365,15 @@ public class ContextMenu extends Table {
 
     /**
      * Listener used to get events from {@link ContextMenu}.
+     *
      * @since 1.0.2
      */
     public interface ContextMenuListener {
         /**
          * Called when active menu item (the highlighted one) has changed. This can't be used to listen when
          * {@link MenuItem} was pressed, add {@link ChangeListener} to {@link MenuItem} directly to achieve this.
-         * @param newActiveItem new item that is now active. May be null.
+         *
+         * @param newActiveItem     new item that is now active. May be null.
          * @param changedByKeyboard whether the change occurred by keyboard (arrows keys) or by mouse.
          */
         void activeItemChanged(MenuItem newActiveItem, boolean changedByKeyboard);

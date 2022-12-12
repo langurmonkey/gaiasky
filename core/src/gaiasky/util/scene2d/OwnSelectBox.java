@@ -67,10 +67,10 @@ public class OwnSelectBox<T> extends SelectBox<T> {
         }
     }
 
-    protected @Null Drawable getBackgroundDrawable () {
+    protected @Null Drawable getBackgroundDrawable() {
         Drawable bg = super.getBackgroundDrawable();
-        if(hasKeyboardFocus() && !isDisabled()) {
-            bg = ((OwnSelectBoxStyle)getStyle()).backgroundFocused;
+        if (hasKeyboardFocus() && !isDisabled()) {
+            bg = ((OwnSelectBoxStyle) getStyle()).backgroundFocused;
         }
         return bg;
     }

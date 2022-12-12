@@ -9,7 +9,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Perimeter;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import net.jafama.FastMath;
 
 public class PerimeterUpdater extends AbstractUpdateSystem {
@@ -49,7 +49,7 @@ public class PerimeterUpdater extends AbstractUpdateSystem {
             updateLocalValues(parent, parentBody, graph, perimeter);
             graph.translation.add(body.pos);
 
-            base.opacity = (float) MathUtilsd.lint(parentBody.solidAngleApparent, angleLow, angleHigh, 0, 1);
+            base.opacity = (float) MathUtilsDouble.lint(parentBody.solidAngleApparent, angleLow, angleHigh, 0, 1);
             base.opacity *= base.getVisibilityOpacityFactor();
 
             body.distToCamera = (float) graph.translation.lend();
@@ -62,7 +62,7 @@ public class PerimeterUpdater extends AbstractUpdateSystem {
 
     public void updateLocalValues(Entity papa, Body papaBody, GraphNode graph, Perimeter perimeter) {
         var papaGraph = Mapper.graph.get(papa);
-        updater.setToLocalTransform(papa, papaBody, papaGraph,1f, graph.localTransform, false);
+        updater.setToLocalTransform(papa, papaBody, papaGraph, 1f, graph.localTransform, false);
         int lineIndex = 0;
         for (float[][] line : perimeter.loc2d) {
             int pointIndex = 0;

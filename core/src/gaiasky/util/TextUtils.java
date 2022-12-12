@@ -21,6 +21,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TextUtils {
 
+    /** Decimal format **/
+    private static final DecimalFormat nf;
+    private static final DecimalFormat nfsci;
+
+    static {
+        nf = new DecimalFormat("#########.###");
+        nfsci = new DecimalFormat("0.#E0");
+    }
+
     /**
      * Escape a give String to make it safe to be printed or stored.
      *
@@ -319,15 +328,6 @@ public class TextUtils {
             }
         }
         return buff + post;
-    }
-
-    /** Decimal format **/
-    private static final DecimalFormat nf;
-    private static final DecimalFormat nfsci;
-
-    static {
-        nf = new DecimalFormat("#########.###");
-        nfsci = new DecimalFormat("0.#E0");
     }
 
     public static String getFormattedTimeWarp(double warp) {

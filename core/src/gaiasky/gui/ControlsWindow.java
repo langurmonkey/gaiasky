@@ -25,7 +25,7 @@ import gaiasky.scene.Scene;
 import gaiasky.util.CatalogManager;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.*;
 
 import java.util.ArrayList;
@@ -35,15 +35,7 @@ import java.util.Map;
 
 public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
-    /**
-     * Content width. To be used in all components.
-     *
-     * @return The width of the content.
-     */
-    public static float getContentWidth() {
-        return 352f;
-    }
-
+    private final CatalogManager catalogManager;
     /**
      * The user interface stage
      */
@@ -60,15 +52,11 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
      * The scene.
      */
     private Scene scene;
-
-    private final CatalogManager catalogManager;
-
     /**
      * Entities that will go in the visibility check boxes
      */
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
-
     /**
      * Access panes
      **/
@@ -87,6 +75,15 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         this.separator = new TiledDrawable(separatorTextureRegion);
 
         EventManager.instance.subscribe(this, Event.TIME_STATE_CMD, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.RECORD_CAMERA_CMD);
+    }
+
+    /**
+     * Content width. To be used in all components.
+     *
+     * @return The width of the content.
+     */
+    public static float getContentWidth() {
+        return 352f;
     }
 
     public void initialize() {
@@ -442,8 +439,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             float windowWidth = getWidth();
             float windowHeight = getHeight();
 
-            x = MathUtilsd.clamp(x * width, 0, width - windowWidth);
-            y = MathUtilsd.clamp(y * height - windowHeight, 0, height - windowHeight);
+            x = MathUtilsDouble.clamp(x * width, 0, width - windowWidth);
+            y = MathUtilsDouble.clamp(y * height - windowHeight, 0, height - windowHeight);
 
             setPosition(Math.round(x), Math.round(y));
 

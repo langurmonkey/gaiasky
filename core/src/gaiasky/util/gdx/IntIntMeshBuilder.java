@@ -47,6 +47,20 @@ import gaiasky.util.gdx.model.IntMeshPart;
  * @author Xoppa
  */
 public class IntIntMeshBuilder implements IntMeshPartBuilder {
+    private final static Pool<Vector3> vectorPool = new Pool<Vector3>() {
+        @Override
+        protected Vector3 newObject() {
+            return new Vector3();
+        }
+    };
+    private final static Array<Vector3> vectorArray = new Array<>();
+    private final static Pool<Matrix4> matrices4Pool = new Pool<Matrix4>() {
+        @Override
+        protected Matrix4 newObject() {
+            return new Matrix4();
+        }
+    };
+    private final static Array<Matrix4> matrices4Array = new Array<>();
     private final VertexInfo vertTmp1 = new VertexInfo();
     private final VertexInfo vertTmp2 = new VertexInfo();
     private final VertexInfo vertTmp3 = new VertexInfo();
@@ -55,20 +69,24 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     private final VertexInfo vertTmp6 = new VertexInfo();
     private final VertexInfo vertTmp7 = new VertexInfo();
     private final VertexInfo vertTmp8 = new VertexInfo();
-
     private final Matrix4 matTmp1 = new Matrix4();
-
     private final Vector3 tempV1 = new Vector3();
     private final Vector3 tempV2 = new Vector3();
     private final Vector3 tempV3 = new Vector3();
     private final Vector3 tempV4 = new Vector3();
-
-    /** The vertex attributes of the resulting mesh */
-    private VertexAttributes attributes;
     /** The vertices to construct, no size checking is done */
     private final FloatArray vertices = new FloatArray();
     /** The indices to construct, no size checking is done */
     private final IntArray indices = new IntArray();
+    /** The parts created between begin and end */
+    private final Array<IntMeshPart> parts = new Array<>();
+    /** The color used if no vertex color is specified. */
+    private final Color color = new Color();
+    private final Matrix4 positionTransform = new Matrix4();
+    private final Matrix4 normalTransform = new Matrix4();
+    private final Vector3 tempVTransformed = new Vector3();
+    /** The vertex attributes of the resulting mesh */
+    private VertexAttributes attributes;
     /** The size (in number of floats) of each vertex */
     private int stride;
     /** The current vertex index, used for indexing */
@@ -95,10 +113,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     private int uvOffset;
     /** The meshpart currently being created */
     private IntMeshPart part;
-    /** The parts created between begin and end */
-    private final Array<IntMeshPart> parts = new Array<>();
-    /** The color used if no vertex color is specified. */
-    private final Color color = new Color();
     /** Whether to apply the default color. */
     private boolean colorSet;
     /** The current primitiveType */
@@ -106,11 +120,8 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     /** The UV range used when building */
     private float uMin = 0, uMax = 1, vMin = 0, vMax = 1;
     private float[] vertex;
-
     private boolean vertexTransformationEnabled = false;
-    private final Matrix4 positionTransform = new Matrix4();
-    private final Matrix4 normalTransform = new Matrix4();
-    private final Vector3 tempVTransformed = new Vector3();
+    private int lastIndex = -1;
 
     /**
      * @param usage bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal and
@@ -253,23 +264,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public IntMeshPart getMeshPart() {
         return part;
     }
-
-    private final static Pool<Vector3> vectorPool = new Pool<Vector3>() {
-        @Override
-        protected Vector3 newObject() {
-            return new Vector3();
-        }
-    };
-
-    private final static Array<Vector3> vectorArray = new Array<>();
-    private final static Pool<Matrix4> matrices4Pool = new Pool<Matrix4>() {
-        @Override
-        protected Matrix4 newObject() {
-            return new Matrix4();
-        }
-    };
-
-    private final static Array<Matrix4> matrices4Array = new Array<>();
 
     private Vector3 tmp(float x, float y, float z) {
         final Vector3 result = vectorPool.obtain().set(x, y, z);
@@ -426,8 +420,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public void ensureRectangles(int numRectangles) {
         ensureRectangles(4 * numRectangles, numRectangles);
     }
-
-    private int lastIndex = -1;
 
     @Override
     public int lastIndex() {
@@ -1197,7 +1189,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     public void sphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         sphere(matTmp1.idt(), width, height, depth, divisionsU, divisionsV, flipNormals, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
-
 
     @Override
     public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {

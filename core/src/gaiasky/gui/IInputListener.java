@@ -8,6 +8,8 @@ package gaiasky.gui;
 public interface IInputListener {
 
     void update();
+
     void activate();
+
     void deactivate();
 }

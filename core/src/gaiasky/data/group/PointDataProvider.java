@@ -34,11 +34,11 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     public List<IParticleRecord> loadData(String file, double factor) {
         InputStream is = Settings.settings.data.dataFileHandle(file).read();
 
-        if(file.endsWith(".gz")){
+        if (file.endsWith(".gz")) {
             try {
                 is = new GZIPInputStream(Settings.settings.data.dataFileHandle(file).read());
-            }catch(IOException e){
-                logger.error("File ends with '.gz' (" + file +") but is not a Gzipped file!", e);
+            } catch (IOException e) {
+                logger.error("File ends with '.gz' (" + file + ") but is not a Gzipped file!", e);
             }
         }
 

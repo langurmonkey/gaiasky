@@ -16,10 +16,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class ModelCache {
-    final Map<String, IntModel> modelCache;
-    public IntModelBuilder mb;
     /** Model cache **/
     public static ModelCache cache = new ModelCache();
+    final Map<String, IntModel> modelCache;
+    public IntModelBuilder mb;
 
     public ModelCache() {
         modelCache = new HashMap<>();

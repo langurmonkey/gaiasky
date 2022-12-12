@@ -40,12 +40,13 @@ public class KeyframeUtils {
         entity.add(scene.engine.createComponent(TagNoProcess.class));
 
         var arrow = Mapper.arrow.get(entity);
-        if(arrow != null) {
+        if (arrow != null) {
             arrow.arrowCap = arrowCaps;
         }
 
         return entity;
     }
+
     public Entity newVerts(Scene scene, String name, ComponentTypes ct, String className, float[] color, RenderGroup rg, boolean closedLoop, float primitiveSize) {
         return newVerts(scene, name, ct, className, color, rg, closedLoop, primitiveSize, false);
     }

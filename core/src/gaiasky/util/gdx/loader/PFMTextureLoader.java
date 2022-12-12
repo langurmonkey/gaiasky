@@ -20,15 +20,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
-public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextureLoader.PFMTextureParameter>  {
+public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextureLoader.PFMTextureParameter> {
     private static final Log logger = Logger.getLogger(PFMTextureLoader.class);
-
-    static public class TextureLoaderInfo {
-        String filename;
-        TextureData data;
-        Texture texture;
-    }
-
     PFMTextureLoader.TextureLoaderInfo info = new PFMTextureLoader.TextureLoaderInfo();
 
     public PFMTextureLoader(FileHandleResolver resolver) {
@@ -45,9 +38,9 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
                 info.texture = parameter.texture;
             }
             logger.info("Loading PFM: " + file.path());
-            if(parameter.internalFormat == GL20.GL_FLOAT){
+            if (parameter.internalFormat == GL20.GL_FLOAT) {
                 info.data = PFMReader.readPFMTextureData(file, parameter.invert);
-            }else {
+            } else {
                 Pixmap pixmap = PFMReader.readPFMPixmap(file, parameter.invert);
                 info.data = new FileTextureData(file, pixmap, parameter.format, parameter.genMipMaps);
             }
@@ -81,10 +74,21 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
         return null;
     }
 
+    static public class TextureLoaderInfo {
+        String filename;
+        TextureData data;
+        Texture texture;
+    }
+
     static public class PFMTextureParameter extends TextureParameter {
-        public PFMTextureParameter(){
+        /** Whether to compute the inverse mapping **/
+        public boolean invert = false;
+        /** Either GL_RGB or GL_FLOAT **/
+        public int internalFormat = GL20.GL_RGB;
+
+        public PFMTextureParameter() {
         }
-        public PFMTextureParameter(TextureParameter other){
+        public PFMTextureParameter(TextureParameter other) {
             this.format = other.format;
             this.genMipMaps = other.genMipMaps;
             this.magFilter = other.magFilter;
@@ -92,13 +96,6 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
             this.wrapU = other.wrapU;
             this.wrapV = other.wrapV;
         }
-
-        /** Whether to compute the inverse mapping **/
-        public boolean invert = false;
-        /** Either GL_RGB or GL_FLOAT **/
-        public int internalFormat = GL20.GL_RGB;
     }
-
-
 
 }

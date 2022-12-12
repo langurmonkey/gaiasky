@@ -18,14 +18,15 @@ import java.util.Map;
  */
 public interface ISceneLoader {
 
-
     void initialize(String[] files, Scene scene) throws RuntimeException;
+
     void initialize(String[] files, String dsLocation, Scene scene) throws RuntimeException;
 
     void initialize(DataSource ds, Scene scene);
 
     /**
      * Performs the loading and returns an array with the entities loaded.
+     *
      * @return The loaded entities.
      */
     Array<Entity> loadData() throws FileNotFoundException;
@@ -35,6 +36,7 @@ public interface ISceneLoader {
     void setDescription(String description);
 
     void setParams(Map<String, Object> params);
+
     Object interceptDataFilePath(Class<?> valueClass, Object val);
 
 }

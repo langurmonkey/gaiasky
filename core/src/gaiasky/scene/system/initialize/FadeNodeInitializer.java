@@ -24,10 +24,10 @@ public class FadeNodeInitializer extends AbstractInitSystem {
         var fade = Mapper.fade.get(entity);
 
         // Initialize default mappings, if no mappings are set
-        if(fade.fadeIn != null && fade.fadeInMap == null) {
-           fade.fadeInMap = new Vector2d(0, 1);
+        if (fade.fadeIn != null && fade.fadeInMap == null) {
+            fade.fadeInMap = new Vector2d(0, 1);
         }
-        if(fade.fadeOut != null && fade.fadeOutMap == null) {
+        if (fade.fadeOut != null && fade.fadeOutMap == null) {
             fade.fadeOutMap = new Vector2d(1, 0);
         }
 

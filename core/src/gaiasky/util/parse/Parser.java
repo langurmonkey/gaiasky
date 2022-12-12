@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
  *
  * @author Miguel Gomes (mdg@uninova.pt)
  * @since 10/02/2015 14:29:47
- *
  */
 public final class Parser {
     /**
@@ -25,8 +24,8 @@ public final class Parser {
      * Parser supports leading/trailing whitespace.
      * </p>
      *
-     * @param input
-     *            String to parse
+     * @param input String to parse
+     *
      * @return Parsed long or 0 if the parsing fails
      */
     public static long parseLong(String input) {
@@ -81,11 +80,11 @@ public final class Parser {
      * Parser supports leading/trailing whitespace.
      * </p>
      *
-     * @param input
-     *            String to parse
+     * @param input String to parse
+     *
      * @return Parsed long or 0 if the parsing fails
-     * @throws NumberFormatException
-     *             If the given input can not be parsed
+     *
+     * @throws NumberFormatException If the given input can not be parsed
      */
     public static long parseLongException(String input) throws NumberFormatException {
         long result = 0;
@@ -143,11 +142,11 @@ public final class Parser {
      * Parser is mostly locale unaware except for dot and comma for decimal
      * separator.
      *
-     * @param input
-     *            String to parse
+     * @param input String to parse
+     *
      * @return Parsed double or Double.NaN if the parsing fails See also
-     *         {@link Parser#parseDoubleException(String)} If exceptions on
-     *         invalid input is necessary
+     * {@link Parser#parseDoubleException(String)} If exceptions on
+     * invalid input is necessary
      */
     public static double parseDouble(String input) {
         double result = 0;
@@ -294,11 +293,11 @@ public final class Parser {
      * Parser is mostly locale unaware except for dot and comma for decimal
      * separator.
      *
-     * @param input
-     *            String to parse
+     * @param input String to parse
+     *
      * @return Parsed double or Double.NaN if the parsing fails
-     * @throws NumberFormatException
-     *             If the input string is invalid
+     *
+     * @throws NumberFormatException If the input string is invalid
      */
     public static double parseDoubleException(String input) throws NumberFormatException {
         double result = 0;
@@ -436,10 +435,10 @@ public final class Parser {
     /**
      * Method used to parse accepted boolean values in incoming messages
      *
-     * @param what
-     *            What to parse
+     * @param what What to parse
+     *
      * @return True or false (also default return) depending on the value of
-     *         what
+     * what
      */
     public static boolean parseBoolean(Object what) {
         if (what instanceof String) {
@@ -455,8 +454,8 @@ public final class Parser {
      * Parses an integer. If the input is not a valid integer representation it
      * returns 0.
      *
-     * @param str
-     *            The input string.
+     * @param str The input string.
+     *
      * @return The integer representation of the string.
      */
     public static int parseInt(String str) {
@@ -480,8 +479,8 @@ public final class Parser {
      * Parses an integer. Throws a {@link NumberFormatException} if the input is
      * not a valid integer representation.
      *
-     * @param str
-     *            The input string.
+     * @param str The input string.
+     *
      * @return The integer representation of the string.
      */
     public static int parseIntException(String str) throws NumberFormatException {
@@ -505,8 +504,8 @@ public final class Parser {
      * Convenience method which uses the double parser and casts the result. It
      * will not throw Please check {@link Parser#parseDouble(String)}.
      *
-     * @param input
-     *            The input string.
+     * @param input The input string.
+     *
      * @return The parsed float, or 0 if the parsing failed.
      */
     public static float parseFloat(String input) {
@@ -517,9 +516,10 @@ public final class Parser {
      * Convenience method which uses the double parser and casts the result.
      * Please check {@link Parser#parseDoubleException(String)}
      *
-     * @param input
-     *            The input string.
+     * @param input The input string.
+     *
      * @return The parsed float, or {@link Float#NaN} if the parsing failed.
+     *
      * @throws NumberFormatException if the parsing failed.
      */
     public static float parseFloatException(String input) throws NumberFormatException {
@@ -528,7 +528,9 @@ public final class Parser {
 
     /**
      * Parses a float array in the form '[a, b, c, ...]
+     *
      * @param input The input string.
+     *
      * @return The parsed float array, or null if the parsing failed.
      */
     public static float[] parseFloatArray(String input) {
@@ -549,7 +551,9 @@ public final class Parser {
 
     /**
      * Parses a float array in the form '[a, b, c, ...]
+     *
      * @param input The input string.
+     *
      * @return The parsed float array, or null if the parsing failed.
      */
     public static float[] parseFloatArrayException(String input) throws NumberFormatException {
@@ -570,7 +574,9 @@ public final class Parser {
 
     /**
      * Parses a double precision float array in the form '[a, b, c, ...]
+     *
      * @param input The input string.
+     *
      * @return The parsed double precision float array, or null if the parsing failed.
      */
     public static double[] parseDoubleArray(String input) {
@@ -591,7 +597,9 @@ public final class Parser {
 
     /**
      * Parses a double precision float array in the form '[a, b, c, ...]
+     *
      * @param input The input string.
+     *
      * @return The parsed double precision float array, or null if the parsing failed.
      */
     public static double[] parseDoubleArrayException(String input) throws NumberFormatException {

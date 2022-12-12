@@ -9,6 +9,24 @@ import gaiasky.render.ComponentTypes.ComponentType;
 
 public class DatasetOptions {
 
+    public DatasetLoadType type;
+    // Particles
+    public double profileDecay;
+    public double[] particleColor;
+    public double particleColorNoise;
+    public double particleSize;
+    public double[] particleSizeLimits;
+    public ComponentType ct;
+    // Stars
+    public double magnitudeScale;
+    // Star clusters
+    public String catalogName;
+    // All
+    public double[] labelColor;
+    public double[] fadeIn;
+    public double[] fadeOut;
+    public boolean initializeCatalogInfo = true;
+
     public static DatasetOptions getStarDatasetOptions(String datasetName, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
         datasetOptions.type = DatasetLoadType.STARS;
@@ -66,31 +84,8 @@ public class DatasetOptions {
         CLUSTERS,
         VARIABLES;
 
-        public boolean isSelectable(){
+        public boolean isSelectable() {
             return this != PARTICLES;
         }
     }
-
-    public DatasetLoadType type;
-
-    // Particles
-    public double profileDecay;
-    public double[] particleColor;
-    public double particleColorNoise;
-    public double particleSize;
-    public double[] particleSizeLimits;
-    public ComponentType ct;
-
-    // Stars
-    public double magnitudeScale;
-
-    // Star clusters
-    public String catalogName;
-
-    // All
-    public double[] labelColor;
-    public double[] fadeIn;
-    public double[] fadeOut;
-
-    public boolean initializeCatalogInfo = true;
 }

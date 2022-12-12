@@ -34,12 +34,11 @@ import java.util.List;
  */
 public class BillboardRenderer extends AbstractRenderSystem implements IObserver {
 
-    private IntMesh mesh;
-    private Texture billboardTexture;
     private final ComponentType componentType;
-
     private final BillboardView view;
     private final BillboardEntityRenderSystem renderSystem;
+    private IntMesh mesh;
+    private Texture billboardTexture;
 
     // Render metadata
 

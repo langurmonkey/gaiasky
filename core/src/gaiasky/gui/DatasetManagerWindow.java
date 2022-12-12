@@ -92,56 +92,23 @@ public class DatasetManagerWindow extends GenericDialog {
         iconMap.put("texture-pack", "icon-elem-moons");
     }
 
-    public static int getTypeWeight(String type) {
-        return switch (type) {
-            case "data-pack" -> -2;
-            case "texture-pack" -> -1;
-            case "catalog-lod" -> 0;
-            case "catalog-gaia" -> 1;
-            case "catalog-star" -> 2;
-            case "catalog-gal" -> 3;
-            case "catalog-cluster" -> 4;
-            case "catalog-sso" -> 5;
-            case "system" -> 6;
-            case "spacecraft" -> 7;
-            case "mesh" -> 8;
-            case "other" -> 9;
-            case "catalog-other" -> 10;
-            default -> 11;
-        };
-    }
-
-    public static String getIcon(String type) {
-        if (type != null && iconMap.containsKey(type))
-            return iconMap.get(type);
-        return "icon-elem-others";
-    }
-
+    private final DatasetDesc[] selectedDataset;
+    private final float[][] scroll;
+    private final Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
+    private final Map<String, Button>[] buttonMap;
+    private final List<Pair<DatasetDesc, Actor>> selectionOrder;
+    private final Color highlight;
+    // Whether to show the data location chooser
+    private final boolean dataLocation;
+    private final DecimalFormat nf;
+    private final Set<DatasetWatcher> watchers;
+    private final AtomicBoolean initialized;
     private DataDescriptor serverDd, localDd;
     private DatasetMode currentMode;
     private Cell<?> left, right;
     private OwnScrollPane leftScroll;
-    private final DatasetDesc[] selectedDataset;
-    private final float[][] scroll;
-
-    private final Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
-
-    private final Map<String, Button>[] buttonMap;
-    private final List<Pair<DatasetDesc, Actor>> selectionOrder;
     private int selectedIndex = 0;
-
-    private final Color highlight;
-
-    // Whether to show the data location chooser
-    private final boolean dataLocation;
-
-    private final DecimalFormat nf;
-
-    private final Set<DatasetWatcher> watchers;
     private DatasetWatcher rightPaneWatcher;
-
-    private final AtomicBoolean initialized;
-
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd) {
         this(stage, skin, serverDd, true, I18n.msg("gui.close"));
     }
@@ -174,6 +141,31 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Build
         buildSuper();
+    }
+
+    public static int getTypeWeight(String type) {
+        return switch (type) {
+            case "data-pack" -> -2;
+            case "texture-pack" -> -1;
+            case "catalog-lod" -> 0;
+            case "catalog-gaia" -> 1;
+            case "catalog-star" -> 2;
+            case "catalog-gal" -> 3;
+            case "catalog-cluster" -> 4;
+            case "catalog-sso" -> 5;
+            case "system" -> 6;
+            case "spacecraft" -> 7;
+            case "mesh" -> 8;
+            case "other" -> 9;
+            case "catalog-other" -> 10;
+            default -> 11;
+        };
+    }
+
+    public static String getIcon(String type) {
+        if (type != null && iconMap.containsKey(type))
+            return iconMap.get(type);
+        return "icon-elem-others";
     }
 
     @Override
@@ -358,11 +350,6 @@ public class DatasetManagerWindow extends GenericDialog {
     private void reloadInstalled(Table content, float width) {
         this.localDd = DataDescriptorUtils.instance().buildLocalDatasets(this.serverDd);
         reloadBothPanes(content, width, localDd, currentMode = DatasetMode.INSTALLED);
-    }
-
-    private enum DatasetMode {
-        AVAILABLE,
-        INSTALLED
     }
 
     private void reloadBothPanes(Table content, float width, DataDescriptor dataDescriptor, DatasetMode mode) {
@@ -1435,7 +1422,7 @@ public class DatasetManagerWindow extends GenericDialog {
             stage.setKeyboardFocus(target);
             // Move scroll, select parent container button (dataset widget), and use its position.
             target = target.getParent();
-            while(!(target instanceof Button)) {
+            while (!(target instanceof Button)) {
                 target = target.getParent();
             }
             leftScroll.scrollTo(target.getX(), target.getY(), target.getWidth(), target.getHeight());
@@ -1445,6 +1432,11 @@ public class DatasetManagerWindow extends GenericDialog {
             return true;
         }
         return false;
+    }
+
+    private enum DatasetMode {
+        AVAILABLE,
+        INSTALLED
     }
 
     private class DatasetManagerKbdListener extends WindowKbdListener {
@@ -1463,6 +1455,7 @@ public class DatasetManagerWindow extends GenericDialog {
             return down();
         }
     }
+
     private class DatasetManagerGamepadListener extends WindowGamepadListener {
 
         public DatasetManagerGamepadListener(String mappingsFile) {

@@ -21,6 +21,39 @@ import java.nio.file.Paths;
  */
 public class SysUtils {
     private static final Log logger = Logger.getLogger(SysUtils.class);
+    private static final String OS;
+    private static final boolean linux;
+    private static final boolean mac;
+    private static final boolean windows;
+    private static final boolean unix;
+    private static final boolean solaris;
+    private static final String ARCH;
+    private static final boolean aarch64;
+    private static final String GAIASKY_DIR_NAME = "gaiasky";
+    private static final String DOTGAIASKY_DIR_NAME = ".gaiasky";
+    private static final String CAMERA_DIR_NAME = "camera";
+    private static final String SCREENSHOTS_DIR_NAME = "screenshots";
+    private static final String FRAMES_DIR_NAME = "frames";
+    private static final String MUSIC_DIR_NAME = "music";
+    private static final String MAPPINGS_DIR_NAME = "mappings";
+    private static final String BOOKMARKS_DIR_NAME = "bookmarks";
+    private static final String MPCDI_DIR_NAME = "mpcdi";
+    private static final String DATA_DIR_NAME = "data";
+    private static final String TMP_DIR_NAME = "tmp";
+    private static final String CRASHREPORTS_DIR_NAME = "crashreports";
+    private static final String LOG_DIR_NAME = "log";
+
+    static {
+        OS = System.getProperty("os.name").toLowerCase();
+        linux = OS.contains("linux");
+        mac = OS.contains("macos") || OS.contains("mac os");
+        windows = OS.contains("win");
+        unix = OS.contains("unix");
+        solaris = OS.contains("sunos");
+
+        ARCH = System.getProperty("os.arch");
+        aarch64 = ARCH.contains("aarch64");
+    }
 
     /**
      * Initialise directories.
@@ -49,28 +82,6 @@ public class SysUtils {
         } catch (IOException e) {
             logger.error(e);
         }
-    }
-
-    private static final String OS;
-    private static final boolean linux;
-    private static final boolean mac;
-    private static final boolean windows;
-    private static final boolean unix;
-    private static final boolean solaris;
-
-    private static final String ARCH;
-    private static final boolean aarch64;
-
-    static {
-        OS = System.getProperty("os.name").toLowerCase();
-        linux = OS.contains("linux");
-        mac = OS.contains("macos") || OS.contains("mac os");
-        windows = OS.contains("win");
-        unix = OS.contains("unix");
-        solaris = OS.contains("sunos");
-
-        ARCH = System.getProperty("os.arch");
-        aarch64 = ARCH.contains("aarch64");
     }
 
     public static String getXdgDesktop() {
@@ -165,20 +176,6 @@ public class SysUtils {
     public static String getOSVersion() {
         return System.getProperty("os.version");
     }
-
-    private static final String GAIASKY_DIR_NAME = "gaiasky";
-    private static final String DOTGAIASKY_DIR_NAME = ".gaiasky";
-    private static final String CAMERA_DIR_NAME = "camera";
-    private static final String SCREENSHOTS_DIR_NAME = "screenshots";
-    private static final String FRAMES_DIR_NAME = "frames";
-    private static final String MUSIC_DIR_NAME = "music";
-    private static final String MAPPINGS_DIR_NAME = "mappings";
-    private static final String BOOKMARKS_DIR_NAME = "bookmarks";
-    private static final String MPCDI_DIR_NAME = "mpcdi";
-    private static final String DATA_DIR_NAME = "data";
-    private static final String TMP_DIR_NAME = "tmp";
-    private static final String CRASHREPORTS_DIR_NAME = "crashreports";
-    private static final String LOG_DIR_NAME = "log";
 
     /**
      * Gets a file pointer to the camera directory.
@@ -394,7 +391,7 @@ public class SysUtils {
         return getConfigDir().resolve(".releasenotes.rev");
     }
 
-    public static Path getProceduralPixmapDir(){
+    public static Path getProceduralPixmapDir() {
         return Settings.settings.data.dataPath("tex").resolve("procedural");
     }
 
@@ -402,8 +399,8 @@ public class SysUtils {
      * Saves the given procedurally generated pixmap as a PNG image
      * to disk using the given name and timestamp.
      *
-     * @param p         The pixmap.
-     * @param name      The name of the pixmap.
+     * @param p    The pixmap.
+     * @param name The name of the pixmap.
      */
     public static void saveProceduralPixmap(Pixmap p, String name) {
         if (p != null) {

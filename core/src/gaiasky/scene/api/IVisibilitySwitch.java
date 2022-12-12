@@ -21,9 +21,11 @@ public interface IVisibilitySwitch {
     void setDescription(String description);
 
     boolean isVisible();
+
     void setVisible(boolean visible);
 
     boolean isVisible(String name);
+
     void setVisible(boolean visible, String name);
 
     boolean isVisible(boolean attributeValue);

@@ -38,6 +38,10 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     private static final long DEFAULT_TIMEOUT = 5000;
     private static final String TAG_SEPARATOR = " - ";
     static LinkedList<MessageBean> historical = new LinkedList<>();
+    /**
+     * Lock object for synchronization
+     **/
+    final Object lock;
     DateTimeFormatter df;
     long msTimeout;
     Label message1, message2;
@@ -49,11 +53,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     boolean writeDates = true;
     // Whether to show the notification sources.
     boolean showSources = false;
-
-    /**
-     * Lock object for synchronization
-     **/
-    final Object lock;
 
     /**
      * Initializes the notifications interface.
@@ -128,6 +127,14 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
 
         this.df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.FOV_CHANGE_NOTIFICATION, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD, Event.SCREEN_NOTIFICATION_CMD, Event.MODE_POPUP_CMD);
+    }
+
+    public static int getNumberMessages() {
+        return historical.size();
+    }
+
+    public static List<MessageBean> getHistorical() {
+        return historical;
     }
 
     public void unsubscribe() {
@@ -345,14 +352,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 break;
             }
         }
-    }
-
-    public static int getNumberMessages() {
-        return historical.size();
-    }
-
-    public static List<MessageBean> getHistorical() {
-        return historical;
     }
 
     public void dispose() {

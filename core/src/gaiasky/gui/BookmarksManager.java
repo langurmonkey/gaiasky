@@ -18,70 +18,9 @@ import java.util.stream.Stream;
  */
 public class BookmarksManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(BookmarksManager.class);
-
-    public static class BookmarkNode {
-        // The name of this node
-        public String name;
-        // The full path
-        public Path path;
-        // The parent of this node, null if root
-        public BookmarkNode parent;
-        // Children, if any
-        public List<BookmarkNode> children;
-        // Is it a folder?
-        public boolean folder;
-
-        public BookmarkNode(Path path, boolean folder) {
-            this.path = path;
-            this.name = this.path.getFileName().toString();
-            this.folder = folder;
-        }
-
-        public void insert(BookmarkNode node) {
-            if (node != null) {
-                initChildren();
-                if (!children.contains(node)) {
-                    children.add(node);
-                    node.parent = this;
-                }
-            }
-        }
-
-        private void initChildren() {
-            if (children == null)
-                children = new ArrayList<>(4);
-        }
-
-        @Override
-        public String toString() {
-            return path.toString();
-        }
-
-        public BookmarkNode getFirstFolderAncestor() {
-            if (folder)
-                return this;
-            else if (parent != null)
-                return parent.getFirstFolderAncestor();
-            else
-                return null;
-        }
-
-        public boolean isDescendantOf(BookmarkNode other) {
-            BookmarkNode current = this;
-            while (current != null) {
-                if (current == other) {
-                    return true;
-                }
-                current = current.parent;
-            }
-            return false;
-        }
-    }
-
     private Path bookmarksFile;
     private List<BookmarkNode> bookmarks;
     private Map<Path, BookmarkNode> nodes;
-
     public BookmarksManager() {
         initDefault();
         EventManager.instance.subscribe(this, Event.BOOKMARKS_ADD, Event.BOOKMARKS_REMOVE, Event.BOOKMARKS_REMOVE_ALL, Event.BOOKMARKS_MOVE, Event.BOOKMARKS_MOVE_UP, Event.BOOKMARKS_MOVE_DOWN);
@@ -386,6 +325,65 @@ public class BookmarksManager implements IObserver {
             break;
         default:
             break;
+        }
+    }
+
+    public static class BookmarkNode {
+        // The name of this node
+        public String name;
+        // The full path
+        public Path path;
+        // The parent of this node, null if root
+        public BookmarkNode parent;
+        // Children, if any
+        public List<BookmarkNode> children;
+        // Is it a folder?
+        public boolean folder;
+
+        public BookmarkNode(Path path, boolean folder) {
+            this.path = path;
+            this.name = this.path.getFileName().toString();
+            this.folder = folder;
+        }
+
+        public void insert(BookmarkNode node) {
+            if (node != null) {
+                initChildren();
+                if (!children.contains(node)) {
+                    children.add(node);
+                    node.parent = this;
+                }
+            }
+        }
+
+        private void initChildren() {
+            if (children == null)
+                children = new ArrayList<>(4);
+        }
+
+        @Override
+        public String toString() {
+            return path.toString();
+        }
+
+        public BookmarkNode getFirstFolderAncestor() {
+            if (folder)
+                return this;
+            else if (parent != null)
+                return parent.getFirstFolderAncestor();
+            else
+                return null;
+        }
+
+        public boolean isDescendantOf(BookmarkNode other) {
+            BookmarkNode current = this;
+            while (current != null) {
+                if (current == other) {
+                    return true;
+                }
+                current = current.parent;
+            }
+            return false;
         }
     }
 }

@@ -47,7 +47,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -67,30 +67,61 @@ import org.lwjgl.opengl.GL30;
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private static final double MIN_DIST = 1 * Constants.M_TO_U;
-
-    /**
-     * VR offset
-     **/
-    public Vector3d vrOffset;
-
-    /**
-     * Acceleration and velocity
-     **/
-    public Vector3d accel, vel, posBak;
+    private static final double HUD_SCALE_MIN = 0.5f;
+    private static final double HUD_SCALE_MAX = 3.0f;
     /**
      * The force acting on the entity and the friction
      **/
     private final Vector3b force;
-    private Vector3b friction;
-
+    /** We use this lock to update any attributes of this camera **/
+    private final Object updateLock = new Object();
+    /**
+     * VR offset
+     **/
+    public Vector3d vrOffset;
+    /**
+     * Acceleration and velocity
+     **/
+    public Vector3d accel, vel, posBak;
     public Vector3d direction, up;
-    private Vector3b focusDirection;
-
     /**
      * Indicates whether the camera is facing the focus or not
      **/
     public boolean facingFocus;
-
+    /**
+     * The focus entity
+     */
+    public FocusView focus, focusBak;
+    public double[] hudScales;
+    public Color[] hudColors;
+    public float hudWidth, hudHeight;
+    /**
+     * Previous angle in orientation lock
+     **/
+    double previousOrientationAngle = 0;
+    /**
+     * Previous orientation matrix, for focus lock
+     */
+    Matrix4d previousOrientation;
+    /**
+     * Fov value backup
+     **/
+    float fovBackup;
+    /**
+     * Gravity in game mode
+     **/
+    boolean gravity = true;
+    /** Has the direction diverted from the focus? **/
+    boolean diverted = false;
+    /** Whether VR is active or not. **/
+    boolean vr;
+    /**
+     * Flag that marks whether the projection has already been modified.
+     * Only in master-slave configurations.
+     */
+    boolean projectionFlag = false;
+    private Vector3b friction;
+    private Vector3b focusDirection;
     /**
      * Auxiliary double vectors
      **/
@@ -119,46 +150,19 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private double lastFwdAmount = 0;
     /**
-     * Previous angle in orientation lock
-     **/
-    double previousOrientationAngle = 0;
-    /**
-     * Previous orientation matrix, for focus lock
-     */
-    Matrix4d previousOrientation;
-    /**
-     * Fov value backup
-     **/
-    float fovBackup;
-
-    /**
-     * Gravity in game mode
-     **/
-    boolean gravity = true;
-
-    /**
      * Thrust which keeps the camera going. Mainly for game pads
      **/
     private double thrust = 0;
     private int thrustDirection = 0;
-
     /**
      * Whether the camera stops after a few seconds or keeps going
      **/
     private boolean fullStop = true;
-
     private CameraMode lastMode;
-
-    /**
-     * The focus entity
-     */
-    public FocusView focus, focusBak;
-
     /**
      * Auxiliary focus view object, used to reduce the amount of allocations.
      */
     private FocusView focusView;
-
     /**
      * The tracking object, if any
      */
@@ -167,7 +171,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * The name of the tracking object
      */
     private String trackingName;
-
     /**
      * The direction point to seek
      */
@@ -181,15 +184,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private Vector3b freeTargetPos;
     private boolean freeTargetOn;
-
     private Vector3b desired;
-
     /**
      * VR mode stuff
      **/
     private boolean firstAux = true;
     private float firstAngle = 0;
-
     /**
      * Velocity module, in case it comes from a game pad.
      * Sets velocity in the direction of the direction vector
@@ -206,31 +206,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private double velocityVRX = 0;
     private double velocityVRY = 0;
-
     /**
      * Home object as defined in the properties file
      **/
     private IFocus home;
-
-    /** We use this lock to update any attributes of this camera **/
-    private final Object updateLock = new Object();
-    /** Has the direction diverted from the focus? **/
-    boolean diverted = false;
-    /** Whether VR is active or not. **/
-    boolean vr;
-
-    /**
-     * Flag that marks whether the projection has already been modified.
-     * Only in master-slave configurations.
-     */
-    boolean projectionFlag = false;
-
-    public double[] hudScales;
-    public Color[] hudColors;
-    public float hudWidth, hudHeight;
-    private static final double HUD_SCALE_MIN = 0.5f;
-    private static final double HUD_SCALE_MAX = 3.0f;
-
     /**
      * The current listener.
      */
@@ -674,15 +653,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // We reset the time counter
         lastFwdTime = 0;
         lastFwdAmount = amount;
-    }
-
-    /**
-     * Sets the gamepad velocity as it comes from the joystick sensor.
-     *
-     * @param amount The amount in [-1, 1].
-     */
-    public void setVelocity(double amount) {
-        velocityGamepad = amount;
     }
 
     /**
@@ -1221,13 +1191,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double func;
         if (dist < DIST_A) {
             // d < 0.1 pc
-            func = MathUtilsd.lint(dist, 0, DIST_A, 0, 1e6) * Constants.DISTANCE_SCALE_FACTOR;
+            func = MathUtilsDouble.lint(dist, 0, DIST_A, 0, 1e6) * Constants.DISTANCE_SCALE_FACTOR;
         } else if (dist < DIST_B) {
             // 0.1 pc < d < 5 Kpc
-            func = MathUtilsd.lint(dist, DIST_A, DIST_B, 1e6, 1e10) * Constants.DISTANCE_SCALE_FACTOR;
+            func = MathUtilsDouble.lint(dist, DIST_A, DIST_B, 1e6, 1e10) * Constants.DISTANCE_SCALE_FACTOR;
         } else {
             // d > 5 Kpc
-            func = MathUtilsd.lint(dist, DIST_B, DIST_C, 1e10, 2e16) * Constants.DISTANCE_SCALE_FACTOR;
+            func = MathUtilsDouble.lint(dist, DIST_B, DIST_C, 1e10, 2e16) * Constants.DISTANCE_SCALE_FACTOR;
         }
 
         return dist > 0 ? Math.max(func, min) * Settings.settings.scene.camera.speed : 0;
@@ -1280,7 +1250,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case FOV_CHANGED_CMD:
             boolean checkMax = source instanceof Actor;
-            float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
+            float fov = MathUtilsDouble.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
 
             for (PerspectiveCamera cam : cameras) {
                 cam.fieldOfView = fov;
@@ -1396,7 +1366,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 double ra = (Double) data[0];
                 double dec = (Double) data[1];
                 double dist = 1e12d * Constants.PC_TO_U;
-                aux1.set(MathUtilsd.degRad * ra, MathUtilsd.degRad * dec, dist);
+                aux1.set(MathUtilsDouble.degRad * ra, MathUtilsDouble.degRad * dec, dist);
                 Coordinates.sphericalToCartesian(aux1, aux2);
                 freeTargetPos.set(aux2);
                 facingFocus = false;
@@ -1539,6 +1509,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
+    public void setCamera(PerspectiveCamera perspectiveCamera) {
+        this.camera = perspectiveCamera;
+    }
+
+    @Override
     public Vector3d getDirection() {
         return direction;
     }
@@ -1672,11 +1647,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         } else {
             return Double.NaN;
         }
-    }
-
-    @Override
-    public void setCamera(PerspectiveCamera perspectiveCamera) {
-        this.camera = perspectiveCamera;
     }
 
     public void setThrust(double thrust, int direction) {
@@ -1909,6 +1879,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     @Override
     public Vector3d getVelocity() {
         return vel;
+    }
+
+    /**
+     * Sets the gamepad velocity as it comes from the joystick sensor.
+     *
+     * @param amount The amount in [-1, 1].
+     */
+    public void setVelocity(double amount) {
+        velocityGamepad = amount;
     }
 
     public void setDiverted(boolean diverted) {

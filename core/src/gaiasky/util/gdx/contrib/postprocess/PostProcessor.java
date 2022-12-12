@@ -39,32 +39,28 @@ import gaiasky.util.gdx.contrib.utils.ItemsManager;
  * @author bmanuel
  */
 public final class PostProcessor implements Disposable {
+    private static final Array<PingPongBuffer> buffers = new Array<>(2);
     /** Enable pipeline state queries: beware the pipeline can stall! */
     public static boolean EnableQueryStates = false;
     public static PostProcessor currentPostProcessor;
-
     private static PipelineState pipelineState = null;
     private static Format pixmapFormat;
     private final PingPongBuffer composite;
+    private final ItemsManager<PostProcessorEffect> effectsManager = new ItemsManager<>();
+    private final Color clearColor = Color.CLEAR;
+    private final Rectangle viewport = new Rectangle();
+    private final boolean useDepth;
+    // maintains a per-frame updated list of enabled effects
+    private final Array<PostProcessorEffect> enabledEffects = new Array<>(5);
     private TextureWrap compositeWrapU;
     private TextureWrap compositeWrapV;
-    private final ItemsManager<PostProcessorEffect> effectsManager = new ItemsManager<>();
-    private static final Array<PingPongBuffer> buffers = new Array<>(2);
-    private final Color clearColor = Color.CLEAR;
     private int clearBits = GL20.GL_COLOR_BUFFER_BIT;
     private float clearDepth = 1f;
-    private final Rectangle viewport = new Rectangle();
     private boolean hasViewport = false;
-
     private boolean enabled;
     private boolean capturing;
     private boolean hasCaptured;
-    private final boolean useDepth;
-
     private PostProcessorListener listener = null;
-
-    // maintains a per-frame updated list of enabled effects
-    private final Array<PostProcessorEffect> enabledEffects = new Array<>(5);
 
     /** Construct a new PostProcessor with FBO dimensions set to the size of the screen */
     public PostProcessor(RenderType rt, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {
@@ -118,8 +114,9 @@ public final class PostProcessor implements Disposable {
      * This is a drop-in replacement for the same-signature PingPongBuffer's constructor.
      */
     public static PingPongBuffer newPingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
-        return newPingPongBuffer(width, height, frameBufferFormat, hasDepth, true, false, false,  true);
+        return newPingPongBuffer(width, height, frameBufferFormat, hasDepth, true, false, false, true);
     }
+
     /**
      * Creates and returns a managed PingPongBuffer buffer, just create and forget. If rebind() is called on context loss, managed
      * PingPongBuffers will be rebound for you.
@@ -144,6 +141,18 @@ public final class PostProcessor implements Disposable {
     }
 
     /**
+     * Returns the internal framebuffer format, computed from the parameters specified during construction. NOTE: the returned
+     * Format will be valid after construction and NOT early!
+     */
+    public static Format getFramebufferFormat() {
+        return pixmapFormat;
+    }
+
+    public Rectangle getViewport() {
+        return viewport;
+    }
+
+    /**
      * Sets the viewport to be restored, if null is specified then the viewport will NOT be restored at all.
      * <p>
      * The predefined effects will restore the viewport settings at the final blitting stage (render to screen) by invoking the
@@ -154,10 +163,6 @@ public final class PostProcessor implements Disposable {
         if (hasViewport && viewport != null) {
             this.viewport.set(viewport);
         }
-    }
-
-    public Rectangle getViewport(){
-        return viewport;
     }
 
     /** Frees owned resources. */
@@ -194,6 +199,11 @@ public final class PostProcessor implements Disposable {
         return enabled;
     }
 
+    /** Sets whether or not the post-processor should be enabled */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     /** If called before capturing it will indicate if the next capture call will succeed or not. */
     public boolean isReady() {
         boolean hasEffects = false;
@@ -206,11 +216,6 @@ public final class PostProcessor implements Disposable {
         }
 
         return (enabled && !capturing && hasEffects);
-    }
-
-    /** Sets whether or not the post-processor should be enabled */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     /** Returns the number of the currently enabled effects */
@@ -235,14 +240,6 @@ public final class PostProcessor implements Disposable {
     /** Removes the specified effect from the effect chain. */
     public void removeEffect(PostProcessorEffect effect) {
         effectsManager.remove(effect);
-    }
-
-    /**
-     * Returns the internal framebuffer format, computed from the parameters specified during construction. NOTE: the returned
-     * Format will be valid after construction and NOT early!
-     */
-    public static Format getFramebufferFormat() {
-        return pixmapFormat;
     }
 
     /** Sets the color that will be used to clear the buffer. */

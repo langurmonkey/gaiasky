@@ -9,20 +9,18 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class Matrix3Attribute extends Attribute {
+    public static final String Gwmat3Alias = "gwmat3";
+    public static final int Gwmat3 = register(Gwmat3Alias);
+    public Matrix3 value;
+
     public Matrix3Attribute(int index) {
         super(index);
         this.value = new Matrix3();
     }
-
     public Matrix3Attribute(int index, Matrix3 value) {
         super(index);
         this.value = value;
     }
-
-    public Matrix3 value;
-
-    public static final String Gwmat3Alias = "gwmat3";
-    public static final int Gwmat3 = register(Gwmat3Alias);
 
     public void set(Matrix3 value) {
         this.value.set(value);

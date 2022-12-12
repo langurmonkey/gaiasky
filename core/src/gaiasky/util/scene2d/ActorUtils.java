@@ -29,28 +29,26 @@ import com.badlogic.gdx.utils.Align;
 
 /**
  * {@link Actor} related utils.
- * @author Kotcrab
  */
 public class ActorUtils {
     /**
-     * Makes sures that actor will be fully visible in stage. If it's necessary actor position will be changed to fit it
+     * Makes sure that the actor will be fully visible in the stage. If necessary, the actor position will be changed to fit
      * on screen.
-     * @throws IllegalStateException if actor does not belong to any stage.
+     *
+     * @throws IllegalStateException if the actor is not in a stage.
      */
     public static void keepWithinStage(Actor actor) {
         Stage stage = actor.getStage();
         if (stage == null) {
-            throw new IllegalStateException("keepWithinStage cannot be used on Actor that doesn't belong to any stage. ");
+            throw new IllegalStateException("The actor is not in a stage: " + actor.getName());
         }
         keepWithinStage(actor.getStage(), actor);
     }
 
     /**
-     * Makes sures that actor will be fully visible in stage. If it's necessary actor position will be changed to fit it
-     * on screen.
+     * Ensures the actor is fully visible in stage.
      */
     public static void keepWithinStage(Stage stage, Actor actor) {
-        //taken from scene2d.ui Window
         Camera camera = stage.getCamera();
         if (camera instanceof OrthographicCamera) {
             OrthographicCamera orthographicCamera = (OrthographicCamera) camera;

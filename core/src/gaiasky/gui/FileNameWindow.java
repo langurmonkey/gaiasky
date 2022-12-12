@@ -13,12 +13,12 @@ import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.LengthValidator;
 import gaiasky.util.validator.RegexpValidator;
 
-public class FileNameWindow extends GenericDialog{
+public class FileNameWindow extends GenericDialog {
 
     private final String defaultName;
     private OwnTextField fileName;
 
-    public FileNameWindow(String defaultName, Stage stage, Skin skin){
+    public FileNameWindow(String defaultName, Stage stage, Skin skin) {
         super(I18n.msg("gui.filename.choose"), skin, stage);
         setModal(true);
         this.defaultName = defaultName;
@@ -33,7 +33,7 @@ public class FileNameWindow extends GenericDialog{
 
     @Override
     protected void build() {
-        OwnLabel label = new OwnLabel(I18n.msg("gui.filename.filename")+ ": ", skin);
+        OwnLabel label = new OwnLabel(I18n.msg("gui.filename.filename") + ": ", skin);
         LengthValidator lengthValidator = new LengthValidator(3, 40);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]+$");
         fileName = new OwnTextField(defaultName, skin, nameValidator);
@@ -45,12 +45,12 @@ public class FileNameWindow extends GenericDialog{
 
     /**
      * Returns the file name text field
+     *
      * @return The text field
      */
-    public OwnTextField getFileNameField(){
+    public OwnTextField getFileNameField() {
         return fileName;
     }
-
 
     @Override
     protected boolean accept() {

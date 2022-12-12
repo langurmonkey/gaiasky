@@ -7,12 +7,13 @@ package gaiasky.gui.beans;
 
 public class IntComboBoxBean {
     public int value;
-    public IntComboBoxBean(int value){
+
+    public IntComboBoxBean(int value) {
         this.value = value;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return Integer.toString(value);
     }
 }

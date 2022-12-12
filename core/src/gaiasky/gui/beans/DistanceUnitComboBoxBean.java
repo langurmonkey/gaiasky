@@ -12,11 +12,6 @@ public class DistanceUnitComboBoxBean {
         this.name = unit.text();
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
     public static DistanceUnitComboBoxBean[] defaultBeans() {
         int i = 0;
         var beans = new DistanceUnitComboBoxBean[DistanceUnit.values().length];
@@ -24,6 +19,11 @@ public class DistanceUnitComboBoxBean {
             beans[i++] = new DistanceUnitComboBoxBean(unit);
         }
         return beans;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     public enum DistanceUnit {

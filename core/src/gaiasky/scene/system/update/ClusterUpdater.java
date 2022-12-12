@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 /**
  * Updates star clusters.
@@ -35,7 +35,7 @@ public class ClusterUpdater extends AbstractUpdateSystem {
             var cluster = Mapper.cluster.get(entity);
 
             base.opacity *= 0.1f * base.getVisibilityOpacityFactor();
-            cluster.fadeAlpha = (float) MathUtilsd.lint(body.solidAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
+            cluster.fadeAlpha = (float) MathUtilsDouble.lint(body.solidAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
             body.labelColor[3] = 8.0f * cluster.fadeAlpha;
 
             graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);

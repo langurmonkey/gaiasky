@@ -15,13 +15,13 @@ public class ControllerConnectionListener extends ControllerAdapter {
     private static final Logger.Log logger = Logger.getLogger(ControllerConnectionListener.class);
 
     @Override
-    public void connected (Controller controller) {
+    public void connected(Controller controller) {
         logger.info("Controller connected: " + controller.getName());
         EventManager.publish(Event.CONTROLLER_CONNECTED_INFO, this, controller.getName());
     }
 
     @Override
-    public void disconnected (Controller controller) {
+    public void disconnected(Controller controller) {
         logger.info("Controller disconnected: " + controller.getName());
         EventManager.publish(Event.CONTROLLER_DISCONNECTED_INFO, this, controller.getName());
     }

@@ -44,7 +44,7 @@ public class TessellationRenderer extends AbstractRenderSystem {
             // Triangles for tessellation
             GL41.glPatchParameteri(GL41.GL_PATCH_VERTICES, 3);
             batch.begin(camera.getCamera());
-            renderables.forEach(r ->{
+            renderables.forEach(r -> {
                 Render render = (Render) r;
                 renderObject.render(render.entity, batch, camera, getAlpha(render.entity), t, rc, getRenderGroup(), !Mapper.tagQuatOrientation.has(render.entity));
             });

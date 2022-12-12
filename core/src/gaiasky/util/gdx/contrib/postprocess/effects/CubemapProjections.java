@@ -18,6 +18,66 @@ import java.util.function.Function;
 public final class CubemapProjections extends PostProcessorEffect {
     private final CubemapProjectionsFilter filter;
 
+    public CubemapProjections(float w, float h) {
+        filter = new CubemapProjectionsFilter(w, h);
+    }
+
+    @Override
+    public void dispose() {
+        filter.dispose();
+    }
+
+    @Override
+    public void rebind() {
+        filter.rebind();
+    }
+
+    public void setSides(FrameBuffer xpositive, FrameBuffer xnegative, FrameBuffer ypositive, FrameBuffer ynegative, FrameBuffer zpositive, FrameBuffer znegative) {
+        filter.setSides(xpositive, xnegative, ypositive, ynegative, zpositive, znegative);
+    }
+
+    public void setViewportSize(float w, float h) {
+        filter.setViewportSize(w, h);
+    }
+
+    public float getPlanetariumAngle() {
+        return filter.getPlanetariumAngle();
+    }
+
+    public void setPlanetariumAngle(float angle) {
+        filter.setPlanetariumAngle(angle);
+    }
+
+    public float getPlanetariumAperture() {
+        return filter.getPlanetariumAperture();
+    }
+
+    public void setPlanetariumAperture(float ap) {
+        filter.setPlanetariumAperture(ap);
+    }
+
+    public float getCelestialSphereIndexOfRefraction() {
+        return filter.getCelestialSphereIndexOfRefraction();
+    }
+
+    public void setCelestialSphereIndexOfRefraction(float ior) {
+        filter.setCelestialSphereIndexOfRefraction(ior);
+    }
+
+    @Override
+    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
+        restoreViewport(dest);
+        filter.setInput(src).setOutput(dest).render();
+    }
+
+    public CubemapProjection getProjection() {
+        return filter.getProjection();
+    }
+
+    public void setProjection(CubemapProjection projection) {
+        filter.setProjection(projection);
+    }
+
     public enum CubemapProjection {
         EQUIRECTANGULAR,
         CYLINDRICAL,
@@ -58,64 +118,6 @@ public final class CubemapProjections extends PostProcessorEffect {
                 }
             }
         }
-    }
-
-    public CubemapProjections(float w, float h) {
-        filter = new CubemapProjectionsFilter(w, h);
-    }
-
-    @Override
-    public void dispose() {
-        filter.dispose();
-    }
-
-    @Override
-    public void rebind() {
-        filter.rebind();
-    }
-
-    public void setSides(FrameBuffer xpositive, FrameBuffer xnegative, FrameBuffer ypositive, FrameBuffer ynegative, FrameBuffer zpositive, FrameBuffer znegative) {
-        filter.setSides(xpositive, xnegative, ypositive, ynegative, zpositive, znegative);
-    }
-
-    public void setViewportSize(float w, float h) {
-        filter.setViewportSize(w, h);
-    }
-
-    public void setPlanetariumAperture(float ap) {
-        filter.setPlanetariumAperture(ap);
-    }
-
-    public void setPlanetariumAngle(float angle) {
-        filter.setPlanetariumAngle(angle);
-    }
-    public void setCelestialSphereIndexOfRefraction(float ior) {
-        filter.setCelestialSphereIndexOfRefraction(ior);
-    }
-
-    public float getPlanetariumAngle() {
-        return filter.getPlanetariumAngle();
-    }
-
-    public float getPlanetariumAperture() {
-        return filter.getPlanetariumAperture();
-    }
-    public float getCelestialSphereIndexOfRefraction() {
-        return filter.getCelestialSphereIndexOfRefraction();
-    }
-
-    @Override
-    public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
-        restoreViewport(dest);
-        filter.setInput(src).setOutput(dest).render();
-    }
-
-    public void setProjection(CubemapProjection projection) {
-        filter.setProjection(projection);
-    }
-
-    public CubemapProjection getProjection() {
-        return filter.getProjection();
     }
 
 }

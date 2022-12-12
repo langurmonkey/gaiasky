@@ -22,15 +22,10 @@ import org.lwjgl.glfw.GLFW;
  * Mouse and keyboard input listener for the natural camera in game mode.
  */
 public class GameMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
+    private final NaturalCamera camera;
     private float prevX = 0, prevY = 0;
     private float dx = 0, dy = 0;
     private boolean prevValid = false;
-    private final NaturalCamera camera;
-
-    private static class GameGestureListener extends GestureAdapter {
-        private GameGestureListener() {
-        }
-    }
 
     public GameMouseKbdListener(GameGestureListener l, NaturalCamera naturalCamera) {
         super(l, naturalCamera);
@@ -68,7 +63,7 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
         if (isKeyPressed(Keys.D)) {
             camera.strafe(keySensitivity * multiplier, minTranslateUnits);
             result = true;
-        }else if (isKeyPressed(Keys.A)) {
+        } else if (isKeyPressed(Keys.A)) {
             camera.strafe(-keySensitivity * multiplier, minTranslateUnits);
             result = true;
         }
@@ -214,6 +209,11 @@ public class GameMouseKbdListener extends AbstractMouseKbdListener implements IO
         switch (event) {
         case MOUSE_CAPTURE_CMD -> setMouseCapture((Boolean) data[0]);
         case MOUSE_CAPTURE_TOGGLE -> toggleMouseCapture();
+        }
+    }
+
+    private static class GameGestureListener extends GestureAdapter {
+        private GameGestureListener() {
         }
     }
 }

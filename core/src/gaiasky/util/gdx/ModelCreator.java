@@ -16,47 +16,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ModelCreator {
-    public interface IFace {
-        int[] v();
-        int[] n();
-        void setNormals(int... n);
-    }
-
-    /**
-     * Contains the index info for a face.
-     */
-    public class Face implements IFace {
-        /** This stores the indices for both the vertices and the UV coordinates **/
-        public int[] v;
-
-        /** This stores the indices for the normals **/
-        public int[] n;
-
-        /**
-         * Constructs a face with the indices of the vertices.
-         * @param v Indices of the vertices.
-         */
-        public Face(int... v) {
-            this.v = v;
-        }
-
-        /**
-         * Sets the normal indices.
-         * @param n Indices of the normals.
-         */
-        public void setNormals(int... n) {
-            this.n = n;
-        }
-
-        @Override
-        public int[] v() {
-            return v;
-        }
-
-        @Override
-        public int[] n() {
-            return n;
-        }
+    public String name;
+    public List<Vector3> vertices;
+    public List<Vector3> normals;
+    public List<Vector2> uv;
+    public List<IFace> faces;
+    protected int index;
+    protected boolean flipNormals;
+    protected boolean hardEdges;
+    public ModelCreator() {
+        this.vertices = new ArrayList<>();
+        this.normals = new ArrayList<>();
+        this.uv = new ArrayList<>();
+        this.faces = new ArrayList<>();
+        this.index = 1;
     }
 
     protected void addFace(List<IFace> faces, boolean flipNormals, int... v) {
@@ -76,27 +49,10 @@ public abstract class ModelCreator {
         return v;
     }
 
-    public String name;
-    public List<Vector3> vertices;
-    public List<Vector3> normals;
-    public List<Vector2> uv;
-    public List<IFace> faces;
-    protected int index;
-    protected boolean flipNormals;
-    protected boolean hardEdges;
-
-    public ModelCreator() {
-        this.vertices = new ArrayList<>();
-        this.normals = new ArrayList<>();
-        this.uv = new ArrayList<>();
-        this.faces = new ArrayList<>();
-        this.index = 1;
-    }
-
     /**
      * Adds a vertex.
      *
-     * @param p      The point.
+     * @param p The point.
      *
      * @return The index of this vertex.
      */
@@ -106,7 +62,8 @@ public abstract class ModelCreator {
     }
 
     /**
-     * Exports the model to the .obj (Wavefront) format in the given output stream. 
+     * Exports the model to the .obj (Wavefront) format in the given output stream.
+     *
      * @param os The output stream.
      */
     public void dumpObj(OutputStream os) throws IOException {
@@ -146,11 +103,60 @@ public abstract class ModelCreator {
 
     /**
      * Constructs the face string for the given vertex.
+     *
      * @param vi The vertex index.
      * @param ni The normal index
+     *
      * @return The face string
      */
     private String idx(int vi, int ni) {
         return vi + "//" + ni;
+    }
+
+    public interface IFace {
+        int[] v();
+
+        int[] n();
+
+        void setNormals(int... n);
+    }
+
+    /**
+     * Contains the index info for a face.
+     */
+    public class Face implements IFace {
+        /** This stores the indices for both the vertices and the UV coordinates **/
+        public int[] v;
+
+        /** This stores the indices for the normals **/
+        public int[] n;
+
+        /**
+         * Constructs a face with the indices of the vertices.
+         *
+         * @param v Indices of the vertices.
+         */
+        public Face(int... v) {
+            this.v = v;
+        }
+
+        /**
+         * Sets the normal indices.
+         *
+         * @param n Indices of the normals.
+         */
+        public void setNormals(int... n) {
+            this.n = n;
+        }
+
+        @Override
+        public int[] v() {
+            return v;
+        }
+
+        @Override
+        public int[] n() {
+            return n;
+        }
     }
 }

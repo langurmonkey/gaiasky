@@ -54,9 +54,9 @@ public interface ISceneRenderer {
      *
      * @return Whether the component is on.
      */
-   boolean isOn(ComponentType comp);
+    boolean isOn(ComponentType comp);
 
-   /**
+    /**
      * Checks if the component types are all on.
      *
      * @param comp The components.

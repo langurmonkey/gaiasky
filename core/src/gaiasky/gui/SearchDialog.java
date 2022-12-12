@@ -47,23 +47,21 @@ import java.util.TreeSet;
  */
 public class SearchDialog extends GenericDialog {
     private static final Log logger = Logger.getLogger(SearchDialog.class);
-
-    private OwnTextField searchInput;
-    private String currentInputText = "";
-    private Cell<?> infoCell;
-    private OwnLabel infoMessage;
     private final Scene scene;
     // Matching nodes
     private final SortedSet<String> matching;
     private final Array<OwnLabel> matchingLabels;
-    private Table candidates;
     private final FocusView view;
     private final FilterView filterView;
-    private int cIdx = -1;
     private final Vector2 aux;
     private final boolean suggestions;
-
     private final Array<Task> tasks;
+    private OwnTextField searchInput;
+    private String currentInputText = "";
+    private Cell<?> infoCell;
+    private OwnLabel infoMessage;
+    private Table candidates;
+    private int cIdx = -1;
 
     public SearchDialog(Skin skin, Stage ui, final Scene scene, boolean suggestions) {
         super(I18n.msg("gui.objects.search"), skin, ui);
@@ -164,7 +162,7 @@ public class SearchDialog extends GenericDialog {
                                                 matchingLabels.add(m);
                                                 m.setWidth(searchInput.getWidth());
                                                 Cell<?> c = candidates.add(m).left().padBottom(pad10);
-                                                    c.row();
+                                                c.row();
                                             });
                                             candidates.pack();
                                             searchInput.localToStageCoordinates(aux.set(0, 0));

@@ -41,8 +41,75 @@ import java.util.MissingResourceException;
  * BitSet with some added functionality
  */
 public class ComponentTypes extends BitSet {
-    @Serial private static final long serialVersionUID = 1L;
     public static final int CT_SIZE = 32;
+    @Serial private static final long serialVersionUID = 1L;
+
+    public ComponentTypes() {
+        super(CT_SIZE);
+    }
+
+    public ComponentTypes(int ordinal) {
+        super(CT_SIZE);
+        set(ordinal);
+    }
+
+    public ComponentTypes(ComponentType... cts) {
+        super();
+        for (ComponentType ct : cts)
+            set(ct.ordinal());
+    }
+
+    /**
+     * Returns the index of the rightmost bit set to 1. If no bits are set to 1,
+     * returns -1
+     *
+     * @return The first ordinal
+     */
+    public int getFirstOrdinal() {
+        return nextSetBit(0);
+    }
+
+    /**
+     * Checks if all the t bits in this bit set are also set in other.
+     *
+     * @param other The bit set to check against
+     *
+     * @return True if all the bits set to true in this bit set are also true in
+     * other. Returns false otherwise
+     */
+    public boolean allSetLike(ComponentTypes other) {
+        long thisval = this.toLongArray()[0];
+        return (thisval & other.toLongArray()[0]) == thisval;
+    }
+
+    /**
+     * Checks whether the given {@link ComponentType} is enabled in this
+     * {@link ComponentTypes} instance
+     *
+     * @param ct The component type to check
+     *
+     * @return True if the component type is enabled
+     */
+    public boolean isEnabled(ComponentType ct) {
+        return this.get(ct.ordinal());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (isEmpty())
+            return "Empty";
+        ComponentType[] values = ComponentType.values();
+        for (int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
+            // operate on index i here
+            sb.append(values[i]).append(" ");
+            if (i == Integer.MAX_VALUE) {
+                break; // or (i+1) would overflow
+            }
+        }
+        sb.replace(sb.length() - 1, sb.length(), "");
+        return sb.toString();
+    }
 
     public enum ComponentType {
         Stars("icon-elem-stars"),
@@ -67,7 +134,6 @@ public class ComponentTypes extends BitSet {
         Ecliptic("icon-elem-ecliptic"),
         Galactic("icon-elem-galactic"),
         RecursiveGrid("icon-elem-recgrid"),
-
 
         Constellations("icon-elem-constellations"),
         Boundaries("icon-elem-boundaries"),
@@ -101,6 +167,10 @@ public class ComponentTypes extends BitSet {
             this.style = icon;
         }
 
+        public static ComponentType getFromKey(String key) {
+            return keysMap.get(key);
+        }
+
         public String getName() {
             try {
                 return I18n.msg(key);
@@ -113,74 +183,6 @@ public class ComponentTypes extends BitSet {
         public String toString() {
             return super.toString();
         }
-
-        public static ComponentType getFromKey(String key) {
-            return keysMap.get(key);
-        }
-    }
-
-    public ComponentTypes() {
-        super(CT_SIZE);
-    }
-
-    public ComponentTypes(int ordinal) {
-        super(CT_SIZE);
-        set(ordinal);
-    }
-
-    public ComponentTypes(ComponentType... cts) {
-        super();
-        for (ComponentType ct : cts)
-            set(ct.ordinal());
-    }
-
-    /**
-     * Returns the index of the rightmost bit set to 1. If no bits are set to 1,
-     * returns -1
-     *
-     * @return The first ordinal
-     */
-    public int getFirstOrdinal() {
-        return nextSetBit(0);
-    }
-
-    /**
-     * Checks if all the t bits in this bit set are also set in other.
-     *
-     * @param other The bit set to check against
-     * @return True if all the bits set to true in this bit set are also true in
-     * other. Returns false otherwise
-     */
-    public boolean allSetLike(ComponentTypes other) {
-        long thisval = this.toLongArray()[0];
-        return (thisval & other.toLongArray()[0]) == thisval;
-    }
-
-    /**
-     * Checks whether the given {@link ComponentType} is enabled in this
-     * {@link ComponentTypes} instance
-     * @param ct The component type to check
-     * @return True if the component type is enabled
-     */
-    public boolean isEnabled(ComponentType ct){
-        return this.get(ct.ordinal());
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if(isEmpty())
-            return "Empty";
-        ComponentType[] values = ComponentType.values();
-        for (int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
-            // operate on index i here
-            sb.append(values[i]).append(" ");
-            if (i == Integer.MAX_VALUE) {
-                break; // or (i+1) would overflow
-            }
-        }
-        sb.replace(sb.length() - 1, sb.length(), "");
-        return sb.toString();
     }
 
 }

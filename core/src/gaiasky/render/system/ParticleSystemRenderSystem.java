@@ -22,10 +22,9 @@ public class ParticleSystemRenderSystem extends AbstractRenderSystem {
     private final ParticleSystem particleSystem;
     private final PointSpriteParticleBatch pointSpriteParticleBatch;
     private final ParticleEffect explosion;
-    private ParticleEffect explosionInstance;
-
     private final ModelBatch modelBatch;
     private final Matrix4 trf;
+    private ParticleEffect explosionInstance;
 
     public ParticleSystemRenderSystem(SceneRenderer sceneRenderer) {
         super(sceneRenderer, null, null, null);

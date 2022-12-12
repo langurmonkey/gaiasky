@@ -47,7 +47,6 @@ import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
-import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
 import gaiasky.script.IScriptingInterface;
@@ -103,7 +102,45 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Singleton instance.
      **/
     public static GaiaSky instance;
-
+    /**
+     * Used to wait for new frames
+     */
+    public final Object frameMonitor = new Object();
+    private final String sceneName = "SceneData";
+    /**
+     * Set log level to debug
+     */
+    private final boolean debugMode;
+    /**
+     * Whether to attempt a connection to the VR HMD
+     */
+    private final boolean vr;
+    /**
+     * Headless mode
+     */
+    private final boolean headless;
+    /**
+     * Skip welcome screen if possible
+     */
+    private final boolean skipWelcome;
+    /**
+     * Forbids the creation of the scripting server
+     */
+    private final boolean noScripting;
+    /**
+     * Parked update runnables. Run after the update-scene stage.
+     */
+    private final Array<Runnable> parkedUpdateRunnables = new Array<>(10);
+    private final Map<String, Runnable> parkedUpdateRunnablesMap = Collections.synchronizedMap(new HashMap<>());
+    /**
+     * Parked camera runnables. Run after the update-camera stage and before the update-scene stage.
+     */
+    private final Array<Runnable> parkedCameraRunnables = new Array<>(10);
+    private final Map<String, Runnable> parkedCameraRunnablesMap = Collections.synchronizedMap(new HashMap<>());
+    // Has the application crashed?
+    private final AtomicBoolean crashed = new AtomicBoolean(false);
+    // Running state
+    private final AtomicBoolean running = new AtomicBoolean(true);
     /**
      * Window.
      **/
@@ -112,7 +149,56 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Graphics.
      **/
     public Graphics graphics;
-
+    /**
+     * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
+     * present or SteamVR is not installed.
+     */
+    public VRContext vrContext;
+    /**
+     * Loading frame buffers.
+     **/
+    public FrameBuffer vrLoadingLeftFb, vrLoadingRightFb;
+    /**
+     * Loading texture.
+     **/
+    public org.lwjgl.openvr.Texture vrLoadingLeftTex, vrLoadingRightTex;
+    /**
+     * The asset manager.
+     */
+    public AssetManager assetManager;
+    /**
+     * The main camera manager.
+     */
+    public CameraManager cameraManager;
+    public Scene scene;
+    public SceneRenderer sceneRenderer;
+    /**
+     * Holds the number of frames produced in this session.
+     */
+    public long frames;
+    public InputMultiplexer inputMultiplexer;
+    /**
+     * The user interfaces
+     */
+    public IGui welcomeGui, welcomeGuiVR, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui;
+    /**
+     * Time
+     */
+    public ITimeFrameProvider time;
+    // Window has been created successfully
+    public boolean windowCreated = false;
+    /**
+     * Save state on exit
+     */
+    public boolean saveState = true;
+    /**
+     * External view with final rendered scene and no UI
+     */
+    public boolean externalView;
+    /**
+     * External UI window
+     */
+    public GaiaSkyView gaiaSkyView = null;
     /**
      * The scene graph update process.
      */
@@ -122,62 +208,20 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
      **/
     private Runnable updateRenderProcess;
-
-    /**
-     * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
-     * present or SteamVR is not installed.
-     */
-    public VRContext vrContext;
-
-    /**
-     * Loading frame buffers.
-     **/
-    public FrameBuffer vrLoadingLeftFb, vrLoadingRightFb;
-    /**
-     * Loading texture.
-     **/
-    public org.lwjgl.openvr.Texture vrLoadingLeftTex, vrLoadingRightTex;
-
     /**
      * Maps the VR devices to model objects.
      */
     private HashMap<VRDevice, Entity> vrDeviceToModel;
-
-    /**
-     * The asset manager.
-     */
-    public AssetManager assetManager;
-
-    /**
-     * The main camera manager.
-     */
-    public CameraManager cameraManager;
-
-    private final String sceneName = "SceneData";
-
-    public Scene scene;
-    public SceneRenderer sceneRenderer;
-
     private IPostProcessor postProcessor;
-
     /**
      * The session start time, in milliseconds.
      */
     private long startTime;
-
     /**
      * Holds the session run time in seconds.
      */
     private double t;
-
-    /**
-     * Holds the number of frames produced in this session.
-     */
-    public long frames;
-
-
     private GuiRegistry guiRegistry;
-
     /**
      * Dynamic resolution level, the index in {@link gaiasky.util.Settings.GraphicsSettings#dynamicResolutionScale}
      * 0 - native
@@ -186,131 +230,176 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     private int dynamicResolutionLevel = 0;
     private long lastDynamicResolutionChange = 0;
-
     /**
      * Provisional console logger
      */
     private ConsoleLogger consoleLogger;
-
-    public InputMultiplexer inputMultiplexer;
-
-    /**
-     * The user interfaces
-     */
-    public IGui welcomeGui, welcomeGuiVR, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui;
-
     /**
      * List of GUIs
      */
     private List<IGui> guis;
-
-    /**
-     * Time
-     */
-    public ITimeFrameProvider time;
-
     // The sprite batch to render the back buffer to screen
     private SpriteBatch renderBatch;
-
     /** Settings reference **/
     private Settings settings;
+    /**
+     * Displays the initial GUI
+     **/
+    private final Runnable runnableInitialGui = () -> {
+        renderGui(welcomeGui);
+        if (settings.runtime.openVr) {
+            try {
+                vrContext.pollEvents();
+            } catch (Exception e) {
+                logger.error(e);
+            }
 
+            renderVRGui((VRGui<?>) welcomeGuiVR);
+        }
+    };
     /**
      * Camera recording or not?
      */
     private boolean camRecording = false;
-
     // Gaia Sky has finished initialization
     private boolean initialized = false;
-    // Window has been created successfully
-    public boolean windowCreated = false;
-
-    /**
-     * Used to wait for new frames
-     */
-    public final Object frameMonitor = new Object();
-
-    /**
-     * Set log level to debug
-     */
-    private final boolean debugMode;
-
-    /**
-     * Whether to attempt a connection to the VR HMD
-     */
-    private final boolean vr;
-
-    /**
-     * Headless mode
-     */
-    private final boolean headless;
-
-    /**
-     * Skip welcome screen if possible
-     */
-    private final boolean skipWelcome;
-
-    /**
-     * Forbids the creation of the scripting server
-     */
-    private final boolean noScripting;
-
-    /**
-     * Save state on exit
-     */
-    public boolean saveState = true;
-
-    /**
-     * External view with final rendered scene and no UI
-     */
-    public boolean externalView;
-
-    /**
-     * External UI window
-     */
-    public GaiaSkyView gaiaSkyView = null;
-
     /**
      * Global resources holder
      */
     private GlobalResources globalResources;
-
     /**
      * The global catalog manager
      */
     private CatalogManager catalogManager;
-
     /**
      * The scripting interface
      */
     private IScriptingInterface scripting;
-
     /**
      * The dataset updater -- sorts and updates dataset metadata
      */
     private GaiaSkyExecutorService executorService;
-
     /**
      * The bookmarks manager
      */
     private BookmarksManager bookmarksManager;
-
     /**
      * The SAMP client
      */
     private SAMPClient sampClient;
-
+    private long start = System.currentTimeMillis();
+    private long lastResizeTime = Long.MAX_VALUE;
+    private int resizeWidth, resizeHeight;
     /**
-     * Parked update runnables. Run after the update-scene stage.
-     */
-    private final Array<Runnable> parkedUpdateRunnables = new Array<>(10);
-    private final Map<String, Runnable> parkedUpdateRunnablesMap = Collections.synchronizedMap(new HashMap<>());
+     * Updates and renders the scene.
+     **/
+    private final Runnable runnableRender = () -> {
 
+        // Asynchronous load of textures and resources
+        assetManager.update();
+
+        if (!settings.runtime.updatePause) {
+            synchronized (frameMonitor) {
+                frameMonitor.notify();
+            }
+            /*
+             * UPDATE SCENE
+             */
+            update(graphics.getDeltaTime());
+
+
+            /*
+             * FRAME OUTPUT
+             */
+            EventManager.publish(Event.RENDER_FRAME, this);
+
+            /*
+             * SCREEN OUTPUT
+             */
+            if (settings.graphics.screenOutput) {
+                int tw = graphics.getWidth();
+                int th = graphics.getHeight();
+                if (tw == 0 || th == 0) {
+                    // Hack - on Windows the reported width and height is 0 when the window is minimized
+                    tw = settings.graphics.resolution[0];
+                    th = settings.graphics.resolution[1];
+                }
+                int w = (int) (tw * settings.graphics.backBufferScale);
+                int h = (int) (th * settings.graphics.backBufferScale);
+                /* RENDER THE SCENE */
+                sceneRenderer.clearScreen();
+
+                if (settings.runtime.openVr) {
+                    sceneRenderer.render(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null, postProcessor.getPostProcessBean(RenderType.screen));
+                } else {
+                    PostProcessBean ppb = postProcessor.getPostProcessBean(RenderType.screen);
+                    if (ppb != null)
+                        sceneRenderer.render(cameraManager, t, w, h, tw, th, null, ppb);
+                }
+
+                // Render the GUI, setting the viewport
+                if (settings.runtime.openVr) {
+                    guiRegistry.render(settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1]);
+                } else {
+                    guiRegistry.render(tw, th);
+                }
+            }
+        }
+        // Clean lists
+        sceneRenderer.swapRenderLists();
+        // Number of frames
+        frames++;
+
+        if (settings.graphics.fpsLimit > 0.0) {
+            // If FPS limit is on, dynamic resolution is off
+            sleep(settings.graphics.fpsLimit);
+        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openVr) {
+            // Dynamic resolution, adjust the back-buffer scale depending on the frame rate
+            float fps = 1f / graphics.getDeltaTime();
+
+            if (fps < 30 && dynamicResolutionLevel < settings.graphics.dynamicResolutionScale.length - 1) {
+                // Downscale
+                settings.graphics.backBufferScale = settings.graphics.dynamicResolutionScale[++dynamicResolutionLevel];
+                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
+                lastDynamicResolutionChange = TimeUtils.millis();
+            } else if (fps > 60 && dynamicResolutionLevel > 0) {
+                // Move up
+                settings.graphics.backBufferScale = settings.graphics.dynamicResolutionScale[--dynamicResolutionLevel];
+                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
+                lastDynamicResolutionChange = TimeUtils.millis();
+            }
+        }
+    };
     /**
-     * Parked camera runnables. Run after the update-camera stage and before the update-scene stage.
-     */
-    private final Array<Runnable> parkedCameraRunnables = new Array<>(10);
-    private final Map<String, Runnable> parkedCameraRunnablesMap = Collections.synchronizedMap(new HashMap<>());
+     * Displays the loading GUI
+     **/
+    private final Runnable runnableLoadingGui = () -> {
+        boolean finished = false;
+        try {
+            finished = assetManager.update();
+        } catch (GdxRuntimeException e) {
+            // Resource failed to load
+            logger.warn(e.getLocalizedMessage());
+        }
+        if (finished) {
+            doneLoading();
+            updateRenderProcess = runnableRender;
+        } else {
+            // Display loading screen
+            if (settings.runtime.openVr) {
+                renderGui(loadingGui);
+
+                try {
+                    vrContext.pollEvents();
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+                renderVRGui((VRGui<?>) loadingGuiVR);
+            } else {
+                renderGui(loadingGui);
+            }
+        }
+    };
 
     /**
      * Creates an instance of Gaia Sky.
@@ -343,6 +432,18 @@ public class GaiaSky implements ApplicationListener, IObserver {
         this.debugMode = debugMode;
 
         this.updateRenderProcess = runnableInitialGui;
+    }
+
+    /**
+     * Posts a runnable that will run once after the current frame.
+     *
+     * @param r The runnable to post.
+     */
+    public static synchronized void postRunnable(final Runnable r) {
+        if (instance != null && instance.window != null)
+            instance.window.postRunnable(r);
+        else
+            Gdx.app.postRunnable(r);
     }
 
     @Override
@@ -956,87 +1057,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         }
     }
 
-    /**
-     * Updates and renders the scene.
-     **/
-    private final Runnable runnableRender = () -> {
-
-        // Asynchronous load of textures and resources
-        assetManager.update();
-
-        if (!settings.runtime.updatePause) {
-            synchronized (frameMonitor) {
-                frameMonitor.notify();
-            }
-            /*
-             * UPDATE SCENE
-             */
-            update(graphics.getDeltaTime());
-
-
-            /*
-             * FRAME OUTPUT
-             */
-            EventManager.publish(Event.RENDER_FRAME, this);
-
-            /*
-             * SCREEN OUTPUT
-             */
-            if (settings.graphics.screenOutput) {
-                int tw = graphics.getWidth();
-                int th = graphics.getHeight();
-                if (tw == 0 || th == 0) {
-                    // Hack - on Windows the reported width and height is 0 when the window is minimized
-                    tw = settings.graphics.resolution[0];
-                    th = settings.graphics.resolution[1];
-                }
-                int w = (int) (tw * settings.graphics.backBufferScale);
-                int h = (int) (th * settings.graphics.backBufferScale);
-                /* RENDER THE SCENE */
-                sceneRenderer.clearScreen();
-
-                if (settings.runtime.openVr) {
-                    sceneRenderer.render(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null, postProcessor.getPostProcessBean(RenderType.screen));
-                } else {
-                    PostProcessBean ppb = postProcessor.getPostProcessBean(RenderType.screen);
-                    if (ppb != null)
-                        sceneRenderer.render(cameraManager, t, w, h, tw, th, null, ppb);
-                }
-
-                // Render the GUI, setting the viewport
-                if (settings.runtime.openVr) {
-                    guiRegistry.render(settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1]);
-                } else {
-                    guiRegistry.render(tw, th);
-                }
-            }
-        }
-        // Clean lists
-        sceneRenderer.swapRenderLists();
-        // Number of frames
-        frames++;
-
-        if (settings.graphics.fpsLimit > 0.0) {
-            // If FPS limit is on, dynamic resolution is off
-            sleep(settings.graphics.fpsLimit);
-        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openVr) {
-            // Dynamic resolution, adjust the back-buffer scale depending on the frame rate
-            float fps = 1f / graphics.getDeltaTime();
-
-            if (fps < 30 && dynamicResolutionLevel < settings.graphics.dynamicResolutionScale.length - 1) {
-                // Downscale
-                settings.graphics.backBufferScale = settings.graphics.dynamicResolutionScale[++dynamicResolutionLevel];
-                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
-                lastDynamicResolutionChange = TimeUtils.millis();
-            } else if (fps > 60 && dynamicResolutionLevel > 0) {
-                // Move up
-                settings.graphics.backBufferScale = settings.graphics.dynamicResolutionScale[--dynamicResolutionLevel];
-                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
-                lastDynamicResolutionChange = TimeUtils.millis();
-            }
-        }
-    };
-
     public void resetDynamicResolution() {
         dynamicResolutionLevel = 0;
         settings.graphics.backBufferScale = 1f;
@@ -1047,53 +1067,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
     public FrameBuffer getBackRenderBuffer() {
         return sceneRenderer.getRenderProcess().getResultBuffer();
     }
-
-    /**
-     * Displays the initial GUI
-     **/
-    private final Runnable runnableInitialGui = () -> {
-        renderGui(welcomeGui);
-        if (settings.runtime.openVr) {
-            try {
-                vrContext.pollEvents();
-            } catch (Exception e) {
-                logger.error(e);
-            }
-
-            renderVRGui((VRGui<?>) welcomeGuiVR);
-        }
-    };
-
-    /**
-     * Displays the loading GUI
-     **/
-    private final Runnable runnableLoadingGui = () -> {
-        boolean finished = false;
-        try {
-            finished = assetManager.update();
-        } catch (GdxRuntimeException e) {
-            // Resource failed to load
-            logger.warn(e.getLocalizedMessage());
-        }
-        if (finished) {
-            doneLoading();
-            updateRenderProcess = runnableRender;
-        } else {
-            // Display loading screen
-            if (settings.runtime.openVr) {
-                renderGui(loadingGui);
-
-                try {
-                    vrContext.pollEvents();
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-                renderVRGui((VRGui<?>) loadingGuiVR);
-            } else {
-                renderGui(loadingGui);
-            }
-        }
-    };
 
     private void renderVRGui(VRGui<?> vrGui) {
         vrLoadingLeftFb.begin();
@@ -1108,11 +1081,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
         VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
     }
-
-    // Has the application crashed?
-    private final AtomicBoolean crashed = new AtomicBoolean(false);
-    // Running state
-    private final AtomicBoolean running = new AtomicBoolean(true);
 
     public void setCrashed(boolean crashed) {
         this.crashed.set(crashed);
@@ -1157,8 +1125,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             });
         }
     }
-
-    private long start = System.currentTimeMillis();
 
     /**
      * Pause the main thread for a certain amount of time to match the
@@ -1262,9 +1228,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         }
     }
 
-    private long lastResizeTime = Long.MAX_VALUE;
-    private int resizeWidth, resizeHeight;
-
     @Override
     public void resize(final int width, final int height) {
         if (width != 0 && height != 0) {
@@ -1341,7 +1304,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         gui.render(graphics.getWidth(), graphics.getHeight());
     }
-
 
     public HashMap<VRDevice, Entity> getVRDeviceToModel() {
         return vrDeviceToModel;
@@ -1660,18 +1622,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 map.remove(key);
             }
         }
-    }
-
-    /**
-     * Posts a runnable that will run once after the current frame.
-     *
-     * @param r The runnable to post.
-     */
-    public static synchronized void postRunnable(final Runnable r) {
-        if (instance != null && instance.window != null)
-            instance.window.postRunnable(r);
-        else
-            Gdx.app.postRunnable(r);
     }
 
 }

@@ -760,7 +760,6 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(fogColor).left().expandX().padBottom(pad18).padRight(pad10);
         content.add(fogColorTooltip).left().padBottom(pad18).row();
 
-
         // Add button group
         addLocalButtons(content, "gui.procedural.atmosphere", this::randomizeAtmosphere, this::generateAtmosphere);
     }

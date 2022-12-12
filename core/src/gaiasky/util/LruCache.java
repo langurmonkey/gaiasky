@@ -29,10 +29,11 @@ public class LruCache<A, B> extends LinkedHashMap<A, B> {
      * <code>LinkedHashMap</code>.
      * </p>
      *
-     * @param eldest
-     *            the <code>Entry</code> in question; this implementation doesn't care what it is, since the
-     *            implementation is only dependent on the size of the cache
+     * @param eldest the <code>Entry</code> in question; this implementation doesn't care what it is, since the
+     *               implementation is only dependent on the size of the cache
+     *
      * @return <tt>true</tt> if the oldest
+     *
      * @see java.util.LinkedHashMap#removeEldestEntry(Map.Entry)
      */
     @Override

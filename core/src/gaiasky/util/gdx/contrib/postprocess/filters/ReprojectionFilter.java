@@ -16,33 +16,6 @@ public final class ReprojectionFilter extends Filter<ReprojectionFilter> {
     private float fov;
     private int mode = 0;
 
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture0("u_texture0", 0),
-        Fov("u_fov", 0),
-        Mode("u_mode", 0),
-        Viewport("u_viewport", 2);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String m, int elementSize) {
-            this.mnemonic = m;
-            this.elementSize = elementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
-
     public ReprojectionFilter(float width, float height) {
         super(ShaderLoader.fromFile("screenspace", "reprojection"));
         viewport = new Vector2(width, height);
@@ -86,5 +59,32 @@ public final class ReprojectionFilter extends Filter<ReprojectionFilter> {
         setParams(Param.Mode, mode);
 
         endParams();
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture0("u_texture0", 0),
+        Fov("u_fov", 0),
+        Mode("u_mode", 0),
+        Viewport("u_viewport", 2);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String m, int elementSize) {
+            this.mnemonic = m;
+            this.elementSize = elementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

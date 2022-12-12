@@ -1,4 +1,3 @@
-
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.g3d.Shader;

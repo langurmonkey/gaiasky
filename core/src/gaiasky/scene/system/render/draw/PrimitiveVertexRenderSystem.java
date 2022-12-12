@@ -7,7 +7,6 @@ package gaiasky.scene.system.render.draw;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
@@ -31,7 +30,6 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
 import java.util.List;
@@ -41,14 +39,12 @@ import java.util.List;
  */
 public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends ImmediateModeRenderSystem implements IObserver {
     protected static final Log logger = Logger.getLogger(PrimitiveVertexRenderSystem.class);
-
-    protected ICamera camera;
     protected final boolean lines;
-    protected int coordOffset;
     protected final VertsView vertsView;
-
     /** Enable method with aliasing in the fragment shader. **/
     protected final boolean shaderAliasMethod = false;
+    protected ICamera camera;
+    protected int coordOffset;
 
     public PrimitiveVertexRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(sceneRenderer, rg, alphas, shaders);

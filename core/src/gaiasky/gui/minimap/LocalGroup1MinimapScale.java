@@ -19,7 +19,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 public class LocalGroup1MinimapScale extends AbstractMinimapScale {
@@ -31,16 +31,14 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
     private Color galc;
     private float gals;
 
-    public LocalGroup1MinimapScale(){
+    public LocalGroup1MinimapScale() {
         super();
     }
-
-
 
     @Override
     public void updateLocal() {
 
-        for(int i = 0; i < positions.length; i++) {
+        for (int i = 0; i < positions.length; i++) {
             position(positions[i], galp[i]);
         }
     }
@@ -57,7 +55,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
 
         int i = 0;
         addGalaxy(i++, "Andromeda", 10.69, 41.27, 0.778);
-        addGalaxy(i++, "Triangulum", 1.565,30.65, 3.0);
+        addGalaxy(i++, "Triangulum", 1.565, 30.65, 3.0);
         addGalaxy(i++, "SMC", 13.158, -72.8002, 0.06);
         addGalaxy(i++, "LeoA", 149.85, 30.74, 0.81);
         addGalaxy(i++, "Bode's", 148.88, 69.06, 3.63);
@@ -65,20 +63,19 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
         addGalaxy(i++, "KK258", 340.18, -30.79, 2.0);
         addGalaxy(i++, "KK196", 200.44, -45.06, 3.98);
 
-
         galc = ColorUtils.gBlueC;
         gals = 3f;
     }
 
-    private void addGalaxy(int i, String name, double raDeg, double decDeg, double distMpc){
+    private void addGalaxy(int i, String name, double raDeg, double decDeg, double distMpc) {
         galp[i] = new float[4];
         positions[i] = get(raDeg, decDeg, distMpc);
         names[i] = name;
 
     }
 
-    private Vector3d get(double raDeg, double decDeg, double distMpc){
-        return Coordinates.sphericalToCartesian(MathUtilsd.degRad * raDeg, MathUtilsd.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
+    private Vector3d get(double raDeg, double decDeg, double distMpc) {
+        return Coordinates.sphericalToCartesian(MathUtilsDouble.degRad * raDeg, MathUtilsDouble.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
     }
 
     @Override
@@ -112,7 +109,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
 
         // Galaxies
         sr.setColor(galc);
-        for(float[] g : galp)
+        for (float[] g : galp)
             sr.circle(g[0], g[1], px(gals));
 
         renderCameraSide(0.4f);
@@ -124,7 +121,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
         font.draw(sb, I18n.msg("gui.minimap.milkyway"), side2 + px(7), sideshort2 - px(2));
 
         font.setColor(galc);
-        for(int i = 0; i < ngals; i++) {
+        for (int i = 0; i < ngals; i++) {
             font.draw(sb, names[i], galp[i][0] + px(5), galp[i][1] - px(10));
         }
 
@@ -156,7 +153,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
         sr.circle(side2, side2, side2 / 2f);
 
         // Gal pointers
-        for(float[] g : galp){
+        for (float[] g : galp) {
             sr.line(g[2], g[3], g[2], g[3] - px(24));
         }
         sr.end();
@@ -169,7 +166,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
 
         // Galaxies
         sr.setColor(galc);
-        for(float[] g : galp)
+        for (float[] g : galp)
             sr.circle(g[2], g[3], px(gals));
 
         renderCameraTop(0.4f);
@@ -181,7 +178,7 @@ public class LocalGroup1MinimapScale extends AbstractMinimapScale {
         font.draw(sb, I18n.msg("gui.minimap.milkyway"), side2 + px(10), side2 + px(10));
 
         font.setColor(galc);
-        for(int i = 0; i < ngals; i++) {
+        for (int i = 0; i < ngals; i++) {
             font.draw(sb, names[i], galp[i][2] + px(5), galp[i][3] - px(15));
         }
 

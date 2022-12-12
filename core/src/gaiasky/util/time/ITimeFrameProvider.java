@@ -21,6 +21,7 @@ public interface ITimeFrameProvider {
 
     /**
      * The frame time difference in seconds.
+     *
      * @return The frame time difference in seconds.
      */
     double getDt();

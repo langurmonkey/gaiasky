@@ -5,13 +5,13 @@
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -247,16 +247,19 @@ public interface IntMeshPartBuilder {
     /** Add a capsule */
     void capsule(float radius, float height, int divisions);
 
-    /** Add an arrow 
-     * @param x1 source x
-     * @param y1 source y
-     * @param z1 source z
-     * @param x2 destination x
-     * @param y2 destination y
-     * @param z2 destination z
-     * @param capLength is the height of the cap in percentage, must be in (0,1) 
+    /**
+     * Add an arrow
+     *
+     * @param x1            source x
+     * @param y1            source y
+     * @param z1            source z
+     * @param x2            destination x
+     * @param y2            destination y
+     * @param z2            destination z
+     * @param capLength     is the height of the cap in percentage, must be in (0,1)
      * @param stemThickness is the percentage of stem diameter compared to cap diameter, must be in (0,1]
-     * @param divisions the amount of vertices used to generate the cap and stem ellipsoidal bases */
+     * @param divisions     the amount of vertices used to generate the cap and stem ellipsoidal bases
+     */
     void arrow(float x1, float y1, float z1, float x2, float y2, float z2, float capLength, float stemThickness, int divisions);
 
     /** Get the current vertex transformation matrix. */
@@ -271,20 +274,41 @@ public interface IntMeshPartBuilder {
     /** Sets whether vertex transformation is enabled. */
     void setVertexTransformationEnabled(boolean enabled);
 
-    /** Class that contains all vertex information the builder can use.
-     * @author Xoppa */
+    /** Add a cylinder */
+    void cylinder(float width, float height, float depth, int divisions, float angleFrom, float angleTo, boolean close, boolean flipNormals);
+
+    /** Add a sphere */
+    void sphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
+
+    /** Add a sphere **/
+    void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
+
+    /** Add a ring **/
+    void ring(float innerRadius, float outerRadius, int divisions, boolean flipNormals);
+
+    /** Add a ring **/
+    void ring(Matrix4 transform, float innerRadius, float outerRadius, int divisions, boolean flipNormals);
+
+    /** Add a ring **/
+    void ring(Matrix4 transform, float innerRadius, float outerRadius, int divisions, boolean flipNormals, float angleStart, float angleEnd);
+
+    /**
+     * Class that contains all vertex information the builder can use.
+     *
+     * @author Xoppa
+     */
     class VertexInfo implements Poolable {
         public final Vector3 position = new Vector3();
-        public boolean hasPosition;
         public final Vector3 normal = new Vector3(0, 1, 0);
-        public boolean hasNormal;
         public final Vector3 tangent = new Vector3(1, 0, 0);
-        public boolean hasTangent;
         public final Vector3 binormal = new Vector3(0, 0, 1);
-        public boolean hasBinormal;
         public final Color color = new Color(1, 1, 1, 1);
-        public boolean hasColor;
         public final Vector2 uv = new Vector2();
+        public boolean hasPosition;
+        public boolean hasNormal;
+        public boolean hasTangent;
+        public boolean hasBinormal;
+        public boolean hasColor;
         public boolean hasUV;
 
         @Override
@@ -360,8 +384,8 @@ public interface IntMeshPartBuilder {
             return this;
         }
 
-        public VertexInfo setTan(float x, float y, float z){
-            tangent.set(x,y,z);
+        public VertexInfo setTan(float x, float y, float z) {
+            tangent.set(x, y, z);
             hasTangent = true;
             return this;
         }
@@ -372,8 +396,8 @@ public interface IntMeshPartBuilder {
             return this;
         }
 
-        public VertexInfo setBin(float x, float y, float z){
-            binormal.set(x,y,z);
+        public VertexInfo setBin(float x, float y, float z) {
+            binormal.set(x, y, z);
             hasBinormal = true;
             return this;
         }
@@ -424,22 +448,4 @@ public interface IntMeshPartBuilder {
             return this;
         }
     }
-
-    /** Add a cylinder */
-    void cylinder(float width, float height, float depth, int divisions, float angleFrom, float angleTo, boolean close, boolean flipNormals);
-
-    /** Add a sphere */
-    void sphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
-
-    /** Add a sphere **/
-    void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo);
-
-    /** Add a ring **/
-    void ring(float innerRadius, float outerRadius, int divisions, boolean flipNormals);
-
-    /** Add a ring **/
-    void ring(Matrix4 transform, float innerRadius, float outerRadius, int divisions, boolean flipNormals);
-
-    /** Add a ring **/
-    void ring(Matrix4 transform, float innerRadius, float outerRadius, int divisions, boolean flipNormals, float angleStart, float angleEnd);
 }

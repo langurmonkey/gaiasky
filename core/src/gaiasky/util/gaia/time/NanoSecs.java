@@ -27,11 +27,11 @@ import java.io.Serializable;
 
 /**
  * A finite number of nanoseconds.
- *
+ * <p>
  * There are two implementations provided of the conversions methods one as
  * object interface, where an object of the current class has to be
  * instantiated. The oder implementation is provided as static class methods.
- *
+ * <p>
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
@@ -52,11 +52,64 @@ public class NanoSecs extends ConcreteDuration implements Serializable {
     /**
      * Construct object from number of nano seconds.
      *
-     * @param ns
-     *            [ns]
+     * @param ns [ns]
      */
     public NanoSecs(final long ns) {
         this.ns = ns;
+    }
+
+    /**
+     * @param nanoSecs
+     *
+     * @return nanoSecs expressed in s
+     */
+    static public double asSecs(final long nanoSecs) {
+        return (double) nanoSecs / (double) Duration.NS_PER_SEC;
+    }
+
+    /**
+     * @param nanoSecs
+     *
+     * @return nanoSecs expressed in mins
+     */
+    static public double asMins(final long nanoSecs) {
+        return (double) nanoSecs / Duration.NS_PER_MIN;
+    }
+
+    /**
+     * @param nanoSecs
+     *
+     * @return nanoSecs expressed in hours
+     */
+    static public double asHours(final long nanoSecs) {
+        return (double) nanoSecs / Duration.NS_PER_HOUR;
+    }
+
+    /**
+     * @param nanoSecs
+     *
+     * @return nanoSecs expressed in revs
+     */
+    static public double asRevs(final long nanoSecs) {
+        return (double) nanoSecs / Duration.NS_PER_REV;
+    }
+
+    /**
+     * @param nanoSecs the time in nanoseconds to convert.
+     *
+     * @return nanoSecs expressed in days.
+     */
+    static public double asDays(final long nanoSecs) {
+        return (double) nanoSecs / Duration.NS_PER_DAY;
+    }
+
+    /**
+     * @param nanoSecs the time in nanoseconds to convert.
+     *
+     * @return nanoSecs expressed in years.
+     */
+    static public double asJulianYears(final long nanoSecs) {
+        return (double) nanoSecs / Duration.NS_PER_JULIAN_YEAR;
     }
 
     /**
@@ -86,27 +139,11 @@ public class NanoSecs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param nanoSecs
-     * @return nanoSecs expressed in s
-     */
-    static public double asSecs(final long nanoSecs) {
-        return (double) nanoSecs / (double) Duration.NS_PER_SEC;
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asMins()
      */
     @Override
     public double asMins() {
         return (double) this.ns / Duration.NS_PER_MIN;
-    }
-
-    /**
-     * @param nanoSecs
-     * @return nanoSecs expressed in mins
-     */
-    static public double asMins(final long nanoSecs) {
-        return (double) nanoSecs / Duration.NS_PER_MIN;
     }
 
     /**
@@ -179,40 +216,6 @@ public class NanoSecs extends ConcreteDuration implements Serializable {
         ns = Math.round((double) ns * s);
 
         return this;
-    }
-
-    /**
-     * @param nanoSecs
-     * @return nanoSecs expressed in hours
-     */
-    static public double asHours(final long nanoSecs) {
-        return (double) nanoSecs / Duration.NS_PER_HOUR;
-    }
-
-    /**
-     * @param nanoSecs
-     * @return nanoSecs expressed in revs
-     */
-    static public double asRevs(final long nanoSecs) {
-        return (double) nanoSecs / Duration.NS_PER_REV;
-    }
-
-    /**
-     * @param nanoSecs
-     *            the time in nanoseconds to convert.
-     * @return nanoSecs expressed in days.
-     */
-    static public double asDays(final long nanoSecs) {
-        return (double) nanoSecs / Duration.NS_PER_DAY;
-    }
-
-    /**
-     * @param nanoSecs
-     *            the time in nanoseconds to convert.
-     * @return nanoSecs expressed in years.
-     */
-    static public double asJulianYears(final long nanoSecs) {
-        return (double) nanoSecs / Duration.NS_PER_JULIAN_YEAR;
     }
 
     /**

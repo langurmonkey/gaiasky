@@ -128,7 +128,6 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         computeMeanPosition(entity, set);
         setLabelPosition(entity);
 
-
         // Labels.
         var label = Mapper.label.get(entity);
         label.label = true;

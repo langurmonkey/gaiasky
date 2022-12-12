@@ -15,11 +15,10 @@ import java.util.Map;
  */
 public class Archetypes {
 
-    /** The engine reference. **/
-    private Engine engine;
-
     /** Archetypes map, links old scene graph model objects to artemis archetypes. **/
     protected Map<String, Archetype> archetypes;
+    /** The engine reference. **/
+    private Engine engine;
 
     /**
      * Creates a new archetypes container.

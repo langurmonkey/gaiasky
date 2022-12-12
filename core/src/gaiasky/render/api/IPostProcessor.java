@@ -19,6 +19,31 @@ import java.util.Set;
 public interface IPostProcessor extends Disposable {
     String DEFAULT_KEY = "%default%";
 
+    void initialize(AssetManager manager);
+
+    void doneLoading(AssetManager manager);
+
+    PostProcessBean getPostProcessBean(RenderType type);
+
+    void resize(int width, int height, int targetWidth, int targetHeight);
+
+    void resizeImmediate(int width, int height, int targetWidth, int targetHeight);
+
+    boolean isLightScatterEnabled();
+
+    enum RenderType {
+        screen(0),
+        screenshot(1),
+        frame(2);
+
+        public int index;
+
+        RenderType(int index) {
+            this.index = index;
+        }
+
+    }
+
     class PostProcessBean {
         protected static Logger.Log logger = Logger.getLogger(PostProcessBean.class);
 
@@ -36,9 +61,10 @@ public interface IPostProcessor extends Disposable {
 
         /**
          * Gets the effect of the given class with the default key
+         *
          * @param clazz The class
          */
-        public PostProcessorEffect get(Class<? extends PostProcessorEffect> clazz){
+        public PostProcessorEffect get(Class<? extends PostProcessorEffect> clazz) {
             return get(DEFAULT_KEY, clazz);
         }
 
@@ -78,6 +104,7 @@ public interface IPostProcessor extends Disposable {
          * Gets the first effect of the given type
          *
          * @param clazz The class
+         *
          * @return The effect
          */
         public PostProcessorEffect get(String key, Class<? extends PostProcessorEffect> clazz) {
@@ -92,6 +119,7 @@ public interface IPostProcessor extends Disposable {
          * Gets all effects of the given type
          *
          * @param clazz The class
+         *
          * @return The map of effects
          */
         public Map<String, PostProcessorEffect> getAll(Class<? extends PostProcessorEffect> clazz) {
@@ -106,7 +134,7 @@ public interface IPostProcessor extends Disposable {
         public void remove(Class<? extends PostProcessorEffect> clazz) {
             Map<String, PostProcessorEffect> l = getAll(clazz);
             if (l != null) {
-                l.forEach((key, ppe) ->{
+                l.forEach((key, ppe) -> {
                     ppe.setEnabled(false);
                     pp.removeEffect(ppe);
                 });
@@ -176,29 +204,4 @@ public interface IPostProcessor extends Disposable {
         }
 
     }
-
-    enum RenderType {
-        screen(0),
-        screenshot(1),
-        frame(2);
-
-        public int index;
-
-        RenderType(int index) {
-            this.index = index;
-        }
-
-    }
-
-    void initialize(AssetManager manager);
-
-    void doneLoading(AssetManager manager);
-
-    PostProcessBean getPostProcessBean(RenderType type);
-
-    void resize(int width, int height, int targetWidth, int targetHeight);
-
-    void resizeImmediate(int width, int height, int targetWidth, int targetHeight);
-
-    boolean isLightScatterEnabled();
 }

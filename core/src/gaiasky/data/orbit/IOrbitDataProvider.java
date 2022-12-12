@@ -13,7 +13,8 @@ public interface IOrbitDataProvider {
     /**
      * Loads the orbit data into the OrbitData object in the internal
      * units.
-     * @param file The file path
+     *
+     * @param file   The file path
      * @param source The parameters
      */
     void load(String file, OrbitDataLoaderParameters source);
@@ -21,8 +22,9 @@ public interface IOrbitDataProvider {
     /**
      * Loads the orbit data into the OrbitData object in the internal
      * units.
-     * @param file The file path
-     * @param source The parameters
+     *
+     * @param file      The file path
+     * @param source    The parameters
      * @param newMethod Use new method (for orbital elements only)
      */
     void load(String file, OrbitDataLoaderParameters source, boolean newMethod);

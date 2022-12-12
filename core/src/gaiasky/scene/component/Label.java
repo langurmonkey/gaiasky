@@ -41,7 +41,7 @@ public class Label implements Component {
     public Consumer<LabelView> depthBufferConsumer = LabelView::defaultTextDepthBuffer;
 
     /** The label rendering code. **/
-    public Consumer7<LabelEntityRenderSystem, LabelView , ExtSpriteBatch, ExtShaderProgram , FontRenderSystem, RenderingContext , ICamera> renderConsumer;
+    public Consumer7<LabelEntityRenderSystem, LabelView, ExtSpriteBatch, ExtShaderProgram, FontRenderSystem, RenderingContext, ICamera> renderConsumer;
 
     /**
      * Sets the position of the label, in parsecs and in the internal reference

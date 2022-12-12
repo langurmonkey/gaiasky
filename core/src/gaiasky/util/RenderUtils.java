@@ -19,11 +19,12 @@ public class RenderUtils {
 
     /**
      * Assumes the aspect ratio is fine
+     *
      * @param fb The frame buffer to render
      * @param sb The sprite batch to use
-     * @param g The graphics instance
+     * @param g  The graphics instance
      */
-    public static void renderBackbuffer(FrameBuffer fb, SpriteBatch sb, Graphics g){
+    public static void renderBackbuffer(FrameBuffer fb, SpriteBatch sb, Graphics g) {
         Texture tex = fb.getColorBufferTexture();
         sb.begin();
         sb.draw(tex, 0, 0, tex.getWidth(), tex.getHeight(), 0, 0, 1, 1);
@@ -32,19 +33,21 @@ public class RenderUtils {
 
     /**
      * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio
+     *
      * @param fb The frame buffer to render
      * @param sb The sprite batch to use
-     * @param g The graphics instance
+     * @param g  The graphics instance
      */
-    public static void renderKeepAspect(FrameBuffer fb, SpriteBatch sb, Graphics g){
+    public static void renderKeepAspect(FrameBuffer fb, SpriteBatch sb, Graphics g) {
         renderKeepAspect(fb, sb, g, null);
     }
 
     /**
      * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio
-     * @param fb The frame buffer to render
-     * @param sb The sprite batch to use
-     * @param g The graphics instance
+     *
+     * @param fb       The frame buffer to render
+     * @param sb       The sprite batch to use
+     * @param g        The graphics instance
      * @param lastSize The previous size, for recomputing the sprite batch transform
      */
     public static void renderKeepAspect(FrameBuffer fb, SpriteBatch sb, Graphics g, Vector2 lastSize) {

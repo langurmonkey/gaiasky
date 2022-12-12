@@ -36,38 +36,12 @@ public class SlaveManager {
     private static final Log logger = Logger.getLogger(SlaveManager.class);
 
     public static SlaveManager instance;
-
-    public static void initialize() {
-        if (instance == null && Settings.settings.program.net.slave.active) {
-            instance = new SlaveManager();
-        }
-    }
-
-    /**
-     * Checks if a special projection is active in this slave (yaw/pitch/roll, etc.)
-     *
-     * @return True if a special projection is active
-     */
-    public static boolean projectionActive() {
-        return instance != null && instance.initialized;
-    }
-
-    public static void load(AssetManager manager) {
-        if (projectionActive()) {
-            instance.loadAssets(manager);
-            // Mute cursor
-            Gdx.graphics.setSystemCursor(SystemCursor.None);
-        }
-    }
-
-    private boolean initialized = false;
-
     public String bufferId, regionId;
     public Path pfm, blend;
     public int xResolution, yResolution;
     public float yaw, pitch, roll, upAngle, downAngle, rightAngle, leftAngle;
     public float cameraFov;
-
+    private boolean initialized = false;
     public SlaveManager() {
         super();
         Settings settings = Settings.settings;
@@ -114,11 +88,36 @@ public class SlaveManager {
         }
     }
 
+    public static void initialize() {
+        if (instance == null && Settings.settings.program.net.slave.active) {
+            instance = new SlaveManager();
+        }
+    }
+
+    /**
+     * Checks if a special projection is active in this slave (yaw/pitch/roll, etc.)
+     *
+     * @return True if a special projection is active
+     */
+    public static boolean projectionActive() {
+        return instance != null && instance.initialized;
+    }
+
+    public static void load(AssetManager manager) {
+        if (projectionActive()) {
+            instance.loadAssets(manager);
+            // Mute cursor
+            Gdx.graphics.setSystemCursor(SystemCursor.None);
+        }
+    }
+
     /**
      * Unpacks the given MPCDI file and returns the unzip location.
      *
      * @param mpcdi The MPCDI configuration file.
+     *
      * @return THe path where the contents were unpacked.
+     *
      * @throws IOException If creating directories fails.
      */
     private Path unpackMpcdi(String mpcdi) throws IOException {
@@ -149,7 +148,7 @@ public class SlaveManager {
      * Parses the mpcdi.xml file and extracts the relevant information
      *
      * @param mpcdi The name of the MPCDI file.
-     * @param loc The directory of the MPCDI file to load.
+     * @param loc   The directory of the MPCDI file to load.
      */
     private void parseMpcdi(String mpcdi, Path loc) throws IOException, ParserConfigurationException, SAXException {
         if (loc != null) {
@@ -277,7 +276,7 @@ public class SlaveManager {
         }
     }
 
-    public boolean isWarpOrBlend(){
+    public boolean isWarpOrBlend() {
         return pfm != null || blend != null;
     }
 

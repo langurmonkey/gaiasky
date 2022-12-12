@@ -30,7 +30,7 @@ public class Octree implements Component {
     }
 
     public void removeParenthood(Entity child) {
-        if(child != null) {
+        if (child != null) {
             parenthood.remove(child);
         }
     }

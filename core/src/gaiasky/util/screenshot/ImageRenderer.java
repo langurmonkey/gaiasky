@@ -28,19 +28,13 @@ public class ImageRenderer {
      * Saves the current screen as an image to the given directory using the
      * given file name. The sequence number is added automatically to the file
      * name. This method works with OpenGL 2.0
-     * 
-     * @param absoluteLocation
-     *            The location folder
-     * @param baseFileName
-     *            File name without extension
-     * @param w
-     *            The width of the image
-     * @param h
-     *            The height of the image
-     * @param format
-     *            The format, either JPG or PNG
-     * @param quality
-     *            Quality, in case of JPG [0..1]
+     *
+     * @param absoluteLocation The location folder
+     * @param baseFileName     File name without extension
+     * @param w                The width of the image
+     * @param h                The height of the image
+     * @param format           The format, either JPG or PNG
+     * @param quality          Quality, in case of JPG [0..1]
      */
     public static String renderToImageGl20(String absoluteLocation, String baseFileName, int w, int h, ImageFormat format, float quality) {
         Pixmap pixmap = getScreenshot(0, 0, w, h, true);
@@ -124,11 +118,11 @@ public class ImageRenderer {
         return df.format(num);
     }
 
-    public synchronized static int getSequenceNumber(){
+    public synchronized static int getSequenceNumber() {
         return sequenceNumber;
     }
 
-    public synchronized static void resetSequenceNumber(){
+    public synchronized static void resetSequenceNumber() {
         sequenceNumber = 0;
     }
 }

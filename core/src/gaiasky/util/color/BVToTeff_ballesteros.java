@@ -30,6 +30,7 @@ public class BVToTeff_ballesteros {
      * Convert the incoming B-V color index [mag] into an effective temperature [K]
      *
      * @param bv The B-V color index [mag]
+     *
      * @return Effective temperature [K]
      */
     public double bvToTeff(double bv) {
@@ -38,7 +39,9 @@ public class BVToTeff_ballesteros {
 
     /**
      * Convert the incoming effective temperature [K] into a B-V color index [mag]
+     *
      * @param teff Effective temperature [K]
+     *
      * @return The B-V color index [mag]
      */
     public double teffToBv(double teff) {

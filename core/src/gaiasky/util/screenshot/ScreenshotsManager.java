@@ -32,8 +32,8 @@ public class ScreenshotsManager implements IObserver {
 
     private final GaiaSky gaiaSky;
     private final SceneRenderer sceneRenderer;
-    public IFileImageRenderer frameRenderer, screenshotRenderer;
     private final IGui renderGui;
+    public IFileImageRenderer frameRenderer, screenshotRenderer;
 
     public ScreenshotsManager(final GaiaSky gaiaSky, final SceneRenderer sceneRenderer, final GlobalResources globalResources) {
         super();
@@ -48,6 +48,12 @@ public class ScreenshotsManager implements IObserver {
         this.renderGui.doneLoading(null);
 
         EventManager.instance.subscribe(this, Event.RENDER_FRAME, Event.RENDER_FRAME_BUFFER, Event.FLUSH_FRAMES, Event.SCREENSHOT_CMD, Event.UPDATE_GUI, Event.DISPOSE);
+    }
+
+    private static String getCurrentTimeStamp() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");//dd/MM/yyyy
+        Date now = new Date();
+        return sdfDate.format(now);
     }
 
     public void renderFrame() {
@@ -191,11 +197,5 @@ public class ScreenshotsManager implements IObserver {
 
     private IGui renderGui() {
         return renderGui;
-    }
-
-    private static String getCurrentTimeStamp() {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");//dd/MM/yyyy
-        Date now = new Date();
-        return sdfDate.format(now);
     }
 }

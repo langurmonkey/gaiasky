@@ -12,15 +12,6 @@ import java.nio.file.Path;
 public class CompressTextures {
 
     /**
-     * Program CLI arguments.
-     */
-    private static class CLIArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
-
-        @Parameter(names = { "-l", "--location" }, description = "Specify the directory to process.", order = 1, required = true) private String location = null;
-    }
-
-    /**
      * Compresses all PNG and JPG files in the given location into ETC1A-compressed ZKTX files.
      *
      * @param args The directory to process.
@@ -76,5 +67,14 @@ public class CompressTextures {
 
     private static void printUsage(JCommander jc) {
         jc.usage();
+    }
+
+    /**
+     * Program CLI arguments.
+     */
+    private static class CLIArgs {
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+
+        @Parameter(names = { "-l", "--location" }, description = "Specify the directory to process.", order = 1, required = true) private String location = null;
     }
 }

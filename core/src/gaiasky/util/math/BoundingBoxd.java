@@ -5,34 +5,19 @@
 
 package gaiasky.util.math;
 
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
- * https://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
-
 import com.badlogic.gdx.math.collision.BoundingBox;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * Encapsulates an axis aligned bounding box represented by a minimum and a
- * maximum Vector. Additionally you can query for the bounding box's center,
+ * maximum Vector. Additionally, you can query for the bounding box's center,
  * dimensions and corner points.
  */
 public class BoundingBoxd implements Serializable {
-    private static final long serialVersionUID = -1286036817192127343L;
+    @Serial private static final long serialVersionUID = -1286036817192127343L;
 
     private final static Vector3d tmpVector = new Vector3d();
 
@@ -46,8 +31,45 @@ public class BoundingBoxd implements Serializable {
     private Vector3d[] corners;
 
     /**
-     * @deprecated Use {@link #getCenter(Vector3d)}
+     * Constructs a new bounding box with the minimum and maximum vector set to
+     * zeros.
+     */
+    public BoundingBoxd() {
+        clr();
+    }
+
+    /**
+     * Constructs a new bounding box from the given bounding box.
+     *
+     * @param bounds The bounding box to copy
+     */
+    public BoundingBoxd(BoundingBoxd bounds) {
+        this.set(bounds);
+    }
+
+    /**
+     * Constructs the new bounding box using the given minimum and maximum
+     * vector.
+     *
+     * @param minimum The minimum vector
+     * @param maximum The maximum vector
+     */
+    public BoundingBoxd(Vector3d minimum, Vector3d maximum) {
+        this.set(minimum, maximum);
+    }
+
+    static final double min(final double a, final double b) {
+        return a > b ? b : a;
+    }
+
+    static final double max(final double a, final double b) {
+        return a > b ? a : b;
+    }
+
+    /**
      * @return the center of the bounding box
+     *
+     * @deprecated Use {@link #getCenter(Vector3d)}
      */
     @Deprecated
     public Vector3d getCenter() {
@@ -55,9 +77,9 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @param out
-     *            The {@link Vector3d} to receive the center of the bounding
+     * @param out The {@link Vector3d} to receive the center of the bounding
      *            box.
+     *
      * @return The vector specified with the out argument.
      */
     public Vector3d getCenter(Vector3d out) {
@@ -81,8 +103,9 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @deprecated Use the getCornerXYZ methods instead
      * @return the corners of this bounding box
+     *
+     * @deprecated Use the getCornerXYZ methods instead
      */
     @Deprecated
     public Vector3d[] getCorners() {
@@ -135,8 +158,9 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @deprecated Use {@link #getDimensions(Vector3d)} instead
      * @return The dimensions of this bounding box on all three axis
+     *
+     * @deprecated Use {@link #getDimensions(Vector3d)} instead
      */
     @Deprecated
     public Vector3d getDimensions() {
@@ -144,9 +168,9 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @param out
-     *            The {@link Vector3d} to receive the dimensions of this
+     * @param out The {@link Vector3d} to receive the dimensions of this
      *            bounding box on all three axis.
+     *
      * @return The vector specified with the out argument
      */
     public Vector3d getDimensions(final Vector3d out) {
@@ -170,8 +194,9 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @deprecated Use {@link #getMin(Vector3d)} instead.
      * @return The minimum vector
+     *
+     * @deprecated Use {@link #getMin(Vector3d)} instead.
      */
     @Deprecated
     public Vector3d getMin() {
@@ -179,8 +204,8 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @param out
-     *            The {@link Vector3d} to receive the minimum values.
+     * @param out The {@link Vector3d} to receive the minimum values.
+     *
      * @return The vector specified with the out argument
      */
     public Vector3d getMin(final Vector3d out) {
@@ -188,8 +213,9 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @deprecated Use {@link #getMax(Vector3d)} instead
      * @return The maximum vector
+     *
+     * @deprecated Use {@link #getMax(Vector3d)} instead
      */
     @Deprecated
     public Vector3d getMax() {
@@ -197,8 +223,8 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * @param out
-     *            The {@link Vector3d} to receive the maximum values.
+     * @param out The {@link Vector3d} to receive the maximum values.
+     *
      * @return The vector specified with the out argument
      */
     public Vector3d getMax(final Vector3d out) {
@@ -206,41 +232,10 @@ public class BoundingBoxd implements Serializable {
     }
 
     /**
-     * Constructs a new bounding box with the minimum and maximum vector set to
-     * zeros.
-     */
-    public BoundingBoxd() {
-        clr();
-    }
-
-    /**
-     * Constructs a new bounding box from the given bounding box.
-     * 
-     * @param bounds
-     *            The bounding box to copy
-     */
-    public BoundingBoxd(BoundingBoxd bounds) {
-        this.set(bounds);
-    }
-
-    /**
-     * Constructs the new bounding box using the given minimum and maximum
-     * vector.
-     * 
-     * @param minimum
-     *            The minimum vector
-     * @param maximum
-     *            The maximum vector
-     */
-    public BoundingBoxd(Vector3d minimum, Vector3d maximum) {
-        this.set(minimum, maximum);
-    }
-
-    /**
      * Sets the given bounding box.
-     * 
-     * @param bounds
-     *            The bounds.
+     *
+     * @param bounds The bounds.
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd set(BoundingBoxd bounds) {
@@ -253,11 +248,10 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Sets the given minimum and maximum vector.
-     * 
-     * @param minimum
-     *            The minimum vector
-     * @param maximum
-     *            The maximum vector
+     *
+     * @param minimum The minimum vector
+     * @param maximum The maximum vector
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd set(Vector3d minimum, Vector3d maximum) {
@@ -270,9 +264,9 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Sets the bounding box minimum and maximum vector from the given points.
-     * 
-     * @param points
-     *            The points.
+     *
+     * @param points The points.
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd set(Vector3d[] points) {
@@ -284,9 +278,9 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Sets the bounding box minimum and maximum vector from the given points.
-     * 
-     * @param points
-     *            The points.
+     *
+     * @param points The points.
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd set(List<Vector3d> points) {
@@ -298,7 +292,7 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Sets the minimum and maximum vector to positive and negative infinity.
-     * 
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd inf() {
@@ -311,9 +305,9 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Extends the bounding box to incorporate the given {@link Vector3d}.
-     * 
-     * @param point
-     *            The vector
+     *
+     * @param point The vector
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd ext(Vector3d point) {
@@ -322,7 +316,7 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Sets the minimum and maximum vector to zeros.
-     * 
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd clr() {
@@ -332,7 +326,7 @@ public class BoundingBoxd implements Serializable {
     /**
      * Returns whether this bounding box is valid. This means that {@link #max}
      * is greater than {@link #min}.
-     * 
+     *
      * @return True in case the bounding box is valid, false otherwise
      */
     public boolean isValid() {
@@ -341,9 +335,9 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Extends this bounding box by the given bounding box.
-     * 
-     * @param a_bounds
-     *            The bounding box
+     *
+     * @param a_bounds The bounding box
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd ext(BoundingBoxd a_bounds) {
@@ -352,12 +346,11 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Extends this bounding box by the given transformed bounding box.
-     * 
-     * @param bounds
-     *            The bounding box
-     * @param transform
-     *            The transformation matrix to apply to bounds, before using it
-     *            to extend this bounding box.
+     *
+     * @param bounds    The bounding box
+     * @param transform The transformation matrix to apply to bounds, before using it
+     *                  to extend this bounding box.
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd ext(BoundingBoxd bounds, Matrix4d transform) {
@@ -376,9 +369,9 @@ public class BoundingBoxd implements Serializable {
      * Multiplies the bounding box by the given matrix. This is achieved by
      * multiplying the 8 corner points and then calculating the minimum and
      * maximum vectors from the transformed points.
-     * 
-     * @param transform
-     *            The matrix
+     *
+     * @param transform The matrix
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd mul(Matrix4d transform) {
@@ -397,9 +390,9 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Returns whether the given bounding box is contained in this bounding box.
-     * 
-     * @param b
-     *            The bounding box
+     *
+     * @param b The bounding box
+     *
      * @return Whether the given bounding box is contained
      */
     public boolean contains(BoundingBoxd b) {
@@ -409,9 +402,9 @@ public class BoundingBoxd implements Serializable {
     /**
      * Returns whether the given bounding box is intersecting this bounding box
      * (at least one point in).
-     * 
-     * @param b
-     *            The bounding box
+     *
+     * @param b The bounding box
+     *
      * @return Whether the given bounding box is intersected
      */
     public boolean intersects(BoundingBoxd b) {
@@ -435,9 +428,9 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Returns whether the given vector is contained in this bounding box.
-     * 
-     * @param v
-     *            The vector
+     *
+     * @param v The vector
+     *
      * @return Whether the vector is contained or not.
      */
     public boolean contains(Vector3d v) {
@@ -447,13 +440,11 @@ public class BoundingBoxd implements Serializable {
     /**
      * Returns whether the given position [xyz] is contained in this bounding
      * box.
-     * 
-     * @param x
-     *            The x component
-     * @param y
-     *            The y component
-     * @param z
-     *            The z component
+     *
+     * @param x The x component
+     * @param y The y component
+     * @param z The z component
+     *
      * @return Whether it is contained in this box
      */
     public boolean contains(double x, double y, double z) {
@@ -468,24 +459,14 @@ public class BoundingBoxd implements Serializable {
 
     /**
      * Extends the bounding box by the given vector.
-     * 
-     * @param x
-     *            The x-coordinate
-     * @param y
-     *            The y-coordinate
-     * @param z
-     *            The z-coordinate
+     *
+     * @param x The x-coordinate
+     * @param y The y-coordinate
+     * @param z The z-coordinate
+     *
      * @return This bounding box for chaining.
      */
     public BoundingBoxd ext(double x, double y, double z) {
         return this.set(min.set(min(min.x, x), min(min.y, y), min(min.z, z)), max.set(max(max.x, x), max(max.y, y), max(max.z, z)));
-    }
-
-    static final double min(final double a, final double b) {
-        return a > b ? b : a;
-    }
-
-    static final double max(final double a, final double b) {
-        return a > b ? a : b;
     }
 }

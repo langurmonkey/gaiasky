@@ -8,19 +8,17 @@ package gaiasky.util.gdx.shader.attribute;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class Vector4Attribute extends Attribute {
+    public static final String HtermsAlias = "hterms";
+    public static final int Hterms = register(HtermsAlias);
+    public float[] value;
+
     public Vector4Attribute(int index) {
         super(index);
     }
-
     public Vector4Attribute(int index, float[] value) {
         super(index);
         this.value = value;
     }
-
-    public float[] value;
-
-    public static final String HtermsAlias = "hterms";
-    public static final int Hterms = register(HtermsAlias);
 
     @Override
     public Attribute copy() {

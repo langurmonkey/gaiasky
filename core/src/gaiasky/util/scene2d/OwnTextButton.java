@@ -18,8 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
  */
 public class OwnTextButton extends TextButton {
 
-    private float ownWidth = 0f, ownHeight = 0f;
     OwnTextButton me;
+    private float ownWidth = 0f, ownHeight = 0f;
 
     public OwnTextButton(String text, Skin skin) {
         super(text, skin);

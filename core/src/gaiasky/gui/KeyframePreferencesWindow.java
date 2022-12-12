@@ -24,9 +24,9 @@ import java.text.DecimalFormat;
 
 public class KeyframePreferencesWindow extends GenericDialog {
 
-    private OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
-    public OwnTextField camrecFps;
     private final DecimalFormat nf3;
+    public OwnTextField camrecFps;
+    private OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
         super(I18n.msg("gui.keyframes.preferences"), skin, stage);

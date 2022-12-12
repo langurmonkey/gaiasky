@@ -25,7 +25,7 @@ import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -39,22 +39,7 @@ import java.text.DecimalFormat;
  */
 public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     static private final int MAX_RULER_NAME_LEN = 9;
-
-    protected Skin skin;
-    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadius;
-    protected Button goTo, landOn, landAt, bookmark;
-    protected OwnImageButton objectVisibility, labelVisibility;
-    protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
-    protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
-    protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
-    protected OwnLabel focusIdExpand;
-
-    protected HorizontalGroup focusActionsGroup;
-
     private final FocusView view;
-    protected IFocus currentFocus;
-    private ExternalInformationUpdater externalInfoUpdater;
-
     private final Table focusInfo;
     private final Table moreInfo;
     private final Table rulerInfo;
@@ -63,15 +48,22 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private final Cell<Table> contentCell;
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
-
     private final Vector3d pos;
     private final Vector3b posb;
-
+    protected Skin skin;
+    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadius;
+    protected Button goTo, landOn, landAt, bookmark;
+    protected OwnImageButton objectVisibility, labelVisibility;
+    protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
+    protected OwnLabel camName, camVel, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
+    protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
+    protected OwnLabel focusIdExpand;
+    protected HorizontalGroup focusActionsGroup;
+    protected IFocus currentFocus;
     DecimalFormat nf, sf;
-
-    private boolean maximized;
-
     float pad1, pad3, pad5, pad10, pad15, bw;
+    private ExternalInformationUpdater externalInfoUpdater;
+    private boolean maximized;
 
     public FocusInfoInterface(Skin skin) {
         this(skin, false);
@@ -365,7 +357,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         content.add(cameraInfo).left();
         content.row();
         rulerCell = content.add(rulerInfo).left();
-        if(maximized) {
+        if (maximized) {
             contentCell = add(content);
         } else {
             contentCell = add();
@@ -513,8 +505,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             } else {
                 Coordinates.cartesianToSpherical(view.getAbsolutePosition(posb), pos);
 
-                focusRA.setText(nf.format(MathUtilsd.radDeg * pos.x % 360) + deg);
-                focusDEC.setText(nf.format(MathUtilsd.radDeg * pos.y % 360) + deg);
+                focusRA.setText(nf.format(MathUtilsDouble.radDeg * pos.x % 360) + deg);
+                focusDEC.setText(nf.format(MathUtilsDouble.radDeg * pos.y % 360) + deg);
             }
             if (view.hasProperMotion()) {
                 focusMuAlpha.setText(nf.format(view.getMuAlpha()) + " " + I18n.msg("gui.unit.masyr"));

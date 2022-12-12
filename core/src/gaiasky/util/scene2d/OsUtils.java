@@ -28,6 +28,7 @@ import gaiasky.gui.GSKeys;
 
 /**
  * Operating system related utils.
+ *
  * @author Kotcrab
  * @author Simon Gerst
  */
@@ -64,6 +65,7 @@ public class OsUtils {
 
     /**
      * Returns the Android API level it's basically the same as android.os.Build.VERSION.SDK_INT
+     *
      * @return the API level. Returns 0 if the current OS isn't Android
      */
     public static int getAndroidApiLevel() {
@@ -81,7 +83,9 @@ public class OsUtils {
      * CONTROL_LEFT and CONTROL_RIGHT and SYM are mapped to Ctrl. The same goes for Alt (ALT_LEFT, ALT_RIGHT) and Shift (SHIFT_LEFT, SHIFT_RIGHT).
      * <p>
      * Keycodes equal to {@link Integer#MIN_VALUE} will be ignored.
+     *
      * @param keycodes keycodes from {@link Keys} that are used to create shortcut text
+     *
      * @return the platform dependent shortcut text
      */
     public static String getShortcutFor(int... keycodes) {

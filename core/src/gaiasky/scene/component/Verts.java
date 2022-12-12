@@ -24,7 +24,6 @@ public class Verts implements Component {
 
     public PointCloudData pointCloudData;
 
-
     public void blend() {
         if (blend) {
             Gdx.gl20.glEnable(GL20.GL_BLEND);

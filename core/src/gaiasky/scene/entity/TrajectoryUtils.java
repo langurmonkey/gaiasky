@@ -23,23 +23,21 @@ public class TrajectoryUtils {
 
     /** The trajectory refresher daemon. **/
     public static OrbitRefresher orbitRefresher;
-
-    /** Initialize the trajectory refresher daemon. **/
-    public static void initRefresher() {
-        if (orbitRefresher == null) {
-            orbitRefresher = new OrbitRefresher("gaiasky-worker-trajectoryupdate");
-        }
-    }
-
     private Vector3b B31, B32;
     private Vector3d D31, D32, D33;
-
     public TrajectoryUtils() {
         B31 = new Vector3b();
         B32 = new Vector3b();
         D31 = new Vector3d();
         D32 = new Vector3d();
         D33 = new Vector3d();
+    }
+
+    /** Initialize the trajectory refresher daemon. **/
+    public static void initRefresher() {
+        if (orbitRefresher == null) {
+            orbitRefresher = new OrbitRefresher("gaiasky-worker-trajectoryupdate");
+        }
     }
 
     public void initOrbitMetadata(Body body, Trajectory trajectory, Verts verts) {

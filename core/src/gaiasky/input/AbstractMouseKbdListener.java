@@ -19,9 +19,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class AbstractMouseKbdListener extends GestureDetector implements IInputListener {
 
-    protected ICamera iCamera;
-
     protected final AtomicBoolean active;
+    protected ICamera iCamera;
     // Minimum time after key press before polling starts.
     protected long minPollTime = 150;
     protected long minPollInterval = 0;

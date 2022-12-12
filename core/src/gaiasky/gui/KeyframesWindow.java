@@ -62,22 +62,43 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private final DecimalFormat secondsFormatter;
     private final DateTimeFormatter dateFormat;
-
-    /**
-     * Seconds
-     **/
-    private OwnTextField secondsInput;
-
-    /**
-     * Name
-     **/
-    private OwnTextField nameInput;
-
     /**
      * Current keyframes
      **/
     private final Array<Keyframe> keyframes;
-
+    /**
+     * Seconds cells
+     **/
+    private final Map<Keyframe, Cell<?>> secondsCells;
+    /**
+     * Names cells
+     **/
+    private final Map<Keyframe, Cell<?>> namesCells;
+    /**
+     * Keyframe cells
+     */
+    private final Map<Keyframe, OwnLabel> keyframeNames;
+    /**
+     * Current camera params
+     **/
+    private final Object lock = new Object();
+    /**
+     * Date format
+     **/
+    private final DateFormat df;
+    private final VertsView vertsView;
+    private final KeyframesView view;
+    private final float buttonSize;
+    private final float buttonSizeL;
+    private final Editing editing;
+    /**
+     * Seconds
+     **/
+    private OwnTextField secondsInput;
+    /**
+     * Name
+     **/
+    private OwnTextField nameInput;
     /**
      * Keyframes table
      **/
@@ -86,139 +107,24 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * Notice cell
      **/
     private Cell<?> notice;
-
-    /**
-     * Seconds cells
-     **/
-    private final Map<Keyframe, Cell<?>> secondsCells;
-
-    /**
-     * Names cells
-     **/
-    private final Map<Keyframe, Cell<?>> namesCells;
-
-    /**
-     * Keyframe cells
-     */
-    private final Map<Keyframe, OwnLabel> keyframeNames;
-
     /**
      * Scroll for keyframes
      **/
     private OwnScrollPane rightScroll;
-
-    /**
-     * Current camera params
-     **/
-    private final Object lock = new Object();
-
     private Vector3b pos;
     private Vector3d dir, up;
     private ITimeFrameProvider t;
-
-    /**
-     * Date format
-     **/
-    private final DateFormat df;
-    private final VertsView vertsView;
-    private final KeyframesView view;
-
     /**
      * Last loaded keyframe file name
      **/
     private String lastKeyframeFileName = null;
-
     /**
      * Model object to represent the path
      **/
     private Entity keyframesPathEntity;
     private Keyframes keyframesComponent;
-
-    private final float buttonSize;
-    private final float buttonSizeL;
-
-    /**
-     * Contains info on field currently being edited
-     */
-    private class Editing {
-        private int type = -1;
-        private Keyframe kf;
-        private int index;
-        private OwnTextField tf;
-        private final Map<String, Object> map;
-
-        public Editing() {
-            map = new HashMap<>();
-        }
-
-        public boolean notEmpty() {
-            return tf != null;
-        }
-
-        public boolean isEmpty() {
-            return tf == null;
-        }
-
-        public void revert() {
-            if (isName()) {
-                addFrameName(kf, index, keyframesTable);
-            } else if (isSeconds()) {
-                addFrameSeconds(kf, (Double) map.get("prevT"), index, keyframesTable);
-            }
-        }
-
-        public void setParam(String key, Object value) {
-            map.put(key, value);
-        }
-
-        public boolean isName() {
-            return !isEmpty() && type == 1;
-        }
-
-        public boolean isSeconds() {
-            return !isEmpty() && type == 0;
-        }
-
-        public void set(Keyframe kf, int idx, OwnTextField tf) {
-            this.kf = kf;
-            this.index = idx;
-            this.tf = tf;
-        }
-
-        public void setName(Keyframe kf, int idx, OwnTextField tf) {
-            type = 1;
-            set(kf, idx, tf);
-        }
-
-        public void setSeconds(Keyframe kf, int idx, OwnTextField tf, double prevT) {
-            type = 0;
-            setParam("prevT", prevT);
-            set(kf, idx, tf);
-        }
-
-        public void unset() {
-            type = -1;
-            kf = null;
-            index = -1;
-            tf = null;
-            map.clear();
-        }
-
-        public Keyframe kf() {
-            return kf;
-        }
-
-        public int index() {
-            return index;
-        }
-
-        public OwnTextField tf() {
-            return tf;
-        }
-
-    }
-
-    private final Editing editing;
+    private long lastMs = 0L;
+    private Color colorBak;
 
     public KeyframesWindow(Scene scene, Stage stage, Skin skin) {
         super(I18n.msg("gui.keyframes.title"), skin, stage);
@@ -673,8 +579,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         addKeyframeToTable(kf, prevT, index, table, false);
     }
 
-    private long lastMs = 0L;
-
     private void addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
         OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-subheader");
@@ -1075,8 +979,6 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         EventManager.instance.removeAllSubscriptions(this);
     }
 
-    private Color colorBak;
-
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
@@ -1130,6 +1032,87 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 vertsView.setEntity(keyframesPathEntity);
                 vertsView.clear();
             });
+        }
+
+    }
+
+    /**
+     * Contains info on field currently being edited
+     */
+    private class Editing {
+        private final Map<String, Object> map;
+        private int type = -1;
+        private Keyframe kf;
+        private int index;
+        private OwnTextField tf;
+
+        public Editing() {
+            map = new HashMap<>();
+        }
+
+        public boolean notEmpty() {
+            return tf != null;
+        }
+
+        public boolean isEmpty() {
+            return tf == null;
+        }
+
+        public void revert() {
+            if (isName()) {
+                addFrameName(kf, index, keyframesTable);
+            } else if (isSeconds()) {
+                addFrameSeconds(kf, (Double) map.get("prevT"), index, keyframesTable);
+            }
+        }
+
+        public void setParam(String key, Object value) {
+            map.put(key, value);
+        }
+
+        public boolean isName() {
+            return !isEmpty() && type == 1;
+        }
+
+        public boolean isSeconds() {
+            return !isEmpty() && type == 0;
+        }
+
+        public void set(Keyframe kf, int idx, OwnTextField tf) {
+            this.kf = kf;
+            this.index = idx;
+            this.tf = tf;
+        }
+
+        public void setName(Keyframe kf, int idx, OwnTextField tf) {
+            type = 1;
+            set(kf, idx, tf);
+        }
+
+        public void setSeconds(Keyframe kf, int idx, OwnTextField tf, double prevT) {
+            type = 0;
+            setParam("prevT", prevT);
+            set(kf, idx, tf);
+        }
+
+        public void unset() {
+            type = -1;
+            kf = null;
+            index = -1;
+            tf = null;
+            map.clear();
+        }
+
+        public Keyframe kf() {
+            return kf;
+        }
+
+        public int index() {
+            return index;
+        }
+
+        public OwnTextField tf() {
+            return tf;
         }
 
     }

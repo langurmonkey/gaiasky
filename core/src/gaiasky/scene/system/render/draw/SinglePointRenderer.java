@@ -46,18 +46,14 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
     protected static final Log logger = Logger.getLogger(SinglePointRenderer.class);
 
     private final double BRIGHTNESS_FACTOR = 10;
-
+    private final RenderView view;
     Vector3 aux;
     int sizeOffset, pmOffset;
     ComponentType ct;
+    boolean initializing;
     private float[] opacityLimits;
     private float[] alphaSizeBrRc;
-
     private Texture starTex;
-
-    private final RenderView view;
-
-    boolean initializing;
 
     public SinglePointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(sceneRenderer, rg, alphas, shaders);

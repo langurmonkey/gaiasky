@@ -13,6 +13,7 @@ public class LongValidator extends CallbackValidator {
     public LongValidator() {
         this(null);
     }
+
     public LongValidator(IValidator parent) {
         this(parent, Long.MIN_VALUE, Long.MAX_VALUE);
     }
@@ -20,6 +21,7 @@ public class LongValidator extends CallbackValidator {
     public LongValidator(long min, long max) {
         this(null, min, max);
     }
+
     public LongValidator(IValidator parent, long min, long max) {
         super(parent);
         this.min = min;

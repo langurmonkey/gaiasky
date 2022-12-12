@@ -30,42 +30,77 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
-    protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
-
-    protected Map<String, Object> params;
-
+    protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
     /**
-     * Represents a column type.
+     * Parallelism value
      */
-    public enum ColId {
-        sourceid,
-        hip,
-        names,
-        ra,
-        dec,
-        pllx,
-        ra_err,
-        dec_err,
-        pllx_err,
-        pmra,
-        pmdec,
-        radvel,
-        pmra_err,
-        pmdec_err,
-        radvel_err,
-        gmag,
-        bpmag,
-        rpmag,
-        bp_rp,
-        col_idx,
-        ref_epoch,
-        teff,
-        radius,
-        ag,
-        ebp_min_rp,
-        ruwe,
-        geodist
+    protected final int parallelism;
+    protected Map<String, Object> params;
+    protected Map<ColId, Integer> indexMap;
+    protected List<IParticleRecord> list;
+    protected LongMap<double[]> sphericalPositions;
+    protected LongMap<float[]> colors;
+    protected long[] countsPerMag;
+    protected Set<Long> mustLoadIds = null;
+    protected List<AdditionalCols> additional;
+    /**
+     * Files or folders with optionally gzipped CSVs containing additional columns to be matched by sourceid with the main catalog. Column names must comport
+     * to {@link ColId}.
+     */
+    protected String[] additionalFiles = null;
+    /**
+     * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
+     */
+    protected Double ruwe = Double.NaN;
+    /**
+     * Distance cap in parsecs
+     */
+    protected double distCap = Double.MAX_VALUE;
+    /**
+     * <p>
+     * The loader will only load stars for which the parallax error is
+     * at most the percentage given here, in [0..1]. Faint stars (gmag >= 13.1)
+     * More specifically, the following must be met:
+     * </p>
+     * <code>pllx_err &lt; pllx * pllxErrFactor</code>
+     **/
+    protected double parallaxErrorFactorFaint = 0.125;
+    /**
+     * <p>
+     * The loader will only load stars for which the parallax error is
+     * at most the percentage given here, in [0..1]. Bright stars (gmag < 13.1)
+     * More specifically, the following must be met:
+     * </p>
+     * <code>pllx_err &lt; pllx * pllxErrFactor</code>
+     **/
+    protected double parallaxErrorFactorBright = 0.25;
+    /**
+     * Whether to use an adaptive threshold which lets more
+     * bright stars in to avoid artifacts.
+     */
+    protected boolean adaptiveParallax = true;
+    /**
+     * The zero point for the parallaxes in mas. Gets added to all loaded
+     * parallax values
+     */
+    protected double parallaxZeroPoint = 0;
+    /**
+     * Apply magnitude/color corrections for extinction/reddening
+     */
+    protected boolean magCorrections = false;
+    /**
+     * Maximum number of files to load. Negative for unlimited
+     */
+    protected int fileNumberCap = -1;
+    /**
+     * Maximum number of files to load per file
+     */
+    protected int starNumberCap = -1;
+
+    public AbstractStarGroupDataProvider() {
+        super();
+        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     public ColId colIdFromStr(final String name) {
@@ -98,8 +133,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         };
     }
 
-    protected Map<ColId, Integer> indexMap;
-
     protected int idx(ColId colId) {
         if (indexMap != null && indexMap.containsKey(colId))
             return indexMap.get(colId);
@@ -110,37 +143,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected boolean hasCol(ColId colId) {
         return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
     }
-
-    protected List<IParticleRecord> list;
-    protected LongMap<double[]> sphericalPositions;
-    protected LongMap<float[]> colors;
-    protected long[] countsPerMag;
-    protected Set<Long> mustLoadIds = null;
-
-    public class AdditionalCols {
-        // Column name -> index
-        Map<String, Integer> indices;
-        // Sourceid -> values
-        TreeMap<Long, double[]> values;
-
-        public boolean hasCol(ColId col) {
-            return indices != null && indices.containsKey(col.name());
-        }
-
-        public Double get(ColId col, Long sourceid) {
-            try {
-                if (hasCol(col)) {
-                    return values.get(sourceid)[indices.get(col.name())];
-                } else {
-                    return null;
-                }
-            } catch (Exception e) {
-                return null;
-            }
-        }
-    }
-
-    protected List<AdditionalCols> additional;
 
     protected boolean hasAdditional(ColId col, Long sourceId) {
         Double val = getAdditionalValue(col, sourceId);
@@ -168,78 +170,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             }
         }
         return null;
-    }
-
-    /**
-     * Files or folders with optionally gzipped CSVs containing additional columns to be matched by sourceid with the main catalog. Column names must comport
-     * to {@link ColId}.
-     */
-    protected String[] additionalFiles = null;
-
-    /**
-     * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
-     */
-    protected Double ruwe = Double.NaN;
-
-    /**
-     * Distance cap in parsecs
-     */
-    protected double distCap = Double.MAX_VALUE;
-
-    /**
-     * <p>
-     * The loader will only load stars for which the parallax error is
-     * at most the percentage given here, in [0..1]. Faint stars (gmag >= 13.1)
-     * More specifically, the following must be met:
-     * </p>
-     * <code>pllx_err &lt; pllx * pllxErrFactor</code>
-     **/
-    protected double parallaxErrorFactorFaint = 0.125;
-
-    /**
-     * <p>
-     * The loader will only load stars for which the parallax error is
-     * at most the percentage given here, in [0..1]. Bright stars (gmag < 13.1)
-     * More specifically, the following must be met:
-     * </p>
-     * <code>pllx_err &lt; pllx * pllxErrFactor</code>
-     **/
-    protected double parallaxErrorFactorBright = 0.25;
-    /**
-     * Whether to use an adaptive threshold which lets more
-     * bright stars in to avoid artifacts.
-     */
-    protected boolean adaptiveParallax = true;
-
-    /**
-     * The zero point for the parallaxes in mas. Gets added to all loaded
-     * parallax values
-     */
-    protected double parallaxZeroPoint = 0;
-
-    /**
-     * Apply magnitude/color corrections for extinction/reddening
-     */
-    protected boolean magCorrections = false;
-
-    /**
-     * Maximum number of files to load. Negative for unlimited
-     */
-    protected int fileNumberCap = -1;
-
-    /**
-     * Maximum number of files to load per file
-     */
-    protected int starNumberCap = -1;
-
-    /**
-     * Parallelism value
-     */
-    protected final int parallelism;
-
-    public AbstractStarGroupDataProvider() {
-        super();
-        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     /**
@@ -282,6 +212,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Returns whether the star must be loaded or not
      *
      * @param id The star ID
+     *
      * @return Whether the star with the given ID must be loaded
      */
     protected boolean mustLoad(long id) {
@@ -307,6 +238,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @param appmag  Apparent magnitude of star
      * @param pllx    Parallax of star
      * @param pllxerr Parallax error of star
+     *
      * @return True if parallax is accepted, false otherwise
      */
     protected boolean acceptParallax(double appmag, double pllx, double pllxerr) {
@@ -339,6 +271,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * map, if it exists. Otherwise, it returns a negative value.
      *
      * @param sourceId The source id of the source
+     *
      * @return The geometric distance in parsecs if it exists, -1 otherwise.
      */
     protected double getGeoDistance(long sourceId) {
@@ -352,6 +285,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Checks whether to accept the distance
      *
      * @param distance Distance in parsecs
+     *
      * @return Whether to accept the distance or not
      */
     protected boolean acceptDistance(double distance) {
@@ -376,7 +310,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Counts the lines on this input stream
      *
      * @param is The input stream
+     *
      * @return The number of lines
+     *
      * @throws IOException
      */
     protected int countLines(InputStream is) throws IOException {
@@ -546,8 +482,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * Loads a single file, optionally gzipped into the given {@link AdditionalCols}
      *
-     * @param f     The path.
+     * @param f              The path.
      * @param additionalCols The {@link AdditionalCols} instance.
+     *
      * @throws RuntimeException If the format of <code>additionalCols</code> is not correct.
      */
     private void loadAdditionalFile(Path f, AdditionalCols additionalCols) throws RuntimeException {
@@ -630,5 +567,61 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     @Override
     public void setProviderParams(Map<String, Object> params) {
         this.params = params;
+    }
+
+    /**
+     * Represents a column type.
+     */
+    public enum ColId {
+        sourceid,
+        hip,
+        names,
+        ra,
+        dec,
+        pllx,
+        ra_err,
+        dec_err,
+        pllx_err,
+        pmra,
+        pmdec,
+        radvel,
+        pmra_err,
+        pmdec_err,
+        radvel_err,
+        gmag,
+        bpmag,
+        rpmag,
+        bp_rp,
+        col_idx,
+        ref_epoch,
+        teff,
+        radius,
+        ag,
+        ebp_min_rp,
+        ruwe,
+        geodist
+    }
+
+    public class AdditionalCols {
+        // Column name -> index
+        Map<String, Integer> indices;
+        // Sourceid -> values
+        TreeMap<Long, double[]> values;
+
+        public boolean hasCol(ColId col) {
+            return indices != null && indices.containsKey(col.name());
+        }
+
+        public Double get(ColId col, Long sourceid) {
+            try {
+                if (hasCol(col)) {
+                    return values.get(sourceid)[indices.get(col.name())];
+                } else {
+                    return null;
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 }

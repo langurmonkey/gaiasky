@@ -32,7 +32,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         // Focus active
         focus.activeFunction = FocusActive::isFocusActiveTrue;
 
-        if(graph.parentName == null) {
+        if (graph.parentName == null) {
             graph.parentName = Scene.ROOT_NAME;
         }
         if (body.size == 0) {
@@ -41,7 +41,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
             // Size is given as a radius in km.
             body.setRadiusKm((double) body.size);
         }
-        if(base.ct == null || base.ct.allSetLike(new ComponentTypes(ComponentType.Others))) {
+        if (base.ct == null || base.ct.allSetLike(new ComponentTypes(ComponentType.Others))) {
             base.ct = new ComponentTypes(ComponentType.Invisible);
         }
 
@@ -54,7 +54,7 @@ public class RaymarchingInitializer extends AbstractInitSystem {
         var raymarching = Mapper.raymarching.get(entity);
         var coord = Mapper.coordinates.get(entity);
 
-        if(raymarching != null) {
+        if (raymarching != null) {
             if (raymarching.raymarchingShader != null && !raymarching.raymarchingShader.isBlank() && !Settings.settings.program.safeMode)
                 EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, coord.coordinates.getEquatorialCartesianCoordinates(Instant.now(), body.pos), raymarching.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
             else

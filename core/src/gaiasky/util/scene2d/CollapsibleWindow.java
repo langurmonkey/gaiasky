@@ -40,24 +40,21 @@ import gaiasky.util.i18n.I18n;
  * the title bar.
  **/
 public class CollapsibleWindow extends OwnWindow {
-    private boolean collapsed, collapsing = false, expanding = false;
-    private float collapseHeight;
-    private float expandHeight;
-    private Vector2 vec2;
     protected Actor me;
     protected Skin skin;
-
-    private float maxWidth = -1f, maxHeight = -1f;
     /**
      * Collapse speed in pixels per second.
      **/
     protected float collapseSpeed;
-
-    /** Whether the user can collapse the window by clicking on the menu bar. **/
-    private boolean collapsible = true;
-
     String expandIcon = "window-expand";
     String collapseIcon = "window-collapse";
+    private boolean collapsed, collapsing = false, expanding = false;
+    private float collapseHeight;
+    private float expandHeight;
+    private Vector2 vec2;
+    private float maxWidth = -1f, maxHeight = -1f;
+    /** Whether the user can collapse the window by clicking on the menu bar. **/
+    private boolean collapsible = true;
 
     public CollapsibleWindow(String title, Skin skin) {
         this(title, skin, 2000);
@@ -251,6 +248,10 @@ public class CollapsibleWindow extends OwnWindow {
         }
     }
 
+    public boolean isCollapsible() {
+        return collapsible;
+    }
+
     public void setCollapsible(boolean collapsible) {
         this.collapsible = collapsible;
         if (collapsible) {
@@ -258,10 +259,6 @@ public class CollapsibleWindow extends OwnWindow {
         } else {
             getTitleTable().clearListeners();
         }
-    }
-
-    public boolean isCollapsible() {
-        return collapsible;
     }
 
     public boolean isCollapsed() {

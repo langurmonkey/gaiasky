@@ -31,7 +31,7 @@ import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -48,11 +48,12 @@ import java.util.stream.IntStream;
  * A basic component that contains the info on a material
  */
 public class MaterialComponent extends NamedComponent implements IObserver {
-    private static final Log logger = Logger.getLogger(MaterialComponent.class);
-
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
+    private static final Log logger = Logger.getLogger(MaterialComponent.class);
+    // DEFAULT REFLECTION CUBEMAP
+    public static CubemapComponent reflectionCubemap;
 
     static {
         textureParamsMipMap = new TextureParameter();
@@ -70,6 +71,42 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         pfmTextureParams.internalFormat = GL20.GL_RGB;
     }
 
+    static {
+        reflectionCubemap = new CubemapComponent();
+    }
+
+    // TEXTURES
+    public boolean texInitialised, texLoading;
+    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao;
+    public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked;
+    // Material properties
+    public float[] diffuseColor;
+    public float[] specularColor;
+    public float[] metallicColor;
+    public float[] emissiveColor;
+    public float roughnessColor = Float.NaN;
+    // HEIGHT
+    public Float heightScale = 0.005f;
+    public Vector2 heightSize = new Vector2();
+    public float[][] heightMap;
+    public NoiseComponent nc;
+    // CUBEMAPS
+    public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
+    // Biome lookup texture
+    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png";
+    public float biomeHueShift = 0;
+    /** Add also color even if texture is present **/
+    public boolean colorIfTexture = false;
+    /** The actual material **/
+    private Material material, ringMaterial;
+    private AtomicBoolean heightGenerated = new AtomicBoolean(false);
+    private AtomicBoolean heightInitialized = new AtomicBoolean(false);
+    private Texture heightTex, specularTex, diffuseTex, normalTex;
+    public MaterialComponent() {
+        super();
+        EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.TESSELLATION_QUALITY_CMD);
+    }
+
     private static TextureParameter getTP(String tex) {
         return getTP(tex, false);
     }
@@ -83,53 +120,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             else
                 return textureParams;
         }
-    }
-
-    // DEFAULT REFLECTION CUBEMAP
-    public static CubemapComponent reflectionCubemap;
-
-    static {
-        reflectionCubemap = new CubemapComponent();
-    }
-
-    // TEXTURES
-    public boolean texInitialised, texLoading;
-    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao;
-    public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked;
-
-    // Material properties
-    public float[] diffuseColor;
-    public float[] specularColor;
-    public float[] metallicColor;
-    public float[] emissiveColor;
-    public float roughnessColor = Float.NaN;
-
-    // HEIGHT
-    public Float heightScale = 0.005f;
-    public Vector2 heightSize = new Vector2();
-    public float[][] heightMap;
-    public NoiseComponent nc;
-
-    // CUBEMAPS
-    public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
-
-    /** The actual material **/
-    private Material material, ringMaterial;
-
-    // Biome lookup texture
-    public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png";
-    public float biomeHueShift = 0;
-
-    private AtomicBoolean heightGenerated = new AtomicBoolean(false);
-    private AtomicBoolean heightInitialized = new AtomicBoolean(false);
-    private Texture heightTex, specularTex, diffuseTex, normalTex;
-
-    /** Add also color even if texture is present **/
-    public boolean colorIfTexture = false;
-
-    public MaterialComponent() {
-        super();
-        EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.TESSELLATION_QUALITY_CMD);
     }
 
     public void initialize(String name, AssetManager manager) {
@@ -190,6 +180,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -211,6 +202,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -461,8 +453,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                                 float height = elevationData[ii][j] / heightScale;
                                 float moisture = moistureData[ii][j];
 
-                                int x = (int) (iw * MathUtilsd.clamp(moisture, 0, 1));
-                                int y = (int) (ih - ih * MathUtilsd.clamp(height, 0, 1));
+                                int x = (int) (iw * MathUtilsDouble.clamp(moisture, 0, 1));
+                                int y = (int) (ih - ih * MathUtilsDouble.clamp(height, 0, 1));
 
                                 java.awt.Color argb = new java.awt.Color(lut.getRGB(x, y));
                                 float[] rgb = new float[] { argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f };

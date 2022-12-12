@@ -15,26 +15,11 @@ import java.util.concurrent.*;
  */
 public class GaiaSkyExecutorService {
     private static final Logger.Log logger = Logger.getLogger(GaiaSkyExecutorService.class);
-
-    private static class DaemonThreadFactory implements ThreadFactory {
-        private int sequence = 0;
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "gaiasky-worker-" + sequence);
-            sequence++;
-            t.setDaemon(true);
-            return t;
-        }
-
-    }
-
     /**
      * Thread pool executor
      */
     private ThreadPoolExecutor pool;
     private BlockingQueue<Runnable> workQueue;
-
     public GaiaSkyExecutorService() {
         super();
         initialize();
@@ -78,6 +63,19 @@ public class GaiaSkyExecutorService {
         }
         if (workQueue != null)
             workQueue.clear();
+    }
+
+    private static class DaemonThreadFactory implements ThreadFactory {
+        private int sequence = 0;
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r, "gaiasky-worker-" + sequence);
+            sequence++;
+            t.setDaemon(true);
+            return t;
+        }
+
     }
 
 }

@@ -24,12 +24,11 @@ import gaiasky.util.math.Vector3d;
 
 public class KeyframesView extends BaseView {
 
-    /** The keyframed path component. **/
-    private Keyframes kf;
-
-    private Scene scene;
     private final VertsView verts;
     private final FocusView focus;
+    /** The keyframed path component. **/
+    private Keyframes kf;
+    private Scene scene;
     private KeyframeUtils utils;
 
     private Vector3 F31 = new Vector3();

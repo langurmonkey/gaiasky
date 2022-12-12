@@ -23,7 +23,6 @@ public class WindowGamepadListener extends GuiGamepadListener {
         this.dialog = dialog;
     }
 
-
     @Override
     public void moveLeft() {
     }

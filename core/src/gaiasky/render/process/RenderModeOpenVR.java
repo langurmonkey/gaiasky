@@ -51,10 +51,11 @@ import java.util.Map;
  */
 public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode, IObserver {
     private static final Log logger = Logger.getLogger(RenderModeOpenVR.class);
-
+    public final Matrix4 eyeSpace = new Matrix4();
+    public final Matrix4 invEyeSpace = new Matrix4();
     private final Scene scene;
     private final VRContext vrContext;
-
+    public Array<Entity> controllerObjects;
     /**
      * Frame buffers for each eye
      **/
@@ -63,14 +64,8 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
      * Textures
      **/
     Texture texLeft, texRight;
-
     HmdMatrix44 projectionMat = HmdMatrix44.create();
     HmdMatrix34 eyeMat = HmdMatrix34.create();
-
-    public final Matrix4 eyeSpace = new Matrix4();
-    public final Matrix4 invEyeSpace = new Matrix4();
-
-    public Array<Entity> controllerObjects;
     private Map<VRDevice, Entity> vrDeviceToModel;
     private Environment controllersEnv;
 

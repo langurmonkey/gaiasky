@@ -28,6 +28,7 @@ public interface IBodyCoordinates {
      * @param instant The instant.
      * @param out     The out vector with the ecliptic coordinates in internal
      *                units.
+     *
      * @return The out vector for chaining.
      */
     Vector3b getEclipticSphericalCoordinates(Instant instant, Vector3b out);
@@ -38,6 +39,7 @@ public interface IBodyCoordinates {
      * @param instant The instant.
      * @param out     The out vector where the ecliptic cartesian coordinates will
      *                be.
+     *
      * @return The out vector for chaining, or null if the date is out of range,
      * in case of non-elliptical orbits such as Gaia.
      */
@@ -49,6 +51,7 @@ public interface IBodyCoordinates {
      * @param instant The instant.
      * @param out     The out vector where the equatorial cartesian coordinates will
      *                be.
+     *
      * @return The out vector for chaining, or null if the date is out of range,
      * in case of non-elliptical orbits such as Gaia.
      */

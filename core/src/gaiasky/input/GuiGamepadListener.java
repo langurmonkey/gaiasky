@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.gui.IGamepadMappings;
 import gaiasky.util.GuiUtils;
-import gaiasky.util.scene2d.OwnSliderPlus;
 
 public abstract class GuiGamepadListener extends AbstractGamepadListener {
     protected final Stage stage;

@@ -27,11 +27,11 @@ import java.io.Serializable;
 
 /**
  * A finite number of hours
- *
+ * <p>
  * There are two implementations provided of the conversions methods one as
  * object interface, where an object of the current class has to be
  * instantiated. The oder implementation is provided as static class methods.
- *
+ * <p>
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
@@ -50,11 +50,64 @@ public class Hours extends ConcreteDuration implements Serializable {
     /**
      * Construct object
      *
-     * @param hours
-     *            number of hours
+     * @param hours number of hours
      */
     public Hours(final double hours) {
         value = hours;
+    }
+
+    /**
+     * @param hours The time in hours to convert.
+     *
+     * @return hours expressed in nanosecs
+     */
+    public static long asNanoSecs(final double hours) {
+        return Math.round(hours * Duration.NS_PER_HOUR);
+    }
+
+    /**
+     * @param hours The time in hours to convert.
+     *
+     * @return hours expressed in secs
+     */
+    public static double asSecs(final double hours) {
+        return hours * Duration.SECS_PER_HOUR;
+    }
+
+    /**
+     * @param hours The time in hours to convert
+     *
+     * @return hours expressed in mins
+     */
+    public static double asMins(final double hours) {
+        return hours * Duration.MINS_PER_HOUR;
+    }
+
+    /**
+     * @param hours Time in hours to convert.
+     *
+     * @return hours expressed in revs
+     */
+    public static double asRevs(final double hours) {
+        return hours / Duration.HOURS_PER_REV;
+    }
+
+    /**
+     * @param hours Time in hours to convert.
+     *
+     * @return hours expressed in days
+     */
+    public static double asDays(final double hours) {
+        return hours / Duration.HOURS_PER_DAY;
+    }
+
+    /**
+     * @param hours Time in hours to convert.
+     *
+     * @return hours expressed in JulianYears
+     */
+    public static double asJulianYears(final double hours) {
+        return hours / Duration.HOURS_PER_JULIAN_YEAR;
     }
 
     /**
@@ -76,15 +129,6 @@ public class Hours extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param hours
-     *            The time in hours to convert.
-     * @return hours expressed in nanosecs
-     */
-    public static long asNanoSecs(final double hours) {
-        return Math.round(hours * Duration.NS_PER_HOUR);
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asSecs()
      */
     @Override
@@ -93,29 +137,11 @@ public class Hours extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param hours
-     *            The time in hours to convert.
-     * @return hours expressed in secs
-     */
-    public static double asSecs(final double hours) {
-        return hours * Duration.SECS_PER_HOUR;
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asMins()
      */
     @Override
     public double asMins() {
         return value * Duration.MINS_PER_HOUR;
-    }
-
-    /**
-     * @param hours
-     *            The time in hours to convert
-     * @return hours expressed in mins
-     */
-    public static double asMins(final double hours) {
-        return hours * Duration.MINS_PER_HOUR;
     }
 
     /**
@@ -135,15 +161,6 @@ public class Hours extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param hours
-     *            Time in hours to convert.
-     * @return hours expressed in revs
-     */
-    public static double asRevs(final double hours) {
-        return hours / Duration.HOURS_PER_REV;
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asDays()
      */
     @Override
@@ -152,29 +169,11 @@ public class Hours extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param hours
-     *            Time in hours to convert.
-     * @return hours expressed in days
-     */
-    public static double asDays(final double hours) {
-        return hours / Duration.HOURS_PER_DAY;
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asJulianYears()
      */
     @Override
     public double asJulianYears() {
         return value / Duration.HOURS_PER_JULIAN_YEAR;
-    }
-
-    /**
-     * @param hours
-     *            Time in hours to convert.
-     * @return hours expressed in JulianYears
-     */
-    public static double asJulianYears(final double hours) {
-        return hours / Duration.HOURS_PER_JULIAN_YEAR;
     }
 
     /**

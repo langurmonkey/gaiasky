@@ -5,26 +5,11 @@
 
 package gaiasky.util.math;
 
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
-
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -39,8 +24,8 @@ import java.io.Serializable;
  *
  * @author badlogicgames@gmail.com
  */
+@SuppressWarnings("unused")
 public class Matrix4d implements Serializable {
-    private static final long serialVersionUID = -2717655254359579617L;
     /**
      * XX: Typically the unrotated X component for scaling, also the cosine of
      * the angle when rotated on the Y and/or Z axis. On Vector3d multiplication
@@ -133,8 +118,21 @@ public class Matrix4d implements Serializable {
      * ignored.
      */
     public static final int M33 = 15;
-
     public final static double[] stmp = new double[16];
+    static final Vector3d l_vez = new Vector3d();
+    static final Vector3d l_vex = new Vector3d();
+    static final Vector3d l_vey = new Vector3d();
+    static final Vector3b l_vezb = new Vector3b();
+    static final Vector3b l_vexb = new Vector3b();
+    static final Vector3b l_veyb = new Vector3b();
+    static final Vector3d tmpVec = new Vector3d();
+    static final Vector3b tmpVecb = new Vector3b();
+    static final Matrix4d tmpMat = new Matrix4d();
+    static final Vector3d right = new Vector3d();
+    static final Vector3d tmpForward = new Vector3d();
+    static final Vector3d tmpUp = new Vector3d();
+    @Serial private static final long serialVersionUID = -2717655254359579617L;
+    static Quaterniond quat = new Quaterniond();
     public final double[] tmp = new double[16];
     public final double[] val = new double[16];
 
@@ -190,6 +188,209 @@ public class Matrix4d implements Serializable {
      */
     public Matrix4d(Vector3d position, Quaterniond rotation, Vector3d scale) {
         set(position, rotation, scale);
+    }
+
+    /**
+     * Computes the inverse of the given matrix. The matrix array is assumed to
+     * hold a 4x4 column major matrix as you can get from {@link Matrix4#val}.
+     *
+     * @param values the matrix values.
+     *
+     * @return false in case the inverse could not be calculated, true
+     * otherwise.
+     */
+    public static boolean inv(double[] values) {
+        return matrix4_inv(values);
+    }
+
+    /**
+     * Multiplies the vector with the given matrix, performing a division by w.
+     * The matrix array is assumed to hold a 4x4 column major matrix as you can
+     * get from {@link Matrix4d#val}. The vector array is assumed to hold a
+     * 3-component vector, with x being the first element, y being the second
+     * and z being the last component. The result is stored in the vector array.
+     * This is the same as {@link Vector3d#prj(Matrix4d)}.
+     *
+     * @param mat the matrix
+     * @param vec the vector.
+     */
+    public static void prj(double[] mat, double[] vec) {
+        matrix4_proj(mat, vec, 0);
+    }
+
+    /**
+     * Multiplies the vectors with the given matrix, , performing a division by
+     * w. The matrix array is assumed to hold a 4x4 column major matrix as you
+     * can get from {@link Matrix4#val}. The vectors array is assumed to hold
+     * 3-component vectors. Offset specifies the offset into the array where the
+     * x-component of the first vector is located. The numVecs parameter
+     * specifies the number of vectors stored in the vectors array. The stride
+     * parameter specifies the number of floats between subsequent vectors and
+     * must be >= 3. This is the same as {@link Vector3#prj(Matrix4)} applied to
+     * multiple vectors.
+     *
+     * @param mat     the matrix
+     * @param vecs    the vectors
+     * @param offset  the offset into the vectors array
+     * @param numVecs the number of vectors
+     * @param stride  the stride between vectors in floats
+     */
+    public static void prj(double[] mat, double[] vecs, int offset, int numVecs, int stride) {
+        for (int i = 0; i < numVecs; i++) {
+            matrix4_proj(mat, vecs, offset);
+            offset += stride;
+        }
+    }
+
+    static void matrix4_mul(double[] mata, double[] matb) {
+        stmp[M00] = mata[M00] * matb[M00] + mata[M01] * matb[M10] + mata[M02] * matb[M20] + mata[M03] * matb[M30];
+        stmp[M01] = mata[M00] * matb[M01] + mata[M01] * matb[M11] + mata[M02] * matb[M21] + mata[M03] * matb[M31];
+        stmp[M02] = mata[M00] * matb[M02] + mata[M01] * matb[M12] + mata[M02] * matb[M22] + mata[M03] * matb[M32];
+        stmp[M03] = mata[M00] * matb[M03] + mata[M01] * matb[M13] + mata[M02] * matb[M23] + mata[M03] * matb[M33];
+        stmp[M10] = mata[M10] * matb[M00] + mata[M11] * matb[M10] + mata[M12] * matb[M20] + mata[M13] * matb[M30];
+        stmp[M11] = mata[M10] * matb[M01] + mata[M11] * matb[M11] + mata[M12] * matb[M21] + mata[M13] * matb[M31];
+        stmp[M12] = mata[M10] * matb[M02] + mata[M11] * matb[M12] + mata[M12] * matb[M22] + mata[M13] * matb[M32];
+        stmp[M13] = mata[M10] * matb[M03] + mata[M11] * matb[M13] + mata[M12] * matb[M23] + mata[M13] * matb[M33];
+        stmp[M20] = mata[M20] * matb[M00] + mata[M21] * matb[M10] + mata[M22] * matb[M20] + mata[M23] * matb[M30];
+        stmp[M21] = mata[M20] * matb[M01] + mata[M21] * matb[M11] + mata[M22] * matb[M21] + mata[M23] * matb[M31];
+        stmp[M22] = mata[M20] * matb[M02] + mata[M21] * matb[M12] + mata[M22] * matb[M22] + mata[M23] * matb[M32];
+        stmp[M23] = mata[M20] * matb[M03] + mata[M21] * matb[M13] + mata[M22] * matb[M23] + mata[M23] * matb[M33];
+        stmp[M30] = mata[M30] * matb[M00] + mata[M31] * matb[M10] + mata[M32] * matb[M20] + mata[M33] * matb[M30];
+        stmp[M31] = mata[M30] * matb[M01] + mata[M31] * matb[M11] + mata[M32] * matb[M21] + mata[M33] * matb[M31];
+        stmp[M32] = mata[M30] * matb[M02] + mata[M31] * matb[M12] + mata[M32] * matb[M22] + mata[M33] * matb[M32];
+        stmp[M33] = mata[M30] * matb[M03] + mata[M31] * matb[M13] + mata[M32] * matb[M23] + mata[M33] * matb[M33];
+        System.arraycopy(stmp, 0, mata, 0, 16);
+    }
+
+    static double matrix4_det(double[] val) {
+        return val[M30] * val[M21] * val[M12] * val[M03] - val[M20] * val[M31] * val[M12] * val[M03] - val[M30] * val[M11] * val[M22] * val[M03] + val[M10] * val[M31] * val[M22] * val[M03] + val[M20] * val[M11] * val[M32] * val[M03] - val[M10] * val[M21] * val[M32] * val[M03] - val[M30] * val[M21] * val[M02] * val[M13] + val[M20] * val[M31] * val[M02] * val[M13] + val[M30] * val[M01] * val[M22] * val[M13] - val[M00] * val[M31] * val[M22] * val[M13] - val[M20] * val[M01] * val[M32] * val[M13]
+                + val[M00] * val[M21] * val[M32] * val[M13] + val[M30] * val[M11] * val[M02] * val[M23] - val[M10] * val[M31] * val[M02] * val[M23] - val[M30] * val[M01] * val[M12] * val[M23] + val[M00] * val[M31] * val[M12] * val[M23] + val[M10] * val[M01] * val[M32] * val[M23] - val[M00] * val[M11] * val[M32] * val[M23] - val[M20] * val[M11] * val[M02] * val[M33] + val[M10] * val[M21] * val[M02] * val[M33] + val[M20] * val[M01] * val[M12] * val[M33] - val[M00] * val[M21] * val[M12] * val[M33]
+                - val[M10] * val[M01] * val[M22] * val[M33] + val[M00] * val[M11] * val[M22] * val[M33];
+    }
+
+    static boolean matrix4_inv(double[] val) {
+        double[] tmp = new double[16];
+        double l_det = matrix4_det(val);
+        if (l_det == 0)
+            return false;
+        stmp[M00] = val[M12] * val[M23] * val[M31] - val[M13] * val[M22] * val[M31] + val[M13] * val[M21] * val[M32] - val[M11] * val[M23] * val[M32] - val[M12] * val[M21] * val[M33] + val[M11] * val[M22] * val[M33];
+        stmp[M01] = val[M03] * val[M22] * val[M31] - val[M02] * val[M23] * val[M31] - val[M03] * val[M21] * val[M32] + val[M01] * val[M23] * val[M32] + val[M02] * val[M21] * val[M33] - val[M01] * val[M22] * val[M33];
+        stmp[M02] = val[M02] * val[M13] * val[M31] - val[M03] * val[M12] * val[M31] + val[M03] * val[M11] * val[M32] - val[M01] * val[M13] * val[M32] - val[M02] * val[M11] * val[M33] + val[M01] * val[M12] * val[M33];
+        stmp[M03] = val[M03] * val[M12] * val[M21] - val[M02] * val[M13] * val[M21] - val[M03] * val[M11] * val[M22] + val[M01] * val[M13] * val[M22] + val[M02] * val[M11] * val[M23] - val[M01] * val[M12] * val[M23];
+        stmp[M10] = val[M13] * val[M22] * val[M30] - val[M12] * val[M23] * val[M30] - val[M13] * val[M20] * val[M32] + val[M10] * val[M23] * val[M32] + val[M12] * val[M20] * val[M33] - val[M10] * val[M22] * val[M33];
+        stmp[M11] = val[M02] * val[M23] * val[M30] - val[M03] * val[M22] * val[M30] + val[M03] * val[M20] * val[M32] - val[M00] * val[M23] * val[M32] - val[M02] * val[M20] * val[M33] + val[M00] * val[M22] * val[M33];
+        stmp[M12] = val[M03] * val[M12] * val[M30] - val[M02] * val[M13] * val[M30] - val[M03] * val[M10] * val[M32] + val[M00] * val[M13] * val[M32] + val[M02] * val[M10] * val[M33] - val[M00] * val[M12] * val[M33];
+        stmp[M13] = val[M02] * val[M13] * val[M20] - val[M03] * val[M12] * val[M20] + val[M03] * val[M10] * val[M22] - val[M00] * val[M13] * val[M22] - val[M02] * val[M10] * val[M23] + val[M00] * val[M12] * val[M23];
+        stmp[M20] = val[M11] * val[M23] * val[M30] - val[M13] * val[M21] * val[M30] + val[M13] * val[M20] * val[M31] - val[M10] * val[M23] * val[M31] - val[M11] * val[M20] * val[M33] + val[M10] * val[M21] * val[M33];
+        stmp[M21] = val[M03] * val[M21] * val[M30] - val[M01] * val[M23] * val[M30] - val[M03] * val[M20] * val[M31] + val[M00] * val[M23] * val[M31] + val[M01] * val[M20] * val[M33] - val[M00] * val[M21] * val[M33];
+        stmp[M22] = val[M01] * val[M13] * val[M30] - val[M03] * val[M11] * val[M30] + val[M03] * val[M10] * val[M31] - val[M00] * val[M13] * val[M31] - val[M01] * val[M10] * val[M33] + val[M00] * val[M11] * val[M33];
+        stmp[M23] = val[M03] * val[M11] * val[M20] - val[M01] * val[M13] * val[M20] - val[M03] * val[M10] * val[M21] + val[M00] * val[M13] * val[M21] + val[M01] * val[M10] * val[M23] - val[M00] * val[M11] * val[M23];
+        stmp[M30] = val[M12] * val[M21] * val[M30] - val[M11] * val[M22] * val[M30] - val[M12] * val[M20] * val[M31] + val[M10] * val[M22] * val[M31] + val[M11] * val[M20] * val[M32] - val[M10] * val[M21] * val[M32];
+        stmp[M31] = val[M01] * val[M22] * val[M30] - val[M02] * val[M21] * val[M30] + val[M02] * val[M20] * val[M31] - val[M00] * val[M22] * val[M31] - val[M01] * val[M20] * val[M32] + val[M00] * val[M21] * val[M32];
+        stmp[M32] = val[M02] * val[M11] * val[M30] - val[M01] * val[M12] * val[M30] - val[M02] * val[M10] * val[M31] + val[M00] * val[M12] * val[M31] + val[M01] * val[M10] * val[M32] - val[M00] * val[M11] * val[M32];
+        stmp[M33] = val[M01] * val[M12] * val[M20] - val[M02] * val[M11] * val[M20] + val[M02] * val[M10] * val[M21] - val[M00] * val[M12] * val[M21] - val[M01] * val[M10] * val[M22] + val[M00] * val[M11] * val[M22];
+
+        double inv_det = 1.0 / l_det;
+        val[M00] = stmp[M00] * inv_det;
+        val[M01] = stmp[M01] * inv_det;
+        val[M02] = stmp[M02] * inv_det;
+        val[M03] = stmp[M03] * inv_det;
+        val[M10] = stmp[M10] * inv_det;
+        val[M11] = stmp[M11] * inv_det;
+        val[M12] = stmp[M12] * inv_det;
+        val[M13] = stmp[M13] * inv_det;
+        val[M20] = stmp[M20] * inv_det;
+        val[M21] = stmp[M21] * inv_det;
+        val[M22] = stmp[M22] * inv_det;
+        val[M23] = stmp[M23] * inv_det;
+        val[M30] = stmp[M30] * inv_det;
+        val[M31] = stmp[M31] * inv_det;
+        val[M32] = stmp[M32] * inv_det;
+        val[M33] = stmp[M33] * inv_det;
+        return true;
+    }
+
+    static void matrix4_mulVec(double[] mat, double[] vec, int offset) {
+        double x = vec[offset] * mat[M00] + vec[offset + 1] * mat[M01] + vec[offset + 2] * mat[M02] + mat[M03];
+        double y = vec[offset] * mat[M10] + vec[offset + 1] * mat[M11] + vec[offset + 2] * mat[M12] + mat[M13];
+        double z = vec[offset] * mat[M20] + vec[offset + 1] * mat[M21] + vec[offset + 2] * mat[M22] + mat[M23];
+        vec[offset] = x;
+        vec[offset + 1] = y;
+        vec[offset + 2] = z;
+    }
+
+    static void matrix4_proj(double[] mat, double[] vec, int offset) {
+        double inv_w = 1.0 / (vec[offset] * mat[M30] + vec[offset + 1] * mat[M31] + vec[offset + 2] * mat[M32] + mat[M33]);
+        double x = (vec[offset] * mat[M00] + vec[offset + 1] * mat[M01] + vec[offset + 2] * mat[M02] + mat[M03]) * inv_w;
+        double y = (vec[offset] * mat[M10] + vec[offset + 1] * mat[M11] + vec[offset + 2] * mat[M12] + mat[M13]) * inv_w;
+        double z = (vec[offset] * mat[M20] + vec[offset + 1] * mat[M21] + vec[offset + 2] * mat[M22] + mat[M23]) * inv_w;
+        vec[offset] = x;
+        vec[offset + 1] = y;
+        vec[offset + 2] = z;
+    }
+
+    static void matrix4_rot(double[] mat, double[] vec, int offset) {
+        double x = vec[offset] * mat[M00] + vec[offset + 1] * mat[M01] + vec[offset + 2] * mat[M02];
+        double y = vec[offset] * mat[M10] + vec[offset + 1] * mat[M11] + vec[offset + 2] * mat[M12];
+        double z = vec[offset] * mat[M20] + vec[offset + 1] * mat[M21] + vec[offset + 2] * mat[M22];
+        vec[offset] = x;
+        vec[offset + 1] = y;
+        vec[offset + 2] = z;
+    }
+
+    /**
+     * Multiplies the matrix mata with matrix matb, storing the result in mata.
+     * The arrays are assumed to hold 4x4 column major matrices as you can get
+     * from {@link Matrix4d#val}. This is the same as
+     * {@link Matrix4d#mul(Matrix4d)}.
+     *
+     * @param mata the first matrix.
+     * @param matb the second matrix.
+     */
+    public static void mul(double[] mata, double[] matb) {
+        matrix4_mul(mata, matb);
+    }
+
+    /**
+     * Constructs a change of basis from the canonical basis to the base defined by the
+     * given x, y and z vectors.
+     *
+     * @param x The x vector of the new basis expressed in the canonical basis.
+     * @param y The y vector of the new basis expressed in the canonical basis.
+     * @param z The z vector of the new basis expressed in the canonical basis.
+     *
+     * @return The change of basis matrix.
+     */
+    public static Matrix4d changeOfBasis(Vector3d x, Vector3d y, Vector3d z) {
+        double[] vals = new double[] {
+                x.x, y.x, z.x, 0,
+                x.y, y.y, z.y, 0,
+                x.z, y.z, z.z, 0,
+                0, 0, 0, 1
+        };
+        Matrix4d c = new Matrix4d(vals);
+        return c.tra();
+    }
+
+    /**
+     * Constructs a change of basis from the canonical basis to the base defined by the
+     * given x, y and z vectors.
+     *
+     * @param x The x vector of the new basis expressed in the canonical basis.
+     * @param y The y vector of the new basis expressed in the canonical basis.
+     * @param z The z vector of the new basis expressed in the canonical basis.
+     *
+     * @return The change of basis matrix.
+     */
+    public static Matrix4d changeOfBasis(double[] x, double[] y, double[] z) {
+        double[] vals = new double[] {
+                x[0], y[0], z[0], 0,
+                x[1], y[1], z[1], 0,
+                x[2], y[2], z[2], 0,
+                0, 0, 0, 1
+        };
+        Matrix4d c = new Matrix4d(vals);
+        return c.tra();
     }
 
     /**
@@ -561,19 +762,6 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    /**
-     * Computes the inverse of the given matrix. The matrix array is assumed to
-     * hold a 4x4 column major matrix as you can get from {@link Matrix4#val}.
-     *
-     * @param values the matrix values.
-     *
-     * @return false in case the inverse could not be calculated, true
-     * otherwise.
-     */
-    public static boolean inv(double[] values) {
-        return matrix4_inv(values);
-    }
-
     /** @return The determinant of this matrix */
     public double det() {
         return val[M30] * val[M21] * val[M12] * val[M03] - val[M20] * val[M31] * val[M12] * val[M03] - val[M30] * val[M11] * val[M22] * val[M03] + val[M10] * val[M31] * val[M22] * val[M03] + val[M20] * val[M11] * val[M32] * val[M03] - val[M10] * val[M21] * val[M32] * val[M03] - val[M30] * val[M21] * val[M02] * val[M13] + val[M20] * val[M31] * val[M02] * val[M13] + val[M30] * val[M01] * val[M22] * val[M13] - val[M00] * val[M31] * val[M22] * val[M13] - val[M20] * val[M01] * val[M32] * val[M13]
@@ -658,8 +846,8 @@ public class Matrix4d implements Serializable {
     }
 
     /**
-     * Sets the matrix to an orthographic projection like glOrtho
-     * (http://www.opengl.org/sdk/docs/man/xhtml/glOrtho.xml) following the
+     * Sets the matrix to an orthographic projection like
+     * <a href="http://www.opengl.org/sdk/docs/man/xhtml/glOrtho.xml">glOrtho</a> following the
      * OpenGL equivalent
      *
      * @param left   The left clipping plane
@@ -699,20 +887,6 @@ public class Matrix4d implements Serializable {
         val[M23] = tz;
         val[M33] = 1;
 
-        return this;
-    }
-
-    /**
-     * Sets the 4th column to the translation vector.
-     *
-     * @param vector The translation vector
-     *
-     * @return This matrix for the purpose of chaining methods together.
-     */
-    public Matrix4d setTranslation(Vector3d vector) {
-        val[M03] = vector.x;
-        val[M13] = vector.y;
-        val[M23] = vector.z;
         return this;
     }
 
@@ -821,8 +995,6 @@ public class Matrix4d implements Serializable {
         val[M22] = scalingZ;
         return this;
     }
-
-    static Quaterniond quat = new Quaterniond();
 
     /**
      * Sets the matrix to a rotation matrix around the given axis.
@@ -966,13 +1138,6 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    static final Vector3d l_vez = new Vector3d();
-    static final Vector3d l_vex = new Vector3d();
-    static final Vector3d l_vey = new Vector3d();
-    static final Vector3b l_vezb = new Vector3b();
-    static final Vector3b l_vexb = new Vector3b();
-    static final Vector3b l_veyb = new Vector3b();
-
     /**
      * Sets the matrix to a look at matrix with a direction and an up vector.
      * Multiply with a translation matrix to get a camera model view matrix.
@@ -1020,10 +1185,6 @@ public class Matrix4d implements Serializable {
         return this;
     }
 
-    static final Vector3d tmpVec = new Vector3d();
-    static final Vector3b tmpVecb = new Vector3b();
-    static final Matrix4d tmpMat = new Matrix4d();
-
     /**
      * Sets this matrix to a look at matrix with the given position, target and
      * up vector.
@@ -1049,10 +1210,6 @@ public class Matrix4d implements Serializable {
 
         return this;
     }
-
-    static final Vector3d right = new Vector3d();
-    static final Vector3d tmpForward = new Vector3d();
-    static final Vector3d tmpUp = new Vector3d();
 
     public Matrix4d setToWorld(Vector3d position, Vector3d forward, Vector3d up) {
         tmpForward.set(forward).nor();
@@ -1147,6 +1304,20 @@ public class Matrix4d implements Serializable {
         return new double[] { val[M03], val[M13], val[M23] };
     }
 
+    /**
+     * Sets the 4th column to the translation vector.
+     *
+     * @param vector The translation vector
+     *
+     * @return This matrix for the purpose of chaining methods together.
+     */
+    public Matrix4d setTranslation(Vector3d vector) {
+        val[M03] = vector.x;
+        val[M13] = vector.y;
+        val[M23] = vector.z;
+        return this;
+    }
+
     public float[] getTranslationf() {
         return new float[] { (float) val[M03], (float) val[M13], (float) val[M23] };
     }
@@ -1164,18 +1335,26 @@ public class Matrix4d implements Serializable {
         return position;
     }
 
-    /** Gets the rotation of this matrix.
-     * @param rotation The {@link Quaterniond} to receive the rotation
+    /**
+     * Gets the rotation of this matrix.
+     *
+     * @param rotation      The {@link Quaterniond} to receive the rotation
      * @param normalizeAxes True to normalize the axes, necessary when the matrix might also include scaling.
-     * @return The provided {@link Quaterniond} for chaining. */
-    public Quaterniond getRotation (Quaterniond rotation, boolean normalizeAxes) {
+     *
+     * @return The provided {@link Quaterniond} for chaining.
+     */
+    public Quaterniond getRotation(Quaterniond rotation, boolean normalizeAxes) {
         return rotation.setFromMatrix(normalizeAxes, this);
     }
 
-    /** Gets the rotation of this matrix.
+    /**
+     * Gets the rotation of this matrix.
+     *
      * @param rotation The {@link Quaterniond} to receive the rotation
-     * @return The provided {@link Quaterniond} for chaining. */
-    public Quaterniond getRotation (Quaterniond rotation) {
+     *
+     * @return The provided {@link Quaterniond} for chaining.
+     */
+    public Quaterniond getRotation(Quaterniond rotation) {
         return rotation.setFromMatrix(this);
     }
 
@@ -1196,18 +1375,22 @@ public class Matrix4d implements Serializable {
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleX() {
-        return (MathUtilsd.isZero(val[Matrix4d.M01]) && MathUtilsd.isZero(val[Matrix4d.M02])) ? val[Matrix4d.M00] : Math.sqrt(getScaleXSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4d.M01]) && MathUtilsDouble.isZero(val[Matrix4d.M02])) ? val[Matrix4d.M00] : Math.sqrt(getScaleXSquared());
     }
 
     /** @return the scale factor on the Y axis (non-negative) */
     public double getScaleY() {
-        return (MathUtilsd.isZero(val[Matrix4d.M10]) && MathUtilsd.isZero(val[Matrix4d.M12])) ? val[Matrix4d.M11] : Math.sqrt(getScaleYSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4d.M10]) && MathUtilsDouble.isZero(val[Matrix4d.M12])) ? val[Matrix4d.M11] : Math.sqrt(getScaleYSquared());
     }
+
+    // @on
 
     /** @return the scale factor on the X axis (non-negative) */
     public double getScaleZ() {
-        return (MathUtilsd.isZero(val[Matrix4d.M20]) && MathUtilsd.isZero(val[Matrix4d.M21])) ? val[Matrix4d.M22] : Math.sqrt(getScaleZSquared());
+        return (MathUtilsDouble.isZero(val[Matrix4d.M20]) && MathUtilsDouble.isZero(val[Matrix4d.M21])) ? val[Matrix4d.M22] : Math.sqrt(getScaleZSquared());
     }
+
+    // @on
 
     public Vector3d getScale(Vector3d scale) {
         return scale.set(getScaleX(), getScaleY(), getScaleZ());
@@ -1222,143 +1405,6 @@ public class Matrix4d implements Serializable {
     }
 
     /**
-     * Multiplies the vector with the given matrix, performing a division by w.
-     * The matrix array is assumed to hold a 4x4 column major matrix as you can
-     * get from {@link Matrix4d#val}. The vector array is assumed to hold a
-     * 3-component vector, with x being the first element, y being the second
-     * and z being the last component. The result is stored in the vector array.
-     * This is the same as {@link Vector3d#prj(Matrix4d)}.
-     *
-     * @param mat the matrix
-     * @param vec the vector.
-     */
-    public static void prj(double[] mat, double[] vec) {
-        matrix4_proj(mat, vec, 0);
-    }
-
-    /**
-     * Multiplies the vectors with the given matrix, , performing a division by
-     * w. The matrix array is assumed to hold a 4x4 column major matrix as you
-     * can get from {@link Matrix4#val}. The vectors array is assumed to hold
-     * 3-component vectors. Offset specifies the offset into the array where the
-     * x-component of the first vector is located. The numVecs parameter
-     * specifies the number of vectors stored in the vectors array. The stride
-     * parameter specifies the number of floats between subsequent vectors and
-     * must be >= 3. This is the same as {@link Vector3#prj(Matrix4)} applied to
-     * multiple vectors.
-     *
-     * @param mat     the matrix
-     * @param vecs    the vectors
-     * @param offset  the offset into the vectors array
-     * @param numVecs the number of vectors
-     * @param stride  the stride between vectors in floats
-     */
-    public static void prj(double[] mat, double[] vecs, int offset, int numVecs, int stride) {
-        for (int i = 0; i < numVecs; i++) {
-            matrix4_proj(mat, vecs, offset);
-            offset += stride;
-        }
-    }
-
-    static void matrix4_mul(double[] mata, double[] matb) {
-        stmp[M00] = mata[M00] * matb[M00] + mata[M01] * matb[M10] + mata[M02] * matb[M20] + mata[M03] * matb[M30];
-        stmp[M01] = mata[M00] * matb[M01] + mata[M01] * matb[M11] + mata[M02] * matb[M21] + mata[M03] * matb[M31];
-        stmp[M02] = mata[M00] * matb[M02] + mata[M01] * matb[M12] + mata[M02] * matb[M22] + mata[M03] * matb[M32];
-        stmp[M03] = mata[M00] * matb[M03] + mata[M01] * matb[M13] + mata[M02] * matb[M23] + mata[M03] * matb[M33];
-        stmp[M10] = mata[M10] * matb[M00] + mata[M11] * matb[M10] + mata[M12] * matb[M20] + mata[M13] * matb[M30];
-        stmp[M11] = mata[M10] * matb[M01] + mata[M11] * matb[M11] + mata[M12] * matb[M21] + mata[M13] * matb[M31];
-        stmp[M12] = mata[M10] * matb[M02] + mata[M11] * matb[M12] + mata[M12] * matb[M22] + mata[M13] * matb[M32];
-        stmp[M13] = mata[M10] * matb[M03] + mata[M11] * matb[M13] + mata[M12] * matb[M23] + mata[M13] * matb[M33];
-        stmp[M20] = mata[M20] * matb[M00] + mata[M21] * matb[M10] + mata[M22] * matb[M20] + mata[M23] * matb[M30];
-        stmp[M21] = mata[M20] * matb[M01] + mata[M21] * matb[M11] + mata[M22] * matb[M21] + mata[M23] * matb[M31];
-        stmp[M22] = mata[M20] * matb[M02] + mata[M21] * matb[M12] + mata[M22] * matb[M22] + mata[M23] * matb[M32];
-        stmp[M23] = mata[M20] * matb[M03] + mata[M21] * matb[M13] + mata[M22] * matb[M23] + mata[M23] * matb[M33];
-        stmp[M30] = mata[M30] * matb[M00] + mata[M31] * matb[M10] + mata[M32] * matb[M20] + mata[M33] * matb[M30];
-        stmp[M31] = mata[M30] * matb[M01] + mata[M31] * matb[M11] + mata[M32] * matb[M21] + mata[M33] * matb[M31];
-        stmp[M32] = mata[M30] * matb[M02] + mata[M31] * matb[M12] + mata[M32] * matb[M22] + mata[M33] * matb[M32];
-        stmp[M33] = mata[M30] * matb[M03] + mata[M31] * matb[M13] + mata[M32] * matb[M23] + mata[M33] * matb[M33];
-        System.arraycopy(stmp, 0, mata, 0, 16);
-    }
-
-    static double matrix4_det(double[] val) {
-        return val[M30] * val[M21] * val[M12] * val[M03] - val[M20] * val[M31] * val[M12] * val[M03] - val[M30] * val[M11] * val[M22] * val[M03] + val[M10] * val[M31] * val[M22] * val[M03] + val[M20] * val[M11] * val[M32] * val[M03] - val[M10] * val[M21] * val[M32] * val[M03] - val[M30] * val[M21] * val[M02] * val[M13] + val[M20] * val[M31] * val[M02] * val[M13] + val[M30] * val[M01] * val[M22] * val[M13] - val[M00] * val[M31] * val[M22] * val[M13] - val[M20] * val[M01] * val[M32] * val[M13]
-                + val[M00] * val[M21] * val[M32] * val[M13] + val[M30] * val[M11] * val[M02] * val[M23] - val[M10] * val[M31] * val[M02] * val[M23] - val[M30] * val[M01] * val[M12] * val[M23] + val[M00] * val[M31] * val[M12] * val[M23] + val[M10] * val[M01] * val[M32] * val[M23] - val[M00] * val[M11] * val[M32] * val[M23] - val[M20] * val[M11] * val[M02] * val[M33] + val[M10] * val[M21] * val[M02] * val[M33] + val[M20] * val[M01] * val[M12] * val[M33] - val[M00] * val[M21] * val[M12] * val[M33]
-                - val[M10] * val[M01] * val[M22] * val[M33] + val[M00] * val[M11] * val[M22] * val[M33];
-    }
-
-    static boolean matrix4_inv(double[] val) {
-        double[] tmp = new double[16];
-        double l_det = matrix4_det(val);
-        if (l_det == 0)
-            return false;
-        stmp[M00] = val[M12] * val[M23] * val[M31] - val[M13] * val[M22] * val[M31] + val[M13] * val[M21] * val[M32] - val[M11] * val[M23] * val[M32] - val[M12] * val[M21] * val[M33] + val[M11] * val[M22] * val[M33];
-        stmp[M01] = val[M03] * val[M22] * val[M31] - val[M02] * val[M23] * val[M31] - val[M03] * val[M21] * val[M32] + val[M01] * val[M23] * val[M32] + val[M02] * val[M21] * val[M33] - val[M01] * val[M22] * val[M33];
-        stmp[M02] = val[M02] * val[M13] * val[M31] - val[M03] * val[M12] * val[M31] + val[M03] * val[M11] * val[M32] - val[M01] * val[M13] * val[M32] - val[M02] * val[M11] * val[M33] + val[M01] * val[M12] * val[M33];
-        stmp[M03] = val[M03] * val[M12] * val[M21] - val[M02] * val[M13] * val[M21] - val[M03] * val[M11] * val[M22] + val[M01] * val[M13] * val[M22] + val[M02] * val[M11] * val[M23] - val[M01] * val[M12] * val[M23];
-        stmp[M10] = val[M13] * val[M22] * val[M30] - val[M12] * val[M23] * val[M30] - val[M13] * val[M20] * val[M32] + val[M10] * val[M23] * val[M32] + val[M12] * val[M20] * val[M33] - val[M10] * val[M22] * val[M33];
-        stmp[M11] = val[M02] * val[M23] * val[M30] - val[M03] * val[M22] * val[M30] + val[M03] * val[M20] * val[M32] - val[M00] * val[M23] * val[M32] - val[M02] * val[M20] * val[M33] + val[M00] * val[M22] * val[M33];
-        stmp[M12] = val[M03] * val[M12] * val[M30] - val[M02] * val[M13] * val[M30] - val[M03] * val[M10] * val[M32] + val[M00] * val[M13] * val[M32] + val[M02] * val[M10] * val[M33] - val[M00] * val[M12] * val[M33];
-        stmp[M13] = val[M02] * val[M13] * val[M20] - val[M03] * val[M12] * val[M20] + val[M03] * val[M10] * val[M22] - val[M00] * val[M13] * val[M22] - val[M02] * val[M10] * val[M23] + val[M00] * val[M12] * val[M23];
-        stmp[M20] = val[M11] * val[M23] * val[M30] - val[M13] * val[M21] * val[M30] + val[M13] * val[M20] * val[M31] - val[M10] * val[M23] * val[M31] - val[M11] * val[M20] * val[M33] + val[M10] * val[M21] * val[M33];
-        stmp[M21] = val[M03] * val[M21] * val[M30] - val[M01] * val[M23] * val[M30] - val[M03] * val[M20] * val[M31] + val[M00] * val[M23] * val[M31] + val[M01] * val[M20] * val[M33] - val[M00] * val[M21] * val[M33];
-        stmp[M22] = val[M01] * val[M13] * val[M30] - val[M03] * val[M11] * val[M30] + val[M03] * val[M10] * val[M31] - val[M00] * val[M13] * val[M31] - val[M01] * val[M10] * val[M33] + val[M00] * val[M11] * val[M33];
-        stmp[M23] = val[M03] * val[M11] * val[M20] - val[M01] * val[M13] * val[M20] - val[M03] * val[M10] * val[M21] + val[M00] * val[M13] * val[M21] + val[M01] * val[M10] * val[M23] - val[M00] * val[M11] * val[M23];
-        stmp[M30] = val[M12] * val[M21] * val[M30] - val[M11] * val[M22] * val[M30] - val[M12] * val[M20] * val[M31] + val[M10] * val[M22] * val[M31] + val[M11] * val[M20] * val[M32] - val[M10] * val[M21] * val[M32];
-        stmp[M31] = val[M01] * val[M22] * val[M30] - val[M02] * val[M21] * val[M30] + val[M02] * val[M20] * val[M31] - val[M00] * val[M22] * val[M31] - val[M01] * val[M20] * val[M32] + val[M00] * val[M21] * val[M32];
-        stmp[M32] = val[M02] * val[M11] * val[M30] - val[M01] * val[M12] * val[M30] - val[M02] * val[M10] * val[M31] + val[M00] * val[M12] * val[M31] + val[M01] * val[M10] * val[M32] - val[M00] * val[M11] * val[M32];
-        stmp[M33] = val[M01] * val[M12] * val[M20] - val[M02] * val[M11] * val[M20] + val[M02] * val[M10] * val[M21] - val[M00] * val[M12] * val[M21] - val[M01] * val[M10] * val[M22] + val[M00] * val[M11] * val[M22];
-
-        double inv_det = 1.0 / l_det;
-        val[M00] = stmp[M00] * inv_det;
-        val[M01] = stmp[M01] * inv_det;
-        val[M02] = stmp[M02] * inv_det;
-        val[M03] = stmp[M03] * inv_det;
-        val[M10] = stmp[M10] * inv_det;
-        val[M11] = stmp[M11] * inv_det;
-        val[M12] = stmp[M12] * inv_det;
-        val[M13] = stmp[M13] * inv_det;
-        val[M20] = stmp[M20] * inv_det;
-        val[M21] = stmp[M21] * inv_det;
-        val[M22] = stmp[M22] * inv_det;
-        val[M23] = stmp[M23] * inv_det;
-        val[M30] = stmp[M30] * inv_det;
-        val[M31] = stmp[M31] * inv_det;
-        val[M32] = stmp[M32] * inv_det;
-        val[M33] = stmp[M33] * inv_det;
-        return true;
-    }
-
-    static void matrix4_mulVec(double[] mat, double[] vec, int offset) {
-        double x = vec[offset + 0] * mat[M00] + vec[offset + 1] * mat[M01] + vec[offset + 2] * mat[M02] + mat[M03];
-        double y = vec[offset + 0] * mat[M10] + vec[offset + 1] * mat[M11] + vec[offset + 2] * mat[M12] + mat[M13];
-        double z = vec[offset + 0] * mat[M20] + vec[offset + 1] * mat[M21] + vec[offset + 2] * mat[M22] + mat[M23];
-        vec[offset + 0] = x;
-        vec[offset + 1] = y;
-        vec[offset + 2] = z;
-    }
-
-    static void matrix4_proj(double[] mat, double[] vec, int offset) {
-        double inv_w = 1.0 / (vec[offset + 0] * mat[M30] + vec[offset + 1] * mat[M31] + vec[offset + 2] * mat[M32] + mat[M33]);
-        double x = (vec[offset + 0] * mat[M00] + vec[offset + 1] * mat[M01] + vec[offset + 2] * mat[M02] + mat[M03]) * inv_w;
-        double y = (vec[offset + 0] * mat[M10] + vec[offset + 1] * mat[M11] + vec[offset + 2] * mat[M12] + mat[M13]) * inv_w;
-        double z = (vec[offset + 0] * mat[M20] + vec[offset + 1] * mat[M21] + vec[offset + 2] * mat[M22] + mat[M23]) * inv_w;
-        vec[offset + 0] = x;
-        vec[offset + 1] = y;
-        vec[offset + 2] = z;
-    }
-
-    static void matrix4_rot(double[] mat, double[] vec, int offset) {
-        double x = vec[offset + 0] * mat[M00] + vec[offset + 1] * mat[M01] + vec[offset + 2] * mat[M02];
-        double y = vec[offset + 0] * mat[M10] + vec[offset + 1] * mat[M11] + vec[offset + 2] * mat[M12];
-        double z = vec[offset + 0] * mat[M20] + vec[offset + 1] * mat[M21] + vec[offset + 2] * mat[M22];
-        vec[offset + 0] = x;
-        vec[offset + 1] = y;
-        vec[offset + 2] = z;
-    }
-
-    // @on
-
-    /**
      * Postmultiplies this matrix by a translation matrix. Postmultiplication is
      * also used by OpenGL ES' glTranslate/glRotate/glScale
      *
@@ -1369,8 +1415,6 @@ public class Matrix4d implements Serializable {
     public Matrix4d translate(Vector3d translation) {
         return translate(translation.x, translation.y, translation.z);
     }
-
-    // @on
 
     /**
      * Postmultiplies this matrix by a translation matrix. Postmultiplication is
@@ -1414,19 +1458,6 @@ public class Matrix4d implements Serializable {
 
         matrix4_mul(val, tmp);
         return this;
-    }
-
-    /**
-     * Multiplies the matrix mata with matrix matb, storing the result in mata.
-     * The arrays are assumed to hold 4x4 column major matrices as you can get
-     * from {@link Matrix4d#val}. This is the same as
-     * {@link Matrix4d#mul(Matrix4d)}.
-     *
-     * @param mata the first matrix.
-     * @param matb the second matrix.
-     */
-    public static void mul(double[] mata, double[] matb) {
-        matrix4_mul(mata, matb);
     }
 
     /**
@@ -1594,43 +1625,5 @@ public class Matrix4d implements Serializable {
             auxval[i] = (float) val[i];
         }
         return aux;
-    }
-
-    /**
-     * Constructs a change of basis from the canonical basis to the base defined by the
-     * given x, y and z vectors.
-     * @param x The x vector of the new basis expressed in the canonical basis.
-     * @param y The y vector of the new basis expressed in the canonical basis.
-     * @param z The z vector of the new basis expressed in the canonical basis.
-     * @return The change of basis matrix.
-     */
-    public static Matrix4d changeOfBasis(Vector3d x, Vector3d y, Vector3d z) {
-        double[] vals = new double[]{
-                x.x, y.x, z.x, 0,
-                x.y, y.y, z.y, 0,
-                x.z, y.z, z.z, 0,
-                0, 0, 0, 1
-        };
-        Matrix4d c = new Matrix4d(vals);
-        return c.tra();
-    }
-
-    /**
-     * Constructs a change of basis from the canonical basis to the base defined by the
-     * given x, y and z vectors.
-     * @param x The x vector of the new basis expressed in the canonical basis.
-     * @param y The y vector of the new basis expressed in the canonical basis.
-     * @param z The z vector of the new basis expressed in the canonical basis.
-     * @return The change of basis matrix.
-     */
-    public static Matrix4d changeOfBasis(double[]  x, double[] y, double[] z) {
-        double[] vals = new double[]{
-                x[0], y[0], z[0], 0,
-                x[1], y[1], z[1], 0,
-                x[2], y[2], z[2], 0,
-                0, 0, 0, 1
-        };
-        Matrix4d c = new Matrix4d(vals);
-        return c.tra();
     }
 }

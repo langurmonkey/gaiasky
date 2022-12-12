@@ -43,19 +43,17 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel spf;
     private final OwnLabel device;
     private final OwnSlider queueStatus;
-    private int previousQueueSize = 0, currentQueueMax = 0;
     /** Lock object for synchronization **/
     private final Object lock;
     private final Skin skin;
-
     private final Cell<Table> extraCell;
     private final Table extra;
-    private boolean maximized;
-
     private final DecimalFormat fpsFormatter;
     private final DecimalFormat spfFormatter;
     private final DecimalFormat memFormatter;
     private final DecimalFormat timeFormatter;
+    private int previousQueueSize = 0, currentQueueMax = 0;
+    private boolean maximized;
 
     public DebugInterface(Skin skin, Object lock) {
         super(skin);
@@ -385,7 +383,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 break;
             case DEBUG_DYN_RES:
-                if(debug && data.length > 0) {
+                if (debug && data.length > 0) {
                     debugDynRes.setText("L" + data[0] + ": " + fpsFormatter.format((Double) data[1]));
                 }
                 break;

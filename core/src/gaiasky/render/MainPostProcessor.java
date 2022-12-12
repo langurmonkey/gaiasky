@@ -54,40 +54,28 @@ import java.util.Map;
  */
 public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
-
-    /** The asset manager. **/
-    private AssetManager manager;
-    /** The actual post processors. **/
-    private PostProcessBean[] pps;
-
-    /** Reference to the scene. **/
-    private Scene scene;
-
-    /** Aspect ratio cache. **/
-    float ar;
-
-    Entity blurObject;
-    BaseView blurObjectView;
-    boolean blurObjectAdded = false;
-
-    Vector3b auxb, prevCampos;
-    Vector3 auxf;
-    Matrix4 prevViewProj;
-    Matrix4 projection, combined, view;
-    Matrix4 frustumCorners;
-
-    private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
-
     /**
      * Contains a map by name with
      * [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
      */
     private final Map<String, Object[]> raymarchingDef;
-
-    private void addRayMarchingDef(String name, Object[] list) {
-        if (!raymarchingDef.containsKey(name))
-            raymarchingDef.put(name, list);
-    }
+    /** Aspect ratio cache. **/
+    float ar;
+    Entity blurObject;
+    BaseView blurObjectView;
+    boolean blurObjectAdded = false;
+    Vector3b auxb, prevCampos;
+    Vector3 auxf;
+    Matrix4 prevViewProj;
+    Matrix4 projection, combined, view;
+    Matrix4 frustumCorners;
+    /** The asset manager. **/
+    private AssetManager manager;
+    /** The actual post processors. **/
+    private PostProcessBean[] pps;
+    /** Reference to the scene. **/
+    private Scene scene;
+    private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
     public MainPostProcessor(Scene scene) {
         ShaderLoader.BasePath = "shader/postprocess/";
@@ -104,6 +92,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         this.raymarchingDef = new HashMap<>();
 
         EventManager.instance.subscribe(this, Event.RAYMARCHING_CMD);
+    }
+
+    private void addRayMarchingDef(String name, Object[] list) {
+        if (!raymarchingDef.containsKey(name))
+            raymarchingDef.put(name, list);
     }
 
     public void initialize(AssetManager manager) {

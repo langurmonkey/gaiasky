@@ -19,22 +19,19 @@ import java.io.Serializable;
  * Vector of arbitrary precision floating point numbers using ApFloat.
  */
 public class Vector3b implements Serializable {
+    public final static Vector3b X = new Vector3b(1, 0, 0);
+    public final static Vector3b Y = new Vector3b(0, 1, 0);
+    public final static Vector3b Z = new Vector3b(0, 0, 1);
     private static final long serialVersionUID = 3840054589595372522L;
     // Number of digits of precision
     private static final int prec = Constants.PREC;
-
+    private final static Matrix4d tmpMat = new Matrix4d();
     /** the x-component of this vector **/
     public Apfloat x;
     /** the y-component of this vector **/
     public Apfloat y;
     /** the z-component of this vector **/
     public Apfloat z;
-
-    public final static Vector3b X = new Vector3b(1, 0, 0);
-    public final static Vector3b Y = new Vector3b(0, 1, 0);
-    public final static Vector3b Z = new Vector3b(0, 0, 1);
-
-    private final static Matrix4d tmpMat = new Matrix4d();
 
     /** Constructs a vector at (0,0,0) */
     public Vector3b() {
@@ -92,6 +89,31 @@ public class Vector3b implements Serializable {
         this.set(values[0], values[1], values[2]);
     }
 
+    /** @return The euclidian length */
+    public static double len(final double x, final double y, final double z) {
+        return FastMath.sqrt(x * x + y * y + z * z);
+    }
+
+    /** @return The squared euclidian length */
+    public static double len2(final double x, final double y, final double z) {
+        return x * x + y * y + z * z;
+    }
+
+    /**
+     * Calculates the outer product of two given vectors <code>v</code> and
+     * <code>w</code> and returns the result as a new <code>GVector3d</code>.
+     *
+     * @param v left operand
+     * @param w right operand
+     *
+     * @return outer product of <code>v</code> and <code>w</code>
+     */
+    static public Vector3b crs(final Vector3b v, final Vector3b w) {
+        final Vector3b res = new Vector3b(v);
+
+        return res.crs(w);
+    }
+
     public double x() {
         return x.doubleValue();
     }
@@ -122,6 +144,7 @@ public class Vector3b implements Serializable {
      * @param x The x-component
      * @param y The y-component
      * @param z The z-component
+     *
      * @return this vector for chaining
      */
     public Vector3b set(float x, float y, float z) {
@@ -137,6 +160,7 @@ public class Vector3b implements Serializable {
      * @param x The x-component
      * @param y The y-component
      * @param z The z-component
+     *
      * @return this vector for chaining
      */
     public Vector3b set(double x, double y, double z) {
@@ -152,6 +176,7 @@ public class Vector3b implements Serializable {
      * @param x The x-component
      * @param y The y-component
      * @param z The z-component
+     *
      * @return this vector for chaining
      */
     public Vector3b set(Apfloat x, Apfloat y, Apfloat z) {
@@ -211,6 +236,7 @@ public class Vector3b implements Serializable {
      * Sets the components from the array. The array must have at least 3 elements
      *
      * @param vals The array
+     *
      * @return this vector for chaining
      */
     public Vector3b set(final double[] vals) {
@@ -221,6 +247,7 @@ public class Vector3b implements Serializable {
      * Sets the components from the array. The array must have at least 3 elements
      *
      * @param vals The array
+     *
      * @return this vector for chaining
      */
     public Vector3b set(final float[] vals) {
@@ -232,23 +259,24 @@ public class Vector3b implements Serializable {
      *
      * @param azimuthalAngle The angle between x-axis in radians [0, 2pi]
      * @param polarAngle     The angle between z-axis in radians [0, pi]
+     *
      * @return This vector for chaining
      */
     public Vector3b setFromSpherical(double azimuthalAngle, double polarAngle) {
-        double cosPolar = MathUtilsd.cos(polarAngle);
-        double sinPolar = MathUtilsd.sin(polarAngle);
+        double cosPolar = MathUtilsDouble.cos(polarAngle);
+        double sinPolar = MathUtilsDouble.sin(polarAngle);
 
-        double cosAzim = MathUtilsd.cos(azimuthalAngle);
-        double sinAzim = MathUtilsd.sin(azimuthalAngle);
+        double cosAzim = MathUtilsDouble.cos(azimuthalAngle);
+        double sinAzim = MathUtilsDouble.sin(azimuthalAngle);
 
         return this.set(cosAzim * sinPolar, sinAzim * sinPolar, cosPolar);
     }
 
     public Vector3b setToRandomDirection() {
-        double u = MathUtilsd.random();
-        double v = MathUtilsd.random();
+        double u = MathUtilsDouble.random();
+        double v = MathUtilsDouble.random();
 
-        double theta = MathUtilsd.PI2 * u; // azimuthal angle
+        double theta = MathUtilsDouble.PI2 * u; // azimuthal angle
         double phi = Math.acos(2f * v - 1f); // polar angle
 
         return this.setFromSpherical(theta, phi);
@@ -285,6 +313,7 @@ public class Vector3b implements Serializable {
      * @param x The x-component of the other vector
      * @param y The y-component of the other vector
      * @param z The z-component of the other vector
+     *
      * @return This vector for chaining.
      */
     public Vector3b add(double x, double y, double z) {
@@ -298,6 +327,7 @@ public class Vector3b implements Serializable {
      * Adds the given vector to this component
      *
      * @param vals The 3-value double vector.
+     *
      * @return This vector for chaining.
      */
     public Vector3b add(double... vals) {
@@ -312,6 +342,7 @@ public class Vector3b implements Serializable {
      * Adds the given value to all three components of the vector.
      *
      * @param value The value
+     *
      * @return This vector for chaining
      */
     public Vector3b add(double value) {
@@ -343,6 +374,7 @@ public class Vector3b implements Serializable {
      * @param x The x-component of the other vector
      * @param y The y-component of the other vector
      * @param z The z-component of the other vector
+     *
      * @return This vector for chaining
      */
     public Vector3b sub(double x, double y, double z) {
@@ -356,6 +388,7 @@ public class Vector3b implements Serializable {
      * Subtracts the given value from all components of this vector
      *
      * @param value The value
+     *
      * @return This vector for chaining
      */
     public Vector3b sub(double value) {
@@ -401,6 +434,7 @@ public class Vector3b implements Serializable {
      * @param x X value
      * @param y Y value
      * @param z Z value
+     *
      * @return This vector for chaining
      */
     public Vector3b scl(double x, double y, double z) {
@@ -439,11 +473,6 @@ public class Vector3b implements Serializable {
         return this;
     }
 
-    /** @return The euclidian length */
-    public static double len(final double x, final double y, final double z) {
-        return FastMath.sqrt(x * x + y * y + z * z);
-    }
-
     public double lend() {
         return len(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
@@ -457,11 +486,6 @@ public class Vector3b implements Serializable {
         return ApfloatMath.sqrt(sumSq);
     }
 
-    /** @return The squared euclidian length */
-    public static double len2(final double x, final double y, final double z) {
-        return x * x + y * y + z * z;
-    }
-
     public double len2d() {
         return this.len2().doubleValue();
     }
@@ -472,6 +496,7 @@ public class Vector3b implements Serializable {
 
     /**
      * @param vec The other vector
+     *
      * @return Whether this and the other vector are equal
      */
     public boolean idt(final Vector3b vec) {
@@ -498,6 +523,7 @@ public class Vector3b implements Serializable {
      *
      * @param vec The vector to compute the distance to.
      * @param aux The auxiliary vector.
+     *
      * @return The distance between the two points.
      */
     public Apfloat dst(final Vector3b vec, final Vector3b aux) {
@@ -516,6 +542,7 @@ public class Vector3b implements Serializable {
      *
      * @param vec The vector to compute the distance to.
      * @param aux The auxiliary vector.
+     *
      * @return The distance between the two points.
      */
     public Apfloat dst(final Vector3d vec, final Vector3b aux) {
@@ -564,6 +591,7 @@ public class Vector3b implements Serializable {
      * @param x The x-component of the other point
      * @param y The y-component of the other point
      * @param z The z-component of the other point
+     *
      * @return The squared distance
      */
     public Apfloat dst2(double x, double y, double z) {
@@ -606,6 +634,7 @@ public class Vector3b implements Serializable {
      * @param x The x-component of the other vector
      * @param y The y-component of the other vector
      * @param z The z-component of the other vector
+     *
      * @return The dot product
      */
     public Apfloat dot(Apfloat x, Apfloat y, Apfloat z) {
@@ -616,6 +645,7 @@ public class Vector3b implements Serializable {
      * Sets this vector to the cross product between it and the other vector.
      *
      * @param vec The other vector
+     *
      * @return This vector for chaining
      */
     public Vector3b crs(final Vector3b vec) {
@@ -630,25 +660,12 @@ public class Vector3b implements Serializable {
     }
 
     /**
-     * Calculates the outer product of two given vectors <code>v</code> and
-     * <code>w</code> and returns the result as a new <code>GVector3d</code>.
-     *
-     * @param v left operand
-     * @param w right operand
-     * @return outer product of <code>v</code> and <code>w</code>
-     */
-    static public Vector3b crs(final Vector3b v, final Vector3b w) {
-        final Vector3b res = new Vector3b(v);
-
-        return res.crs(w);
-    }
-
-    /**
      * Sets this vector to the cross product between it and the other vector.
      *
      * @param x The x-component of the other vector
      * @param y The y-component of the other vector
      * @param z The z-component of the other vector
+     *
      * @return This vector for chaining
      */
     public Vector3b crs(double x, double y, double z) {
@@ -664,6 +681,7 @@ public class Vector3b implements Serializable {
      * matrix representing the translation.
      *
      * @param matrix The matrix
+     *
      * @return This vector for chaining
      */
     public Vector3b mul4x3(double[] matrix) {
@@ -687,6 +705,7 @@ public class Vector3b implements Serializable {
      * component of the vector is 1.
      *
      * @param matrix The matrix
+     *
      * @return This vector for chaining
      */
     public Vector3b mul(final Matrix4d matrix) {
@@ -713,6 +732,7 @@ public class Vector3b implements Serializable {
      * @param axisX   the x-component of the axis
      * @param axisY   the y-component of the axis
      * @param axisZ   the z-component of the axis
+     *
      * @return This vector for chaining
      */
     public Vector3b rotate(double degrees, double axisX, double axisY, double axisZ) {
@@ -724,6 +744,7 @@ public class Vector3b implements Serializable {
      *
      * @param axis    the axis
      * @param degrees the angle in degrees
+     *
      * @return This vector for chaining
      */
     public Vector3b rotate(final Vector3d axis, double degrees) {
@@ -735,6 +756,7 @@ public class Vector3b implements Serializable {
      * Sets the given matrix to a translation matrix using this vector.
      *
      * @param matrix The matrix to set as a translation matrix.
+     *
      * @return The matrix aux, for chaining.
      */
     public Matrix4 setToTranslation(Matrix4 matrix) {
@@ -745,6 +767,7 @@ public class Vector3b implements Serializable {
      * Sets the given matrix to a translation matrix using this vector.
      *
      * @param matrix The matrix to set as a translation matrix.
+     *
      * @return The matrix aux, for chaining.
      */
     public Matrix4d setToTranslation(Matrix4d matrix) {
@@ -816,6 +839,7 @@ public class Vector3b implements Serializable {
      *
      * @param s scalar scaling factor
      * @param v vector to scale
+     *
      * @return vector modified in place
      */
     public Vector3b scaleAdd(final double s, final Vector3b v) {
@@ -862,22 +886,22 @@ public class Vector3b implements Serializable {
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3b v) {
-        return MathUtilsd.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3d v) {
-        return MathUtilsd.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3b v) {
-        return MathUtilsd.radiansToDegrees * Math.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3d v) {
-        return MathUtilsd.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
     }
 
     @Override

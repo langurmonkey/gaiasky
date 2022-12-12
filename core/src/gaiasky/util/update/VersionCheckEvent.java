@@ -33,7 +33,7 @@ public class VersionCheckEvent extends Event {
         return tag;
     }
 
-    public Integer getVersionNumber(){
+    public Integer getVersionNumber() {
         return versionNumber;
     }
 

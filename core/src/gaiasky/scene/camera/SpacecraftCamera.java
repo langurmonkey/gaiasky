@@ -38,47 +38,42 @@ import org.apfloat.Apfloat;
 public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     /**
-     * Direction and up vectors.
-     **/
-    public Vector3d direction, up;
-    public Vector3b relpos;
-
-    private Entity sc;
-    private SpacecraftView view;
-
-    /**
      * The input inputListener attached to this camera
      **/
     private final SpacecraftMouseKbdListener spacecraftMouseKbdListener;
-    /**
-     * Implements gamepad camera input.
-     **/
-    private SpacecraftGamepadListener gamepadListener;
-
-    /*
-     * Controller listener
-     **/
-    //private SpacecraftControllerListener controllerListener;
-
-    /**
-     * Closest body apart from the spacecraft (second closest)
-     **/
-    private FocusView secondClosest;
-    private FocusView auxView;
-
     private final Vector3d aux1, aux2;
     private final Vector3b aux1b;
     private final Vector3b todesired;
     private final Vector3b desired;
     private final Vector3d scthrust;
+
+    /*
+     * Controller listener
+     **/
+    //private SpacecraftControllerListener controllerListener;
     private final Vector3d scforce;
     private final Vector3d scaccel;
     private final Vector3d scvel;
-    private Vector3b scpos;
     private final Vector3d scdir;
     private final Vector3d scup;
     private final Pair<Vector3d, Vector3d> dirup;
-
+    /**
+     * Direction and up vectors.
+     **/
+    public Vector3d direction, up;
+    public Vector3b relpos;
+    private Entity sc;
+    private SpacecraftView view;
+    /**
+     * Implements gamepad camera input.
+     **/
+    private SpacecraftGamepadListener gamepadListener;
+    /**
+     * Closest body apart from the spacecraft (second closest)
+     **/
+    private FocusView secondClosest;
+    private FocusView auxView;
+    private Vector3b scpos;
     private double targetDistance;
 
     public SpacecraftCamera(CameraManager parent) {

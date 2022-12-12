@@ -26,11 +26,11 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
     private final float[] venp;
     private final float[] earp;
     private final float[] marp;
-    private FocusView mer, ven, ear, mar;
     private final Color merc;
     private final Color venc;
     private final Color marc;
     private final Color earc;
+    private FocusView mer, ven, ear, mar;
 
     public InnerSolarSystemMinimapScale() {
         super();

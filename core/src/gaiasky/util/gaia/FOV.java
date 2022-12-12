@@ -6,7 +6,7 @@
 /*
  * GaiaTools
  * Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -26,13 +26,17 @@ package gaiasky.util.gaia;
 
 /**
  * FOV enumeration
- * 
+ *
  * @author Javier Castaneda
  * @version $Id$
  */
 public enum FOV {
 
-    FOV1 /* FoV identifier for observations from Preceding telescope with AC motion */, FOV2 /* FoV identifier for observations from Following telescope with AC motion */, FOV3 /* FoV identifier for observations from Preceding telescope without AC motion */, FOV4 /* FoV identifier for observations from Following telescope without AC motion */,;
+    FOV1 /* FoV identifier for observations from Preceding telescope with AC motion */,
+    FOV2 /* FoV identifier for observations from Following telescope with AC motion */,
+    FOV3 /* FoV identifier for observations from Preceding telescope without AC motion */,
+    FOV4 /* FoV identifier for observations from Following telescope without AC motion */,
+    ;
 
     /**
      * Mapping/Alias of the FOVs (with AC motion applied) to the "Following/Preceding" telescope nomenclature (mainly
@@ -60,9 +64,9 @@ public enum FOV {
 
     /**
      * Get enumeration type for the given FoV index [0-3]
-     * 
-     * @param fovIndex
-     *            FoV index [0-3]
+     *
+     * @param fovIndex FoV index [0-3]
+     *
      * @return enumeration type for the desired FoV index, null if index is not valid
      */
     public static FOV getFov(int fovIndex) {
@@ -76,9 +80,9 @@ public enum FOV {
 
     /**
      * Get enumeration type for the given FoV number [1-4]
-     * 
-     * @param fovNumber
-     *            FoV number [1-4]
+     *
+     * @param fovNumber FoV number [1-4]
+     *
      * @return enumeration type for the desired FoV number, null if number is invalid
      */
     public static FOV getFovByNumber(int fovNumber) {
@@ -93,7 +97,7 @@ public enum FOV {
 
     /**
      * Get the number of FoV identifiers (including the both motion configurations)
-     * 
+     *
      * @return Number of FoV identifiers
      */
     public static int getFovCount() {
@@ -103,9 +107,9 @@ public enum FOV {
 
     /**
      * Indicates if the FoV index is valid [0-3]
-     * 
-     * @param fovIndex
-     *            FoV [0-3]
+     *
+     * @param fovIndex FoV [0-3]
+     *
      * @return true if the FoV index is valid, false otherwise
      */
     public static boolean validFov(int fovIndex) {
@@ -115,7 +119,7 @@ public enum FOV {
 
     /**
      * Get FOV index [0-3]
-     * 
+     *
      * @return FOV index [FOV1:0, FOV2:1, FOV3:2, FOV4:3]
      */
     public byte getIndex() {
@@ -125,7 +129,7 @@ public enum FOV {
 
     /**
      * Get FOV number [1-4]
-     * 
+     *
      * @return FOV number [FOV1:1, FOV2:2, FOV3:3, FOV4:4]
      */
     public byte getNumber() {
@@ -135,7 +139,7 @@ public enum FOV {
 
     /**
      * Get numerical field index defined as 1.0 for FOV1-3 and -1.0 for FOV2-4
-     * 
+     *
      * @return the numerical field index [-1.0:+1.0]
      */
     public double getNumericalFieldIndex() {
@@ -149,7 +153,7 @@ public enum FOV {
 
     /**
      * Get telescope index [0-1]
-     * 
+     *
      * @return Telescope index [FOV1:0, FOV2:1, FOV3:0, FOV4:1]
      */
     public byte getTelescopeIndex() {
@@ -159,7 +163,7 @@ public enum FOV {
 
     /**
      * Get telescope number [1-2]
-     * 
+     *
      * @return Telescope number [FOV1:1, FOV2:2, FOV3:1, FOV4:2]
      */
     public byte getTelescopeNumber() {
@@ -169,7 +173,7 @@ public enum FOV {
 
     /**
      * Determine whether a given field of view corresponds to the following telescope
-     * 
+     *
      * @return true if field of view corresponds to the following telescope, false otherwise
      */
     public boolean isFollowingTelescope() {
@@ -178,7 +182,7 @@ public enum FOV {
 
     /**
      * Indicates if this FoV has motion propagation in the Focal plane
-     * 
+     *
      * @return True if this FoV correspond to a motion propagation observation
      */
     public boolean isMotion() {
@@ -188,7 +192,7 @@ public enum FOV {
 
     /**
      * Indicates if this FoV has Null motion propagation in the Focal plane
-     * 
+     *
      * @return True if this FoV correspond to a Null motion propagation observation
      */
     public boolean isNullMotion() {
@@ -198,7 +202,7 @@ public enum FOV {
 
     /**
      * Indicates whether this field of view corresponds to the preceding telescope
-     * 
+     *
      * @return true if field of view corresponds to the preceding telescope, false otherwise
      */
     public boolean isPrecedingTelescope() {

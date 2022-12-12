@@ -20,7 +20,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -57,17 +57,16 @@ import java.util.logging.Level;
  */
 public class STILDataProvider extends AbstractStarGroupDataProvider {
     private static final Log logger = Logger.getLogger(STILDataProvider.class);
-    private StarTableFactory factory;
-    private long starId = 10000000;
-    // Dataset options, may be null
-    private DatasetOptions datasetOptions;
+    // These names are not allowed
+    private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
     // Store already visited colname:attribute pairs.
     private final Map<String, Integer> stringAttributesMap;
     // Store the last index for a given attribute.
     private final Map<String, Integer> lastIndexMap;
-
-    // These names are not allowed
-    private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
+    private StarTableFactory factory;
+    private long starId = 10000000;
+    // Dataset options, may be null
+    private DatasetOptions datasetOptions;
 
     public STILDataProvider() {
         super();
@@ -321,7 +320,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double appMag;
                             if (!ucdParser.MAG.isEmpty()) {
                                 Pair<UCD, Double> appMagPair = getDoubleUcd(ucdParser.MAG, row);
-                                if(appMagPair == null) {
+                                if (appMagPair == null) {
                                     // Default magnitude
                                     appMag = 15;
                                 } else {
@@ -557,7 +556,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                                 list.add(sb);
 
-                                int appMagClamp = (int) MathUtilsd.clamp(appMag, 0, 21);
+                                int appMagClamp = (int) MathUtilsDouble.clamp(appMag, 0, 21);
                                 countsPerMag[appMagClamp] += 1;
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                                 double[] point = new double[3];
@@ -652,7 +651,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     private double getStringAttributeValue(UCD extra, Object o) {
         double val;
         String value = (String) o;
-        if(value == null || value.isEmpty()) {
+        if (value == null || value.isEmpty()) {
             return -1;
         }
 

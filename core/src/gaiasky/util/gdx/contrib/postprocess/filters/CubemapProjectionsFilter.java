@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
@@ -19,38 +18,8 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
     private final Vector2 viewport;
     private float planetariumAperture, planetariumAngle, celestialSphereIndexOfRefraction;
     private CubemapProjection projection;
-
-    public enum Param implements Parameter {
-        // @formatter:off
-        Cubemap("u_cubemap", 0),
-        Viewport("u_viewport", 2),
-        PlanetariumAperture("u_planetariumAperture", 0),
-        PlanetariumAngle("u_planetariumAngle", 0),
-        CelestialSphereIndexOfRefraction("u_celestialSphereIndexOfRefraction", 1);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
-
     private TextureData[] cubemapSides;
     private int cmId = Integer.MIN_VALUE;
-
     public CubemapProjectionsFilter(float w, float h) {
         super(null);
         this.viewport = new Vector2(w, h);
@@ -75,6 +44,10 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         super.program = equirectangular;
         rebind();
 
+    }
+
+    public CubemapProjection getProjection() {
+        return this.projection;
     }
 
     /**
@@ -116,10 +89,6 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         default -> {
         }
         }
-    }
-
-    public CubemapProjection getProjection() {
-        return this.projection;
     }
 
     public void setSides(FrameBuffer xpositive, FrameBuffer xnegative, FrameBuffer ypositive, FrameBuffer ynegative, FrameBuffer zpositive, FrameBuffer znegative) {
@@ -168,31 +137,37 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         setParam(Param.Cubemap, u_texture1);
 
     }
+
     public void setViewportSize(float width, float height) {
         this.viewport.set(width, height);
         setParam(Param.Viewport, this.viewport);
     }
-    public void setPlanetariumAperture(float ap){
+
+    public float getPlanetariumAperture() {
+        return this.planetariumAperture;
+    }
+
+    public void setPlanetariumAperture(float ap) {
         this.planetariumAperture = ap;
         setParam(Param.PlanetariumAperture, ap);
     }
-    public void setPlanetariumAngle(float angle){
+
+    public float getPlanetariumAngle() {
+        return this.planetariumAngle;
+    }
+
+    public void setPlanetariumAngle(float angle) {
         this.planetariumAngle = angle;
         setParam(Param.PlanetariumAngle, angle);
     }
-    public void setCelestialSphereIndexOfRefraction(float ior){
-        this.celestialSphereIndexOfRefraction = ior;
-        setParam(Param.CelestialSphereIndexOfRefraction, ior);
+
+    public float getCelestialSphereIndexOfRefraction() {
+        return this.celestialSphereIndexOfRefraction;
     }
 
-    public float getPlanetariumAperture(){
-        return this.planetariumAperture;
-    }
-    public float getPlanetariumAngle(){
-        return this.planetariumAngle;
-    }
-    public float getCelestialSphereIndexOfRefraction(){
-        return this.celestialSphereIndexOfRefraction;
+    public void setCelestialSphereIndexOfRefraction(float ior) {
+        this.celestialSphereIndexOfRefraction = ior;
+        setParam(Param.CelestialSphereIndexOfRefraction, ior);
     }
 
     @Override
@@ -211,5 +186,33 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         // Bind cubemap
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + u_texture1);
         Gdx.gl.glBindTexture(GL20.GL_TEXTURE_CUBE_MAP, cmId);
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Cubemap("u_cubemap", 0),
+        Viewport("u_viewport", 2),
+        PlanetariumAperture("u_planetariumAperture", 0),
+        PlanetariumAngle("u_planetariumAngle", 0),
+        CelestialSphereIndexOfRefraction("u_celestialSphereIndexOfRefraction", 1);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

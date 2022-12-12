@@ -9,6 +9,10 @@ import gaiasky.util.camera.rec.Keyframe;
 public class Keyframes implements Component {
 
     /**
+     * Multiplier to primitive size
+     **/
+    public final float ss = 1f;
+    /**
      * Keyframe objects.
      */
     public Array<Keyframe> keyframes;
@@ -20,7 +24,6 @@ public class Keyframes implements Component {
      * Highlighted keyframe.
      */
     public Keyframe highlighted = null;
-
     /**
      * The actual path.
      **/
@@ -41,38 +44,27 @@ public class Keyframes implements Component {
      * Selected knot.
      **/
     public Entity selectedKnot;
-
     /**
      * High-lighted knot.
      */
     public Entity highlightedKnot;
-
     /**
      * Contains pairs of {direction, up} representing the orientation at each knot.
      **/
     public Array<Entity> orientations;
-
     /**
      * Objects.
      **/
     public Array<Entity> objects;
-
     /**
      * Invisible focus for camera.
      */
     public Entity focus;
-
     /** Reference to the scene. **/
     public Scene scene;
 
-    /**
-     * Multiplier to primitive size
-     **/
-    public final float ss = 1f;
-
     public Keyframes() {
     }
-
 
     public void clearOrientations() {
         for (Entity vo : orientations)

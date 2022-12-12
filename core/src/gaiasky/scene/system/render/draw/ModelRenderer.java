@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class ModelRenderer extends AbstractRenderSystem {
 
-    protected IntModelBatch batch;
     private final ModelEntityRenderSystem renderObject;
+    protected IntModelBatch batch;
 
     /**
      * Creates a new model batch render component.

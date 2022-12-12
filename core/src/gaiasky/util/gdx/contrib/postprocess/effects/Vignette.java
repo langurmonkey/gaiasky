@@ -44,10 +44,6 @@ public final class Vignette extends PostProcessorEffect {
         return controlSaturation;
     }
 
-    public void setIntensity(float intensity) {
-        vignetting.setIntensity(intensity);
-    }
-
     public void setCoords(float x, float y) {
         vignetting.setCoords(x, y);
     }
@@ -60,20 +56,8 @@ public final class Vignette extends PostProcessorEffect {
         vignetting.setY(y);
     }
 
-    public void setSaturation(float saturation) {
-        vignetting.setSaturation(saturation);
-    }
-
-    public void setSaturationMul(float saturationMul) {
-        vignetting.setSaturationMul(saturationMul);
-    }
-
     public void setLutTexture(Texture texture) {
         vignetting.setLut(texture);
-    }
-
-    public void setLutIntensity(float value) {
-        vignetting.setLutIntensity(value);
     }
 
     public void setLutIndexVal(int index, int value) {
@@ -93,8 +77,16 @@ public final class Vignette extends PostProcessorEffect {
         return vignetting.getIntensity();
     }
 
+    public void setIntensity(float intensity) {
+        vignetting.setIntensity(intensity);
+    }
+
     public float getLutIntensity() {
         return vignetting.getLutIntensity();
+    }
+
+    public void setLutIntensity(float value) {
+        vignetting.setLutIntensity(value);
     }
 
     public int getLutIndexVal(int index) {
@@ -125,8 +117,16 @@ public final class Vignette extends PostProcessorEffect {
         return vignetting.getSaturation();
     }
 
+    public void setSaturation(float saturation) {
+        vignetting.setSaturation(saturation);
+    }
+
     public float getSaturationMul() {
         return vignetting.getSaturationMul();
+    }
+
+    public void setSaturationMul(float saturationMul) {
+        vignetting.setSaturationMul(saturationMul);
     }
 
     public boolean isGradientMappingEnabled() {

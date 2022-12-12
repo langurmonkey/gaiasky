@@ -219,7 +219,9 @@ public class EntityUtils {
 
     /**
      * Re-implementation of {@link FocusView#getRadius()} in a static context.
+     *
      * @param entity The entity.
+     *
      * @return The radius of the entity.
      */
     public static double getRadius(Entity entity) {
@@ -234,9 +236,9 @@ public class EntityUtils {
     }
 
     private static ParticleSet getSet(Entity entity) {
-        if(Mapper.particleSet.has(entity)) {
+        if (Mapper.particleSet.has(entity)) {
             return Mapper.particleSet.get(entity);
-        } else if(Mapper.starSet.has(entity)) {
+        } else if (Mapper.starSet.has(entity)) {
             return Mapper.starSet.get(entity);
         }
         return null;

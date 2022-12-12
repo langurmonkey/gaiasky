@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Null;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnSlider.OwnSliderStyle;
 
 import java.text.DecimalFormat;
@@ -26,20 +26,21 @@ import java.util.function.Function;
  */
 public class OwnSliderPlus extends Slider {
 
+    private final Skin skin;
+    private final float padX = 4.8f;
+    private final float padY = 3.2f;
     private OwnSliderPlus me;
     private float ownwidth = 0f, ownheight = 0f;
     private float mapMin, mapMax;
     private boolean map = false;
-    private final Skin skin;
     private OwnLabel titleLabel, valueLabel;
     private boolean displayValueMapped = false;
     private String valuePrefix, valueSuffix;
-    private final float padX = 4.8f;
-    private final float padY = 3.2f;
     private DecimalFormat nf;
     // This function is applied to the value of this slider in order to
     // produce the label to be displayed.
     private Function<Float, String> valueLabelTransform;
+    private Color labelColorBackup;
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin, String labelStyle) {
         super(min, max, stepSize, false, skin.get("big-horizontal", OwnSliderStyle.class));
@@ -150,7 +151,7 @@ public class OwnSliderPlus extends Slider {
 
     public float getMappedValue() {
         if (map) {
-            return MathUtilsd.lint(getValue(), getMinValue(), getMaxValue(), mapMin, mapMax);
+            return MathUtilsDouble.lint(getValue(), getMinValue(), getMaxValue(), mapMin, mapMax);
         } else {
             return getValue();
         }
@@ -162,7 +163,7 @@ public class OwnSliderPlus extends Slider {
 
     public void setMappedValue(float mappedValue) {
         if (map) {
-            setValue(MathUtilsd.lint(mappedValue, mapMin, mapMax, getMinValue(), getMaxValue()));
+            setValue(MathUtilsDouble.lint(mappedValue, mapMin, mapMax, getMinValue(), getMaxValue()));
         } else {
             setValue(mappedValue);
         }
@@ -234,7 +235,7 @@ public class OwnSliderPlus extends Slider {
         return bg;
     }
 
-    protected Drawable getKnobBeforeDrawable () {
+    protected Drawable getKnobBeforeDrawable() {
         Drawable knobBefore = super.getKnobBeforeDrawable();
         if (hasKeyboardFocus() && !isDisabled()) {
             knobBefore = ((OwnSliderStyle) getStyle()).knobBeforeFocused;
@@ -251,10 +252,8 @@ public class OwnSliderPlus extends Slider {
             titleLabel.setDisabled(disabled);
     }
 
-    private Color labelColorBackup;
-
     public void setLabelColor(Color c) {
-       setLabelColor(c.r, c.g, c.b, c.a);
+        setLabelColor(c.r, c.g, c.b, c.a);
     }
 
     public void setLabelColor(float r, float g, float b, float a) {

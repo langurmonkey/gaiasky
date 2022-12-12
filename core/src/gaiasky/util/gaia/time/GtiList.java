@@ -49,7 +49,6 @@ import java.util.Collections;
  * A collection of Good Time Intervals (GTIs).
  *
  * @author jhoar
- *
  * @version $Id: GtiList.java 290526 2013-04-30 11:26:35Z pbalm $
  */
 public class GtiList extends ArrayList<Gti> {
@@ -70,7 +69,8 @@ public class GtiList extends ArrayList<Gti> {
      * Convenience method to add a new GTI
      *
      * @param start T
-     * @param end T
+     * @param end   T
+     *
      * @throws RuntimeException
      */
     public void add(final long start, final long end) throws RuntimeException {
@@ -80,10 +80,10 @@ public class GtiList extends ArrayList<Gti> {
     /**
      * Check if a time is within any GTI in the list
      *
-     * @param time
-     *            time to find
+     * @param time time to find
+     *
      * @return first GTI object in which the time the time is found, null
-     *         otherwise
+     * otherwise
      */
     public Gti inside(final long time) {
         for (final Gti t : this) {
@@ -117,8 +117,8 @@ public class GtiList extends ArrayList<Gti> {
      * +-------------------+ combined
      * </pre>
      *
-     * @param list
-     *            List to combine with
+     * @param list List to combine with
+     *
      * @throws RuntimeException
      */
     public void or(final GtiList list) throws RuntimeException {
@@ -139,8 +139,8 @@ public class GtiList extends ArrayList<Gti> {
      *     +-------+ combined
      * </pre>
      *
-     * @param list
-     *            List to combine with
+     * @param list List to combine with
+     *
      * @throws RuntimeException
      */
     public void and(final GtiList list) throws RuntimeException {
@@ -298,8 +298,6 @@ public class GtiList extends ArrayList<Gti> {
     }
 
     /**
-     *
-     *
      * @return String
      */
     @Override
@@ -315,15 +313,18 @@ public class GtiList extends ArrayList<Gti> {
     }
 
     /**
+     *
      */
     private enum State {
         /**
          * Field UNKNOWN.
          */
-        UNKNOWN, /**
+        UNKNOWN,
+        /**
          * Field SORTED.
          */
-        SORTED, /**
+        SORTED,
+        /**
          * Field REDUCED.
          */
         REDUCED

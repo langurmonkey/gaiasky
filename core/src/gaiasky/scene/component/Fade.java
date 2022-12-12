@@ -41,6 +41,7 @@ public class Fade implements Component {
     public void setFadein(double[] fadeIn) {
         setFadeIn(fadeIn);
     }
+
     public void setFadeIn(double[] fadeIn) {
         if (fadeIn != null)
             this.fadeIn = new Vector2d(fadeIn[0] * Constants.PC_TO_U, fadeIn[1] * Constants.PC_TO_U);
@@ -51,6 +52,7 @@ public class Fade implements Component {
     /**
      * Sets the values to which the fade in distances are mapped. If not set, they are initialized
      * automatically with [0,1].
+     *
      * @param fadeInMap The values.
      */
     public void setFadeInMap(double[] fadeInMap) {
@@ -61,8 +63,9 @@ public class Fade implements Component {
     }
 
     public void setFadeout(double[] fadeOut) {
-       setFadeOut(fadeOut);
+        setFadeOut(fadeOut);
     }
+
     public void setFadeOut(double[] fadeOut) {
         if (fadeOut != null)
             this.fadeOut = new Vector2d(fadeOut[0] * Constants.PC_TO_U, fadeOut[1] * Constants.PC_TO_U);
@@ -73,6 +76,7 @@ public class Fade implements Component {
     /**
      * Sets the values to which the fade out distances are mapped. If not set, they are initialized
      * automatically with [1,0].
+     *
      * @param fadeOutMap The values.
      */
     public void setFadeOutMap(double[] fadeOutMap) {
@@ -87,18 +91,20 @@ public class Fade implements Component {
     }
 
     public void setFadepc(double[] fade) {
-       setFadePc(fade);
+        setFadePc(fade);
     }
+
     public void setFadePc(double[] fade) {
-        if(fadeIn == null) {
+        if (fadeIn == null) {
             fadeIn = new Vector2d();
         }
         fadeIn.set(fade).scl(Constants.PC_TO_U);
     }
 
     public void setPositionobjectname(String name) {
-       setFadeObjectName(name);
+        setFadeObjectName(name);
     }
+
     public void setFadeObjectName(String name) {
         this.fadePositionObjectName = name;
     }

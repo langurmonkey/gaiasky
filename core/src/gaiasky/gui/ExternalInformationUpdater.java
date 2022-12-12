@@ -39,14 +39,16 @@ public class ExternalInformationUpdater {
     private static final Log logger = Logger.getLogger(ExternalInformationUpdater.class);
 
     private static final int TIMEOUT_MS = 5000;
-
+    private final String[] suffixes = { "_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", "" };
+    private final String[] suffixes_model = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "_Galaxy", "_Dwarf", "" };
+    private final String[] suffixes_gal = { "_(dwarf_galaxy)", "_(galaxy)", "_Galaxy", "_Dwarf", "_Cluster", "" };
+    private final String[] suffixes_cluster = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
+    private final String[] suffixes_star = { "_(star)", "" };
     private Skin skin;
     private LabelStyle linkStyle;
-
     private Cell<Link> infoCell, gaiaCell, simbadCell;
     private Link simbadLink;
     private OwnTextButton infoButton, gaiaButton;
-
     // The table to modify
     private Table table;
     private float pad;
@@ -59,24 +61,6 @@ public class ExternalInformationUpdater {
         this.skin = skin;
         this.linkStyle = skin.get("link", LabelStyle.class);
         this.pad = pad;
-    }
-
-    private class GaiaButtonListener implements EventListener {
-        private final IStarFocus focus;
-
-        public GaiaButtonListener(IStarFocus focus) {
-            super();
-            this.focus = focus;
-        }
-
-        @Override
-        public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.SHOW_ARCHIVE_VIEW_ACTION, this, focus);
-                return true;
-            }
-            return false;
-        }
     }
 
     public void update(final IFocus focus) {
@@ -177,12 +161,6 @@ public class ExternalInformationUpdater {
         }
     }
 
-    private final String[] suffixes = { "_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", "" };
-    private final String[] suffixes_model = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "_Galaxy", "_Dwarf", "" };
-    private final String[] suffixes_gal = { "_(dwarf_galaxy)", "_(galaxy)", "_Galaxy", "_Dwarf", "_Cluster", "" };
-    private final String[] suffixes_cluster = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
-    private final String[] suffixes_star = { "_(star)", "" };
-
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
             String url = Constants.URL_WIKIPEDIA;
@@ -262,5 +240,23 @@ public class ExternalInformationUpdater {
         void ok(String link);
 
         void ko(String link);
+    }
+
+    private class GaiaButtonListener implements EventListener {
+        private final IStarFocus focus;
+
+        public GaiaButtonListener(IStarFocus focus) {
+            super();
+            this.focus = focus;
+        }
+
+        @Override
+        public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_ARCHIVE_VIEW_ACTION, this, focus);
+                return true;
+            }
+            return false;
+        }
     }
 }

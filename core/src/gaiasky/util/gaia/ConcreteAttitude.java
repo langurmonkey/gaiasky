@@ -30,26 +30,23 @@ import gaiasky.util.math.Vector3d;
 public class ConcreteAttitude implements IAttitude {
 
     private static final double BASICANGLE_DEGREE = 106.5;
-    private static final Vector3d[] xyz = new Vector3d[]{new Vector3d(), new Vector3d(), new Vector3d()};
-    private static final Vector3d[] fovDirections = new Vector3d[]{new Vector3d(), new Vector3d()};
+    private static final Vector3d[] xyz = new Vector3d[] { new Vector3d(), new Vector3d(), new Vector3d() };
+    private static final Vector3d[] fovDirections = new Vector3d[] { new Vector3d(), new Vector3d() };
     private static final Vector3d aux = new Vector3d();
+    // half the conventional basic angle Gamma [rad]
+    private final double halfGamma = Math.toRadians(.5 * BASICANGLE_DEGREE);
     /**
      * time to which the attitude refers, in elapsed ns since the reference epoch
      */
     private long t;
-
     /**
      * attitude quaternion at time t
      */
     private Quaterniond q;
-
     /**
      * time derivative of the attitude at time t
      */
     private Quaterniond qDot;
-
-    // half the conventional basic angle Gamma [rad]
-    private final double halfGamma = Math.toRadians(.5 * BASICANGLE_DEGREE);
 
     /**
      * Construct object from time, and a quaternion. This leaves the time
@@ -71,7 +68,7 @@ public class ConcreteAttitude implements IAttitude {
      * @param qDot time derivative of quaternion [1/day]
      */
     public ConcreteAttitude(long t, Quaterniond q, Quaterniond qDot,
-                            boolean withZeroSigmaCorr) { //-V6022
+            boolean withZeroSigmaCorr) { //-V6022
         this.t = t;
         this.q = q;
         this.qDot = qDot;
@@ -274,7 +271,7 @@ public class ConcreteAttitude implements IAttitude {
         // Across scan speed in rad/s
         double zetap = -spinRate.x * sphi + spinRate.y * cphi;
 
-        return new double[]{phip, zetap};
+        return new double[] { phip, zetap };
     }
 
     /**
@@ -282,7 +279,7 @@ public class ConcreteAttitude implements IAttitude {
      */
     @Override
     public double[] getAlAcRates(FOV fov, double alFieldAngle,
-                                 double acFieldAngle) {
+            double acFieldAngle) {
 
         return getAlAcRates(alFieldAngle + fov.getNumericalFieldIndex()
                 * halfGamma, acFieldAngle);

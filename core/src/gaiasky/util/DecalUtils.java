@@ -43,14 +43,14 @@ public class DecalUtils {
      * been called. This enables 3D techniques such as z-buffering to be applied
      * to the text textures.
      *
-     * @param sprite           The sprite.
+     * @param sprite         The sprite.
      * @param batch          The sprite batch to use.
      * @param x              The x coordinate.
      * @param y              The y coordinate.
      * @param z              The z coordinate.
      * @param size           The scale of the sprite.
      * @param rotationCenter Angles to rotate around center.
-     * @param cam         The camera.
+     * @param cam            The camera.
      * @param faceCamera     Whether to apply bill-boarding.
      * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
      * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
@@ -61,7 +61,6 @@ public class DecalUtils {
         // Store batch matrices
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
-
 
         Camera camera = cam.getCamera();
         Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
@@ -121,7 +120,7 @@ public class DecalUtils {
      * @param z              The z coordinate.
      * @param size           The scale of the font.
      * @param rotationCenter Angles to rotate around center.
-     * @param cam         The camera.
+     * @param cam            The camera.
      * @param faceCamera     Whether to apply bill-boarding.
      * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
      * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
@@ -189,7 +188,6 @@ public class DecalUtils {
         float scaley = font.getData().scaleY;
         aux1.set(batch.getProjectionMatrix());
 
-
         batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h());
         font.getData().setScale(scale);
 
@@ -220,6 +218,7 @@ public class DecalUtils {
         quaternion.y = (float) ((direction.x - right.z) * w4Recip);
         quaternion.z = (float) ((right.y - up.x) * w4Recip);
     }
+
     /**
      * Gets the billboard rotation using the parameters of the given camera
      *

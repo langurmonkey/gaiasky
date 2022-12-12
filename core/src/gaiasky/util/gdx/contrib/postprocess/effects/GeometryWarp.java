@@ -37,7 +37,7 @@ public final class GeometryWarp extends PostProcessorEffect {
         warpFilter = new GeometryWarpFilter(data, blend);
     }
 
-    public void setBlendTexture(Texture tex){
+    public void setBlendTexture(Texture tex) {
         warpFilter.setBlendTexture(tex);
     }
 

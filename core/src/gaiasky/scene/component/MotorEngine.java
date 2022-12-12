@@ -9,19 +9,19 @@ import gaiasky.scene.api.ISpacecraft;
 import gaiasky.scene.record.MachineDefinition;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 import java.util.stream.Stream;
 
 public class MotorEngine implements Component, ISpacecraft, ICopy {
-    /** Max speed in relativistic mode **/
-    private static final double relativisticSpeedCap = Constants.C_US * 0.99999;
-
     /**
      * Factor (adapt to be able to navigate small and large scale structures)
      **/
     public static final double[] thrustFactor = new double[14];
+    public static final double thrustBase = 1e12d;
+    /** Max speed in relativistic mode **/
+    private static final double relativisticSpeedCap = Constants.C_US * 0.99999;
 
     static {
         double val = 0.01;
@@ -32,33 +32,24 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
 
     /** The current name of this spacecraft **/
     public String machineName;
-
     /** Seconds to reach full power **/
     public double fullPowerTime;
-
     /** Force, acceleration and velocity **/
     public Vector3d force, accel, vel;
     /** Direction and up vectors **/
     public Vector3d direction, up;
-
     public Pair<Vector3d, Vector3d> dirup;
-
     /** Float counterparts **/
     public Vector3 posf, directionf, upf;
     /** Instantaneous engine power, do not set manually **/
     public double currentEnginePower;
-
-
     /** Engine thrust vector **/
     public Vector3d thrust;
-
-    public static final double thrustBase = 1e12d;
     /** This is the magnitude of the thrust **/
     public double thrustMagnitude;
 
     /** Mass in kg **/
     public double mass;
-
 
     /** Responsiveness in [{@link Constants#MIN_SC_RESPONSIVENESS}, {@link Constants#MAX_SC_RESPONSIVENESS}] **/
     public double responsiveness;
@@ -105,7 +96,7 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
      * @param currentEnginePower The power in [-1..1]
      */
     public void setCurrentEnginePower(double currentEnginePower) {
-        this.currentEnginePower = MathUtilsd.clamp(currentEnginePower, -1, 1);
+        this.currentEnginePower = MathUtilsDouble.clamp(currentEnginePower, -1, 1);
     }
 
     /**
@@ -114,7 +105,7 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
      * @param yawp The yaw power in [-1..1]
      */
     public void setYawPower(double yawp) {
-        this.yawp = MathUtilsd.clamp(yawp, -1, 1);
+        this.yawp = MathUtilsDouble.clamp(yawp, -1, 1);
     }
 
     /**
@@ -123,7 +114,7 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
      * @param pitchp The pitch power in [-1..1]
      */
     public void setPitchPower(double pitchp) {
-        this.pitchp = MathUtilsd.clamp(pitchp, -1, 1);
+        this.pitchp = MathUtilsDouble.clamp(pitchp, -1, 1);
     }
 
     /**
@@ -132,7 +123,7 @@ public class MotorEngine implements Component, ISpacecraft, ICopy {
      * @param rollp The roll power in [-1..1]
      */
     public void setRollPower(double rollp) {
-        this.rollp = MathUtilsd.clamp(rollp, -1, 1);
+        this.rollp = MathUtilsDouble.clamp(rollp, -1, 1);
     }
 
     public void stopAllMovement() {

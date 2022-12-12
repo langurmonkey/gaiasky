@@ -49,7 +49,7 @@ public class GamepadMappings extends AbstractGamepadMappings {
         try {
             if (!Files.exists(mappingsFile)) {
                 Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
-                if(Files.exists(internalMappings))
+                if (Files.exists(internalMappings))
                     mappingsFile = internalMappings;
             }
             InputStream is = Files.newInputStream(mappingsFile);
@@ -99,6 +99,7 @@ public class GamepadMappings extends AbstractGamepadMappings {
      * Persist the current mappings to the given path
      *
      * @param path Pointer to the file
+     *
      * @return True if operation succeeded
      */
     public boolean persist(Path path) {
@@ -181,6 +182,5 @@ public class GamepadMappings extends AbstractGamepadMappings {
             return Parser.parseDouble(defaultValue);
         }
     }
-
 
 }

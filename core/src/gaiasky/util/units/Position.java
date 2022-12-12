@@ -18,31 +18,12 @@ import gaiasky.util.units.Quantity.Length.LengthUnit;
  */
 public class Position {
 
-    public enum PositionType {
-        EQ_SPH_DIST,
-        EQ_SPH_PLX,
-
-        ECL_SPH_DIST,
-        ECL_SPH_PLX,
-
-        GAL_SPH_DIST,
-        GAL_SPH_PLX,
-
-        EQ_XYZ,
-        ECL_XYZ,
-        GAL_XYZ;
-
-        public boolean isParallax(){
-            return this.equals(EQ_SPH_PLX) || this.equals(ECL_SPH_PLX) || this.equals(GAL_SPH_PLX);
-        }
-    }
-
     public final Vector3d gsposition;
 
     /**
      * Works out the cartesian equatorial position in the Gaia Sandbox reference
      * system. The units of the result are parsecs.
-     * 
+     *
      * @param a
      * @param unitA
      * @param b
@@ -50,6 +31,7 @@ public class Position {
      * @param c
      * @param unitC
      * @param type
+     *
      * @throws RuntimeException On negative distance or parallax
      */
     public Position(double a, String unitA, double b, String unitB, double c, String unitC, PositionType type) throws RuntimeException {
@@ -67,7 +49,7 @@ public class Position {
             Angle lat = new Angle(b, unitB);
             Length dist = new Length(c, unitC);
 
-            if(dist.value_m <= 0){
+            if (dist.value_m <= 0) {
                 throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
             }
 
@@ -80,7 +62,7 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
 
-            if(dist.value_m <= 0){
+            if (dist.value_m <= 0) {
                 throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
             }
 
@@ -93,7 +75,7 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
 
-            if(dist.value_m <= 0){
+            if (dist.value_m <= 0) {
                 throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
             }
 
@@ -106,7 +88,7 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
 
-            if(dist.value_m <= 0){
+            if (dist.value_m <= 0) {
                 throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
             }
 
@@ -119,7 +101,7 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Length(c, unitC);
 
-            if(dist.value_m <= 0){
+            if (dist.value_m <= 0) {
                 throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
             }
 
@@ -132,7 +114,7 @@ public class Position {
             lat = new Angle(b, unitB);
             dist = new Angle(c, unitC).getParallaxDistance();
 
-            if(dist.value_m <= 0){
+            if (dist.value_m <= 0) {
                 throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
             }
 
@@ -178,5 +160,24 @@ public class Position {
         gsposition.x = gsposition.y;
         gsposition.y = gsposition.z;
         gsposition.z = aux;
+    }
+
+    public enum PositionType {
+        EQ_SPH_DIST,
+        EQ_SPH_PLX,
+
+        ECL_SPH_DIST,
+        ECL_SPH_PLX,
+
+        GAL_SPH_DIST,
+        GAL_SPH_PLX,
+
+        EQ_XYZ,
+        ECL_XYZ,
+        GAL_XYZ;
+
+        public boolean isParallax() {
+            return this.equals(EQ_SPH_PLX) || this.equals(ECL_SPH_PLX) || this.equals(GAL_SPH_PLX);
+        }
     }
 }

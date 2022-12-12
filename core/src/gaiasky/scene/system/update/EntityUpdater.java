@@ -15,6 +15,7 @@ public interface EntityUpdater {
 
     /**
      * Returns the family for this updater.
+     *
      * @return The family.
      */
     Family getFamily();

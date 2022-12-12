@@ -35,10 +35,10 @@ public class DatasetPreferencesWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetPreferencesWindow.class);
 
     private final CatalogInfo ci;
+    private final DatasetPreferencesWindow dpw;
     private OwnTextField highlightSizeFactor, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
     private OwnCheckBox allVisible, fadeIn, fadeOut;
     private Table filterTable;
-    private final DatasetPreferencesWindow dpw;
     private Filter filter;
     private boolean filterEdited;
     private float taWidth;
@@ -90,7 +90,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
         // Fade
         addFadeAttributes(content);
 
-        if(ci.hasParticleAttributes()) {
+        if (ci.hasParticleAttributes()) {
             // Filters
             content.add(new OwnLabel(I18n.msg("gui.dataset.filter"), skin, "hud-header")).left().colspan(2).padBottom(pad18).padTop(pad20).row();
             filterTable = new Table(skin);

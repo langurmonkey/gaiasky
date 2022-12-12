@@ -6,7 +6,7 @@
 /*
  * GaiaTools
  * Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -36,13 +36,12 @@ public class NslUtil {
      * Calculates the nominal speed of the z axis in solar motion units, as
      * function of the precession rate precRate [rev/yr] and the solar aspect
      * angle xi [rad].
-     * 
+     * <p>
      * This method implements Eq. (26) in FM-037-2, accurate to O(1/K^12).
-     * 
-     * @param xi
-     *            solar aspect angle [rad]
-     * @param precRate
-     *            precession rate [rev/yr]
+     *
+     * @param xi       solar aspect angle [rad]
+     * @param precRate precession rate [rev/yr]
+     *
      * @return nominal speed (S)
      */
     public static double calcSNom(double xi, double precRate) {
@@ -59,13 +58,13 @@ public class NslUtil {
         double t10 = 11
                 + c2
                 * (-130 + c2
-                        * (6000 + c2 * (35168 + c2 * (24704 + c2 * (1792)))));
+                * (6000 + c2 * (35168 + c2 * (24704 + c2 * (1792)))));
         return ks
                 * (1 + f
-                        * (t2 + f
-                                * (t4 / 4 + f
-                                        * (-t6 / 4 + f
-                                                * (-t8 / 64 + f * t10 / 64)))));
+                * (t2 + f
+                * (t4 / 4 + f
+                * (-t6 / 4 + f
+                * (-t8 / 64 + f * t10 / 64)))));
     }
 
 }

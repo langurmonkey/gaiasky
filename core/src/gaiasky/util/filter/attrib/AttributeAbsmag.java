@@ -14,10 +14,11 @@ public class AttributeAbsmag extends AttributeAbstract implements IAttribute {
         return pb.absmag();
     }
 
-    public String getUnit(){
+    public String getUnit() {
         return I18n.msg("gui.unit.mag");
     }
-    public String toString(){
+
+    public String toString() {
         return I18n.msg("gui.attrib.absmag");
     }
 }

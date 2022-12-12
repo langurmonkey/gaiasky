@@ -76,7 +76,6 @@ public abstract class BinaryIOBase implements BinaryIO {
         return new ParticleRecord(dataD, dataF, id, names);
     }
 
-
     @Override
     public ParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException {
         double[] dataD = new double[ParticleRecord.STAR_SIZE_D];

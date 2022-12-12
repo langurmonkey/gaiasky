@@ -32,22 +32,19 @@ import gaiasky.util.scene2d.OwnLabel;
  */
 public class GaiaSkyView implements ApplicationListener, IObserver {
 
+    private final Skin skin;
+    private final ShaderProgram spriteShader;
+    private final Vector2 lastTexSize;
     /* Window */
     public Lwjgl3Window window;
     /* Graphics */
     public Lwjgl3Graphics graphics;
     /* Input */
     public Lwjgl3Input input;
-
-    private final Skin skin;
     private Stage ui;
-    private final ShaderProgram spriteShader;
-
     private SpriteBatch sb;
     private boolean initGui = false;
     private boolean initializing = true;
-
-    private final Vector2 lastTexSize;
 
     public GaiaSkyView(final Skin skin, final ShaderProgram spriteShader) {
         super();

@@ -17,7 +17,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 public class HighZMinimapScale extends AbstractMinimapScale {
@@ -37,9 +37,8 @@ public class HighZMinimapScale extends AbstractMinimapScale {
         trans = Coordinates.eqToGal();
     }
 
-
     private Vector3d get(double raDeg, double decDeg, double distMpc) {
-        return Coordinates.sphericalToCartesian(MathUtilsd.degRad * raDeg, MathUtilsd.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
+        return Coordinates.sphericalToCartesian(MathUtilsDouble.degRad * raDeg, MathUtilsDouble.degRad * decDeg, distMpc * Constants.MPC_TO_U, new Vector3d());
     }
 
     @Override
@@ -137,7 +136,6 @@ public class HighZMinimapScale extends AbstractMinimapScale {
         sb.begin();
         font.setColor(1, 1, 0, 1);
         font.draw(sb, I18n.msg("gui.minimap.localgroup"), side2 + px(10), side2 + px(20));
-
 
         font.setColor(textmc);
         font.draw(sb, "0" + I18n.msg("gui.unit.deg"), side2 - px(15), side - px(5));

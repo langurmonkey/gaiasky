@@ -63,7 +63,6 @@ public class GridRecInitializer extends AbstractInitSystem {
         body.color = Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? gr.ccGal : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? gr.ccEcl : gr.ccEq);
         body.labelColor = body.color;
 
-
         gr.p01 = new Vector3d();
         gr.p02 = new Vector3d();
         gr.d01 = -1;

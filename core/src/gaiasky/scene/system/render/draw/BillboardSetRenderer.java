@@ -39,7 +39,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
 
@@ -223,9 +223,9 @@ public class BillboardSetRenderer extends PointCloudTriRenderSystem implements I
                     // COLOR
                     double[] doubleData = particle.rawDoubleData();
                     float[] col = doubleData.length >= 7 ? new float[] { (float) doubleData[4], (float) doubleData[5], (float) doubleData[6] } : cg.generateColor();
-                    col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
-                    col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
-                    col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
+                    col[0] = MathUtilsDouble.clamp(col[0], 0f, 1f);
+                    col[1] = MathUtilsDouble.clamp(col[1], 0f, 1f);
+                    col[2] = MathUtilsDouble.clamp(col[2], 0f, 1f);
                     ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
 
                     // UV coordinates

@@ -41,7 +41,7 @@ public class IndexInitializer extends AbstractInitSystem {
         if (octant != null) {
 
             // Add objects to index.
-            if(octant.objects != null) {
+            if (octant.objects != null) {
                 octant.objects.forEach((object) -> {
                     if (object instanceof OctreeObjectView) {
                         index.addToIndex(((OctreeObjectView) object).getEntity());
@@ -50,9 +50,9 @@ public class IndexInitializer extends AbstractInitSystem {
             }
 
             // Process children octants.
-            if(octant.children != null) {
-                for(OctreeNode child : octant.children) {
-                    if(child != null) {
+            if (octant.children != null) {
+                for (OctreeNode child : octant.children) {
+                    if (child != null) {
                         initializeOctant(child);
                     }
                 }

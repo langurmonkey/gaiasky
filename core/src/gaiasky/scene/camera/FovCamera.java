@@ -46,36 +46,28 @@ import java.util.List;
 public class FovCamera extends AbstractCamera implements IObserver {
     private static final float FOV_CORR = 0.3f;
     private static final float FOV = (float) Satellite.FOV_AC + FOV_CORR;
-    private static final float BAM_2 = (float) Satellite.BASICANGLE_DEGREE / 2f;
     private static final double GAIA_ASPECT_RATIO = (Satellite.FOV_AL + FOV_CORR) / FOV;
-
+    private static final float BAM_2 = (float) Satellite.BASICANGLE_DEGREE / 2f;
+    private final Vector3d dir1;
+    private final Vector3d dir2;
+    private final Matrix4d matrix;
     /**
      * time that has to pass with the current scan rate so that we scan to the
      * edge of the current field of view.
      **/
     public long MAX_OVERLAP_TIME = 0l;
     public float MAX_OVERLAP_ANGLE = 0;
-
-    private PerspectiveCamera camera2;
-    private Frustumd frustum2;
-
-    private Entity gaia;
-    private IAttitudeServer attitudeServer;
-
-    Vector3d dirMiddle, up;
     public Vector3d[] directions;
     public List<Vector3d[]> interpolatedDirections;
-    private Matrix4d trf;
-
     public long currentTime, lastTime;
-
     // Direction index for the render stage
     public int dirIndex;
-
-    private final Vector3d dir1;
-    private final Vector3d dir2;
-    private final Matrix4d matrix;
-
+    Vector3d dirMiddle, up;
+    private PerspectiveCamera camera2;
+    private Frustumd frustum2;
+    private Entity gaia;
+    private IAttitudeServer attitudeServer;
+    private Matrix4d trf;
     private Scene scene;
 
     private Stage[] fpStages;
@@ -245,6 +237,11 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
+    public void setCamera(PerspectiveCamera perspectiveCamera) {
+        // Nothing to do
+    }
+
+    @Override
     public float getFovFactor() {
         return this.fovFactor;
     }
@@ -281,7 +278,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
             this.closestBody.setScene(scene);
             this.closestStarView.setScene(this.scene);
 
-            if(gaia != null && Mapper.attitude.has(gaia)) {
+            if (gaia != null && Mapper.attitude.has(gaia)) {
                 var att = Mapper.attitude.get(this.gaia);
                 this.attitudeServer = att.attitudeServer;
             }
@@ -349,11 +346,6 @@ public class FovCamera extends AbstractCamera implements IObserver {
             case GAIA_FOVS_MODE -> computeVisibleFovs(cb, this);
             default -> false;
         };
-    }
-
-    @Override
-    public void setCamera(PerspectiveCamera perspectiveCamera) {
-        // Nothing to do
     }
 
     @Override

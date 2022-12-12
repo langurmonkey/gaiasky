@@ -23,8 +23,8 @@ public class CubemapComponent implements Disposable {
     private static final Log logger = Logger.getLogger(CubemapComponent.class);
 
     public OwnCubemap cubemap;
-    protected boolean loaded = false;
     public String location;
+    protected boolean loaded = false;
     protected String cmBack, cmFront, cmUp, cmDown, cmRight, cmLeft;
 
     public synchronized void initialize() {
@@ -127,7 +127,6 @@ public class CubemapComponent implements Disposable {
     public void setLocation(String location) {
         this.location = location;
     }
-
 
     @Override
     public void dispose() {

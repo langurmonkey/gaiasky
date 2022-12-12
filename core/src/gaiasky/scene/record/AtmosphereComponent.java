@@ -268,10 +268,6 @@ public class AtmosphereComponent extends NamedComponent {
         this.localTransform = localTransform;
     }
 
-    public void setWavelengths(double[] wavelengths) {
-        this.wavelengths = wavelengths;
-    }
-
     public void setFogcolor(double[] fogColor) {
         this.fogColor.set((float) fogColor[0], (float) fogColor[1], (float) fogColor[2]);
     }
@@ -302,6 +298,10 @@ public class AtmosphereComponent extends NamedComponent {
 
     public double[] getWavelengths() {
         return wavelengths;
+    }
+
+    public void setWavelengths(double[] wavelengths) {
+        this.wavelengths = wavelengths;
     }
 
     public void setParams(Map<String, Object> params) {

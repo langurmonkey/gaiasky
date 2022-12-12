@@ -27,11 +27,11 @@ import java.io.Serializable;
 
 /**
  * A finite number of minutes.
- *
+ * <p>
  * There are two implementations provided of the conversions methods one as
  * object interface, where an object of the current class has to be
  * instantiated. The oder implementation is provided as static class methods.
- *
+ * <p>
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
@@ -50,11 +50,64 @@ public class Mins extends ConcreteDuration implements Serializable {
     /**
      * Construct object from number of minutes.
      *
-     * @param mins
-     *            number of mins [minutes]
+     * @param mins number of mins [minutes]
      */
     public Mins(final double mins) {
         value = mins;
+    }
+
+    /**
+     * @param mins Time in mins to convert
+     *
+     * @return Minutes expressed in nanoSec
+     */
+    public static long asNanoSecs(final double mins) {
+        return Math.round(mins * Duration.NS_PER_MIN);
+    }
+
+    /**
+     * @param mins Time in mins to convert
+     *
+     * @return Mins expressed in secs
+     */
+    public static double asSecs(final double mins) {
+        return mins * Duration.SECS_PER_MIN;
+    }
+
+    /**
+     * @param mins Time in mins to convert
+     *
+     * @return Mins expressed in hours
+     */
+    public static double asHours(final double mins) {
+        return mins / Duration.MINS_PER_HOUR;
+    }
+
+    /**
+     * @param mins Time in mins to convert
+     *
+     * @return Mins expressed in revs
+     */
+    public static double asRevs(final double mins) {
+        return mins / Duration.MINS_PER_REV;
+    }
+
+    /**
+     * @param mins Time in mins to convert
+     *
+     * @return Mins expressed in days
+     */
+    public static double asDays(final double mins) {
+        return mins / Duration.MINS_PER_DAY;
+    }
+
+    /**
+     * @param mins Time in mins to convert
+     *
+     * @return Mins expressed in JulianYears
+     */
+    public static double asJulianYears(final double mins) {
+        return mins / Duration.MINS_PER_JULIAN_YEAR;
     }
 
     /**
@@ -76,29 +129,11 @@ public class Mins extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param mins
-     *            Time in mins to convert
-     * @return Minutes expressed in nanoSec
-     */
-    public static long asNanoSecs(final double mins) {
-        return Math.round(mins * Duration.NS_PER_MIN);
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asSecs()
      */
     @Override
     public double asSecs() {
         return value * Duration.SECS_PER_MIN;
-    }
-
-    /**
-     * @param mins
-     *            Time in mins to convert
-     * @return Mins expressed in secs
-     */
-    public static double asSecs(final double mins) {
-        return mins * Duration.SECS_PER_MIN;
     }
 
     /**
@@ -118,29 +153,11 @@ public class Mins extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param mins
-     *            Time in mins to convert
-     * @return Mins expressed in hours
-     */
-    public static double asHours(final double mins) {
-        return mins / Duration.MINS_PER_HOUR;
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asRevs()
      */
     @Override
     public double asRevs() {
         return value / Duration.MINS_PER_REV;
-    }
-
-    /**
-     * @param mins
-     *            Time in mins to convert
-     * @return Mins expressed in revs
-     */
-    public static double asRevs(final double mins) {
-        return mins / Duration.MINS_PER_REV;
     }
 
     /**
@@ -152,29 +169,11 @@ public class Mins extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param mins
-     *            Time in mins to convert
-     * @return Mins expressed in days
-     */
-    public static double asDays(final double mins) {
-        return mins / Duration.MINS_PER_DAY;
-    }
-
-    /**
      * @see gaiasky.util.gaia.time.Duration#asJulianYears()
      */
     @Override
     public double asJulianYears() {
         return value / Duration.MINS_PER_JULIAN_YEAR;
-    }
-
-    /**
-     * @param mins
-     *            Time in mins to convert
-     * @return Mins expressed in JulianYears
-     */
-    public static double asJulianYears(final double mins) {
-        return mins / Duration.MINS_PER_JULIAN_YEAR;
     }
 
     /**

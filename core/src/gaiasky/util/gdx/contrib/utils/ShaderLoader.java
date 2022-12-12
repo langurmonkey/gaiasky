@@ -22,6 +22,9 @@ public final class ShaderLoader {
     public static String BasePath = "";
     public static boolean Pedantic = true;
 
+    private ShaderLoader() {
+    }
+
     public static ShaderProgram fromFile(String vertexFileName, String fragmentFileName) {
         return ShaderLoader.fromFile(vertexFileName, fragmentFileName, "");
     }
@@ -45,7 +48,7 @@ public final class ShaderLoader {
     }
 
     private static String loadShaderCode(String fileName, String... extensions) {
-        for(String extension : extensions) {
+        for (String extension : extensions) {
             String file = fileName + "." + extension;
             try {
                 return Gdx.files.internal(BasePath + file).readString();
@@ -97,8 +100,5 @@ public final class ShaderLoader {
         } else {
             return defines + "\n" + shader;
         }
-    }
-
-    private ShaderLoader() {
     }
 }

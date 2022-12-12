@@ -108,7 +108,7 @@ public class VRGui<T extends IGui> implements IGui {
         left.setVr(vr);
     }
 
-    public void updateViewportSize(int w, int h, boolean centerCamera){
+    public void updateViewportSize(int w, int h, boolean centerCamera) {
         right.getGuiStage().getViewport().update(w, h, centerCamera);
         left.getGuiStage().getViewport().update(w, h, centerCamera);
     }

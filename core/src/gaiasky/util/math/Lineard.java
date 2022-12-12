@@ -7,7 +7,6 @@ package gaiasky.util.math;
 
 public class Lineard<T extends Vectord<T>> implements Pathd<T> {
 
-
     public T[] controlPoints;
 
     public Lineard(final T[] controlPoints) {
@@ -28,7 +27,7 @@ public class Lineard<T extends Vectord<T>> implements Pathd<T> {
     public T valueAt(T out, double t) {
         int n = controlPoints.length;
         double step = 1d / ((double) n - 1d);
-        int i0 = (int) Math.floor(t / step) ;
+        int i0 = (int) Math.floor(t / step);
         int i1 = i0 + 1;
         double alpha = (t / step) - (double) i0;
         T p0 = controlPoints[i0];
@@ -37,7 +36,6 @@ public class Lineard<T extends Vectord<T>> implements Pathd<T> {
         out.set(p0);
         return out.interpolate(p1, alpha, Interpolationd.linear);
     }
-
 
     @Override
     public double approximate(T v) {

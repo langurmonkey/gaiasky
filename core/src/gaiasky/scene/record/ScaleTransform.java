@@ -15,6 +15,7 @@ public class ScaleTransform implements ITransform {
     public void apply(Matrix4 mat) {
         mat.scale((float) scale[0], (float) scale[1], (float) scale[2]);
     }
+
     public void apply(Matrix4d mat) {
         mat.scale(scale[0], scale[1], scale[2]);
     }

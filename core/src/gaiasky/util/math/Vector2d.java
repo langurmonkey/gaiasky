@@ -32,12 +32,10 @@ import java.io.Serializable;
  * @author badlogicgames@gmail.com
  */
 public class Vector2d implements Serializable, Vectord<Vector2d> {
-    private static final long serialVersionUID = 913902788239530931L;
-
     public final static Vector2d X = new Vector2d(1, 0);
     public final static Vector2d Y = new Vector2d(0, 1);
     public final static Vector2d Zero = new Vector2d(0, 0);
-
+    private static final long serialVersionUID = 913902788239530931L;
     /** the x-component of this vector **/
     public double x;
     /** the y-component of this vector **/
@@ -67,11 +65,35 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
         set(v);
     }
 
-    public double x(){
+    public static double len(double x, double y) {
+        return Math.sqrt(x * x + y * y);
+    }
+
+    public static double len2(double x, double y) {
+        return x * x + y * y;
+    }
+
+    public static double dot(double x1, double y1, double x2, double y2) {
+        return x1 * x2 + y1 * y2;
+    }
+
+    public static double dst(double x1, double y1, double x2, double y2) {
+        final double x_d = x2 - x1;
+        final double y_d = y2 - y1;
+        return Math.sqrt(x_d * x_d + y_d * y_d);
+    }
+
+    public static double dst2(double x1, double y1, double x2, double y2) {
+        final double x_d = x2 - x1;
+        final double y_d = y2 - y1;
+        return x_d * x_d + y_d * y_d;
+    }
+
+    public double x() {
         return x;
     }
 
-    public double y(){
+    public double y() {
         return y;
     }
 
@@ -79,16 +101,8 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
         return new Vector2d(this);
     }
 
-    public static double len(double x, double y) {
-        return Math.sqrt(x * x + y * y);
-    }
-
     public double len() {
         return Math.sqrt(x * x + y * y);
-    }
-
-    public static double len2(double x, double y) {
-        return x * x + y * y;
     }
 
     public double len2() {
@@ -110,6 +124,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      *
      * @param x The x-component
      * @param y The y-component
+     *
      * @return This vector for chaining
      */
     public Vector2d set(double x, double y) {
@@ -129,6 +144,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      *
      * @param x The x-component of the other vector
      * @param y The y-component of the other vector
+     *
      * @return This vector for chaining
      */
     public Vector2d sub(double x, double y) {
@@ -157,16 +173,13 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      *
      * @param x The x-component
      * @param y The y-component
+     *
      * @return This vector for chaining
      */
     public Vector2d add(double x, double y) {
         this.x += x;
         this.y += y;
         return this;
-    }
-
-    public static double dot(double x1, double y1, double x2, double y2) {
-        return x1 * x2 + y1 * y2;
     }
 
     public double dot(Vector2d v) {
@@ -217,12 +230,6 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
         return null;
     }
 
-    public static double dst(double x1, double y1, double x2, double y2) {
-        final double x_d = x2 - x1;
-        final double y_d = y2 - y1;
-        return Math.sqrt(x_d * x_d + y_d * y_d);
-    }
-
     public double dst(Vector2d v) {
         final double x_d = v.x - x;
         final double y_d = v.y - y;
@@ -232,18 +239,13 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     /**
      * @param x The x-component of the other vector
      * @param y The y-component of the other vector
+     *
      * @return the distance between this and the other vector
      */
     public double dst(double x, double y) {
         final double x_d = x - this.x;
         final double y_d = y - this.y;
         return Math.sqrt(x_d * x_d + y_d * y_d);
-    }
-
-    public static double dst2(double x1, double y1, double x2, double y2) {
-        final double x_d = x2 - x1;
-        final double y_d = y2 - y1;
-        return x_d * x_d + y_d * y_d;
     }
 
     public double dst2(Vector2d v) {
@@ -255,6 +257,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     /**
      * @param x The x-component of the other vector
      * @param y The y-component of the other vector
+     *
      * @return the squared distance between this and the other vector
      */
     public double dst2(double x, double y) {
@@ -306,6 +309,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      * Left-multiplies this vector by the given matrix
      *
      * @param mat the matrix
+     *
      * @return this vector
      */
     public Vector2d mul(Matrix3 mat) {
@@ -320,6 +324,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      * Calculates the 2D cross product between this and the given vector.
      *
      * @param v the other vector
+     *
      * @return the cross product
      */
     public double crs(Vector2d v) {
@@ -331,6 +336,7 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
      *
      * @param x the x-coordinate of the other vector
      * @param y the y-coordinate of the other vector
+     *
      * @return the cross product
      */
     public double crs(double x, double y) {
@@ -357,15 +363,6 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     }
 
     /**
-     * Sets the angle of the vector in degrees relative to the x-axis, towards the positive y-axis (typically counter-clockwise).
-     *
-     * @param degrees The angle in degrees to set.
-     */
-    public Vector2d setAngle(double degrees) {
-        return setAngleRad(degrees * MathUtils.degreesToRadians);
-    }
-
-    /**
      * Sets the angle of the vector in radians relative to the x-axis, towards the positive y-axis (typically counter-clockwise).
      *
      * @param radians The angle in radians to set.
@@ -375,6 +372,15 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
         this.rotateRad(radians);
 
         return this;
+    }
+
+    /**
+     * Sets the angle of the vector in degrees relative to the x-axis, towards the positive y-axis (typically counter-clockwise).
+     *
+     * @param degrees The angle in degrees to set.
+     */
+    public Vector2d setAngle(double degrees) {
+        return setAngleRad(degrees * MathUtils.degreesToRadians);
     }
 
     /**
@@ -429,14 +435,14 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
     }
 
     @Override
-    public Vector2d interpolate (Vector2d target, double alpha, Interpolationd interpolation) {
+    public Vector2d interpolate(Vector2d target, double alpha, Interpolationd interpolation) {
         return lerp(target, interpolation.apply(alpha));
     }
 
     @Override
-    public Vector2d setToRandomDirection () {
-        double theta = MathUtilsd.random(0, MathUtils.PI2);
-        return this.set(MathUtilsd.cos(theta), MathUtilsd.sin(theta));
+    public Vector2d setToRandomDirection() {
+        double theta = MathUtilsDouble.random(0, MathUtils.PI2);
+        return this.set(MathUtilsDouble.cos(theta), MathUtilsDouble.sin(theta));
     }
 
     public boolean epsilonEquals(Vector2d other, double epsilon) {
@@ -476,12 +482,12 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
 
     @Override
     public boolean isOnLine(Vector2d other) {
-        return MathUtilsd.isZero(x * other.y - y * other.x);
+        return MathUtilsDouble.isZero(x * other.y - y * other.x);
     }
 
     @Override
     public boolean isOnLine(Vector2d other, double epsilon) {
-        return MathUtilsd.isZero(x * other.y - y * other.x, epsilon);
+        return MathUtilsDouble.isZero(x * other.y - y * other.x, epsilon);
     }
 
     @Override
@@ -506,12 +512,12 @@ public class Vector2d implements Serializable, Vectord<Vector2d> {
 
     @Override
     public boolean isPerpendicular(Vector2d vector) {
-        return MathUtilsd.isZero(dot(vector));
+        return MathUtilsDouble.isZero(dot(vector));
     }
 
     @Override
     public boolean isPerpendicular(Vector2d vector, double epsilon) {
-        return MathUtilsd.isZero(dot(vector), epsilon);
+        return MathUtilsDouble.isZero(dot(vector), epsilon);
     }
 
     @Override

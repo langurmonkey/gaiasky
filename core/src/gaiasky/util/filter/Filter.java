@@ -37,7 +37,7 @@ public class Filter {
         this.operation = getOperationFromString(operation);
     }
 
-    public Filter(String operation, Array<FilterRule> rules){
+    public Filter(String operation, Array<FilterRule> rules) {
         this.rules = rules;
         this.operation = getOperationFromString(operation);
     }
@@ -57,7 +57,7 @@ public class Filter {
         }
     }
 
-    public boolean hasRules(){
+    public boolean hasRules() {
         return rules != null && rules.size > 0;
     }
 
@@ -69,12 +69,12 @@ public class Filter {
         return operation;
     }
 
-    public String getOperationString() {
-        return operation != null ? operation.getOperationString() : null;
-    }
-
     public void setOperation(String op) {
         this.operation = getOperationFromString(op);
+    }
+
+    public String getOperationString() {
+        return operation != null ? operation.getOperationString() : null;
     }
 
     public IOperation getOperationFromString(String op) {

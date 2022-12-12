@@ -7,18 +7,23 @@ package gaiasky.util.math;
 
 import java.io.Serializable;
 
-/** Encapsulates a Rayd having a starting position and a unit length direction.
- * 
- * @author badlogicgames@gmail.com */
+/**
+ * Encapsulates a Rayd having a starting position and a unit length direction.
+ *
+ * @author badlogicgames@gmail.com
+ */
 public class Rayd implements Serializable {
     private static final long serialVersionUID = -620692054835390878L;
+    static Vector3d tmp = new Vector3d();
     public final Vector3d origin = new Vector3d();
     public final Vector3d direction = new Vector3d();
 
-    /** Constructor, sets the starting position of the Rayd and the direction.
-     * 
-     * @param origin The starting position
-     * @param direction The direction */
+    /**
+     * Constructor, sets the starting position of the Rayd and the direction.
+     *
+     * @param origin    The starting position
+     * @param direction The direction
+     */
     public Rayd(Vector3d origin, Vector3d direction) {
         this.origin.set(origin);
         this.direction.set(direction).nor();
@@ -29,29 +34,38 @@ public class Rayd implements Serializable {
         return new Rayd(this.origin, this.direction);
     }
 
-    /** @deprecated Use {@link #getEndPoint(Vector3d, float)} instead. Returns the endpoint given the distance. This is calculated as
-     *             startpoint + distance * direction.
+    /**
      * @param distance The distance from the end point to the start point.
-     * @return The end point */
+     *
+     * @return The end point
+     *
+     * @deprecated Use {@link #getEndPoint(Vector3d, float)} instead. Returns the endpoint given the distance. This is calculated as
+     * startpoint + distance * direction.
+     */
     @Deprecated
     public Vector3d getEndPoint(float distance) {
         return getEndPoint(new Vector3d(), distance);
     }
 
-    /** Returns the endpoint given the distance. This is calculated as startpoint + distance * direction.
-     * @param out The vector to set to the result
+    /**
+     * Returns the endpoint given the distance. This is calculated as startpoint + distance * direction.
+     *
+     * @param out      The vector to set to the result
      * @param distance The distance from the end point to the start point.
-     * @return The out param */
+     *
+     * @return The out param
+     */
     public Vector3d getEndPoint(final Vector3d out, final float distance) {
         return out.set(direction).scl(distance).add(origin);
     }
 
-    static Vector3d tmp = new Vector3d();
-
-    /** Multiplies the Rayd by the given matrix. Use this to transform a Rayd into another coordinate system.
-     * 
+    /**
+     * Multiplies the Rayd by the given matrix. Use this to transform a Rayd into another coordinate system.
+     *
      * @param matrix The matrix
-     * @return This Rayd for chaining. */
+     *
+     * @return This Rayd for chaining.
+     */
     public Rayd mul(Matrix4d matrix) {
         tmp.set(origin).add(direction);
         tmp.mul(matrix);
@@ -65,36 +79,45 @@ public class Rayd implements Serializable {
         return "Rayd [" + origin + ":" + direction + "]";
     }
 
-    /** Sets the starting position and the direction of this Rayd.
-     * 
-     * @param origin The starting position
+    /**
+     * Sets the starting position and the direction of this Rayd.
+     *
+     * @param origin    The starting position
      * @param direction The direction
-     * @return this Rayd for chaining */
+     *
+     * @return this Rayd for chaining
+     */
     public Rayd set(Vector3d origin, Vector3d direction) {
         this.origin.set(origin);
         this.direction.set(direction);
         return this;
     }
 
-    /** Sets this Rayd from the given starting position and direction.
-     * 
-     * @param x The x-component of the starting position
-     * @param y The y-component of the starting position
-     * @param z The z-component of the starting position
+    /**
+     * Sets this Rayd from the given starting position and direction.
+     *
+     * @param x  The x-component of the starting position
+     * @param y  The y-component of the starting position
+     * @param z  The z-component of the starting position
      * @param dx The x-component of the direction
      * @param dy The y-component of the direction
      * @param dz The z-component of the direction
-     * @return this Rayd for chaining */
+     *
+     * @return this Rayd for chaining
+     */
     public Rayd set(float x, float y, float z, float dx, float dy, float dz) {
         this.origin.set(x, y, z);
         this.direction.set(dx, dy, dz);
         return this;
     }
 
-    /** Sets the starting position and direction from the given Rayd
-     * 
+    /**
+     * Sets the starting position and direction from the given Rayd
+     *
      * @param Rayd The Rayd
-     * @return This Rayd for chaining */
+     *
+     * @return This Rayd for chaining
+     */
     public Rayd set(Rayd Rayd) {
         this.origin.set(Rayd.origin);
         this.direction.set(Rayd.direction);

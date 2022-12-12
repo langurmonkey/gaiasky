@@ -22,20 +22,17 @@ import gaiasky.render.ComponentTypes.ComponentType;
  * window.
  */
 public class HUDGui implements IGui {
-    private Skin skin;
     /**
      * The user interface stage
      */
     protected Stage ui;
-
     protected FocusInfoInterface focusInterface;
     protected NotificationsInterface notificationsInterface;
     protected MessagesInterface messagesInterface;
     protected DebugInterface debugInterface;
     protected RunStateInterface inputInterface;
-
     protected Array<IGuiInterface> interfaces;
-
+    private Skin skin;
     /** Lock object for synchronization **/
     private Object lock;
 
@@ -198,9 +195,9 @@ public class HUDGui implements IGui {
     }
 
     @Override
-    public boolean updateUnitsPerPixel(float upp){
+    public boolean updateUnitsPerPixel(float upp) {
         this.unitsPerPixel = upp;
-        if(ui.getViewport() instanceof ScreenViewport){
+        if (ui.getViewport() instanceof ScreenViewport) {
             ScreenViewport svp = (ScreenViewport) ui.getViewport();
             svp.setUnitsPerPixel(this.unitsPerPixel);
             svp.update(graphics.getWidth(), graphics.getHeight(), true);

@@ -8,7 +8,7 @@ package gaiasky.scene.record;
 import gaiasky.util.Constants;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -104,10 +104,10 @@ public class OrbitComponent {
     public void loadDataPoint(Vector3d out, double dtDays) {
         computeMu();
         double a = semimajoraxis * Nature.KM_TO_M; // km to m
-        double M0 = meananomaly * MathUtilsd.degRad;
-        double omega_lan = ascendingnode * MathUtilsd.degRad;
-        double omega_ap = argofpericenter * MathUtilsd.degRad;
-        double ic = i * MathUtilsd.degRad;
+        double M0 = meananomaly * MathUtilsDouble.degRad;
+        double omega_lan = ascendingnode * MathUtilsDouble.degRad;
+        double omega_ap = argofpericenter * MathUtilsDouble.degRad;
+        double ic = i * MathUtilsDouble.degRad;
 
         // 1
         double dt = dtDays * Nature.D_TO_S;

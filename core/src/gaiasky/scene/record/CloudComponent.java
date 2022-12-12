@@ -37,10 +37,9 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CloudComponent extends NamedComponent implements IObserver {
-    private static final Log logger = Logger.getLogger(CloudComponent.class);
-
     /** Default texture parameters **/
     protected static final TextureParameter textureParams;
+    private static final Log logger = Logger.getLogger(CloudComponent.class);
 
     static {
         textureParams = new TextureParameter();
@@ -49,32 +48,25 @@ public class CloudComponent extends NamedComponent implements IObserver {
         textureParams.minFilter = TextureFilter.MipMapLinearNearest;
     }
 
-    private AssetManager manager;
     public int quality;
     public float size;
     public NoiseComponent nc;
     public ModelComponent mc;
     public Matrix4 localTransform;
-
     /** RGB color of generated clouds **/
     public float[] color = new float[] { 1f, 1f, 1f, 0.7f };
-
-    private AtomicBoolean generated = new AtomicBoolean(false);
-    private Texture cloudTex;
-
     public String diffuse, diffuseUnpacked;
-
-    private Material material;
-
     // CUBEMAPS
     public CubemapComponent diffuseCubemap;
-
-    private boolean texInitialised, texLoading;
     // Model parameters
     public Map<String, Object> params;
-
     Vector3 aux;
     Vector3d aux3;
+    private AssetManager manager;
+    private AtomicBoolean generated = new AtomicBoolean(false);
+    private Texture cloudTex;
+    private Material material;
+    private boolean texInitialised, texLoading;
 
     public CloudComponent() {
         localTransform = new Matrix4();
@@ -298,7 +290,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
     }
 
     public void setCloud(String diffuse) {
-       setDiffuse(diffuse);
+        setDiffuse(diffuse);
     }
 
     public void setDiffuse(String diffuse) {

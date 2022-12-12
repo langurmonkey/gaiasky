@@ -156,10 +156,6 @@ public enum RenderGroup {
      **/
     NONE;
 
-    public boolean is(Bits renderGroupMask) {
-        return (this.ordinal() < 0 && renderGroupMask.isEmpty()) || renderGroupMask.get(this.ordinal());
-    }
-
     /**
      * Adds the given render groups to the given Bits mask
      *
@@ -186,6 +182,10 @@ public enum RenderGroup {
     public static Bits set(Bits renderGroupMask, RenderGroup... rgs) {
         renderGroupMask.clear();
         return add(renderGroupMask, rgs);
+    }
+
+    public boolean is(Bits renderGroupMask) {
+        return (this.ordinal() < 0 && renderGroupMask.isEmpty()) || renderGroupMask.get(this.ordinal());
     }
 
 }

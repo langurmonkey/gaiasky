@@ -36,10 +36,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * and manages all entities and systems in the world.
  */
 public class Scene {
-    private static final Logger.Log logger = Logger.getLogger(Scene.class);
-
     public static final String ROOT_NAME = "Universe";
-
+    private static final Logger.Log logger = Logger.getLogger(Scene.class);
     /** The engine, containing all entities, components and systems. **/
     public Engine engine;
 
@@ -65,6 +63,10 @@ public class Scene {
 
     /** Number of actual objects in the scene. **/
     private int numberObjects = -1;
+    private Vector3b aux3b = new Vector3b();
+
+    public Scene() {
+    }
 
     /** Access to the index. **/
     public Index index() {
@@ -74,9 +76,6 @@ public class Scene {
     /** Access to the archetypes. **/
     public Archetypes archetypes() {
         return archetypes;
-    }
-
-    public Scene() {
     }
 
     public void initialize() {
@@ -620,8 +619,6 @@ public class Scene {
             base.updateLocalizedName();
         });
     }
-
-    private Vector3b aux3b = new Vector3b();
 
     /**
      * Returns the entity with the given name, or null if it does not exist.

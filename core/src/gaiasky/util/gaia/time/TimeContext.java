@@ -6,7 +6,7 @@
 /*
  * GaiaTools
  * Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -24,7 +24,6 @@
  */
 package gaiasky.util.gaia.time;
 
-
 /**
  * An enumeration to distinguish between the different times that attitude can be expressed
  * in.
@@ -33,21 +32,21 @@ package gaiasky.util.gaia.time;
  * @version $Id: TimeContext.java 329790 2013-11-15 16:31:56Z ulammers $
  */
 public enum TimeContext {
-	/**
-	 * Number of elapsed ns in TCB since the reference epoch
-	 */
-	TCB,
-	
-	/**
-	 * OnBoard-Mission Time: Strictly monotonically increasing values with a resolution of 50ns. Around the
-	 * times of resets of the onboard clock OBMT will have jumps. See BAS-030 for details.
-	 */
-	OBMT;
-	
-	/**
-	 * @return unique index in range [0, 1]
-	 */
-	public int getIndex() {
-		return ordinal();
-	}
+    /**
+     * Number of elapsed ns in TCB since the reference epoch
+     */
+    TCB,
+
+    /**
+     * OnBoard-Mission Time: Strictly monotonically increasing values with a resolution of 50ns. Around the
+     * times of resets of the onboard clock OBMT will have jumps. See BAS-030 for details.
+     */
+    OBMT;
+
+    /**
+     * @return unique index in range [0, 1]
+     */
+    public int getIndex() {
+        return ordinal();
+    }
 }

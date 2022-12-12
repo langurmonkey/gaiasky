@@ -28,7 +28,7 @@ public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
     private static final Matrix4d invProjectionView = new Matrix4d();
-
+    private static final double VIEW_ANGLE = Math.toRadians(0.05);
     /**
      * Camera far value
      **/
@@ -37,9 +37,13 @@ public abstract class AbstractCamera implements ICamera {
      * Camera near value
      **/
     public double CAM_NEAR;
-
     public Vector3b pos, posinv, prevpos;
     public Vector3d tmp, shift;
+    /**
+     * The main camera
+     **/
+    public PerspectiveCamera camera;
+    public float fovFactor;
     /**
      * Angle from the center to the corner of the screen in scene coordinates,
      * in radians
@@ -49,64 +53,42 @@ public abstract class AbstractCamera implements ICamera {
      * Aspect ratio
      **/
     protected float ar;
-
     /**
      * Distance of camera to center
      **/
     protected double distance;
-
     /**
      * The parent
      **/
     protected CameraManager parent;
-
-    /**
-     * The main camera
-     **/
-    public PerspectiveCamera camera;
-
     /**
      * Stereoscopic mode cameras
      **/
     protected PerspectiveCamera camLeft, camRight;
-
     /**
      * Vector with all perspective cameras
      **/
     protected PerspectiveCamera[] cameras;
-
     protected Matrix4d projection, view, combined;
     protected Frustumd frustumd;
-
-    public float fovFactor;
-
     /**
      * Closest non-star body to the camera
      **/
     protected FocusView closestBody;
-
     /**
      * The closest particle to the camera
      */
     protected IFocus closestStar;
     protected FocusView closestStarView;
     protected Proximity proximity;
-
     protected Matrix4 prevCombined;
-
     /**
      * The closest between {@link AbstractCamera#closestBody} and
      * {@link AbstractCamera#closestStar}
      */
     protected IFocus closest;
-
     /** The last input event was by a gamepad. **/
     protected boolean gamepadInput;
-
-    private void initNearFar() {
-        CAM_NEAR = 0.5d * Constants.M_TO_U;
-        CAM_FAR = Constants.MPC_TO_U;
-    }
 
     public AbstractCamera(CameraManager parent) {
         initNearFar();
@@ -136,6 +118,11 @@ public abstract class AbstractCamera implements ICamera {
         closestStarView = new FocusView();
 
         proximity = new Proximity(Constants.N_DIR_LIGHTS);
+    }
+
+    private void initNearFar() {
+        CAM_NEAR = 0.5d * Constants.M_TO_U;
+        CAM_FAR = Constants.MPC_TO_U;
     }
 
     @Override
@@ -171,13 +158,13 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public void setPreviousPos(Vector3b pos) {
-        this.prevpos.set(pos);
+    public Vector3b getPreviousPos() {
+        return prevpos;
     }
 
     @Override
-    public Vector3b getPreviousPos() {
-        return prevpos;
+    public void setPreviousPos(Vector3b pos) {
+        this.prevpos.set(pos);
     }
 
     @Override
@@ -210,8 +197,6 @@ public abstract class AbstractCamera implements ICamera {
         return this;
     }
 
-    private static final double VIEW_ANGLE = Math.toRadians(0.05);
-
     @Override
     public boolean isVisible(Entity cb) {
         var body = Mapper.body.get(cb);
@@ -234,6 +219,7 @@ public abstract class AbstractCamera implements ICamera {
      *
      * @param cb      The body.
      * @param fCamera The FovCamera.
+     *
      * @return True if the body is observed. False otherwise.
      */
     protected boolean computeVisibleFovs(Entity cb, FovCamera fCamera) {
@@ -274,13 +260,13 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public PerspectiveCamera getCameraStereoRight() {
-        return camRight;
+    public void setCameraStereoLeft(PerspectiveCamera cam) {
+        copyCamera(cam, camLeft);
     }
 
     @Override
-    public void setCameraStereoLeft(PerspectiveCamera cam) {
-        copyCamera(cam, camLeft);
+    public PerspectiveCamera getCameraStereoRight() {
+        return camRight;
     }
 
     @Override
@@ -289,13 +275,13 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public void setShift(Vector3d shift) {
-        this.shift.set(shift);
+    public Vector3d getShift() {
+        return this.shift;
     }
 
     @Override
-    public Vector3d getShift() {
-        return this.shift;
+    public void setShift(Vector3d shift) {
+        this.shift.set(shift);
     }
 
     public void update(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {

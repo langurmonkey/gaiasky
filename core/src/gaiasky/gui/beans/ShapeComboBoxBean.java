@@ -12,19 +12,18 @@ public class ShapeComboBoxBean {
         this.name = I18n.msg("gui.shape." + shape.name().toLowerCase());
     }
 
-    public String toString() {
-        return name;
-    }
-
     public static ShapeComboBoxBean[] defaultShapes() {
         int i = 0;
         var shapes = new ShapeComboBoxBean[Shape.values().length];
-        for(Shape s : Shape.values()) {
+        for (Shape s : Shape.values()) {
             shapes[i++] = new ShapeComboBoxBean(s);
         }
         return shapes;
     }
 
+    public String toString() {
+        return name;
+    }
 
     public enum Shape {
         SPHERE,

@@ -34,9 +34,8 @@ import gaiasky.util.math.Vector3b;
 public class ParticleInitializer extends AbstractInitSystem implements IObserver {
 
     private final ParticleUtils utils;
-    private Vector3b B31;
-
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
+    private Vector3b B31;
 
     public ParticleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
@@ -115,16 +114,15 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         sa.thresholdPoint = Settings.settings.scene.star.threshold.point;
         sa.thresholdQuad = Settings.settings.scene.star.threshold.quad;
 
-        if(render.renderGroup == null) {
+        if (render.renderGroup == null) {
             render.renderGroup = RenderGroup.BILLBOARD_STAR;
         }
 
-        if(extra.primitiveRenderScale <= 0) {
+        if (extra.primitiveRenderScale <= 0) {
             extra.primitiveRenderScale = 1;
         }
         float pSize = Settings.settings.scene.star.pointSize < 0 ? 8 : Settings.settings.scene.star.pointSize;
         celestial.innerRad = (0.004f * discFactor + pSize * 0.008f) * 1.5f;
-
 
     }
 

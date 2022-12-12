@@ -1,7 +1,6 @@
 package gaiasky.input;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.util.GuiUtils;
-import gaiasky.util.scene2d.OwnSliderPlus;
 
 public abstract class GuiKbdListener extends AbstractMouseKbdListener {
 
@@ -44,12 +42,11 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
             super.keyUp(keycode);
             lastPollTime = now;
 
-            return switch(keycode) {
+            return switch (keycode) {
                 case Keys.UP -> moveUp();
                 case Keys.DOWN -> moveDown();
                 case Keys.LEFT -> moveLeft();
-                case Keys.TAB ->
-                    !isKeyPressed(Keys.SHIFT_LEFT) ? tabRight() : tabLeft();
+                case Keys.TAB -> !isKeyPressed(Keys.SHIFT_LEFT) ? tabRight() : tabLeft();
                 case Keys.ENTER -> actionDown();
                 case Keys.ESCAPE -> close();
                 case Keys.HOME -> moveHome();
@@ -90,7 +87,7 @@ public abstract class GuiKbdListener extends AbstractMouseKbdListener {
                     cb.setChecked(!cb.isChecked());
                     return true;
                 }
-            } else if (target instanceof Button){
+            } else if (target instanceof Button) {
                 // Fire change event on buttons.
                 ChangeEvent event = Pools.obtain(ChangeEvent.class);
                 event.setTarget(target);

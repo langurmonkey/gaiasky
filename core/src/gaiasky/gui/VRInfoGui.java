@@ -94,7 +94,7 @@ public class VRInfoGui extends AbstractGui {
     }
 
     @Override
-    public boolean mustDraw(){
+    public boolean mustDraw() {
         return Settings.settings.runtime.displayVrGui;
     }
 

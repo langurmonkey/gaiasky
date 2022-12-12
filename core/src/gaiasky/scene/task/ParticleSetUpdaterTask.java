@@ -30,41 +30,24 @@ import java.util.Comparator;
  */
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
+    // Minimum amount of time [ms] between two update calls
+    protected static final double UPDATE_INTERVAL_MS = 1500;
+    protected static final double UPDATE_INTERVAL_MS_2 = UPDATE_INTERVAL_MS * 2;
+    // Camera dx threshold
+    protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
     /** Reference to the entity. **/
     private final Entity entity;
-
     /** Reference to the particle set component. **/
     private final ParticleSet particleSet;
-
     /** Reference to the star set component. **/
     private final StarSet starSet;
-
     /** Reference to the dataset description component. **/
     private final DatasetDescription datasetDescription;
-
     private final ParticleUtils utils;
-
     private final Comparator<Integer> comp;
-
     private final Vector3d D31 = new Vector3d();
     private final Vector3d D32 = new Vector3d();
     private final Vector3d D34 = new Vector3d();
-
-    /**
-     * User order in metadata arrays to compare indices in this particle set.
-     */
-    private class ParticleSetComparator implements Comparator<Integer> {
-        private ParticleSet set;
-
-        public ParticleSetComparator(ParticleSet set) {
-            this.set = set;
-        }
-
-        @Override
-        public int compare(Integer i1, Integer i2) {
-            return Double.compare(set.metadata[i1], set.metadata[i2]);
-        }
-    }
 
     public ParticleSetUpdaterTask(Entity entity, ParticleSet particleSet, StarSet starSet) {
         this.entity = entity;
@@ -145,13 +128,6 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
         }
     }
 
-    // Minimum amount of time [ms] between two update calls
-    protected static final double UPDATE_INTERVAL_MS = 1500;
-    protected static final double UPDATE_INTERVAL_MS_2 = UPDATE_INTERVAL_MS * 2;
-
-    // Camera dx threshold
-    protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
-
     @Override
     public void notify(Event event, Object source, Object... data) {
         var base = Mapper.base.get(entity);
@@ -183,5 +159,21 @@ public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
     public void dispose() {
         EventManager.instance.removeAllSubscriptions(this);
+    }
+
+    /**
+     * User order in metadata arrays to compare indices in this particle set.
+     */
+    private class ParticleSetComparator implements Comparator<Integer> {
+        private ParticleSet set;
+
+        public ParticleSetComparator(ParticleSet set) {
+            this.set = set;
+        }
+
+        @Override
+        public int compare(Integer i1, Integer i2) {
+            return Double.compare(set.metadata[i1], set.metadata[i2]);
+        }
     }
 }

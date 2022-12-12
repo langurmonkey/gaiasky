@@ -117,8 +117,8 @@ public class BillboardEntityRenderSystem implements IObserver {
             double dist;
             if (viewAngle > solidAngleThresholdTopOverFovFactor) {
                 dist = radius / Constants.STAR_SOLID_ANGLE_THRESHOLD_TOP;
-            }else {
-               dist = distToCamera / fovFactor;
+            } else {
+                dist = distToCamera / fovFactor;
             }
             computedSize = (size * (dist / radius) * Constants.STAR_SOLID_ANGLE_THRESHOLD_BOTTOM);
         }

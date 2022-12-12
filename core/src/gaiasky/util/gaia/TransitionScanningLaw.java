@@ -5,7 +5,7 @@
 
 /*
  * GaiaTools Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or (at your option)
@@ -43,14 +43,14 @@ import gaiasky.util.math.Quaterniond;
  * choice of initial angles) both in value and rate at t = tRef + T, where T is
  * the ramp-up time (if T > 0) or ramp-down time (if T < 0). At t = tRef the
  * revolving phase is exactly 0 (preceding mode) or PI (following mode).
- * 
+ * <p>
  * A number of reference quantities can be set as usual by means of setRefTime,
  * setXiRef, setOmegaRef, setTargetPrecRate, and setTargetScanRate from the
  * AnalyticalAttitudeDataServer. Only setNuRef should not be used; it is
  * replaced by setMode(Epsl.Mode). [Nevertheless it is possible to use
  * setNuRef(0.0) instead of setMode(Epsl.Mode.PRECEDING) and setNuRef(Math.PI)
  * instead of setMode(Epsl.Mode.PRECEDING).]
- * 
+ *
  * @author lennartlindegren
  */
 public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
@@ -66,7 +66,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
     /**
      * The constructor is the only way to set the duration of the ramp
-     * 
+     *
      * @param ramp
      */
     public TransitionScanningLaw(Duration ramp) {
@@ -77,7 +77,7 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
     /**
      * Return the Epsl.Mode (preceding or following)
-     * 
+     *
      * @return The mode
      */
     public Epsl.Mode getMode() {
@@ -90,9 +90,9 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
     /**
      * Preferred method to set the Epsl.Mode (it can also be set using setNuRef)
-     * 
-     * @param mode
-     *            EPSL preceding or following
+     *
+     * @param mode EPSL preceding or following
+     *
      * @return This object with the right mode set
      */
     public TransitionScanningLaw setMode(Epsl.Mode mode) {
@@ -167,11 +167,11 @@ public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
     }
 
     /**
-     * @see gaiasky.util.gaia.AnalyticalAttitudeDataServer#getAttitude(long)
-     * 
-     * @param time
-     *            - the time elapsed since the epoch of J2010 in ns (TCB)
+     * @param time - the time elapsed since the epoch of J2010 in ns (TCB)
+     *
      * @return attitude for the given time
+     *
+     * @see gaiasky.util.gaia.AnalyticalAttitudeDataServer#getAttitude(long)
      */
     @Override
     public IAttitude getAttitudeNative(long time) {

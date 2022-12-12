@@ -23,19 +23,17 @@ import gaiasky.util.validator.FloatValidator;
 
 public class AddShapeDialog extends GenericDialog {
 
+    private final IFocus object;
+    private final String objectName;
+    private final float fieldWidth;
+    private final float titleWidth;
+    private final float cpSize;
     public OwnCheckBox track, showLabel;
     public OwnTextField name, size;
     public ColorPicker color;
     public OwnSelectBox<DistanceUnitComboBoxBean> units;
     public OwnSelectBox<ShapeComboBoxBean> shape;
     public OwnSelectBox<PrimitiveComboBoxBean> primitive;
-
-    private final IFocus object;
-    private final String objectName;
-    private final float fieldWidth;
-    private final float titleWidth;
-    private final float cpSize;
-
     // We can recompute the name only when the filed
     // has not been manually edited
     private boolean canRecomputeName = true;

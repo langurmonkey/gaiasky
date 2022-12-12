@@ -22,10 +22,8 @@ import java.util.concurrent.ForkJoinPool;
  */
 public abstract class ParallelSystem extends EntitySystem {
     private final Family family;
-    private ImmutableArray<Entity> entities;
-
     private final ForkJoinPool forkJoinPool;
-
+    private ImmutableArray<Entity> entities;
     private List<Callable<Integer>> runnableTasks;
 
     /**

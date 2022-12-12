@@ -14,6 +14,7 @@ public class TextureWidget extends Widget {
     private final FrameBuffer fb;
     private final float width;
     private final float height;
+
     public TextureWidget(FrameBuffer fb) {
         super();
         this.fb = fb;

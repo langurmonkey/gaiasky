@@ -25,7 +25,7 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
@@ -76,7 +76,7 @@ public class ParticleUtils {
                 double x0 = times[i] - t0;
                 double x1 = times[i + 1] - t0;
                 if (t >= x0 && t <= x1) {
-                    return MathUtilsd.lint(t, x0, x1, sizes[i], sizes[i + 1]) / vr.size();
+                    return MathUtilsDouble.lint(t, x0, x1, sizes[i], sizes[i + 1]) / vr.size();
                 }
             }
         }
@@ -113,7 +113,7 @@ public class ParticleUtils {
             particleSet.focus = particleSet.pointData.get(particleSet.focusIndex);
             particleSet.focusPosition.set(particleSet.focus.x(), particleSet.focus.y(), particleSet.focus.z());
             Vector3d posSph = Coordinates.cartesianToSpherical(particleSet.focusPosition, D31);
-            particleSet.focusPositionSph.set((float) (MathUtilsd.radDeg * posSph.x), (float) (MathUtilsd.radDeg * posSph.y));
+            particleSet.focusPositionSph.set((float) (MathUtilsDouble.radDeg * posSph.x), (float) (MathUtilsDouble.radDeg * posSph.y));
             particleSet.updateFocus(GaiaSky.instance.getICamera());
         }
     }

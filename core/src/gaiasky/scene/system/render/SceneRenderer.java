@@ -54,7 +54,7 @@ import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.math.Intersectord;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
@@ -71,7 +71,15 @@ import static gaiasky.render.RenderGroup.*;
  */
 public class SceneRenderer implements ISceneRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneRenderer.class);
-
+    // Indexes
+    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENVR_IDX = 4;
+    /** Contains the code to render models. **/
+    private final ModelEntityRenderSystem shadowModelRenderer;
+    // VRContext, may be null
+    private final VRContext vrContext;
+    private final GlobalResources globalResources;
+    private final AtomicBoolean rendering;
+    private final RenderAssets renderAssets;
     /**
      * Contains the flags representing each type's visibility
      **/
@@ -84,18 +92,22 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Alpha values for each type.
      **/
     public float[] alphas;
-
+    // Dimension 1: number of shadows, dimension 2: number of lights
+    public FrameBuffer[][] shadowMapFb;
+    /** Map containing the shadow map for each model body. **/
+    public Map<Entity, Texture> smTexMap;
+    /** Map containing the combined matrix for each model body. **/
+    public Map<Entity, Matrix4> smCombinedMap;
+    Array<Entity> controllers = new Array<>();
+    ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
     /**
      * Render lists for all render groups.
      * The front render lists contain the objects which are actually rendered in the current cycle. The back
      * render lists get updated by the update thread.
      **/
     private List<List<IRenderable>> renderLists;
-
     private Array<IRenderSystem> renderSystems;
-
     private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, noDepthWritesR, depthWritesR, clearDepthR;
-
     /**
      * The particular current scene graph renderer
      **/
@@ -104,30 +116,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Renderers vector, with 0 = normal, 1 = stereoscopic, 2 = FOV, 3 = cubemap
      **/
     private IRenderMode[] sgrList;
-    // Indexes
-    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENVR_IDX = 4;
-
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
-
     /** Contains the candidates for regular and tessellated shadow maps. **/
     private List<Entity> shadowCandidates/*, shadowCandidatesTess */;
-
-    // Dimension 1: number of shadows, dimension 2: number of lights
-    public FrameBuffer[][] shadowMapFb;
-
     // Dimension 1: number of shadows, dimension 2: number of lights
     private Matrix4[][] shadowMapCombined;
-
-    /** Map containing the shadow map for each model body. **/
-    public Map<Entity, Texture> smTexMap;
-
-    /** Map containing the combined matrix for each model body. **/
-    public Map<Entity, Matrix4> smCombinedMap;
-
-    /** Contains the code to render models. **/
-    private final ModelEntityRenderSystem shadowModelRenderer;
-
     // Light glow pre-render
     private FrameBuffer glowFb;
     private LightPositionUpdater lpu;
@@ -136,22 +130,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * in screenshots and frame capture.
      */
     private Map<Integer, FrameBuffer> frameBufferMap;
-
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
     private Vector3b aux1b;
-
-    // VRContext, may be null
-    private final VRContext vrContext;
-    private final GlobalResources globalResources;
-
     private List<IRenderable> stars;
-
     private AbstractRenderSystem billboardStarsProc;
-
-    private final AtomicBoolean rendering;
-
-    private final RenderAssets renderAssets;
 
     public SceneRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
@@ -529,9 +512,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             renderMode = sgrList[SGR_DEFAULT_IDX];
         }
     }
-
-    Array<Entity> controllers = new Array<>();
-    ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
 
     private void renderModel(IRenderable r, IntModelBatch batch, float alpha, boolean shadow) {
         if (r instanceof Render) {
@@ -1094,7 +1074,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
             return alphas[ordinal];
         } else {
-            return visible.get(ordinal) ? MathUtilsd.lint(diff, 0, Settings.settings.scene.fadeMs, 0, 1) : MathUtilsd.lint(diff, 0, Settings.settings.scene.fadeMs, 1, 0);
+            return visible.get(ordinal) ? MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 0, 1) : MathUtilsDouble.lint(diff, 0, Settings.settings.scene.fadeMs, 1, 0);
         }
     }
 

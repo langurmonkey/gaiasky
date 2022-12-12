@@ -18,7 +18,7 @@ import gaiasky.scene.view.OctreeObjectView;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -31,11 +31,6 @@ import java.util.*;
  * and possibly 8 sub-nodes.
  */
 public class OctreeNode implements ILineRenderable {
-    public static int nOctantsObserved = 0;
-    public static int nObjectsObserved = 0;
-    /** Max depth of the structure this node belongs to. **/
-    public static int maxDepth;
-
     /**
      * Since OctreeNode is not to be parallelized, these can be static.
      **/
@@ -43,11 +38,10 @@ public class OctreeNode implements ILineRenderable {
     private static final Vector3d auxD2 = new Vector3d();
     private static final Vector3d auxD3 = new Vector3d();
     private static final Vector3d auxD4 = new Vector3d();
-
-    /** The load status of this node. **/
-    private LoadStatus status;
-    /** The unique page identifier. **/
-    public long pageId;
+    public static int nOctantsObserved = 0;
+    public static int nObjectsObserved = 0;
+    /** Max depth of the structure this node belongs to. **/
+    public static int maxDepth;
     /** Contains the bottom-left-front position of the octant. **/
     public final Vector3d min;
     /** Contains the top-right-back position of the octant. **/
@@ -58,6 +52,9 @@ public class OctreeNode implements ILineRenderable {
     public final Vector3d size;
     /** Contains the depth level. **/
     public final int depth;
+    private final double radius;
+    /** The unique page identifier. **/
+    public long pageId;
     /** Number of objects contained in this node and its descendants. **/
     public int numObjectsRec;
     /** Number of objects contained in this node. **/
@@ -72,8 +69,6 @@ public class OctreeNode implements ILineRenderable {
     public List<IOctreeObject> objects;
     /** The object used to load new octants. **/
     public IOctantLoader loader;
-
-    private final double radius;
     /** If observed, the view angle in radians of this octant. **/
     public double viewAngle;
     /** The distance to the camera in units of the center of this octant. **/
@@ -82,6 +77,10 @@ public class OctreeNode implements ILineRenderable {
     public boolean observed;
     /** The opacity of this node. **/
     public float opacity;
+    ComponentTypes ct = new ComponentTypes(ComponentType.Others);
+    com.badlogic.gdx.graphics.Color col = new com.badlogic.gdx.graphics.Color();
+    /** The load status of this node. **/
+    private LoadStatus status;
 
     /**
      * Constructs an octree node.
@@ -165,6 +164,27 @@ public class OctreeNode implements ILineRenderable {
         this.numChildren = childrenCount;
         this.numObjectsRec = nObjects;
         this.numObjects = ownObjects;
+    }
+
+    public static long hash(double x, double y, double z) {
+        long result = 3;
+        result = result * 31 + hash(x);
+        result = result * 31 + hash(y);
+        result = result * 31 + hash(z);
+
+        return result;
+    }
+
+    /**
+     * Returns an integer hash code representing the given double value.
+     *
+     * @param value the value to be hashed
+     *
+     * @return the hash code
+     */
+    public static long hash(double value) {
+        long bits = Double.doubleToLongBits(value);
+        return (bits ^ (bits >>> 32));
     }
 
     public long computePageId() {
@@ -433,8 +453,6 @@ public class OctreeNode implements ILineRenderable {
         return numNodes;
     }
 
-    ComponentTypes ct = new ComponentTypes(ComponentType.Others);
-
     @Override
     public ComponentTypes getComponentType() {
         return ct;
@@ -518,7 +536,7 @@ public class OctreeNode implements ILineRenderable {
         // View angle is normalized to 40 degrees when the octant is exactly the size of the screen height, regardless of the camera fov
         viewAngle = Math.atan(radius / distToCamera) * 2;
 
-        float cf = MathUtilsd.clamp(cam.getFovFactor() * 2.5f, 0.15f, 1f);
+        float cf = MathUtilsDouble.clamp(cam.getFovFactor() * 2.5f, 0.15f, 1f);
         float th0 = Settings.settings.scene.octree.threshold[0] * cf;
         float th1 = Settings.settings.scene.octree.threshold[1] * cf;
 
@@ -545,7 +563,7 @@ public class OctreeNode implements ILineRenderable {
 
             double alpha = 1;
             if (Settings.settings.scene.octree.fade && viewAngle < th1) {
-                alpha = MathUtilsd.clamp(MathUtilsd.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
+                alpha = MathUtilsDouble.clamp(MathUtilsDouble.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
             }
             this.opacity *= alpha;
 
@@ -752,8 +770,6 @@ public class OctreeNode implements ILineRenderable {
             return parent.getRoot();
     }
 
-    com.badlogic.gdx.graphics.Color col = new com.badlogic.gdx.graphics.Color();
-
     @Override
     public void render(LineRenderSystem sr, ICamera camera, float alpha) {
         if (this.observed) {
@@ -810,27 +826,6 @@ public class OctreeNode implements ILineRenderable {
     /** Draws a line **/
     private void line(LineRenderSystem sr, double x1, double y1, double z1, double x2, double y2, double z2, com.badlogic.gdx.graphics.Color col) {
         sr.addLine(this, (float) x1, (float) y1, (float) z1, (float) x2, (float) y2, (float) z2, col);
-    }
-
-    public static long hash(double x, double y, double z) {
-        long result = 3;
-        result = result * 31 + hash(x);
-        result = result * 31 + hash(y);
-        result = result * 31 + hash(z);
-
-        return result;
-    }
-
-    /**
-     * Returns an integer hash code representing the given double value.
-     *
-     * @param value the value to be hashed
-     *
-     * @return the hash code
-     */
-    public static long hash(double value) {
-        long bits = Double.doubleToLongBits(value);
-        return (bits ^ (bits >>> 32));
     }
 
     /**

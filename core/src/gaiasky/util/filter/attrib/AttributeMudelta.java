@@ -13,10 +13,12 @@ public class AttributeMudelta extends AttributeAbstract implements IAttribute {
     public double get(IParticleRecord bean) {
         return bean.mudelta();
     }
-    public String getUnit(){
+
+    public String getUnit() {
         return I18n.msg("gui.unit.masyr");
     }
-    public String toString(){
+
+    public String toString() {
         return I18n.msg("gui.focusinfo.mudelta");
     }
 }

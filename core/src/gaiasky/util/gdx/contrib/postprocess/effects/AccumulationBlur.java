@@ -17,8 +17,8 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * result is then stored as the next last frame to create the trail effect.
  */
 public class AccumulationBlur extends PostProcessorEffect {
-    private AccumulationBlurFilter motionFilter;
     private final Copy copyFilter;
+    private AccumulationBlurFilter motionFilter;
     private FrameBuffer fbo;
 
     public AccumulationBlur(int width, int height) {

@@ -35,9 +35,9 @@ public interface ICamera {
 
     PerspectiveCamera getCameraStereoLeft();
 
-    PerspectiveCamera getCameraStereoRight();
-
     void setCameraStereoLeft(PerspectiveCamera cam);
+
+    PerspectiveCamera getCameraStereoRight();
 
     void setCameraStereoRight(PerspectiveCamera cam);
 
@@ -59,11 +59,11 @@ public interface ICamera {
 
     void setPreviousPos(Vector3b pos);
 
-    void setDirection(Vector3d dir);
-
     Vector3b getInversePos();
 
     Vector3d getDirection();
+
+    void setDirection(Vector3d dir);
 
     Vector3d getVelocity();
 
@@ -75,9 +75,9 @@ public interface ICamera {
 
     double speedScaling();
 
-    void setShift(Vector3d shift);
-
     Vector3d getShift();
+
+    void setShift(Vector3d shift);
 
     Matrix4 getProjView();
 
@@ -137,6 +137,7 @@ public interface ICamera {
 
     /**
      * Checks whether the current camera has a focus set.
+     *
      * @return True if the camera has a focus.
      */
     boolean hasFocus();

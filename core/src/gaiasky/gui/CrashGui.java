@@ -77,7 +77,6 @@ public class CrashGui extends AbstractGui {
         }
     }
 
-
     private class CrashWindow extends GenericDialog {
         public CrashWindow(Stage ui, Skin skin, Throwable crash) {
             super(I18n.msg("gui.crash.title"), skin, ui);
@@ -118,8 +117,8 @@ public class CrashGui extends AbstractGui {
             crash.printStackTrace(pw);
             String sts = sw.toString();
             int lines = 1;
-            for(char c : sts.toCharArray()){
-                if(c == '\n')
+            for (char c : sts.toCharArray()) {
+                if (c == '\n')
                     lines++;
             }
 
@@ -134,7 +133,6 @@ public class CrashGui extends AbstractGui {
             stScroll.setSmoothScrolling(true);
             stScroll.setFadeScrollBars(false);
             content.add(stScroll).center();
-
 
         }
 

@@ -23,7 +23,7 @@ import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 import java.util.Objects;
 
@@ -301,7 +301,7 @@ public class ModelEntityRenderSystem {
         if (mc != null && mc.isModelInitialised()) {
             mc.touch();
             if (set.proximity.updating[0] != null) {
-                float opacity = (float) MathUtilsd.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
+                float opacity = (float) MathUtilsDouble.lint(set.proximity.updating[0].distToCamera, set.modelDist / 50f, set.modelDist, 1f, 0f);
                 if (alpha * opacity > 0) {
                     mc.setTransparency(alpha * opacity);
                     mc.updateDepthTest();
@@ -345,7 +345,7 @@ public class ModelEntityRenderSystem {
         var cc = body.color;
 
         double thresholdDistance = dist.distance * scaffolding.sizeScaleFactor;
-        float opacity = (float) MathUtilsd.lint(body.distToCamera, thresholdDistance / 50f, thresholdDistance, 1f, 0f);
+        float opacity = (float) MathUtilsDouble.lint(body.distToCamera, thresholdDistance / 50f, thresholdDistance, 1f, 0f);
         ((ColorAttribute) Objects.requireNonNull(mc.env.get(ColorAttribute.AmbientLight))).color.set(cc[0], cc[1], cc[2], 1f);
         ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
         mc.updateDepthTest();
@@ -421,7 +421,7 @@ public class ModelEntityRenderSystem {
         } else {
             // If atmosphere ground params are present, set them
             if (atmosphere.atmosphere != null) {
-                float atmOpacity = (float) MathUtilsd.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
+                float atmOpacity = (float) MathUtilsDouble.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
                 if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0) {
                     var graph = Mapper.graph.get(entity);
                     var rotation = Mapper.rotation.get(entity);
@@ -446,7 +446,7 @@ public class ModelEntityRenderSystem {
 
         // Atmosphere fades in between 1 and 2 degrees of view angle apparent
         ICamera cam = GaiaSky.instance.getICamera();
-        float atmOpacity = (float) MathUtilsd.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
+        float atmOpacity = (float) MathUtilsDouble.lint(body.solidAngle, 0.00745329f, 0.02490659f, 0f, 1f);
         if (atmOpacity > 0) {
             var graph = Mapper.graph.get(entity);
             var rotation = Mapper.rotation.get(entity);

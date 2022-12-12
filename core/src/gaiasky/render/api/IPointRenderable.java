@@ -12,6 +12,7 @@ package gaiasky.render.api;
 public interface IPointRenderable extends IRenderable {
 
     void blend();
+
     void depth();
 
 }

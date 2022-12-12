@@ -18,8 +18,7 @@ import gaiasky.util.math.Vector3d;
  *
  * @author Lennart Lindegren
  * @version $Id: AnalyticalAttitudeDataServer.java 329790 2013-11-15 16:31:56Z
- *          ulammers $
- *
+ * ulammers $
  */
 public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServer<IAttitude> {
 
@@ -45,80 +44,30 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
      * The time in ns of one rotation of the satellite around its spin axis.
      */
     protected long targetScanPeriod = Math.round(360.0 * 3600.0 * 1.e9 / Satellite.SCANRATE);
-
-    /**
-     * Reference time
-     */
-    private long tRef;
-
-    /**
-     * Reference value of the solar aspect angle (valid at time tRef) [rad]
-     */
-    private double xiRef;
-
-    /**
-     * Reference value of the revolving phase angle (valid at time tRef) [rad]
-     */
-    private double nuRef;
-
-    /**
-     * Reference value of the scan phase angle (valid at time tRef) [rad]
-     */
-    private double omegaRef;
-
-    /**
-     * Target precession rate (K) in revolutions per year
-     */
-    private double targetPrecessionRate;
-
     /*
      * every thread gets is own local copy of the NslSun
      */
     protected NslSun nslSun = new NslSun();
-
     /**
-     * Set the reference value for the solar aspect angle (xi)
-     *
-     * @param xiRef
-     *            angle in [rad]
+     * Reference time
      */
-    public void setXiRef(double xiRef) {
-        this.xiRef = xiRef;
-        initialized = false;
-    }
-
+    private long tRef;
     /**
-     * Set the reference value for the precession phase angle (nu)
-     *
-     * @param nuRef
-     *            angle in [rad]
+     * Reference value of the solar aspect angle (valid at time tRef) [rad]
      */
-    public void setNuRef(double nuRef) {
-        this.nuRef = nuRef;
-        initialized = false;
-    }
-
+    private double xiRef;
     /**
-     * Set the reference value for the spin phase abgle (Omega)
-     *
-     * @param omegaRef
-     *            angle in [rad]
+     * Reference value of the revolving phase angle (valid at time tRef) [rad]
      */
-    public void setOmegaRef(double omegaRef) {
-        this.omegaRef = omegaRef;
-        initialized = false;
-    }
-
+    private double nuRef;
     /**
-     * Set the target precession rate
-     *
-     * @param targetPrecessionRate
-     *            target value in [rev/yr]
+     * Reference value of the scan phase angle (valid at time tRef) [rad]
      */
-    public void setTargetPrecessionRate(double targetPrecessionRate) {
-        this.targetPrecessionRate = targetPrecessionRate;
-        initialized = false;
-    }
+    private double omegaRef;
+    /**
+     * Target precession rate (K) in revolutions per year
+     */
+    private double targetPrecessionRate;
 
     /**
      * Set all parameters to default values (from GaiaParam)
@@ -145,34 +94,22 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
     }
 
     /**
-     * Set the target scan period
-     *
-     * @param targetScanPeriod
-     *            period in [ns]
-     */
-    public void setTargetScanPeriod(long targetScanPeriod) {
-        this.targetScanPeriod = targetScanPeriod;
-        initialized = false;
-    }
-
-    /**
-     * Set the target scan rate
-     *
-     * @param targetScanRate
-     *            target value in [arcsec/s]
-     */
-    public void setTargetScanRate(double targetScanRate) {
-        targetScanPeriod = Math.round(360.0 * 3600.0 * 1e9 / targetScanRate);
-        initialized = false;
-    }
-
-    /**
      * Get the target scan period
      *
      * @return targetScanPeriod period in [ns]
      */
     public long getTargetScanPeriod() {
         return targetScanPeriod;
+    }
+
+    /**
+     * Set the target scan period
+     *
+     * @param targetScanPeriod period in [ns]
+     */
+    public void setTargetScanPeriod(long targetScanPeriod) {
+        this.targetScanPeriod = targetScanPeriod;
+        initialized = false;
     }
 
     /**
@@ -185,12 +122,32 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
     }
 
     /**
+     * Set the target scan rate
+     *
+     * @param targetScanRate target value in [arcsec/s]
+     */
+    public void setTargetScanRate(double targetScanRate) {
+        targetScanPeriod = Math.round(360.0 * 3600.0 * 1e9 / targetScanRate);
+        initialized = false;
+    }
+
+    /**
      * Get the reference solar aspect angle
      *
      * @return reference solar aspect angle [rad]
      */
     public double getXiRef() {
         return xiRef;
+    }
+
+    /**
+     * Set the reference value for the solar aspect angle (xi)
+     *
+     * @param xiRef angle in [rad]
+     */
+    public void setXiRef(double xiRef) {
+        this.xiRef = xiRef;
+        initialized = false;
     }
 
     /**
@@ -203,12 +160,32 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
     }
 
     /**
+     * Set the reference value for the precession phase angle (nu)
+     *
+     * @param nuRef angle in [rad]
+     */
+    public void setNuRef(double nuRef) {
+        this.nuRef = nuRef;
+        initialized = false;
+    }
+
+    /**
      * Get the reference scan phase angle
      *
      * @return reference scan phase angle [rad]
      */
     public double getOmegaRef() {
         return omegaRef;
+    }
+
+    /**
+     * Set the reference value for the spin phase abgle (Omega)
+     *
+     * @param omegaRef angle in [rad]
+     */
+    public void setOmegaRef(double omegaRef) {
+        this.omegaRef = omegaRef;
+        initialized = false;
     }
 
     /**
@@ -220,13 +197,23 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
         return targetPrecessionRate;
     }
 
+    /**
+     * Set the target precession rate
+     *
+     * @param targetPrecessionRate target value in [rev/yr]
+     */
+    public void setTargetPrecessionRate(double targetPrecessionRate) {
+        this.targetPrecessionRate = targetPrecessionRate;
+        initialized = false;
+    }
+
     public boolean inGap(long time) {
         return false;
     }
 
     /**
      * Ref time in nanoseconds since epoch.
-     * 
+     *
      * @return The reference time [ns]
      */
     public long getRefTime() {
@@ -235,9 +222,8 @@ public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServe
 
     /**
      * Sets the reference time in nanoseconds.
-     * 
-     * @param tRef
-     *            [ns]
+     *
+     * @param tRef [ns]
      */
     public void setRefTime(long tRef) {
         this.tRef = tRef;

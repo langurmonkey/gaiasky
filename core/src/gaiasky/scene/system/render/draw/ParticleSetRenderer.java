@@ -40,10 +40,10 @@ public class ParticleSetRenderer extends PointCloudQuadRenderer implements IObse
     protected static final Log logger = Logger.getLogger(ParticleSetRenderer.class);
 
     private final Vector3 aux1;
-    private int posOffset, sizeOffset, particlePosOffset, uvOffset;
     private final Random rand;
     private final Colormap cmap;
     private final ParticleUtils utils;
+    private int posOffset, sizeOffset, particlePosOffset, uvOffset;
 
     public ParticleSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);

@@ -47,14 +47,12 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset;
-    private float[] opacityLimits;
     private final float[] alphaSizeBrRc;
     private final float[] opacityLimitsHlShowAll;
     private final Colormap cmap;
-
     private final ParticleUtils utils;
-
+    private int sizeOffset, pmOffset;
+    private float[] opacityLimits;
     private Texture starTex;
 
     public StarSetPointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {

@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -48,7 +48,7 @@ public class StaticCoordinates implements IBodyCoordinates {
 
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
-       return out.set(position);
+        return out.set(position);
     }
 
     public void setTransformFunction(String transformName) {
@@ -81,7 +81,6 @@ public class StaticCoordinates implements IBodyCoordinates {
         trf = new Matrix4d(transformMatrix);
     }
 
-
     public Vector3b getPosition() {
         return position;
     }
@@ -93,6 +92,7 @@ public class StaticCoordinates implements IBodyCoordinates {
     public void setPositionKm(double[] position) {
         this.position = new Vector3b(position[0] * Constants.KM_TO_U, position[1] * Constants.KM_TO_U, position[2] * Constants.KM_TO_U);
     }
+
     public void setPositionkm(double[] position) {
         setPositionKm(position);
     }
@@ -117,6 +117,7 @@ public class StaticCoordinates implements IBodyCoordinates {
     public void setPositionPc(double[] position) {
         this.position = new Vector3b(position[0] * Constants.PC_TO_U, position[1] * Constants.PC_TO_U, position[2] * Constants.PC_TO_U);
     }
+
     public void setPositionpc(double[] position) {
         setPositionPc(position);
     }
@@ -127,8 +128,8 @@ public class StaticCoordinates implements IBodyCoordinates {
      * @param equatorial Vector with [ra, dec, distance] with angles in degrees and distance in parsecs
      */
     public void setEquatorial(double[] equatorial) {
-        double ra = MathUtilsd.degRad * equatorial[0];
-        double dec = MathUtilsd.degRad * equatorial[1];
+        double ra = MathUtilsDouble.degRad * equatorial[0];
+        double dec = MathUtilsDouble.degRad * equatorial[1];
         double dist = Constants.PC_TO_U * equatorial[2];
         this.position = new Vector3b();
         Coordinates.sphericalToCartesian(ra, dec, new Apfloat(dist), this.position);

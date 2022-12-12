@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * A structure composed of a set of collections of a given size in which
- * additions happen to the next list in the roulette before it is spun. 
+ * additions happen to the next list in the roulette before it is spun.
  */
 public class RouletteList<T> implements Collection<T> {
 
@@ -19,7 +19,8 @@ public class RouletteList<T> implements Collection<T> {
 
     /**
      * Constructs a roulette list with a given size.
-     * @param numLists The number of collections.
+     *
+     * @param numLists              The number of collections.
      * @param initialCollectionSize The initial size of each collection.
      */
     @SuppressWarnings("unchecked")
@@ -33,9 +34,11 @@ public class RouletteList<T> implements Collection<T> {
 
     /**
      * Returns the list for the given index. If the index is negative
-     * or greater than the number of lists in the roulette, it asserts an 
+     * or greater than the number of lists in the roulette, it asserts an
      * exception.
+     *
      * @param index The index.
+     *
      * @return The list at the given index in this roulette.
      */
     public List<T> getList(int index) {

@@ -11,9 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class OwnProgressBar extends ProgressBar {
 
+    private final boolean vertical;
     private float prefWidth = 0;
     private float prefHeight = 0;
-    private final boolean vertical;
     private OwnLabel titleLabel;
 
     public OwnProgressBar(float min, float max, float stepSize, boolean vertical, ProgressBarStyle style) {
@@ -31,16 +31,8 @@ public class OwnProgressBar extends ProgressBar {
         this.vertical = vertical;
     }
 
-    public void setTitle(String title, Skin skin){
+    public void setTitle(String title, Skin skin) {
         this.titleLabel = new OwnLabel(title, skin, "small");
-    }
-
-    public void setPrefWidth(float prefWidth) {
-        this.prefWidth = prefWidth;
-    }
-
-    public void setPrefHeight(float prefHeight) {
-        this.prefHeight = prefHeight;
     }
 
     public float getPrefWidth() {
@@ -52,12 +44,20 @@ public class OwnProgressBar extends ProgressBar {
 
     }
 
+    public void setPrefWidth(float prefWidth) {
+        this.prefWidth = prefWidth;
+    }
+
     public float getPrefHeight() {
         if (vertical && prefHeight > 0) {
             return prefHeight;
         } else {
             return super.getPrefHeight();
         }
+    }
+
+    public void setPrefHeight(float prefHeight) {
+        this.prefHeight = prefHeight;
     }
 
     @Override

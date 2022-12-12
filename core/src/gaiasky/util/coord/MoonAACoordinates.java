@@ -20,7 +20,7 @@ public class MoonAACoordinates extends AbstractOrbitCoordinates {
 
     private Vector3d aux;
 
-    public MoonAACoordinates(){
+    public MoonAACoordinates() {
         super();
         aux = new Vector3d();
     }

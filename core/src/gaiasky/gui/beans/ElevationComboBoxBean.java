@@ -12,13 +12,13 @@ public class ElevationComboBoxBean {
     public String name;
     public ElevationType type;
 
-    public ElevationComboBoxBean(String name, ElevationType type){
+    public ElevationComboBoxBean(String name, ElevationType type) {
         this.name = name;
         this.type = type;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return name;
     }
 }

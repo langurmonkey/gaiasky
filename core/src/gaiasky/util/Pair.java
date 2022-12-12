@@ -7,6 +7,7 @@ package gaiasky.util;
 
 /**
  * Simple implementation of a pair of objects.
+ *
  * @param <A> First type
  * @param <B> Second type
  */
@@ -36,12 +37,11 @@ public class Pair<A, B> {
         return false;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "(" + first + ", " + second + ")";
     }
 
-    public void set(A first, B second){
+    public void set(A first, B second) {
         this.first = first;
         this.second = second;
     }

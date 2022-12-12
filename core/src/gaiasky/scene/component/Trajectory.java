@@ -16,20 +16,6 @@ import gaiasky.util.math.Vector3d;
 
 public class Trajectory implements Component {
     public static final Log logger = Logger.getLogger(Trajectory.class);
-
-    public enum OrbitOrientationModel {
-        DEFAULT,
-        EXTRASOLAR_SYSTEM;
-
-        public boolean isDefault() {
-            return this.equals(DEFAULT);
-        }
-
-        public boolean isExtrasolar() {
-            return this.equals(EXTRASOLAR_SYSTEM);
-        }
-    }
-
     public Entity body;
     public Vector3d curr;
     public double alpha;
@@ -46,19 +32,14 @@ public class Trajectory implements Component {
     public double coord;
     // The orientation model
     public OrbitOrientationModel model = OrbitOrientationModel.DEFAULT;
-
     public boolean isInOrbitalElementsGroup = false;
-
     /**
      * Refreshing state
      */
     public boolean refreshing = false;
-
     /** Number of samples for the orbit data provider. **/
     public int numSamples = 100;
-
     public long orbitStartMs, orbitEndMs;
-
     /**
      * Whether the orbit must be refreshed when out of bounds
      */
@@ -77,19 +58,15 @@ public class Trajectory implements Component {
      * Set to 1 to have no orbit at all.
      */
     public float trailMap = 0.0f;
-
     public OrbitDataLoaderParameters params;
-
     /**
      * Point color
      **/
     public float[] pointColor;
-
     /**
      * Point size
      **/
     public float pointSize = 1f;
-
     public float distUp, distDown;
 
     /**
@@ -158,6 +135,19 @@ public class Trajectory implements Component {
         this.body = entity;
         this.distUp = (float) Math.max(radius * 200, 500 * Constants.KM_TO_U);
         this.distDown = (float) Math.max(radius * 20, 50 * Constants.KM_TO_U);
+    }
+
+    public enum OrbitOrientationModel {
+        DEFAULT,
+        EXTRASOLAR_SYSTEM;
+
+        public boolean isDefault() {
+            return this.equals(DEFAULT);
+        }
+
+        public boolean isExtrasolar() {
+            return this.equals(EXTRASOLAR_SYSTEM);
+        }
     }
 
 }

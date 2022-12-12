@@ -26,24 +26,10 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * Light glow implementation.
  */
 public final class LightGlow extends PostProcessorEffect {
-    public static class Settings {
-        public final String name;
-
-        public Settings(String name) {
-            this.name = name;
-        }
-
-        public Settings(Settings other) {
-            this.name = other.name;
-        }
-    }
-
     private final Glow glow;
     private Settings settings;
-
     private boolean blending = false;
     private int sfactor, dfactor;
-
     public LightGlow(int width, int height) {
         glow = new Glow(width, height);
     }
@@ -53,7 +39,7 @@ public final class LightGlow extends PostProcessorEffect {
         glow.dispose();
     }
 
-    public void setBackbufferScale(float bbs){
+    public void setBackbufferScale(float bbs) {
         glow.setBackbufferScale(bbs);
     }
 
@@ -81,7 +67,7 @@ public final class LightGlow extends PostProcessorEffect {
         glow.setSpiralScale(scl);
     }
 
-    public void setOrientation(float o){
+    public void setOrientation(float o) {
         glow.setOrientation(o);
     }
 
@@ -95,24 +81,20 @@ public final class LightGlow extends PostProcessorEffect {
         this.blending = false;
     }
 
-    public void setSettings(Settings settings) {
-        this.settings = settings;
+    public Texture getLightGlowTexture() {
+        return glow.getLightGlowTexture();
     }
 
     public void setLightGlowTexture(Texture tex) {
         glow.setLightGlowTexture(tex);
     }
 
-    public Texture getLightGlowTexture() {
-        return glow.getLightGlowTexture();
+    public Texture getPrePassTexture() {
+        return glow.getPrePassTexture();
     }
 
     public void setPrePassTexture(Texture tex) {
         glow.setPrePassTexture(tex);
-    }
-
-    public Texture getPrePassTexture() {
-        return glow.getPrePassTexture();
     }
 
     public boolean isBlendingEnabled() {
@@ -131,6 +113,10 @@ public final class LightGlow extends PostProcessorEffect {
         return settings;
     }
 
+    public void setSettings(Settings settings) {
+        this.settings = settings;
+    }
+
     @Override
     public void render(final FrameBuffer src, final FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
@@ -144,5 +130,17 @@ public final class LightGlow extends PostProcessorEffect {
     @Override
     public void rebind() {
         glow.rebind();
+    }
+
+    public static class Settings {
+        public final String name;
+
+        public Settings(String name) {
+            this.name = name;
+        }
+
+        public Settings(Settings other) {
+            this.name = other.name;
+        }
     }
 }

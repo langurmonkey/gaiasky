@@ -18,7 +18,6 @@ public class MessageBean {
     String msg;
     Instant date;
 
-
     public MessageBean(Instant date, String msg) {
         this.msg = msg;
         this.date = date;

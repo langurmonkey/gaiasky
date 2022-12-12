@@ -12,6 +12,56 @@ import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 
 public class RelativisticShader extends DefaultIntShader {
 
+    // Special relativity
+    public final int u_vc;
+    public final int u_velDir;
+    // Gravitational waves
+    public final int u_hterms;
+    public final int u_gw;
+    public final int u_gwmat3;
+    public final int u_ts;
+    public final int u_omgw;
+    public RelativisticShader(final IntRenderable renderable) {
+        this(renderable, new Config());
+    }
+    public RelativisticShader(final IntRenderable renderable, final Config config) {
+        this(renderable, config, createPrefix(renderable, config));
+    }
+
+    public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix) {
+        this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(), config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
+    }
+
+    public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
+        this(renderable, config, new ExtShaderProgram(config.vertexShaderFile, config.fragmentShaderFile, ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+    }
+
+    public RelativisticShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
+        super(renderable, config, shaderProgram);
+
+        u_vc = register(Inputs.vc, Setters.vc);
+        u_velDir = register(Inputs.velDir, Setters.velDir);
+
+        u_hterms = register(Inputs.hterms, Setters.hTerms);
+        u_gw = register(Inputs.gw, Setters.gw);
+        u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
+        u_ts = register(Inputs.ts, Setters.ts);
+        u_omgw = register(Inputs.omgw, Setters.omgw);
+
+    }
+
+    public static String createPrefix(final IntRenderable renderable, final Config config) {
+        String prefix = DefaultIntShader.createPrefix(renderable, config);
+        final Bits mask = renderable.material.getMask();
+        // Special relativity
+        if (mask.has(FloatAttribute.Vc))
+            prefix += "#define relativisticEffects\n";
+        // Gravitational waves
+        if (mask.has(FloatAttribute.Omgw))
+            prefix += "#define gravitationalWaves\n";
+        return prefix;
+    }
+
     public static class Inputs extends DefaultIntShader.Inputs {
         // Special relativity
         public final static Uniform vc = new Uniform("u_vc");
@@ -119,58 +169,6 @@ public class RelativisticShader extends DefaultIntShader {
             }
         };
 
-    }
-
-    // Special relativity
-    public final int u_vc;
-    public final int u_velDir;
-    // Gravitational waves
-    public final int u_hterms;
-    public final int u_gw;
-    public final int u_gwmat3;
-    public final int u_ts;
-    public final int u_omgw;
-
-    public RelativisticShader(final IntRenderable renderable) {
-        this(renderable, new Config());
-    }
-
-    public RelativisticShader(final IntRenderable renderable, final Config config) {
-        this(renderable, config, createPrefix(renderable, config));
-    }
-
-    public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix) {
-        this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(), config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
-    }
-
-    public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
-        this(renderable, config, new ExtShaderProgram(config.vertexShaderFile, config.fragmentShaderFile, ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
-    }
-
-    public RelativisticShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
-        super(renderable, config, shaderProgram);
-
-        u_vc = register(Inputs.vc, Setters.vc);
-        u_velDir = register(Inputs.velDir, Setters.velDir);
-
-        u_hterms = register(Inputs.hterms, Setters.hTerms);
-        u_gw = register(Inputs.gw, Setters.gw);
-        u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
-        u_ts = register(Inputs.ts, Setters.ts);
-        u_omgw = register(Inputs.omgw, Setters.omgw);
-
-    }
-
-    public static String createPrefix(final IntRenderable renderable, final Config config) {
-        String prefix = DefaultIntShader.createPrefix(renderable, config);
-        final Bits mask = renderable.material.getMask();
-        // Special relativity
-        if (mask.has(FloatAttribute.Vc))
-            prefix += "#define relativisticEffects\n";
-        // Gravitational waves
-        if (mask.has(FloatAttribute.Omgw))
-            prefix += "#define gravitationalWaves\n";
-        return prefix;
     }
 
 }

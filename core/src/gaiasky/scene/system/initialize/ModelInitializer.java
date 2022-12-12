@@ -36,7 +36,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.coord.SpacecraftCoordinates;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
@@ -53,6 +53,22 @@ public class ModelInitializer extends AbstractInitSystem {
 
     public ModelInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
+    }
+
+    public static void initializeModelSize(Model model) {
+        if (model.model != null && model.model.params != null) {
+            if (model.model.params.containsKey("diameter")) {
+                model.modelSize = (Double) model.model.params.get("diameter");
+            } else if (model.model.params.containsKey("size")) {
+                model.modelSize = (Double) model.model.params.get("size");
+            } else if (model.model.params.containsKey("width")) {
+                model.modelSize = (Double) model.model.params.get("width");
+            } else if (model.model.params.containsKey("height")) {
+                model.modelSize = (Double) model.model.params.get("height");
+            } else if (model.model.params.containsKey("depth")) {
+                model.modelSize = (Double) model.model.params.get("depth");
+            }
+        }
     }
 
     @Override
@@ -362,7 +378,7 @@ public class ModelInitializer extends AbstractInitSystem {
         engine.mass = machine.getMass();
         scaffolding.shadowMapValues = machine.getShadowvalues();
         engine.drag = machine.getDrag();
-        engine.responsiveness = MathUtilsd.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
+        engine.responsiveness = MathUtilsDouble.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         engine.machineName = machine.getName();
         body.setSize(machine.getSize() * Constants.KM_TO_U);
 
@@ -384,22 +400,6 @@ public class ModelInitializer extends AbstractInitSystem {
     private void initializeClouds(AssetManager manager, CloudComponent cloudComponent) {
         if (cloudComponent != null) {
             cloudComponent.doneLoading(manager);
-        }
-    }
-
-    public static void initializeModelSize(Model model) {
-        if (model.model != null && model.model.params != null) {
-            if (model.model.params.containsKey("diameter")) {
-                model.modelSize = (Double) model.model.params.get("diameter");
-            } else if (model.model.params.containsKey("size")) {
-                model.modelSize = (Double) model.model.params.get("size");
-            } else if (model.model.params.containsKey("width")) {
-                model.modelSize = (Double) model.model.params.get("width");
-            } else if (model.model.params.containsKey("height")) {
-                model.modelSize = (Double) model.model.params.get("height");
-            } else if (model.model.params.containsKey("depth")) {
-                model.modelSize = (Double) model.model.params.get("depth");
-            }
         }
     }
 }

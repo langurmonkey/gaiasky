@@ -20,8 +20,8 @@ import java.util.List;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
-    private ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
+    private ExtSpriteBatch batch;
 
     protected FontRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super(sceneRenderer, rg, alphas, programs);

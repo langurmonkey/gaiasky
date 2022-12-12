@@ -38,10 +38,6 @@ public class ConsoleLogger implements IObserver {
         this(true);
     }
 
-    public void setUseHistorical(boolean useHistorical) {
-        this.useHistorical = useHistorical;
-    }
-
     /**
      * Initializes the notifications interface.
      *
@@ -57,6 +53,10 @@ public class ConsoleLogger implements IObserver {
             this.df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(I18n.locale).withZone(ZoneOffset.UTC);
         }
         subscribe();
+    }
+
+    public void setUseHistorical(boolean useHistorical) {
+        this.useHistorical = useHistorical;
     }
 
     public void subscribe() {

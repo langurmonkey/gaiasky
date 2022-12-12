@@ -9,7 +9,7 @@ public class ComboBoxBean {
     public String name;
     public int value;
 
-    public ComboBoxBean(String name){
+    public ComboBoxBean(String name) {
         super();
         this.name = name;
     }

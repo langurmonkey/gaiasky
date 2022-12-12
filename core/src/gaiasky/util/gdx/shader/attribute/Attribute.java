@@ -16,6 +16,18 @@ import gaiasky.util.Bits;
 public abstract class Attribute implements Comparable<Attribute> {
     /** The registered type aliases */
     private final static Array<String> types = new Array<>();
+    /** The type of this attribute */
+    //public final long type;
+    public final Bits type;
+    public final int index;
+    private final int typeBit;
+
+    protected Attribute(final int index) {
+        this.type = Bits.empty();
+        this.index = index;
+        this.type.set(index);
+        this.typeBit = index;
+    }
 
     /** @return The ID of the specified attribute type, or zero if not available */
     public final static Bits getAttributeType(final String alias) {
@@ -55,6 +67,7 @@ public abstract class Attribute implements Comparable<Attribute> {
      * ID will be reused. The alias should be unambiguous and will by default be returned by the call to {@link #toString()}.
      *
      * @param alias The alias of the type to register, must be different for each direct type, will be used for debugging.
+     *
      * @return the index of the newly registered type, or the index of the existing type if the alias was already registered.
      */
     protected final static int register(final String alias) {
@@ -71,20 +84,6 @@ public abstract class Attribute implements Comparable<Attribute> {
 
     public static Array<String> getTypes() {
         return types;
-    }
-
-    /** The type of this attribute */
-    //public final long type;
-    public final Bits type;
-    public final int index;
-
-    private final int typeBit;
-
-    protected Attribute(final int index) {
-        this.type = Bits.empty();
-        this.index = index;
-        this.type.set(index);
-        this.typeBit = index;
     }
 
     public boolean has(int index) {

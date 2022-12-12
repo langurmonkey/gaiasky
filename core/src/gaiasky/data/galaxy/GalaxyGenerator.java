@@ -12,7 +12,7 @@ import gaiasky.gui.ConsoleLogger;
 import gaiasky.util.Logger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3d;
 
@@ -119,7 +119,7 @@ public class GalaxyGenerator {
 
     // Clamp
     private static double[] cl(double r, double g, double b) {
-        return new double[] { MathUtilsd.clamp(r, 0, 1), MathUtilsd.clamp(g, 0, 1), MathUtilsd.clamp(b, 0, 1) };
+        return new double[] { MathUtilsDouble.clamp(r, 0, 1), MathUtilsDouble.clamp(g, 0, 1), MathUtilsDouble.clamp(b, 0, 1) };
     }
 
     private static double[] generateNewColor() {
@@ -188,6 +188,7 @@ public class GalaxyGenerator {
      * normal with sigma^2 = 0.2 The normalisation factor is 1/30 units/Kpc
      *
      * @return The list of stars
+     *
      * @throws RuntimeException
      */
     private static List<double[]> generateMilkyWay() {

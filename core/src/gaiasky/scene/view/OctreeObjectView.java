@@ -36,7 +36,6 @@ public class OctreeObjectView extends PositionView implements IOctreeObject {
         this.octant = null;
     }
 
-
     @Override
     public int getStarCount() {
         return set != null ? set.pointData.size() : 0;

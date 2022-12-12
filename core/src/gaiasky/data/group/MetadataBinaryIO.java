@@ -48,6 +48,7 @@ public class MetadataBinaryIO {
      * Reads the metadata into an octree node
      *
      * @param in
+     *
      * @return The octree node
      */
     public OctreeNode readMetadata(InputStream in) {
@@ -58,6 +59,7 @@ public class MetadataBinaryIO {
      * Reads the metadata into an octree node
      *
      * @param in Input stream
+     *
      * @return The octree node
      */
     public OctreeNode readMetadata(InputStream in, LoadStatus status) {

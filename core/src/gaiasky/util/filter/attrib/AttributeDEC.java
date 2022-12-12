@@ -13,10 +13,12 @@ public class AttributeDEC extends AttributeAbstract implements IAttribute {
     public double get(IParticleRecord bean) {
         return bean.dec();
     }
-    public String getUnit(){
+
+    public String getUnit() {
         return I18n.msg("gui.unit.deg");
     }
-    public String toString(){
+
+    public String toString() {
         return I18n.msg("gui.attrib.dec") + " (" + I18n.msg("gui.focusinfo.delta") + ")";
     }
 }

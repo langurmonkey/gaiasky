@@ -19,8 +19,6 @@ import java.nio.file.Path;
 
 public class DatasetDesc {
     private final Log logger = Logger.getLogger(DatasetDesc.class);
-
-    private JsonReader reader;
     public JsonValue source;
     public String key;
     public String name;
@@ -30,31 +28,24 @@ public class DatasetDesc {
     public String file;
     public DatasetType datasetType;
     public DatasetStatus status;
-
     public Path checkPath;
     public String checkStr;
     public FileHandle catalogFile;
-
     public String size;
     public long sizeBytes;
-
     public String nObjectsStr;
     public long nObjects;
-
     public String sha256;
-
     public boolean exists;
     public int myVersion = -1, serverVersion;
     public int minGsVersion = -1;
     public boolean outdated;
     public boolean baseData;
-
     public String releaseNotes;
-
     public String[] files;
-
     // In case of local datasets, this links to the server description
     public DatasetDesc server;
+    private JsonReader reader;
 
     public DatasetDesc() {
     }
@@ -226,12 +217,6 @@ public class DatasetDesc {
         return this.type != null && (this.type.equals("catalog-lod") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
     }
 
-    public enum DatasetStatus {
-        AVAILABLE,
-        INSTALLED,
-        DOWNLOADING
-    }
-
     public DatasetDesc getLocalCopy() {
         DatasetDesc copy = this.copy();
         copy.catalogFile = Gdx.files.absolute(copy.checkPath.toAbsolutePath().toString());
@@ -268,6 +253,12 @@ public class DatasetDesc {
         copy.files = this.files;
         copy.server = this.server;
         return copy;
+    }
+
+    public enum DatasetStatus {
+        AVAILABLE,
+        INSTALLED,
+        DOWNLOADING
     }
 
 }

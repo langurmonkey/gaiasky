@@ -17,20 +17,20 @@ public class ColorUtilsTest {
         convert(3.0f, 3.0f, 0.0f, 0.0f);
         convert(0.123f, 0.774f, 0.947f, 1.0f);
         convert(0.71979f, 0.79023f, 1f, 1f);
-        convert(1f, 0.9229006f,  0.8682735f, 1f);
+        convert(1f, 0.9229006f, 0.8682735f, 1f);
 
         toBinary(0.15f, 0.398f, 0.43f, 0.8f);
         fromBinary(9385193);
 
     }
 
-    private static void fromBinary(int val){
+    private static void fromBinary(int val) {
         Color color = new Color();
         Color.rgba8888ToColor(color, val);
         System.out.println(color.r + "," + color.g + "," + color.b + "," + color.a);
     }
 
-    private static void toBinary(float r, float g, float b, float a){
+    private static void toBinary(float r, float g, float b, float a) {
         float col = Color.toFloatBits(r, g, b, a);
         System.out.println(Integer.toBinaryString(Float.floatToIntBits(col)));
     }
@@ -48,7 +48,6 @@ public class ColorUtilsTest {
 
         double packedd = packed;
         //packedd = -1.6947656946257677E38;
-
 
         Color out = new Color();
         Color.abgr8888ToColor(out, (float) packedd);

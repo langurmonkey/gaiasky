@@ -62,7 +62,7 @@ public class OwnTextIconButton extends OwnTextButton {
         setIcon(up);
     }
 
-    public void setContentAlign(int align){
+    public void setContentAlign(int align) {
         this.contentAlign = align;
     }
 
@@ -71,7 +71,7 @@ public class OwnTextIconButton extends OwnTextButton {
         setIcon(this.icon);
     }
 
-    public void setSpace(float space){
+    public void setSpace(float space) {
         this.space = space;
         setIcon(this.icon);
     }
@@ -97,13 +97,13 @@ public class OwnTextIconButton extends OwnTextButton {
     @Override
     public void setDisabled(boolean isDisabled) {
         super.setDisabled(isDisabled);
-        if(isDisabled) {
+        if (isDisabled) {
             if (this.style.disabledFontColor != null) {
                 this.icon.setColor(this.style.disabledFontColor);
                 this.setIcon(this.icon);
             }
         } else {
-            if(this.style.fontColor != null) {
+            if (this.style.fontColor != null) {
                 this.icon.setColor(this.style.fontColor);
                 this.setIcon(this.icon);
             }

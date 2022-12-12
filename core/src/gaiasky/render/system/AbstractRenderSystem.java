@@ -27,23 +27,18 @@ import java.util.List;
 
 public abstract class AbstractRenderSystem implements IRenderSystem {
 
-    protected ExtShaderProgram[] programs;
+    protected final SceneRenderer sceneRenderer;
     private final RenderGroup group;
+    private final Settings settings;
+    public RenderingContext rc;
+    protected ExtShaderProgram[] programs;
     protected float[] alphas;
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;
-    public RenderingContext rc;
-
     protected Vector3 auxf;
     protected Vector3d auxd;
-
-    private final Settings settings;
-
-    private boolean vrScaleFlag = false, depthBufferFlag = false;
-
     protected Array<RenderSystemRunnable> preRunnables, postRunnables;
-
-    protected final SceneRenderer sceneRenderer;
+    private boolean vrScaleFlag = false, depthBufferFlag = false;
 
     protected AbstractRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super();
@@ -126,10 +121,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         // Empty by default
     }
 
-    public interface RenderSystemRunnable {
-        void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera);
-    }
-
     protected void addEffectsUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         addRelativisticUniforms(shaderProgram, camera);
         addGravWaveUniforms(shaderProgram);
@@ -162,7 +153,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
             shaderProgram.setUniformf("u_omgw", rem.omgw);
             // Coordinates of wave (cartesian)
             shaderProgram.setUniformf("u_gw", rem.gw);
-            // Transformation matrix 
+            // Transformation matrix
             shaderProgram.setUniformMatrix("u_gwmat3", rem.gwmat3);
             // H terms - hpluscos, hplussin, htimescos, htimessin
             shaderProgram.setUniform4fv("u_hterms", rem.hterms, 0, 4);
@@ -226,7 +217,6 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         // Empty by default, override if needed.
     }
 
-
     public void dispose() {
         preRunnables.clear();
         preRunnables = null;
@@ -237,5 +227,9 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     public void resetFlags() {
         vrScaleFlag = false;
         depthBufferFlag = false;
+    }
+
+    public interface RenderSystemRunnable {
+        void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera);
     }
 }

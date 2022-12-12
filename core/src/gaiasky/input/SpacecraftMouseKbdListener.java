@@ -21,7 +21,7 @@ public class SpacecraftMouseKbdListener extends AbstractMouseKbdListener {
 
     @Override
     public boolean keyDown(int keycode) {
-        if(isActive()) {
+        if (isActive()) {
             SpacecraftView sc = cam.getSpacecraftView();
             if (sc != null && Settings.settings.runtime.inputEnabled) {
                 double step = 0.01;
@@ -77,7 +77,7 @@ public class SpacecraftMouseKbdListener extends AbstractMouseKbdListener {
 
     @Override
     public boolean keyUp(int keycode) {
-        if(isActive()) {
+        if (isActive()) {
             SpacecraftView sc = cam.getSpacecraftView();
             if (sc != null && sc.getEntity() != null && Settings.settings.runtime.inputEnabled) {
                 switch (keycode) {

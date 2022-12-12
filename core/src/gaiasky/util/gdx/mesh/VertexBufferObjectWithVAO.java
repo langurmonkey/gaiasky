@@ -46,9 +46,9 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
     final VertexAttributes attributes;
     final FloatBuffer buffer;
     final ByteBuffer byteBuffer;
-    int bufferHandle;
     final boolean isStatic;
     final int usage;
+    int bufferHandle;
     boolean isDirty = false;
     boolean isBound = false;
     int vaoHandle = -1;

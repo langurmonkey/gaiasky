@@ -18,7 +18,6 @@ import java.util.List;
  * integration of the basic equations in heliotropic angles.
  *
  * @author Lennart Lindegren
- *
  */
 public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer {
 
@@ -79,15 +78,12 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     /**
      * Constructor for given start time and mission length
      *
-     * @param tStart
-     *            start time
-     * @param tLength
-     *            coverage length
-     * @param msl
-     *            the underlying scanning law
-     * @throws IllegalArgumentException
-     *             if the tStart is before the start time of the passed scanning
-     *             law, msl.
+     * @param tStart  start time
+     * @param tLength coverage length
+     * @param msl     the underlying scanning law
+     *
+     * @throws IllegalArgumentException if the tStart is before the start time of the passed scanning
+     *                                  law, msl.
      */
     public MslAttitudeDataServer(long tStart, Duration tLength, ModifiedScanningLaw msl) {
 
@@ -210,28 +206,16 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     }
 
     /**
+     *
      */
     public boolean inGap(long time) {
         return false;
     }
 
     /**
-     * Set the maximum step size to be used in the Hermite interpolation.
-     * Replaces the default value set at construction.
-     *
-     * @param maxStepInSec
-     *            [sec]
-     */
-    public void setMaxStep(double maxStepInSec) {
-        this.maxStepSec = maxStepInSec;
-        initialized = false;
-    }
-
-    /**
      * This allows to override the default choice of max step for integrator
      *
-     * @param maxStepInSec
-     *            maximum step in [s]
+     * @param maxStepInSec maximum step in [s]
      */
     public void setMaxStepForIntegrator(double maxStepInSec) {
         stepForIntegrator = Math.round(maxStepInSec * 1e9);
@@ -249,9 +233,20 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     }
 
     /**
+     * Set the maximum step size to be used in the Hermite interpolation.
+     * Replaces the default value set at construction.
+     *
+     * @param maxStepInSec [sec]
+     */
+    public void setMaxStep(double maxStepInSec) {
+        this.maxStepSec = maxStepInSec;
+        initialized = false;
+    }
+
+    /**
      * Return the parameters defining the Hermite interpolation nodes (array
      * tNs)
-     *
+     * <p>
      * Note: Although the super (HermiteInterpolatedAttitudeDataServer) permits
      * to use a non-equidistant grid of Hermite nodes, the grid in
      * MslAttitudeDataServer is always equidistant. It is therefore completely
@@ -266,25 +261,6 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     }
 
     /**
-     * Adds an extra angle to the reference spin phase (omegaRef).
-     *
-     * In contrast to the normal way of setting omegaRef (applying the method
-     * setRefNuOmega to the ModifiedScanningLaw object and initializing the
-     * MslAttitudeDataServer) this method does not trigger a re-initialization.
-     * It is therefore a fast way to change the effective value of omegaRef.
-     *
-     * This method is private, so extraOmega cannot be accessed from the
-     * outside, instead it is set through the setRefOmega method.
-     *
-     * @param extraOmega
-     *            [rad]
-     */
-    private void setExtraOmega(double extraOmega) {
-        this.extraOmega = extraOmega;
-        this.qExtraOmega.set(0.0, 0.0, Math.sin(extraOmega / 2), Math.cos(extraOmega / 2));
-    }
-
-    /**
      * Returns the currently set extraOmega [rad]
      *
      * @return
@@ -294,27 +270,44 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
     }
 
     /**
-     * Sets the (effective) reference value of the heliotropic angle Omega.
+     * Adds an extra angle to the reference spin phase (omegaRef).
+     * <p>
+     * In contrast to the normal way of setting omegaRef (applying the method
+     * setRefNuOmega to the ModifiedScanningLaw object and initializing the
+     * MslAttitudeDataServer) this method does not trigger a re-initialization.
+     * It is therefore a fast way to change the effective value of omegaRef.
+     * <p>
+     * This method is private, so extraOmega cannot be accessed from the
+     * outside, instead it is set through the setRefOmega method.
      *
-     * To avoid re-initializing, extraOmega is set to the difference between the
-     * requested refOmega and the value set in the MSL
-     *
-     * @param refOmega
-     *            reference value of Omega in [rad]
+     * @param extraOmega [rad]
      */
-    public void setRefOmega(double refOmega) {
-        this.setExtraOmega(refOmega - msl.getRefOmega());
+    private void setExtraOmega(double extraOmega) {
+        this.extraOmega = extraOmega;
+        this.qExtraOmega.set(0.0, 0.0, Math.sin(extraOmega / 2), Math.cos(extraOmega / 2));
     }
 
     /**
      * Returns the (effective) reference value of the heliotropic angle Omega.
-     *
+     * <p>
      * This is the sum of refOmega (as set in the MSL) and extraOmega
      *
      * @return effective reference value of Omega in [rad]
      */
     public double getRefOmega() {
         return msl.getRefOmega() + this.getExtraOmega();
+    }
+
+    /**
+     * Sets the (effective) reference value of the heliotropic angle Omega.
+     * <p>
+     * To avoid re-initializing, extraOmega is set to the difference between the
+     * requested refOmega and the value set in the MSL
+     *
+     * @param refOmega reference value of Omega in [rad]
+     */
+    public void setRefOmega(double refOmega) {
+        this.setExtraOmega(refOmega - msl.getRefOmega());
     }
 
     /**
@@ -355,6 +348,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
      * interval containing t
      *
      * @param t
+     *
      * @return
      */
     public boolean isModified(long t) {
@@ -366,8 +360,8 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
      * Returns true if the precession rate is in a transition phase during the
      * interval containing t
      *
-     * @param t
-     *            The rate
+     * @param t The rate
+     *
      * @return Whether it is in a transition phase
      */
     public boolean isTransition(long t) {

@@ -36,44 +36,6 @@ import java.util.function.Consumer;
  */
 public class FileChooser extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(FileChooser.class);
-
-    public interface ResultListener {
-        boolean result(boolean success, Path result);
-    }
-
-    /**
-     * The type of files that can be chosen with this file chooser
-     */
-    public enum FileChooserTarget {
-        FILES,
-        DIRECTORIES,
-        ALL
-    }
-
-    /** Target of this file chooser **/
-    final private FileChooserTarget target;
-    private boolean fileNameEnabled;
-    private TextField fileNameInput;
-    private Label acceptedFiles;
-    private final Path baseDir;
-    private OwnTextField location;
-    private OwnTextIconButton newDirectory;
-    private List<FileListItem> fileList;
-    private float scrollPaneWidth;
-    private float maxPathLength;
-    private ScrollPane scrollPane;
-    private CheckBox hidden;
-    private Consumer<Boolean> hiddenConsumer;
-
-    private Path currentDir, previousDir, nextDir;
-    protected String result;
-
-    private long lastClick = 0L;
-    private boolean showHidden = false;
-
-    protected ResultListener resultListener;
-    protected EventListener selectionListener;
-
     private static final Comparator<FileListItem> dirListComparator = (file1, file2) -> {
         if (Files.isDirectory(file1.file) && !Files.isDirectory(file2.file)) {
             return -1;
@@ -86,19 +48,37 @@ public class FileChooser extends GenericDialog {
         }
         return 1;
     };
-    /** Filters files that appear in the file chooser. For internal use only! **/
-    private DirectoryStream.Filter<Path> filter;
+    /** Target of this file chooser **/
+    final private FileChooserTarget target;
+    private final Path baseDir;
     /** Enables directories in the file chooser **/
     private final boolean directoryBrowsingEnabled;
     /** Enables files in the file chooser **/
     private final boolean fileBrowsingEnabled;
+    protected String result;
+    protected ResultListener resultListener;
+    protected EventListener selectionListener;
+    private boolean fileNameEnabled;
+    private TextField fileNameInput;
+    private Label acceptedFiles;
+    private OwnTextField location;
+    private OwnTextIconButton newDirectory;
+    private List<FileListItem> fileList;
+    private float scrollPaneWidth;
+    private float maxPathLength;
+    private ScrollPane scrollPane;
+    private CheckBox hidden;
+    private Consumer<Boolean> hiddenConsumer;
+    private Path currentDir, previousDir, nextDir;
+    private long lastClick = 0L;
+    private boolean showHidden = false;
+    /** Filters files that appear in the file chooser. For internal use only! **/
+    private DirectoryStream.Filter<Path> filter;
     /** Allows setting filters on the files which are to be selected **/
     private PathnameFilter pathnameFilter;
-
     public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target) {
         this(title, skin, stage, baseDir, target, null);
     }
-
     public FileChooser(String title, final Skin skin, Stage stage, Path baseDir, FileChooserTarget target, EventListener selectionListener) {
         this(title, skin, stage, baseDir, target, selectionListener, true);
     }
@@ -609,6 +589,23 @@ public class FileChooser extends GenericDialog {
 
     }
 
+    /**
+     * The type of files that can be chosen with this file chooser
+     */
+    public enum FileChooserTarget {
+        FILES,
+        DIRECTORIES,
+        ALL
+    }
+
+    public interface ResultListener {
+        boolean result(boolean success, Path result);
+    }
+
+    public interface PathnameFilter {
+        boolean accept(Path pathname);
+    }
+
     public static class FileListItem {
 
         public Path file;
@@ -628,10 +625,6 @@ public class FileChooser extends GenericDialog {
             return " " + name;
         }
 
-    }
-
-    public interface PathnameFilter {
-        boolean accept(Path pathname);
     }
 
     private static class NewDirectoryDialog extends GenericDialog {

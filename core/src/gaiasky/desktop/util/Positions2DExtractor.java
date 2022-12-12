@@ -28,6 +28,19 @@ import java.util.Date;
 
 public class Positions2DExtractor {
 
+    int year = 2016;
+    int month = 1;
+    int day = 1;
+    String filePath = "/tmp/sun-earth-moon.txt";
+    // Solar mass
+    double Mo = 1.989e30;
+    // Earth mass
+    double Me = 5.972e24;
+    // Moon mass
+    double Mm = 7.34767309e22;
+    int steps = 1000;
+    long MS_IN_YEAR = (long) Nature.Y_TO_S * 1000L;
+
     public static void main(String[] args) throws IOException {
         Positions2DExtractor p2d = new Positions2DExtractor();
         new ConsoleLogger();
@@ -44,22 +57,6 @@ public class Positions2DExtractor {
 
         p2d.process();
     }
-
-    int year = 2016;
-    int month = 1;
-    int day = 1;
-
-    String filePath = "/tmp/sun-earth-moon.txt";
-
-    // Solar mass
-    double Mo = 1.989e30;
-    // Earth mass
-    double Me = 5.972e24;
-    // Moon mass
-    double Mm = 7.34767309e22;
-
-    int steps = 1000;
-    long MS_IN_YEAR = (long) Nature.Y_TO_S * 1000L;
 
     public void process() throws IOException {
 

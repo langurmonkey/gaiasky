@@ -319,6 +319,7 @@ public class Intersectord {
         // The segment is parallel to the plane
         return -1;
     }
+
     /**
      * Determines the point of intersection between a plane defined by a point and a normal vector and a line defined by a point and a direction vector.
      *
@@ -326,6 +327,7 @@ public class Intersectord {
      * @param planeNormal   The normal vector of the plane.
      * @param linePoint     A point on the line.
      * @param lineDirection The direction vector of the line.
+     *
      * @return The point of intersection between the line and the plane, null if the line is parallel to the plane.
      */
     public static double lineIntersection(Vector3d planePoint, Vector3d planeNormal, Vector3d linePoint, Vector3d lineDirection, Vector3d out) {

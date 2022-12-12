@@ -11,10 +11,10 @@ package gaiasky.scene.record;
 public class PrecessionComponent {
     /** Precession angle in deg **/
     public float precessionAngle;
-    /** Precession velocity in deg/s **/
-    protected float precessionVelocity;
     /** Current precession position around y **/
     public float precessionPosition;
+    /** Precession velocity in deg/s **/
+    protected float precessionVelocity;
 
     public PrecessionComponent() {
 

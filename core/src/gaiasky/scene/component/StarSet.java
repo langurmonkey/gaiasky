@@ -13,34 +13,27 @@ import java.util.Map;
 import java.util.Set;
 
 public class StarSet extends ParticleSet {
+    public final Vector3d D32 = new Vector3d();
+    public final Vector3d D33 = new Vector3d();
     /**
      * Epoch for positions/proper motions in julian days.
      **/
     public double epochJd;
-
     /**
      * Epoch for the times in the light curves in julian days.
      */
     public double variabilityEpochJd;
-
     /**
      * Current computed epoch time.
      **/
     public double currDeltaYears = 0;
-
     public double modelDist;
-
     /** Does this contain variable stars? **/
     public boolean variableStars = false;
-
     /** Stars for which forceLabel is enabled. **/
     public Set<Integer> forceLabelStars;
-
     /** Stars with special label colors. **/
     public Map<Integer, float[]> labelColors;
-
-    public final Vector3d D32 = new Vector3d();
-    public final Vector3d D33 = new Vector3d();
 
     public Vector3b getAbsolutePosition(String name, Vector3b aux) {
         Vector3d vec = getAbsolutePosition(name, D31);

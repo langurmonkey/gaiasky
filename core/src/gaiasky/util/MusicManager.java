@@ -28,6 +28,16 @@ public class MusicManager implements IObserver {
 
     public static MusicManager instance;
     private static Path[] folders;
+    private Array<Path> musicFiles;
+    private int i = 0;
+    private Music currentMusic;
+    private float volume = 0.05f;
+    public MusicManager(Path[] dirs) {
+        super();
+        initFiles(dirs);
+
+        EventManager.instance.subscribe(this, Event.MUSIC_NEXT_CMD, Event.MUSIC_PLAYPAUSE_CMD, Event.MUSIC_PREVIOUS_CMD, Event.MUSIC_VOLUME_CMD, Event.MUSIC_RELOAD_CMD);
+    }
 
     public static void initialize(Path... folders) {
         MusicManager.folders = folders;
@@ -38,16 +48,11 @@ public class MusicManager implements IObserver {
         return instance != null;
     }
 
-    private Array<Path> musicFiles;
-    private int i = 0;
-    private Music currentMusic;
-    private float volume = 0.05f;
-
-    public MusicManager(Path[] dirs) {
-        super();
-        initFiles(dirs);
-
-        EventManager.instance.subscribe(this, Event.MUSIC_NEXT_CMD, Event.MUSIC_PLAYPAUSE_CMD, Event.MUSIC_PREVIOUS_CMD, Event.MUSIC_VOLUME_CMD, Event.MUSIC_RELOAD_CMD);
+    public static void dispose() {
+        if (instance != null) {
+            instance.disposeInstance();
+            instance = null;
+        }
     }
 
     private void initFiles(Path[] folders) {
@@ -108,12 +113,17 @@ public class MusicManager implements IObserver {
 
     /**
      * Gets the current play position in seconds
+     *
      * @return The play position in seconds
      */
     public float getPosition() {
         if (currentMusic == null)
             return 0;
         return currentMusic.getPosition();
+    }
+
+    public float getVolume() {
+        return volume;
     }
 
     /**
@@ -126,10 +136,6 @@ public class MusicManager implements IObserver {
         if (currentMusic != null) {
             currentMusic.setVolume(this.volume);
         }
-    }
-
-    public float getVolume() {
-        return volume;
     }
 
     public void next() {
@@ -168,15 +174,6 @@ public class MusicManager implements IObserver {
         initFiles(folders);
     }
 
-    private class MusicFileFilter implements DirectoryStream.Filter<Path> {
-        private final PathMatcher pm = FileSystems.getDefault().getPathMatcher("glob:**.{mp3,wav,ogg,flac}");
-        @Override
-        public boolean accept(Path dir) {
-            return pm.matches(dir);
-        }
-
-    }
-
     private void disposeInstance() {
         if (currentMusic != null) {
             currentMusic.stop();
@@ -184,13 +181,6 @@ public class MusicManager implements IObserver {
         }
         if (EventManager.instance != null)
             EventManager.instance.unsubscribe(this, Event.MUSIC_NEXT_CMD, Event.MUSIC_PLAYPAUSE_CMD, Event.MUSIC_PREVIOUS_CMD, Event.MUSIC_VOLUME_CMD, Event.MUSIC_RELOAD_CMD);
-    }
-
-    public static void dispose() {
-        if (instance != null) {
-            instance.disposeInstance();
-            instance = null;
-        }
     }
 
     @Override
@@ -217,6 +207,16 @@ public class MusicManager implements IObserver {
             break;
         default:
             break;
+        }
+
+    }
+
+    private class MusicFileFilter implements DirectoryStream.Filter<Path> {
+        private final PathMatcher pm = FileSystems.getDefault().getPathMatcher("glob:**.{mp3,wav,ogg,flac}");
+
+        @Override
+        public boolean accept(Path dir) {
+            return pm.matches(dir);
         }
 
     }

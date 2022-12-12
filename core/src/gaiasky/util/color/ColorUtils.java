@@ -9,7 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import gaiasky.util.Logger;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;
 
 import java.io.BufferedReader;
@@ -50,15 +50,15 @@ public class ColorUtils {
     public static Color oLightGrayC = getCol(oLightGray);
     public static float[] oDarkGray = new float[] { 0.3f, 0.3f, 0.3f, 1f };
     public static Color oDarkGrayC = getCol(oDarkGray);
-
-    private static Color getCol(float[] c) {
-        return new Color(c[0], c[1], c[2], c[3]);
-    }
-
     /**
      * Highlight color array for datasets
      **/
     public static float[][] colorArray = new float[][] { gBlue, gRed, gYellow, gGreen, gPink, aOrange, tPurple, ddBrown, ddMagenta };
+    private static float[][] teffToRGB_harre;
+
+    private static Color getCol(float[] c) {
+        return new Color(c[0], c[1], c[2], c[3]);
+    }
 
     public static float[] getColorFromIndex(int idx) {
         return colorArray[idx % colorArray.length];
@@ -268,8 +268,6 @@ public class ColorUtils {
         rgba[2] = 1;
     }
 
-    private static float[][] teffToRGB_harre;
-
     private static void initHarreData() {
         if (teffToRGB_harre == null) {
             teffToRGB_harre = new float[105][];
@@ -303,7 +301,9 @@ public class ColorUtils {
      * method.
      *
      * @param teff The effective temperature of the star
+     *
      * @return The RGB color in a float array
+     *
      * @see <a href="https://ui.adsabs.harvard.edu/abs/2021arXiv210106254H/abstract">Paper at ADS</a>
      */
     public static float[] teffToRGB_harre(double teff) {
@@ -339,7 +339,9 @@ public class ColorUtils {
      * Converts effective temperature in Kelvin (1000-40000) to RGB
      *
      * @param teff Effective temperature
+     *
      * @return The RGB color in a float array
+     *
      * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
      * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
      */
@@ -354,18 +356,18 @@ public class ColorUtils {
         } else {
             double x = temp - 55;
             r = 351.97690566805693 + 0.114206453784165 * x - 40.25366309332127 * Math.log(x);
-            r = MathUtilsd.clamp(r, 0, 255);
+            r = MathUtilsDouble.clamp(r, 0, 255);
         }
 
         // Green
         if (temp <= 66) {
             double x = temp - 2;
             g = -155.25485562709179 - 0.44596950469579133 * x + 104.49216199393888 * Math.log(x);
-            g = MathUtilsd.clamp(g, 0, 255);
+            g = MathUtilsDouble.clamp(g, 0, 255);
         } else {
             double x = temp - 50;
             g = 325.4494125711974 + 0.07943456536662342 * x - 28.0852963507957 * Math.log(x);
-            g = MathUtilsd.clamp(g, 0, 255);
+            g = MathUtilsDouble.clamp(g, 0, 255);
         }
 
         // Blue
@@ -377,7 +379,7 @@ public class ColorUtils {
             } else {
                 double x = temp - 10;
                 b = -254.76935184120902 + 0.8274096064007395 * x + 115.67994401066147 * Math.log(x);
-                b = MathUtilsd.clamp(b, 0, 255);
+                b = MathUtilsDouble.clamp(b, 0, 255);
             }
         }
 
@@ -389,6 +391,7 @@ public class ColorUtils {
      * "http://stackoverflow.com/questions/21977786/star-b-v-color-index-to-apparent-rgb-color">here</a>
      *
      * @param bv The B-V color index
+     *
      * @return The RGB as a float array in [0..1]
      */
     public static float[] BVtoRGB(double bv) {
@@ -447,6 +450,7 @@ public class ColorUtils {
      *
      * @param rgb        The RGB color
      * @param luminosity The new luminosity amount in [0..1]
+     *
      * @return The new RGB array
      */
     public static float[] brighten(float[] rgb, float luminosity) {
@@ -461,6 +465,7 @@ public class ColorUtils {
      * contained in the set [0..255] and returns h, s, and l in the set [0..1]
      *
      * @param rgb Float array with the RGB values
+     *
      * @return Array The HSL representation
      */
     public static float[] rgbToHsl(float[] rgb) {
@@ -497,6 +502,7 @@ public class ColorUtils {
      * contained in the set [0..1] and returns r, g, and b in the set [0..255].
      *
      * @param hsl Float array with the HSL values
+     *
      * @return Array The RGB representation
      */
     public static float[] hslToRgb(float[] hsl) {

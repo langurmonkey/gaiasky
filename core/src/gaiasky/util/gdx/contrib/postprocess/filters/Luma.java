@@ -21,6 +21,66 @@ import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 public class Luma extends Filter<Luma> {
+    private final Vector2 texelSize;
+    private final Vector2 imageSize;
+    private final ShaderProgram programLuma;
+    private final ShaderProgram programAvg;
+    private final ShaderProgram programMax;
+    private float lodLevel = 0;
+    public Luma() {
+        super(ShaderLoader.fromFile("screenspace", "luma", "#define LUMA"));
+        programLuma = program;
+        programAvg = ShaderLoader.fromFile("screenspace", "luma", "#define AVERAGE");
+        programMax = ShaderLoader.fromFile("screenspace", "luma", "#define MAX");
+
+        texelSize = new Vector2();
+        imageSize = new Vector2();
+    }
+
+    public void enableProgramLuma() {
+        this.program = programLuma;
+        rebind();
+    }
+
+    public void enableProgramAvg() {
+        this.program = programAvg;
+        rebind();
+    }
+
+    public void enableProgramMax() {
+        this.program = programMax;
+        rebind();
+    }
+
+    public void setImageSize(float w, float h) {
+        imageSize.set(w, h);
+        setParam(Param.ImageSize, texelSize);
+    }
+
+    public void setTexelSize(float u, float v) {
+        texelSize.set(u, v);
+        setParam(Param.TexelSize, texelSize);
+    }
+
+    public void setLodLevel(float lodLevel) {
+        this.lodLevel = lodLevel;
+        setParam(Param.LodLevel, lodLevel);
+    }
+
+    @Override
+    public void rebind() {
+        setParams(Param.Texture0, u_texture0);
+        setParams(Param.TexelSize, texelSize);
+        setParams(Param.ImageSize, texelSize);
+        setParams(Param.LodLevel, lodLevel);
+        endParams();
+    }
+
+    @Override
+    protected void onBeforeRender() {
+        inputTexture.bind(u_texture0);
+    }
+
     public enum Param implements Parameter {
         // @formatter:off
         Texture0("u_texture0", 0),
@@ -46,65 +106,5 @@ public class Luma extends Filter<Luma> {
         public int arrayElementSize() {
             return this.elementSize;
         }
-    }
-
-    private final Vector2 texelSize;
-    private final Vector2 imageSize;
-    private float lodLevel = 0;
-    private final ShaderProgram programLuma;
-    private final ShaderProgram programAvg;
-    private final ShaderProgram programMax;
-
-    public Luma() {
-        super(ShaderLoader.fromFile("screenspace", "luma", "#define LUMA"));
-        programLuma = program;
-        programAvg = ShaderLoader.fromFile("screenspace", "luma", "#define AVERAGE");
-        programMax = ShaderLoader.fromFile("screenspace", "luma", "#define MAX");
-
-        texelSize = new Vector2();
-        imageSize = new Vector2();
-    }
-
-    public void enableProgramLuma(){
-        this.program = programLuma;
-        rebind();
-    }
-
-    public void enableProgramAvg(){
-        this.program = programAvg;
-        rebind();
-    }
-
-    public void enableProgramMax(){
-        this.program = programMax;
-        rebind();
-    }
-
-    public void setImageSize(float w, float h){
-        imageSize.set(w, h);
-        setParam(Param.ImageSize, texelSize);
-    }
-    public void setTexelSize(float u, float v){
-        texelSize.set(u, v);
-        setParam(Param.TexelSize, texelSize);
-    }
-
-    public void setLodLevel(float lodLevel){
-        this.lodLevel = lodLevel;
-        setParam(Param.LodLevel, lodLevel);
-    }
-
-    @Override
-    public void rebind() {
-        setParams(Param.Texture0, u_texture0);
-        setParams(Param.TexelSize, texelSize);
-        setParams(Param.ImageSize, texelSize);
-        setParams(Param.LodLevel, lodLevel);
-        endParams();
-    }
-
-    @Override
-    protected void onBeforeRender() {
-        inputTexture.bind(u_texture0);
     }
 }

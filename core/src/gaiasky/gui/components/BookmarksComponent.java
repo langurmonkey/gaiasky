@@ -41,25 +41,18 @@ import java.util.Set;
 
 public class BookmarksComponent extends GuiComponent implements IObserver {
     static private final Vector2 tmpCoords = new Vector2();
-
+    private final Drawable folderIcon;
+    private final Drawable bookmarkIcon;
+    private final Set<ContextMenu> contextMenus;
     protected Scene scene;
-
     protected FocusView view;
-
     protected Tree<TreeNode, String> bookmarksTree;
     protected TextField searchBox;
     protected OwnScrollPane bookmarksScrollPane;
-
     protected Table infoTable;
     protected Cell<?> infoCell1, infoCell2;
     protected OwnLabel infoMessage1, infoMessage2;
-
     private boolean events = true;
-
-    private final Drawable folderIcon;
-    private final Drawable bookmarkIcon;
-
-    private final Set<ContextMenu> contextMenus;
 
     public BookmarksComponent(Skin skin, Stage stage) {
         super(skin, stage);
@@ -325,16 +318,6 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         contextMenus.add(cm);
     }
 
-    private static class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
-        public BookmarkNode node;
-
-        public TreeNode(BookmarkNode node, Skin skin) {
-            super(new OwnLabel(node.name, skin));
-            this.node = node;
-            setValue(node.name);
-        }
-    }
-
     public void reloadBookmarksTree() {
         java.util.List<BookmarkNode> bookmarks = GaiaSky.instance.getBookmarksManager().getBookmarks();
         bookmarksTree.clearChildren();
@@ -467,6 +450,16 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     @Override
     public void dispose() {
         EventManager.instance.removeAllSubscriptions(this);
+    }
+
+    private static class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
+        public BookmarkNode node;
+
+        public TreeNode(BookmarkNode node, Skin skin) {
+            super(new OwnLabel(node.name, skin));
+            this.node = node;
+            setValue(node.name);
+        }
     }
 
 }

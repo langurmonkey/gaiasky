@@ -44,7 +44,6 @@ public class MemInfoWindow extends GenericDialog {
         memInfo.setHeight((memInfo.getLines() + 3) * fontHeight);
         memInfo.clearListeners();
 
-
         OwnScrollPane memInfoScroll = new OwnScrollPane(memInfo, skin, "minimalist-nobg");
         memInfoScroll.setWidth(taWidth);
         memInfoScroll.setForceScroll(false, false);

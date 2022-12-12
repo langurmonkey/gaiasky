@@ -6,7 +6,7 @@
 /*
  * GaiaTools
  * Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -27,7 +27,7 @@ package gaiasky.util.gaia;
 /**
  * A compound object for holding heliotropic angles and their rates as per
  * Fig. 3 in GAIA-C3-TN-LU-085.
- * 
+ *
  * @author Uwe Lammers, Lennart Lindegren
  * @version $Id: HeliotropicAnglesRates.java 308373 2013-08-02 16:01:12Z ulammers $
  */
@@ -35,7 +35,7 @@ public class HeliotropicAnglesRates extends AbstractAttitudeAnglesRates {
     /**
      * Get the solar aspect angle (between the nominal sun and the SRS z axis) -
      * this is the first heliotropic attitude angle
-     * 
+     *
      * @return solar aspect angle [rad]
      */
     public double getXi() {
@@ -44,7 +44,7 @@ public class HeliotropicAnglesRates extends AbstractAttitudeAnglesRates {
 
     /**
      * Get the time derivative of the solar aspect angle
-     * 
+     *
      * @return time derivative of the solar aspect angle [rad/day]
      */
     public double getXiDot() {
@@ -54,7 +54,7 @@ public class HeliotropicAnglesRates extends AbstractAttitudeAnglesRates {
     /**
      * Get the revolving phase angle - this is the second heliotropic attitude
      * angle
-     * 
+     *
      * @return revolving phase [rad]
      */
     public double getNu() {
@@ -63,7 +63,7 @@ public class HeliotropicAnglesRates extends AbstractAttitudeAnglesRates {
 
     /**
      * Get the time derivative of the revolving phase angle
-     * 
+     *
      * @return time derivative of the revolving phase [rad/day]
      */
     public double getNuDot() {
@@ -72,7 +72,7 @@ public class HeliotropicAnglesRates extends AbstractAttitudeAnglesRates {
 
     /**
      * Get the spin phase angle - this is the third heliotropic attitude angle
-     * 
+     *
      * @return spin phase [rad]
      */
     public double getOmega() {
@@ -81,7 +81,7 @@ public class HeliotropicAnglesRates extends AbstractAttitudeAnglesRates {
 
     /**
      * Get the time derivative of the spin phase angle
-     * 
+     *
      * @return time derivative of the spin phase [rad/day]
      */
     public double getOmegaDot() {

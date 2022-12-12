@@ -12,7 +12,7 @@ import gaiasky.scene.component.MotorEngine;
 import gaiasky.scene.record.MachineDefinition;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Constants;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 /**
  * Picks up spacecraft events and relays them to the entity.
@@ -80,7 +80,7 @@ public class SpacecraftRadio extends EntityRadio {
         engine.mass = machine.getMass();
         scaffolding.shadowMapValues = machine.getShadowvalues();
         engine.drag = machine.getDrag();
-        engine.responsiveness = MathUtilsd.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
+        engine.responsiveness = MathUtilsDouble.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         engine.machineName = machine.getName();
         body.setSizeKm(machine.getSize());
 

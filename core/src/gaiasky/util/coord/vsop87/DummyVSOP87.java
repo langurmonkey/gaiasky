@@ -6,7 +6,7 @@
 package gaiasky.util.coord.vsop87;
 
 public class DummyVSOP87 extends AbstractVSOP87 {
-    public DummyVSOP87(){
+    public DummyVSOP87() {
         super();
     }
 

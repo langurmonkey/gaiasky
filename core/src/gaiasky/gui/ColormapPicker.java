@@ -50,13 +50,8 @@ import java.util.Map;
  */
 public class ColormapPicker extends ColorPickerAbstract {
 
-    private final CatalogInfo catalogInfo;
-    private int cmapIndex;
-    private IAttribute cmapAttrib;
-    private double cmapMin, cmapMax;
-
-    private final FocusView view;
-
+    // Stores minimum and maximum mapping values for the session
+    private static final Map<String, double[]> minMaxMap = new HashMap<>();
     public static Array<Pair<String, Integer>> cmapList;
 
     static {
@@ -72,21 +67,13 @@ public class ColormapPicker extends ColorPickerAbstract {
         cmapList.add(new Pair<>("cool", 8));
     }
 
-    static int getCmapIndex(String name) {
-        for (Pair<String, Integer> cmapDef : cmapList) {
-            if (cmapDef.getFirst().equalsIgnoreCase(name))
-                return cmapDef.getSecond();
-        }
-        return -1;
-    }
-
-    static String getCmapName(int index) {
-        return cmapList.get(index).getFirst();
-    }
-
+    private final CatalogInfo catalogInfo;
+    private final FocusView view;
     private final Drawable drawableColor;
     private final Drawable drawableColormap;
-
+    private int cmapIndex;
+    private IAttribute cmapAttrib;
+    private double cmapMin, cmapMax;
     private ColormapPicker(String name, CatalogInfo ci, Stage stage, Skin skin) {
         super(name, stage, skin);
         this.catalogInfo = ci;
@@ -103,6 +90,18 @@ public class ColormapPicker extends ColorPickerAbstract {
     public ColormapPicker(String name, float[] rgba, CatalogInfo ci, Stage stage, Skin skin) {
         this(name, ci, stage, skin);
         setPickedColor(rgba);
+    }
+
+    static int getCmapIndex(String name) {
+        for (Pair<String, Integer> cmapDef : cmapList) {
+            if (cmapDef.getFirst().equalsIgnoreCase(name))
+                return cmapDef.getSecond();
+        }
+        return -1;
+    }
+
+    static String getCmapName(int index) {
+        return cmapList.get(index).getFirst();
     }
 
     protected void initialize() {
@@ -206,26 +205,23 @@ public class ColormapPicker extends ColorPickerAbstract {
         return cmapMax;
     }
 
-    // Stores minimum and maximum mapping values for the session
-    private static final Map<String, double[]> minMaxMap = new HashMap<>();
-
     /** A color picker and colormap dialog **/
     private class ColorPickerColormapDialog extends GenericDialog {
-        private CheckBox plainColor, colormap;
         private final Map<Integer, Image> cmapImages;
+        private final DecimalFormat nf;
+        private final ColorPickerColormapDialog cpd;
+        private final Array<Entity> pgarray;
+        private final Array<IOctreeObject> apearray;
+        private CheckBox plainColor, colormap;
         private Image cmapImage;
         private Cell cmapImageCell;
         private float[] color;
         private OwnTextField minMap, maxMap;
-        private final DecimalFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
         private Image newColorImage;
         private boolean changeEvents = true;
-        private final ColorPickerColormapDialog cpd;
-        private final Array<Entity> pgarray;
-        private final Array<IOctreeObject> apearray;
 
         public ColorPickerColormapDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.msg("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);

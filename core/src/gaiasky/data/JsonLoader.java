@@ -56,6 +56,13 @@ public class JsonLoader extends AbstractSceneLoader {
         this.attributeMap.initialize();
     }
 
+    private static String replace(String key) {
+        if (REPLACE.containsKey(key)) {
+            return REPLACE.get(key);
+        }
+        return key;
+    }
+
     @Override
     public Array<Entity> loadData() throws FileNotFoundException {
         Array<Entity> loadedEntities = new Array<>();
@@ -192,13 +199,6 @@ public class JsonLoader extends AbstractSceneLoader {
             }
             attribute = attribute.next;
         }
-    }
-
-    private static String replace(String key) {
-        if (REPLACE.containsKey(key)) {
-            return REPLACE.get(key);
-        }
-        return key;
     }
 
     public void fillEntity(final JsonValue json, final Entity entity, final String className) throws ReflectionException {

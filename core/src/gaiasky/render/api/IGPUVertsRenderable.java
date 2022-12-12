@@ -32,9 +32,12 @@ public interface IGPUVertsRenderable extends IRenderable {
     void setClosedLoop(boolean closedLoop);
 
     void blend();
+
     void depth();
 
     int getGlPrimitive();
+
+    float getPrimitiveSize();
 
     /**
      * Line width for lines, point size for points
@@ -42,6 +45,4 @@ public interface IGPUVertsRenderable extends IRenderable {
      * @param size The size
      */
     void setPrimitiveSize(float size);
-
-    float getPrimitiveSize();
 }

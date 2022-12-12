@@ -67,7 +67,7 @@ public final class Raymarching extends PostProcessorEffect {
         filter.setZfarK(zfar, k);
     }
 
-    public void setAdditionalTexture(Texture tex){
+    public void setAdditionalTexture(Texture tex) {
         filter.setAdditionalTexture(tex);
     }
 

@@ -49,38 +49,34 @@ public class GamepadGui extends AbstractGui {
     private static final Logger.Log logger = Logger.getLogger(GamepadGui.class.getSimpleName());
 
     private final Table content, menu;
+    // Contains a matrix (column major) of actors for each tab
+    private final List<Actor[][]> model;
+    private final List<OwnTextButton> tabButtons;
+    private final List<ScrollPane> tabContents;
+    private final EventManager em;
+    private final float pad5;
+    private final float pad10;
+    private final float pad20;
+    private final float pad30;
+    private final float pad40;
+    private final FocusView view;
+    private final FilterView filterView;
+    boolean hackProgrammaticChangeEvents = true;
     private Table searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
     private Cell<?> contentCell, infoCell;
     private OwnTextButton searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere;
-    // Contains a matrix (column major) of actors for each tab
-    private final List<Actor[][]> model;
     private OwnCheckBox cinematic;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
     private OwnTextField searchField;
     private OwnLabel infoMessage;
-
-    private final List<OwnTextButton> tabButtons;
-    private final List<ScrollPane> tabContents;
-
     private Actor[][] currentModel;
     private Scene scene;
-
-    private final EventManager em;
     private GamepadGuiListener gamepadListener;
     private Set<ControllerListener> backupGamepadListeners;
-    private final float pad5;
-    private final float pad10;
-    private final float pad20;
-    private final float pad30;
-    private final float pad40;
     private String currentInputText = "";
-    private final FocusView view;
-    private final FilterView filterView;
-    boolean hackProgrammaticChangeEvents = true;
-
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
@@ -358,7 +354,6 @@ public class GamepadGui extends AbstractGui {
         });
         camT.add(turnLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camTurnSlider).left().padBottom(pad20).row();
-
 
         // Mode buttons
         Table modeButtons = new Table(skin);
@@ -695,7 +690,6 @@ public class GamepadGui extends AbstractGui {
             return false;
         });
 
-
         // Magnitude multiplier
         magnitudeMultiplier = new OwnSliderPlus(I18n.msg("gui.star.brightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
         graphicsModel[0][1] = magnitudeMultiplier;
@@ -740,7 +734,6 @@ public class GamepadGui extends AbstractGui {
             }
             return false;
         });
-
 
         // Base star level
         starBaseLevel = new OwnSliderPlus(I18n.msg("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");

@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Null;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 import java.text.DecimalFormat;
 
@@ -91,7 +91,7 @@ public class OwnSlider extends Slider {
 
     public float getMappedValue() {
         if (map) {
-            return MathUtilsd.lint(getValue(), getMinValue(), getMaxValue(), mapMin, mapMax);
+            return MathUtilsDouble.lint(getValue(), getMinValue(), getMaxValue(), mapMin, mapMax);
         } else {
             return getValue();
         }
@@ -103,7 +103,7 @@ public class OwnSlider extends Slider {
 
     public void setMappedValue(float mappedValue) {
         if (map) {
-            setValue(MathUtilsd.lint(mappedValue, mapMin, mapMax, getMinValue(), getMaxValue()));
+            setValue(MathUtilsDouble.lint(mappedValue, mapMin, mapMax, getMinValue(), getMaxValue()));
         } else {
             setValue(mappedValue);
         }
@@ -183,7 +183,7 @@ public class OwnSlider extends Slider {
         return bg;
     }
 
-    protected Drawable getKnobBeforeDrawable () {
+    protected Drawable getKnobBeforeDrawable() {
         Drawable knobBefore = super.getKnobBeforeDrawable();
         if (hasKeyboardFocus() && !isDisabled()) {
             knobBefore = ((OwnSliderStyle) getStyle()).knobBeforeFocused;

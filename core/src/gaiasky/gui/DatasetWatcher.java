@@ -94,7 +94,7 @@ public class DatasetWatcher implements IObserver {
                             default -> "gui.download.status.working";
                         };
                         if (this.status != null) {
-                            if(data.length > 2 && data[2] != null) {
+                            if (data.length > 2 && data[2] != null) {
                                 this.status.setText(I18n.msg(messageKey) + " " + data[2]);
                             } else {
                                 this.status.setText(I18n.msg(messageKey));

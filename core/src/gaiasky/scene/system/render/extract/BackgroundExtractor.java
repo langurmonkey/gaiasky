@@ -24,7 +24,7 @@ public class BackgroundExtractor extends AbstractExtractSystem {
         if (mustRender(base)) {
             var render = Mapper.render.get(entity);
 
-            if(Mapper.grid.has(entity)) {
+            if (Mapper.grid.has(entity)) {
                 // UV grid
                 addToRender(render, RenderGroup.MODEL_VERT_GRID);
                 addToRender(render, RenderGroup.FONT_ANNOTATION);

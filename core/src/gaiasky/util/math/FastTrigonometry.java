@@ -8,8 +8,8 @@ package gaiasky.util.math;
 import net.jafama.FastMath;
 
 /**
- * Uses jafama ({@link net.jafama.FastMath}) library. It is not super accurate,
- * but it's the fastest shot in the West.
+ * Uses Jafama ({@link net.jafama.FastMath}) library. It is not super accurate,
+ * but it's the fastest shot in the west.
  */
 public class FastTrigonometry implements ITrigonometry {
 

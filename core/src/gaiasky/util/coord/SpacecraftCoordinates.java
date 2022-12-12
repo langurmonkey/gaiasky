@@ -26,7 +26,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
     private Vector3d D31, D32, D33;
     private Vector3b B31, B32, B33, B34;
 
-    public SpacecraftCoordinates(){
+    public SpacecraftCoordinates() {
         this.D31 = new Vector3d();
         this.D32 = new Vector3d();
         this.D33 = new Vector3d();
@@ -94,7 +94,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         }
 
         double friction = (spacecraft.drag() * 2e16) * dt;
-       force.add(D31.set(vel).scl(-friction));
+        force.add(D31.set(vel).scl(-friction));
 
         if (spacecraft.stopping()) {
             double speed = vel.len();

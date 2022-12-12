@@ -24,34 +24,6 @@ public final class MosaicFilter extends Filter<MosaicFilter> {
     private final Vector2 viewport;
     private final Texture[] tiles = new Texture[4];
 
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture0("u_texture0", 0),
-        Texture1("u_texture1", 0),
-        Texture2("u_texture2", 0),
-        Texture3("u_texture3", 0),
-        Viewport("u_viewport", 2);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
-
     public MosaicFilter(float w, float h) {
         super(null);
         this.viewport = new Vector2(w, h);
@@ -94,6 +66,34 @@ public final class MosaicFilter extends Filter<MosaicFilter> {
     protected void onBeforeRender() {
         for (int i = 0; i < 4; i++) {
             tiles[i].bind(u_texture0 + i);
+        }
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture0("u_texture0", 0),
+        Texture1("u_texture1", 0),
+        Texture2("u_texture2", 0),
+        Texture3("u_texture3", 0),
+        Viewport("u_viewport", 2);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
         }
     }
 }

@@ -48,15 +48,9 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
     /** Viewport to use in stereoscopic mode **/
     private final Viewport stretchViewport;
-
-    /** Frame buffers for 3D mode (screen, screenshot, frame output) **/
-    Map<Integer, FrameBuffer> fb3D;
-
     private final SpriteBatch sb;
-
     private final AnaglyphEffect anaglyphEffect;
     private final Copy copy;
-
     private final Vector3 aux1;
     private final Vector3 aux2;
     private final Vector3 aux3;
@@ -65,6 +59,8 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     private final Vector3d aux3d;
     private final Vector3d aux4d;
     private final Vector3d aux5d;
+    /** Frame buffers for 3D mode (screen, screenshot, frame output) **/
+    Map<Integer, FrameBuffer> fb3D;
 
     public RenderModeStereoscopic(final SpriteBatch spriteBatch) {
         super();

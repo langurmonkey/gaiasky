@@ -6,7 +6,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Settings;
 
-public class GridRecExtractor extends AbstractExtractSystem{
+public class GridRecExtractor extends AbstractExtractSystem {
     public GridRecExtractor(Family family, int priority) {
         super(family, priority);
     }

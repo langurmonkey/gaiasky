@@ -11,24 +11,23 @@ import gaiasky.util.math.Vector3d;
 
 /**
  * Analytical representation of the Nominal Sun for the Gaia NSL.
- * 
+ * <p>
  * Uses a low precision formula for the solar longitude (apparent longitude)
  * valid for the period 1980-2020 with an accuracy of 0.005 deg.
- * 
+ * <p>
  * The reference frame is the ecliptic equinox J2000.
- * 
+ * <p>
  * The analytical formula for calculating the longitude is written in terms of
  * the number of days since J2000.0(TCB). Since the zero point for GaiaTime (the
  * Mission Reference Epoch, see GAIA-CA-SP-ARI-BAS-003-06, rev. 1, Sect. 3.5) is
  * different from J2000.0 (actually it is J2010.0), it is necessary to add the
  * number of days from J2000.0 to the Mission Reference Epoch before doing the
  * calculation. This number is given by missionReferenceEpochDaysFromJ2000.
- * 
+ * <p>
  * Since the time may be specified as the number of elapsed ns since a time
  * origin that is a settable attribute of the attitude data server, the NslSun
  * has a field timeOriginDaysFromJ2000 that can be set with setTimeOrigin(). By
  * default the origin time is the Mission Reference Epoch.
- * 
  */
 public class NslSun {
 
@@ -56,16 +55,12 @@ public class NslSun {
     static final double ABERRATION_CONSTANT_J2000 = 20.49122;
     // static final double ABERRATION_CONSTANT_J2000 =
     // GaiaParam.Nature.ABERRATION_CONSTANT_J2000;
-
-    private final double timeOriginDaysFromJ2000 = missionReferenceEpoch - (AstroUtils.JD_J2000 - AstroUtils.JD_J2010);
-    private final double timeOriginNsFromJ2000 = missionReferenceEpoch - (AstroUtils.JD_J2000 - AstroUtils.JD_J2010) * Nature.D_TO_NS;
-
-
     /** Unit vectors **/
     static final Vector3d X_AXIS = Vector3d.getUnitX();
     static final Vector3d Y_AXIS = Vector3d.getUnitY();
     static final Vector3d Z_AXIS = Vector3d.getUnitZ();
-
+    private final double timeOriginDaysFromJ2000 = missionReferenceEpoch - (AstroUtils.JD_J2000 - AstroUtils.JD_J2010);
+    private final double timeOriginNsFromJ2000 = missionReferenceEpoch - (AstroUtils.JD_J2000 - AstroUtils.JD_J2010) * Nature.D_TO_NS;
     /**
      * Time dependent variables
      */
@@ -79,6 +74,7 @@ public class NslSun {
 
     /**
      * Calculate all fields for a given julian date.
+     *
      * @param julianDate The julian date.
      */
     public void setTime(double julianDate) {
@@ -88,11 +84,10 @@ public class NslSun {
 
     /**
      * Calculate all fields for a given time
-     * 
+     * <p>
      * Author: F. Mignard
-     * 
-     * @param tNs
-     *            time in [ns] since the time origin
+     *
+     * @param tNs time in [ns] since the time origin
      */
     public void setTime(long tNs) {
         final double daysFromJ2000 = timeOriginDaysFromJ2000 + (double) tNs * Nature.NS_TO_D;
@@ -118,7 +113,7 @@ public class NslSun {
                 .toRadians(NOMINALSUN_MEANLONGITUDERATE_J2000
                         + NOMINALSUN_ORBITALMEANANOMALYRATE_J2000
                         * Math.toRadians(d2e * cm + d5_2e2
-                                * (cm * cm - sm * sm)));
+                        * (cm * cm - sm * sm)));
 
         this.sLon = Math.toRadians(lon);
         this.sLonMod4Pi = Math.toRadians(lon % (2. * 360.0));
@@ -149,6 +144,7 @@ public class NslSun {
 
     /**
      * @param out The output vector.
+     *
      * @return The output vector containing the solar direction as a unit 3-vector in BCRS.
      */
     public Vector3d getSolarDirection(Vector3d out) {
@@ -158,22 +154,18 @@ public class NslSun {
 
     /**
      * Method to convert heliotropic angles to quaternion
-     * 
-     * @param t
-     *            time [ns]
-     * @param xi
-     *            revolving angle (solar aspect angle) [rad]
-     * @param nu
-     *            revolving phase [rad]
-     * @param Omega
-     *            spin phase [rad]
+     *
+     * @param t     time [ns]
+     * @param xi    revolving angle (solar aspect angle) [rad]
+     * @param nu    revolving phase [rad]
+     * @param Omega spin phase [rad]
+     *
      * @return attitude quaternion
      */
     public Quaterniond heliotropicToQuaternion(long t, double xi, double nu,
             double Omega) {
         setTime(t);
         double sLon = getSolarLongitude();
-
 
         /** SOME AXES NEED TO BE SWAPPED TO ALIGN WITH OUR REF SYS:
          * 	GLOBAL ->	GAIASANDBOX
@@ -191,11 +183,10 @@ public class NslSun {
 
     /**
      * Puts an angle in the base interval [ 0, nRev*2*PI )
-     * 
-     * @param x
-     *            angle [rad]
-     * @param nRev
-     *            number of revolutions in base interval
+     *
+     * @param x    angle [rad]
+     * @param nRev number of revolutions in base interval
+     *
      * @return angle in base interval [rad]
      */
     public double angleBase(double x, int nRev) {

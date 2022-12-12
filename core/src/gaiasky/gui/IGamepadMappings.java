@@ -10,7 +10,7 @@ public interface IGamepadMappings {
     /**
      * The configured axis zero point. Axis values below this value
      * are considered zero.
-     *
+     * <p>
      * return The zero point.
      */
     double getZeroPoint();
@@ -139,12 +139,14 @@ public interface IGamepadMappings {
 
     /**
      * Returns the code of the horizontal dpad axis, if exists
+     *
      * @return Horizontal dpad axis code
      */
     int getAxisDpadH();
 
     /**
      * Returns the code of the vertical dpad axis, if exists
+     *
      * @return Vertical dpad axis code
      */
     int getAxisDpadV();
@@ -207,24 +209,28 @@ public interface IGamepadMappings {
 
     /**
      * Returns the code of the RT button
+     *
      * @return The RT button code, negative if not mapped.
      */
     int getButtonRT();
 
     /**
      * Returns the code of the RB button
+     *
      * @return The RB button code, negative if not mapped.
      */
     int getButtonRB();
 
     /**
      * Returns the code of the LT button
+     *
      * @return The LT button code, negative if not mapped.
      */
     int getButtonLT();
 
     /**
      * Returns the code of the LB button
+     *
      * @return The LB button code, negative if not mapped.
      */
     int getButtonLB();

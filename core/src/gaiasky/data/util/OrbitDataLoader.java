@@ -21,7 +21,7 @@ import gaiasky.util.Logger;
 import java.util.Date;
 
 /**
- * An orbit data loader to rule them all.
+ * The orbit data loader to rule them all.
  */
 public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, OrbitDataLoader.OrbitDataLoaderParameters> {
 
@@ -49,16 +49,12 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         }
     }
 
-    /**
-     * 
-     */
     public PointCloudData loadSync(AssetManager manager, String fileName, FileHandle file, OrbitDataLoaderParameters parameter) {
         return data;
     }
 
     static public class OrbitDataLoaderParameters extends AssetLoaderParameters<PointCloudData> {
 
-        Class<? extends IOrbitDataProvider> providerClass;
         public Date ini;
         public boolean forward;
         public double orbitalPeriod;
@@ -67,6 +63,7 @@ public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, Orb
         public String name;
         public OrbitComponent orbitalParamaters;
         public Entity entity;
+        Class<? extends IOrbitDataProvider> providerClass;
 
         public OrbitDataLoaderParameters(Class<? extends IOrbitDataProvider> providerClass) {
             this.providerClass = providerClass;

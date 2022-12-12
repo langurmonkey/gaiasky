@@ -12,11 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-public class LinkButton  extends OwnImageButton {
+public class LinkButton extends OwnImageButton {
 
     private final String linkURL;
 
-    public LinkButton(String linkURL, Skin skin){
+    public LinkButton(String linkURL, Skin skin) {
         super(skin, "link");
         this.linkURL = linkURL;
         initialize(skin);
@@ -28,8 +28,9 @@ public class LinkButton  extends OwnImageButton {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return super.touchDown(event, x, y, pointer, button);
             }
+
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if(event.getButton() == Input.Buttons.LEFT && linkURL != null && !linkURL.isEmpty())
+                if (event.getButton() == Input.Buttons.LEFT && linkURL != null && !linkURL.isEmpty())
                     Gdx.net.openURI(linkURL);
 
                 // Bubble up

@@ -49,7 +49,7 @@ public class RenderModeAbstract {
         ppb.render(fb);
 
         // Render camera
-        if(!Settings.settings.runtime.openVr) {
+        if (!Settings.settings.runtime.openVr) {
             if (fb != null && postproc) {
                 fb.begin();
             }
@@ -59,10 +59,10 @@ public class RenderModeAbstract {
             }
         }
 
-        resultBuffer = fb != null? fb : ppb.pp.getCombinedBuffer().getResultBuffer();
+        resultBuffer = fb != null ? fb : ppb.pp.getCombinedBuffer().getResultBuffer();
     }
 
-    public RenderingContext getRenderingContext(){
+    public RenderingContext getRenderingContext() {
         return rc;
     }
 
@@ -70,7 +70,7 @@ public class RenderModeAbstract {
         return resultBuffer;
     }
 
-    protected void sendOrientationUpdate(PerspectiveCamera cam, int w, int h){
+    protected void sendOrientationUpdate(PerspectiveCamera cam, int w, int h) {
         EventManager.publish(Event.CAMERA_ORIENTATION_UPDATE, this, cam, w, h);
     }
 

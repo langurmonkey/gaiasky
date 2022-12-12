@@ -7,7 +7,7 @@ package gaiasky.util.math;
 
 /**
  * Uses the default {@link java.lang.Math} library. Very accurate but not the
- * fastest in the West.
+ * fastest in the west.
  */
 public class Trigonometry implements ITrigonometry {
 

@@ -16,8 +16,6 @@ import java.lang.reflect.Field;
  * Contains key definitions for Gaia Sky
  */
 public class GSKeys {
-    private static final Log logger = Logger.getLogger(GSKeys.class);
-
     public static final int ANY_KEY = Keys.ANY_KEY;
     public static final int NUM_0 = Keys.NUM_0;
     public static final int NUM_1 = Keys.NUM_1;
@@ -136,7 +134,6 @@ public class GSKeys {
     public static final int PICTSYMBOLS = Keys.PICTSYMBOLS;
     public static final int SWITCH_CHARSET = Keys.SWITCH_CHARSET;
     public static final int CAPS_LOCK = Keys.CAPS_LOCK;
-
     public static final int NUMPAD_0 = Keys.NUMPAD_0;
     public static final int NUMPAD_1 = Keys.NUMPAD_1;
     public static final int NUMPAD_2 = Keys.NUMPAD_2;
@@ -147,7 +144,6 @@ public class GSKeys {
     public static final int NUMPAD_7 = Keys.NUMPAD_7;
     public static final int NUMPAD_8 = Keys.NUMPAD_8;
     public static final int NUMPAD_9 = Keys.NUMPAD_9;
-
     public static final int COLON = Keys.COLON;
     public static final int F1 = Keys.F1;
     public static final int F2 = Keys.F2;
@@ -161,6 +157,7 @@ public class GSKeys {
     public static final int F10 = Keys.F10;
     public static final int F11 = Keys.F11;
     public static final int F12 = Keys.F12;
+    private static final Log logger = Logger.getLogger(GSKeys.class);
 
     public static int valueOf(String name) {
         int code = ANY_KEY;
@@ -178,7 +175,9 @@ public class GSKeys {
     /**
      * Intercepts the toString() method in {@link Keys} and injects our
      * own I18n.
+     *
      * @param keycode The key code.
+     *
      * @return The string representation, internationalized.
      */
     public static String toString(int keycode) {

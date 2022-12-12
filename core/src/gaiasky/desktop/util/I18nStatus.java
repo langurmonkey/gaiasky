@@ -28,14 +28,6 @@ import java.util.stream.Collectors;
 public class I18nStatus {
     private static final Log logger = Logger.getLogger(I18nStatus.class);
 
-    private static class CLIArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
-        @Parameter(names = { "-s", "--show-untranslated" }, description = "Show untranslated keys for each language.", order = 1) private boolean showUntranslated = false;
-        @Parameter(names = { "-u", "--show-unknown" }, description = "Show unknown keys for each language.", order = 2) private boolean showUnknown = false;
-        @Parameter(names = { "-f", "--file"}, description = "The name of the file to check, either 'gsbundle' or 'objects'.", order = 3) private String bundleFile = "gsbundle";
-
-    }
-
     public static void main(String[] args) {
         CLIArgs cliArgs = new CLIArgs();
         JCommander jc = JCommander.newBuilder().addObject(cliArgs).build();
@@ -104,14 +96,13 @@ public class I18nStatus {
             logger.info("Total keys: " + totalKeys);
             logger.info("");
 
-
-            for(Path p : languagePaths) {
+            for (Path p : languagePaths) {
                 String name = p.getFileName().toString();
                 name = name.substring(0, name.lastIndexOf(".properties"));
 
                 String languageCode = name.substring(name.indexOf("_") + 1);
                 String country = null;
-                if(languageCode.contains("_")) {
+                if (languageCode.contains("_")) {
                     country = languageCode.substring(languageCode.indexOf("_") + 1);
                     languageCode = languageCode.substring(0, languageCode.indexOf("_"));
                 }
@@ -127,9 +118,9 @@ public class I18nStatus {
                 Set<Object> missingKeys = new HashSet<>();
                 Enumeration<Object> mainKeys = mainProps.keys();
                 Iterator<Object> it = mainKeys.asIterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     Object key = it.next();
-                    if(lang.containsKey(key)){
+                    if (lang.containsKey(key)) {
                         translatedKeys++;
                     } else {
                         missingKeys.add(key);
@@ -137,9 +128,9 @@ public class I18nStatus {
                 }
                 Set<Object> unknownKeys = new HashSet<>();
                 it = lang.keys().asIterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     Object key = it.next();
-                    if(!mainProps.containsKey(key)) {
+                    if (!mainProps.containsKey(key)) {
                         unknownKeys.add(key);
                     }
                 }
@@ -148,23 +139,22 @@ public class I18nStatus {
                 double percentage = 100.0 * ((double) (translatedKeys + extra) / (double) totalKeys);
                 int unknownCount = unknownKeys.size();
 
-
                 logger.info(locale.getDisplayName() + " (" + locale + ")");
                 logger.info("Translated: " + translatedKeys + "/" + totalKeys + (extra > 0 ? " (+" + extra + " extra)" : ""));
                 logger.info(df.format(percentage) + "%");
-                if(cliArgs.showUnknown && translatedKeys < lang.size()) {
+                if (cliArgs.showUnknown && translatedKeys < lang.size()) {
                     logger.info(unknownCount + " unknown keys:");
                     StringBuilder sb = new StringBuilder();
-                    for(Object key : unknownKeys) {
+                    for (Object key : unknownKeys) {
                         sb.append(key).append(" ");
                     }
                     String keyString = TextUtils.breakCharacters(sb.toString(), 100);
                     logger.info(keyString);
                 }
-                if(cliArgs.showUntranslated && missingKeys.size() > 0) {
+                if (cliArgs.showUntranslated && missingKeys.size() > 0) {
                     logger.info(missingKeys.size() + " untranslated keys:");
                     StringBuilder sb = new StringBuilder();
-                    for(Object key : missingKeys) {
+                    for (Object key : missingKeys) {
                         sb.append(key).append(" ");
                     }
                     String keyString = TextUtils.breakCharacters(sb.toString(), 100);
@@ -176,5 +166,13 @@ public class I18nStatus {
         } catch (IOException e) {
             logger.error(e);
         }
+    }
+
+    private static class CLIArgs {
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+        @Parameter(names = { "-s", "--show-untranslated" }, description = "Show untranslated keys for each language.", order = 1) private boolean showUntranslated = false;
+        @Parameter(names = { "-u", "--show-unknown" }, description = "Show unknown keys for each language.", order = 2) private boolean showUnknown = false;
+        @Parameter(names = { "-f", "--file" }, description = "The name of the file to check, either 'gsbundle' or 'objects'.", order = 3) private String bundleFile = "gsbundle";
+
     }
 }

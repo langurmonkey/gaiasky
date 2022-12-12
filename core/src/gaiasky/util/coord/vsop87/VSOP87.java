@@ -17,6 +17,7 @@ import java.util.Map;
 public class VSOP87 {
     private static final Log logger = Logger.getLogger(VSOP87.class);
     public static VSOP87 instance;
+
     static {
         instance = new VSOP87();
     }

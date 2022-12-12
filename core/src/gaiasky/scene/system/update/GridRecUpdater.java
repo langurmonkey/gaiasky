@@ -15,7 +15,7 @@ import gaiasky.scene.component.RefSysTransform;
 import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -61,7 +61,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
         if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.hasFocus()) {
             // Baked fade-in as we get close to focus
             IFocus focus = camera.getFocus();
-            base.opacity *= MathUtilsd.lint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
+            base.opacity *= MathUtilsDouble.lint(body.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
         }
 
         gr.fovFactor = camera.getFovFactor() * .75e-3f;
@@ -141,7 +141,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
 
         for (int i = -25; i < 25; i++) {
             if (au < Math.pow(10, i)) {
-                double fading = MathUtilsd.lint(au, Math.pow(10d, i - 1), Math.pow(10d, i), 1d, 0d);
+                double fading = MathUtilsDouble.lint(au, Math.pow(10d, i - 1), Math.pow(10d, i), 1d, 0d);
                 res.setFirst(au * Math.pow(10, -i));
                 res.setSecond(fading);
                 return res;

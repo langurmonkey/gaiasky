@@ -6,7 +6,7 @@
 /*
  * GaiaTools
  * Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -35,15 +35,15 @@ import java.util.Date;
  * e.g. the time origin for relative time scales (in ns) and implements
  * {@link #getAttitude(long)} in terms of {@link #getAttitude(long)} which
  * is the same for all servers.
- *
+ * <p>
  * The time context and its possible switch is implemented in a thread-safe manner.
  * Derived classes should hence be likewise thread-safe.
  *
+ * @param <A> type of Attitude that the server is serving
+ *
  * @author Uwe Lammers
  * @version $Id: BaseAttitudeDataServer.java 254926 2012-10-01 15:10:38Z
- *          ulammers $
- * @param <A>
- *            type of Attitude that the server is serving
+ * ulammers $
  */
 public abstract class BaseAttitudeDataServer<A extends IAttitude> {
 
@@ -54,19 +54,16 @@ public abstract class BaseAttitudeDataServer<A extends IAttitude> {
      * (whatever applicable) are up to date.
      */
     protected boolean initialized = false;
-
-    private long refEpoch = -1;
-
     /**
      * native and initially requested time context of the server - has to be set by the implementing class
      */
     protected TimeContext nativeTimeContext = null;
     protected TimeContext initialRequestedTimeContext = null;
-
     /**
      * switch to decide if attitude uncertainties and correlations should be calculated
      */
     protected boolean withUncertaintiesCorrelations = true;
+    private long refEpoch = -1;
 
     /**
      * @return Returns the initialised.
@@ -97,19 +94,17 @@ public abstract class BaseAttitudeDataServer<A extends IAttitude> {
     abstract protected A getAttitudeNative(long time);
 
     /**
-     *
-     * @param t Reference time in nanoseconds (jd)
-     */
-    public void setRefTime(long t) {
-        this.refEpoch = t;
-    }
-
-    /**
-     *
      * @return The reference time in ns
      */
     public long getRefTime() {
         return refEpoch;
+    }
+
+    /**
+     * @param t Reference time in nanoseconds (jd)
+     */
+    public void setRefTime(long t) {
+        this.refEpoch = t;
     }
 
 }

@@ -40,253 +40,35 @@ import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
  * <p>
  */
 public class VRContext implements Disposable {
-    private static final Log logger = getLogger(VRContext.class);
-
     /**
      * device index of the head mounted display
      **/
     public static final int HMD_DEVICE_INDEX = VR.k_unTrackedDeviceIndex_Hmd;
-
     /**
      * maximum device index
      **/
     public static final int MAX_DEVICE_INDEX = VR.k_unMaxTrackedDeviceCount - 1;
-
-    /**
-     * Space in which matrices and vectors are returned in by {@link VRDevice}
-     * methods taking a {@link Space}.
-     */
-    public enum Space {
-        Tracker,
-        World
-    }
-
-    /**
-     * Type of a {@link VRDevice}
-     */
-    public enum VRDeviceType {
-        /**
-         * the head mounted display
-         **/
-        HeadMountedDisplay,
-        /**
-         * a controller like Oculus touch or HTC Vice controller
-         **/
-        Controller,
-        /**
-         * a camera/base station tracking the HMD and/or controllers
-         **/
-        BaseStation,
-        /**
-         * a generic VR tracking device
-         **/
-        Generic
-    }
-
-    /**
-     * The role of a {@link VRDevice} of type {@link VRDeviceType#Controller}
-     */
-    public enum VRControllerRole {
-        Invalid,
-        LeftHand,
-        Max,
-        OptOut,
-        RightHand,
-        Treadmill
-    }
-
-    /**
-     * Button ids on VR controllers
-     */
-    public static class VRControllerButtons {
-        public static final int System = 0;
-        public static final int ApplicationMenu = 1;
-        public static final int Grip = 2;
-        public static final int DPad_Left = 3;
-        public static final int DPad_Up = 4;
-        public static final int DPad_Right = 5;
-        public static final int DPad_Down = 6;
-        public static final int A = 7;
-        public static final int B = 1;
-
-        public static final int ProximitySensor = 31;
-
-        public static final int Axis0 = 32;
-        public static final int Axis1 = 33;
-        public static final int Axis2 = 34;
-        public static final int Axis3 = 35;
-        public static final int Axis4 = 36;
-
-        // aliases for well known controllers
-        public static final int SteamVR_Touchpad = Axis0;
-        public static final int SteamVR_Trigger = Axis1;
-
-        public static final int Dashboard_Back = Grip;
-    }
-
-    /**
-     * Axes ids on VR controllers
-     */
-    public static class VRControllerAxes {
-        public static final int Axis0 = 0;
-        public static final int Axis1 = 1;
-        public static final int Axis2 = 2;
-        public static final int Axis3 = 3;
-        public static final int Axis4 = 4;
-
-        // aliases for known controllers
-        public static final int SteamVR_Touchpad = Axis0;
-        public static final int SteamVR_Trigger = Axis1;
-    }
-
-    public enum VRDeviceProperty {
-        Invalid(0),
-
-        // general properties that apply to all device classes
-        TrackingSystemName_String(1000),
-        ModelNumber_String(1001),
-        SerialNumber_String(1002),
-        RenderModelName_String(1003),
-        WillDriftInYaw_Bool(1004),
-        ManufacturerName_String(1005),
-        TrackingFirmwareVersion_String(1006),
-        HardwareRevision_String(1007),
-        AllWirelessDongleDescriptions_String(1008),
-        ConnectedWirelessDongle_String(1009),
-        DeviceIsWireless_Bool(1010),
-        DeviceIsCharging_Bool(1011),
-        DeviceBatteryPercentage_Float(1012), // 0 is empty), 1 is full
-        // StatusDisplayTransform_Matrix34		(1013),
-        Firmware_UpdateAvailable_Bool(1014),
-        Firmware_ManualUpdate_Bool(1015),
-        Firmware_ManualUpdateURL_String(1016),
-        HardwareRevision_Uint64(1017),
-        FirmwareVersion_Uint64(1018),
-        FPGAVersion_Uint64(1019),
-        VRCVersion_Uint64(1020),
-        RadioVersion_Uint64(1021),
-        DongleVersion_Uint64(1022),
-        BlockServerShutdown_Bool(1023),
-        CanUnifyCoordinateSystemWithHmd_Bool(1024),
-        ContainsProximitySensor_Bool(1025),
-        DeviceProvidesBatteryStatus_Bool(1026),
-        DeviceCanPowerOff_Bool(1027),
-        Firmware_ProgrammingTarget_String(1028),
-        DeviceClass_Int32(1029),
-        HasCamera_Bool(1030),
-        DriverVersion_String(1031),
-        Firmware_ForceUpdateRequired_Bool(1032),
-        ViveSystemButtonFixRequired_Bool(1033),
-
-        // Properties that are unique to TrackedDeviceClass_HMD
-        ReportsTimeSinceVSync_Bool(2000),
-        SecondsFromVsyncToPhotons_Float(2001),
-        DisplayFrequency_Float(2002),
-        UserIpdMeters_Float(2003),
-        CurrentUniverseId_Uint64(2004),
-        PreviousUniverseId_Uint64(2005),
-        DisplayFirmwareVersion_Uint64(2006),
-        IsOnDesktop_Bool(2007),
-        DisplayMCType_Int32(2008),
-        DisplayMCOffset_Float(2009),
-        DisplayMCScale_Float(2010),
-        EdidVendorID_Int32(2011),
-        DisplayMCImageLeft_String(2012),
-        DisplayMCImageRight_String(2013),
-        DisplayGCBlackClamp_Float(2014),
-        EdidProductID_Int32(2015),
-        // FIXME
-        // CameraToHeadTransform_Matrix34			(2016),
-        DisplayGCType_Int32(2017),
-        DisplayGCOffset_Float(2018),
-        DisplayGCScale_Float(2019),
-        DisplayGCPrescale_Float(2020),
-        DisplayGCImage_String(2021),
-        LensCenterLeftU_Float(2022),
-        LensCenterLeftV_Float(2023),
-        LensCenterRightU_Float(2024),
-        LensCenterRightV_Float(2025),
-        UserHeadToEyeDepthMeters_Float(2026),
-        CameraFirmwareVersion_Uint64(2027),
-        CameraFirmwareDescription_String(2028),
-        DisplayFPGAVersion_Uint64(2029),
-        DisplayBootloaderVersion_Uint64(2030),
-        DisplayHardwareVersion_Uint64(2031),
-        AudioFirmwareVersion_Uint64(2032),
-        CameraCompatibilityMode_Int32(2033),
-        ScreenshotHorizontalFieldOfViewDegrees_Float(2034),
-        ScreenshotVerticalFieldOfViewDegrees_Float(2035),
-        DisplaySuppressed_Bool(2036),
-        DisplayAllowNightMode_Bool(2037),
-
-        // Properties that are unique to TrackedDeviceClass_Controller
-        AttachedDeviceId_String(3000),
-        SupportedButtons_Uint64(3001),
-        Axis0Type_Int32(3002), // Return value is of type EVRControllerAxisType
-        Axis1Type_Int32(3003), // Return value is of type EVRControllerAxisType
-        Axis2Type_Int32(3004), // Return value is of type EVRControllerAxisType
-        Axis3Type_Int32(3005), // Return value is of type EVRControllerAxisType
-        Axis4Type_Int32(3006), // Return value is of type EVRControllerAxisType
-        ControllerRoleHint_Int32(3007), // Return value is of type ETrackedControllerRole
-
-        // Properties that are unique to TrackedDeviceClass_TrackingReference
-        FieldOfViewLeftDegrees_Float(4000),
-        FieldOfViewRightDegrees_Float(4001),
-        FieldOfViewTopDegrees_Float(4002),
-        FieldOfViewBottomDegrees_Float(4003),
-        TrackingRangeMinimumMeters_Float(4004),
-        TrackingRangeMaximumMeters_Float(4005),
-        ModeLabel_String(4006),
-
-        // Properties that are used for user interface like icons names
-        IconPathName_String(5000), // usually a directory named "icons"
-        NamedIconPathDeviceOff_String(5001), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-        NamedIconPathDeviceSearching_String(5002), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-        NamedIconPathDeviceSearchingAlert_String(5003), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-        NamedIconPathDeviceReady_String(5004), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-        NamedIconPathDeviceReadyAlert_String(5005), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-        NamedIconPathDeviceNotReady_String(5006), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-        NamedIconPathDeviceStandby_String(5007), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-        NamedIconPathDeviceAlertLow_String(5008), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
-
-        // Vendors are free to expose private debug data in this reserved region
-        VendorSpecific_Reserved_Start(10000),
-        VendorSpecific_Reserved_End(10999);
-
-        public final int value;
-
-        VRDeviceProperty(int value) {
-            this.value = value;
-        }
-    }
-
+    private static final Log logger = getLogger(VRContext.class);
     private final IntBuffer scratch = BufferUtils.newIntBuffer(1);
-
-    // internal native objects to get device poses 
+    // internal native objects to get device poses
     private final TrackedDevicePose.Buffer trackedDevicePoses = TrackedDevicePose.create(VR.k_unMaxTrackedDeviceCount);
     private final TrackedDevicePose.Buffer trackedDeviceGamePoses = TrackedDevicePose.create(VR.k_unMaxTrackedDeviceCount);
-
     // devices, their poses and listeners
     private final VRDevicePose[] devicePoses = new VRDevicePose[VR.k_unMaxTrackedDeviceCount];
     private final VRDevice[] devices = new VRDevice[VR.k_unMaxTrackedDeviceCount];
     private final Array<VRDeviceListener> listeners = new Array<VRDeviceListener>();
     private final VREvent event = VREvent.create();
-
     // default size
     private final int width;
     private final int height;
-
     // render models
     private final ObjectMap<String, IntModel> models = new ObjectMap<>();
-
-    // book keeping
-    private boolean renderingStarted = false;
-    private boolean initialDevicesReported = false;
-
     // offsets for translation and rotation from tracker to world space
     private final Vector3 trackerSpaceOriginToWorldSpaceTranslationOffset = new Vector3();
     private final Matrix4 trackerSpaceToWorldspaceRotationOffset = new Matrix4();
-
+    // book keeping
+    private boolean renderingStarted = false;
+    private boolean initialDevicesReported = false;
     /**
      * Creates a new VRContext, initializes the VR system, and sets up rendering
      * surfaces with depth attachments.
@@ -324,6 +106,56 @@ public class VRContext implements Disposable {
         VRSystem.VRSystem_GetRecommendedRenderTargetSize(scratch, scratch2);
         width = (int) (scratch.get(0) * renderTargetMultiplier);
         height = (int) (scratch2.get(0) * renderTargetMultiplier);
+    }
+
+    public static void hmdMat4toMatrix4(HmdMatrix44 hdm, Matrix4 mat) {
+        float[] val = mat.val;
+        FloatBuffer m = hdm.m();
+
+        val[0] = m.get(0);
+        val[1] = m.get(4);
+        val[2] = m.get(8);
+        val[3] = m.get(12);
+
+        val[4] = m.get(1);
+        val[5] = m.get(5);
+        val[6] = m.get(9);
+        val[7] = m.get(13);
+
+        val[8] = m.get(2);
+        val[9] = m.get(6);
+        val[10] = m.get(10);
+        val[11] = m.get(14);
+
+        val[12] = m.get(3);
+        val[13] = m.get(7);
+        val[14] = m.get(11);
+        val[15] = m.get(15);
+    }
+
+    public static void hmdMat34ToMatrix4(HmdMatrix34 hmd, Matrix4 mat) {
+        float[] val = mat.val;
+        FloatBuffer m = hmd.m();
+
+        val[0] = m.get(0);
+        val[1] = m.get(4);
+        val[2] = m.get(8);
+        val[3] = 0;
+
+        val[4] = m.get(1);
+        val[5] = m.get(5);
+        val[6] = m.get(9);
+        val[7] = 0;
+
+        val[8] = m.get(2);
+        val[9] = m.get(6);
+        val[10] = m.get(10);
+        val[11] = 0;
+
+        val[12] = m.get(3);
+        val[13] = m.get(7);
+        val[14] = m.get(11);
+        val[15] = 1;
     }
 
     public int getWidth() {
@@ -733,6 +565,214 @@ public class VRContext implements Disposable {
     }
 
     /**
+     * Space in which matrices and vectors are returned in by {@link VRDevice}
+     * methods taking a {@link Space}.
+     */
+    public enum Space {
+        Tracker,
+        World
+    }
+
+    /**
+     * Type of a {@link VRDevice}
+     */
+    public enum VRDeviceType {
+        /**
+         * the head mounted display
+         **/
+        HeadMountedDisplay,
+        /**
+         * a controller like Oculus touch or HTC Vice controller
+         **/
+        Controller,
+        /**
+         * a camera/base station tracking the HMD and/or controllers
+         **/
+        BaseStation,
+        /**
+         * a generic VR tracking device
+         **/
+        Generic
+    }
+
+    /**
+     * The role of a {@link VRDevice} of type {@link VRDeviceType#Controller}
+     */
+    public enum VRControllerRole {
+        Invalid,
+        LeftHand,
+        Max,
+        OptOut,
+        RightHand,
+        Treadmill
+    }
+
+    public enum VRDeviceProperty {
+        Invalid(0),
+
+        // general properties that apply to all device classes
+        TrackingSystemName_String(1000),
+        ModelNumber_String(1001),
+        SerialNumber_String(1002),
+        RenderModelName_String(1003),
+        WillDriftInYaw_Bool(1004),
+        ManufacturerName_String(1005),
+        TrackingFirmwareVersion_String(1006),
+        HardwareRevision_String(1007),
+        AllWirelessDongleDescriptions_String(1008),
+        ConnectedWirelessDongle_String(1009),
+        DeviceIsWireless_Bool(1010),
+        DeviceIsCharging_Bool(1011),
+        DeviceBatteryPercentage_Float(1012), // 0 is empty), 1 is full
+        // StatusDisplayTransform_Matrix34		(1013),
+        Firmware_UpdateAvailable_Bool(1014),
+        Firmware_ManualUpdate_Bool(1015),
+        Firmware_ManualUpdateURL_String(1016),
+        HardwareRevision_Uint64(1017),
+        FirmwareVersion_Uint64(1018),
+        FPGAVersion_Uint64(1019),
+        VRCVersion_Uint64(1020),
+        RadioVersion_Uint64(1021),
+        DongleVersion_Uint64(1022),
+        BlockServerShutdown_Bool(1023),
+        CanUnifyCoordinateSystemWithHmd_Bool(1024),
+        ContainsProximitySensor_Bool(1025),
+        DeviceProvidesBatteryStatus_Bool(1026),
+        DeviceCanPowerOff_Bool(1027),
+        Firmware_ProgrammingTarget_String(1028),
+        DeviceClass_Int32(1029),
+        HasCamera_Bool(1030),
+        DriverVersion_String(1031),
+        Firmware_ForceUpdateRequired_Bool(1032),
+        ViveSystemButtonFixRequired_Bool(1033),
+
+        // Properties that are unique to TrackedDeviceClass_HMD
+        ReportsTimeSinceVSync_Bool(2000),
+        SecondsFromVsyncToPhotons_Float(2001),
+        DisplayFrequency_Float(2002),
+        UserIpdMeters_Float(2003),
+        CurrentUniverseId_Uint64(2004),
+        PreviousUniverseId_Uint64(2005),
+        DisplayFirmwareVersion_Uint64(2006),
+        IsOnDesktop_Bool(2007),
+        DisplayMCType_Int32(2008),
+        DisplayMCOffset_Float(2009),
+        DisplayMCScale_Float(2010),
+        EdidVendorID_Int32(2011),
+        DisplayMCImageLeft_String(2012),
+        DisplayMCImageRight_String(2013),
+        DisplayGCBlackClamp_Float(2014),
+        EdidProductID_Int32(2015),
+        // FIXME
+        // CameraToHeadTransform_Matrix34			(2016),
+        DisplayGCType_Int32(2017),
+        DisplayGCOffset_Float(2018),
+        DisplayGCScale_Float(2019),
+        DisplayGCPrescale_Float(2020),
+        DisplayGCImage_String(2021),
+        LensCenterLeftU_Float(2022),
+        LensCenterLeftV_Float(2023),
+        LensCenterRightU_Float(2024),
+        LensCenterRightV_Float(2025),
+        UserHeadToEyeDepthMeters_Float(2026),
+        CameraFirmwareVersion_Uint64(2027),
+        CameraFirmwareDescription_String(2028),
+        DisplayFPGAVersion_Uint64(2029),
+        DisplayBootloaderVersion_Uint64(2030),
+        DisplayHardwareVersion_Uint64(2031),
+        AudioFirmwareVersion_Uint64(2032),
+        CameraCompatibilityMode_Int32(2033),
+        ScreenshotHorizontalFieldOfViewDegrees_Float(2034),
+        ScreenshotVerticalFieldOfViewDegrees_Float(2035),
+        DisplaySuppressed_Bool(2036),
+        DisplayAllowNightMode_Bool(2037),
+
+        // Properties that are unique to TrackedDeviceClass_Controller
+        AttachedDeviceId_String(3000),
+        SupportedButtons_Uint64(3001),
+        Axis0Type_Int32(3002), // Return value is of type EVRControllerAxisType
+        Axis1Type_Int32(3003), // Return value is of type EVRControllerAxisType
+        Axis2Type_Int32(3004), // Return value is of type EVRControllerAxisType
+        Axis3Type_Int32(3005), // Return value is of type EVRControllerAxisType
+        Axis4Type_Int32(3006), // Return value is of type EVRControllerAxisType
+        ControllerRoleHint_Int32(3007), // Return value is of type ETrackedControllerRole
+
+        // Properties that are unique to TrackedDeviceClass_TrackingReference
+        FieldOfViewLeftDegrees_Float(4000),
+        FieldOfViewRightDegrees_Float(4001),
+        FieldOfViewTopDegrees_Float(4002),
+        FieldOfViewBottomDegrees_Float(4003),
+        TrackingRangeMinimumMeters_Float(4004),
+        TrackingRangeMaximumMeters_Float(4005),
+        ModeLabel_String(4006),
+
+        // Properties that are used for user interface like icons names
+        IconPathName_String(5000), // usually a directory named "icons"
+        NamedIconPathDeviceOff_String(5001), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+        NamedIconPathDeviceSearching_String(5002), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+        NamedIconPathDeviceSearchingAlert_String(5003), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+        NamedIconPathDeviceReady_String(5004), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+        NamedIconPathDeviceReadyAlert_String(5005), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+        NamedIconPathDeviceNotReady_String(5006), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+        NamedIconPathDeviceStandby_String(5007), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+        NamedIconPathDeviceAlertLow_String(5008), // PNG for static icon), or GIF for animation), 50x32 for headsets and 32x32 for others
+
+        // Vendors are free to expose private debug data in this reserved region
+        VendorSpecific_Reserved_Start(10000),
+        VendorSpecific_Reserved_End(10999);
+
+        public final int value;
+
+        VRDeviceProperty(int value) {
+            this.value = value;
+        }
+    }
+
+    /**
+     * Button ids on VR controllers
+     */
+    public static class VRControllerButtons {
+        public static final int System = 0;
+        public static final int ApplicationMenu = 1;
+        public static final int Grip = 2;
+        public static final int DPad_Left = 3;
+        public static final int DPad_Up = 4;
+        public static final int DPad_Right = 5;
+        public static final int DPad_Down = 6;
+        public static final int A = 7;
+        public static final int B = 1;
+
+        public static final int ProximitySensor = 31;
+
+        public static final int Axis0 = 32;
+        public static final int Axis1 = 33;
+        public static final int Axis2 = 34;
+        public static final int Axis3 = 35;
+        public static final int Axis4 = 36;
+
+        // aliases for well known controllers
+        public static final int SteamVR_Touchpad = Axis0;
+        public static final int SteamVR_Trigger = Axis1;
+
+        public static final int Dashboard_Back = Grip;
+    }
+
+    /**
+     * Axes ids on VR controllers
+     */
+    public static class VRControllerAxes {
+        public static final int Axis0 = 0;
+        public static final int Axis1 = 1;
+        public static final int Axis2 = 2;
+        public static final int Axis3 = 3;
+        public static final int Axis4 = 4;
+
+        // aliases for known controllers
+        public static final int SteamVR_Touchpad = Axis0;
+        public static final int SteamVR_Trigger = Axis1;
+    }
+
+    /**
      * Represents the pose of a {@link VRDevice}, including its transform,
      * velocity and angular velocity. Also indicates whether the pose is valid
      * and whether the device is connected.
@@ -752,6 +792,10 @@ public class VRContext implements Disposable {
          **/
         public final Vector3 angularVelocity = new Vector3();
         /**
+         * the device index
+         **/
+        private final int index;
+        /**
          * whether the pose is valid our invalid, e.g. outdated because of
          * tracking failure
          **/
@@ -760,10 +804,6 @@ public class VRContext implements Disposable {
          * whether the device is connected
          **/
         public boolean isConnected;
-        /**
-         * the device index
-         **/
-        private final int index;
 
         public VRDevicePose(int index) {
             this.index = index;
@@ -779,33 +819,27 @@ public class VRContext implements Disposable {
      * etc.
      */
     public class VRDevice {
-        public String renderModelName, modelNumber, manufacturerName;
-
         private final VRDevicePose pose;
         private final VRDeviceType type;
-        private VRControllerRole role;
-        private long buttons = 0;
         private final VRControllerState state = VRControllerState.create();
-        private IntModelInstance modelInstance;
-
         // tracker space
         private final Vector3 position = new Vector3();
         private final Vector3 xAxis = new Vector3();
         private final Vector3 yAxis = new Vector3();
         private final Vector3 zAxis = new Vector3();
-
         // world space
         private final Vector3 positionWorld = new Vector3();
         private final Vector3 xAxisWorld = new Vector3();
         private final Vector3 yAxisWorld = new Vector3();
         private final Vector3 zAxisWorld = new Vector3();
-
+        private final Matrix4 matTmp = new Matrix4();
+        public String renderModelName, modelNumber, manufacturerName;
         // axes state, only for controllers
         // [axis][x,y]
         float[][] axes;
-
-        private final Matrix4 matTmp = new Matrix4();
-
+        private VRControllerRole role;
+        private long buttons = 0;
+        private IntModelInstance modelInstance;
         private boolean initialized;
 
         VRDevice(VRDevicePose pose, VRDeviceType type, VRControllerRole role) {
@@ -1072,55 +1106,5 @@ public class VRContext implements Disposable {
         public boolean isInitialized() {
             return initialized;
         }
-    }
-
-    public static void hmdMat4toMatrix4(HmdMatrix44 hdm, Matrix4 mat) {
-        float[] val = mat.val;
-        FloatBuffer m = hdm.m();
-
-        val[0] = m.get(0);
-        val[1] = m.get(4);
-        val[2] = m.get(8);
-        val[3] = m.get(12);
-
-        val[4] = m.get(1);
-        val[5] = m.get(5);
-        val[6] = m.get(9);
-        val[7] = m.get(13);
-
-        val[8] = m.get(2);
-        val[9] = m.get(6);
-        val[10] = m.get(10);
-        val[11] = m.get(14);
-
-        val[12] = m.get(3);
-        val[13] = m.get(7);
-        val[14] = m.get(11);
-        val[15] = m.get(15);
-    }
-
-    public static void hmdMat34ToMatrix4(HmdMatrix34 hmd, Matrix4 mat) {
-        float[] val = mat.val;
-        FloatBuffer m = hmd.m();
-
-        val[0] = m.get(0);
-        val[1] = m.get(4);
-        val[2] = m.get(8);
-        val[3] = 0;
-
-        val[4] = m.get(1);
-        val[5] = m.get(5);
-        val[6] = m.get(9);
-        val[7] = 0;
-
-        val[8] = m.get(2);
-        val[9] = m.get(6);
-        val[10] = m.get(10);
-        val[11] = 0;
-
-        val[12] = m.get(3);
-        val[13] = m.get(7);
-        val[14] = m.get(11);
-        val[15] = 1;
     }
 }

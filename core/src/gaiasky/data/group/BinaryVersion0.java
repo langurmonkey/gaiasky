@@ -14,6 +14,7 @@ public class BinaryVersion0 extends BinaryIOBase {
     public BinaryVersion0() {
         super(9, 4, true);
     }
+
     @Override
     public void writeParticleRecord(IParticleRecord sb, DataOutputStream out) throws IOException {
         // 9 doubles

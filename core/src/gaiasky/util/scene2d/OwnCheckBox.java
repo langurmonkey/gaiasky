@@ -170,14 +170,15 @@ public class OwnCheckBox extends CheckBox {
             // From WidgetGroup
             validate();
             // From Group
-            if (isTransform()) applyTransform(batch, computeTransform());
+            if (isTransform())
+                applyTransform(batch, computeTransform());
             drawChildren(batch, parentAlpha);
-            if (isTransform()) resetTransform(batch);
+            if (isTransform())
+                resetTransform(batch);
             // End Group
             // End WidgetGroup
         }
         // End Table
-
 
         if (offset) {
             for (int i = 0; i < children.size; i++)

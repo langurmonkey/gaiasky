@@ -50,58 +50,44 @@ public abstract class GenericDialog extends CollapsibleWindow {
         updatePads();
     }
 
-    public static void updatePads() {
-        pad34 = 34f;
-        pad20 = 20f;
-        pad18 = 18f;
-        pad10 = 10f;
-    }
-
     final protected Stage stage;
     final protected Skin skin;
+    public TextButton acceptButton, cancelButton;
     protected GenericDialog me;
     protected Table content, bottom;
-    private String acceptText = null, cancelText = null;
-    private String acceptStyle = "default", cancelStyle = "default";
     protected boolean modal = true;
     protected boolean defaultMouseKbdListener = true;
     protected boolean defaultGamepadListener = true;
-
     protected float lastPosX = -1, lastPosY = -1;
-
     protected HorizontalGroup buttonGroup;
-    public TextButton acceptButton, cancelButton;
-
     protected boolean enterExit = true, escExit = true;
-
     protected Runnable acceptRunnable, cancelRunnable;
-
-    private Actor previousKeyboardFocus, previousScrollFocus;
-
     // Specific mouse/keyboard listener, if any.
     protected AbstractMouseKbdListener mouseKbdListener;
-
     // The gamepad listener for this window, if any.
     protected AbstractGamepadListener gamepadListener;
-
     /** If this dialog has tabs, this list holds them. **/
     protected Array<Button> tabButtons;
     /** Currently selected tab **/
     protected int selectedTab = 0;
-
     /** Actual actor for each tab. **/
     protected Array<Group> tabContents;
     /** Tab contents stack. **/
     protected Stack tabStack;
-
     protected InputListener ignoreTouchDown = new InputListener() {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
             event.cancel();
             return false;
         }
     };
-
     protected Array<OwnScrollPane> scrolls;
+    // Backup active mouse/keyboard listeners before entering this dialog.
+    protected Set<AbstractMouseKbdListener> backupMouseKbdListeners = new HashSet<>();
+    // Backup of the gamepad listeners present before entering this dialog.
+    protected Set<ControllerListener> backupGamepadListeners = null;
+    private String acceptText = null, cancelText = null;
+    private String acceptStyle = "default", cancelStyle = "default";
+    private Actor previousKeyboardFocus, previousScrollFocus;
 
     public GenericDialog(String title, Skin skin, Stage stage) {
         super(title, skin);
@@ -111,6 +97,13 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.content = new Table(skin);
         this.bottom = new Table(skin);
         this.scrolls = new Array<>(false, 5);
+    }
+
+    public static void updatePads() {
+        pad34 = 34f;
+        pad20 = 20f;
+        pad18 = 18f;
+        pad10 = 10f;
     }
 
     public void setAcceptText(String acceptText) {
@@ -587,11 +580,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 c.setDisabled(!enabled);
         }
     }
-
-    // Backup active mouse/keyboard listeners before entering this dialog.
-    protected Set<AbstractMouseKbdListener> backupMouseKbdListeners = new HashSet<>();
-    // Backup of the gamepad listeners present before entering this dialog.
-    protected Set<ControllerListener> backupGamepadListeners = null;
 
     private void addOwnListeners() {
         if (mouseKbdListener != null) {

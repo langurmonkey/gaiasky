@@ -7,7 +7,7 @@ package gaiasky.vr.openvr;
 
 public class ControllerModelNotFoundException extends Exception {
 
-    public ControllerModelNotFoundException(String message, Throwable t){
+    public ControllerModelNotFoundException(String message, Throwable t) {
         super(message, t);
     }
 }

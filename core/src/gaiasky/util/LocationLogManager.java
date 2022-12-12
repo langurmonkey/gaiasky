@@ -24,6 +24,14 @@ public class LocationLogManager implements IObserver {
 
     private static final int MAX_SIZE = 200;
     private static LocationLogManager instance;
+    /**
+     * Array that holds the locations
+     */
+    private final LinkedList<LocationRecord> locations;
+
+    public LocationLogManager() {
+        this.locations = new LinkedList<>();
+    }
 
     public static LocationLogManager instance() {
         if (instance == null) {
@@ -34,45 +42,6 @@ public class LocationLogManager implements IObserver {
 
     public static void initialize() {
         instance = new LocationLogManager();
-    }
-
-    /**
-     * Array that holds the locations
-     */
-    private final LinkedList<LocationRecord> locations;
-
-    /**
-     * A single location
-     */
-    public static class LocationRecord {
-        public String name;
-        public Vector3b position;
-        public Vector3d direction;
-        public Vector3d up;
-        public Instant simulationTime;
-        public Instant entryTime;
-
-        @Override
-        public String toString() {
-            String elapsedStr = "";
-            if (entryTime != null) {
-                elapsedStr = elapsedString();
-            }
-            return name + " (" + I18n.msg("gui.locationlog.ago", elapsedStr) + ")";
-        }
-
-        public String elapsedString() {
-            long elapsedMs = Instant.now().toEpochMilli() - entryTime.toEpochMilli();
-            return GlobalResources.msToTimeString(elapsedMs);
-        }
-
-        public String toStringFull() {
-            return "LocationRecord{" + "\n\tname='" + name + '\'' + "\n\tposition=" + position + "\n\tdirection=" + direction + "\n\tup=" + up + "\n\tsimulationTime=" + simulationTime + "\n\tentryTime=" + entryTime + "\n" + '}';
-        }
-    }
-
-    public LocationLogManager() {
-        this.locations = new LinkedList<>();
     }
 
     public LinkedList<LocationRecord> getLocations() {
@@ -144,6 +113,36 @@ public class LocationLogManager implements IObserver {
             final IFocus closest = (IFocus) data[0];
             this.addRecord(closest, GaiaSky.instance.getICamera(), GaiaSky.instance.time);
 
+        }
+    }
+
+    /**
+     * A single location
+     */
+    public static class LocationRecord {
+        public String name;
+        public Vector3b position;
+        public Vector3d direction;
+        public Vector3d up;
+        public Instant simulationTime;
+        public Instant entryTime;
+
+        @Override
+        public String toString() {
+            String elapsedStr = "";
+            if (entryTime != null) {
+                elapsedStr = elapsedString();
+            }
+            return name + " (" + I18n.msg("gui.locationlog.ago", elapsedStr) + ")";
+        }
+
+        public String elapsedString() {
+            long elapsedMs = Instant.now().toEpochMilli() - entryTime.toEpochMilli();
+            return GlobalResources.msToTimeString(elapsedMs);
+        }
+
+        public String toStringFull() {
+            return "LocationRecord{" + "\n\tname='" + name + '\'' + "\n\tposition=" + position + "\n\tdirection=" + direction + "\n\tup=" + up + "\n\tsimulationTime=" + simulationTime + "\n\tentryTime=" + entryTime + "\n" + '}';
         }
     }
 }

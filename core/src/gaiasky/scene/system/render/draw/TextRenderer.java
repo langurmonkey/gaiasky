@@ -28,11 +28,9 @@ import java.util.List;
 public class TextRenderer extends FontRenderSystem {
 
     private final ExtSpriteBatch batch;
-    public BitmapFont fontDistanceField, font2d, fontTitles;
-
     private final AnnotationsEntityRenderSystem girdRenderer;
-
     private final LabelView view;
+    public BitmapFont fontDistanceField, font2d, fontTitles;
 
     public TextRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(sceneRenderer, rg, alphas, new ExtShaderProgram[] { program });

@@ -44,6 +44,54 @@ public class UCDParser {
     public static String[] varimagscolnames = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
     public static String[] varitimescolnames = new String[] { "g_transit_time", "time_list", "time_series" };
     public static String[] periodcolnames = new String[] { "pf", "period" };
+    public Map<UCDType, Set<UCD>> ucdmap;
+    // IDS
+    public boolean hasid = false;
+    public Array<UCD> ID;
+    // NAME
+    public boolean hasname = false;
+    public Array<UCD> NAME;
+    // POSITIONS
+    public boolean haspos = false;
+    public Array<UCD> POS1, POS2, POS3;
+    // PROPER MOTIONS
+    public boolean haspm = false;
+    public Array<UCD> PMRA, PMDEC, RADVEL;
+    // MAGNITUDES
+    public boolean hasmag = false;
+    public Array<UCD> MAG;
+    // COLORS
+    public boolean hascol = false;
+    public Array<UCD> COL;
+    // PHYSICAL PARAMS
+    public boolean hasteff = false;
+    public Array<UCD> TEFF;
+    // VARIABILITY
+    public boolean hasvari = false;
+    public boolean hasperiod = false;
+    public Array<UCD> VARI_TIMES, VARI_MAGS, VARI_PERIOD;
+    // REST
+    public Array<UCD> extra;
+
+    public UCDParser() {
+        super();
+        ucdmap = new HashMap<>();
+        ID = new Array<>();
+        NAME = new Array<>();
+        POS1 = new Array<>();
+        POS2 = new Array<>();
+        POS3 = new Array<>();
+        MAG = new Array<>();
+        COL = new Array<>();
+        PMRA = new Array<>();
+        PMDEC = new Array<>();
+        RADVEL = new Array<>();
+        TEFF = new Array<>();
+        VARI_TIMES = new Array<>();
+        VARI_MAGS = new Array<>();
+        VARI_PERIOD = new Array<>();
+        extra = new Array<>();
+    }
 
     public static boolean isName(String colname) {
         return TextUtils.contains(namecolnames, colname, true);
@@ -123,64 +171,6 @@ public class UCDParser {
 
     public static boolean isPeriod(String colname) {
         return TextUtils.contains(periodcolnames, colname, true);
-    }
-
-    public Map<UCDType, Set<UCD>> ucdmap;
-
-    // IDS
-    public boolean hasid = false;
-    public Array<UCD> ID;
-
-    // NAME
-    public boolean hasname = false;
-    public Array<UCD> NAME;
-
-    // POSITIONS
-    public boolean haspos = false;
-    public Array<UCD> POS1, POS2, POS3;
-
-    // PROPER MOTIONS
-    public boolean haspm = false;
-    public Array<UCD> PMRA, PMDEC, RADVEL;
-
-    // MAGNITUDES
-    public boolean hasmag = false;
-    public Array<UCD> MAG;
-
-    // COLORS
-    public boolean hascol = false;
-    public Array<UCD> COL;
-
-    // PHYSICAL PARAMS
-    public boolean hasteff = false;
-    public Array<UCD> TEFF;
-
-    // VARIABILITY
-    public boolean hasvari = false;
-    public boolean hasperiod = false;
-    public Array<UCD> VARI_TIMES, VARI_MAGS, VARI_PERIOD;
-
-    // REST
-    public Array<UCD> extra;
-
-    public UCDParser() {
-        super();
-        ucdmap = new HashMap<>();
-        ID = new Array<>();
-        NAME = new Array<>();
-        POS1 = new Array<>();
-        POS2 = new Array<>();
-        POS3 = new Array<>();
-        MAG = new Array<>();
-        COL = new Array<>();
-        PMRA = new Array<>();
-        PMDEC = new Array<>();
-        RADVEL = new Array<>();
-        TEFF = new Array<>();
-        VARI_TIMES = new Array<>();
-        VARI_MAGS = new Array<>();
-        VARI_PERIOD = new Array<>();
-        extra = new Array<>();
     }
 
     /**
@@ -421,7 +411,6 @@ public class UCDParser {
         }
         this.hasperiod = !this.VARI_PERIOD.isEmpty();
 
-
         // REST OF COLUMNS
         Set<UCDType> keys = ucdmap.keySet();
         for (UCDType ucdType : keys) {
@@ -475,7 +464,7 @@ public class UCDParser {
     }
 
     public UCD getByColumName(String columName) {
-        return getByColNames(new String[]{columName}).first();
+        return getByColNames(new String[] { columName }).first();
     }
 
     private Array<UCD> getByColNames(String[] colnames) {
@@ -553,6 +542,7 @@ public class UCDParser {
      * Checks whether this UCD is a derived quantity (ratio, etc.)
      *
      * @param ucd The UCD to test
+     *
      * @return True if the given UCD is a derived quantity.
      */
     private boolean checkDerivedQuantity(String[][] ucd) {

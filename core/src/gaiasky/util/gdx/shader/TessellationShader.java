@@ -31,11 +31,6 @@ public class TessellationShader extends GroundShader {
         this(renderable, config, prefix, config.vertexShaderCode, config.controlShader, config.evaluationShader, config.fragmentShaderCode);
     }
 
-    @Override
-    public boolean canRender(final IntRenderable renderable) {
-        return super.canRender(renderable) && this.shadowMap == (renderable.environment.shadowMap != null);
-    }
-
     public static String createPrefix(final IntRenderable renderable, final TessellationShaderProvider.Config config) {
         String prefix = RelativisticShader.createPrefix(renderable, config);
         final Bits mask = renderable.material.getMask();
@@ -45,7 +40,12 @@ public class TessellationShader extends GroundShader {
         return prefix;
     }
 
-    public void renderMesh(ExtShaderProgram program, IntMeshPart meshPart){
+    @Override
+    public boolean canRender(final IntRenderable renderable) {
+        return super.canRender(renderable) && this.shadowMap == (renderable.environment.shadowMap != null);
+    }
+
+    public void renderMesh(ExtShaderProgram program, IntMeshPart meshPart) {
         // Override primitive
         meshPart.mesh.render(program, GL41.GL_PATCHES, meshPart.offset, meshPart.size, false);
     }

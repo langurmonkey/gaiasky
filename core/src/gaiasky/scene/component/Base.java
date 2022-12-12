@@ -8,7 +8,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Archetype;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 import java.util.Locale;
 
@@ -239,7 +239,7 @@ public class Base implements Component, ICopy {
             return visible ? 1 : 0;
 
         // Fading
-        float opacity = MathUtilsd.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
+        float opacity = MathUtilsDouble.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
         if (!visible) {
             opacity = 1 - opacity;
         }

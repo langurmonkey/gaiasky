@@ -25,13 +25,37 @@ public class IcoSphereCreator extends ModelCreator {
 
     private Map<Long, Integer> middlePointIndexCache;
 
+    public IcoSphereCreator() {
+        super();
+        this.name = "Icosphere";
+    }
+
+    public static void main(String[] args) {
+        boolean flipNormals = true;
+        IcoSphereCreator isc = new IcoSphereCreator();
+        int recursion = 2;
+        isc.create(1, recursion, flipNormals);
+        try {
+            File file = File.createTempFile("icosphere_" + recursion + "_", ".obj");
+            OutputStream os = new FileOutputStream(file);
+            isc.dumpObj(os);
+            os.flush();
+            os.close();
+            System.out.println("Vertices: " + isc.vertices.size());
+            System.out.println("Normals: " + isc.normals.size());
+            System.out.println("Faces: " + isc.faces.size());
+            System.out.println("Model written in: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Adds a vertex and its UV mapping.
-     * 
-     * @param p
-     *            The point.
-     * @param radius
-     *            The radius.
+     *
+     * @param p      The point.
+     * @param radius The radius.
+     *
      * @return
      */
     protected int vertex(Vector3 p, float radius) {
@@ -46,9 +70,8 @@ public class IcoSphereCreator extends ModelCreator {
 
     /**
      * Implements the spherical UV mapping
-     * 
-     * @param p
-     *            The normalized point
+     *
+     * @param p The normalized point
      */
     protected void addUV(final Vector3 p) {
         // UV
@@ -136,24 +159,17 @@ public class IcoSphereCreator extends ModelCreator {
         return indices;
     }
 
-    public IcoSphereCreator() {
-        super();
-        this.name = "Icosphere";
-    }
-
     public IcoSphereCreator create(float radius, int recursionLevel) {
         return create(radius, recursionLevel, false);
     }
 
     /**
      * Creates an ico-sphere.
-     * 
-     * @param radius
-     *            The radius of the sphere.
-     * @param divisions
-     *            The number of divisions, it must be bigger than 0.
-     * @param flipNormals
-     *            Whether to flip normals or not.
+     *
+     * @param radius      The radius of the sphere.
+     * @param divisions   The number of divisions, it must be bigger than 0.
+     * @param flipNormals Whether to flip normals or not.
+     *
      * @return This creator
      */
     public IcoSphereCreator create(float radius, int divisions, boolean flipNormals) {
@@ -162,16 +178,13 @@ public class IcoSphereCreator extends ModelCreator {
 
     /**
      * Creates an ico-sphere.
-     * 
-     * @param radius
-     *            The radius of the sphere.
-     * @param divisions
-     *            The number of divisions, it must be bigger than 0.
-     * @param flipNormals
-     *            Whether to flip normals or not.
-     * @param hardEdges
-     *            Whether to use smoothLighting (all vertices in a face have a
-     *            different normal) or not.
+     *
+     * @param radius      The radius of the sphere.
+     * @param divisions   The number of divisions, it must be bigger than 0.
+     * @param flipNormals Whether to flip normals or not.
+     * @param hardEdges   Whether to use smoothLighting (all vertices in a face have a
+     *                    different normal) or not.
+     *
      * @return This creator
      */
     public IcoSphereCreator create(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
@@ -209,7 +222,7 @@ public class IcoSphereCreator extends ModelCreator {
         addFace(faces, flipNormals, 1, 8, 11);
         addFace(faces, flipNormals, 1, 11, 12);
 
-        // 5 adjacent faces 
+        // 5 adjacent faces
         addFace(faces, flipNormals, 2, 6, 10);
         addFace(faces, flipNormals, 6, 12, 5);
         addFace(faces, flipNormals, 12, 11, 3);
@@ -223,7 +236,7 @@ public class IcoSphereCreator extends ModelCreator {
         addFace(faces, flipNormals, 4, 7, 9);
         addFace(faces, flipNormals, 4, 9, 10);
 
-        // 5 adjacent faces 
+        // 5 adjacent faces
         addFace(faces, flipNormals, 5, 10, 6);
         addFace(faces, flipNormals, 3, 5, 12);
         addFace(faces, flipNormals, 7, 3, 11);
@@ -254,25 +267,5 @@ public class IcoSphereCreator extends ModelCreator {
         //repairTextureWrapSeam();
 
         return this;
-    }
-
-    public static void main(String[] args) {
-        boolean flipNormals = true;
-        IcoSphereCreator isc = new IcoSphereCreator();
-        int recursion = 2;
-        isc.create(1, recursion, flipNormals);
-        try {
-            File file = File.createTempFile("icosphere_" + recursion + "_", ".obj");
-            OutputStream os = new FileOutputStream(file);
-            isc.dumpObj(os);
-            os.flush();
-            os.close();
-            System.out.println("Vertices: " + isc.vertices.size());
-            System.out.println("Normals: " + isc.normals.size());
-            System.out.println("Faces: " + isc.faces.size());
-            System.out.println("Model written in: " + file.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

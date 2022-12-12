@@ -49,10 +49,11 @@ import static gaiasky.event.Event.*;
  */
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
-
+    private final GlobalResources globalResources;
+    private final CatalogManager catalogManager;
+    private final FocusView view;
     protected ControlsWindow controlsWindow;
     protected MinimapWindow minimapWindow;
-
     protected Container<FocusInfoInterface> fi;
     protected Container<TopInfoInterface> ti;
     protected Container<NotificationsInterface> ni;
@@ -65,23 +66,15 @@ public class FullGui extends AbstractGui {
     protected PopupNotificationsInterface popupNotificationsInterface;
     protected MinimapInterface minimapInterface;
     protected LoadProgressInterface loadProgressInterface;
-
     protected LogWindow logWindow;
     protected WikiInfoWindow wikiInfoWindow;
     protected ArchiveViewWindow archiveViewWindow;
-
     protected DecimalFormat nf;
     protected Label pointerXCoord, pointerYCoord;
-
     protected float pad, pad5;
-
     protected Scene scene;
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
-
-    private final GlobalResources globalResources;
-    private final CatalogManager catalogManager;
-    private final FocusView view;
 
     public FullGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources, final CatalogManager catalogManager) {
         super(graphics, unitsPerPixel);
@@ -512,7 +505,7 @@ public class FullGui extends AbstractGui {
             int screenY = Gdx.input.getY();
 
             FocusView focusView = null;
-            if(candidate != null) {
+            if (candidate != null) {
                 view.setEntity(candidate);
                 focusView = view;
             }

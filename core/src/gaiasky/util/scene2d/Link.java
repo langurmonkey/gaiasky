@@ -58,8 +58,9 @@ public class Link extends Label {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return super.touchDown(event, x, y, pointer, button);
             }
+
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if(event.getButton() == Buttons.LEFT && linkURL != null && !linkURL.isEmpty())
+                if (event.getButton() == Buttons.LEFT && linkURL != null && !linkURL.isEmpty())
                     Gdx.net.openURI(linkURL);
 
                 // Bubble up

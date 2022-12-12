@@ -42,22 +42,16 @@ public class AttitudeConverter {
      * Converts heliotropic angles and rates to an attitude quaternion and its
      * derivative
      *
-     * @param lSun
-     *            longitude of the nominal sun [rad]
-     * @param xi
-     *            solar aspect angle [rad]
-     * @param nu
-     *            revolving phase angle [rad]
-     * @param omega
-     *            scan phase angle [rad]
-     * @param lSunDot
-     *            time derivative of lSun [rad/day]
-     * @param nuDot
-     *            time derivative of nu [rad/day]
-     * @param omegaDot
-     *            time derivative of omega [rad/day]
+     * @param lSun     longitude of the nominal sun [rad]
+     * @param xi       solar aspect angle [rad]
+     * @param nu       revolving phase angle [rad]
+     * @param omega    scan phase angle [rad]
+     * @param lSunDot  time derivative of lSun [rad/day]
+     * @param nuDot    time derivative of nu [rad/day]
+     * @param omegaDot time derivative of omega [rad/day]
+     *
      * @return an array of two quaternions, q (the attitude quaternion) and qDot
-     *         (the time derivative of q, per day)
+     * (the time derivative of q, per day)
      */
     public static Quaterniond[] heliotropicToQuaternions(double lSun, double xi,
             double nu, double omega, double lSunDot, double nuDot,
@@ -101,20 +95,14 @@ public class AttitudeConverter {
      * Converts heliotropic angles and rates to the attitude quaternion
      * components and the inertial rates in SRS
      *
-     * @param lSun
-     *            longitude of the nominal sun [rad]
-     * @param xi
-     *            solar aspect angle [rad]
-     * @param nu
-     *            revolving phase angle [rad]
-     * @param omega
-     *            scan phase angle [rad]
-     * @param lSunDot
-     *            time derivative of lSun [rad/day]
-     * @param nuDot
-     *            time derivative of nu [rad/day]
-     * @param omegaDot
-     *            time derivative of omega [rad/day]
+     * @param lSun     longitude of the nominal sun [rad]
+     * @param xi       solar aspect angle [rad]
+     * @param nu       revolving phase angle [rad]
+     * @param omega    scan phase angle [rad]
+     * @param lSunDot  time derivative of lSun [rad/day]
+     * @param nuDot    time derivative of nu [rad/day]
+     * @param omegaDot time derivative of omega [rad/day]
+     *
      * @return double[] array {qx, qy, qz, qw, rateX, rateY, rateZ} with rates in [rad/day]
      */
     public static double[] heliotropicToQuaternionSrsRates(double lSun, double xi,
@@ -156,13 +144,13 @@ public class AttitudeConverter {
      * Converts heliotropic angles and rates to an attitude quaternion and its
      * derivative
      *
-     * @param gt
-     *            GaiaTime
-     * @param h
-     *            heliotropic angles and their rates in [rad] and [rad/day]
+     * @param gt GaiaTime
+     * @param h  heliotropic angles and their rates in [rad] and [rad/day]
+     *
      * @return
+     *
      * @return an array of two quaternions, q (the attitude quaternion) and qDot
-     *         (the time derivative of q, per day)
+     * (the time derivative of q, per day)
      */
     public static Quaterniond[] getQuaternionAndRate(long gt,
             HeliotropicAnglesRates h) {
@@ -214,10 +202,9 @@ public class AttitudeConverter {
     /**
      * Calculate the heliotropic angles and rates for a given attitude
      *
-     * @param gt
-     *            Time for the attitude
-     * @param att
-     *            attitude
+     * @param gt  Time for the attitude
+     * @param att attitude
+     *
      * @return
      */
     public static HeliotropicAnglesRates getHeliotropicAnglesRates(long gt,

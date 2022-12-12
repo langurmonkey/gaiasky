@@ -33,7 +33,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 
 import java.util.List;
@@ -136,10 +136,10 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                             tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
                             // ORBIT ELEMENTS 02
-                            tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsDouble.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsDouble.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsDouble.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsDouble.degRad);
 
                             // SIZE
                             tempVerts[curr.vertexIdx + sizeOffset] = trajectory.pointSize * (hl.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
@@ -188,12 +188,12 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
 
                 // Reference system transform
                 Matrix4d refSysTransform = null;
-                if(graph.children != null && graph.children.size > 0) {
-                   refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
+                if (graph.children != null && graph.children.size > 0) {
+                    refSysTransform = Mapper.transform.get(graph.children.get(0)).matrix;
                 }
-                if(Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
+                if (Mapper.trajectory.get(graph.children.get(0)).model.isExtrasolar()) {
                     refSysTransform.putIn(aux).inv();
-                    refSysTransformF.setToRotation(0,1,0,-90).mul(aux);
+                    refSysTransformF.setToRotation(0, 1, 0, -90).mul(aux);
                 } else {
                     refSysTransform.putIn(refSysTransformF).inv();
                 }

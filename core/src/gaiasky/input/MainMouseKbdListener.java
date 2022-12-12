@@ -34,6 +34,25 @@ import java.util.Objects;
  */
 public class MainMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
 
+    /** Maximum double click time, in ms **/
+    private static final long doubleClickTime = 400;
+    public final GaiaGestureListener gestureListener;
+    /** FOCUS_MODE comparator **/
+    private final Comparator<Entity> comp;
+    /** Max pixel distance to be considered a click **/
+    private final float MOVE_PX_DIST;
+    /** Max distance from the click to the actual selected star **/
+    private final int MIN_PIX_DIST;
+    private final Vector2 gesture = new Vector2();
+    /** Smoothing factor applied in the non-cinematic mode **/
+    private final double noAccelSmoothing;
+    /** Scaling factor applied in the non-cinematic mode **/
+    private final double noAccelFactor;
+    /** Drag vectors **/
+    private final Vector2 currentDrag;
+    private final Vector2 lastDrag;
+    private final NaturalCamera camera;
+    private final FocusView view;
     /**
      * The button for rotating the camera either around its center or around the
      * focus.
@@ -52,92 +71,24 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     public float scrollFactor = -0.1f;
     /** The key for rolling the camera **/
     public int rollKey = Keys.SHIFT_LEFT;
-    /** FOCUS_MODE comparator **/
-    private final Comparator<Entity> comp;
-
     /** The current (first) button being pressed. */
     protected int button = -1;
-
     private float startX, startY;
-    /** Max pixel distance to be considered a click **/
-    private final float MOVE_PX_DIST;
-    /** Max distance from the click to the actual selected star **/
-    private final int MIN_PIX_DIST;
-    private final Vector2 gesture = new Vector2();
-
     /** dx(mouse pointer) since last time **/
     private double dragDx;
     /** dy(mouse pointer) since last time **/
     private double dragDy;
-    /** Smoothing factor applied in the non-cinematic mode **/
-    private final double noAccelSmoothing;
-    /** Scaling factor applied in the non-cinematic mode **/
-    private final double noAccelFactor;
-    /** Drag vectors **/
-    private final Vector2 currentDrag;
-    private final Vector2 lastDrag;
-
     /** Save time of last click, in ms */
     private long lastClickTime = -1;
-    /** Maximum double click time, in ms **/
-    private static final long doubleClickTime = 400;
-
     /** We're dragging or selecting a keyframe **/
     private boolean keyframeBeingDragged = false;
-
-    private final NaturalCamera camera;
-
-    private final FocusView view;
-
-    protected static class GaiaGestureListener extends GestureAdapter {
-        public MainMouseKbdListener inputListener;
-        private float previousZoom;
-
-        @Override
-        public boolean touchDown(float x, float y, int pointer, int button) {
-            previousZoom = 0;
-            return false;
-        }
-
-        @Override
-        public boolean tap(float x, float y, int count, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean longPress(float x, float y) {
-            return false;
-        }
-
-        @Override
-        public boolean fling(float velocityX, float velocityY, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean pan(float x, float y, float deltaX, float deltaY) {
-            return false;
-        }
-
-        @Override
-        public boolean zoom(float initialDistance, float distance) {
-            if (inputListener.isActive()) {
-                float newZoom = distance - initialDistance;
-                float amount = newZoom - previousZoom;
-                previousZoom = newZoom;
-                float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
-                return inputListener.zoom(amount / (Math.min(w, h)));
-            }
-            return false;
-        }
-
-        @Override
-        public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-            return false;
-        }
-    }
-
-    public final GaiaGestureListener gestureListener;
+    private int touched;
+    private boolean multiTouch;
+    /** Reference to the scene. **/
+    private Scene scene;
+    /** Keyframes path entity. **/
+    private Entity kpo;
+    private KeyframesView kfView;
 
     protected MainMouseKbdListener(final GaiaGestureListener gestureListener, NaturalCamera camera) {
         super(gestureListener, camera);
@@ -159,20 +110,10 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         this.currentDrag = new Vector2();
         this.lastDrag = new Vector2();
     }
-
     public MainMouseKbdListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
         EventManager.instance.subscribe(this, Event.TOUCH_DOWN, Event.TOUCH_UP, Event.TOUCH_DRAGGED, Event.SCROLLED, Event.KEY_DOWN, Event.KEY_UP, Event.SCENE_LOADED);
     }
-
-    private int touched;
-    private boolean multiTouch;
-
-    /** Reference to the scene. **/
-    private Scene scene;
-    /** Keyframes path entity. **/
-    private Entity kpo;
-    private KeyframesView kfView;
 
     private KeyframesView getKeyframesPathObject() {
         if (scene != null) {
@@ -401,7 +342,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if(isActive()) {
+        if (isActive()) {
             if (Settings.settings.runtime.inputEnabled) {
                 boolean result = super.touchDragged(screenX, screenY, pointer);
                 if (result || this.button < 0)
@@ -419,7 +360,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        if(isActive()) {
+        if (isActive()) {
             if (Settings.settings.runtime.inputEnabled) {
                 return zoom(amountY * scrollFactor);
             }
@@ -476,6 +417,54 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         case SCENE_LOADED -> this.scene = (Scene) data[0];
         default -> {
         }
+        }
+    }
+
+    protected static class GaiaGestureListener extends GestureAdapter {
+        public MainMouseKbdListener inputListener;
+        private float previousZoom;
+
+        @Override
+        public boolean touchDown(float x, float y, int pointer, int button) {
+            previousZoom = 0;
+            return false;
+        }
+
+        @Override
+        public boolean tap(float x, float y, int count, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean longPress(float x, float y) {
+            return false;
+        }
+
+        @Override
+        public boolean fling(float velocityX, float velocityY, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean pan(float x, float y, float deltaX, float deltaY) {
+            return false;
+        }
+
+        @Override
+        public boolean zoom(float initialDistance, float distance) {
+            if (inputListener.isActive()) {
+                float newZoom = distance - initialDistance;
+                float amount = newZoom - previousZoom;
+                previousZoom = newZoom;
+                float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
+                return inputListener.zoom(amount / (Math.min(w, h)));
+            }
+            return false;
+        }
+
+        @Override
+        public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+            return false;
         }
     }
 

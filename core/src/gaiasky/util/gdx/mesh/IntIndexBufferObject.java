@@ -57,14 +57,13 @@ import java.nio.IntBuffer;
 public class IntIndexBufferObject implements IntIndexData {
     final IntBuffer buffer;
     final ByteBuffer byteBuffer;
-    int bufferHandle;
     final boolean isDirect;
-    boolean isDirty = true;
-    boolean isBound = false;
     final int usage;
-
     // used to work around bug: https://android-review.googlesource.com/#/c/73175/
     private final boolean empty;
+    int bufferHandle;
+    boolean isDirty = true;
+    boolean isBound = false;
 
     /**
      * Creates a new static IntIndexBufferObject to be used with vertex arrays.

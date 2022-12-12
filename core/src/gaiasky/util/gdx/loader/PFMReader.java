@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.FloatTextureData;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.Logger;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -115,7 +115,7 @@ public class PFMReader {
     }
 
     private static double nor(double value) {
-        return MathUtilsd.clamp(value + 0.5d, 0d, 1d);
+        return MathUtilsDouble.clamp(value + 0.5d, 0d, 1d);
         //return value;
     }
 
@@ -174,6 +174,7 @@ public class PFMReader {
      * @param d The data
      * @param w The source width
      * @param h The source height
+     *
      * @return
      */
     private static float[] invertWarp(final float[] d, int w, int h) throws RuntimeException {

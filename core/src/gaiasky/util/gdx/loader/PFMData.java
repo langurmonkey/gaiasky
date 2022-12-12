@@ -6,12 +6,11 @@
 package gaiasky.util.gdx.loader;
 
 public class PFMData {
-    public PFMData(float[] data, int width, int height){
+    public float[] data;
+    public int width, height;
+    public PFMData(float[] data, int width, int height) {
         this.data = data;
         this.width = width;
         this.height = height;
     }
-
-    public float[] data;
-    public int width, height;
 }

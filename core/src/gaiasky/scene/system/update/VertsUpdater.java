@@ -16,7 +16,7 @@ public class VertsUpdater extends AbstractUpdateSystem {
 
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
-        var graph =  Mapper.graph.get(entity);
+        var graph = Mapper.graph.get(entity);
         graph.translation.setToTranslation(graph.localTransform);
     }
 }

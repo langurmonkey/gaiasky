@@ -30,9 +30,9 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import java.util.Comparator;
 
 public class DefaultIntRenderableSorter implements IntRenderableSorter, Comparator<IntRenderable> {
-    private Camera camera;
     private final Vector3 tmpV1 = new Vector3();
     private final Vector3 tmpV2 = new Vector3();
+    private Camera camera;
 
     @Override
     public void sort(final Camera camera, final Array<IntRenderable> renderables) {

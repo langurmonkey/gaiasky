@@ -23,6 +23,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * Lens flare effect as described in John Chapman's article (without lens dirt
  * or diffraction starburst). Lens color image (lenscolor.png) is located in
  * src/main/resources/ folder.
+ *
  * @see <a href=
  * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
  **/
@@ -31,34 +32,6 @@ public final class Flare extends Filter<Flare> {
     private int ghosts;
     private float haloWidth;
     private Texture lensColorTexture;
-
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture("u_texture0", 0),
-        LensColor("u_texture1", 0),
-        ViewportInverse("u_viewportInverse", 2),
-        Ghosts("u_ghosts", 0),
-        HaloWidth("u_haloWidth", 0);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
 
     public Flare(int width, int height) {
         super(ShaderLoader.fromFile("screenspace", "flare"));
@@ -109,5 +82,33 @@ public final class Flare extends Filter<Flare> {
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
         lensColorTexture.bind(u_texture1);
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture("u_texture0", 0),
+        LensColor("u_texture1", 0),
+        ViewportInverse("u_viewportInverse", 2),
+        Ghosts("u_ghosts", 0),
+        HaloWidth("u_haloWidth", 0);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

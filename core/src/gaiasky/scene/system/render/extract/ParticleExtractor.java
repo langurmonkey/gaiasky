@@ -23,7 +23,6 @@ public class ParticleExtractor extends AbstractExtractSystem {
         view = new FocusView();
     }
 
-
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         addToRenderLists(entity, camera);

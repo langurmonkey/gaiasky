@@ -37,76 +37,26 @@ import java.util.Map;
  */
 public class GamepadConfigWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GamepadConfigWindow.class);
-
+    private static final int TYPE_BUTTON = 0;
+    private static final int TYPE_AXIS = 1;
+    private static final int TYPE_EITHER = 2;
     private final String none;
     private final String button;
     private final String axis;
-
+    private final String controllerName;
+    // Saved file, at the end, if any
+    public Path savedFile = null;
     private Texture controller;
     // For each button/axis we have the texture, the location in pixels and the name
     private Map<GamepadInput, Trio<Texture, float[], String>> inputInfo;
     private Map<GamepadInput, OwnTextField> inputFields;
-
-    private final String controllerName;
     private GamepadMappings mappings;
-
     private GamepadInput currGamepadInput;
     private OwnTextField currTextField, filename;
     private OwnLabel currentInput;
     private OwnSlider lsx, lsy, rsx, rsy, lts, rts, axisPower;
-
     // The cell with the active element
     private Cell<Image> elementCell;
-    // Saved file, at the end, if any
-    public Path savedFile = null;
-
-    private static final int TYPE_BUTTON = 0;
-    private static final int TYPE_AXIS = 1;
-    private static final int TYPE_EITHER = 2;
-
-    private enum GamepadInput {
-        A(TYPE_BUTTON),
-        B(TYPE_BUTTON),
-        X(TYPE_BUTTON),
-        Y(TYPE_BUTTON),
-        LSTICK_V(TYPE_AXIS),
-        LSTICK_H(TYPE_AXIS),
-        LSTICK(TYPE_BUTTON),
-        RSTICK_V(TYPE_AXIS),
-        RSTICK_H(TYPE_AXIS),
-        RSTICK(TYPE_BUTTON),
-        DPAD_UP(TYPE_EITHER),
-        DPAD_DOWN(TYPE_EITHER),
-        DPAD_LEFT(TYPE_EITHER),
-        DPAD_RIGHT(TYPE_EITHER),
-        START(TYPE_BUTTON),
-        SELECT(TYPE_BUTTON),
-        RB(TYPE_BUTTON),
-        RT(TYPE_EITHER),
-        LB(TYPE_BUTTON),
-        LT(TYPE_EITHER);
-
-        public final int type;
-
-        /**
-         * @param type 0 = button, 1 = axis, 2 = either
-         */
-        GamepadInput(int type) {
-            this.type = type;
-        }
-
-        public boolean isButton() {
-            return type == TYPE_BUTTON || type == TYPE_EITHER;
-        }
-
-        public boolean isAxis() {
-            return type == TYPE_AXIS || type == TYPE_EITHER;
-        }
-
-        public boolean isEither() {
-            return type == TYPE_EITHER;
-        }
-    }
 
     public GamepadConfigWindow(String controllerName, GamepadMappings mappings, Stage stage, Skin skin) {
         super("Configure controller: " + controllerName, skin, stage);
@@ -613,6 +563,50 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
+    }
+
+    private enum GamepadInput {
+        A(TYPE_BUTTON),
+        B(TYPE_BUTTON),
+        X(TYPE_BUTTON),
+        Y(TYPE_BUTTON),
+        LSTICK_V(TYPE_AXIS),
+        LSTICK_H(TYPE_AXIS),
+        LSTICK(TYPE_BUTTON),
+        RSTICK_V(TYPE_AXIS),
+        RSTICK_H(TYPE_AXIS),
+        RSTICK(TYPE_BUTTON),
+        DPAD_UP(TYPE_EITHER),
+        DPAD_DOWN(TYPE_EITHER),
+        DPAD_LEFT(TYPE_EITHER),
+        DPAD_RIGHT(TYPE_EITHER),
+        START(TYPE_BUTTON),
+        SELECT(TYPE_BUTTON),
+        RB(TYPE_BUTTON),
+        RT(TYPE_EITHER),
+        LB(TYPE_BUTTON),
+        LT(TYPE_EITHER);
+
+        public final int type;
+
+        /**
+         * @param type 0 = button, 1 = axis, 2 = either
+         */
+        GamepadInput(int type) {
+            this.type = type;
+        }
+
+        public boolean isButton() {
+            return type == TYPE_BUTTON || type == TYPE_EITHER;
+        }
+
+        public boolean isAxis() {
+            return type == TYPE_AXIS || type == TYPE_EITHER;
+        }
+
+        public boolean isEither() {
+            return type == TYPE_EITHER;
+        }
     }
 
     /**

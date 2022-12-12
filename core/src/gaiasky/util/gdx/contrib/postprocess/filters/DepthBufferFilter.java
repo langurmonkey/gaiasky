@@ -14,6 +14,30 @@ public final class DepthBufferFilter extends Filter<DepthBufferFilter> {
      */
     private Texture depthTexture;
 
+    public DepthBufferFilter() {
+        super(ShaderLoader.fromFile("screenspace", "depthbuffer"));
+        rebind();
+    }
+
+    public void setDepthTexture(Texture tex) {
+        this.depthTexture = tex;
+        setParam(Param.TextureDepth, u_texture1);
+    }
+
+    @Override
+    public void rebind() {
+        // reimplement super to batch every parameter
+        setParams(Param.Texture, u_texture0);
+        setParams(Param.TextureDepth, u_texture1);
+        endParams();
+    }
+
+    @Override
+    protected void onBeforeRender() {
+        inputTexture.bind(u_texture0);
+        depthTexture.bind(u_texture1);
+    }
+
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
@@ -37,29 +61,5 @@ public final class DepthBufferFilter extends Filter<DepthBufferFilter> {
         public int arrayElementSize() {
             return this.elementSize;
         }
-    }
-
-    public DepthBufferFilter() {
-        super(ShaderLoader.fromFile("screenspace", "depthbuffer"));
-        rebind();
-    }
-
-    public void setDepthTexture(Texture tex){
-        this.depthTexture = tex;
-        setParam(Param.TextureDepth, u_texture1);
-    }
-
-    @Override
-    public void rebind() {
-        // reimplement super to batch every parameter
-        setParams(Param.Texture, u_texture0);
-        setParams(Param.TextureDepth, u_texture1);
-        endParams();
-    }
-
-    @Override
-    protected void onBeforeRender() {
-        inputTexture.bind(u_texture0);
-        depthTexture.bind(u_texture1);
     }
 }

@@ -5,7 +5,7 @@
 
 package gaiasky.util.color;
 
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 public class Colormap {
     // Value is assumed to be normalized in [0,1] in all cases
@@ -36,9 +36,9 @@ public class Colormap {
     }
 
     public double[] colormap_blues(double x) {
-        double r = MathUtilsd.clamp(colormap_blues_red(x) / 255.0, 0.0, 1.0);
-        double g = MathUtilsd.clamp(colormap_blues_green(x) / 255.0, 0.0, 1.0);
-        double b = MathUtilsd.clamp(colormap_blues_blue(x) / 255.0, 0.0, 1.0);
+        double r = MathUtilsDouble.clamp(colormap_blues_red(x) / 255.0, 0.0, 1.0);
+        double g = MathUtilsDouble.clamp(colormap_blues_green(x) / 255.0, 0.0, 1.0);
+        double b = MathUtilsDouble.clamp(colormap_blues_blue(x) / 255.0, 0.0, 1.0);
         return new double[] { r, g, b };
     }
 
@@ -64,9 +64,9 @@ public class Colormap {
     }
 
     public double[] colormap_greens(double x) {
-        double r = MathUtilsd.clamp(colormap_greens_red(x) / 255.0, 0.0, 1.0);
-        double g = MathUtilsd.clamp(colormap_greens_green(x) / 255.0, 0.0, 1.0);
-        double b = MathUtilsd.clamp(colormap_greens_blue(x) / 255.0, 0.0, 1.0);
+        double r = MathUtilsDouble.clamp(colormap_greens_red(x) / 255.0, 0.0, 1.0);
+        double g = MathUtilsDouble.clamp(colormap_greens_green(x) / 255.0, 0.0, 1.0);
+        double b = MathUtilsDouble.clamp(colormap_greens_blue(x) / 255.0, 0.0, 1.0);
         return new double[] { r, g, b };
     }
 
@@ -92,9 +92,9 @@ public class Colormap {
     }
 
     public double[] colormap_reds(double x) {
-        double r = MathUtilsd.clamp(colormap_reds_red(x) / 255.0, 0.0, 1.0);
-        double g = MathUtilsd.clamp(colormap_reds_green(x) / 255.0, 0.0, 1.0);
-        double b = MathUtilsd.clamp(colormap_reds_blue(x) / 255.0, 0.0, 1.0);
+        double r = MathUtilsDouble.clamp(colormap_reds_red(x) / 255.0, 0.0, 1.0);
+        double g = MathUtilsDouble.clamp(colormap_reds_green(x) / 255.0, 0.0, 1.0);
+        double b = MathUtilsDouble.clamp(colormap_reds_blue(x) / 255.0, 0.0, 1.0);
         return new double[] { r, g, b };
     }
 
@@ -153,8 +153,8 @@ public class Colormap {
     }
 
     public double[] colormap_cool(double x) {
-        double r = MathUtilsd.clamp(colormap_cool_red(x), 0.0, 1.0);
-        double g = MathUtilsd.clamp(colormap_cool_green(x), 0.0, 1.0);
+        double r = MathUtilsDouble.clamp(colormap_cool_red(x), 0.0, 1.0);
+        double g = MathUtilsDouble.clamp(colormap_cool_green(x), 0.0, 1.0);
         double b = 1.0;
         return new double[] { r, g, b };
     }
@@ -388,6 +388,6 @@ public class Colormap {
         } else {
             x = (value - min) / (max - min);
         }
-        return colormap(cmap, MathUtilsd.clamp(x, 0.0, 1.0));
+        return colormap(cmap, MathUtilsDouble.clamp(x, 0.0, 1.0));
     }
 }

@@ -23,11 +23,10 @@ import java.util.Set;
  */
 public class KeyboardInputController extends InputAdapter implements IObserver {
 
+    private final Input input;
     public KeyBindings mappings;
     /** Holds the pressed keys at any moment **/
     public Set<Integer> pressedKeys;
-
-    private final Input input;
 
     public KeyboardInputController(Input input) {
         super();

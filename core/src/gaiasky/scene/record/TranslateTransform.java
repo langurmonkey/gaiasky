@@ -20,11 +20,11 @@ public class TranslateTransform implements ITransform {
         mat.translate(vector[0], vector[1], vector[2]);
     }
 
-    public void setVector(double[] vector) {
-        this.vector = vector;
-    }
-
     public double[] getVector() {
         return vector;
+    }
+
+    public void setVector(double[] vector) {
+        this.vector = vector;
     }
 }

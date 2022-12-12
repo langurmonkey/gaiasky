@@ -19,8 +19,10 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
 
-/** Exclude the initialization of some modules that do not play well
- *  with OpenComposite. */
+/**
+ * Exclude the initialization of some modules that do not play well
+ * with OpenComposite.
+ */
 public final class OpenVR {
 
     @Nullable public static IVRSystem VRSystem;
@@ -82,7 +84,6 @@ public final class OpenVR {
         //VRDebug = getGenericInterface(IVRDebug_Version, IVRDebug::new);
         //VRNotifications = getGenericInterface(IVRNotifications_Version, IVRNotifications::new);
     }
-
 
     private static <T> T getGenericInterface(String interfaceNameVersion, LongFunction<T> supplier) {
         try (MemoryStack stack = stackPush()) {

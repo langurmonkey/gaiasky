@@ -32,6 +32,7 @@ public class ProperMotion implements Component, ICopy {
 
     /**
      * Sets the epoch as a Gregorian calendar year and a fraction (i.e. 2015.5).
+     *
      * @param epochYear The Gregorian calendar year and fraction, as a double.
      */
     public void setEpochYear(Double epochYear) {

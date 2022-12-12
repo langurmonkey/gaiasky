@@ -33,6 +33,26 @@ public class ColorAttribute extends Attribute {
     public static final int AmbientLight = register(AmbientLightAlias);
     public final static String FogAlias = "fogColor";
     public static final int Fog = register(FogAlias);
+    public final Color color = new Color();
+
+    public ColorAttribute(final int index) {
+        super(index);
+    }
+
+    public ColorAttribute(final int index, final Color color) {
+        this(index);
+        if (color != null)
+            this.color.set(color);
+    }
+
+    public ColorAttribute(final int index, float r, float g, float b, float a) {
+        this(index);
+        this.color.set(r, g, b, a);
+    }
+
+    public ColorAttribute(final ColorAttribute copyFrom) {
+        this(copyFrom.index, copyFrom.color);
+    }
 
     public final static ColorAttribute createAmbient(final Color color) {
         return new ColorAttribute(Ambient, color);
@@ -88,27 +108,6 @@ public class ColorAttribute extends Attribute {
 
     public final static ColorAttribute createFog(float r, float g, float b, float a) {
         return new ColorAttribute(Fog, r, g, b, a);
-    }
-
-    public final Color color = new Color();
-
-    public ColorAttribute(final int index) {
-        super(index);
-    }
-
-    public ColorAttribute(final int index, final Color color) {
-        this(index);
-        if (color != null)
-            this.color.set(color);
-    }
-
-    public ColorAttribute(final int index, float r, float g, float b, float a) {
-        this(index);
-        this.color.set(r, g, b, a);
-    }
-
-    public ColorAttribute(final ColorAttribute copyFrom) {
-        this(copyFrom.index, copyFrom.color);
     }
 
     @Override

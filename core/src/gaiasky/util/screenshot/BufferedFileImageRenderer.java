@@ -24,7 +24,7 @@ import java.util.TimerTask;
  */
 public class BufferedFileImageRenderer implements IFileImageRenderer {
     private static final Log logger = Logger.getLogger(BufferedFileImageRenderer.class);
-    
+
     /** Daemon timer **/
     private static final Timer timer = new Timer(true);
 

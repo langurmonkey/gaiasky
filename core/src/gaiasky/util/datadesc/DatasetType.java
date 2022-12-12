@@ -12,12 +12,12 @@ public class DatasetType {
     public String typeStr;
     public List<DatasetDesc> datasets;
 
-    public DatasetType(String typeStr){
+    public DatasetType(String typeStr) {
         this.typeStr = typeStr;
         this.datasets = new ArrayList<>();
     }
 
-    public void addDataset(DatasetDesc dd){
+    public void addDataset(DatasetDesc dd) {
         this.datasets.add(dd);
     }
 }

@@ -11,7 +11,7 @@ public enum VRStatus {
     ERROR_RENDERMODEL,
     NO_VR;
 
-    public boolean vrInitFailed(){
+    public boolean vrInitFailed() {
         return this.equals(ERROR_NO_CONTEXT) || this.equals(ERROR_RENDERMODEL);
     }
 }

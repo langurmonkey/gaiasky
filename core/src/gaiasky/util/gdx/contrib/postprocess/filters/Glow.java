@@ -21,6 +21,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Scattering Light effect.
+ *
  * @see <a href="https://medium.com/community-play-3d/god-rays-whats-that-5a67f26aeac2">https://medium.com/community-play-3d/god-
  * rays-whats-that-5a67f26aeac2</a>
  **/
@@ -41,49 +42,13 @@ public final class Glow extends Filter<Glow> {
     private Texture prePassTexture;
     private Texture lightGlowTexture;
 
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture("u_texture0", 0),
-        LightGlowTexture("u_texture1", 0),
-        PrePassTexture("u_texture2", 0),
-        LightPositions("u_lightPositions", 2),
-        LightViewAngles("u_lightViewAngles", 1),
-        LightColors("u_lightColors", 3),
-        Viewport("u_viewport", 2),
-        NLights("u_nLights", 0),
-        NSamples("u_nSamples", 0),
-        Orientation("u_orientation", 0),
-        SpiralScale("u_spiralScale", 0),
-        BackbufferScale("u_backbufferScale", 0),
-        TextureScale("u_textureScale", 0);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
-
     public Glow(int width, int height) {
         super(ShaderLoader.fromFile("lightglow", "lightglow"));
         viewport = new Vector2(width, height);
         rebind();
     }
 
-    public void setBackbufferScale(float s){
+    public void setBackbufferScale(float s) {
         this.backbufferScale = s;
         setParam(Param.BackbufferScale, s);
     }
@@ -125,22 +90,22 @@ public final class Glow extends Filter<Glow> {
         setParam(Param.SpiralScale, spiralScale);
     }
 
+    public Texture getLightGlowTexture() {
+        return lightGlowTexture;
+    }
+
     public void setLightGlowTexture(Texture tex) {
         lightGlowTexture = tex;
         setParam(Param.LightGlowTexture, u_texture1);
     }
 
-    public Texture getLightGlowTexture() {
-        return lightGlowTexture;
+    public Texture getPrePassTexture() {
+        return prePassTexture;
     }
 
     public void setPrePassTexture(Texture tex) {
         prePassTexture = tex;
         setParam(Param.PrePassTexture, u_texture2);
-    }
-
-    public Texture getPrePassTexture() {
-        return prePassTexture;
     }
 
     public void setOrientation(float o) {
@@ -177,5 +142,41 @@ public final class Glow extends Filter<Glow> {
             lightGlowTexture.bind(u_texture1);
         if (prePassTexture != null)
             prePassTexture.bind(u_texture2);
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture("u_texture0", 0),
+        LightGlowTexture("u_texture1", 0),
+        PrePassTexture("u_texture2", 0),
+        LightPositions("u_lightPositions", 2),
+        LightViewAngles("u_lightViewAngles", 1),
+        LightColors("u_lightColors", 3),
+        Viewport("u_viewport", 2),
+        NLights("u_nLights", 0),
+        NSamples("u_nSamples", 0),
+        Orientation("u_orientation", 0),
+        SpiralScale("u_spiralScale", 0),
+        BackbufferScale("u_backbufferScale", 0),
+        TextureScale("u_textureScale", 0);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

@@ -27,21 +27,6 @@ public abstract class AbstractView {
     }
 
     /**
-     * Sets the entity behind this view. This method
-     * can be used to reuse the {@link AbstractView} instance.
-     *
-     * @param entity The new entity.
-     */
-    public void setEntity(Entity entity) {
-        if (entity != null && (this.entity != entity || !componentsCheck(entity))) {
-            clearEntity();
-            entityCheck(entity);
-            this.entity = entity;
-            entityChanged();
-        }
-    }
-
-    /**
      * Check whether the current components are the same as the components of the given entity.
      *
      * @param entity The entity to check.
@@ -62,6 +47,21 @@ public abstract class AbstractView {
     /** Returns the current entity under this view. **/
     public Entity getEntity() {
         return this.entity;
+    }
+
+    /**
+     * Sets the entity behind this view. This method
+     * can be used to reuse the {@link AbstractView} instance.
+     *
+     * @param entity The new entity.
+     */
+    public void setEntity(Entity entity) {
+        if (entity != null && (this.entity != entity || !componentsCheck(entity))) {
+            clearEntity();
+            entityCheck(entity);
+            this.entity = entity;
+            entityChanged();
+        }
     }
 
     /**

@@ -15,9 +15,9 @@ import gaiasky.util.scene2d.OwnButton;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class PopupNotificationsInterface extends TableGuiInterface implements IObserver {
-    protected Skin skin;
     protected final Table me;
     protected final VerticalGroup stack;
+    protected Skin skin;
     protected float pad5, pad15;
     protected float defaultSeconds;
 
@@ -50,7 +50,6 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
         Table t = new Table(skin);
         t.pad(pad5, pad15, pad5, pad15);
         OwnLabel label = new OwnLabel(message, skin, "big", 60);
-
 
         // Add to table
         t.add(label).left().padRight(pad5);

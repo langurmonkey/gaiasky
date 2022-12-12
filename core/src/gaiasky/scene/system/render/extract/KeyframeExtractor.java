@@ -23,10 +23,9 @@ public class KeyframeExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var kf = Mapper.keyframes.get(entity);
         // Extract all children paths
-        for(Entity object : kf.objects) {
+        for (Entity object : kf.objects) {
             extractVerts(object);
         }
-
 
         // Extract main object
         var base = Mapper.base.get(entity);

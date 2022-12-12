@@ -34,26 +34,16 @@ import static gaiasky.util.Settings.StereoProfile.values;
  * in the future.
  */
 public class KeyBindings {
-    private static final Log logger = Logger.getLogger(KeyBindings.class);
-
-    private final Map<String, ProgramAction> actions;
-    private final Map<TreeSet<Integer>, ProgramAction> mappings;
-    private final Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
-
-    public static KeyBindings instance;
-
-    public static void initialize() {
-        if (instance == null) {
-            instance = new KeyBindings();
-        }
-    }
-
     // Special keys
     public static final int CTRL_L = Keys.CONTROL_LEFT;
     public static final int SHIFT_L = Keys.SHIFT_LEFT;
     public static final int ALT_L = Keys.ALT_LEFT;
     public static final int[] SPECIAL = new int[] { CTRL_L, SHIFT_L, ALT_L };
-
+    private static final Log logger = Logger.getLogger(KeyBindings.class);
+    public static KeyBindings instance;
+    private final Map<String, ProgramAction> actions;
+    private final Map<TreeSet<Integer>, ProgramAction> mappings;
+    private final Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
     /**
      * Creates a key mappings instance.
      */
@@ -62,6 +52,12 @@ public class KeyBindings {
         mappings = new HashMap<>();
         mappingsInv = new TreeMap<>();
         initDefault();
+    }
+
+    public static void initialize() {
+        if (instance == null) {
+            instance = new KeyBindings();
+        }
     }
 
     public Map<TreeSet<Integer>, ProgramAction> getMappings() {
@@ -557,6 +553,10 @@ public class KeyBindings {
         return result;
     }
 
+    public interface BooleanRunnable {
+        boolean run();
+    }
+
     /**
      * A simple program action. It can optionally contain a condition which must
      * evaluate to true for the action to be run.
@@ -616,10 +616,6 @@ public class KeyBindings {
             return actionName.toLowerCase().compareTo(other.actionName.toLowerCase());
         }
 
-    }
-
-    public interface BooleanRunnable {
-        boolean run();
     }
 
 }

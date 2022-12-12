@@ -45,7 +45,7 @@ import gaiasky.gui.GSKeys;
  * {@link com.badlogic.gdx.scenes.scene2d.utils.ClickListener}).
  * {@link com.badlogic.gdx.scenes.scene2d.utils.ClickListener} does not support
  * disabling menu item and will still report item clicks.
- * 
+ *
  * @author Kotcrab
  * @author langurmonkey
  */
@@ -53,9 +53,9 @@ public class MenuItem extends Button {
     private static final Vector2 tmpVector = new Vector2();
 
     //MenuItem is modified version of TextButton
-
+    /** Menu that this item belongs to */
+    ContextMenu containerMenu;
     private MenuItemStyle style;
-
     private Image image;
     private boolean generateDisabledImage = true;
     private Label label;
@@ -63,11 +63,7 @@ public class MenuItem extends Button {
     private Label shortcutLabel;
     private Image subMenuImage;
     private Cell<Image> subMenuIconCell;
-
     private ContextMenu subMenu;
-
-    /** Menu that this item belongs to */
-    ContextMenu containerMenu;
 
     public MenuItem(String text, Skin skin) {
         this(text, skin, (Image) null, skin.get(MenuItemStyle.class));
@@ -168,6 +164,10 @@ public class MenuItem extends Button {
         });
     }
 
+    public ContextMenu getSubMenu() {
+        return subMenu;
+    }
+
     public void setSubMenu(final ContextMenu subMenu) {
         this.subMenu = subMenu;
 
@@ -176,10 +176,6 @@ public class MenuItem extends Button {
         } else {
             subMenuIconCell.setActor(subMenuImage);
         }
-    }
-
-    public ContextMenu getSubMenu() {
-        return subMenu;
     }
 
     void packContainerMenu() {
@@ -306,17 +302,6 @@ public class MenuItem extends Button {
         this.generateDisabledImage = generateDisabledImage;
     }
 
-    /**
-     * Set shortcuts text displayed in this menu item. This DOES NOT set actual
-     * hot key for this menu item, it only makes shortcut text visible in item.
-     * 
-     * @param keycode
-     *            from {@link Keys}.
-     */
-    public MenuItem setShortcut(int keycode) {
-        return setShortcut(GSKeys.toString(keycode));
-    }
-
     public CharSequence getShortcut() {
         return shortcutLabel.getText();
     }
@@ -324,9 +309,19 @@ public class MenuItem extends Button {
     /**
      * Set shortcuts text displayed in this menu item. This DOES NOT set actual
      * hot key for this menu item, it only makes shortcut text visible in item.
-     * 
-     * @param text
-     *            text that will be displayed
+     *
+     * @param keycode from {@link Keys}.
+     */
+    public MenuItem setShortcut(int keycode) {
+        return setShortcut(GSKeys.toString(keycode));
+    }
+
+    /**
+     * Set shortcuts text displayed in this menu item. This DOES NOT set actual
+     * hot key for this menu item, it only makes shortcut text visible in item.
+     *
+     * @param text text that will be displayed
+     *
      * @return this object for the purpose of chaining methods
      */
     public MenuItem setShortcut(String text) {
@@ -345,10 +340,10 @@ public class MenuItem extends Button {
      * <p>
      * This DOES NOT set actual hot key for this menu item, it only makes
      * shortcut text visible in item.
-     * 
-     * @param keycodes
-     *            keycodes from {@link Keys} that are used to create shortcut
-     *            text
+     *
+     * @param keycodes keycodes from {@link Keys} that are used to create shortcut
+     *                 text
+     *
      * @return this object for the purpose of chaining methods
      */
     public MenuItem setShortcut(int... keycodes) {

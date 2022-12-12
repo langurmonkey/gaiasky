@@ -14,38 +14,10 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  */
 public class AccumulationBlurFilter extends Filter<AccumulationBlurFilter> {
 
+    private final Vector2 resolution;
     private float blurOpacity = 0.5f;
     private float blurRadius = 0.5f;
-    private final Vector2 resolution;
     private Texture lastFrameTex;
-
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture("u_texture0", 0),
-        LastFrame("u_texture1", 0),
-        BlurOpacity("u_blurOpacity", 0),
-        BlurRadius("u_blurRadius", 0),
-        Resolution("u_resolution", 2);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String mnemonic, int arrayElementSize) {
-            this.mnemonic = mnemonic;
-            this.elementSize = arrayElementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
 
     public AccumulationBlurFilter() {
         super(ShaderLoader.fromFile("screenspace", "motionblur"));
@@ -90,6 +62,34 @@ public class AccumulationBlurFilter extends Filter<AccumulationBlurFilter> {
         inputTexture.bind(u_texture0);
         if (lastFrameTex != null)
             lastFrameTex.bind(u_texture1);
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture("u_texture0", 0),
+        LastFrame("u_texture1", 0),
+        BlurOpacity("u_blurOpacity", 0),
+        BlurRadius("u_blurRadius", 0),
+        Resolution("u_resolution", 2);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 
 }

@@ -22,11 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ScriptingServer {
     private static final Logger.Log logger = Logger.getLogger(ScriptingServer.class);
-
+    private static final AtomicInteger connections = new AtomicInteger(0);
     private static ClientServer gatewayServer;
     private static GatewayServerListener listener;
     private static IScriptingInterface scriptingInterface;
-    private static final AtomicInteger connections = new AtomicInteger(0);
 
     public static void initialize(IScriptingInterface scriptingInterface) {
         initialize(scriptingInterface, false);

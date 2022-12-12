@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public interface AbortableRunnable extends Runnable {
     /**
      * Sets the abort object.
+     *
      * @param abort The abort object.
      */
     public void setAbort(AtomicBoolean abort);

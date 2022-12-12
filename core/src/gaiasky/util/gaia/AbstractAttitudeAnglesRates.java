@@ -6,7 +6,7 @@
 /*
  * GaiaTools
  * Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -25,7 +25,7 @@
 package gaiasky.util.gaia;
 
 /**
- * A little helper class to hold a set of three angles and associated rates. 
+ * A little helper class to hold a set of three angles and associated rates.
  *
  * @author Uwe Lammers
  * @version $Id: AbstractAttitudeAnglesRates.java 308373 2013-08-02 16:01:12Z ulammers $
@@ -42,7 +42,7 @@ public abstract class AbstractAttitudeAnglesRates {
         anglesRates[i][1] = rate;
     }
 
-    /** Set first angle and/or rate  */
+    /** Set first angle and/or rate */
     @SuppressWarnings("javadoc")
     public void setFirstAngle(double angle) {
         setAngle(0, angle);

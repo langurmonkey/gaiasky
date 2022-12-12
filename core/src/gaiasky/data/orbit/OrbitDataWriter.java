@@ -19,11 +19,10 @@ import java.util.Locale;
 public class OrbitDataWriter {
     /**
      * Dumps the current orbit data to the given file
-     * 
-     * @param filePath
-     *            The path to the file to write
-     * @param data
-     *            The OrbitData instance
+     *
+     * @param filePath The path to the file to write
+     * @param data     The OrbitData instance
+     *
      * @throws IOException
      */
     public static void writeOrbitData(String filePath, PointCloudData data) throws IOException {

@@ -9,7 +9,7 @@ import gaiasky.scene.component.Model;
 import gaiasky.util.Constants;
 import gaiasky.util.TLV3;
 import gaiasky.util.camera.Proximity;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 
 public class LightingUtils {
@@ -33,7 +33,7 @@ public class LightingUtils {
                             float[] col = nr.getColor();
                             double closestDist = nr.getClosestDistToCamera();
                             // Dim light with distance.
-                            float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
+                            float colFactor = (float) Math.pow(MathUtilsDouble.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
                             model.model.directional(i).direction.sub(nr.pos.put(F31.get()));
                             model.model.directional(i).color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
                         } else {

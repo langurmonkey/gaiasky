@@ -82,7 +82,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     private void setPlanetariumAperture(float planetariumAperture) {
         cubemapEffect.setPlanetariumAperture(planetariumAperture);
     }
-    
+
     private void setCelestialSphereIndexOfRefraction(float ior) {
         cubemapEffect.setCelestialSphereIndexOfRefraction(ior);
     }

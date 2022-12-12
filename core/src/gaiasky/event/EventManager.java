@@ -20,35 +20,14 @@ import java.util.*;
  */
 public class EventManager implements IObserver {
 
-    /** Time frame options **/
-    public enum TimeFrame {
-        /** Real time from the user's perspective **/
-        REAL_TIME,
-        /** Simulation time in the simulation clock **/
-        SIMULATION_TIME;
-
-        public long getCurrentTimeMs() {
-            if (this.equals(REAL_TIME)) {
-                return TimeUtils.millis();
-            } else if (this.equals(SIMULATION_TIME)) {
-                return GaiaSky.instance.time.getTime().toEpochMilli();
-            }
-            return -1;
-        }
-    }
-
     /** Singleton pattern **/
     public static final EventManager instance = new EventManager();
-
     /** Holds a priority queue for each time frame **/
     private final Map<TimeFrame, PriorityQueue<Telegram>> queues;
-
     /** Telegram pool **/
     private final Pool<Telegram> pool;
-
     /** Subscriptions Event-Observers **/
     private final Map<Integer, Set<IObserver>> subscriptions = new HashMap<>();
-
     /** The time frame to use if none is specified **/
     private TimeFrame defaultTimeFrame;
 
@@ -66,6 +45,33 @@ public class EventManager implements IObserver {
         }
         defaultTimeFrame = TimeFrame.REAL_TIME;
         subscribe(this, Event.EVENT_TIME_FRAME_CMD);
+    }
+
+    /**
+     * Register a new event to the default event manager instance with the given source
+     * and data.
+     *
+     * @param event  The event.
+     * @param source The source object, if any.
+     * @param data   The event data.
+     */
+    public static void publish(final Event event, Object source, final Object... data) {
+        instance.post(event, source, data);
+    }
+
+    /**
+     * Register a new delayed event in the default manager with the given type, data, delay and the default
+     * time frame. The default time frame can be changed using the event
+     * {@link Event#EVENT_TIME_FRAME_CMD}. The event will be passed along after
+     * the specified delay time [ms] in the given time frame has passed.
+     *
+     * @param event   The event.
+     * @param source  The source object, if any.
+     * @param delayMs Milliseconds of delay in the given time frame.
+     * @param data    The event data.
+     */
+    public static void publishDelayed(Event event, Object source, long delayMs, Object... data) {
+        instance.postDelayed(event, source, delayMs, data);
     }
 
     /**
@@ -163,18 +169,6 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Register a new event to the default event manager instance with the given source
-     * and data.
-     *
-     * @param event  The event.
-     * @param source The source object, if any.
-     * @param data   The event data.
-     */
-    public static void publish(final Event event, Object source, final Object... data) {
-        instance.post(event, source, data);
-    }
-
-    /**
      * Register a new data-less event with the given source.
      *
      * @param event  The event.
@@ -200,21 +194,6 @@ public class EventManager implements IObserver {
                 }
             }
         }
-    }
-
-    /**
-     * Register a new delayed event in the default manager with the given type, data, delay and the default
-     * time frame. The default time frame can be changed using the event
-     * {@link Event#EVENT_TIME_FRAME_CMD}. The event will be passed along after
-     * the specified delay time [ms] in the given time frame has passed.
-     *
-     * @param event   The event.
-     * @param source  The source object, if any.
-     * @param delayMs Milliseconds of delay in the given time frame.
-     * @param data    The event data.
-     */
-    public static void publishDelayed(Event event, Object source, long delayMs, Object... data) {
-        instance.postDelayed(event, source, delayMs, data);
     }
 
     /**
@@ -314,5 +293,22 @@ public class EventManager implements IObserver {
             defaultTimeFrame = (TimeFrame) data[0];
         }
 
+    }
+
+    /** Time frame options **/
+    public enum TimeFrame {
+        /** Real time from the user's perspective **/
+        REAL_TIME,
+        /** Simulation time in the simulation clock **/
+        SIMULATION_TIME;
+
+        public long getCurrentTimeMs() {
+            if (this.equals(REAL_TIME)) {
+                return TimeUtils.millis();
+            } else if (this.equals(SIMULATION_TIME)) {
+                return GaiaSky.instance.time.getTime().toEpochMilli();
+            }
+            return -1;
+        }
     }
 }

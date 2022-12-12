@@ -11,8 +11,29 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
  * Contains the frustum corner index as an additional vertex attribute.
  */
 public class FullscreenQuad3 {
+    private static final int VERT_SIZE = 20;
+    private static final float[] verts = new float[VERT_SIZE];
+    private static final int X1 = 0;
+    private static final int Y1 = 1;
+    private static final int I1 = 2;
+    private static final int U1 = 3;
+    private static final int V1 = 4;
+    private static final int X2 = 5;
+    private static final int Y2 = 6;
+    private static final int I2 = 7;
+    private static final int U2 = 8;
+    private static final int V2 = 9;
+    private static final int X3 = 10;
+    private static final int Y3 = 11;
+    private static final int I3 = 12;
+    private static final int U3 = 13;
+    private static final int V3 = 14;
+    private static final int X4 = 15;
+    private static final int Y4 = 16;
+    private static final int I4 = 17;
+    private static final int U4 = 18;
+    private static final int V4 = 19;
     private final Mesh quad;
-
     public FullscreenQuad3() {
         quad = createFullscreenQuad();
     }
@@ -66,27 +87,4 @@ public class FullscreenQuad3 {
         tmpMesh.setVertices(verts);
         return tmpMesh;
     }
-
-    private static final int VERT_SIZE = 20;
-    private static final float[] verts = new float[VERT_SIZE];
-    private static final int X1 = 0;
-    private static final int Y1 = 1;
-    private static final int I1 = 2;
-    private static final int U1 = 3;
-    private static final int V1 = 4;
-    private static final int X2 = 5;
-    private static final int Y2 = 6;
-    private static final int I2 = 7;
-    private static final int U2 = 8;
-    private static final int V2 = 9;
-    private static final int X3 = 10;
-    private static final int Y3 = 11;
-    private static final int I3 = 12;
-    private static final int U3 = 13;
-    private static final int V3 = 14;
-    private static final int X4 = 15;
-    private static final int Y4 = 16;
-    private static final int I4 = 17;
-    private static final int U4 = 18;
-    private static final int V4 = 19;
 }

@@ -15,11 +15,10 @@ import java.util.Scanner;
  */
 public class LoadingTextGenerator {
     private static final int MAX_KEYS = 100;
-
-    private String[][] set;
     private final String[] verbs;
     private final String[] adjectives;
     private final String[] objects;
+    private String[][] set;
 
     public LoadingTextGenerator() {
         Locale locale = I18n.getLocaleFromLanguageTag(Settings.settings.program.getLocale());
@@ -35,21 +34,21 @@ public class LoadingTextGenerator {
 
     private String[] read(String keyPrefix, int nBlanks) {
         Array<String> strings = new Array<>();
-        for(int i =0; i < MAX_KEYS; i++) {
-            try{
+        for (int i = 0; i < MAX_KEYS; i++) {
+            try {
                 String s = I18n.msg(keyPrefix + i);
                 strings.add(s);
             } catch (MissingResourceException e) {
                 // Skip
             }
         }
-        if(nBlanks > 0) {
-            for(int i =0; i < nBlanks; i++) {
+        if (nBlanks > 0) {
+            for (int i = 0; i < nBlanks; i++) {
                 strings.add("");
             }
         }
         String[] out = new String[strings.size];
-        for(int i =0; i < strings.size; i++) {
+        for (int i = 0; i < strings.size; i++) {
             out[i] = strings.get(i);
         }
         return out;

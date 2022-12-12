@@ -7,12 +7,13 @@ package gaiasky.gui.beans;
 
 public class FloatComboBoxBean {
     public float value;
-    public FloatComboBoxBean(float value){
+
+    public FloatComboBoxBean(float value) {
         this.value = value;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return Float.toString(value);
     }
 }

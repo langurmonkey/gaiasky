@@ -67,8 +67,8 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
     /**
      * Calculate the scanning law at a given time. See GAIA-CA-TN-OCA-FM-037-2
      *
-     * @param julianDate
-     *            The julian date
+     * @param julianDate The julian date
+     *
      * @return The attidue object
      */
     public IAttitude getAttitudeNative(double julianDate) {
@@ -77,9 +77,8 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
     }
 
     /**
+     * @param tNow The time elapsed in nanoseconds since epoch J2010
      *
-     * @param tNow
-     *            The time elapsed in nanoseconds since epoch J2010
      * @return The attitude object
      */
     protected IAttitude getAttitudeNative(long tNow) {
@@ -224,8 +223,8 @@ public class Nsl37 extends AnalyticalAttitudeDataServer {
     /**
      * Returns the argument modulo 4*pi [rad]
      *
-     * @param angle
-     *            angle [rad]
+     * @param angle angle [rad]
+     *
      * @return angle modulo 4*PI
      */
     public double modFourPi(double angle) {

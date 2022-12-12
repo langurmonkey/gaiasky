@@ -9,7 +9,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.entity.TrajectoryUtils;
 import gaiasky.util.Settings;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 /**
  * Extracts trajectory and orbit data to feed to the render stages.
@@ -55,7 +55,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                 if (body.solidAngle > angleLimit) {
 
                     if (body.solidAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
-                        trajectory.alpha = MathUtilsd.lint(body.solidAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, body.color[3]);
+                        trajectory.alpha = MathUtilsDouble.lint(body.solidAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, body.color[3]);
                     } else {
                         trajectory.alpha = body.color[3];
                     }
@@ -71,7 +71,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                         if (bodyBody.distToCamera > trajectory.distDown) {
                             // Body, disappear slowly
                             if (bodyBody.distToCamera < trajectory.distUp)
-                                trajectory.alpha *= MathUtilsd.lint(bodyBody.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
+                                trajectory.alpha *= MathUtilsDouble.lint(bodyBody.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
                             addToRender(render, rg);
                             added = true;
                         }

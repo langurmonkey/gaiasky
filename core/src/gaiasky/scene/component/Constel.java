@@ -21,9 +21,9 @@ public class Constel implements Component {
 
     public void setIds(double[][] ids) {
         this.ids = new Array<>(ids.length);
-        for(double[] dd : ids) {
+        for (double[] dd : ids) {
             int[] ii = new int[dd.length];
-            for(int j =0; j < dd.length; j++)
+            for (int j = 0; j < dd.length; j++)
                 ii[j] = (int) Math.round(dd[j]);
             this.ids.add(ii);
         }

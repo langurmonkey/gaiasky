@@ -22,15 +22,7 @@ import java.time.Instant;
 public class CatalogInfo {
     private static final Log logger = Logger.getLogger(CatalogInfo.class);
     private static int colorIndexSequence = 0;
-
-    public enum CatalogInfoSource {
-        INTERNAL,
-        LOD,
-        SAMP,
-        SCRIPT,
-        UI
-    }
-
+    private final FocusView view;
     // Base properties
     public String name;
     public String description;
@@ -57,8 +49,6 @@ public class CatalogInfo {
 
     // Reference to the entity
     public Entity entity;
-    private final FocusView view;
-
     public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, Entity entity) {
         this(name, description, source, type, hlSizeFactor);
         setEntity(entity);
@@ -122,13 +112,13 @@ public class CatalogInfo {
         highlight(highlighted);
     }
 
+    public float[] getHlColor() {
+        return hlColor;
+    }
+
     public void setHlColor(float[] hlColor) {
         this.plainColor = true;
         setColor(hlColor[0], hlColor[1], hlColor[2], hlColor[3]);
-    }
-
-    public float[] getHlColor() {
-        return hlColor;
     }
 
     public void setHlColormap(int cmapIndex, IAttribute cmapAttribute, double cmapMin, double cmapMax) {
@@ -213,6 +203,14 @@ public class CatalogInfo {
             return Mapper.base.get(entity).ct;
         }
         return null;
+    }
+
+    public enum CatalogInfoSource {
+        INTERNAL,
+        LOD,
+        SAMP,
+        SCRIPT,
+        UI
     }
 
 }

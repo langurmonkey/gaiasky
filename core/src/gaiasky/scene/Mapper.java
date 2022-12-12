@@ -67,7 +67,6 @@ public class Mapper {
     public static final ComponentMapper<Perimeter> perimeter = ComponentMapper.getFor(Perimeter.class);
     public static final ComponentMapper<VRDevice> vr = ComponentMapper.getFor(VRDevice.class);
 
-
     // Tags
     public static final ComponentMapper<TagBackgroundModel> tagBackgroundModel = ComponentMapper.getFor(TagBackgroundModel.class);
     public static final ComponentMapper<TagQuaternionOrientation> tagQuatOrientation = ComponentMapper.getFor(TagQuaternionOrientation.class);

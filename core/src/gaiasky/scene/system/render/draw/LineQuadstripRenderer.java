@@ -22,7 +22,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 
@@ -37,34 +37,16 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
 
     protected static final int INI_DPOOL_SIZE = 1000;
     protected static final int MAX_DPOOL_SIZE = 10000;
+    final static double baseWidthAngle = Math.toRadians(.13);
+    final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
+    private final LineArraySorter sorter;
+    private final Pool<double[]> doublePool;
+    private final Vector3d aux = new Vector3d();
+    Vector3d line, camdir0, camdir1, camdir15, point, vec;
     private MeshDataExt currExt;
     private Array<double[]> provisionalLines;
     private Array<Line> provLines;
-    private final LineArraySorter sorter;
-    private final Pool<double[]> doublePool;
-
-    private class MeshDataExt extends MeshData {
-        int uvOffset;
-        int indexIdx;
-        int maxIndices;
-        int[] indices;
-
-        public void clear() {
-            super.clear();
-            indexIdx = 0;
-        }
-    }
-
-    private class Line {
-        public float r, g, b, a;
-        public double widthAngleTan;
-        public double[][] points;
-        public double[] dists;
-    }
-
-    Vector3d line, camdir0, camdir1, camdir15, point, vec;
-    final static double baseWidthAngle = Math.toRadians(.13);
-    final static double baseWidthAngleTan = Math.tan(baseWidthAngle);
+    private boolean two = false;
 
     public LineQuadstripRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -132,9 +114,6 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
         currExt.vertices[currExt.vertexIdx + currExt.uvOffset + 1] = v;
     }
 
-    private boolean two = false;
-    private final Vector3d aux = new Vector3d();
-
     public void breakLine() {
         two = false;
     }
@@ -164,7 +143,7 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     }
 
     private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan, boolean rec) {
-        double distToSegment = MathUtilsd.distancePointSegment(x0, y0, z0, x1, y1, z1, 0, 0, 0);
+        double distToSegment = MathUtilsDouble.distancePointSegment(x0, y0, z0, x1, y1, z1, 0, 0, 0);
 
         double dist0 = FastMath.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
         double dist1 = FastMath.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
@@ -173,7 +152,7 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
 
         if (rec && distToSegment < dist0 && distToSegment < dist1) {
             // Projection falls in line, split line
-            p15 = MathUtilsd.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0, p15);
+            p15 = MathUtilsDouble.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0, p15);
             double px = p15.x;
             double py = p15.y;
             double pz = p15.z;
@@ -363,6 +342,35 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
         provLines.clear();
     }
 
+    public void dispose() {
+        super.dispose();
+        currExt = null;
+        provisionalLines.clear();
+        provLines.clear();
+        provisionalLines = null;
+        provLines = null;
+
+    }
+
+    private class MeshDataExt extends MeshData {
+        int uvOffset;
+        int indexIdx;
+        int maxIndices;
+        int[] indices;
+
+        public void clear() {
+            super.clear();
+            indexIdx = 0;
+        }
+    }
+
+    private class Line {
+        public float r, g, b, a;
+        public double widthAngleTan;
+        public double[][] points;
+        public double[] dists;
+    }
+
     /**
      * Pools arrays of double-precision floating point numbers.
      */
@@ -379,16 +387,6 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
         protected double[] newObject() {
             return new double[poolSize];
         }
-
-    }
-
-    public void dispose() {
-        super.dispose();
-        currExt = null;
-        provisionalLines.clear();
-        provLines.clear();
-        provisionalLines = null;
-        provLines = null;
 
     }
 

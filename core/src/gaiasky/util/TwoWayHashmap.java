@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * Simple two-way hashmap implemented with two maps.
+ *
  * @param <K> Key type in forward map, value in backward map
  * @param <V> Value type in forward map, key in backward map
  */
@@ -31,11 +32,11 @@ public class TwoWayHashmap<K extends Object, V extends Object> {
         return backward.get(key);
     }
 
-    public synchronized boolean containsKey(K key){
+    public synchronized boolean containsKey(K key) {
         return forward.containsKey(key);
     }
 
-    public synchronized boolean containsValue(V value){
+    public synchronized boolean containsValue(V value) {
         return backward.containsKey(value);
     }
 
@@ -43,13 +44,14 @@ public class TwoWayHashmap<K extends Object, V extends Object> {
         V value = forward.get(key);
         return remove(key, value);
     }
+
     public synchronized boolean removeValue(V value) {
         K key = backward.get(value);
         return remove(key, value);
     }
 
     private synchronized boolean remove(K key, V value) {
-        if(value != null && key != null){
+        if (value != null && key != null) {
             forward.remove(key);
             backward.remove(value);
             return true;

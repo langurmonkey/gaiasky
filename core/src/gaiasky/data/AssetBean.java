@@ -17,16 +17,26 @@ import java.util.Set;
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class AssetBean {
-    private static AssetManager assetManager;
     private static final Set<AssetBean> assetDescriptors;
-
-    private final String assetName;
-
-    private final Class assetClass;
-    private AssetLoaderParameters assetParams = null;
+    private static AssetManager assetManager;
 
     static {
         assetDescriptors = new HashSet<>();
+    }
+
+    private final String assetName;
+    private final Class assetClass;
+    private AssetLoaderParameters assetParams = null;
+
+    private AssetBean(String assetName, Class assetClass) {
+        super();
+        this.assetName = assetName;
+        this.assetClass = assetClass;
+    }
+
+    private AssetBean(String assetName, Class assetClass, AssetLoaderParameters params) {
+        this(assetName, assetClass);
+        this.assetParams = params;
     }
 
     public static void addAsset(String assetName, Class assetClass) {
@@ -53,23 +63,13 @@ public class AssetBean {
         AssetBean.assetManager = manager;
     }
 
-    public static AssetManager manager(){
+    public static AssetManager manager() {
         return assetManager;
-    }
-
-    private AssetBean(String assetName, Class assetClass) {
-        super();
-        this.assetName = assetName;
-        this.assetClass = assetClass;
-    }
-
-    private AssetBean(String assetName, Class assetClass, AssetLoaderParameters params) {
-        this(assetName, assetClass);
-        this.assetParams = params;
     }
 
     /**
      * Invokes the load operation on the given AssetManager for this given AssetBean.
+     *
      * @param manager
      */
     public void load(AssetManager manager) {

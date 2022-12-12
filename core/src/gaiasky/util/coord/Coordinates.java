@@ -141,6 +141,7 @@ public class Coordinates {
      * @param alpha The &alpha; angle in degrees, between z and N.
      * @param beta  The &beta; angle in degrees, between y and Y.
      * @param gamma The &gamma; angle in degrees, Z and N.
+     *
      * @return The rotation matrix.
      */
     public static Matrix4d getRotationMatrix(double alpha, double beta, double gamma) {
@@ -290,9 +291,11 @@ public class Coordinates {
 
     /**
      * Transforms from spherical equatorial coordinates to spherical galactic coordinates.
+     *
      * @param alpha The right ascension in radians.
      * @param delta The declination in radians.
-     * @param out The out vector.
+     * @param out   The out vector.
+     *
      * @return The out vector with the galactic longitude and latitude, in radians.
      */
     public static Vector2d equatorialToGalactic(double alpha, double delta, Vector2d out) {
@@ -318,6 +321,7 @@ public class Coordinates {
      * @param vec Vector with ecliptic longitude (&lambda;) and ecliptic
      *            latitude (&beta;) in radians.
      * @param out The output vector.
+     *
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
      * for chaining.
      */
@@ -331,6 +335,7 @@ public class Coordinates {
      * @param lambda Ecliptic longitude (&lambda;) in radians.
      * @param beta   Ecliptic latitude (&beta;) in radians.
      * @param out    The output vector.
+     *
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
      * for chaining.
      */
@@ -375,6 +380,7 @@ public class Coordinates {
      *            <li>The radius or distance to the point.</li>
      *            </ol>
      * @param out The output vector.
+     *
      * @return Output vector in Cartesian coordinates where x and z are on the
      * horizontal plane and y is in the up direction.
      */
@@ -395,6 +401,7 @@ public class Coordinates {
      * @param latitude  The latitude or declination, in radians.
      * @param radius    The radius or distance to the point.
      * @param out       The output vector.
+     *
      * @return Output vector with the Cartesian coordinates[x, y, z] where x and
      * z are on the horizontal plane and y is in the up direction, for
      * chaining.
@@ -419,6 +426,7 @@ public class Coordinates {
      * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
      * @param out Output vector.
+     *
      * @return Output vector containing the spherical coordinates.
      * <ol>
      * <li>The longitude or right ascension (&alpha;), from the z
@@ -469,6 +477,7 @@ public class Coordinates {
      * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
      * @param out Output vector.
+     *
      * @return Output vector containing the spherical coordinates.
      * <ol>
      * <li>The longitude or right ascension (&alpha;), from the z
@@ -524,6 +533,7 @@ public class Coordinates {
      * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
      * @param out Output vector.
+     *
      * @return Output vector containing the spherical coordinates.
      * <ol>
      * <li>The longitude or right ascension (&alpha;), from the z

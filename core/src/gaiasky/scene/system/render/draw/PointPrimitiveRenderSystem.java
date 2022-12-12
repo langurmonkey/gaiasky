@@ -40,16 +40,16 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     private int sizeOffset;
     private Vector3d D31 = new Vector3d();
 
-    @Override
-    protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
-        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
-    }
-
     public PointPrimitiveRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders, -1);
         this.pointView = new PointView();
         this.glType = GL20.GL_POINTS;
+    }
+
+    @Override
+    protected void initShaderProgram() {
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
 
     }
 
-    private void render(Entity entity, PointView pointView, float alpha){
+    private void render(Entity entity, PointView pointView, float alpha) {
         // Render points CPU
         var body = Mapper.body.get(entity);
         var verts = Mapper.verts.get(entity);

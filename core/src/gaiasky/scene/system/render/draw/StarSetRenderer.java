@@ -41,11 +41,9 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
     protected static final Log logger = Logger.getLogger(StarSetRenderer.class);
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset, uvOffset, starPosOffset;
     private final Colormap cmap;
-
     private final ParticleUtils utils;
-
+    private int sizeOffset, pmOffset, uvOffset, starPosOffset;
     private StarSetQuadComponent triComponent;
 
     public StarSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {

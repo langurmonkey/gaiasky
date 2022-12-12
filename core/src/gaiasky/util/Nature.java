@@ -25,10 +25,10 @@ public class Nature {
     public static final double ARCSEC_TO_RAD = ARCSEC_TO_DEG * TO_RAD;
     public static final double DEG_TO_MILLARCSEC = DEG_TO_ARCSEC * 1000;
     public static final double MILLARCSEC_TO_DEG = 1 / DEG_TO_MILLARCSEC;
-    public static final double RAD_TO_MILLARCSEC = TO_DEG * DEG_TO_MILLARCSEC;
     public static final double MILLARCSEC_TO_RAD = MILLARCSEC_TO_DEG * TO_RAD;
+    public static final double RAD_TO_MILLARCSEC = TO_DEG * DEG_TO_MILLARCSEC;
     public static final double MILLIARCSEC_TO_ARCSEC = 1d / 1000d;
-    
+
     /*
      * ======= DISTANCE UNITS =======
      */

@@ -34,10 +34,9 @@ public final class Mosaic extends PostProcessorEffect {
         filter.setTiles(topLeft, bottomLeft, bl, tl);
     }
 
-    public void setViewportSize(float w, float h){
+    public void setViewportSize(float w, float h) {
         filter.setViewportSize(w, h);
     }
-
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {

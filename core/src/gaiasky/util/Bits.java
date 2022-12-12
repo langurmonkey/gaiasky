@@ -26,28 +26,6 @@ import java.util.Arrays;
  */
 public class Bits {
     public static int DEFAULT_LENGTH = 120;
-
-    public static Bits empty() {
-        return empty(DEFAULT_LENGTH);
-    }
-
-    public static Bits empty(int nBits) {
-        return new Bits(nBits);
-    }
-
-    public static Bits from(long mask) {
-        Bits b = empty();
-        b.setMask(mask);
-        return b;
-    }
-    public static Bits indexes(int... idx) {
-        Bits b = empty();
-        for(int i =0; i < idx.length; i++){
-            b.set(idx[i]);
-        }
-        return b;
-    }
-
     long[] bits = { 0 };
 
     public Bits() {
@@ -63,9 +41,32 @@ public class Bits {
         checkCapacity(nbits >>> 6);
     }
 
+    public static Bits empty() {
+        return empty(DEFAULT_LENGTH);
+    }
+
+    public static Bits empty(int nBits) {
+        return new Bits(nBits);
+    }
+
+    public static Bits from(long mask) {
+        Bits b = empty();
+        b.setMask(mask);
+        return b;
+    }
+
+    public static Bits indexes(int... idx) {
+        Bits b = empty();
+        for (int i = 0; i < idx.length; i++) {
+            b.set(idx[i]);
+        }
+        return b;
+    }
+
     public boolean has(int index) {
         return get(index);
     }
+
     public boolean is(int index) {
         return get(index);
     }
@@ -132,7 +133,7 @@ public class Bits {
 
     public void setMask(long mask) {
         for (int i = 0; i < 64; i++) {
-            if((mask >> i & 1L) == 1) {
+            if ((mask >> i & 1L) == 1) {
                 set(i);
             }
         }
@@ -457,9 +458,9 @@ public class Bits {
         return 0;
     }
 
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(long bit: bits) {
+        for (long bit : bits) {
             sb.append(bit);
         }
         return sb.toString();

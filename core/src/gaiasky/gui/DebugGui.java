@@ -57,7 +57,6 @@ public class DebugGui extends AbstractGui {
         }
     }
 
-
     @Override
     public void update(double dt) {
         stage.act((float) dt);

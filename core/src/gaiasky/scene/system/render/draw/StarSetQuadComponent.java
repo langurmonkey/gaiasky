@@ -14,7 +14,6 @@ public class StarSetQuadComponent {
     protected int fovMode;
     protected Texture starTex;
 
-
     public void setStarTexture(String starTexture) {
         starTex = new Texture(Settings.settings.data.dataFileHandle(starTexture), true);
         starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -51,6 +50,7 @@ public class StarSetQuadComponent {
             shaderProgram.end();
         });
     }
+
     protected void updateStarBrightness(float br) {
         // Remap brightness to [0,2]
         alphaSizeBr[2] = (br - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 4f;

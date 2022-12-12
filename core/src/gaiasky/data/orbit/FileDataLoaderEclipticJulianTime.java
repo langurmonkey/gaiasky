@@ -24,9 +24,9 @@ public class FileDataLoaderEclipticJulianTime {
 
     /**
      * Loads the data in the input stream into an OrbitData object.
-     * 
-     * @param data
-     *            The input stream
+     *
+     * @param data The input stream
+     *
      * @return The orbit data
      */
     public PointCloudData load(InputStream data) throws Exception {

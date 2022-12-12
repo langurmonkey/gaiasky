@@ -29,10 +29,9 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
     }
 
     @Override
-    public void updateLocal(){
+    public void updateLocal() {
         position(GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1), camp);
     }
-
 
     @Override
     public void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort) {
@@ -83,7 +82,7 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
         // Fonts
         sb.begin();
         font.setColor(occ);
-        font.draw(sb, I18n.obj("oort_cloud"),  side2 - px(60),  u2Px(-50000, sideshort2) + px(8));
+        font.draw(sb, I18n.obj("oort_cloud"), side2 - px(60), u2Px(-50000, sideshort2) + px(8));
         font.setColor(sunc);
         font.draw(sb, I18n.obj("sun"), side2 + px(8), u2Px(10, sideshort2) - px(2));
         sb.end();
@@ -131,8 +130,6 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
         renderCameraTop(0.4f);
         sr.end();
 
-
-
         // Fonts
         sb.begin();
         font.setColor(textbc);
@@ -141,7 +138,7 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
         font.draw(sb, "100,000 " + I18n.msg("gui.unit.au"), side2, u2Px(95000, side2));
 
         font.setColor(occ);
-        font.draw(sb, I18n.obj("oort_cloud"),  side2 + px(15),  u2Px(-60000, side2) + px(8));
+        font.draw(sb, I18n.obj("oort_cloud"), side2 + px(15), u2Px(-60000, side2) + px(8));
         font.setColor(sunc);
         font.draw(sb, I18n.obj("sun"), side2 + px(5), side2 - px(5));
 

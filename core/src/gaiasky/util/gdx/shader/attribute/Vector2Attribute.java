@@ -9,19 +9,17 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class Vector2Attribute extends Attribute {
+    public static final String HeightSizeAlias = "heightSize";
+    public static final int HeightSize = register(HeightSizeAlias);
+    public Vector2 value;
+
     public Vector2Attribute(int index) {
         super(index);
     }
-
     public Vector2Attribute(int index, Vector2 value) {
         super(index);
         this.value = value;
     }
-
-    public Vector2 value;
-
-    public static final String HeightSizeAlias = "heightSize";
-    public static final int HeightSize = register(HeightSizeAlias);
 
     @Override
     public Attribute copy() {

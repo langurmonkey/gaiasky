@@ -16,7 +16,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -26,38 +26,31 @@ import java.util.*;
 public class ParticleSet implements Component, IDisposable {
 
     public static long idSeq = 0;
-
+    public final Vector3d D31 = new Vector3d();
     /**
      * List that contains the point data. It contains only [x y z]
      */
     public List<IParticleRecord> pointData;
-
     /** Flag indicating whether the particle set holds stars or particles. **/
     public boolean isStars;
-
     /**
      * Fully qualified name of data provider class
      */
     public String provider;
-
     /**
      * Path of data file
      */
     public String datafile;
-
     // Parameters for the data provider
     public Map<String, Object> providerParams;
-
     /**
      * Profile decay of the particles in the shader
      */
     public float profileDecay = 0.2f;
-
     /**
      * Noise factor for the color in [0,1]
      */
     public float colorNoise = 0;
-
     /**
      * Particle size limits. Applies to legacy point render (using GL_POINTS).
      */
@@ -67,35 +60,29 @@ public class ParticleSet implements Component, IDisposable {
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
      */
     public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.07)), Math.tan(Math.toRadians(6.0)) };
-
     /**
      * Temporary storage for the mean position of this particle set, if it is given externally.
      * If this is set, the mean position is not computed from the positions of all the particles automatically.
      **/
     public Vector3d meanPosition;
-
     /**
      * Factor to apply to the data points, usually to normalise distances
      */
     public Double factor = null;
-
     /**
      * Mapping colors
      */
     public float[] ccMin = null, ccMax = null;
-
     /**
      * Stores the time when the last sort operation finished, in ms
      */
     public long lastSortTime;
-
     /**
      * The mean distance from the origin of all points in this group.
      * Gives a sense of the scale.
      */
     public double meanDistance;
     public double maxDistance, minDistance;
-
     /**
      * Reference to the current focus.
      */
@@ -104,44 +91,32 @@ public class ParticleSet implements Component, IDisposable {
      * Index of the particle acting as focus. Negative if we have no focus here.
      */
     public int focusIndex = -1;
-
     /**
      * Candidate to focus.
      */
     public int candidateFocusIndex = -1;
-
     /**
      * Position of the current focus
      */
     public Vector3d focusPosition;
-
     /**
      * Position in equatorial coordinates of the current focus in radians
      */
     public Vector2d focusPositionSph;
-
     /**
      * FOCUS_MODE attributes
      */
     public double focusDistToCamera, focusSolidAngle, focusSolidAngleApparent, focusSize;
-
     /**
      * Proximity particles
      */
     public Proximity proximity;
-
     // Has been disposed
     public boolean disposed = false;
-
     // Name index
     public Map<String, Integer> index;
-
     // Metadata, for sorting - holds distances from each particle to the camera, squared.
     public double[] metadata;
-
-    // Comparator
-    private Comparator<Integer> comp;
-
     // Indices list buffer 1
     public Integer[] indices1;
     // Indices list buffer 2
@@ -162,15 +137,31 @@ public class ParticleSet implements Component, IDisposable {
 
     // Last sort position
     public Vector3d lastSortCameraPos, cPosD;
-
-    public final Vector3d D31 = new Vector3d();
+    // Comparator
+    private Comparator<Integer> comp;
 
     public float[] getColorMin() {
         return ccMin;
     }
 
+    public void setColorMin(double[] colorMin) {
+        this.ccMin = GlobalResources.toFloatArray(colorMin);
+    }
+
+    public void setColorMin(float[] colorMin) {
+        this.ccMin = colorMin;
+    }
+
     public float[] getColorMax() {
         return ccMax;
+    }
+
+    public void setColorMax(double[] colorMax) {
+        this.ccMax = GlobalResources.toFloatArray(colorMax);
+    }
+
+    public void setColorMax(float[] colorMax) {
+        this.ccMax = colorMax;
     }
 
     public double getMeanDistance() {
@@ -289,22 +280,6 @@ public class ParticleSet implements Component, IDisposable {
         this.colorNoise = colorNoise.floatValue();
     }
 
-    public void setColorMin(double[] colorMin) {
-        this.ccMin = GlobalResources.toFloatArray(colorMin);
-    }
-
-    public void setColorMin(float[] colorMin) {
-        this.ccMin = colorMin;
-    }
-
-    public void setColorMax(double[] colorMax) {
-        this.ccMax = GlobalResources.toFloatArray(colorMax);
-    }
-
-    public void setColorMax(float[] colorMax) {
-        this.ccMax = colorMax;
-    }
-
     public void setParticleSizeLimits(double[] sizeLimits) {
         if (sizeLimits[0] > sizeLimits[1])
             sizeLimits[0] = sizeLimits[1];
@@ -399,7 +374,7 @@ public class ParticleSet implements Component, IDisposable {
             focus = pointData.get(focusIndex);
             focusPosition.set(focus.x(), focus.y(), focus.z());
             Vector3d posSph = Coordinates.cartesianToSpherical(focusPosition, D31);
-            focusPositionSph.set((float) (MathUtilsd.radDeg * posSph.x), (float) (MathUtilsd.radDeg * posSph.y));
+            focusPositionSph.set((float) (MathUtilsDouble.radDeg * posSph.x), (float) (MathUtilsDouble.radDeg * posSph.y));
             updateFocus(GaiaSky.instance.getICamera());
         }
     }

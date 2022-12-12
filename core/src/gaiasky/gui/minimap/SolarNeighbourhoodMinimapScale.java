@@ -28,7 +28,7 @@ public class SolarNeighbourhoodMinimapScale extends AbstractMinimapScale {
     private Image topProjection;
     private Image sideProjection;
 
-    public SolarNeighbourhoodMinimapScale(){
+    public SolarNeighbourhoodMinimapScale() {
         super();
         camp = new float[4];
     }

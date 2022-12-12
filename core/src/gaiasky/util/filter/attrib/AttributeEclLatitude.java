@@ -13,10 +13,12 @@ public class AttributeEclLatitude extends AttributeAbstract implements IAttribut
     public double get(IParticleRecord bean) {
         return bean.beta();
     }
-    public String getUnit(){
+
+    public String getUnit() {
         return I18n.msg("gui.unit.deg");
     }
-    public String toString(){
+
+    public String toString() {
         return I18n.msg("gui.attrib.ecllat");
     }
 }

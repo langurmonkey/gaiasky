@@ -39,21 +39,7 @@ import java.util.Objects;
 
 public class ModelComponent extends NamedComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
-
-    public boolean forceInit = false;
     private static final ColorAttribute ambient;
-    /**
-     * Light never changes; set fixed ambient light for this model
-     */
-    private Boolean staticLight = false;
-    /**
-     * Ambient light level for static light objects
-     **/
-    private float staticLightLevel = 0.6f;
-    /**
-     * Flag
-     **/
-    private boolean updateStaticLight = false;
 
     static {
         ambient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
@@ -67,6 +53,57 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
         };
         EventManager.instance.subscribe(observer, Event.AMBIENT_LIGHT_CMD);
+    }
+
+    public boolean forceInit = false;
+    public IntModelInstance instance;
+    public Environment env;
+    public Map<String, Object> params;
+    public String type, modelFile;
+    public double scale = 1d;
+    public boolean culling = true;
+    /**
+     * COMPONENTS
+     */
+    // Texture
+    public MaterialComponent mtc;
+    // Relativistic effects
+    public RelativisticEffectsComponent rec;
+    // Velocity buffer
+    public VelocityBufferComponent vbc;
+    /**
+     * Light never changes; set fixed ambient light for this model
+     */
+    private Boolean staticLight = false;
+    /**
+     * Ambient light level for static light objects
+     **/
+    private float staticLightLevel = 0.6f;
+    /**
+     * Flag
+     **/
+    private boolean updateStaticLight = false;
+    private boolean modelInitialised, modelLoading;
+    private boolean useColor = true;
+    /** The blend mode **/
+    private BlendMode blendMode = BlendMode.ALPHA;
+    private AssetManager manager;
+    private float[] cc;
+    private int primitiveType = GL20.GL_TRIANGLES;
+    public ModelComponent() {
+        this(true);
+    }
+    public ModelComponent(Boolean initEnvironment) {
+        if (initEnvironment) {
+            env = new Environment();
+            env.set(ambient);
+            // Directional lights
+            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
+                DirectionalLight dLight = new DirectionalLight();
+                dLight.color.set(0f, 0f, 0f, 1f);
+                env.add(dLight);
+            }
+        }
     }
 
     public static void toggleAmbientLight(boolean on) {
@@ -84,52 +121,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      */
     public static void setAmbientLight(float level) {
         ambient.color.set(level, level, level, 1f);
-    }
-
-    public IntModelInstance instance;
-    public Environment env;
-
-    public Map<String, Object> params;
-
-    public String type, modelFile;
-
-    public double scale = 1d;
-    public boolean culling = true;
-    private boolean modelInitialised, modelLoading;
-    private boolean useColor = true;
-
-    /** The blend mode **/
-    private BlendMode blendMode = BlendMode.ALPHA;
-
-    private AssetManager manager;
-    private float[] cc;
-    private int primitiveType = GL20.GL_TRIANGLES;
-
-    /**
-     * COMPONENTS
-     */
-    // Texture
-    public MaterialComponent mtc;
-    // Relativistic effects
-    public RelativisticEffectsComponent rec;
-    // Velocity buffer
-    public VelocityBufferComponent vbc;
-
-    public ModelComponent() {
-        this(true);
-    }
-
-    public ModelComponent(Boolean initEnvironment) {
-        if (initEnvironment) {
-            env = new Environment();
-            env.set(ambient);
-            // Directional lights
-            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
-                DirectionalLight dLight = new DirectionalLight();
-                dLight.color.set(0f, 0f, 0f, 1f);
-                env.add(dLight);
-            }
-        }
     }
 
     /**
@@ -558,25 +549,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         this.modelFile = model;
     }
 
-    public void setStaticLight(String staticLight) {
-        setStaticlight(Boolean.valueOf(staticLight));
-    }
-
     public void setStaticlight(String staticLight) {
         setStaticLight(staticLight);
     }
 
-    public void setStaticLight(Boolean staticLight) {
-        this.staticLight = staticLight;
-    }
-
     public void setStaticlight(Boolean staticLight) {
         setStaticLight(staticLight);
-    }
-
-    public void setStaticLight(Double lightLevel) {
-        this.staticLight = true;
-        this.staticLightLevel = lightLevel.floatValue();
     }
 
     public void setStaticlight(Double lightLevel) {
@@ -731,6 +709,19 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public boolean isStaticLight() {
         return staticLight;
+    }
+
+    public void setStaticLight(String staticLight) {
+        setStaticlight(Boolean.valueOf(staticLight));
+    }
+
+    public void setStaticLight(Boolean staticLight) {
+        this.staticLight = staticLight;
+    }
+
+    public void setStaticLight(Double lightLevel) {
+        this.staticLight = true;
+        this.staticLightLevel = lightLevel.floatValue();
     }
 
     public void setPrimitiveType(int primitiveType) {

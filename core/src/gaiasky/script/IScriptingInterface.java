@@ -376,17 +376,6 @@ public interface IScriptingInterface {
 
     /**
      * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
-     * The default behavior of this method posts a runnable to update the
-     * camera after the current frame. If you need to call this method from
-     * within a parked runnable, use {@link IScriptingInterface#setCameraPosition(double[], boolean)},
-     * with the boolean set to <code>true</code>.
-     *
-     * @param position Vector of three components in internal coordinates and Km.
-     */
-    void setCameraPosition(double[] position);
-
-    /**
-     * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
      * The <code>immediate</code> parameter enables setting the camera state
      * immediately without waiting for the possible current update
      * operation to finish. Set this to true if you run this function
@@ -416,17 +405,15 @@ public interface IScriptingInterface {
     double[] getCameraPosition();
 
     /**
-     * Sets the camera direction vector to the given vector, in the internal reference system.
-     * You can convert from spherical coordinates using {@link IScriptingInterface#equatorialCartesianToInternalCartesian(double[], double)},
-     * {@link IScriptingInterface#galacticToInternalCartesian(double, double, double)} and {@link IScriptingInterface#eclipticToInternalCartesian(double, double, double)}.
+     * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
-     * within a parked runnable, use {@link IScriptingInterface#setCameraDirection(double[], boolean)},
+     * within a parked runnable, use {@link IScriptingInterface#setCameraPosition(double[], boolean)},
      * with the boolean set to <code>true</code>.
      *
-     * @param dir The direction vector in equatorial cartesian coordinates.
+     * @param position Vector of three components in internal coordinates and Km.
      */
-    void setCameraDirection(double[] dir);
+    void setCameraPosition(double[] position);
 
     /**
      * Sets the camera direction vector to the given vector, in the internal reference system.
@@ -448,15 +435,17 @@ public interface IScriptingInterface {
     double[] getCameraDirection();
 
     /**
-     * Sets the camera up vector to the given vector, in the internal reference system.
+     * Sets the camera direction vector to the given vector, in the internal reference system.
+     * You can convert from spherical coordinates using {@link IScriptingInterface#equatorialCartesianToInternalCartesian(double[], double)},
+     * {@link IScriptingInterface#galacticToInternalCartesian(double, double, double)} and {@link IScriptingInterface#eclipticToInternalCartesian(double, double, double)}.
      * The default behavior of this method posts a runnable to update the
      * camera after the current frame. If you need to call this method from
-     * within a parked runnable, use {@link IScriptingInterface#setCameraUp(double[], boolean)},
+     * within a parked runnable, use {@link IScriptingInterface#setCameraDirection(double[], boolean)},
      * with the boolean set to <code>true</code>.
      *
-     * @param up The up vector in equatorial coordinates.
+     * @param dir The direction vector in equatorial cartesian coordinates.
      */
-    void setCameraUp(double[] up);
+    void setCameraDirection(double[] dir);
 
     /**
      * Sets the camera up vector to the given vector, in the internal reference system.
@@ -476,6 +465,17 @@ public interface IScriptingInterface {
      * @return The camera up vector in the internal reference system.
      */
     double[] getCameraUp();
+
+    /**
+     * Sets the camera up vector to the given vector, in the internal reference system.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link IScriptingInterface#setCameraUp(double[], boolean)},
+     * with the boolean set to <code>true</code>.
+     *
+     * @param up The up vector in equatorial coordinates.
+     */
+    void setCameraUp(double[] up);
 
     /**
      * Sets the focus and instantly moves the camera to a point in the line
@@ -500,18 +500,18 @@ public interface IScriptingInterface {
     void pointAtSkyCoordinate(double ra, double dec);
 
     /**
-     * Changes the speed multiplier of the camera and its acceleration.
-     *
-     * @param speed The new speed, from 0 to 100.
-     */
-    void setCameraSpeed(float speed);
-
-    /**
      * Gets the current physical speed of the camera in km/h.
      *
      * @return The current speed of the camera in km/h.
      */
     double getCameraSpeed();
+
+    /**
+     * Changes the speed multiplier of the camera and its acceleration.
+     *
+     * @param speed The new speed, from 0 to 100.
+     */
+    void setCameraSpeed(float speed);
 
     /**
      * Changes the speed of the camera when it rotates around a focus.
@@ -826,18 +826,18 @@ public interface IScriptingInterface {
     void setProperMotionsArrowheads(boolean arrowheadsEnabled);
 
     /**
-     * Sets the maximum number of proper motion vectors to add per star group.
-     *
-     * @param maxNumber The maximum number of proper motion vectors per star group.
-     */
-    void setProperMotionsMaxNumber(long maxNumber);
-
-    /**
      * Returns the current maximum number of velocity vectors per star group.
      *
      * @return Max number of velocity vectors per star group.
      */
     long getProperMotionsMaxNumber();
+
+    /**
+     * Sets the maximum number of proper motion vectors to add per star group.
+     *
+     * @param maxNumber The maximum number of proper motion vectors per star group.
+     */
+    void setProperMotionsMaxNumber(long maxNumber);
 
     /**
      * Sets the visibility of all cross-hairs.
@@ -896,6 +896,14 @@ public interface IScriptingInterface {
     void setSimulationTime(int year, int month, int day, int hour, int min, int sec, int millisec);
 
     /**
+     * Returns the current simulation time as the number of milliseconds since
+     * 1970-01-01T00:00:00Z (UTC).
+     *
+     * @return Number of milliseconds since the epoch (Jan 1, 1970 00:00:00 UTC).
+     */
+    long getSimulationTime();
+
+    /**
      * Sets the time of the application. The long value represents specified
      * number of milliseconds since the standard base time known as "the epoch",
      * namely January 1, 1970, 00:00:00 GMT.
@@ -903,14 +911,6 @@ public interface IScriptingInterface {
      * @param time Number of milliseconds since the epoch (Jan 1, 1970).
      */
     void setSimulationTime(long time);
-
-    /**
-     * Returns the current simulation time as the number of milliseconds since
-     * 1970-01-01T00:00:00Z (UTC).
-     *
-     * @return Number of milliseconds since the epoch (Jan 1, 1970 00:00:00 UTC).
-     */
-    long getSimulationTime();
 
     /**
      * Returns the current UTC simulation time in an array.
@@ -1014,6 +1014,7 @@ public interface IScriptingInterface {
      * Sets the star glow factor level value. This controls the amount of glow light
      * when the camera is close to stars. Must be between {@link Constants#MIN_STAR_GLOW_FACTOR} and {@link Constants#MAX_STAR_GLOW_FACTOR}.
      * Default is 0.06.
+     *
      * @param glowFactor The new glow factor value.
      */
     void setStarGlowFactor(float glowFactor);
@@ -2220,6 +2221,7 @@ public interface IScriptingInterface {
      * Enables or disables the stars glowing over objects.
      *
      * @param state Activate (true) or deactivate (false).
+     *
      * @deprecated Use {@link #setStarGlowOverObjects(boolean)} instead.
      */
     @Deprecated

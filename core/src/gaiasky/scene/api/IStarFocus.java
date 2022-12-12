@@ -63,6 +63,7 @@ public interface IStarFocus extends IFocus, IProperMotion {
      * Returns the position of the closest star in camera coordinates
      *
      * @param out The out vector
+     *
      * @return The out vector with the position
      */
     Vector3d getClosestPos(Vector3d out);
@@ -71,6 +72,7 @@ public interface IStarFocus extends IFocus, IProperMotion {
      * Returns the position of the closest star in world coordinates
      *
      * @param out The out vector
+     *
      * @return The out vector with the position
      */
     Vector3b getClosestAbsolutePos(Vector3b out);

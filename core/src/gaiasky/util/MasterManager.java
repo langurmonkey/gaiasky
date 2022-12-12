@@ -11,7 +11,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -37,39 +37,10 @@ public class MasterManager implements IObserver {
 
     // Singleton instance
     public static MasterManager instance;
-
-    public static void initialize() {
-        if (Settings.settings.program.net.master.active)
-            MasterManager.instance = new MasterManager();
-    }
-
-    public static boolean hasSlaves() {
-        return instance != null && instance.slaves != null && !instance.slaves.isEmpty();
-    }
-
     // Slave list
     private final List<String> slaves;
-
-    public boolean isSlaveConnected(String slaveName) {
-        return isSlaveConnected(getSlaveIndex(slaveName));
-
-    }
-
-    public int getSlaveIndex(String slaveName) {
-        return slaves.indexOf(slaveName);
-    }
-
-    public boolean isSlaveConnected(int index) {
-        if (index >= 0 && index < slaves.size()) {
-            return slaveStates[index] == 0;
-        }
-        return false;
-    }
-
-    public byte[] getSlaveStates() {
-        return slaveStates;
-    }
-
+    // HTTP client
+    private final HttpClient http;
     /**
      * Vector with slave states
      * <ul>
@@ -83,13 +54,9 @@ public class MasterManager implements IObserver {
     private byte[] slaveFlags;
     /** Last ping times for each slave **/
     private long[] slavePingTimes;
-
     // Handlers
     private ResponseHandler[] responseHandlers;
     private ExceptHandler[] exceptHandlers;
-
-    // HTTP client
-    private final HttpClient http;
 
     private MasterManager() {
         super();
@@ -123,6 +90,35 @@ public class MasterManager implements IObserver {
         EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BASE_LEVEL_CMD, Event.STAR_POINT_SIZE_CMD, Event.DISPOSE);
     }
 
+    public static void initialize() {
+        if (Settings.settings.program.net.master.active)
+            MasterManager.instance = new MasterManager();
+    }
+
+    public static boolean hasSlaves() {
+        return instance != null && instance.slaves != null && !instance.slaves.isEmpty();
+    }
+
+    public boolean isSlaveConnected(String slaveName) {
+        return isSlaveConnected(getSlaveIndex(slaveName));
+
+    }
+
+    public int getSlaveIndex(String slaveName) {
+        return slaves.indexOf(slaveName);
+    }
+
+    public boolean isSlaveConnected(int index) {
+        if (index >= 0 && index < slaves.size()) {
+            return slaveStates[index] == 0;
+        }
+        return false;
+    }
+
+    public byte[] getSlaveStates() {
+        return slaveStates;
+    }
+
     /**
      * Broadcasts the given camera state and time to all the slaves.
      *
@@ -146,10 +142,10 @@ public class MasterManager implements IObserver {
 
                 try {
                     http.sendAsync(req, rhandler(i)).thenApply(HttpResponse::body).exceptionally(ehandler(i));
-                }catch(Exception e){
+                } catch (Exception e) {
                     logger.error(e);
                 }
-                if(slaveFlags[i] == 1)
+                if (slaveFlags[i] == 1)
                     slaveFlags[i] = 0;
             } else {
                 slaveOffline = slaveStates[i] == -1;
@@ -274,7 +270,7 @@ public class MasterManager implements IObserver {
             }
             break;
         case STAR_BRIGHTNESS_CMD:
-            float brightness = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+            float brightness = MathUtilsDouble.lint((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
             String sbr = Float.toString(brightness);
             i = 0;
             for (String slave : slaves) {
@@ -328,19 +324,35 @@ public class MasterManager implements IObserver {
         }
     }
 
-
-
     private ResponseHandler rhandler(int index) {
         return responseHandlers[index];
     }
+
     private ExceptHandler ehandler(int index) {
         return exceptHandlers[index];
     }
 
-    private class ExceptHandler implements Function<Throwable, String>{
+    private void markSlaveOffline(int index) {
+        slaveEvent(index, -1);
+        slaveStates[index] = -1;
+        slavePingTimes[index] = System.currentTimeMillis();
+    }
+
+    private void makeSlaveOnline(int index) {
+        slaveEvent(index, 0);
+        slaveStates[index] = 0;
+    }
+
+    private void slaveEvent(int idx, int newState) {
+        if (slaveStates[idx] != newState) {
+            EventManager.publish(Event.SLAVE_CONNECTION_EVENT, this, idx, slaves.get(idx), newState >= 0);
+        }
+    }
+
+    private class ExceptHandler implements Function<Throwable, String> {
         private final int idx;
 
-        public ExceptHandler(int idx){
+        public ExceptHandler(int idx) {
             this.idx = idx;
         }
 
@@ -371,22 +383,5 @@ public class MasterManager implements IObserver {
             return HttpResponse.BodySubscribers.discarding();
         }
 
-    }
-
-    private void markSlaveOffline(int index) {
-        slaveEvent(index, -1);
-        slaveStates[index] = -1;
-        slavePingTimes[index] = System.currentTimeMillis();
-    }
-
-    private void makeSlaveOnline(int index){
-        slaveEvent(index, 0);
-        slaveStates[index] = 0;
-    }
-
-    private void slaveEvent(int idx, int newState){
-        if(slaveStates[idx] != newState){
-            EventManager.publish(Event.SLAVE_CONNECTION_EVENT, this, idx, slaves.get(idx), newState >= 0);
-        }
     }
 }

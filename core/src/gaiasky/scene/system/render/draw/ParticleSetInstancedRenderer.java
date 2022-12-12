@@ -41,11 +41,10 @@ public class ParticleSetInstancedRenderer extends InstancedRenderSystem implemen
     protected static final Log logger = Logger.getLogger(ParticleSetInstancedRenderer.class);
 
     private final Vector3 aux1;
-    private int sizeOffset, particlePosOffset;
     private final Random rand;
     private final Colormap cmap;
-
     private final ParticleUtils utils;
+    private int sizeOffset, particlePosOffset;
 
     public ParticleSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);

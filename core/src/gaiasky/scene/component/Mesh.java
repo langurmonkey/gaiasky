@@ -6,12 +6,6 @@ import com.badlogic.gdx.math.Matrix4;
 import java.util.Locale;
 
 public class Mesh implements Component {
-    public enum MeshShading {
-        REGULAR,
-        DUST,
-        ADDITIVE
-    }
-
     // Shading mode
     public MeshShading shading = MeshShading.ADDITIVE;
     public Matrix4 coordinateSystem;
@@ -30,5 +24,11 @@ public class Mesh implements Component {
         } catch (IllegalArgumentException e) {
             shading = MeshShading.ADDITIVE;
         }
+    }
+
+    public enum MeshShading {
+        REGULAR,
+        DUST,
+        ADDITIVE
     }
 }

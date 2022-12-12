@@ -36,7 +36,7 @@ public class GeoJsonLoader extends AbstractSceneLoader {
                     size++;
 
                     Entity loadedEntity = loadJsonObject(child);
-                    if(loadedEntity != null) {
+                    if (loadedEntity != null) {
                         loadedEntities.add(loadedEntity);
                     }
 

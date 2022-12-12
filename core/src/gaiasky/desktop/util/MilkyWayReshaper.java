@@ -25,7 +25,7 @@ import java.util.List;
 public class MilkyWayReshaper {
     private static final Logger.Log logger = Logger.getLogger(MilkyWayReshaper.class);
 
-    static int[] moduluses = new int[] {10, 5, 2, 0, 0};
+    static int[] moduluses = new int[] { 10, 5, 2, 0, 0 };
     static String f = Constants.DATA_LOCATION_TOKEN + "galaxy/";
     static String[] filesIn = new String[] { f + "galaxy_ArmDust.dat.gz", f + "galaxy_Bulge.dat.gz", f + "galaxy_Gas.dat.gz", f + "galaxy_HII.dat.gz", f + "galaxy_Stars.dat.gz" };
     static String[] filesOut = new String[] { f + "galaxy_ArmDust.dat", f + "galaxy_Bulge.dat", f + "galaxy_Gas.dat", f + "galaxy_HII.dat", f + "galaxy_Stars.dat" };
@@ -50,7 +50,7 @@ public class MilkyWayReshaper {
             }
             SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(dummyv));
 
-            for(int ds = 0; ds < filesIn.length; ds++) {
+            for (int ds = 0; ds < filesIn.length; ds++) {
                 logger.info();
                 int modulus = moduluses[ds];
                 String fileIn = filesIn[ds];

@@ -48,9 +48,9 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel home;
     private final OwnLabel s1;
     private final OwnLabel s2;
-    private String lastFocusName;
     private final Scene scene;
     private final FocusView view;
+    private String lastFocusName;
 
     public TopInfoInterface(Skin skin, Scene scene) {
         super(skin);

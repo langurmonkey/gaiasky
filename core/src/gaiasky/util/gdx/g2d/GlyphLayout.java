@@ -35,9 +35,8 @@ import static gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
  */
 public class GlyphLayout implements Poolable {
     public final Array<GlyphRun> runs = new Array<>();
-    public float width, height;
-
     private final Array<Color> colorStack = new Array<>(4);
+    public float width, height;
 
     /** Creates an empty GlyphLayout. */
     public GlyphLayout() {
@@ -527,6 +526,7 @@ public class GlyphLayout implements Poolable {
      * @author Nathan Sweet
      */
     static public class GlyphRun implements Poolable {
+        public final Color color = new Color();
         public Array<Glyph> glyphs = new Array<>();
         /**
          * Contains glyphs.size+1 entries: First entry is X offset relative to the drawing position. Subsequent entries are the X
@@ -534,7 +534,6 @@ public class GlyphLayout implements Poolable {
          */
         public FloatArray xAdvances = new FloatArray();
         public float x, y, width;
-        public final Color color = new Color();
 
         public void reset() {
             glyphs.clear();

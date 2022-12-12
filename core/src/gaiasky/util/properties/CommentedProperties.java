@@ -21,15 +21,19 @@ import java.util.Vector;
  */
 public class CommentedProperties extends java.util.Properties {
 
+    private static final char[] hexDigit = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
     /**
      * Use a Vector to keep a copy of lines that are a comment or 'blank'
      */
     public Vector<String> lineData = new Vector<>(0, 1);
-
     /**
      * Use a Vector to keep a copy of lines containing a key, i.e. they are a property.
      */
     public Vector<String> keyData = new Vector<>(0, 1);
+
+    private static char toHex(int var0) {
+        return hexDigit[var0 & 15];
+    }
 
     /**
      * Load properties from the specified InputStreamReader.
@@ -364,12 +368,6 @@ public class CommentedProperties extends java.util.Properties {
         }
 
         return var6.toString();
-    }
-
-    private static final char[] hexDigit = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-    private static char toHex(int var0) {
-        return hexDigit[var0 & 15];
     }
 
     /**

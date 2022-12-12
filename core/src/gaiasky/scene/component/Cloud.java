@@ -7,5 +7,4 @@ public class Cloud implements Component {
 
     public CloudComponent cloud;
 
-
 }

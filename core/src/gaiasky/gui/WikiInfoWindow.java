@@ -112,7 +112,7 @@ public class WikiInfoWindow extends GenericDialog {
         request.setUrl(url);
         request.setTimeOut(5000);
 
-        if(Settings.settings.program.offlineMode) {
+        if (Settings.settings.program.offlineMode) {
             listener.ko(I18n.msg("gui.system.offlinemode.tooltip"));
         } else {
             Gdx.net.sendHttpRequest(request, new HttpResponseListener() {

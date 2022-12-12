@@ -9,23 +9,20 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 
 public class Matrix4Attribute extends Attribute {
+    public static final String ShadowMapProjViewTransAlias = "shadowMapProjViewTrans";
+    public static final int ShadowMapProjViewTrans = register(ShadowMapProjViewTransAlias);
+    public static final String PrevProjViewAlias = "prevProjView";
+    public static final int PrevProjView = register(PrevProjViewAlias);
+    public Matrix4 value;
+
     public Matrix4Attribute(int index) {
         super(index);
         this.value = new Matrix4();
     }
-
     public Matrix4Attribute(int index, Matrix4 value) {
         super(index);
         this.value = new Matrix4(value);
     }
-
-    public Matrix4 value;
-
-    public static final String ShadowMapProjViewTransAlias = "shadowMapProjViewTrans";
-    public static final int ShadowMapProjViewTrans = register(ShadowMapProjViewTransAlias);
-
-    public static final String PrevProjViewAlias = "prevProjView";
-    public static final int PrevProjView = register(PrevProjViewAlias);
 
     public void set(Matrix4 value) {
         this.value.set(value);

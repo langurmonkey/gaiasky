@@ -72,9 +72,11 @@ public final class Zoomer extends PostProcessorEffect {
         }
     }
 
-    public void setBlurStrength(float strength) {
+    public float getZoom() {
         if (doRadial) {
-            radialBlur.setStrength(strength);
+            return 1f / radialBlur.getZoom();
+        } else {
+            return 1f / zoom.getZoom();
         }
     }
 
@@ -86,20 +88,18 @@ public final class Zoomer extends PostProcessorEffect {
         }
     }
 
-    public float getZoom() {
-        if (doRadial) {
-            return 1f / radialBlur.getZoom();
-        } else {
-            return 1f / zoom.getZoom();
-        }
-    }
-
     public float getBlurStrength() {
         if (doRadial) {
             return radialBlur.getStrength();
         }
 
         return -1;
+    }
+
+    public void setBlurStrength(float strength) {
+        if (doRadial) {
+            radialBlur.setStrength(strength);
+        }
     }
 
     public float getOriginX() {

@@ -45,9 +45,8 @@ public interface VRDeviceListener {
 
     /**
      * Unhandled event on the {@link VRDevice}
-     * 
-     * @param code
-     *            Event code
+     *
+     * @param code Event code
      */
     void event(int code);
 }

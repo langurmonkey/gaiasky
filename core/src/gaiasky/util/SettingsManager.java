@@ -10,7 +10,7 @@ import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.VersionSettings;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 
 import java.io.*;
 import java.net.Authenticator;
@@ -32,21 +32,9 @@ public class SettingsManager {
     private static final Logger.Log logger = Logger.getLogger(SettingsManager.class);
 
     public static SettingsManager instance;
-
-    public static void initialize(boolean vr) throws Exception {
-        SettingsManager.instance = new SettingsManager(vr);
-        instance.initSettings();
-    }
-
-    public static void initialize(FileInputStream fis, FileInputStream vis) throws Exception {
-        SettingsManager.instance = new SettingsManager(fis, vis);
-        instance.initSettings();
-    }
-
     private Settings settings;
     private Properties vp;
     private ObjectMapper mapper;
-
     public SettingsManager(boolean vr) {
         super();
         try {
@@ -74,7 +62,6 @@ public class SettingsManager {
             logger.error(e);
         }
     }
-
     public SettingsManager(InputStream fis, InputStream vis) {
         super();
         try {
@@ -87,6 +74,81 @@ public class SettingsManager {
         } catch (Exception e) {
             logger.error(e);
         }
+    }
+
+    public static void initialize(boolean vr) throws Exception {
+        SettingsManager.instance = new SettingsManager(vr);
+        instance.initSettings();
+    }
+
+    public static void initialize(FileInputStream fis, FileInputStream vis) throws Exception {
+        SettingsManager.instance = new SettingsManager(fis, vis);
+        instance.initSettings();
+    }
+
+    private static void setProxySettings(ProxyBean proxy, String protocol) {
+        setProxySettings(proxy, protocol, protocol);
+    }
+
+    private static void setProxySettings(ProxyBean proxy, String protocol, String nonProxyHostsProtocol) {
+        if (proxy.host != null)
+            System.setProperty(protocol + ".proxyHost", proxy.host);
+        if (proxy.port != null)
+            System.setProperty(protocol + ".proxyPort", Integer.toString(proxy.port));
+        if (proxy.nonProxyHosts != null)
+            System.setProperty(nonProxyHostsProtocol + ".nonProxyHosts", proxy.password);
+
+        if (proxy.username != null)
+            System.setProperty(protocol + ".proxyUser", proxy.username);
+        if (proxy.password != null)
+            System.setProperty(protocol + ".proxyPassword", proxy.password);
+    }
+
+    private static void setSocksProxySettings(ProxyBean proxy, String prefix) {
+        if (proxy.version != null)
+            System.setProperty(prefix + "ProxyVersion", Integer.toString(proxy.version));
+        if (proxy.host != null)
+            System.setProperty(prefix + "ProxyHost", proxy.host);
+        if (proxy.port != null)
+            System.setProperty(prefix + "ProxyPort", Integer.toString(proxy.port));
+        if (proxy.username != null)
+            System.setProperty("java.net.socks.username", proxy.username);
+        if (proxy.password != null)
+            System.setProperty("java.net.socks.password", proxy.password);
+    }
+
+    public static void initializeProxyAuthenticator() {
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                if (getRequestorType() == RequestorType.PROXY) {
+                    String protocol = getRequestingProtocol().toLowerCase();
+                    String host = System.getProperty(protocol + ".proxyHost", "");
+                    String port = System.getProperty(protocol + ".proxyPort", "80");
+                    String user = System.getProperty(protocol + ".proxyUser", "");
+                    String password = System.getProperty(protocol + ".proxyPassword", "");
+                    if (getRequestingHost().equalsIgnoreCase(host)) {
+                        if (Integer.parseInt(port) == getRequestingPort()) {
+                            return new PasswordAuthentication(user, password.toCharArray());
+                        }
+                    }
+                }
+                return null;
+            }
+        });
+        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+    }
+
+    public static void persistSettings(final File settingsFile) {
+        if (instance != null)
+            instance.persist(settingsFile);
+    }
+
+    public static String getConfigFileName(boolean vr) {
+        if (vr)
+            return "config.vr.yaml";
+        else
+            return "config.yaml";
     }
 
     private void initializeMapper() {
@@ -130,7 +192,7 @@ public class SettingsManager {
         }
 
         // UI scale mapping
-        settings.program.ui.scale = MathUtilsd.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+        settings.program.ui.scale = MathUtilsDouble.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
 
         // Default distance units
         if (settings.program.ui.distanceUnits == null) {
@@ -154,7 +216,7 @@ public class SettingsManager {
         }
 
         // Minimap size
-        settings.program.minimap.size = MathUtilsd.clamp(settings.program.minimap.size, Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
+        settings.program.minimap.size = MathUtilsDouble.clamp(settings.program.minimap.size, Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
 
         // Limit draw distance in 32-bit JVM
         if (arch.equals("32")) {
@@ -217,64 +279,6 @@ public class SettingsManager {
         settings.initialized = true;
     }
 
-    private static void setProxySettings(ProxyBean proxy, String protocol) {
-        setProxySettings(proxy, protocol, protocol);
-    }
-
-    private static void setProxySettings(ProxyBean proxy, String protocol, String nonProxyHostsProtocol) {
-        if (proxy.host != null)
-            System.setProperty(protocol + ".proxyHost", proxy.host);
-        if (proxy.port != null)
-            System.setProperty(protocol + ".proxyPort", Integer.toString(proxy.port));
-        if (proxy.nonProxyHosts != null)
-            System.setProperty(nonProxyHostsProtocol + ".nonProxyHosts", proxy.password);
-
-        if (proxy.username != null)
-            System.setProperty(protocol + ".proxyUser", proxy.username);
-        if (proxy.password != null)
-            System.setProperty(protocol + ".proxyPassword", proxy.password);
-    }
-
-    private static void setSocksProxySettings(ProxyBean proxy, String prefix) {
-        if (proxy.version != null)
-            System.setProperty(prefix + "ProxyVersion", Integer.toString(proxy.version));
-        if (proxy.host != null)
-            System.setProperty(prefix + "ProxyHost", proxy.host);
-        if (proxy.port != null)
-            System.setProperty(prefix + "ProxyPort", Integer.toString(proxy.port));
-        if (proxy.username != null)
-            System.setProperty("java.net.socks.username", proxy.username);
-        if (proxy.password != null)
-            System.setProperty("java.net.socks.password", proxy.password);
-    }
-
-    public static void initializeProxyAuthenticator() {
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                if (getRequestorType() == RequestorType.PROXY) {
-                    String protocol = getRequestingProtocol().toLowerCase();
-                    String host = System.getProperty(protocol + ".proxyHost", "");
-                    String port = System.getProperty(protocol + ".proxyPort", "80");
-                    String user = System.getProperty(protocol + ".proxyUser", "");
-                    String password = System.getProperty(protocol + ".proxyPassword", "");
-                    if (getRequestingHost().equalsIgnoreCase(host)) {
-                        if (Integer.parseInt(port) == getRequestingPort()) {
-                            return new PasswordAuthentication(user, password.toCharArray());
-                        }
-                    }
-                }
-                return null;
-            }
-        });
-        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
-    }
-
-    public static void persistSettings(final File settingsFile) {
-        if (instance != null)
-            instance.persist(settingsFile);
-    }
-
     private void persist(final File settingsFile) {
         try {
             FileOutputStream fos = new FileOutputStream(settingsFile);
@@ -298,13 +302,6 @@ public class SettingsManager {
         String props = userFolderConfFile.toAbsolutePath().toString();
         System.setProperty("properties.file", props);
         return props;
-    }
-
-    public static String getConfigFileName(boolean vr) {
-        if (vr)
-            return "config.vr.yaml";
-        else
-            return "config.yaml";
     }
 
 }

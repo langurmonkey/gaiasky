@@ -27,11 +27,11 @@ import java.io.Serializable;
 
 /**
  * A finite number of days
- *
+ * <p>
  * There are two implementations provided of the conversions methods one as
  * object interface, where an object of the current class has to be
  * instantiated. The oder implementation is provided as static class methods.
- *
+ * <p>
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
@@ -50,16 +50,71 @@ public class Days extends ConcreteDuration implements Serializable {
     /**
      * Construct object
      *
-     * @param days
-     *            number of days
+     * @param days number of days
      */
     public Days(final double days) {
         value = days;
     }
 
     /**
+     * @param days The time in days to convert.
+     *
+     * @return days expressed in nanoSec
+     */
+    public static long asNanoSecs(final double days) {
+        return Math.round(days * Duration.NS_PER_DAY);
+    }
+
+    /**
+     * @param days The time in days to convert.
+     *
+     * @return days expressed in sec
+     */
+    public static double asSecs(final double days) {
+        return days * Duration.SECS_PER_DAY;
+    }
+
+    /**
+     * @param days The time in days to convert.
+     *
+     * @return days expressed in mins
+     */
+    public static double asMins(final double days) {
+        return days * Duration.MINS_PER_DAY;
+    }
+
+    /**
+     * @param days The time in days to convert.
+     *
+     * @return days expressed in revolutions
+     */
+    public static double asRevs(final double days) {
+        return days * Duration.REVS_PER_DAY;
+    }
+
+    /**
+     * @param days The time in days to convert.
+     *
+     * @return days expressed in hours
+     */
+    public static double asHours(final double days) {
+        return days * Duration.HOURS_PER_DAY;
+    }
+
+    /**
+     * @param days The time in days to convert.
+     *
+     * @return days expressed in julian years
+     */
+    public static double asJulianYears(final double days) {
+        return days / Duration.DAYS_PER_JULIAN_YEAR;
+    }
+
+    /**
      * @param d Duration
+     *
      * @return Duration
+     *
      * @see gaiasky.util.gaia.time.Duration#set(Duration)
      */
     @Override
@@ -71,6 +126,7 @@ public class Days extends ConcreteDuration implements Serializable {
 
     /**
      * @return long
+     *
      * @see gaiasky.util.gaia.time.Duration#asNanoSecs()
      */
     @Override
@@ -79,16 +135,8 @@ public class Days extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param days
-     *            The time in days to convert.
-     * @return days expressed in nanoSec
-     */
-    public static long asNanoSecs(final double days) {
-        return Math.round(days * Duration.NS_PER_DAY);
-    }
-
-    /**
      * @return double
+     *
      * @see gaiasky.util.gaia.time.Duration#asSecs()
      */
     @Override
@@ -97,16 +145,8 @@ public class Days extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param days
-     *            The time in days to convert.
-     * @return days expressed in sec
-     */
-    public static double asSecs(final double days) {
-        return days * Duration.SECS_PER_DAY;
-    }
-
-    /**
      * @return double
+     *
      * @see gaiasky.util.gaia.time.Duration#asMins()
      */
     @Override
@@ -115,16 +155,8 @@ public class Days extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param days
-     *            The time in days to convert.
-     * @return days expressed in mins
-     */
-    public static double asMins(final double days) {
-        return days * Duration.MINS_PER_DAY;
-    }
-
-    /**
      * @return double
+     *
      * @see gaiasky.util.gaia.time.Duration#asHours()
      */
     @Override
@@ -134,6 +166,7 @@ public class Days extends ConcreteDuration implements Serializable {
 
     /**
      * @return double
+     *
      * @see gaiasky.util.gaia.time.Duration#asRevs
      */
     @Override
@@ -142,25 +175,8 @@ public class Days extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param days
-     *            The time in days to convert.
-     * @return days expressed in revolutions
-     */
-    public static double asRevs(final double days) {
-        return days * Duration.REVS_PER_DAY;
-    }
-
-    /**
-     * @param days
-     *            The time in days to convert.
-     * @return days expressed in hours
-     */
-    public static double asHours(final double days) {
-        return days * Duration.HOURS_PER_DAY;
-    }
-
-    /**
      * @return double
+     *
      * @see gaiasky.util.gaia.time.Duration#asDays()
      */
     @Override
@@ -170,6 +186,7 @@ public class Days extends ConcreteDuration implements Serializable {
 
     /**
      * @return double
+     *
      * @see gaiasky.util.gaia.time.Duration#asJulianYears()
      */
     @Override
@@ -178,16 +195,8 @@ public class Days extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param days
-     *            The time in days to convert.
-     * @return days expressed in julian years
-     */
-    public static double asJulianYears(final double days) {
-        return days / Duration.DAYS_PER_JULIAN_YEAR;
-    }
-
-    /**
      * @return Duration
+     *
      * @see gaiasky.util.gaia.time.Duration#negate()
      */
     @Override
@@ -199,7 +208,9 @@ public class Days extends ConcreteDuration implements Serializable {
 
     /**
      * @param d Duration
+     *
      * @return Duration
+     *
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override
@@ -211,7 +222,9 @@ public class Days extends ConcreteDuration implements Serializable {
 
     /**
      * @param d Duration
+     *
      * @return Duration
+     *
      * @see gaiasky.util.gaia.time.Duration#sub(Duration)
      */
     @Override

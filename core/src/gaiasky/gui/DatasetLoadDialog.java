@@ -25,19 +25,17 @@ import gaiasky.util.validator.TextFieldComparatorValidator;
 
 public class DatasetLoadDialog extends GenericDialog {
 
-    public OwnCheckBox particles, stars, clusters, variables, fadeIn, fadeOut;
-    public OwnTextField dsName, magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
-    public OwnSliderPlus particleSize, colorNoise;
-    public ColorPicker particleColor, labelColor;
-    public OwnSelectBox<ComponentTypeBean> componentType;
-
     private final String fileName;
-
     private final float sliderWidth;
     private final float fieldWidth;
     private final float titleWidth;
     private final float cpSize;
     private final float taWidth;
+    public OwnCheckBox particles, stars, clusters, variables, fadeIn, fadeOut;
+    public OwnTextField dsName, magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
+    public OwnSliderPlus particleSize, colorNoise;
+    public ColorPicker particleColor, labelColor;
+    public OwnSelectBox<ComponentTypeBean> componentType;
 
     public DatasetLoadDialog(final String title, final String fileName, final Skin skin, final Stage ui) {
         super(title, skin, ui);
@@ -439,7 +437,7 @@ public class DatasetLoadDialog extends GenericDialog {
             datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
             datasetOptions.particleColor = particleColor.getPickedColorDouble();
             datasetOptions.particleColorNoise = colorNoise.getValue();
-            datasetOptions.particleSize = particleSize.getValue()  * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? .2e-3 : 1.0);
+            datasetOptions.particleSize = particleSize.getValue() * (Settings.settings.scene.renderer.pointCloud.isTriangles() ? .2e-3 : 1.0);
             datasetOptions.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * datasetOptions.particleSize) };
         } else if (clusters.isChecked()) {
             datasetOptions.type = DatasetLoadType.CLUSTERS;

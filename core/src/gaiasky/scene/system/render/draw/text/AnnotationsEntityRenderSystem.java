@@ -36,7 +36,6 @@ public class AnnotationsEntityRenderSystem {
         var grid = Mapper.grid.get(entity);
         var body = Mapper.body.get(entity);
 
-
         // Horizon
         float stepAngle = 360f / divisionsU;
         alpha *= ANNOTATIONS_ALPHA;
@@ -47,7 +46,7 @@ public class AnnotationsEntityRenderSystem {
         if (Settings.settings.runtime.openVr) {
             if (camera.getCurrent() instanceof NaturalCamera) {
                 ((NaturalCamera) camera.getCurrent()).vrOffset.put(vrOffset);
-                vrOffset.scl((float)(1f / Constants.M_TO_U));
+                vrOffset.scl((float) (1f / Constants.M_TO_U));
             }
         } else {
             vrOffset.set(0, 0, 0);
@@ -85,11 +84,11 @@ public class AnnotationsEntityRenderSystem {
         }
     }
 
-    private String angle(int angle){
+    private String angle(int angle) {
         return angle + "°";
     }
 
-    private String angleSign(int angle){
+    private String angleSign(int angle) {
         return (angle >= 0 ? "+" : "-") + Math.abs(angle) + "°";
     }
 

@@ -23,6 +23,32 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 public final class UnsharpMaskFilter extends Filter<UnsharpMaskFilter> {
     private float u_sharpenFactor = 1f;
 
+    /**
+     * Creates an unsharp mask filter.
+     */
+    public UnsharpMaskFilter() {
+        super(ShaderLoader.fromFile("screenspace", "unsharpmask"));
+        rebind();
+    }
+
+    public void setSharpenFactor(float sf) {
+        this.u_sharpenFactor = sf;
+        setParam(Param.SharpenFactor, this.u_sharpenFactor);
+    }
+
+    @Override
+    public void rebind() {
+        // reimplement super to batch every parameter
+        setParams(Param.Texture, u_texture0);
+        setParams(Param.SharpenFactor, u_sharpenFactor);
+        endParams();
+    }
+
+    @Override
+    protected void onBeforeRender() {
+        inputTexture.bind(u_texture0);
+    }
+
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
@@ -46,35 +72,6 @@ public final class UnsharpMaskFilter extends Filter<UnsharpMaskFilter> {
         public int arrayElementSize() {
             return this.elementSize;
         }
-    }
-
-
-
-    /**
-     * Creates an unsharp mask filter.
-     *
-     */
-    public UnsharpMaskFilter() {
-        super(ShaderLoader.fromFile("screenspace", "unsharpmask"));
-        rebind();
-    }
-
-    public void setSharpenFactor(float sf){
-        this.u_sharpenFactor = sf;
-        setParam(Param.SharpenFactor, this.u_sharpenFactor);
-    }
-
-    @Override
-    public void rebind() {
-        // reimplement super to batch every parameter
-        setParams(Param.Texture, u_texture0);
-        setParams(Param.SharpenFactor, u_sharpenFactor);
-        endParams();
-    }
-
-    @Override
-    protected void onBeforeRender() {
-        inputTexture.bind(u_texture0);
     }
 
 }

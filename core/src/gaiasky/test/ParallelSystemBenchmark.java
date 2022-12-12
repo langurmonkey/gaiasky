@@ -37,48 +37,9 @@ public class ParallelSystemBenchmark {
     /**
      * Number of entities to use.
      */
-    private static final int[] SIZES = new int[] { 50, 100, 250, 500, 1_000, 2_000, 5_000, 10_000};
-
-    public static void main(String[] args) {
-        (new ParallelSystemBenchmark()).test();
-    }
-
-    /**
-     * The sequential system.
-     */
-    private static class MySequentialSystem extends IteratingSystem {
-        private final Consumer<Entity> fn;
-
-        public MySequentialSystem(Family family, Consumer<Entity> fn) {
-            super(family);
-            this.fn = fn;
-        }
-
-        @Override
-        protected void processEntity(Entity entity, float deltaTime) {
-            fn.accept(entity);
-        }
-    }
-
-    /**
-     * The parallel system
-     */
-    private static class MyParallelSystem extends ParallelSystem {
-        private final Consumer<Entity> fn;
-
-        public MyParallelSystem(Family family, Consumer<Entity> fn) {
-            super(family);
-            this.fn = fn;
-        }
-
-        @Override
-        protected void processEntity(Entity entity, float deltaTime) {
-            fn.accept(entity);
-        }
-    }
-
-    protected Logger log;
+    private static final int[] SIZES = new int[] { 50, 100, 250, 500, 1_000, 2_000, 5_000, 10_000 };
     private final DecimalFormat df;
+    protected Logger log;
 
     public ParallelSystemBenchmark() {
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%4$-2s] %5$s %n");
@@ -90,6 +51,10 @@ public class ParallelSystemBenchmark {
         this.df = new DecimalFormat("0.0#");
     }
 
+    public static void main(String[] args) {
+        (new ParallelSystemBenchmark()).test();
+    }
+
     private void test() {
         int pad = 22;
         log.info(pad("Java version", pad) + System.getProperty("java.version"));
@@ -98,7 +63,6 @@ public class ParallelSystemBenchmark {
         log.info(pad("ENGINE_ITERATIONS", pad) + formatNumber(ENGINE_ITERATIONS, pad));
         log.info(pad("N_ENTITIES", pad) + pad(Arrays.toString(SIZES), pad));
         log.info("");
-
 
         Consumer<Entity> func = entity -> {
             Base base = entity.getComponent(Base.class);
@@ -145,7 +109,6 @@ public class ParallelSystemBenchmark {
             test(engine, sequential, ROUNDS, true);
             test(engine, parallel, ROUNDS, true);
 
-
             log.info("----------------------------------------------------------------------");
             log.info("");
 
@@ -155,7 +118,7 @@ public class ParallelSystemBenchmark {
     }
 
     private void test(Engine engine, EntitySystem system, int rounds, boolean record) {
-        if(rounds == 0) {
+        if (rounds == 0) {
             return;
         }
 
@@ -235,6 +198,40 @@ public class ParallelSystemBenchmark {
             return df.format(num / 1_000d) + " k";
         } else {
             return Integer.toString(num);
+        }
+    }
+
+    /**
+     * The sequential system.
+     */
+    private static class MySequentialSystem extends IteratingSystem {
+        private final Consumer<Entity> fn;
+
+        public MySequentialSystem(Family family, Consumer<Entity> fn) {
+            super(family);
+            this.fn = fn;
+        }
+
+        @Override
+        protected void processEntity(Entity entity, float deltaTime) {
+            fn.accept(entity);
+        }
+    }
+
+    /**
+     * The parallel system
+     */
+    private static class MyParallelSystem extends ParallelSystem {
+        private final Consumer<Entity> fn;
+
+        public MyParallelSystem(Family family, Consumer<Entity> fn) {
+            super(family);
+            this.fn = fn;
+        }
+
+        @Override
+        protected void processEntity(Entity entity, float deltaTime) {
+            fn.accept(entity);
         }
     }
 

@@ -31,27 +31,22 @@ public class OpenVRListener implements VRDeviceListener {
     private final NaturalCamera cam;
     /** Focus comparator **/
     private final Comparator<Entity> comp;
-    /** Map from VR device to model object **/
-    private HashMap<VRDevice, Entity> vrDeviceToModel;
     /** Aux vectors **/
     private final Vector3d p0;
     private final Vector3d p1;
-
+    // Selection
+    private final long SELECTION_COUNTDOWN_MS = 2000;
+    private final Set<Integer> pressedButtons;
+    private final FocusView focusView;
+    /** Map from VR device to model object **/
+    private HashMap<VRDevice, Entity> vrDeviceToModel;
     private boolean vrControllerHint = false;
     private boolean vrInfoGui = false;
     private long lastDoublePress = 0l;
-
-    // Selection
-    private final long SELECTION_COUNTDOWN_MS = 2000;
     private boolean selecting = false;
     private long selectingTime = 0;
     private VRDevice selectingDevice;
-
     private long lastAxisMovedFrame = Long.MIN_VALUE;
-
-    private final Set<Integer> pressedButtons;
-
-    private final FocusView focusView;
 
     public OpenVRListener(NaturalCamera cam) {
         this.cam = cam;
@@ -97,6 +92,7 @@ public class OpenVRListener implements VRDeviceListener {
      * Returns true if all given buttons are pressed
      *
      * @param buttons
+     *
      * @return
      */
     private boolean arePressed(int... buttons) {

@@ -12,7 +12,7 @@ public class CameraComboBoxBean {
     public String name;
     public CameraMode mode;
 
-    public CameraComboBoxBean(String name, CameraMode mode){
+    public CameraComboBoxBean(String name, CameraMode mode) {
         this.name = name;
         this.mode = mode;
     }

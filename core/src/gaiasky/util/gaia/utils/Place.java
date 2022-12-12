@@ -35,8 +35,7 @@ public class Place {
      * Constructs a Place at the position given by a vector (need not be a unit
      * vector)
      *
-     * @param r
-     *            vector
+     * @param r vector
      */
     public Place(Vector3d r) {
         dirICRS = r.cpy().nor();
@@ -60,8 +59,7 @@ public class Place {
     /**
      * Constructs a Place at a random position
      *
-     * @param rnd
-     *            Random number generator
+     * @param rnd Random number generator
      */
     public Place(Random rnd) {
         dirICRS = new Vector3d(rnd.nextGaussian(), rnd.nextGaussian(), rnd.nextGaussian()).nor();
@@ -85,6 +83,18 @@ public class Place {
      */
     public Vector3d getDirection() {
         return dirICRS.cpy();
+    }
+
+    /**
+     * Sets the position of the Place to that of a given vector (need not be a
+     * unit vector)
+     *
+     * @param r vector
+     */
+    public Place setDirection(Vector3d r) {
+        dirICRS = r.cpy().nor();
+        haveAngles = false;
+        return this;
     }
 
     /**
@@ -128,23 +138,9 @@ public class Place {
     }
 
     /**
-     * Sets the position of the Place to that of a given vector (need not be a
-     * unit vector)
-     *
-     * @param r
-     *            vector
-     */
-    public Place setDirection(Vector3d r) {
-        dirICRS = r.cpy().nor();
-        haveAngles = false;
-        return this;
-    }
-
-    /**
      * Calculates the angle between this Place and another Place
      *
-     * @param p
-     *            the other Place
+     * @param p the other Place
      *
      * @return angle between them [rad]
      */
@@ -167,7 +163,6 @@ public class Place {
 
     /**
      * Moves the current Place to a random position
-     *
      */
     public Place moveToRandom(Random rnd) {
         double x = rnd.nextGaussian();
@@ -181,7 +176,6 @@ public class Place {
     /**
      * Moves the current Place to a random position within a certain radius of a
      * given Place.
-     *
      */
     public Place moveToRandom(Random rnd, Place centre, double radius) {
 

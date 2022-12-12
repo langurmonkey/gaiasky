@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.ObjectMap.Keys;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.util.*;
@@ -31,9 +31,8 @@ public class CustomInterface implements IObserver, IGuiInterface {
     private final Object lock;
     private final Skin skin;
     private final Stage ui;
-    private List<Integer> sizes;
-
     Map<Integer, Widget> customElements;
+    private List<Integer> sizes;
 
     public CustomInterface(Stage ui, Skin skin, Object lock) {
         this.skin = skin;
@@ -84,8 +83,8 @@ public class CustomInterface implements IObserver, IGuiInterface {
 
                 Texture tex = (Texture) data[1];
 
-                float x = MathUtilsd.lint((Float) data[2], 0, 1, 0, width);
-                float y = MathUtilsd.lint((Float) data[3], 0, 1, 0, height);
+                float x = MathUtilsDouble.lint((Float) data[2], 0, 1, 0, width);
+                float y = MathUtilsDouble.lint((Float) data[3], 0, 1, 0, height);
 
                 Image img;
                 boolean add = false;
@@ -122,8 +121,8 @@ public class CustomInterface implements IObserver, IGuiInterface {
 
                 String msg = (String) data[1];
 
-                x = MathUtilsd.lint((Float) data[2], 0, 1, 0, width);
-                y = MathUtilsd.lint((Float) data[3], 0, 1, 0, height);
+                x = MathUtilsDouble.lint((Float) data[2], 0, 1, 0, width);
+                y = MathUtilsDouble.lint((Float) data[3], 0, 1, 0, height);
 
                 float r = (Float) data[4];
                 float g = (Float) data[5];
@@ -167,11 +166,11 @@ public class CustomInterface implements IObserver, IGuiInterface {
 
                 msg = (String) data[1];
 
-                x = MathUtilsd.lint((Float) data[2], 0, 1, 0, width);
-                y = MathUtilsd.lint((Float) data[3], 0, 1, 0, height);
+                x = MathUtilsDouble.lint((Float) data[2], 0, 1, 0, width);
+                y = MathUtilsDouble.lint((Float) data[3], 0, 1, 0, height);
 
-                float w = MathUtilsd.clamp(MathUtilsd.lint((Float) data[4], 0, 1, 0, width), 0, width - x);
-                float h = MathUtilsd.clamp(MathUtilsd.lint((Float) data[5], 0, 1, 0, height), 0, height - y);
+                float w = MathUtilsDouble.clamp(MathUtilsDouble.lint((Float) data[4], 0, 1, 0, width), 0, width - x);
+                float h = MathUtilsDouble.clamp(MathUtilsDouble.lint((Float) data[5], 0, 1, 0, height), 0, height - y);
 
                 r = (Float) data[6];
                 g = (Float) data[7];

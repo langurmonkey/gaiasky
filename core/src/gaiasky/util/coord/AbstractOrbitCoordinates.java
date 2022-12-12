@@ -75,12 +75,12 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         return orbitname;
     }
 
-    public void setOrbitname(String orbitName) {
-        setOrbitName(orbitName);
-    }
-
     public void setOrbitName(String orbitName) {
         this.orbitname = orbitName;
+    }
+
+    public void setOrbitname(String orbitName) {
+        setOrbitName(orbitName);
     }
 
     public void setScaling(double scaling) {

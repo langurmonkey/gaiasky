@@ -27,11 +27,11 @@ import java.io.Serializable;
 
 /**
  * A finite number of seconds.
- *
+ * <p>
  * There are two implementations provided of the conversions methods one as
  * object interface, where an object of the current class has to be
  * instantiated. The oder implementation is provided as static class methods.
- *
+ * <p>
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
@@ -50,11 +50,64 @@ public class Secs extends ConcreteDuration implements Serializable {
     /**
      * Construct object from an elapsed number of seconds.
      *
-     * @param secs
-     *            elapsed time [seconds]
+     * @param secs elapsed time [seconds]
      */
     public Secs(final double secs) {
         value = secs;
+    }
+
+    /**
+     * @param secs Time in secs to process
+     *
+     * @return Secs expressed in nanosec
+     */
+    public static long asNanoSecs(final double secs) {
+        return Math.round(secs * Duration.NS_PER_SEC);
+    }
+
+    /**
+     * @param secs Time in secs to convert
+     *
+     * @return Secs expressed in mins
+     */
+    public static double asMins(final double secs) {
+        return secs / Duration.SECS_PER_MIN;
+    }
+
+    /**
+     * @param secs Time in secs to convert
+     *
+     * @return Secs expressed in hours
+     */
+    public static double asHours(final double secs) {
+        return secs / Duration.SECS_PER_HOUR;
+    }
+
+    /**
+     * @param secs Time in secs to convert
+     *
+     * @return Secs expressed in days
+     */
+    public static double asRevs(final double secs) {
+        return secs / Duration.SECS_PER_REV;
+    }
+
+    /**
+     * @param secs Time in secs to convert
+     *
+     * @return Secs expressed in days
+     */
+    public static double asDays(final double secs) {
+        return secs / Duration.SECS_PER_DAY;
+    }
+
+    /**
+     * @param secs Time in secs to convert
+     *
+     * @return Secs expressed in JulianYears
+     */
+    public static double asJulianYears(final double secs) {
+        return secs / Duration.SECS_PER_JULIAN_YEAR;
     }
 
     /**
@@ -76,15 +129,6 @@ public class Secs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param secs
-     *            Time in secs to process
-     * @return Secs expressed in nanosec
-     */
-    public static long asNanoSecs(final double secs) {
-        return Math.round(secs * Duration.NS_PER_SEC);
-    }
-
-    /**
      * @see Duration#asSecs()
      */
     @Override
@@ -101,29 +145,11 @@ public class Secs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param secs
-     *            Time in secs to convert
-     * @return Secs expressed in mins
-     */
-    public static double asMins(final double secs) {
-        return secs / Duration.SECS_PER_MIN;
-    }
-
-    /**
      * @see Duration#asHours()
      */
     @Override
     public double asHours() {
         return value / Duration.SECS_PER_HOUR;
-    }
-
-    /**
-     * @param secs
-     *            Time in secs to convert
-     * @return Secs expressed in hours
-     */
-    public static double asHours(final double secs) {
-        return secs / Duration.SECS_PER_HOUR;
     }
 
     /**
@@ -135,15 +161,6 @@ public class Secs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param secs
-     *            Time in secs to convert
-     * @return Secs expressed in days
-     */
-    public static double asRevs(final double secs) {
-        return secs / Duration.SECS_PER_REV;
-    }
-
-    /**
      * @see Duration#asDays()
      */
     @Override
@@ -152,29 +169,11 @@ public class Secs extends ConcreteDuration implements Serializable {
     }
 
     /**
-     * @param secs
-     *            Time in secs to convert
-     * @return Secs expressed in days
-     */
-    public static double asDays(final double secs) {
-        return secs / Duration.SECS_PER_DAY;
-    }
-
-    /**
      * @see Duration#asJulianYears()
      */
     @Override
     public double asJulianYears() {
         return value / Duration.SECS_PER_JULIAN_YEAR;
-    }
-
-    /**
-     * @param secs
-     *            Time in secs to convert
-     * @return Secs expressed in JulianYears
-     */
-    public static double asJulianYears(final double secs) {
-        return secs / Duration.SECS_PER_JULIAN_YEAR;
     }
 
     /**

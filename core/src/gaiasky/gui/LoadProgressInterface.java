@@ -47,7 +47,7 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
 
             OwnProgressBar p = null;
             if (!progress.containsKey(name) && val < 1f) {
-                if(progress.size < MAX_PROGRESS_BARS) {
+                if (progress.size < MAX_PROGRESS_BARS) {
                     p = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "small-horizontal");
                     p.setTitle(name, skin);
                     p.setPrefWidth(width);
@@ -58,7 +58,7 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
             } else {
                 p = progress.get(name);
             }
-            if(p != null) {
+            if (p != null) {
                 p.setValue(val * 100f);
                 if (val >= 1) {
                     p.setVisible(false);

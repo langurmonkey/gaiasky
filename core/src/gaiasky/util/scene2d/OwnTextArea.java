@@ -60,7 +60,7 @@ public class OwnTextArea extends TextArea {
         }
     }
 
-    public void offsets(){
+    public void offsets() {
         super.calculateOffsets();
     }
 }

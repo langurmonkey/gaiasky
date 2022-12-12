@@ -17,12 +17,6 @@ import gaiasky.util.Logger.Log;
 
 public class PFMDataLoader extends AsynchronousAssetLoader<PFMData, PFMDataLoader.PFMDataParameter> {
     private static final Log logger = Logger.getLogger(PFMDataLoader.class);
-
-    static public class PFMDataInfo {
-        String filename;
-        PFMData data;
-    }
-
     PFMDataInfo info = new PFMDataInfo();
 
     public PFMDataLoader(FileHandleResolver resolver) {
@@ -46,6 +40,11 @@ public class PFMDataLoader extends AsynchronousAssetLoader<PFMData, PFMDataLoade
         if (info == null)
             return null;
         return info.data;
+    }
+
+    static public class PFMDataInfo {
+        String filename;
+        PFMData data;
     }
 
     static public class PFMDataParameter extends AssetLoaderParameters<PFMData> {

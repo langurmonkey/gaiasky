@@ -6,7 +6,7 @@
 /*
  * GaiaTools
  * Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -27,7 +27,7 @@ package gaiasky.util.gaia;
 /**
  * A compound object for holding equatorial angles and their rates as per
  * Fig. 4 in GAIA-C3-TN-LU-085.
- * 
+ *
  * @author Uwe Lammers, Lennart Lindegren
  * @version $Id: EquatorialAnglesRates.java 308373 2013-08-02 16:01:12Z ulammers $
  */
@@ -35,7 +35,7 @@ public class EquatorialAnglesRates extends AbstractAttitudeAnglesRates {
     /**
      * Get the right ascension of the SRS z axis - this is the first equatorial
      * attitude angle
-     * 
+     *
      * @return right ascension of the z axis [rad]
      */
     public double getAlphaZ() {
@@ -44,7 +44,7 @@ public class EquatorialAnglesRates extends AbstractAttitudeAnglesRates {
 
     /**
      * Get the time derivative of the right ascension of the SRS z axis
-     * 
+     *
      * @return time derivative of the right ascension of the z axis [rad/day]
      */
     public double getAlphaZDot() {
@@ -54,7 +54,7 @@ public class EquatorialAnglesRates extends AbstractAttitudeAnglesRates {
     /**
      * Get the declination of the SRS z axis - this is the second equatorial
      * attitude angle
-     * 
+     *
      * @return declination of the z axis [rad]
      */
     public double getDeltaZ() {
@@ -63,7 +63,7 @@ public class EquatorialAnglesRates extends AbstractAttitudeAnglesRates {
 
     /**
      * Get the time derivative of the declination of the SRS z axis
-     * 
+     *
      * @return time derivative of the declination of the z axis [rad/day]
      */
     public double getDeltaZDot() {
@@ -73,7 +73,7 @@ public class EquatorialAnglesRates extends AbstractAttitudeAnglesRates {
     /**
      * Get the equatorial spin phase angle, psi (from the ascending node on the
      * equator to the SRS x axis) - this is the third equatorial attitude angle
-     * 
+     *
      * @return equatorial spin phase [rad]
      */
     public double getPsi() {
@@ -82,7 +82,7 @@ public class EquatorialAnglesRates extends AbstractAttitudeAnglesRates {
 
     /**
      * Get time derivative psiDot of the the equatorial spin phase angle
-     * 
+     *
      * @return time derivative of the equatorial spin phase [rad/day]
      */
     public double getPsiDot() {

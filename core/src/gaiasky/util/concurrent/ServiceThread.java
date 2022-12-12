@@ -7,11 +7,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * be aborted.
  */
 public class ServiceThread extends Thread {
-    protected Runnable task;
     protected final Object threadLock;
-
     protected final AtomicBoolean awake;
     protected final AtomicBoolean running;
+    protected Runnable task;
 
     public ServiceThread() {
         this("service-thread");
@@ -76,7 +75,6 @@ public class ServiceThread extends Thread {
      * This method wakes up the thread and runs the current task. If the thread is sleeping,
      * the task is executed right away. Otherwise, the method blocks
      * and does a busy wait until the current task finishes.
-     *
      */
     public void wakeUp() {
         waitCurrentTask();

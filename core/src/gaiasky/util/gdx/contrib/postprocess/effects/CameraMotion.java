@@ -29,6 +29,7 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Camera blur effect.
+ *
  * @author bmanuel
  */
 public final class CameraMotion extends PostProcessorEffect {

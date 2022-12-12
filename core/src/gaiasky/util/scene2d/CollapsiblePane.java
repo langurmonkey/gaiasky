@@ -27,6 +27,8 @@ import gaiasky.util.i18n.I18n;
  */
 public class CollapsiblePane extends Table {
 
+    /** Collapse speed in pixels per second **/
+    protected float collapseSpeed;
     CollapsibleWindow dialogWindow;
     ImageButton expandIcon, detachIcon;
     float lastX = -1, lastY = -1;
@@ -36,9 +38,6 @@ public class CollapsiblePane extends Table {
     Stage stage;
     float space;
     Cell<?> contentCell;
-
-    /** Collapse speed in pixels per second **/
-    protected float collapseSpeed;
     float targetHeight;
     boolean expanding = false;
     boolean collapsing = false;
@@ -178,6 +177,22 @@ public class CollapsiblePane extends Table {
 
     }
 
+    /**
+     * Creates a collapsible pane.
+     *
+     * @param stage    The main stage.
+     * @param title    The title.
+     * @param content  The content actor.
+     * @param width    The preferred width of this pane.
+     * @param skin     The skin to use.
+     * @param shortcut The keyboard shortcut to use.
+     * @param topIcons List of top icons that will be added between the label and the
+     *                 expand/detach icons.
+     */
+    public CollapsiblePane(Stage stage, String title, final Actor content, float width, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
+        this(stage, title, content, width, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
+    }
+
     public boolean expandPane() {
         if (!expandIcon.isChecked()) {
             expandIcon.setChecked(true);
@@ -238,22 +253,6 @@ public class CollapsiblePane extends Table {
         expandIcon.setChecked(false);
         expandIcon.setDisabled(true);
         detachIcon.setDisabled(true);
-    }
-
-    /**
-     * Creates a collapsible pane.
-     *
-     * @param stage    The main stage.
-     * @param title    The title.
-     * @param content  The content actor.
-     * @param width    The preferred width of this pane.
-     * @param skin     The skin to use.
-     * @param shortcut The keyboard shortcut to use.
-     * @param topIcons List of top icons that will be added between the label and the
-     *                 expand/detach icons.
-     */
-    public CollapsiblePane(Stage stage, String title, final Actor content, float width, Skin skin, boolean expanded, String shortcut, Actor... topIcons) {
-        this(stage, title, content, width, skin, "header", "expand-collapse", "detach", expanded, shortcut, topIcons);
     }
 
     private CollapsibleWindow createWindow(String labelText, final Actor content, Skin skin, Stage stage, float x, float y) {

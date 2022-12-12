@@ -33,6 +33,14 @@ import gaiasky.util.tree.OctreeNode;
  */
 public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
 
+    private final Vector3d D31 = new Vector3d();
+    private final Vector3d D32 = new Vector3d();
+    private final Vector3b B31 = new Vector3b();
+    private final Vector3b B33 = new Vector3b();
+    private final Matrix4 mataux = new Matrix4();
+    private final Matrix4d matauxd = new Matrix4d();
+    /** Particle component, maybe. **/
+    protected ParticleExtra extra;
     /** Focus component. **/
     private Focus focus;
     /** The graph component. **/
@@ -41,34 +49,19 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     private Octant octant;
     /** The magnitude component. **/
     private Magnitude mag;
-    /** Particle component, maybe. **/
-    protected ParticleExtra extra;
-
     /** The particle set component, if any. **/
     private ParticleSet particleSet;
     /** The star set component, if any. **/
     private StarSet starSet;
     /** The highlight component, initialized lazily. **/
     private Highlight hl;
-
     /** Implementation of pointer collision. **/
     private FocusHit focusHit;
-
     /** Reference to the scene. **/
     private Scene scene;
-
     /** The focus active computer. **/
     private FocusActive focusActive;
-
     private FocusView auxView;
-
-    private final Vector3d D31 = new Vector3d();
-    private final Vector3d D32 = new Vector3d();
-    private final Vector3b B31 = new Vector3b();
-    private final Vector3b B33 = new Vector3b();
-    private final Matrix4 mataux = new Matrix4();
-    private final Matrix4d matauxd = new Matrix4d();
-
     private ModelUpdater updater;
 
     /** Creates a focus view with the given scene. **/
@@ -259,6 +252,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return isVisibleGroup(false);
     }
 
+    public void setVisibleGroup(boolean visibility) {
+        setVisible(visibility);
+    }
+
     public boolean isVisibleGroup(boolean attributeValue) {
         return isVisible(attributeValue);
     }
@@ -271,10 +268,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         } else {
             setVisible(visible);
         }
-    }
-
-    public void setVisibleGroup(boolean visibility) {
-        setVisible(visibility);
     }
 
     @Override
@@ -385,8 +378,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         Vector3d aux2 = D32;
 
         // Lon/Lat/Radius
-        longitude *= MathUtilsd.degRad;
-        latitude *= MathUtilsd.degRad;
+        longitude *= MathUtilsDouble.degRad;
+        latitude *= MathUtilsDouble.degRad;
         double rad = 1;
         Coordinates.sphericalToCartesian(longitude, latitude, rad, aux1);
 
@@ -831,7 +824,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public StarSet getStarSet() {
         return starSet;
     }
-
 
     /**
      * Checks whether the entity is a particle or star set.

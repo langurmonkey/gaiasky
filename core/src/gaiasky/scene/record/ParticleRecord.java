@@ -9,24 +9,21 @@ import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.TLV3D;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
 public class ParticleRecord implements IParticleRecord {
-    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
     public static final int STAR_SIZE_D = 3;
     public static final int STAR_SIZE_F = 11;
-
-    /* INDICES */
-
     /* doubles */
     public static final int I_X = 0;
+
+    /* INDICES */
     public static final int I_Y = 1;
     public static final int I_Z = 2;
-
     /* floats (stars) */
     public static final int I_FPMX = 0;
     public static final int I_FPMY = 1;
@@ -38,10 +35,9 @@ public class ParticleRecord implements IParticleRecord {
     public static final int I_FABSMAG = 7;
     public static final int I_FCOL = 8;
     public static final int I_FSIZE = 9;
-
     /* int */
     public static final int I_FHIP = 10;
-
+    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
     // Particle ID
     public long id;
 
@@ -359,7 +355,7 @@ public class ParticleRecord implements IParticleRecord {
     public double ra() {
         Vector3d cartPos = pos(aux3d1.get());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2.get());
-        return MathUtilsd.radDeg * sphPos.x;
+        return MathUtilsDouble.radDeg * sphPos.x;
     }
 
     /**
@@ -371,7 +367,7 @@ public class ParticleRecord implements IParticleRecord {
     public double dec() {
         Vector3d cartPos = pos(aux3d1.get());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartPos, aux3d2.get());
-        return MathUtilsd.radDeg * sphPos.y;
+        return MathUtilsDouble.radDeg * sphPos.y;
     }
 
     /**
@@ -383,7 +379,7 @@ public class ParticleRecord implements IParticleRecord {
     public double lambda() {
         Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
-        return MathUtilsd.radDeg * sphPos.x;
+        return MathUtilsDouble.radDeg * sphPos.x;
     }
 
     /**
@@ -395,7 +391,7 @@ public class ParticleRecord implements IParticleRecord {
     public double beta() {
         Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToEcl());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
-        return MathUtilsd.radDeg * sphPos.y;
+        return MathUtilsDouble.radDeg * sphPos.y;
     }
 
     /**
@@ -407,7 +403,7 @@ public class ParticleRecord implements IParticleRecord {
     public double l() {
         Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
-        return MathUtilsd.radDeg * sphPos.x;
+        return MathUtilsDouble.radDeg * sphPos.x;
     }
 
     /**
@@ -419,7 +415,7 @@ public class ParticleRecord implements IParticleRecord {
     public double b() {
         Vector3d cartEclPos = pos(aux3d1.get()).mul(Coordinates.eqToGal());
         Vector3d sphPos = Coordinates.cartesianToSpherical(cartEclPos, aux3d2.get());
-        return MathUtilsd.radDeg * sphPos.y;
+        return MathUtilsDouble.radDeg * sphPos.y;
     }
 
     @Override

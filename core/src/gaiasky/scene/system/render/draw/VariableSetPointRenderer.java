@@ -47,13 +47,12 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;
-    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset;
-    private float[] opacityLimits;
     private final float[] alphaSizeBrRc;
     private final float[] opacityLimitsHl;
     private final Colormap cmap;
     private final ParticleUtils utils;
-
+    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset;
+    private float[] opacityLimits;
     private Texture starTex;
 
     public VariableSetPointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
@@ -276,8 +275,8 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, renderable);
             }
             if (state) {

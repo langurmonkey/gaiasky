@@ -20,7 +20,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.IPosition;
@@ -34,20 +34,18 @@ import java.util.List;
  */
 public class LineEntityRenderSystem {
 
+    /** Auxiliary color array. **/
+    private final float[] rgba = new float[4];
+    protected Vector3d prev = new Vector3d(), curr = new Vector3d();
     /**
      * The line view object, used to send into the
      * {@link LinePrimitiveRenderer}.
      **/
     private LineView lineView;
-
-    /** Auxiliary color array. **/
-    private final float[] rgba = new float[4];
-
     private Vector3d D31 = new Vector3d();
     private Vector3d D32 = new Vector3d();
     private Vector3d D33 = new Vector3d();
     private Vector3d D34 = new Vector3d();
-    protected Vector3d prev = new Vector3d(), curr = new Vector3d();
 
     public LineEntityRenderSystem() {
         this.lineView = new LineView();
@@ -453,7 +451,7 @@ public class LineEntityRenderSystem {
                     ppm.set(star.pmx(), star.pmy(), star.pmz());
                     // Units/year to Km/s
                     ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                    double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
+                    double len = MathUtilsDouble.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
                     ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
                     r = rgba[0];
                     g = rgba[1];
@@ -476,7 +474,7 @@ public class LineEntityRenderSystem {
                     float rav = star.radvel();
                     if (rav != 0) {
                         // rv in [0:1]
-                        float rv = ((MathUtilsd.clamp(rav, -maxSpeedKms, maxSpeedKms) / maxSpeedKms) + 1) / 2;
+                        float rv = ((MathUtilsDouble.clamp(rav, -maxSpeedKms, maxSpeedKms) / maxSpeedKms) + 1) / 2;
                         ColorUtils.colormap_blue_white_red(rv, rgba);
                         r = rgba[0];
                         g = rgba[1];
@@ -493,7 +491,7 @@ public class LineEntityRenderSystem {
                         ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
                         Vector3d camStar = D34.set(p1);
                         double pr = ppm.dot(camStar.nor());
-                        double projection = ((MathUtilsd.clamp(pr, -(double) maxSpeedKms, maxSpeedKms) / (double) maxSpeedKms) + 1) / 2;
+                        double projection = ((MathUtilsDouble.clamp(pr, -(double) maxSpeedKms, maxSpeedKms) / (double) maxSpeedKms) + 1) / 2;
                         ColorUtils.colormap_blue_white_red((float) projection, rgba);
                         r = rgba[0];
                         g = rgba[1];
@@ -511,9 +509,9 @@ public class LineEntityRenderSystem {
                 }
 
                 // Clamp
-                r = MathUtilsd.clamp(r, 0, 1);
-                g = MathUtilsd.clamp(g, 0, 1);
-                b = MathUtilsd.clamp(b, 0, 1);
+                r = MathUtilsDouble.clamp(r, 0, 1);
+                g = MathUtilsDouble.clamp(g, 0, 1);
+                b = MathUtilsDouble.clamp(b, 0, 1);
 
                 renderer.addLine(lineView, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * base.opacity);
                 if (Settings.settings.scene.properMotion.arrowHeads) {

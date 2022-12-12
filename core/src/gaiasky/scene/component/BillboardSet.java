@@ -17,6 +17,7 @@ public class BillboardSet implements Component {
             this.datasets[i] = (BillboardDataset) data[i];
         }
     }
+
     public LoadStatus getStatus() {
         return status;
     }

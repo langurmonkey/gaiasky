@@ -16,32 +16,6 @@ public final class AnaglyphFilter extends Filter<AnaglyphFilter> {
     private Texture textureLeft, textureRight;
     private int anaglyphMode;
 
-    public enum Param implements Parameter {
-        // @formatter:off
-        AnaglyphMode("u_anaglyphMode", 0),
-        TextureLeft("u_texture0", 0),
-        TextureRight("u_texture1", 0);
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String m, int elementSize) {
-            this.mnemonic = m;
-            this.elementSize = elementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
-    }
-
     public AnaglyphFilter() {
         super(ShaderLoader.fromFile("screenspace", "anaglyphic"));
         rebind();
@@ -78,5 +52,31 @@ public final class AnaglyphFilter extends Filter<AnaglyphFilter> {
         setParams(Param.AnaglyphMode, anaglyphMode);
 
         endParams();
+    }
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        AnaglyphMode("u_anaglyphMode", 0),
+        TextureLeft("u_texture0", 0),
+        TextureRight("u_texture1", 0);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String m, int elementSize) {
+            this.mnemonic = m;
+            this.elementSize = elementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
     }
 }

@@ -77,7 +77,7 @@ public class HipNames {
     }
 
     public void load(Path... paths) {
-        for(Path path : paths)
+        for (Path path : paths)
             load(path);
     }
 }

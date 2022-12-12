@@ -27,50 +27,21 @@ import gaiasky.util.time.ITimeFrameProvider;
 public class RelativisticEffectsManager implements IObserver {
 
     private static RelativisticEffectsManager instance;
-
-    public static RelativisticEffectsManager getInstance() {
-        return instance;
-    }
-
-    public static void initialize(ITimeFrameProvider time) {
-        instance = new RelativisticEffectsManager(time);
-    }
+    /** Intial time for the counter **/
+    private final long initime;
+    /** Unit vector **/
+    private final Vector3 unitz;
 
     /*
      * RELATIVISTIC ABERRATION
      */
-    /** Camera velocity direction vector **/
-    public Vector3 velDir;
-    /** v/c **/
-    public float vc;
+    private final Vector3 screenCoords;
+    /** Aux matrices **/
+    private final Matrix3 eplus;
 
     /*
      * GRAVITATIONAL WAVES
      */
-
-    /** Cartesian coordinates from the origin of the grav wave. Unit vector **/
-    public Vector3 gw;
-    /** Rotation of gw **/
-    public Matrix3 gwmat3;
-    /** Rotation of gw **/
-    public Matrix4 gwmat4;
-    /** Time in seconds, synced to the simulation time. Ready to pass to the shader **/
-    public float gwtime;
-
-    /** Wave frequency **/
-    public float omgw;
-
-    /** Hterms: hpluscos, hplussin, htimescos, htimessin **/
-    public float[] hterms;
-
-    /** Intial time for the counter **/
-    private final long initime;
-
-    /** Unit vector **/
-    private final Vector3 unitz;
-    private final Vector3 screenCoords;
-    /** Aux matrices **/
-    private final Matrix3 eplus;
     private final Matrix3 etimes;
     private final Matrix3 auxm1;
     private final Matrix3 auxm2;
@@ -82,7 +53,22 @@ public class RelativisticEffectsManager implements IObserver {
     private final Vector3d auxd3;
     private final Vector3d auxd4;
     private final Vector3d auxd5;
-
+    /** Camera velocity direction vector **/
+    public Vector3 velDir;
+    /** v/c **/
+    public float vc;
+    /** Cartesian coordinates from the origin of the grav wave. Unit vector **/
+    public Vector3 gw;
+    /** Rotation of gw **/
+    public Matrix3 gwmat3;
+    /** Rotation of gw **/
+    public Matrix4 gwmat4;
+    /** Time in seconds, synced to the simulation time. Ready to pass to the shader **/
+    public float gwtime;
+    /** Wave frequency **/
+    public float omgw;
+    /** Hterms: hpluscos, hplussin, htimescos, htimessin **/
+    public float[] hterms;
     private RelativisticEffectsManager(ITimeFrameProvider time) {
         super();
         velDir = new Vector3();
@@ -112,6 +98,14 @@ public class RelativisticEffectsManager implements IObserver {
         EventManager.instance.subscribe(this, Event.GRAV_WAVE_START);
     }
 
+    public static RelativisticEffectsManager getInstance() {
+        return instance;
+    }
+
+    public static void initialize(ITimeFrameProvider time) {
+        instance = new RelativisticEffectsManager(time);
+    }
+
     public boolean relAberrationOn() {
         return Settings.settings.runtime.relativisticAberration;
     }
@@ -123,6 +117,7 @@ public class RelativisticEffectsManager implements IObserver {
     /**
      * This must be called every cycle, it updates
      * the needed parameters for the gravitational waves
+     *
      * @param time
      */
     public void update(ITimeFrameProvider time, ICamera camera) {
@@ -162,6 +157,7 @@ public class RelativisticEffectsManager implements IObserver {
 
     /**
      * Applies the gravitational wave transformation to the given position
+     *
      * @param pos The position for chaining
      */
     public Vector3d gravitationalWavePos(Vector3d pos) {

@@ -45,23 +45,12 @@ public class BillboardDataset {
      **/
     public double[] maxSizes;
 
-    public enum ParticleType {
-        DUST,
-        BULGE,
-        STAR,
-        GAS,
-        HII,
-        GALAXY,
-        POINT,
-        OTHER;
-    }
-
     public BillboardDataset() {
         super();
     }
 
     public boolean initialize(PointDataProvider provider, boolean reload) {
-        if(file != null && !file.isBlank()) {
+        if (file != null && !file.isBlank()) {
             Pair<List<IParticleRecord>, String> p;
             p = reloadFile(provider, file, fileUnpack, data);
             reload = reload || !p.getSecond().equals(fileUnpack);
@@ -149,5 +138,16 @@ public class BillboardDataset {
             // What to do?
             logger.warn("The length of the maximum sizes array must be 4, got " + maxSizes.length);
         }
+    }
+
+    public enum ParticleType {
+        DUST,
+        BULGE,
+        STAR,
+        GAS,
+        HII,
+        GALAXY,
+        POINT,
+        OTHER;
     }
 }

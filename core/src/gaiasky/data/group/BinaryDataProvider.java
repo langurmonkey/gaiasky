@@ -36,20 +36,17 @@ import java.util.List;
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
-
     /** The default output format version to use for writing **/
     public static int DEFAULT_OUTPUT_VERSION = 2;
 
     public static int MIN_OUTPUT_VERSION = 0;
     public static int MAX_OUTPUT_VERSION = DEFAULT_OUTPUT_VERSION;
-
-    /** The output format version for writing **/
-    private int outputVersion = -1;
-
     /**
      * Binary IO for the different format versions
      */
     private final BinaryIO[] binaryVersions;
+    /** The output format version for writing **/
+    private int outputVersion = -1;
 
     public BinaryDataProvider() {
         super();
@@ -181,6 +178,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
      * @param factor      Distance factor, if any
      * @param versionHint Data version number, in case of version 0 or 1, since these formats were
      *                    not annotated. If version >=2, the version number is read from the file header
+     *
      * @return
      */
     public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
@@ -216,7 +214,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public void setOutputFormatVersion(int version){
+    public void setOutputFormatVersion(int version) {
         this.outputVersion = version;
     }
 }

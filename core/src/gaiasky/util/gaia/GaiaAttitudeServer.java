@@ -22,28 +22,25 @@ import java.util.Date;
  */
 public class GaiaAttitudeServer implements IAttitudeServer {
     private static final Log logger = Logger.getLogger(GaiaAttitudeServer.class);
-
-    // List of attitudes in a BST sorted by activation date
-    private BinarySearchTree attitudes;
     // Dummy attitude for launch sequence
     IAttitude dummyAttitude;
     Nsl37 nsl;
-
     // The previous attitude
     AttitudeIntervalBean prevAttitude = null, current;
-
     // The first activation date
     Date initialDate;
+    // List of attitudes in a BST sorted by activation date
+    private BinarySearchTree attitudes;
 
     public GaiaAttitudeServer(String folder) {
         if (Settings.settings.data.realGaiaAttitude) {
             attitudes = AttitudeXmlParser.parseFolder(folder);
-            if(attitudes != null) {
+            if (attitudes != null) {
                 initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
                 current = new AttitudeIntervalBean("current", null, null, "dummy");
                 // Dummy attitude
                 dummyAttitude = new ConcreteAttitude(0, new Quaterniond(), false);
-            }else{
+            } else {
                 logger.error("Error loading real attitude: " + folder);
             }
         } else {
@@ -56,6 +53,7 @@ public class GaiaAttitudeServer implements IAttitudeServer {
      * Returns the NSL37 attitude for the given date.
      *
      * @param date The date
+     *
      * @return The attitude
      */
     public synchronized IAttitude getAttitude(final Date date) {

@@ -48,73 +48,64 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * loads star groups using {@link BinaryDataProvider}.
  */
 public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOctantLoader {
-    private static final Log logger = Logger.getLogger(OctreeLoader.class);
-
     /**
-     * Data will be pre-loaded at startup down to this octree depth.
+     * Data will be preloaded at startup down to this octree depth.
      */
     protected static final int PRELOAD_DEPTH = 3;
     /**
      * Default load queue size in octants.
      */
     protected static final int LOAD_QUEUE_MAX_SIZE = 100;
-
     /**
      * Minimum time to pass to be able to clear the queue again.
      */
     protected static final long MIN_QUEUE_CLEAR_MS = 2000;
-
     /**
      * Maximum number of pages to send to load every batch.
      **/
     protected static final int MAX_LOAD_CHUNK = 5;
-
+    private static final Log logger = Logger.getLogger(OctreeLoader.class);
     public static OctreeLoader instance;
-
+    /**
+     * Max number of stars loaded at once.
+     **/
+    protected final long maxLoadedStars;
+    /**
+     * Binary particle reader.
+     **/
+    private final BinaryDataProvider particleReader;
     /**
      * Current number of stars that are loaded.
      **/
     protected int nLoadedStars = 0;
     /**
-     * Max number of stars loaded at once.
-     **/
-    protected final long maxLoadedStars;
-
-    /**
      * The octant loading queue.
      **/
     protected Queue<OctreeNode> toLoadQueue;
-
     /**
      * Whether loading is paused or not.
      **/
     protected boolean loadingPaused = false;
-
     /**
      * Last time of a queue clear event went through.
      **/
     protected long lastQueueClearMs = 0;
-
     // Dataset name and description.
     protected String name, description;
     // Dataset parameters
     protected Map<String, Object> params;
-
     /**
      * This queue is sorted ascending by access date, so that we know which
      * element to release if needed (oldest).
      **/
     protected Queue<OctreeNode> toUnloadQueue;
-
     /**
      * Loaded octant ids, for logging.
      **/
     protected long[] loadedIds;
     protected int loadedObjects;
     protected int maxLoadedIds, idxLoadedIds;
-
     protected String metadata, particles;
-
     /**
      * Daemon thread that gets the data loading requests and serves them.
      **/
@@ -125,12 +116,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * from outside
      */
     private int dataVersionHint;
-
-    /**
-     * Binary particle reader.
-     **/
-    private final BinaryDataProvider particleReader;
-
     /** Utils class. **/
     private StarSetUtils utils;
 
@@ -180,7 +165,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         initializePrivate();
     }
 
-    private void initializePrivate(){
+    private void initializePrivate() {
         if (filePaths == null || filePaths.length < 2) {
             throw new RuntimeException("Error loading octree files: " + (filePaths != null ? filePaths.length : "files array is null"));
         }
@@ -295,7 +280,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             octree.parenthood.put(sg, octreeNode);
 
             // Add to index
-            if(scene.index() != null) {
+            if (scene.index() != null) {
                 scene.index().addToIndex(sg);
                 scene.index().addToHipMap(sg);
             }
@@ -507,7 +492,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper.
      * @param level         The depth to load.
-     *
      */
     public void loadOctant(final OctreeNode octant, final Entity octreeWrapper, Integer level) {
         if (level >= 0) {
@@ -529,7 +513,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
      * @param abort         State variable that will be set to true if an abort is called.
      *
      * @return The actual number of loaded octants.
-     *
      */
     public int loadOctants(final Array<OctreeNode> octants, final Entity octreeWrapper, final AtomicBoolean abort) {
         int loaded = 0;
@@ -589,6 +572,46 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
                 }
             });
         }
+    }
+
+    @Override
+    public void notify(final Event event, Object source, final Object... data) {
+        switch (event) {
+        case PAUSE_BACKGROUND_LOADING -> {
+            loadingPaused = true;
+            clearQueue();
+            logger.info("Background data loading thread paused");
+        }
+        case RESUME_BACKGROUND_LOADING -> {
+            loadingPaused = false;
+            clearQueue();
+            logger.info("Background data loading thread resumed");
+        }
+        case CLEAR_OCTANT_QUEUE -> clearQueue();
+        case DISPOSE -> {
+            if (daemon != null) {
+                daemon.stopDaemon();
+            }
+        }
+        default -> {
+        }
+        }
+
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
     }
 
     /**
@@ -657,48 +680,6 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
             this.abort.set(true);
         }
 
-    }
-
-    @Override
-    public void notify(final Event event, Object source, final Object... data) {
-        switch (event) {
-        case PAUSE_BACKGROUND_LOADING:
-            loadingPaused = true;
-            clearQueue();
-            logger.info("Background data loading thread paused");
-            break;
-        case RESUME_BACKGROUND_LOADING:
-            loadingPaused = false;
-            clearQueue();
-            logger.info("Background data loading thread resumed");
-            break;
-        case CLEAR_OCTANT_QUEUE:
-            clearQueue();
-            break;
-        case DISPOSE:
-            if (daemon != null) {
-                daemon.stopDaemon();
-            }
-            break;
-        default:
-            break;
-        }
-
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public void setParams(Map<String, Object> params) {
-        this.params = params;
     }
 
 }

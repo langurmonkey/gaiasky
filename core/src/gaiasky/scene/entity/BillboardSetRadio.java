@@ -23,7 +23,7 @@ public class BillboardSetRadio extends EntityRadio {
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if(event == Event.GRAPHICS_QUALITY_UPDATED) {
+        if (event == Event.GRAPHICS_QUALITY_UPDATED) {
             // Reload data files with new graphics setting
             boolean reloaded = initializer.reloadData(billboardSet);
             if (reloaded) {

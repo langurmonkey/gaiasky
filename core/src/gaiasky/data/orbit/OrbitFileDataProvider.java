@@ -21,7 +21,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
 
     @Override
     public void load(String file, OrbitDataLoaderParameters parameter) {
-        if(file != null) {
+        if (file != null) {
             FileDataLoader odl = new FileDataLoader();
             try {
                 FileHandle f = Settings.settings.data.dataFileHandle(file);

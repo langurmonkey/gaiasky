@@ -36,12 +36,12 @@ import java.util.Random;
 
 public class ParticleSetPointRenderer extends PointCloudRenderer implements IObserver {
     private final Vector3 aux1;
-    private int additionalOffset;
     private final Random rand;
     private final Colormap cmap;
+    private final ParticleUtils utils;
+    private int additionalOffset;
     private ICamera camera;
     private boolean stereoHalfWidth;
-    private final ParticleUtils utils;
 
     public ParticleSetPointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);

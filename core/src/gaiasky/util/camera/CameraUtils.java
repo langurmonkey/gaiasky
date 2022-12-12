@@ -30,6 +30,7 @@ public class CameraUtils {
      * Checks if the entity e is hit by the screen position x and y.
      *
      * @param e The entity.
+     *
      * @return Whether an intersection has occurred
      */
     public static boolean intersectScreenSphere(IFocus f, Entity e, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection) {

@@ -64,19 +64,6 @@ public class StarClusterLoader extends AbstractSceneLoader {
 
     private Array<Entity> clusters;
 
-    private enum ClusterProperties {
-        NAME,
-        RA,
-        DEC,
-        DIST,
-        PLLX,
-        PMRA,
-        PMDE,
-        RV,
-        RADIUS,
-        NSTARS
-    }
-
     @Override
     public Array<Entity> loadData() {
         clusters = new Array<>();
@@ -398,6 +385,19 @@ public class StarClusterLoader extends AbstractSceneLoader {
         }
 
         return indices;
+    }
+
+    private enum ClusterProperties {
+        NAME,
+        RA,
+        DEC,
+        DIST,
+        PLLX,
+        PMRA,
+        PMDE,
+        RV,
+        RADIUS,
+        NSTARS
     }
 
 }

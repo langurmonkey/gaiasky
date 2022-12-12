@@ -55,6 +55,12 @@ import java.text.DecimalFormat;
 
 public class SpacecraftGui extends AbstractGui {
 
+    // Number format
+    private final DecimalFormat nf;
+    private final DecimalFormat sf;
+    // Auxiliary vectors
+    private final Vector3 aux3f1;
+    private final Vector3 aux3f2;
     private Container<HorizontalGroup> buttonContainer;
     private Container<Label> thrustContainer;
     private HorizontalGroup buttonRow, engineGroup;
@@ -67,18 +73,11 @@ public class SpacecraftGui extends AbstractGui {
     private OwnLabel mainvel, yawvel, pitchvel, rollvel, closestname, closestdist, thrustfactor;
     private CheckBox velToDir;
     private SelectBox<MachineDefinition> machineSelector;
-
     // The spacecraft object
     private Entity sc;
     private SpacecraftView view;
-
-    // Number format
-    private final DecimalFormat nf;
-    private final DecimalFormat sf;
-
     // Camera to render the attitude indicator system
     private PerspectiveCamera aiCam;
-
     // Attitude indicator
     private IntModelBatch mb;
     private DecalBatch db;
@@ -91,18 +90,11 @@ public class SpacecraftGui extends AbstractGui {
     private Matrix4 aiTransform;
     private Viewport aiViewport;
     private DirectionalLight dlight;
-
     // Reference to spacecraft camera rotation quaternion
     private Quaternion qf;
     // Reference to spacecraft camera velocity vector
     private Vector3d vel;
-
     private float indicatorw, indicatorh, indicatorx, indicatory;
-
-    // Auxiliary vectors
-    private final Vector3 aux3f1;
-    private final Vector3 aux3f2;
-
     private boolean thrustEvents = true;
 
     public SpacecraftGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {

@@ -23,9 +23,9 @@ public class SceneGraphBuilderSystem extends AbstractInitSystem {
     @Override
     public void initializeEntity(Entity entity) {
         var graph = entity.getComponent(GraphNode.class);
-        if (graph.parentName != null)  {
+        if (graph.parentName != null) {
             var parent = index.getEntity(graph.parentName);
-            if(parent != null) {
+            if (parent != null) {
                 addChild(parent, entity, true);
             } else {
                 throw new RuntimeException(I18n.msg("error.parent.notfound", Mapper.base.get(entity).getName(), graph.parentName));

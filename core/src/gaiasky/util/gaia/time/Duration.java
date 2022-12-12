@@ -29,11 +29,11 @@ import java.io.Serializable;
 
 /**
  * A {@code Duration} represents an amount of time on a proper time scale.
- *
+ * <p>
  * There are two implementations provided of the conversions methods one as
  * object interface, where an object of the current class has to be
  * instantiated. The oder implementation is provided as static class methods.
- *
+ * <p>
  * Performance tests of both implementations have come up with a performance
  * improvement of 20% of the static methods compared with the object methods.
  *
@@ -42,7 +42,7 @@ import java.io.Serializable;
  */
 public interface Duration extends Serializable {
     /**
-     * A few obvious constants  
+     * A few obvious constants
      */
     long NS_PER_SEC = 1000000000L;
     double SECS_PER_MIN = 60.;
@@ -79,8 +79,8 @@ public interface Duration extends Serializable {
     /**
      * Set this duration to a new given one
      *
-     * @param d
-     *            duration to set this one to
+     * @param d duration to set this one to
+     *
      * @return updated object
      */
     Duration set(final Duration d);
@@ -128,8 +128,8 @@ public interface Duration extends Serializable {
     /**
      * Add a duration to this one
      *
-     * @param d
-     *            amount of time to add
+     * @param d amount of time to add
+     *
      * @return updated object
      */
     Duration add(final Duration d);
@@ -137,21 +137,24 @@ public interface Duration extends Serializable {
     /**
      * Subtract a duration from this one
      *
-     * @param d
-     *            amount of time to subtract
+     * @param d amount of time to subtract
+     *
      * @return updated object
      */
     Duration sub(final Duration d);
 
     /**
-     * Check that this duration is longer than a given one 
+     * Check that this duration is longer than a given one
+     *
      * @param d duration to compare to
+     *
      * @return {@code true} if this duration is longer than {@code d}
      */
     boolean isLongerThan(Duration d);
 
     /**
      * Multiply this duration by a given factor
+     *
      * @param s scale factor
      *
      * @return updated object
@@ -165,6 +168,7 @@ public interface Duration extends Serializable {
 
     /**
      * Set the time scale for this duration
+     *
      * @param scale time scale to set the duration to
      */
     void setScale(TimeScale scale);

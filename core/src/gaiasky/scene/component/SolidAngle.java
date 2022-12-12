@@ -19,7 +19,7 @@ public class SolidAngle implements Component {
      * radius/distance limit for rendering as point. If angle is any bigger, we
      * render with shader.
      */
-    public  double thresholdPoint;
+    public double thresholdPoint;
 
     /** Minimum solid angle for rendering the lable of this object. */
     public double thresholdLabel;

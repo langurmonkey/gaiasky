@@ -232,6 +232,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
             slaveStatusLabel.setColor(Color.RED);
         }
     }
+
     private synchronized void updateSlaveStatusText(String newSlave) {
         List<String> slaves = MasterManager.instance.getSlaves();
         int idx = slaves.indexOf(newSlave);

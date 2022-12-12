@@ -42,11 +42,10 @@ public class StarSetInstancedRenderer extends InstancedRenderSystem implements I
     protected static final Log logger = Logger.getLogger(StarSetInstancedRenderer.class);
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset, starPosOffset;
     private final Colormap cmap;
-
-    private StarSetQuadComponent triComponent;
     private final ParticleUtils utils;
+    private int sizeOffset, pmOffset, starPosOffset;
+    private StarSetQuadComponent triComponent;
 
     public StarSetInstancedRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);

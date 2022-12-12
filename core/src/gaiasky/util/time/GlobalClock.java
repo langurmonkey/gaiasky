@@ -25,25 +25,21 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
 
     /** The current time of the clock **/
     public Instant time;
-    long lastTime;
-    /** Target time to stop the clock, if any **/
-    private Instant targetTime;
-
-    /** The simulation time difference in hours **/
-    private double hDiff;
-
-    /** The frame time difference in seconds **/
-    private double dt;
-
-    /** Represents the time wrap multiplier. Scales the real time **/
-    private double timeWarp = 1;
-
-    // Seconds since last event POST
-    private float lastUpdate = 1;
     /**
      * The fixed frame rate when not in real time. Set negative to use real time
      **/
     public float fps = -1;
+    long lastTime;
+    /** Target time to stop the clock, if any **/
+    private Instant targetTime;
+    /** The simulation time difference in hours **/
+    private double hDiff;
+    /** The frame time difference in seconds **/
+    private double dt;
+    /** Represents the time wrap multiplier. Scales the real time **/
+    private double timeWarp = 1;
+    // Seconds since last event POST
+    private float lastUpdate = 1;
 
     /**
      * Creates a new GlobalClock

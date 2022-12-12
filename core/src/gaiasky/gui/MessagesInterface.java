@@ -20,11 +20,10 @@ import java.util.Map;
  * Widget that displays big messages on screen.
  */
 public class MessagesInterface extends TableGuiInterface implements IObserver {
-    private Label headline, subhead;
     /** Lock object for synchronization **/
     private final Object lock;
-
     Map<Integer, Widget> customElements;
+    private Label headline, subhead;
 
     public MessagesInterface(Skin skin, Object lock) {
         super(skin);

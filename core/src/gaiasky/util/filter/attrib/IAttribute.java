@@ -19,6 +19,7 @@ public interface IAttribute {
      * Gets the value of this attribute
      *
      * @param bean The particle or star bean
+     *
      * @return The value
      */
     double get(IParticleRecord bean);

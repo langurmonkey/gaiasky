@@ -13,8 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import gaiasky.util.TextUtils;
 
 public class OwnLabel extends Label implements Disableable {
-    private float ownwidth = 0f, ownheight = 0f;
     private final Color regularColor;
+    private float ownwidth = 0f, ownheight = 0f;
     private boolean disabled = false;
 
     public OwnLabel(CharSequence text, Skin skin, float width) {
@@ -53,20 +53,20 @@ public class OwnLabel extends Label implements Disableable {
         this.regularColor = this.getColor().cpy();
     }
 
-    public void receiveScrollEvents(){
-            // FOCUS_MODE listener
-            addListener((e) -> {
-                if (e instanceof InputEvent) {
-                    InputEvent ie = (InputEvent) e;
-                    e.setBubbles(false);
-                    if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
-                        return this.getStage().setScrollFocus(this);
-                    } else if (ie.getType() == InputEvent.Type.exit && this.getStage() != null) {
-                        return this.getStage().setScrollFocus(null);
-                    }
+    public void receiveScrollEvents() {
+        // FOCUS_MODE listener
+        addListener((e) -> {
+            if (e instanceof InputEvent) {
+                InputEvent ie = (InputEvent) e;
+                e.setBubbles(false);
+                if (ie.getType() == InputEvent.Type.enter && this.getStage() != null) {
+                    return this.getStage().setScrollFocus(this);
+                } else if (ie.getType() == InputEvent.Type.exit && this.getStage() != null) {
+                    return this.getStage().setScrollFocus(null);
                 }
-                return true;
-            });
+            }
+            return true;
+        });
     }
 
     @Override
@@ -107,6 +107,11 @@ public class OwnLabel extends Label implements Disableable {
     }
 
     @Override
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    @Override
     public void setDisabled(boolean isDisabled) {
         if (isDisabled) {
             disabled = true;
@@ -115,11 +120,6 @@ public class OwnLabel extends Label implements Disableable {
             disabled = false;
             this.setColor(regularColor);
         }
-    }
-
-    @Override
-    public boolean isDisabled() {
-        return disabled;
     }
 
 }

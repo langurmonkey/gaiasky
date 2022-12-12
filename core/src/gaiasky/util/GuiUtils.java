@@ -16,7 +16,10 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.gui.GenericDialog;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.Link;
+import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 public class GuiUtils {
 
@@ -271,12 +274,12 @@ public class GuiUtils {
             Actor parent = actor.getParent();
             float x = actor.getX();
             float y = actor.getY();
-            while(parent != null && !(parent instanceof ScrollPane)) {
+            while (parent != null && !(parent instanceof ScrollPane)) {
                 x += parent.getX();
                 y += parent.getY();
                 parent = parent.getParent();
             }
-            if(parent != null) {
+            if (parent != null) {
                 var scrollPane = (ScrollPane) parent;
                 scrollPane.scrollTo(x, y, actor.getWidth(), actor.getHeight());
                 return true;

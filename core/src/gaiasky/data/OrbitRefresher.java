@@ -28,13 +28,11 @@ import java.util.concurrent.ArrayBlockingQueue;
  * Refreshes sampled orbit data from the underlying data provider algorithms.
  */
 public class OrbitRefresher implements IObserver {
-    private static final Log logger = Logger.getLogger(OrbitRefresher.class);
-
-    // Maximum size of load queue.
-    private static final int LOAD_QUEUE_MAX_SIZE = 15;
     // Maximum number of pages to send to load every batch.
     protected static final int MAX_LOAD_CHUNK = 5;
-
+    private static final Log logger = Logger.getLogger(OrbitRefresher.class);
+    // Maximum size of load queue.
+    private static final int LOAD_QUEUE_MAX_SIZE = 15;
     private final Queue<OrbitDataLoaderParameters> toLoadQueue;
     private final OrbitUpdaterThread daemon;
     private final boolean loadingPaused = false;
@@ -61,7 +59,7 @@ public class OrbitRefresher implements IObserver {
         if (!loadingPaused && toLoadQueue.size() < LOAD_QUEUE_MAX_SIZE - 1) {
             toLoadQueue.remove(params);
             toLoadQueue.add(params);
-            if(params.entity != null) {
+            if (params.entity != null) {
                 Mapper.trajectory.get(params.entity).refreshing = true;
             }
             daemon.wakeUp();

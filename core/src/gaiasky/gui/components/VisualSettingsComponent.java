@@ -19,7 +19,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
-import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.scene2d.OwnSliderPlus;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
@@ -32,11 +32,9 @@ import java.util.Map;
 
 public class VisualSettingsComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(VisualSettingsComponent.class);
-
+    boolean hackProgrammaticChangeEvents = true;
     private OwnSliderPlus starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
     private OwnSliderPlus ambientLight, labelSize, lineWidth, elevMult;
-
-    boolean hackProgrammaticChangeEvents = true;
 
     public VisualSettingsComponent(Skin skin, Stage stage) {
         super(skin, stage);
@@ -150,7 +148,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
         /* Elevation multiplier */
         elevMult = new OwnSliderPlus(I18n.msg("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, 0.1f, false, skin);
         elevMult.setWidth(contentWidth);
-        elevMult.setValue((float) MathUtilsd.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
+        elevMult.setValue((float) MathUtilsDouble.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
         elevMult.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 float val = elevMult.getValue();

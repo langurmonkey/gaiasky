@@ -36,15 +36,16 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  * Displays the loading screen.
  */
 public class LoadingGui extends AbstractGui {
-    protected Table center, topLeft, bottomMiddle, screenMode;
-
+    private final long tipTime = 3500;
     public NotificationsInterface notificationsInterface;
+    protected Table center, topLeft, bottomMiddle, screenMode;
     private TipsGenerator tipGenerator;
     private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
     private HorizontalGroup tip;
     private long lastFunnyTime;
     private long lastTipTime;
+    private long funnyTextTime = 1400;
 
     public LoadingGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         this(skin, graphics, unitsPerPixel, 0, vr);
@@ -73,9 +74,8 @@ public class LoadingGui extends AbstractGui {
             vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
 
-
         center = new Table(skin);
-        if(!vr) {
+        if (!vr) {
             Texture tex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
             Drawable bg = new SpriteDrawable(new Sprite(tex));
             center.setBackground(bg);
@@ -86,7 +86,6 @@ public class LoadingGui extends AbstractGui {
             center.padLeft(hOffset);
         else if (hOffset < 0)
             center.padRight(-hOffset);
-
 
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(pad30 * 2f);
@@ -145,9 +144,6 @@ public class LoadingGui extends AbstractGui {
 
     }
 
-    private final long tipTime = 3500;
-    private long funnyTextTime = 1400;
-
     @Override
     public void update(double dt) {
         super.update(dt);
@@ -185,7 +181,7 @@ public class LoadingGui extends AbstractGui {
             stage.clear();
             stage.addActor(center);
             stage.addActor(screenMode);
-            if(!vr) {
+            if (!vr) {
                 stage.addActor(bottomMiddle);
                 stage.addActor(topLeft);
             }

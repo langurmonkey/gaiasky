@@ -42,25 +42,21 @@ public class GaiaSkyContextMenu extends ContextMenu {
     private final Skin skin;
     // The candidate, if any
     private final FocusView candidate;
-    // The name of the candidate
-    private String candidateName;
-    // Short name of candidate
-    private String candidateNameShort;
     // Screen coordinates
     private final int screenX;
     private final int screenY;
     // Default pad
     private final float pad;
-
-    // Added items
-    private int nItems = 0;
-
     private final CatalogManager catalogManager;
-
     private final Scene scene;
-
     // Rel effects off
     private final boolean relativisticEffects = false;
+    // The name of the candidate
+    private String candidateName;
+    // Short name of candidate
+    private String candidateNameShort;
+    // Added items
+    private int nItems = 0;
 
     public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final FocusView candidate, final CatalogManager catalogManager, final Scene scene) {
         super(skin, styleName);
@@ -176,7 +172,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                         ImmutableArray<Entity> shapes = scene.engine.getEntitiesFor(scene.getFamilies().shapes);
                         for (Entity entity : shapes) {
                             var shape = Mapper.shape.get(entity);
-                            if(shape.track != null || shape.trackName != null) {
+                            if (shape.track != null || shape.trackName != null) {
                                 EventManager.publish(Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, removeShapesAll, entity, false);
                             }
                         }

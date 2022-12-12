@@ -9,6 +9,7 @@ import gaiasky.scene.Mapper;
 public class BillboardSetUpdater extends AbstractUpdateSystem {
 
     private final Matrix4 M41;
+
     public BillboardSetUpdater(Family family, int priority) {
         super(family, priority);
         M41 = new Matrix4();

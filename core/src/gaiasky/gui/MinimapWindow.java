@@ -14,9 +14,8 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.TextureWidget;
 
 public class MinimapWindow extends GenericDialog {
-    private OwnLabel mapName;
     private final MinimapWidget minimap;
-
+    private OwnLabel mapName;
 
     public MinimapWindow(final Stage stage, final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
         super(I18n.msg("gui.minimap.title"), skin, stage);
@@ -66,14 +65,14 @@ public class MinimapWindow extends GenericDialog {
 
     }
 
-    private void updateMapName(String mapName){
-        if(this.mapName != null)
+    private void updateMapName(String mapName) {
+        if (this.mapName != null)
             this.mapName.setText(mapName);
     }
 
     public void act(float delta) {
         super.act(delta);
-        if(minimap != null) {
+        if (minimap != null) {
             minimap.update();
             String mapName = minimap.getCurrentName();
             if (!mapName.equals(this.mapName.getName())) {
@@ -81,6 +80,5 @@ public class MinimapWindow extends GenericDialog {
             }
         }
     }
-
 
 }

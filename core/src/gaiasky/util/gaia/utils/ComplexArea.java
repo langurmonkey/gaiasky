@@ -19,10 +19,8 @@ import java.util.Random;
  */
 public class ComplexArea implements Area {
 
-    private final Collection<Area> listOfAreas;
-
     private final static double piHalf = Math.PI / 2.0;
-
+    private final Collection<Area> listOfAreas;
     private String name;
 
     private Place p;
@@ -36,6 +34,7 @@ public class ComplexArea implements Area {
     }
 
     /**
+     *
      */
     @Override
     public double altitude(Place spinAxisPlace) {
@@ -47,6 +46,7 @@ public class ComplexArea implements Area {
     }
 
     /**
+     *
      */
     @Override
     public boolean contains(Place p) {
@@ -58,6 +58,7 @@ public class ComplexArea implements Area {
     }
 
     /**
+     *
      */
     @Override
     public Place getMidPoint() {
@@ -73,6 +74,7 @@ public class ComplexArea implements Area {
     }
 
     /**
+     *
      */
     @Override
     public double getWeight() {
@@ -86,8 +88,8 @@ public class ComplexArea implements Area {
     /**
      * Get a random Place within the ComplexArea
      *
-     * @param rnd
-     *            Random number generator
+     * @param rnd Random number generator
+     *
      * @return random Place
      */
     public Place getRandomPlace(Random rnd) {
@@ -133,21 +135,20 @@ public class ComplexArea implements Area {
     }
 
     /**
-     * Set the name of the area
-     *
-     * @param str
-     *            The string
-     */
-    public void setName(String str) {
-        this.name = str;
-    }
-
-    /**
      * Get the name of the area
      *
      * @return The name
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Set the name of the area
+     *
+     * @param str The string
+     */
+    public void setName(String str) {
+        this.name = str;
     }
 }

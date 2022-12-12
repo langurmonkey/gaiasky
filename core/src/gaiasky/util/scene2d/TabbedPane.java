@@ -5,13 +5,13 @@
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,64 +32,82 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 
-/** A {@code TabbedPane} widget not full featured but somewhat reusable.
- * 
- * @author davebaol */
+/**
+ * A {@code TabbedPane} widget not full featured but somewhat reusable.
+ *
+ * @author davebaol
+ */
 public class TabbedPane extends Table {
-    private TabbedPaneStyle style;
-
     Table tabTitleTable;
     Stack tabBodyStack;
     int selectedIndex;
     int tabTitleAlign = Align.left;
+    private TabbedPaneStyle style;
 
-    /** Creates a {@code TabbedPane} using the specified skin.
-     * @param skin the skin */
+    /**
+     * Creates a {@code TabbedPane} using the specified skin.
+     *
+     * @param skin the skin
+     */
     public TabbedPane(Skin skin) {
         super(skin);
         initialize(skin.get(TabbedPaneStyle.class));
     }
 
-    /** Creates a {@code TabbedPane} using the specified skin and alignment.
-     * @param skin the skin
+    /**
+     * Creates a {@code TabbedPane} using the specified skin and alignment.
+     *
+     * @param skin          the skin
      * @param tabTitleAlign the alignment for tab titles. Must be one of {@link Align#left}, {@link Align#center} or
-     *           {@link Align#right}. */
+     *                      {@link Align#right}.
+     */
     public TabbedPane(Skin skin, int tabTitleAlign) {
         super(skin);
         this.tabTitleAlign = tabTitleAlign;
         initialize(skin.get(TabbedPaneStyle.class));
     }
 
-    /** Creates a {@code TabbedPane} using the specified skin and style name.
-     * @param skin the skin
-     * @param styleName the style name */
+    /**
+     * Creates a {@code TabbedPane} using the specified skin and style name.
+     *
+     * @param skin      the skin
+     * @param styleName the style name
+     */
     public TabbedPane(Skin skin, String styleName) {
         super(skin);
         initialize(skin.get(styleName, TabbedPaneStyle.class));
     }
 
-    /** Creates a {@code TabbedPane} using the specified skin, style name and alignment.
-     * @param skin the skin
-     * @param styleName the style name
+    /**
+     * Creates a {@code TabbedPane} using the specified skin, style name and alignment.
+     *
+     * @param skin          the skin
+     * @param styleName     the style name
      * @param tabTitleAlign the alignment for tab titles. Must be one of {@link Align#left}, {@link Align#center} or
-     *           {@link Align#right}. */
+     *                      {@link Align#right}.
+     */
     public TabbedPane(Skin skin, String styleName, int tabTitleAlign) {
         super(skin);
         this.tabTitleAlign = tabTitleAlign;
         initialize(skin.get(styleName, TabbedPaneStyle.class));
     }
 
-    /** Creates a {@code TabbedPane} using the specified style.
+    /**
+     * Creates a {@code TabbedPane} using the specified style.
+     *
      * @param style the style
      **/
     public TabbedPane(TabbedPaneStyle style) {
         initialize(style);
     }
 
-    /** Creates a {@code TabbedPane} using the specified style and alignment.
-     * @param style the style
+    /**
+     * Creates a {@code TabbedPane} using the specified style and alignment.
+     *
+     * @param style         the style
      * @param tabTitleAlign the alignment for tab titles. Must be one of {@link Align#left}, {@link Align#center} or
-     *           {@link Align#right}. */
+     *                      {@link Align#right}.
+     */
     public TabbedPane(TabbedPaneStyle style, int tabTitleAlign) {
         this.tabTitleAlign = tabTitleAlign;
         initialize(style);
@@ -151,6 +169,14 @@ public class TabbedPane extends Table {
         return super.debug();
     }
 
+    /**
+     * Returns the tabbed pane's style. Modifying the returned style may not have an effect until
+     * {@link #setStyle(TabbedPaneStyle)} is called.
+     */
+    public TabbedPaneStyle getStyle() {
+        return style;
+    }
+
     public void setStyle(TabbedPaneStyle style) {
         if (style == null)
             throw new IllegalArgumentException("style cannot be null.");
@@ -168,12 +194,6 @@ public class TabbedPane extends Table {
         // padRight(background.getRightWidth());
         // }
         invalidateHierarchy();
-    }
-
-    /** Returns the tabbed pane's style. Modifying the returned style may not have an effect until
-     * {@link #setStyle(TabbedPaneStyle)} is called. */
-    public TabbedPaneStyle getStyle() {
-        return style;
     }
 
     public void addTab(String title, Actor actor) {
@@ -224,8 +244,10 @@ public class TabbedPane extends Table {
         tabBodyStack.getChildren().get(selectedIndex).setVisible(value);
     }
 
-    /** Sends a ChangeEvent, with this TabbedPane as the target, to each registered listener. This method is called each time there
-     * is a change to the selected index. */
+    /**
+     * Sends a ChangeEvent, with this TabbedPane as the target, to each registered listener. This method is called each time there
+     * is a change to the selected index.
+     */
     protected void fireStateChanged() {
         ChangeEvent changeEvent = new ChangeEvent();
         changeEvent.setBubbles(false);
