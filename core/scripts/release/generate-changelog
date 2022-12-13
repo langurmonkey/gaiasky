@@ -28,12 +28,12 @@ fi
 CURRENT_TAG=$1
 
 # Use regexp to only include full versions (e.g. exclude release candidates)
-if [ -z "$var" ]; then
+if [ -z "$OUTPUT" ]; then
   # Print to stdout
   git-chglog -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml $CURRENT_TAG
 else
   # Print to output file
   git-chglog -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml -o $OUTPUT $CURRENT_TAG
+  echo "Changelog generated to $OUTPUT"
 fi
 
-echo "Changelog generated to $OUTPUT"
