@@ -773,13 +773,23 @@ public class DatasetManagerWindow extends GenericDialog {
                 filesString = "-";
             } else {
                 filesString = TextUtils.arrayToStr(dataset.files, "", "", "\n");
+                // Use data location token to keep from overflowing horizontally.
+                var dataLocation = Settings.settings.data.location;
+                if(!dataLocation.endsWith(File.separator) && !dataLocation.endsWith("/")) {
+                    dataLocation += "/";
+                }
+                filesString = filesString.replace(dataLocation, Constants.DATA_LOCATION_TOKEN);
             }
             OwnLabel files = new OwnLabel(I18n.msg("gui.download.files", filesString), skin, "grey-large");
+
+            // Data location
+            OwnLabel dataLocationNote = new OwnLabel(Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location, skin);
 
             infoTable.add(desc).top().left().padBottom(pad34).row();
             infoTable.add(releaseNotesTitle).top().left().padBottom(pad18).row();
             infoTable.add(releaseNotes).top().left().padBottom(pad34).row();
-            infoTable.add(files).top().left();
+            infoTable.add(files).top().left().padBottom(pad34).row();
+            infoTable.add(dataLocationNote).top().left();
 
             // Scroll
             OwnScrollPane infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
