@@ -87,7 +87,7 @@ public class DataDescriptorUtils {
                     return true;
                 } else
                     return p.toFile().isDirectory() && !p.equals(dataLocation) && !p.resolve("dataset.json").toFile().exists() && !p.getFileName().toString().equals("tmp");
-            }).collect(Collectors.toList());
+            }).toList();
             if (!toDelete.isEmpty()) {
                 for (var delete : toDelete) {
                     if (Files.exists(delete)) {

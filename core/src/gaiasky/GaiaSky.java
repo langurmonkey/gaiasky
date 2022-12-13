@@ -449,20 +449,25 @@ public class GaiaSky implements ApplicationListener, IObserver {
     @Override
     public void create() {
         startTime = TimeUtils.millis();
-        // Set log level
+        // Set log level.
         Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
         Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
 
+        // Initialize timer.
+        // Doing this preemptively helps prevent some macOS errors.
+        Timer.instance();
+
+        // Console logger.
         consoleLogger = new ConsoleLogger();
 
         if (debugMode)
             logger.debug("Logging level set to DEBUG");
 
-        // Init graphics and window
+        // Init graphics and window.
         graphics = Gdx.graphics;
         window = headless ? null : ((Lwjgl3Graphics) graphics).getWindow();
 
-        // Basic info
+        // Log basic info.
         logger.info(settings.version.version, I18n.msg("gui.build", settings.version.build));
         logger.info(I18n.msg("notif.info.displaymode", graphics.getWidth(), graphics.getHeight(), Gdx.graphics.isFullscreen()));
         logger.info(I18n.msg("notif.info.device", GL30.glGetString(GL30.GL_RENDERER)));
@@ -471,7 +476,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
         logger.info(I18n.msg("notif.info.maxattribs", GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
 
-        // Disable all kinds of input
+        // Disable all kinds of input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
 
         if (!settings.initialized) {
@@ -479,20 +484,20 @@ public class GaiaSky implements ApplicationListener, IObserver {
             return;
         }
 
-        // Initialize times
+        // Initialize times.
         final ITimeFrameProvider clock = new GlobalClock(1, Instant.now());
         final ITimeFrameProvider real = new RealTimeClock();
         time = settings.runtime.realTime ? real : clock;
         t = 0;
 
-        // Initialize i18n
+        // Initialize i18n.
         I18n.initialize();
 
-        // Tooltips
+        // Tooltips.
         TooltipManager.getInstance().initialTime = 1f;
         TooltipManager.getInstance().hideAll();
 
-        // Initialize asset manager
+        // Initialize asset manager.
         final FileHandleResolver internalResolver = new InternalFileHandleResolver();
         final FileHandleResolver dataResolver = fileName -> settings.data.dataFileHandle(fileName);
         assetManager = new AssetManager(internalResolver);
@@ -516,28 +521,28 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Init global resources -- Can't be postponed!
         this.globalResources = new GlobalResources(assetManager);
 
-        // Catalog manager
+        // Catalog manager.
         this.catalogManager = new CatalogManager();
 
-        // Initialise master manager
+        // Initialise master manager.
         MasterManager.initialize();
-        // Load slave assets
+        // Load slave assets.
         SlaveManager.load(assetManager);
 
-        // Initialise dataset updater
+        // Initialise dataset updater.
         this.executorService = new GaiaSkyExecutorService();
 
-        // Initialise Cameras
+        // Initialise Cameras.
         cameraManager = new CameraManager(assetManager, CameraMode.FOCUS_MODE, vr, globalResources);
 
-        // Set asset manager to asset bean
+        // Set asset manager to asset bean.
         AssetBean.setAssetManager(assetManager);
 
-        // Create vr context if possible
+        // Create vr context if possible.
         final VRStatus vrStatus = createVR();
         cameraManager.updateFrustumPlanes();
 
-        // GUI
+        // GUI.
         guis = new ArrayList<>(3);
 
         // Post-processor.
@@ -550,10 +555,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Screenshots and frame output manager.
         new ScreenshotsManager(this, sceneRenderer, globalResources);
 
-        // Load various assets
+        // Load various assets.
         assetManager.load("gaiasky-assets", GaiaSkyAssets.class, new GaiaSkyLoaderParameters(this, noScripting));
 
-        // Tell the asset manager to load all the assets
+        // Tell the asset manager to load all the assets.
         final Set<AssetBean> assets = AssetBean.getAssets();
         for (AssetBean ab : assets) {
             ab.load(assetManager);
@@ -574,14 +579,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
 
-        // GL clear state
+        // GL clear state.
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClearDepthf(1f);
     }
 
     /**
      * Attempt to create a VR context. This operation will only succeed if an HMD is connected
-     * and detected via OpenVR
+     * and detected via OpenVR.
      **/
     private VRStatus createVR() {
         if (vr) {
@@ -624,24 +629,24 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 vrLoadingRightTex = org.lwjgl.openvr.Texture.create();
                 vrLoadingRightTex.set(vrLoadingRightFb.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Gamma);
 
-                // Sprite batch for VR - uses back buffer resolution
+                // Sprite batch for VR - uses back buffer resolution.
                 globalResources.setSpriteBatchVR(new SpriteBatch(500, globalResources.getSpriteShader()));
                 globalResources.getSpriteBatchVR().getProjectionMatrix().setToOrtho2D(0, 0, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1]);
 
-                // Enable visibility of 'Others' if off (for VR controllers)
+                // Enable visibility of 'Others' if off (for VR controllers).
                 if (!settings.scene.visibility.get(ComponentType.Others.name())) {
                     EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.others", false);
                 }
                 return VRStatus.OK;
             } catch (Exception e) {
-                // If initializing the VRContext failed
+                // If initializing the VRContext failed.
                 settings.runtime.openVr = false;
                 logger.error(e);
                 logger.error("Initialisation of VR context failed");
                 return VRStatus.ERROR_NO_CONTEXT;
             }
         } else {
-            // Desktop mode
+            // Desktop mode.
             settings.runtime.openVr = false;
             Constants.initialize(settings.scene.distanceScaleDesktop);
         }
@@ -650,21 +655,21 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
     /**
      * Execute this when the models have finished loading. This sets the models
-     * to their classes and removes the Loading message
+     * to their classes and removes the Loading message.
      */
     private void doneLoading() {
-        // Get assets
+        // Get assets.
         final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
 
         windowCreated = true;
-        // Dispose of initial and loading GUIs
+        // Dispose of initial and loading GUIs.
         welcomeGui.dispose();
         welcomeGui = null;
 
         loadingGui.dispose();
         loadingGui = null;
 
-        // Dispose vr loading GUI
+        // Dispose vr loading GUI.
         if (settings.runtime.openVr) {
             welcomeGuiVR.dispose();
             welcomeGuiVR = null;
@@ -683,18 +688,18 @@ public class GaiaSky implements ApplicationListener, IObserver {
             vrLoadingRightFb = null;
         }
 
-        // Collect assets
+        // Collect assets.
         scripting = assets.scriptingInterface;
         bookmarksManager = assets.bookmarksManager;
         sampClient = assets.sampClient;
 
         /*
-         * POST-PROCESSOR
+         * Complete post-processor loading.
          */
         postProcessor.doneLoading(assetManager);
 
         /*
-         * GET SCENE
+         * Fetch scene object.
          */
         if (assetManager.isLoaded(sceneName)) {
             scene = assetManager.get(sceneName);
@@ -704,7 +709,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
 
         /*
-         * SCENE GRAPH UPDATER
+         * Implement update process.
          */
         updateProcess = () -> {
             // Update scene.
@@ -715,14 +720,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
         };
 
         /*
-         * SCENE RENDERER
+         * Complete scene renderer loading.
          */
         sceneRenderer.doneLoading(assetManager);
         sceneRenderer.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
 
-        // Set up entities
+        // Set up entities.
         scene.setUpEntities();
-        // Prepare scene for update
+        // Prepare scene for update.
         scene.prepareUpdateSystems(sceneRenderer);
 
         // Initialize input multiplexer to handle various input processors.
@@ -731,10 +736,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-        // Stop updating log list
+        // Stop updating log list.
         consoleLogger.setUseHistorical(false);
 
-        // Init GUIs, step 2
+        // Init GUIs, step 2.
         reinitialiseGUI2();
 
         // Publish visibility.
@@ -748,35 +753,35 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         touchSceneGraph();
 
-        // Initialise time in GUI
+        // Initialise time in GUI.
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
-        // Subscribe to events
+        // Subscribe to events.
         EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD,
                 Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD,
                 Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
                 Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
                 Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE);
 
-        // Re-enable input
+        // Re-enable input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
 
-        // Set current date
+        // Set current date.
         EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.now());
 
-        // Resize GUIs to current size
+        // Resize GUIs to current size.
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
 
         if (settings.runtime.openVr) {
-            // Resize post-processors and render systems
+            // Resize post-processors and render systems.
             postRunnable(() -> resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, false, false, false));
         }
 
-        // Initialise frames
+        // Initialise frames.
         frames = 0;
 
-        // Debug info scheduler
+        // Debug info scheduler.
         final Task debugTask1 = new Task() {
             @Override
             public void run() {
@@ -809,12 +814,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
             }
         };
 
-        // Every second
+        // Every second.
         Timer.schedule(debugTask1, 2, 1);
-        // Every 10 seconds
+        // Every 10 seconds.
         Timer.schedule(debugTask10, 2, 10);
 
-        // Start capturing locations
+        // Start capturing locations.
         final Task startCapturing = new Task() {
             @Override
             public void run() {
@@ -823,13 +828,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
         };
         Timer.schedule(startCapturing, 1f);
 
-        // Release notes
+        // Release notes.
         guiRegistry.publishReleaseNotes();
 
-        // Go home
+        // Go home.
         goHome();
 
-        // Log attributes
+        // Log attributes.
         final Task logAttributes = new Task() {
             @Override
             public void run() {
@@ -878,22 +883,22 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     /**
-     * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun
+     * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun.
      */
     private void goHome() {
         final Entity homeObject = scene.findFocus(settings.scene.homeObject);
         boolean isOn = true;
         if (homeObject != null && (isOn = isOn(Mapper.base.get(homeObject).ct)) && !settings.program.net.slave.active) {
-            // Set focus to Earth
+            // Set focus to Earth.
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, homeObject, true);
             EventManager.publish(Event.GO_TO_OBJECT_CMD, this);
             if (settings.runtime.openVr) {
-                // Free mode by default in VR
+                // Free mode by default in VR.
                 EventManager.publishDelayed(Event.CAMERA_MODE_CMD, this, 1000L, CameraMode.FREE_MODE);
             }
         } else {
-            // At 5 AU in Y looking towards origin (top-down look)
+            // At 5 AU in Y looking towards origin (top-down look).
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
             EventManager.publish(Event.CAMERA_POS_CMD, this, (Object) new double[] { 0d, 5d * Constants.AU_TO_U, 0d });
             EventManager.publish(Event.CAMERA_DIR_CMD, this, (Object) new double[] { 0d, -1d, 0d });
@@ -912,7 +917,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     /**
-     * Re-initialises all the GUI (step 1)
+     * Re-initialises all the GUI (step 1).
      */
     public void reinitialiseGUI1() {
         if (guis != null && !guis.isEmpty()) {
@@ -949,13 +954,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Second step in GUI initialisation.
      */
     public void reinitialiseGUI2() {
-        // Reinitialise registry to listen to relevant events
+        // Reinitialise registry to listen to relevant events.
         if (guiRegistry != null)
             guiRegistry.dispose();
         guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, catalogManager);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
 
-        // Unregister all current GUIs
+        // Unregister all current GUIs.
         guiRegistry.unregisterAll();
 
         // Set scene to main gui.
@@ -992,13 +997,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Stop
         running.set(false);
 
-        // Revert back-buffer resolution
+        // Revert back-buffer resolution.
         if (dynamicResolutionLevel > 0 && settings.graphics.backBufferScale == settings.graphics.dynamicResolutionScale[0]) {
             settings.graphics.backBufferScale = 1f;
             dynamicResolutionLevel = 0;
         }
 
-        // Dispose
+        // Dispose.
         if (saveState && !crashed.get()) {
             SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
             if (bookmarksManager != null)
@@ -1010,10 +1015,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         ScriptingServer.dispose();
 
-        // Flush frames
+        // Flush frames.
         EventManager.publish(Event.FLUSH_FRAMES, this);
 
-        // Dispose all
+        // Dispose all.
         if (guis != null)
             for (IGui gui : guis)
                 gui.dispose();
@@ -1021,33 +1026,33 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.DISPOSE, this);
         ModelCache.cache.dispose();
 
-        // Shutdown asset manager
+        // Shutdown asset manager.
         if (assetManager != null) {
             assetManager.dispose();
         }
 
-        // Shutdown dataset updater thread pool
+        // Shutdown dataset updater thread pool.
         if (executorService != null) {
             executorService.shutDownThreadPool();
         }
 
-        // Scripting
+        // Scripting.
         ScriptingServer.dispose();
 
-        // Renderer
+        // Renderer.
         if (sceneRenderer != null) {
             sceneRenderer.dispose();
         }
 
-        // Post processor
+        // Post processor.
         if (postProcessor != null) {
             postProcessor.dispose();
         }
 
-        // Dispose music manager
+        // Dispose music manager.
         MusicManager.dispose();
 
-        // Clear temp
+        // Clear temp.
         try {
             Path tmp = SysUtils.getTempDir(settings.data.location);
             if (java.nio.file.Files.exists(tmp) && java.nio.file.Files.isDirectory(tmp))
@@ -1077,7 +1082,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         renderGui((vrGui).right());
         vrLoadingRightFb.end();
 
-        /* SUBMIT TO VR COMPOSITOR */
+        /* Submit to VR compositor. */
         VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
         VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
     }
@@ -1090,28 +1095,28 @@ public class GaiaSky implements ApplicationListener, IObserver {
     public void render() {
         try {
             if (running.get() && !crashed.get()) {
-                // Run the render process
+                // Run the render process.
                 updateRenderProcess.run();
 
             } else if (crashGui != null) {
-                // Crash information
+                // Crash information.
                 renderGui(crashGui);
             }
         } catch (Throwable t) {
-            // Report the crash
+            // Report the crash.
             CrashReporter.reportCrash(t, logger);
-            // Set up crash window
+            // Set up crash window.
             crashGui = new CrashGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, t);
             crashGui.initialize(assetManager, globalResources.getSpriteBatch());
             Gdx.input.setInputProcessor(crashGui.getGuiStage());
-            // Flag up
+            // Flag up.
             crashed.set(true);
         }
 
-        // Create UI window if needed
+        // Create UI window if needed.
         if (externalView && gaiaSkyView == null) {
             postRunnable(() -> {
-                // Create window
+                // Create window.
                 Lwjgl3Application app = (Lwjgl3Application) Gdx.app;
                 Lwjgl3WindowConfiguration config = new Lwjgl3WindowConfiguration();
                 config.setWindowPosition(0, 0);
@@ -1130,7 +1135,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Pause the main thread for a certain amount of time to match the
      * given target frame rate.
      *
-     * @param fps The target frame rate
+     * @param fps The target frame rate.
      */
     private void sleep(double fps) {
         if (fps > 0) {
@@ -1152,19 +1157,19 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * @param dt Delta time in seconds.
      */
     public void update(double dt) {
-        // Resize if needed
+        // Resize if needed.
         updateResize();
 
         Timer.instance();
-        // The actual frame time difference in seconds
+        // The actual frame time difference in seconds.
         double dtGs;
         if (settings.frame.active) {
             // If frame output is active, we need to set our delta t according to
-            // the configured frame rate of the frame output system
+            // the configured frame rate of the frame output system.
             dtGs = 1.0 / settings.frame.targetFps;
         } else if (camRecording) {
             // If Camera is recording, we need to set our delta t according to
-            // the configured frame rate of the camrecorder
+            // the configured frame rate of the camrecorder.
             dtGs = 1.0 / settings.camrecorder.targetFps;
         } else {
             // Max time step is 0.05 seconds (20 FPS). Not in RENDER_OUTPUT MODE.
@@ -1221,7 +1226,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     r.run();
                 } catch (Exception e) {
                     logger.error(e);
-                    // If it crashed, remove it
+                    // If it crashed, remove it.
                     it.remove();
                 }
             }
@@ -1293,9 +1298,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
     }
 
     /**
-     * Renders a particular GUI
+     * Renders a particular GUI.
      *
-     * @param gui The GUI to render
+     * @param gui The GUI to render.
      */
     private void renderGui(final IGui gui) {
         gui.update(graphics.getDeltaTime());
@@ -1367,28 +1372,28 @@ public class GaiaSky implements ApplicationListener, IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case LOAD_DATA_CMD -> { // Init components that need assets in data folder
+        case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
             reinitialiseGUI1();
             postProcessor.initialize(assetManager);
 
-            // Initialise loading screen
+            // Initialise loading screen.
             loadingGui = new LoadingGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, false);
             loadingGui.initialize(assetManager, globalResources.getSpriteBatch());
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
-            // Also VR
+            // Also VR.
             if (settings.runtime.openVr) {
                 loadingGuiVR = new VRGui<>(LoadingGui.class, (int) (settings.graphics.backBufferResolution[0] / 4f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
             }
             this.updateRenderProcess = runnableLoadingGui;
 
-            // Load scene
+            // Load scene.
             if (scene == null) {
                 final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
                 int i = 0;
-                // Add data files
-                // Our resolver in the SGLoader itself will resolve their full paths
+                // Add data files.
+                // Our resolver in the SGLoader itself will resolve their full paths.
                 for (String dataFile : settings.data.dataFiles) {
                     dataFilesToLoad[i] = dataFile;
                     i++;
@@ -1403,7 +1408,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 camRecording = !camRecording;
             }
         }
-        case CAMERA_MODE_CMD -> { // Register/unregister GUI
+        case CAMERA_MODE_CMD -> { // Register/unregister GUI.
             final CameraMode mode = (CameraMode) data[0];
             if (settings.program.modeStereo.isStereoHalfViewport()) {
                 guiRegistry.change(stereoGui);
@@ -1422,8 +1427,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 guiRegistry.change(guiRegistry.previous, prev);
             }
 
-            // Disable dynamic resolution
-            // Post a message to the screen
+            // Disable dynamic resolution.
+            // Post a message to the screen.
             if (stereoMode) {
                 resetDynamicResolution();
 
