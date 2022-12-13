@@ -5,7 +5,7 @@
 #define PI 3.141592653589793238462643383
 #endif // PI
 #ifndef PI2
-#define PI2 3.1415927 * 2.0
+#define PI2 3.14159265358979323846264338 * 2.0
 #endif //PI2
 
 // Returns >=0 if visible, <0 if not visible 

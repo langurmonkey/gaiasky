@@ -1,5 +1,6 @@
 // Billboard snippet
-// This snippet requires importing shader/lib_geometry.glsl
+// This snippet requires importing shader/lib_geometry.glsl like so:
+// #include shader/lib_geometry.glsl
 // It rotates the vertex using a billboard rotation
 // using the camera-object vector and a computed up vector.
 
