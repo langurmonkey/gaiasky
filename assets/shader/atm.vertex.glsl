@@ -1,6 +1,5 @@
 #version 330 core
 
-
 uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 
