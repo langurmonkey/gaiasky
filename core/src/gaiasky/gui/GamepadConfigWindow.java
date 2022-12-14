@@ -296,25 +296,13 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         String a = axis + " ";
         String out;
         switch (gpd) {
-        case A:
-            out = m.BUTTON_A >= 0 ? b + m.BUTTON_A : none;
-            break;
-        case B:
-            out = m.BUTTON_B >= 0 ? b + m.BUTTON_B : none;
-            break;
-        case X:
-            out = m.BUTTON_X >= 0 ? b + m.BUTTON_X : none;
-            break;
-        case Y:
-            out = m.BUTTON_Y >= 0 ? b + m.BUTTON_Y : none;
-            break;
-        case START:
-            out = m.BUTTON_START >= 0 ? b + m.BUTTON_START : none;
-            break;
-        case SELECT:
-            out = m.BUTTON_SELECT >= 0 ? b + m.BUTTON_SELECT : none;
-            break;
-        case DPAD_UP:
+        case A -> out = m.BUTTON_A >= 0 ? b + m.BUTTON_A : none;
+        case B -> out = m.BUTTON_B >= 0 ? b + m.BUTTON_B : none;
+        case X -> out = m.BUTTON_X >= 0 ? b + m.BUTTON_X : none;
+        case Y -> out = m.BUTTON_Y >= 0 ? b + m.BUTTON_Y : none;
+        case START -> out = m.BUTTON_START >= 0 ? b + m.BUTTON_START : none;
+        case SELECT -> out = m.BUTTON_SELECT >= 0 ? b + m.BUTTON_SELECT : none;
+        case DPAD_UP -> {
             if (m.BUTTON_DPAD_UP >= 0) {
                 // Button
                 out = b + m.BUTTON_DPAD_UP;
@@ -325,8 +313,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 // None
                 out = none;
             }
-            break;
-        case DPAD_DOWN:
+        }
+        case DPAD_DOWN -> {
             if (m.BUTTON_DPAD_DOWN >= 0) {
                 // Button
                 out = b + m.BUTTON_DPAD_DOWN;
@@ -337,8 +325,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 // None
                 out = none;
             }
-            break;
-        case DPAD_LEFT:
+        }
+        case DPAD_LEFT -> {
             if (m.BUTTON_DPAD_LEFT >= 0) {
                 // Button
                 out = b + m.BUTTON_DPAD_LEFT;
@@ -349,8 +337,8 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 // None
                 out = none;
             }
-            break;
-        case DPAD_RIGHT:
+        }
+        case DPAD_RIGHT -> {
             if (m.BUTTON_DPAD_RIGHT >= 0) {
                 // Button
                 out = b + m.BUTTON_DPAD_RIGHT;
@@ -361,11 +349,9 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 // None
                 out = none;
             }
-            break;
-        case RB:
-            out = m.BUTTON_RB >= 0 ? b + m.BUTTON_RB : none;
-            break;
-        case RT:
+        }
+        case RB -> out = m.BUTTON_RB >= 0 ? b + m.BUTTON_RB : none;
+        case RT -> {
             if (m.BUTTON_RT >= 0) {
                 // Button
                 out = b + m.BUTTON_RT;
@@ -376,11 +362,9 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 // None
                 out = none;
             }
-            break;
-        case LB:
-            out = m.BUTTON_LB >= 0 ? b + m.BUTTON_LB : none;
-            break;
-        case LT:
+        }
+        case LB -> out = m.BUTTON_LB >= 0 ? b + m.BUTTON_LB : none;
+        case LT -> {
             if (m.BUTTON_LT >= 0) {
                 // Button
                 out = b + m.BUTTON_LT;
@@ -391,29 +375,14 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                 // None
                 out = none;
             }
-            break;
-        case LSTICK_H:
-            out = m.AXIS_LSTICK_H >= 0 ? a + m.AXIS_LSTICK_H : none;
-            break;
-        case LSTICK_V:
-            out = m.AXIS_LSTICK_V >= 0 ? a + m.AXIS_LSTICK_V : none;
-            break;
-        case LSTICK:
-            out = m.BUTTON_LSTICK >= 0 ? b + m.BUTTON_LSTICK : none;
-            break;
-        case RSTICK_H:
-            out = m.AXIS_RSTICK_H >= 0 ? a + m.AXIS_RSTICK_H : none;
-            break;
-        case RSTICK_V:
-            out = m.AXIS_RSTICK_V >= 0 ? a + m.AXIS_RSTICK_V : none;
-            break;
-        case RSTICK:
-            out = m.BUTTON_RSTICK >= 0 ? b + m.BUTTON_RSTICK : none;
-            break;
-
-        default:
-            out = none;
-            break;
+        }
+        case LSTICK_H -> out = m.AXIS_LSTICK_H >= 0 ? a + m.AXIS_LSTICK_H : none;
+        case LSTICK_V -> out = m.AXIS_LSTICK_V >= 0 ? a + m.AXIS_LSTICK_V : none;
+        case LSTICK -> out = m.BUTTON_LSTICK >= 0 ? b + m.BUTTON_LSTICK : none;
+        case RSTICK_H -> out = m.AXIS_RSTICK_H >= 0 ? a + m.AXIS_RSTICK_H : none;
+        case RSTICK_V -> out = m.AXIS_RSTICK_V >= 0 ? a + m.AXIS_RSTICK_V : none;
+        case RSTICK -> out = m.BUTTON_RSTICK >= 0 ? b + m.BUTTON_RSTICK : none;
+        default -> out = none;
         }
         return out;
     }
@@ -457,7 +426,7 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
                     int code = Parser.parseIntException(tokens[1]);
                     int type = gp.type;
                     if (type == TYPE_EITHER) {
-                        if (tokens[0].toLowerCase().equals(button.toLowerCase())) {
+                        if (tokens[0].equalsIgnoreCase(button)) {
                             type = TYPE_BUTTON;
                         } else {
                             type = TYPE_AXIS;
@@ -619,10 +588,6 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         long minDelayT = 500;
         long minAxisT = 300;
         double[] axes = new double[40];
-
-        public GamepadConfigListener(String mappingsFile) {
-            super(mappingsFile, me);
-        }
 
         public GamepadConfigListener(IGamepadMappings mappings) {
             super(mappings, me);

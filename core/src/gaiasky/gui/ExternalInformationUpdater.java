@@ -242,7 +242,7 @@ public class ExternalInformationUpdater {
         void ko(String link);
     }
 
-    private class GaiaButtonListener implements EventListener {
+    private static class GaiaButtonListener implements EventListener {
         private final IStarFocus focus;
 
         public GaiaButtonListener(IStarFocus focus) {

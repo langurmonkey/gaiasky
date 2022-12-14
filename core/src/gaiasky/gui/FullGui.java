@@ -172,7 +172,7 @@ public class FullGui extends AbstractGui {
         interfaces.add(popupNotificationsInterface);
 
         // LOAD PROGRESS INTERFACE
-        addLoadProgressInterface(stage);
+        addLoadProgressInterface();
 
         // CUSTOM OBJECTS INTERFACE
         customInterface = new CustomInterface(stage, skin, lock);
@@ -547,17 +547,10 @@ public class FullGui extends AbstractGui {
     @Override
     public void setVisibilityToggles(ComponentType[] entities, ComponentTypes visible) {
         this.visibilityEntities = entities;
-        ComponentType[] vals = ComponentType.values();
-        this.visible = new boolean[vals.length];
-        for (int i = 0; i < vals.length; i++)
-            this.visible[i] = visible.get(vals[i].ordinal());
-    }
-
-    public void removeControlsWindow() {
-        if (controlsWindow != null) {
-            controlsWindow.remove();
-            controlsWindow = null;
-        }
+        ComponentType[] values = ComponentType.values();
+        this.visible = new boolean[values.length];
+        for (int i = 0; i < values.length; i++)
+            this.visible[i] = visible.get(values[i].ordinal());
     }
 
     public void addControlsWindow() {
@@ -611,7 +604,7 @@ public class FullGui extends AbstractGui {
         }
     }
 
-    public void addLoadProgressInterface(Stage ui) {
+    public void addLoadProgressInterface() {
         loadProgressInterface = new LoadProgressInterface(400f, skin);
         loadProgressInterface.setFillParent(true);
         loadProgressInterface.center().bottom();
@@ -619,15 +612,15 @@ public class FullGui extends AbstractGui {
         interfaces.add(loadProgressInterface);
     }
 
-    public void toggleMinimapInterface(Stage ui) {
-        showMinimapInterface(ui, minimapInterface == null || (!minimapInterface.isVisible() || !minimapInterface.hasParent()));
+    public void toggleMinimapInterface(Stage stage) {
+        showMinimapInterface(stage, minimapInterface == null || (!minimapInterface.isVisible() || !minimapInterface.hasParent()));
     }
 
-    public void showMinimapWindow(Stage ui, boolean show) {
+    public void showMinimapWindow(Stage stage, boolean show) {
         if (minimapWindow == null)
-            minimapWindow = new MinimapWindow(ui, skin, globalResources.getShapeShader(), globalResources.getSpriteShader());
+            minimapWindow = new MinimapWindow(stage, skin, globalResources.getShapeShader(), globalResources.getSpriteShader());
         if (show)
-            minimapWindow.show(ui, graphics.getWidth() - minimapWindow.getWidth(), graphics.getHeight() - minimapWindow.getHeight());
+            minimapWindow.show(stage, graphics.getWidth() - minimapWindow.getWidth(), graphics.getHeight() - minimapWindow.getHeight());
         else
             minimapWindow.hide();
     }

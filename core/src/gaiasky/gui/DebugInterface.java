@@ -309,15 +309,14 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         synchronized (lock) {
             final boolean debug = Settings.settings.program.debugInfo;
             switch (event) {
-            case DEBUG_TIME:
+            case DEBUG_TIME -> {
                 if (debug && data.length > 0) {
                     // Double with run time
                     Double runTime = (Double) data[0];
                     debugRuntime.setText(getRunTimeString(runTime));
                 }
-                break;
-
-            case DEBUG_RAM:
+            }
+            case DEBUG_RAM -> {
                 if (debug && data.length > 0) {
                     // Doubles (MB):
                     // used/free/total/max
@@ -333,8 +332,8 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     debugRAMAlloc.setColor(getColor(alloc, total));
                     debugRAMTotal.setText(memFormatter.format(total) + unit);
                 }
-                break;
-            case DEBUG_VRAM:
+            }
+            case DEBUG_VRAM -> {
                 if (debug && data.length > 0) {
                     Double used = (Double) data[0];
                     Double total = (Double) data[1];
@@ -348,24 +347,24 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                         debugVRAMTotal.setText(memFormatter.format(total) + unit);
                     }
                 }
-                break;
-            case DEBUG_THREADS:
+            }
+            case DEBUG_THREADS -> {
                 if (debug && data.length > 0) {
                     Integer active = (Integer) data[0];
                     Integer poolSize = (Integer) data[1];
                     threadsRunning.setText(active);
                     threadsSize.setText(poolSize);
                 }
-                break;
-            case DEBUG_OBJECTS:
+            }
+            case DEBUG_OBJECTS -> {
                 if (debug && data.length > 0) {
                     Integer display = (Integer) data[0];
                     Integer loaded = (Integer) data[1];
                     debugObjectsDisplay.setText(display);
                     debugObjectsLoaded.setText(loaded);
                 }
-                break;
-            case DEBUG_QUEUE:
+            }
+            case DEBUG_QUEUE -> {
                 if (debug && data.length > 0) {
                     int observed = (Integer) data[0];
                     int queueSize = (Integer) data[1];
@@ -381,26 +380,26 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     queueStatus.setValue(queueSize * 100f / currentQueueMax);
                     previousQueueSize = queueSize;
                 }
-                break;
-            case DEBUG_DYN_RES:
+            }
+            case DEBUG_DYN_RES -> {
                 if (debug && data.length > 0) {
                     debugDynRes.setText("L" + data[0] + ": " + fpsFormatter.format((Double) data[1]));
                 }
-                break;
-            case FPS_INFO:
+            }
+            case FPS_INFO -> {
                 if (debug && data.length > 0) {
                     double dfps = (Float) data[0];
                     double dspf = 1000 / dfps;
                     fps.setText(fpsFormatter.format(dfps).concat(" " + I18n.msg("gui.debug.fps")));
                     spf.setText(spfFormatter.format(dspf).concat(" " + I18n.msg("gui.debug.ms")));
                 }
-                break;
-            case SAMP_INFO:
+            }
+            case SAMP_INFO -> {
                 if (debug && data.length > 0) {
                     debugSamp.setText((String) data[0]);
                 }
-                break;
-            case SHOW_DEBUG_CMD:
+            }
+            case SHOW_DEBUG_CMD -> {
                 boolean shw;
                 if (data.length >= 1) {
                     shw = (boolean) data[0];
@@ -409,9 +408,9 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 Settings.settings.program.debugInfo = shw;
                 this.setVisible(Settings.settings.program.debugInfo);
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
             }
         }
     }

@@ -77,9 +77,12 @@ public class CrashGui extends AbstractGui {
         }
     }
 
-    private class CrashWindow extends GenericDialog {
+    private static class CrashWindow extends GenericDialog {
+        private final Throwable crash;
+
         public CrashWindow(Stage ui, Skin skin, Throwable crash) {
             super(I18n.msg("gui.crash.title"), skin, ui);
+            this.crash = crash;
 
             setAcceptText(I18n.msg("gui.exit"));
 
@@ -96,9 +99,9 @@ public class CrashGui extends AbstractGui {
 
             // Delete data folder and try again
             content.add(new OwnLabel(I18n.msg("gui.crash.info.1"), skin)).left().padBottom(pad10).row();
-            OwnLabel dloc = new OwnLabel(TextUtils.capString(Settings.settings.data.location, 50), skin, "hud-subheader");
-            dloc.addListener(new OwnTextTooltip(Settings.settings.data.location, skin));
-            content.add(dloc).left().padBottom(pad18 * 3f).row();
+            OwnLabel dataLocationLabel = new OwnLabel(TextUtils.capString(Settings.settings.data.location, 50), skin, "hud-subheader");
+            dataLocationLabel.addListener(new OwnTextTooltip(Settings.settings.data.location, skin));
+            content.add(dataLocationLabel).left().padBottom(pad18 * 3f).row();
 
             // Crash log
             content.add(new OwnLabel(I18n.msg("gui.crash.info.2"), skin)).left().padBottom(pad10).row();
@@ -106,7 +109,7 @@ public class CrashGui extends AbstractGui {
             cloc.addListener(new OwnTextTooltip(SysUtils.getCrashReportsDir().toString(), skin));
             content.add(cloc).left().padBottom(pad10).row();
             content.add(new OwnLabel(I18n.msg("gui.crash.info.3"), skin)).left().padBottom(pad10).row();
-            content.add(new Link(Settings.settings.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), Settings.settings.REPO_ISSUES)).left().padBottom(pad18 * 3f).row();
+            content.add(new Link(Settings.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), Settings.REPO_ISSUES)).left().padBottom(pad18 * 3f).row();
 
             // Stack trace
             float taw = 720f;

@@ -190,7 +190,7 @@ public class GamepadGui extends AbstractGui {
                 }
             }
             return false;
-        }, searchModel, 10, 0, true, tfw / 1.5f, pad10, 0);
+        }, searchModel, 10, 0, true, tfw / 1.5f, 0);
         // Second row
         searchT.add().padRight(pad5).padBottom(pad10);
         addTextKey("A", searchModel, 1, 1, false);
@@ -209,7 +209,7 @@ public class GamepadGui extends AbstractGui {
                 }
             }
             return false;
-        }, searchModel, 10, 1, true, tfw / 1.5f, pad10, 0);
+        }, searchModel, 10, 1, true, tfw / 1.5f, 0);
         // Third row
         searchT.add().padRight(pad5).padBottom(pad10);
         searchT.add().padRight(pad5).padBottom(pad10);
@@ -231,7 +231,7 @@ public class GamepadGui extends AbstractGui {
                 searchField.setText(searchField.getText() + " ");
             }
             return false;
-        }, searchModel, 5, 3, false, tfw * 2f, pad5, 6);
+        }, searchModel, 5, 3, false, tfw * 2f, 6);
 
         tabContents.add(container(searchT, w, h));
         updatePads(searchT);
@@ -1034,29 +1034,16 @@ public class GamepadGui extends AbstractGui {
                 searchField.setText(searchField.getText() + text.toLowerCase());
             }
             return false;
-        }, m, i, j, nl, -1, pad5, 1);
+        }, m, i, j, nl, -1, 1);
     }
 
-    private void addTextIconKey(String text, String style, int align, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, float padRight, int colspan) {
-        OwnTextButton key = new OwnTextIconButton(text, align, skin, style);
-        if (width > 0)
-            key.setWidth(width);
-        key.addListener(el);
-        m[i][j] = key;
-        Cell<?> c = searchT.add(key).padRight(pad5).padBottom(pad10);
-        if (nl)
-            c.row();
-        if (colspan > 1)
-            c.colspan(colspan);
-    }
-
-    private void addTextKey(String text, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, float padRight, int colspan) {
+    private void addTextKey(String text, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, int colspan) {
         OwnTextButton key = new OwnTextButton(text, skin, "big");
         if (width > 0)
             key.setWidth(width);
         key.addListener(el);
         m[i][j] = key;
-        Cell<?> c = searchT.add(key).padRight(pad5).padBottom(pad10);
+        var c = searchT.add(key).padRight(pad5).padBottom(pad10);
         if (nl)
             c.row();
         if (colspan > 1)
@@ -1131,7 +1118,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     private ScrollPane container(Table t, float w, float h) {
-        OwnScrollPane c = new OwnScrollPane(t, skin, "minimalist-nobg");
+        var c = new OwnScrollPane(t, skin, "minimalist-nobg");
         t.center();
         c.setFadeScrollBars(true);
         c.setForceScroll(false, false);
@@ -1140,7 +1127,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     private void updatePads(Table t) {
-        Array<Cell> cells = t.getCells();
+        var cells = t.getCells();
         for (Cell<?> c : cells) {
             if (c.getActor() instanceof Button && !(c.getActor() instanceof CheckBox)) {
                 ((Button) c.getActor()).pad(pad20);
@@ -1254,23 +1241,27 @@ public class GamepadGui extends AbstractGui {
     }
 
     public void up() {
-        selectInCol(fi, update(fj, -1, currentModel[fi].length), false);
-        updateFocused();
+        if (selectInCol(fi, update(fj, -1, currentModel[fi].length), false)) {
+            updateFocused();
+        }
     }
 
     public void down() {
-        selectInCol(fi, update(fj, 1, currentModel[fi].length), true);
-        updateFocused();
+        if (selectInCol(fi, update(fj, 1, currentModel[fi].length), true)) {
+            updateFocused();
+        }
     }
 
     public void left() {
-        selectInRow(update(fi, -1, currentModel.length), fj, false);
-        updateFocused();
+        if (selectInRow(update(fi, -1, currentModel.length), fj, false)) {
+            updateFocused();
+        }
     }
 
     public void right() {
-        selectInRow(update(fi, 1, currentModel.length), fj, true);
-        updateFocused();
+        if (selectInRow(update(fi, 1, currentModel.length), fj, true)) {
+            updateFocused();
+        }
     }
 
     private Actor getFocusedActor() {
