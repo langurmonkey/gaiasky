@@ -109,6 +109,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private OwnScrollPane leftScroll;
     private int selectedIndex = 0;
     private DatasetWatcher rightPaneWatcher;
+
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd) {
         this(stage, skin, serverDd, true, I18n.msg("gui.close"));
     }
@@ -775,7 +776,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 filesString = TextUtils.arrayToStr(dataset.files, "", "", "\n");
                 // Use data location token to keep from overflowing horizontally.
                 var dataLocation = Settings.settings.data.location;
-                if(!dataLocation.endsWith(File.separator) && !dataLocation.endsWith("/")) {
+                if (!dataLocation.endsWith(File.separator) && !dataLocation.endsWith("/")) {
                     dataLocation += "/";
                 }
                 filesString = filesString.replace(dataLocation, Constants.DATA_LOCATION_TOKEN);
@@ -783,7 +784,9 @@ public class DatasetManagerWindow extends GenericDialog {
             OwnLabel files = new OwnLabel(I18n.msg("gui.download.files", filesString), skin, "grey-large");
 
             // Data location
-            OwnLabel dataLocationNote = new OwnLabel(Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location, skin);
+            String dataLocationNoteString = Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location;
+            OwnLabel dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin);
+            dataLocationNote.addListener(new OwnTextTooltip(dataLocationNoteString, skin, 10));
 
             infoTable.add(desc).top().left().padBottom(pad34).row();
             infoTable.add(releaseNotesTitle).top().left().padBottom(pad18).row();
