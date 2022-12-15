@@ -25,9 +25,9 @@ package gaiasky.util;// BinarySearchTree class
  *
  * @author Mark Allen Weiss
  */
-public class BinarySearchTree {
+public class BinarySearchTree<T extends Comparable<T>> {
     /** The tree root. */
-    protected BinaryNode root;
+    protected BinaryNode<T> root;
 
     /**
      * Construct the tree.
@@ -36,9 +36,9 @@ public class BinarySearchTree {
         root = null;
     }
 
-    // Test program
+    // Quick binary tree test.
     public static void main(String[] args) {
-        BinarySearchTree t = new BinarySearchTree();
+        BinarySearchTree<Integer> t = new BinarySearchTree<>();
         final int NUMS = 4000;
         final int GAP = 37;
 
@@ -70,28 +70,19 @@ public class BinarySearchTree {
      *
      * @throws RuntimeException if x is already present.
      */
-    public void insert(Comparable x) {
+    public void insert(T x) {
         root = insert(x, root);
     }
 
     /**
-     * Remove from the tree..
+     * Remove from the tree.
      *
      * @param x the item to remove.
      *
      * @throws RuntimeException if x is not found.
      */
-    public void remove(Comparable x) {
+    public void remove(T x) {
         root = remove(x, root);
-    }
-
-    /**
-     * Remove minimum item from the tree.
-     *
-     * @throws RuntimeException if tree is empty.
-     */
-    public void removeMin() {
-        root = removeMin(root);
     }
 
     /**
@@ -99,7 +90,7 @@ public class BinarySearchTree {
      *
      * @return smallest item or null if empty.
      */
-    public Comparable findMin() {
+    public Comparable<T> findMin() {
         return elementAt(findMin(root));
     }
 
@@ -108,7 +99,7 @@ public class BinarySearchTree {
      *
      * @return the largest item or null if empty.
      */
-    public Comparable findMax() {
+    public Comparable<T> findMax() {
         return elementAt(findMax(root));
     }
 
@@ -119,7 +110,7 @@ public class BinarySearchTree {
      *
      * @return the matching item or null if not found.
      */
-    public Comparable find(Comparable x) {
+    public Comparable<T> find(Comparable<T> x) {
         return elementAt(find(x, root));
     }
 
@@ -131,15 +122,8 @@ public class BinarySearchTree {
      * @return node containing the start of the interval where x
      * is in, or null if x is not contained in any interval.
      */
-    public Comparable findIntervalStart(Comparable x) {
+    public Comparable<T> findIntervalStart(Comparable<T> x) {
         return elementAt(findIntervalStart(x, root));
-    }
-
-    /**
-     * Make the tree logically empty.
-     */
-    public void makeEmpty() {
-        root = null;
     }
 
     /**
@@ -158,7 +142,7 @@ public class BinarySearchTree {
      *
      * @return the element field or null if t is null.
      */
-    private Comparable elementAt(BinaryNode t) {
+    private Comparable<T> elementAt(BinaryNode<T> t) {
         return t == null ? null : t.element;
     }
 
@@ -172,9 +156,9 @@ public class BinarySearchTree {
      *
      * @throws RuntimeException if x is already present.
      */
-    protected BinaryNode insert(Comparable x, BinaryNode t) {
+    protected BinaryNode<T> insert(T x, BinaryNode<T> t) {
         if (t == null)
-            t = new BinaryNode(x);
+            t = new BinaryNode<>(x);
         else if (x.compareTo(t.element) < 0)
             t.left = insert(x, t.left);
         else if (x.compareTo(t.element) > 0)
@@ -194,7 +178,7 @@ public class BinarySearchTree {
      *
      * @throws RuntimeException if x is not found.
      */
-    protected BinaryNode remove(Comparable x, BinaryNode t) {
+    protected BinaryNode<T> remove(Comparable<T> x, BinaryNode<T> t) {
         if (t == null)
             throw new RuntimeException("Item not found: " + x.toString());
         if (x.compareTo(t.element) < 0)
@@ -219,7 +203,7 @@ public class BinarySearchTree {
      *
      * @throws RuntimeException if x is not found.
      */
-    protected BinaryNode removeMin(BinaryNode t) {
+    protected BinaryNode<T> removeMin(BinaryNode<T> t) {
         if (t == null)
             throw new RuntimeException("Item not found");
         else if (t.left != null) {
@@ -236,7 +220,7 @@ public class BinarySearchTree {
      *
      * @return node containing the smallest item.
      */
-    protected BinaryNode findMin(BinaryNode t) {
+    protected BinaryNode<T> findMin(BinaryNode<T> t) {
         if (t != null)
             while (t.left != null)
                 t = t.left;
@@ -251,7 +235,7 @@ public class BinarySearchTree {
      *
      * @return node containing the largest item.
      */
-    private BinaryNode findMax(BinaryNode t) {
+    private BinaryNode<T> findMax(BinaryNode<T> t) {
         if (t != null)
             while (t.right != null)
                 t = t.right;
@@ -267,7 +251,7 @@ public class BinarySearchTree {
      *
      * @return node containing the matched item.
      */
-    private BinaryNode find(Comparable x, BinaryNode t) {
+    private BinaryNode<T> find(Comparable<T> x, BinaryNode<T> t) {
         while (t != null) {
             if (x.compareTo(t.element) < 0)
                 t = t.left;
@@ -290,8 +274,8 @@ public class BinarySearchTree {
      * @return node containing the start of the interval where x
      * is in, or null if x is not contained in any interval.
      */
-    private BinaryNode findIntervalStart(Comparable x, BinaryNode t) {
-        BinaryNode lastPrev = null;
+    private BinaryNode<T> findIntervalStart(Comparable<T> x, BinaryNode<T> t) {
+        BinaryNode<T> lastPrev = null;
         while (t != null) {
             if (x.compareTo(t.element) < 0) {
                 t = t.left;
@@ -310,14 +294,14 @@ public class BinarySearchTree {
 // Basic node stored in unbalanced binary search trees
 // Note that this class is not accessible outside
 // of this package.
-
-class BinaryNode {
+class BinaryNode<T> {
     // Friendly data; accessible by other package routines
-    Comparable element;      // The data in the node
-    BinaryNode left;         // Left child
-    BinaryNode right;        // Right child
+    T element;      // The data in the node
+    BinaryNode<T> left;         // Left child
+    BinaryNode<T> right;        // Right child
+
     // Constructors
-    BinaryNode(Comparable theElement) {
+    BinaryNode(T theElement) {
         element = theElement;
         left = right = null;
     }

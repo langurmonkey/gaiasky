@@ -26,7 +26,7 @@ import java.util.TreeSet;
 public class VersionChecker implements Runnable {
     public static final int MAX_VERSION_NUMBER = 1000000;
     private static final Logger.Log logger = Logger.getLogger(VersionChecker.class);
-    private static final int VERSIONCHECK_TIMEOUT_MS = 5000;
+    private static final int VERSION_CHECK_TIMEOUT_MS = 5000;
     private final String stringUrl;
     private EventListener listener;
 
@@ -89,7 +89,7 @@ public class VersionChecker implements Runnable {
 
         HttpRequest request = new HttpRequest(HttpMethods.GET);
         request.setUrl(stringUrl);
-        request.setTimeOut(VERSIONCHECK_TIMEOUT_MS);
+        request.setTimeOut(VERSION_CHECK_TIMEOUT_MS);
 
         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
             public void handleHttpResponse(HttpResponse httpResponse) {
@@ -105,7 +105,7 @@ public class VersionChecker implements Runnable {
                     String tag = result.get(i).getString("name");
 
                     // Check tag is major.minor.rev
-                    if (tag.matches("^(\\D{1})?\\d+.\\d+(\\D{1})?(.\\d+)?$")) {
+                    if (tag.matches("^(\\D)?\\d+.\\d+(\\D{1})?(.\\d+)?$")) {
                         Integer version = stringToVersionNumber(tag);
                         String commitDate = result.get(i).get("commit").getString("created");
                         //Format 2016-12-07T10:41:35+01:00
@@ -150,7 +150,7 @@ public class VersionChecker implements Runnable {
         this.listener = listener;
     }
 
-    private class VersionObject implements Comparable<VersionObject> {
+    private static class VersionObject implements Comparable<VersionObject> {
         JsonValue json;
         Integer version;
         Instant created;

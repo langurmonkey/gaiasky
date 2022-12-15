@@ -18,19 +18,11 @@ import gaiasky.util.units.Quantity.Length.LengthUnit;
  */
 public class Position {
 
-    public final Vector3d gsposition;
+    public final Vector3d realPosition;
 
     /**
      * Works out the cartesian equatorial position in the Gaia Sandbox reference
      * system. The units of the result are parsecs.
-     *
-     * @param a
-     * @param unitA
-     * @param b
-     * @param unitB
-     * @param c
-     * @param unitC
-     * @param type
      *
      * @throws RuntimeException On negative distance or parallax
      */
@@ -40,7 +32,7 @@ public class Position {
             c = 0.04;
             unitC = "mas";
         }
-        gsposition = new Vector3d();
+        realPosition = new Vector3d();
 
         switch (type) {
         case EQ_SPH_DIST:
@@ -53,7 +45,7 @@ public class Position {
                 throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
             }
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
+            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
 
             break;
         case EQ_SPH_PLX:
@@ -66,7 +58,7 @@ public class Position {
                 throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
             }
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
+            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
 
             break;
         case GAL_SPH_DIST:
@@ -79,8 +71,8 @@ public class Position {
                 throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
             }
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
-            gsposition.mul(Coordinates.galToEq());
+            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+            realPosition.mul(Coordinates.galToEq());
             break;
         case GAL_SPH_PLX:
 
@@ -92,8 +84,8 @@ public class Position {
                 throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
             }
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
-            gsposition.mul(Coordinates.galToEq());
+            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+            realPosition.mul(Coordinates.galToEq());
             break;
         case ECL_SPH_DIST:
 
@@ -105,8 +97,8 @@ public class Position {
                 throw new RuntimeException("Negative distance found: " + dist.value_m + " m");
             }
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
-            gsposition.mul(Coordinates.eclToEq());
+            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+            realPosition.mul(Coordinates.eclToEq());
             break;
         case ECL_SPH_PLX:
 
@@ -118,8 +110,8 @@ public class Position {
                 throw new RuntimeException("Negative parallax found: " + dist.value_m + " m");
             }
 
-            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), gsposition);
-            gsposition.mul(Coordinates.eclToEq());
+            Coordinates.sphericalToCartesian(lon.get(AngleUnit.RAD), lat.get(AngleUnit.RAD), dist.get(LengthUnit.PC), realPosition);
+            realPosition.mul(Coordinates.eclToEq());
             break;
         case EQ_XYZ:
 
@@ -127,7 +119,7 @@ public class Position {
             Length y = new Length(b, unitB);
             Length z = new Length(c, unitC);
 
-            gsposition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
+            realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
 
             break;
         case GAL_XYZ:
@@ -136,8 +128,8 @@ public class Position {
             y = new Length(b, unitB);
             z = new Length(c, unitC);
 
-            gsposition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
-            gsposition.mul(Coordinates.galToEq());
+            realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
+            realPosition.mul(Coordinates.galToEq());
             break;
         case ECL_XYZ:
 
@@ -145,21 +137,13 @@ public class Position {
             y = new Length(b, unitB);
             z = new Length(c, unitC);
 
-            gsposition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
-            gsposition.mul(Coordinates.eclToEq());
+            realPosition.set(x.get(LengthUnit.PC), y.get(LengthUnit.PC), z.get(LengthUnit.PC));
+            realPosition.mul(Coordinates.eclToEq());
             break;
         default:
             break;
         }
 
-    }
-
-    private void swapCoordinates() {
-        // Switch axes
-        double aux = gsposition.x;
-        gsposition.x = gsposition.y;
-        gsposition.y = gsposition.z;
-        gsposition.z = aux;
     }
 
     public enum PositionType {

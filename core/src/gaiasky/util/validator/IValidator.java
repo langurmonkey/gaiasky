@@ -5,6 +5,9 @@
 
 package gaiasky.util.validator;
 
+/**
+ * Generic interface to be implemented by all input validators.
+ */
 public interface IValidator {
     boolean validate(String value);
 }

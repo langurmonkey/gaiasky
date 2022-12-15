@@ -285,16 +285,16 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitC, pt);
 
-                            double distPc = p.gsposition.len();
+                            double distPc = p.realPosition.len();
                             if ((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distPc) || distPc < 0) {
                                 // Next
                                 break;
                             }
 
-                            p.gsposition.scl(Constants.PC_TO_U);
+                            p.realPosition.scl(Constants.PC_TO_U);
                             // Find out RA/DEC/Dist
                             Vector3d sph = new Vector3d();
-                            Coordinates.cartesianToSpherical(p.gsposition, sph);
+                            Coordinates.cartesianToSpherical(p.realPosition, sph);
 
                             // PROPER MOTION
                             Vector3d pm;
@@ -521,9 +521,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {
                                 double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
                                 float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
-                                dataD[ParticleRecord.I_X] = p.gsposition.x;
-                                dataD[ParticleRecord.I_Y] = p.gsposition.y;
-                                dataD[ParticleRecord.I_Z] = p.gsposition.z;
+                                dataD[ParticleRecord.I_X] = p.realPosition.x;
+                                dataD[ParticleRecord.I_Y] = p.realPosition.y;
+                                dataD[ParticleRecord.I_Z] = p.realPosition.z;
 
                                 dataF[ParticleRecord.I_FPMX] = (float) pm.x;
                                 dataF[ParticleRecord.I_FPMY] = (float) pm.y;
@@ -560,9 +560,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 countsPerMag[appMagClamp] += 1;
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                                 double[] point = new double[3];
-                                point[ParticleRecord.I_X] = p.gsposition.x;
-                                point[ParticleRecord.I_Y] = p.gsposition.y;
-                                point[ParticleRecord.I_Z] = p.gsposition.z;
+                                point[ParticleRecord.I_X] = p.realPosition.x;
+                                point[ParticleRecord.I_Y] = p.realPosition.y;
+                                point[ParticleRecord.I_Z] = p.realPosition.z;
 
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
