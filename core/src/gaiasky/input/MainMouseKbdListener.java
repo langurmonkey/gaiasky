@@ -322,7 +322,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                         camera.setHorizontal(-dragDx * 5f);
                         camera.setVertical(-dragDy * 5f);
                     } else {
-                        // Look around
+                        // Rotate around focus.
                         camera.addRotateMovement(dragDx, dragDy, true, accel);
                     }
                 }
