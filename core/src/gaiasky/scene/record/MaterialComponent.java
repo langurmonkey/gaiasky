@@ -6,7 +6,6 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -26,6 +25,7 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -49,19 +50,19 @@ import java.util.stream.IntStream;
  */
 public class MaterialComponent extends NamedComponent implements IObserver {
     /** Default texture parameters **/
-    protected static final TextureParameter textureParamsMipMap, textureParams;
+    protected static final OwnTextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
     // DEFAULT REFLECTION CUBEMAP
     public static CubemapComponent reflectionCubemap;
 
     static {
-        textureParamsMipMap = new TextureParameter();
+        textureParamsMipMap = new OwnTextureParameter();
         textureParamsMipMap.genMipMaps = true;
         textureParamsMipMap.magFilter = TextureFilter.Linear;
         textureParamsMipMap.minFilter = TextureFilter.MipMapLinearLinear;
 
-        textureParams = new TextureParameter();
+        textureParams = new OwnTextureParameter();
         textureParams.genMipMaps = false;
         textureParams.magFilter = TextureFilter.Linear;
         textureParams.minFilter = TextureFilter.Linear;
@@ -99,19 +100,20 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public boolean colorIfTexture = false;
     /** The actual material **/
     private Material material, ringMaterial;
-    private AtomicBoolean heightGenerated = new AtomicBoolean(false);
-    private AtomicBoolean heightInitialized = new AtomicBoolean(false);
+    private final AtomicBoolean heightGenerated = new AtomicBoolean(false);
+    private final AtomicBoolean heightInitialized = new AtomicBoolean(false);
     private Texture heightTex, specularTex, diffuseTex, normalTex;
+
     public MaterialComponent() {
         super();
         EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.TESSELLATION_QUALITY_CMD);
     }
 
-    private static TextureParameter getTP(String tex) {
+    private static OwnTextureParameter getTP(String tex) {
         return getTP(tex, false);
     }
 
-    private static TextureParameter getTP(String tex, boolean mipmap) {
+    private static OwnTextureParameter getTP(String tex, boolean mipmap) {
         if (tex != null && tex.endsWith(".pfm")) {
             return pfmTextureParams;
         } else {
@@ -183,7 +185,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      *
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
+    private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
         if (manager == null)
             return addToLoad(tex, texParams);
 
@@ -205,7 +207,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      *
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex, TextureParameter texParams) {
+    private String addToLoad(String tex, OwnTextureParameter texParams) {
         if (tex == null)
             return null;
 
@@ -216,11 +218,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         return tex;
     }
 
-    public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] diffuseCol, boolean culling) {
-        return initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, diffuseCol, culling);
+    public void initMaterial(AssetManager manager, IntModelInstance instance, float[] diffuseCol, boolean culling) {
+        initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, diffuseCol, culling);
     }
 
-    public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {
+    public void initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {
         reflectionCubemap.initialize();
         this.material = mat;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
@@ -236,7 +238,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             diffuseColor[1] = diffuseCol[1];
             diffuseColor[2] = diffuseCol[2];
             diffuseColor[3] = diffuseCol[3];
-            if (diffuseColor != null && (colorIfTexture || diffuse == null)) {
+            if (colorIfTexture || diffuse == null) {
                 // Add diffuse colour
                 material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
             }
@@ -353,8 +355,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             heightCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.HeightCubemap, heightCubemap.cubemap));
         }
-
-        return material;
     }
 
     private void addHeightTex(Texture heightTex) {
@@ -593,6 +593,14 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
     }
 
+    public Material getMaterial() {
+        return material;
+    }
+
+    public Material getRingMaterial() {
+        return ringMaterial;
+    }
+
     private void removeElevationData() {
         heightMap = null;
         material.remove(TextureAttribute.Height);
@@ -774,8 +782,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public void setReflectionCubemap(String reflectionCubemap) {
-        this.reflectionCubemap = new CubemapComponent();
-        this.reflectionCubemap.setLocation(reflectionCubemap);
+        MaterialComponent.reflectionCubemap = new CubemapComponent();
+        MaterialComponent.reflectionCubemap.setLocation(reflectionCubemap);
     }
 
     public void setSkybox(String diffuseCubemap) {
@@ -851,7 +859,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case ELEVATION_TYPE_CMD:
+        case ELEVATION_TYPE_CMD -> {
             if (this.hasHeight() && this.material != null) {
                 ElevationType newType = (ElevationType) data[0];
                 GaiaSky.postRunnable(() -> {
@@ -862,7 +870,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                             initializeGenElevationData();
                         else if (heightMap == null) {
                             if (this.material.has(TextureAttribute.Height)) {
-                                initializeElevationData(((TextureAttribute) this.material.get(TextureAttribute.Height)).textureDescription.texture);
+                                initializeElevationData(((TextureAttribute) Objects.requireNonNull(this.material.get(TextureAttribute.Height))).textureDescription.texture);
                             } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
                                 if (!height.endsWith(Constants.GEN_KEYWORD)) {
                                     Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
@@ -877,21 +885,21 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                     }
                 });
             }
-            break;
-        case ELEVATION_MULTIPLIER_CMD:
+        }
+        case ELEVATION_MULTIPLIER_CMD -> {
             if (this.hasHeight() && this.material != null) {
                 float newMultiplier = (Float) data[0];
                 GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.HeightScale, heightScale * newMultiplier)));
             }
-            break;
-        case TESSELLATION_QUALITY_CMD:
+        }
+        case TESSELLATION_QUALITY_CMD -> {
             if (this.hasHeight() && this.material != null) {
                 float newQuality = (Float) data[0];
                 GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.TessQuality, newQuality)));
             }
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
     }
 

@@ -70,7 +70,7 @@ public class AssetBean {
     /**
      * Invokes the load operation on the given AssetManager for this given AssetBean.
      *
-     * @param manager
+     * @param manager The asset manager.
      */
     public void load(AssetManager manager) {
         if (assetParams != null) {

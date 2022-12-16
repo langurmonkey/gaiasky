@@ -370,10 +370,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
      * @param latitude  The latitude in deg
      * @param distance  The distance in km
      * @param out       The vector to store the result
-     *
-     * @return The cartesian position above the surface of this body
      */
-    public Vector3b getPositionAboveSurface(double longitude, double latitude, double distance, Vector3b out) {
+    public void getPositionAboveSurface(double longitude, double latitude, double distance, Vector3b out) {
         Vector3d aux1 = D31;
         Vector3d aux2 = D32;
 
@@ -384,7 +382,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         Coordinates.sphericalToCartesian(longitude, latitude, rad, aux1);
 
         aux2.set(aux1.z, aux1.y, aux1.x).scl(1, -1, -1).scl(-(getRadius() + distance * Constants.KM_TO_U));
-        //aux2.rotate(rc.angle, 0, 1, 0);
         Matrix4d ori = new Matrix4d(graph.orientation);
         var rotation = getRotationComponent();
         if (rotation != null) {
@@ -393,7 +390,6 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         aux2.mul(ori);
 
         getAbsolutePosition(out).add(aux2);
-        return out;
     }
 
     @Override

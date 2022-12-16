@@ -508,6 +508,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(IAttitudeServer.class, new AttitudeLoader(dataResolver));
         assetManager.setLoader(ExtShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
         assetManager.setLoader(BitmapFont.class, new BitmapFontLoader(internalResolver));
+        assetManager.setLoader(Texture.class, new OwnTextureLoader(internalResolver));
         assetManager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(internalResolver));
         assetManager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(internalResolver));
         assetManager.setLoader(TessellationShaderProvider.class, new TessellationShaderProviderLoader<>(internalResolver));

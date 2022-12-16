@@ -71,7 +71,7 @@ public class BitmapFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitmap
                 String path = data.getImagePath(i);
                 FileHandle resolved = resolve(path);
 
-                TextureLoader.TextureParameter textureParams = new TextureLoader.TextureParameter();
+                OwnTextureLoader.OwnTextureParameter textureParams = new OwnTextureLoader.OwnTextureParameter();
 
                 if (parameter != null) {
                     textureParams.genMipMaps = parameter.genMipMaps;
@@ -79,7 +79,7 @@ public class BitmapFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitmap
                     textureParams.magFilter = parameter.magFilter;
                 }
 
-                AssetDescriptor descriptor = new AssetDescriptor<>(resolved, Texture.class, textureParams);
+                AssetDescriptor<?> descriptor = new AssetDescriptor<>(resolved, Texture.class, textureParams);
                 deps.add(descriptor);
             }
         }
