@@ -159,15 +159,15 @@ public class JsonLoader extends AbstractSceneLoader {
                     case object -> {
                         valueClass = Object[].class;
                         value = new Object[attribute.size];
-                        JsonValue vectorattrib = attribute.child;
+                        JsonValue vectorAttribute = attribute.child;
                         int i = 0;
-                        while (vectorattrib != null) {
-                            String clazzName = vectorattrib.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                        while (vectorAttribute != null) {
+                            String clazzName = vectorAttribute.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
                             clazzName = replace(clazzName);
-                            @SuppressWarnings("unchecked") Class<Object> childclazz = (Class<Object>) ClassReflection.forName(clazzName);
-                            ((Object[]) value)[i] = convertJsonToObject(vectorattrib, childclazz);
+                            @SuppressWarnings("unchecked") Class<Object> childClazz = (Class<Object>) ClassReflection.forName(clazzName);
+                            ((Object[]) value)[i] = convertJsonToObject(vectorAttribute, childClazz);
                             i++;
-                            vectorattrib = vectorattrib.next;
+                            vectorAttribute = vectorAttribute.next;
                         }
                     }
                     case array -> {
@@ -188,8 +188,12 @@ public class JsonLoader extends AbstractSceneLoader {
                         value = convertJsonToObject(attribute, valueClass);
                     } catch (Exception e1) {
                         // We use a map
-                        valueClass = Map.class;
-                        value = convertJsonToMap(attribute);
+                        try {
+                            valueClass = Map.class;
+                            value = convertJsonToMap(attribute);
+                        } catch (Exception e2) {
+                            logger.error("Could not convert attribute to value, object or map: " + attribute);
+                        }
                     }
                 }
                 // Here we have value and valueClass -> run function.
@@ -203,27 +207,32 @@ public class JsonLoader extends AbstractSceneLoader {
 
     public void fillEntity(final JsonValue json, final Entity entity, final String className) throws ReflectionException {
         processJson(json, (valueClass, value, attribute) -> {
-            String key = findAttribute(attribute.name, className);
-            if (key != null) {
-                Class<? extends Component> componentClass = attributeMap.get(key);
-                Component comp = entity.getComponent(componentClass);
+            try {
+                String key = findAttribute(attribute.name, className);
+                if (key != null) {
+                    Class<? extends Component> componentClass = attributeMap.get(key);
+                    Component comp = entity.getComponent(componentClass);
 
-                if (comp != null) {
-                    if (!set(attribute, comp, value, valueClass, componentClass)) {
-                        // Setter set did not work, try setting the attribute directly
-                        boolean succeed = set(comp, attribute.name, value);
-                        if (!succeed) {
-                            logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                    if (comp != null) {
+                        if (!set(attribute, comp, value, valueClass, componentClass)) {
+                            // Setter set did not work, try setting the attribute directly
+                            boolean succeed = set(comp, attribute.name, value);
+                            if (!succeed) {
+                                logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                            }
+                            return succeed;
                         }
-                        return succeed;
+                    } else {
+                        logger.error("Error, component of class " + componentClass + " is null: " + json.name);
+                        return false;
                     }
+                    return true;
                 } else {
-                    logger.error("Error, component of class " + componentClass + " is null: " + json.name);
+                    logger.warn("Component not found for attribute '" + attribute.name + "' and class '" + className + "'");
                     return false;
                 }
-                return true;
-            } else {
-                logger.warn("Component not found for attribute '" + attribute.name + "' and class '" + className + "'");
+            } catch (Exception e) {
+                logger.error(e);
                 return false;
             }
         });
@@ -245,7 +254,6 @@ public class JsonLoader extends AbstractSceneLoader {
      *
      * @param json  The {@link JsonValue} for the object to convert.
      * @param clazz The class of the object.
-     *
      * @return The java object of the given class.
      */
     private Object convertJsonToObject(JsonValue json, Class<?> clazz) throws ReflectionException {
@@ -317,7 +325,6 @@ public class JsonLoader extends AbstractSceneLoader {
      * @param parameterType  The parameter class type.
      * @param source         The class of the source object.
      * @param printException Whether to print an exception if no method is found.
-     *
      * @return The method, if found. Null otherwise.
      */
     private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source, boolean printException) {
