@@ -37,6 +37,4 @@ public interface ISceneLoader {
 
     void setParams(Map<String, Object> params);
 
-    Object interceptDataFilePath(Class<?> valueClass, Object val);
-
 }

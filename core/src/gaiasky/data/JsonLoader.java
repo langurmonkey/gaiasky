@@ -134,7 +134,6 @@ public class JsonLoader extends AbstractSceneLoader {
                     value = getValue(attribute);
                     if (value instanceof String) {
                         value = ((String) value).replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
-                        value = interceptDataFilePath(String.class, value);
                     }
                 } else if (attribute.isArray()) {
                     // We suppose our children are of the same type
@@ -142,7 +141,6 @@ public class JsonLoader extends AbstractSceneLoader {
                     case stringValue -> {
                         valueClass = String[].class;
                         value = attribute.asStringArray();
-                        value = interceptDataFilePaths((String[]) value);
                     }
                     case doubleValue -> {
                         valueClass = double[].class;
@@ -447,7 +445,6 @@ public class JsonLoader extends AbstractSceneLoader {
         JsonValue child = json.child;
         while (child != null) {
             Object val = getValue(child);
-            val = interceptDataFilePath(val.getClass(), val);
             if (val != null) {
                 map.put(child.name, val);
             }

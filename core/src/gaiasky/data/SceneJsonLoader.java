@@ -120,7 +120,6 @@ public class SceneJsonLoader {
                             valueClass = Long.class;
                         }
                         if (val != null) {
-                            val = loader.interceptDataFilePath(valueClass, val);
                             String methodName = "set" + TextUtils.propertyToMethodName(nameAttr);
                             Method m = searchMethod(methodName, valueClass, clazz);
                             if (m != null)
