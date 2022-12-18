@@ -1,3 +1,14 @@
+<a name="3.3.2"></a>
+## [3.3.2](https://codeberg.org/gaiasky/gaiasky/tree/3.3.1) (2022-12-18)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.1...3.3.2)
+
+### Bug Fixes
+- stop intercepting data location in paths, implementation did not work for Windows when the original path contained '*', and it was useless anyway, as we always use fully-defined paths. 
+- avoid expanding dataset file paths in dataset manager to prevent horizontal overflow. 
+### Features
+- improve drag rotation behaviour when very close to objects. 
+
+
 <a name="3.3.1"></a>
 ## [3.3.1](https://codeberg.org/gaiasky/gaiasky/tree/3.3.0) (2022-12-13)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.0...3.3.1)
