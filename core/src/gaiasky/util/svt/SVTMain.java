@@ -11,13 +11,14 @@ import gaiasky.util.i18n.I18n;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
 public class SVTMain {
+    private static Logger.Log logger;
 
     public static void main(String[] args) {
-        Logger.Log logger;
         try {
             // Assets location.
             String ASSETS_LOC = Settings.ASSETS_LOC + "/";
@@ -48,5 +49,20 @@ public class SVTMain {
         var builder = new SVTQuadtreeBuilder();
         var tree = builder.build(loc, 512);
         logger.info("SVT initialized with " + tree.numTiles + " " + tree.tileSize + "x" + tree.tileSize + " tiles");
+
+        // Test.
+        test(tree, 0, 0.55, 0.55);
+        test(tree, 0, 0.25, 0.95);
+        test(tree, 1, 0.55, 0.45);
+        test(tree, 1, 0.75, 0.95);
+        test(tree, 3, 0.75, 0.95);
+        test(tree, 5, 0.05, 0.4);
+        test(tree, 6, 0.75, 0.95);
+    }
+
+    private static void test(SVTQuadtree<Path> tree, int level, double u, double v) {
+        logger.info("L" + level + " u: " + u + ", v: " + v);
+        var tile = tree.getTile(level, u, v);
+        logger.info(tile != null ? tile : "null");
     }
 }

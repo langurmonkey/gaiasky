@@ -31,36 +31,50 @@ public class SVTQuadtree<T> {
         this.levels = new Map[MAX_LEVEL];
     }
 
-    public void insert(int level, int u, int v, T object) {
+    public void insert(int level, int col, int row, T object) {
         assert level >= 0 && level <= MAX_LEVEL : "Level out of bounds: " + level;
-        assert u >= 0 && v >= 0 : "Invalid UV: " + u + ", " + v;
+        assert col >= 0 && row >= 0 : "Invalid UV: " + col + ", " + row;
 
         if (levels[level] == null) {
             // Create map.
             levels[level] = new HashMap<>();
         }
 
-        var tile = new SVTQuadtreeNode<T>(level, u, v, object);
-        levels[level].put(getKey(u, v), tile);
+        var tile = new SVTQuadtreeNode<T>(level, col, row, object);
+        levels[level].put(getKey(col, row), tile);
         numTiles++;
     }
 
-    public SVTQuadtreeNode<T> getNode(int level, int u, int v) {
+    public SVTQuadtreeNode<T> getNode(int level, int col, int row) {
         assert level >= 0 && level <= MAX_LEVEL : "Level out of bounds: " + level;
-        assert u >= 0 && v >= 0 : "Invalid UV: " + u + ", " + v;
+        assert col >= 0 && row >= 0 : "Invalid UV: " + col + ", " + row;
 
         if (levels[level] == null) {
             return null;
         }
 
-        return levels[level].get(getKey(u, v));
+        return levels[level].get(getKey(col, row));
     }
 
-    public boolean contains(int level, int u, int v) {
-        return levels[level] != null && levels[level].containsKey(getKey(u, v));
+    /**
+     * Gets a tile given a level and texture coordinates in UV.
+     * @param level The level.
+     * @param u The U texture coordinate in [0,1].
+     * @param v The V texture coordinate in [0,1].
+     * @return The tile at the given level and UV.
+     */
+    public SVTQuadtreeNode<T> getTile(int level, double u, double v) {
+        long levelSide = (long) Math.pow(2L, level);
+        final var col = (int) (u * levelSide * 2);
+        final var row = (int) ((1.0 - v) * levelSide);
+        return getNode(level, col, row);
     }
 
-    public long getKey(int u, int v) {
-        return (long) u << MAX_LEVEL + (long) v;
+    public boolean contains(int level, int col, int row) {
+        return levels[level] != null && levels[level].containsKey(getKey(col, row));
+    }
+
+    public long getKey(int col, int row) {
+        return (long) col << MAX_LEVEL + (long) row;
     }
 }

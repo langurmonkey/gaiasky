@@ -49,21 +49,21 @@ public class SVTQuadtreeBuilder {
             return null;
         }
         try (Stream<Path> stream = Files.list(location)) {
-            stream.sorted().forEach(l -> {
-                var dirName = l.getFileName().toString();
+            stream.sorted().forEach(directory -> {
+                var dirName = directory.getFileName().toString();
                 if (dirName.matches("level\\d+")) {
                     var level = Integer.parseInt(dirName.substring(5));
                     logger.info("visit: " + dirName + " (l" + level + ")");
-                    try (Stream<Path> files = Files.list(l)) {
-                        files.sorted().forEach(c -> {
-                            var fileName = c.getFileName().toString();
+                    try (Stream<Path> files = Files.list(directory)) {
+                        files.sorted().forEach(file -> {
+                            var fileName = file.getFileName().toString();
                             // Accepted file names: tx[_|-| ]COLNUM[_|-| ]ROWNUM.ext
-                            if (fileName.matches("tx[_|-| ]\\d+[_|\\-| ]\\d+\\.\\w+")) {
-                                String[] tokens = fileName.split("[_|\\-|\s|\\.]");
-                                int u = Integer.parseInt(tokens[1].trim());
-                                int v = Integer.parseInt(tokens[2].trim());
-                                logger.info("l" + level + " u" + u + " v" + v);
-                                tree.insert(level, u, v, c);
+                            if (fileName.matches("tx[_\\-\\s.]\\d+[_\\-\\s.]\\d+\\.\\w+")) {
+                                String[] tokens = fileName.split("[_\\-\\s.]");
+                                int col = Integer.parseInt(tokens[1].trim());
+                                int row = Integer.parseInt(tokens[2].trim());
+                                logger.info("l" + level + " -> col: " + col + " row: " + row);
+                                tree.insert(level, col, row, file);
                             } else {
                                 logger.error("Wrong tile name format: " + fileName);
                             }
