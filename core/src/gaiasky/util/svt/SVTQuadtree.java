@@ -58,16 +58,26 @@ public class SVTQuadtree<T> {
 
     /**
      * Gets a tile given a level and texture coordinates in UV.
+     *
      * @param level The level.
-     * @param u The U texture coordinate in [0,1].
-     * @param v The V texture coordinate in [0,1].
+     * @param u     The U texture coordinate in [0,1].
+     * @param v     The V texture coordinate in [0,1].
      * @return The tile at the given level and UV.
      */
     public SVTQuadtreeNode<T> getTile(int level, double u, double v) {
-        long levelSide = (long) Math.pow(2L, level);
-        final var col = (int) (u * levelSide * 2);
-        final var row = (int) ((1.0 - v) * levelSide);
+        long vCount = getVTileCount(level);
+        long uCount = vCount * 2;
+        final var col = (int) (u * uCount);
+        final var row = (int) ((1.0 - v) * uCount);
         return getNode(level, col, row);
+    }
+
+    public long getUTileCount(int level) {
+        return 2 * (2L << level);
+    }
+
+    public long getVTileCount(int level) {
+        return 2L << level;
     }
 
     public boolean contains(int level, int col, int row) {
