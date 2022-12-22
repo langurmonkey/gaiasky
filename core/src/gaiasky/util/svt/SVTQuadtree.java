@@ -31,7 +31,7 @@ public class SVTQuadtree<T> {
         this.levels = new Map[MAX_LEVEL];
     }
 
-    public void insert(int level, int col, int row, T object) {
+    public void insert(final int level, final int col, final int row, T object) {
         assert level >= 0 && level <= MAX_LEVEL : "Level out of bounds: " + level;
         assert col >= 0 && row >= 0 : "Invalid UV: " + col + ", " + row;
 
@@ -44,10 +44,10 @@ public class SVTQuadtree<T> {
         if (level > 0) {
             // Find parent.
             var uv = getUV(level, col, row);
-             parent = getTile(level - 1, uv.getFirst(), uv.getSecond());
+            parent = getTile(level - 1, uv.getFirst(), uv.getSecond());
         }
 
-        var tile = new SVTQuadtreeNode<T>(parent, level, col, row, object);
+        var tile = new SVTQuadtreeNode<>(parent, level, col, row, object);
         levels[level].put(getKey(col, row), tile);
         numTiles++;
     }
@@ -92,7 +92,7 @@ public class SVTQuadtree<T> {
         long vCount = getVTileCount(level);
         long uCount = vCount * 2;
         final var col = (int) (u * uCount);
-        final var row = (int) ((1.0 - v) * uCount);
+        final var row = (int) ((1.0 - v) * vCount);
         return new Pair<>(col, row);
     }
 
@@ -109,6 +109,6 @@ public class SVTQuadtree<T> {
     }
 
     public long getKey(int col, int row) {
-        return (long) col << MAX_LEVEL + (long) row;
+        return ((long) col << MAX_LEVEL) + (long) row;
     }
 }
