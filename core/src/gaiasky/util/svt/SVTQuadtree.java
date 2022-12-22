@@ -1,8 +1,7 @@
 package gaiasky.util.svt;
 
-import com.badlogic.gdx.utils.Array;
+import gaiasky.util.Pair;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +16,7 @@ public class SVTQuadtree<T> {
     /** Size in pixels of each tile. Tiles are square, so width and height are equal. **/
     public final long tileSize;
 
+    /** Root node(s) of the tree. **/
     public SVTQuadtreeNode<T>[] root;
 
     /** Each tile is identified by its level and its UV. Here we can access tiles directly. **/
@@ -40,14 +40,21 @@ public class SVTQuadtree<T> {
             levels[level] = new HashMap<>();
         }
 
-        var tile = new SVTQuadtreeNode<T>(level, col, row, object);
+        SVTQuadtreeNode<T> parent = null;
+        if (level > 0) {
+            // Find parent.
+            var uv = getUV(level, col, row);
+             parent = getTile(level - 1, uv.getFirst(), uv.getSecond());
+        }
+
+        var tile = new SVTQuadtreeNode<T>(parent, level, col, row, object);
         levels[level].put(getKey(col, row), tile);
         numTiles++;
     }
 
     public SVTQuadtreeNode<T> getNode(int level, int col, int row) {
         assert level >= 0 && level <= MAX_LEVEL : "Level out of bounds: " + level;
-        assert col >= 0 && row >= 0 : "Invalid UV: " + col + ", " + row;
+        assert col >= 0 && row >= 0 : "Invalid Col/Row: " + col + ", " + row;
 
         if (levels[level] == null) {
             return null;
@@ -65,11 +72,8 @@ public class SVTQuadtree<T> {
      * @return The tile at the given level and UV.
      */
     public SVTQuadtreeNode<T> getTile(int level, double u, double v) {
-        long vCount = getVTileCount(level);
-        long uCount = vCount * 2;
-        final var col = (int) (u * uCount);
-        final var row = (int) ((1.0 - v) * uCount);
-        return getNode(level, col, row);
+        final var pair = getColRow(level, u, v);
+        return getNode(level, pair.getFirst(), pair.getSecond());
     }
 
     public long getUTileCount(int level) {
@@ -77,7 +81,27 @@ public class SVTQuadtree<T> {
     }
 
     public long getVTileCount(int level) {
-        return 2L << level;
+        if (level == 0) {
+            return 1;
+        } else {
+            return 2L << (level - 1);
+        }
+    }
+
+    public Pair<Integer, Integer> getColRow(int level, double u, double v) {
+        long vCount = getVTileCount(level);
+        long uCount = vCount * 2;
+        final var col = (int) (u * uCount);
+        final var row = (int) ((1.0 - v) * uCount);
+        return new Pair<>(col, row);
+    }
+
+    public Pair<Double, Double> getUV(int level, int col, int row) {
+        double vCount = getVTileCount(level);
+        double uCount = vCount * 2;
+        final var u = (double) col / uCount;
+        final var v = (vCount - row) / vCount;
+        return new Pair<>(u, v);
     }
 
     public boolean contains(int level, int col, int row) {

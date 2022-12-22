@@ -25,12 +25,14 @@ package gaiasky.util.svt;
  */
 public class SVTQuadtreeNode<T> {
 
+    public final SVTQuadtreeNode<T> parent;
     public final int level;
     public final int col;
     public final int row;
     public final T object;
 
-    public SVTQuadtreeNode(final int level, final int col, final int row, final T object) {
+    public SVTQuadtreeNode(final SVTQuadtreeNode<T> parent, final int level, final int col, final int row, final T object) {
+        this.parent = parent;
         this.level = level;
         this.col = col;
         this.row = row;
