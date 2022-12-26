@@ -210,7 +210,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             // Camera to left
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFrameBuffer());
+            sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
             boolean postProcess = postProcessCapture(ppb, fbLeft, rw, rh);
 
@@ -238,7 +238,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             // Camera to right
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFrameBuffer());
+            sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
             postProcess = postProcessCapture(ppb, fbRight, rw, rh);
 

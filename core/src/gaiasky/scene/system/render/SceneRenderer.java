@@ -38,6 +38,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.draw.*;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
+import gaiasky.scene.system.render.pass.LightGlowPass;
 import gaiasky.scene.system.render.pass.ShadowMapRenderPass;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -82,7 +83,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Alpha values for each type.
      **/
     public float[] alphas;
-    Array<Entity> controllers = new Array<>();
     ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
     /**
      * Render lists for all render groups.
@@ -100,17 +100,13 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Renderers vector, with 0 = normal, 1 = stereoscopic, 2 = FOV, 3 = cubemap
      **/
     private IRenderMode[] sgrList;
-    // Light glow pre-render
-    private FrameBuffer glowFb;
-    private LightPositionUpdater lpu;
     /**
      * Frame buffer map. Holds frame buffers for different resolutions, usually used
      * in screenshots and frame capture.
      */
     private Map<Integer, FrameBuffer> frameBufferMap;
-    private List<IRenderable> stars;
-    private AbstractRenderSystem billboardStarsProc;
     private final ShadowMapRenderPass shadowMapPass;
+    private final LightGlowPass lightGlowPass;
 
     public SceneRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
@@ -119,6 +115,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.rendering = new AtomicBoolean(false);
         this.renderAssets = new RenderAssets(globalResources);
         this.shadowMapPass = new ShadowMapRenderPass(this);
+        this.lightGlowPass = new LightGlowPass(this);
     }
 
     @Override
@@ -127,8 +124,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         frameBufferMap = new HashMap<>();
         // Initialize the render assets.
         renderAssets.initialize(manager);
-
-        stars = new ArrayList<>();
 
         renderSystems = new Array<>();
 
@@ -162,7 +157,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
 
         if (Settings.settings.postprocess.lightGlow.active) {
-            buildGlowData();
+            lightGlowPass.buildLightGlowData();
         }
     }
 
@@ -236,10 +231,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
+        AbstractRenderSystem billboardStarsProc = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
-        lpu = new LightPositionUpdater();
-        billboardStarsProc.addPostRunnables(lpu);
+        billboardStarsProc.addPostRunnables(lightGlowPass.getLpu());
+        lightGlowPass.setBillboardStarsProc(billboardStarsProc);
 
         // BILLBOARD GALAXIES
         AbstractRenderSystem billboardGalaxiesProc = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", ComponentType.Galaxies, false);
@@ -478,7 +473,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    private void renderModel(IRenderable r, IntModelBatch batch) {
+    public void renderModel(IRenderable r, IntModelBatch batch) {
         if (r instanceof Render) {
             Render render = (Render) r;
             if (Mapper.model.has(render.entity)) {
@@ -488,80 +483,12 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     }
 
-    public void renderGlowPass(ICamera camera, FrameBuffer frameBuffer) {
-        if (frameBuffer == null) {
-            frameBuffer = glowFb;
-        }
-        if (Settings.settings.postprocess.lightGlow.active && frameBuffer != null) {
-            // Get all billboard stars
-            List<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
-
-            stars.clear();
-            for (IRenderable st : billboardStars) {
-                if (st instanceof Render) {
-                    if (Mapper.hip.has(((Render) st).getEntity())) {
-                        stars.add(st);
-                    }
-                }
-            }
-
-            // Get all models
-            List<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
-            List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
-
-            // VR controllers
-            if (Settings.settings.runtime.openVr) {
-                RenderModeOpenVR sgrVR = (RenderModeOpenVR) sgrList[SGR_OPENVR_IDX];
-                if (vrContext != null) {
-                    for (Entity m : sgrVR.controllerObjects) {
-                        var render = Mapper.render.get(m);
-                        if (!models.contains(render))
-                            controllers.add(m);
-                    }
-                }
-            }
-
-            frameBuffer.begin();
-            Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-            // Render billboard stars
-            billboardStarsProc.render(stars, camera, 0, null);
-
-            // Render models
-            renderAssets.mbPixelLightingOpaque.begin(camera.getCamera());
-            for (IRenderable model : models) {
-                renderModel(model, renderAssets.mbPixelLightingOpaque);
-            }
-            renderAssets.mbPixelLightingOpaque.end();
-
-            // Render tessellated models
-            if (modelsTess.size() > 0) {
-                renderAssets.mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
-                for (IRenderable model : modelsTess) {
-                    renderModel(model, renderAssets.mbPixelLightingOpaqueTessellation);
-                }
-                renderAssets.mbPixelLightingOpaqueTessellation.end();
-            }
-            //}
-
-            // Set texture to updater
-            if (lpu != null) {
-                lpu.setGlowTexture(frameBuffer.getColorBufferTexture());
-            }
-
-            frameBuffer.end();
-
-        }
-
-    }
-
     public void clearScreen() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
     private void renderSVTTileDetermination(ICamera camera) {
-        // TOOD.
+        // TODO.
     }
 
     public void render(final ICamera camera, final double t, final int rw, final int rh, final int tw, final int th, final FrameBuffer fb, final PostProcessBean ppb) {
@@ -575,7 +502,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             // Light glow pass.
             // In stereo and cubemap modes, the glow pass is rendered in the SGR itself.
             if (!Settings.settings.program.modeStereo.active && !Settings.settings.program.modeCubemap.active && !Settings.settings.runtime.openVr) {
-                renderGlowPass(camera, glowFb);
+                lightGlowPass.renderGlowPass(camera, null);
             }
 
             // SVT tile determination pass.
@@ -592,7 +519,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     @Override
     public FrameBuffer getGlowFrameBuffer() {
-        return glowFb;
+        return lightGlowPass.getGlowFrameBuffer();
     }
 
     /**
@@ -828,7 +755,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         case LIGHT_GLOW_CMD -> {
             boolean glow = (Boolean) data[0];
             if (glow) {
-                buildGlowData();
+                lightGlowPass.buildLightGlowData();
             }
         }
         default -> {
@@ -922,15 +849,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    private void buildGlowData() {
-        if (glowFb == null) {
-            FrameBufferBuilder fbb = new FrameBufferBuilder(1920, 1080);
-            fbb.addBasicColorTextureAttachment(Format.RGBA8888);
-            fbb.addBasicDepthRenderBuffer();
-            glowFb = new GaiaSkyFrameBuffer(fbb, 0, 1);
-        }
-    }
-
     public void updateLineRenderSystem() {
         LineRenderSystem current = null;
         for (IRenderSystem system : renderSystems) {
@@ -969,6 +887,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return this.shadowMapPass;
     }
 
+    public LightGlowPass getLightGlowPass() {
+        return this.lightGlowPass;
+    }
+
+
     /**
      * Resets the render flags for all systems.
      */
@@ -978,6 +901,14 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 ((AbstractRenderSystem) system).resetFlags();
             }
         }
+    }
+
+    public IRenderMode getRenderModeOpenVR() {
+        return sgrList[SGR_OPENVR_IDX];
+    }
+
+    public VRContext getVrContext() {
+        return vrContext;
     }
 
     public FrameBuffer getFrameBuffer(final int w, final int h) {
