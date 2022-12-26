@@ -475,9 +475,10 @@ public class ModelEntityRenderSystem {
     protected void prepareShadowEnvironment(Entity entity, Model model, ModelScaffolding scaffolding) {
         if (Settings.settings.scene.renderer.shadow.active) {
             Environment env = model.model.env;
-            if (scaffolding.shadow > 0 && sceneRenderer.smTexMap.containsKey(entity)) {
-                Matrix4 combined = sceneRenderer.smCombinedMap.get(entity);
-                Texture tex = sceneRenderer.smTexMap.get(entity);
+            var shadowMapPass = sceneRenderer.getShadowMapPass();
+            if (scaffolding.shadow > 0 && shadowMapPass.smTexMap.containsKey(entity)) {
+                Matrix4 combined = shadowMapPass.smCombinedMap.get(entity);
+                Texture tex = shadowMapPass.smTexMap.get(entity);
                 if (env.shadowMap == null) {
                     if (scaffolding.shadowMap == null)
                         scaffolding.shadowMap = new ShadowMapImpl(combined, tex);
