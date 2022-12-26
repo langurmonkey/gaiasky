@@ -950,21 +950,21 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         setNormal("generate");
         setSpecular("generate");
         var dataPath = Settings.settings.data.dataPath("tex/base");
-        Array<String> luts = new Array<>();
+        Array<String> lookUpTables = new Array<>();
         try (var paths = Files.list(dataPath)) {
             List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
             for (Path p : l) {
                 String name = p.toString();
-                luts.add("data" + name.substring(name.indexOf("/tex/base/")));
+                lookUpTables.add("data" + name.substring(name.indexOf("/tex/base/")));
             }
         } catch (Exception ignored) {
         }
 
-        if (luts.isEmpty()) {
-            luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
-            luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
+        if (lookUpTables.isEmpty()) {
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
         }
-        setBiomelut(luts.get(rand.nextInt(luts.size)));
+        setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
         setBiomehueshift(rand.nextDouble() * 360.0);
         double sizeKm = bodySize * Constants.U_TO_KM;
         setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0));

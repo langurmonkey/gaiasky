@@ -56,20 +56,21 @@ public class ShadowMapRenderPass {
         this.shadowModelRenderer = new ModelEntityRenderSystem(sceneRenderer);
     }
 
-    public void initialize(){
-            // Shadow map camera
-            cameraLight = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
+    public void initialize() {
+        // Shadow map camera
+        cameraLight = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
 
-            // Aux vectors
-            aux1 = new Vector3();
-            aux1d = new Vector3d();
-            aux2d = new Vector3d();
-            aux3d = new Vector3d();
-            aux1b = new Vector3b();
+        // Aux vectors
+        aux1 = new Vector3();
+        aux1d = new Vector3d();
+        aux2d = new Vector3d();
+        aux3d = new Vector3d();
+        aux1b = new Vector3b();
 
-            // Build frame buffers and arrays
-            buildShadowMapData();
+        // Build frame buffers and arrays
+        buildShadowMapData();
     }
+
     /**
      * Builds the shadow map data; frame buffers, arrays, etc.
      */
@@ -108,6 +109,7 @@ public class ShadowMapRenderPass {
         shadowCandidates.clear();
         //shadowCandidatesTess.clear();
     }
+
     private void renderShadowMapCandidates(List<Entity> candidates, int shadowNRender, ICamera camera) {
         var renderAssets = sceneRenderer.getRenderAssets();
         int i = 0;
@@ -184,6 +186,7 @@ public class ShadowMapRenderPass {
         }
     }
 
+    @SuppressWarnings("unused")
     private void renderShadowMapCandidatesTess(Array<Entity> candidates, int shadowNRender, ICamera camera, RenderingContext rc) {
         int i = 0;
         int j = 0;
@@ -262,40 +265,38 @@ public class ShadowMapRenderPass {
         }
     }
 
-    public void renderShadowMap(ICamera camera) {
-        if (Settings.settings.scene.renderer.shadow.active) {
-            /*
-             * Shadow mapping here?
-             * <ul>
-             * <li>Extract model bodies (front)</li>
-             * <li>Work out light direction</li>
-             * <li>Set orthographic camera at set distance from bodies,
-             * direction of light, clip planes</li>
-             * <li>Render depth map to frame buffer (fb)</li>
-             * <li>Send frame buffer texture in to ModelBatchRenderSystem along
-             * with light position, direction, clip planes and light camera
-             * combined matrix</li>
-             * <li>Compare real distance from light to texture sample, render
-             * shadow if different</li>
-             * </ul>
-             */
-            List<IRenderable> models = sceneRenderer.renderListsFront().get(MODEL_PIX.ordinal());
-            //List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
-            models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
+    public void render(ICamera camera) {
+        /*
+         * Shadow mapping here?
+         * <ul>
+         * <li>Extract model bodies (front)</li>
+         * <li>Work out light direction</li>
+         * <li>Set orthographic camera at set distance from bodies,
+         * direction of light, clip planes</li>
+         * <li>Render depth map to frame buffer (fb)</li>
+         * <li>Send frame buffer texture in to ModelBatchRenderSystem along
+         * with light position, direction, clip planes and light camera
+         * combined matrix</li>
+         * <li>Compare real distance from light to texture sample, render
+         * shadow if different</li>
+         * </ul>
+         */
+        List<IRenderable> models = sceneRenderer.getRenderLists().get(MODEL_PIX.ordinal());
+        //List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
+        models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 
-            int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openVr) ? 2 : Settings.settings.program.modeCubemap.active ? 6 : 1;
+        final int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openVr) ? 2 : Settings.settings.program.modeCubemap.active ? 6 : 1;
 
-            if (shadowMapFb != null && smCombinedMap != null) {
-                addCandidates(models, shadowCandidates);
-                //addCandidates(modelsTess, shadowCandidatesTess);
+        if (shadowMapFb != null && smCombinedMap != null) {
+            addCandidates(models, shadowCandidates);
+            //addCandidates(modelsTess, shadowCandidatesTess);
 
-                // Clear maps
-                smTexMap.clear();
-                smCombinedMap.clear();
+            // Clear maps
+            smTexMap.clear();
+            smCombinedMap.clear();
 
-                renderShadowMapCandidates(shadowCandidates, shadowNRender, camera);
-                //renderShadowMapCandidatesTess(shadowCandidatesTess, shadowNRender, camera);
-            }
+            renderShadowMapCandidates(shadowCandidates, shadowNRender, camera);
+            //renderShadowMapCandidatesTess(shadowCandidatesTess, shadowNRender, camera);
         }
     }
 }

@@ -5,13 +5,11 @@
 
 package gaiasky.scene.system.render;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -30,7 +28,6 @@ import gaiasky.render.process.*;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.IRenderSystem;
-import gaiasky.render.system.LightPositionUpdater;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.CameraManager.CameraMode;
@@ -39,6 +36,7 @@ import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.draw.*;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.pass.LightGlowPass;
+import gaiasky.scene.system.render.pass.SVTRenderPass;
 import gaiasky.scene.system.render.pass.ShadowMapRenderPass;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -48,13 +46,15 @@ import gaiasky.util.Settings;
 import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
-import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.vr.openvr.VRContext;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.render.RenderGroup.*;
@@ -107,6 +107,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private Map<Integer, FrameBuffer> frameBufferMap;
     private final ShadowMapRenderPass shadowMapPass;
     private final LightGlowPass lightGlowPass;
+    private final SVTRenderPass svtPass;
 
     public SceneRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
@@ -116,6 +117,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.renderAssets = new RenderAssets(globalResources);
         this.shadowMapPass = new ShadowMapRenderPass(this);
         this.lightGlowPass = new LightGlowPass(this);
+        this.svtPass = new SVTRenderPass();
     }
 
     @Override
@@ -440,11 +442,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.rendering.set(rendering);
     }
 
-    public List<List<IRenderable>> renderListsFront() {
-        return renderLists;
-    }
-
-    public List<List<IRenderable>> renderListsBack() {
+    public List<List<IRenderable>> getRenderLists() {
         return renderLists;
     }
 
@@ -487,27 +485,27 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
-    private void renderSVTTileDetermination(ICamera camera) {
-        // TODO.
-    }
-
     public void render(final ICamera camera, final double t, final int rw, final int rh, final int tw, final int th, final FrameBuffer fb, final PostProcessBean ppb) {
         if (rendering.get()) {
-            if (renderMode == null)
+            if (renderMode == null) {
                 initRenderMode(camera);
+            }
 
             // Shadow map render pass.
-            shadowMapPass.renderShadowMap(camera);
+            if (Settings.settings.scene.renderer.shadow.active) {
+                shadowMapPass.render(camera);
+            }
 
             // Light glow pass.
             // In stereo and cubemap modes, the glow pass is rendered in the SGR itself.
-            if (!Settings.settings.program.modeStereo.active && !Settings.settings.program.modeCubemap.active && !Settings.settings.runtime.openVr) {
+            if (!Settings.settings.program.isStereoOrCubemap() && !Settings.settings.runtime.openVr) {
                 lightGlowPass.renderGlowPass(camera, null);
             }
 
             // SVT tile determination pass.
-            renderSVTTileDetermination(camera);
+            svtPass.render(camera);
 
+            // Main render operation.
             renderMode.render(this, camera, t, rw, rh, tw, th, fb, ppb);
         }
     }
@@ -552,74 +550,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             logger.error(e);
         }
 
-    }
-
-    /**
-     * Renders all the systems which are of the given class.
-     *
-     * @param camera        The camera to use.
-     * @param t             The time in seconds since the start.
-     * @param renderContext The render context.
-     * @param systemClass   The class.
-     */
-    protected void renderSystem(ICamera camera, double t, RenderingContext renderContext, Class<? extends IRenderSystem> systemClass) {
-        // Update time difference since last update
-        for (ComponentType ct : ComponentType.values()) {
-            alphas[ct.ordinal()] = calculateAlpha(ct, t);
-        }
-
-        int size = renderSystems.size;
-        for (int i = 0; i < size; i++) {
-            IRenderSystem process = renderSystems.get(i);
-            if (systemClass.isInstance(process)) {
-                // If we have no render group, this means all the info is already in
-                // the render system. No lists needed
-                if (process.getRenderGroup() != null) {
-                    List<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
-                    process.render(l, camera, t, renderContext);
-                } else {
-                    process.render(null, camera, t, renderContext);
-                }
-            }
-        }
-    }
-
-    private boolean isInstance(IRenderSystem process, Class<?>... systemClasses) {
-        for (Class<?> systemClass : systemClasses) {
-            if (systemClass.isInstance(process))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Renders all the systems which are of one of the given classes.
-     *
-     * @param camera        The camera to use.
-     * @param t             The time in seconds since the start.
-     * @param renderContext The render context.
-     * @param systemClasses The classes.
-     */
-    protected void renderSystems(ICamera camera, double t, RenderingContext renderContext, Class<?>... systemClasses) {
-        // Update time difference since last update
-        for (ComponentType ct : ComponentType.values()) {
-            alphas[ct.ordinal()] = calculateAlpha(ct, t);
-        }
-
-        int size = renderSystems.size;
-        for (int i = 0; i < size; i++) {
-            IRenderSystem process = renderSystems.get(i);
-            if (isInstance(process, systemClasses)) {
-                // If we have no render group, this means all the info is already in
-                // the render system. No lists needed
-                if (process.getRenderGroup() != null) {
-                    List<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
-                    process.render(l, camera, t, renderContext);
-                } else {
-                    process.render(null, camera, t, renderContext);
-                }
-            }
-        }
     }
 
     /**
@@ -808,7 +738,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      */
     public void resize(final int tw, final int th, final int rw, final int rh, boolean resizeRenderSys) {
         if (resizeRenderSys) {
-            resizeRenderSystems(tw, th, rw, rh);
+            resizeRenderSystems(tw, th);
         }
 
         for (IRenderMode sgr : sgrList) {
@@ -821,10 +751,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      *
      * @param tw New target (screen) width.
      * @param th New target (screen) height.
-     * @param rw New render buffer width.
-     * @param rh New render buffer height.
      */
-    public void resizeRenderSystems(final int tw, final int th, final int rw, final int rh) {
+    public void resizeRenderSystems(final int tw, final int th) {
         for (IRenderSystem rendSys : renderSystems) {
             rendSys.resize(tw, th);
         }

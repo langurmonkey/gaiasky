@@ -7,7 +7,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.system.render.pass.LightGlowPass;
-import gaiasky.util.gdx.contrib.postprocess.effects.LightGlow;
 
 import java.util.List;
 
@@ -75,7 +74,7 @@ public interface ISceneRenderer {
     FrameBuffer getGlowFrameBuffer();
 
     /** Returns he render lists of this renderer. **/
-    List<List<IRenderable>> renderListsFront();
+    List<List<IRenderable>> getRenderLists();
 
     /** Gets the light glow pass object. **/
     LightGlowPass getLightGlowPass();
