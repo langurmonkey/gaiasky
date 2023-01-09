@@ -168,6 +168,14 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         if (metallicCubemap != null)
             metallicCubemap.initialize(manager);
 
+        // SVT
+        if (diffuseSvt != null)
+            diffuseSvt.initialize("diffuseSvt");
+        if (heightSvt != null)
+            heightSvt.initialize("heightSvt");
+        if (specularSvt != null)
+            specularSvt.initialize("specularSvt");
+
         this.heightGenerated.set(false);
     }
 
@@ -796,13 +804,15 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public void setDiffuseSVT(VirtualTextureComponent virtualTextureComponent) {
         this.diffuseSvt = virtualTextureComponent;
     }
+
     public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
-                setDiffuseSVT(convertToComponent(virtualTexture));
+        setDiffuseSVT(convertToComponent(virtualTexture));
     }
 
     public void setSpecularSVT(VirtualTextureComponent virtualTextureComponent) {
         this.specularSvt = virtualTextureComponent;
     }
+
     public void setSpecularSVT(Map<Object, Object> virtualTexture) {
         setSpecularSVT(convertToComponent(virtualTexture));
     }
@@ -810,17 +820,17 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public void setHeightSVT(VirtualTextureComponent virtualTextureComponent) {
         this.heightSvt = virtualTextureComponent;
     }
+
     public void setHeightSVT(Map<Object, Object> virtualTexture) {
         setHeightSVT(convertToComponent(virtualTexture));
     }
 
-
     public VirtualTextureComponent convertToComponent(Map<Object, Object> map) {
         var vt = new VirtualTextureComponent();
         if (map.containsKey("location"))
-            vt.location = (String) map.get("location");
+            vt.setLocation((String) map.get("location"));
         if (map.containsKey("size"))
-            vt.size = ((Long) map.get("size")).intValue();
+            vt.setSize((Long) map.get("size"));
         return vt;
     }
 

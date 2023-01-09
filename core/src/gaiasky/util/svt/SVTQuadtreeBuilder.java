@@ -2,10 +2,12 @@ package gaiasky.util.svt;
 
 import gaiasky.util.Logger;
 import gaiasky.util.comp.FilenameComparator;
+import gaiasky.util.i18n.I18n;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -39,6 +41,7 @@ public class SVTQuadtreeBuilder {
      * @param location The location where the levels are. A directory for each level is expected within this
      *                 location, with the name "level[num]". Usually, "level0" is mandatory.
      * @param tileSize The size (width and height) of each tile in the SVT.
+     *
      * @return The SVT quadtree object.
      */
     public SVTQuadtree<Path> build(final Path location, final int tileSize) {
@@ -50,12 +53,14 @@ public class SVTQuadtreeBuilder {
             logger.error("Can't initialize SVT without 'level0' directory: " + location);
             return null;
         }
+        logger.info(I18n.msg("notif.loading", "SVT quadtree: " + location));
         try (Stream<Path> stream = Files.list(location)) {
+            final AtomicInteger depth = new AtomicInteger(0);
             stream.sorted(comp).forEach(directory -> {
                 var dirName = directory.getFileName().toString();
                 if (dirName.matches("level\\d+")) {
                     var level = Integer.parseInt(dirName.substring(5));
-                    logger.info("visit: " + dirName + " (l" + level + ")");
+                    logger.debug("visit: " + dirName + " (l" + level + ")");
                     try (Stream<Path> files = Files.list(directory)) {
                         files.sorted(comp).forEach(file -> {
                             var fileName = file.getFileName().toString();
@@ -64,21 +69,25 @@ public class SVTQuadtreeBuilder {
                                 String[] tokens = fileName.split("[_\\-\\s.]");
                                 int col = Integer.parseInt(tokens[1].trim());
                                 int row = Integer.parseInt(tokens[2].trim());
-                                logger.info("l" + level + " -> col: " + col + " row: " + row);
+                                logger.debug("l" + level + " -> col: " + col + " row: " + row);
                                 tree.insert(level, col, row, file);
+                                if (level > depth.get()) {
+                                    depth.set(level);
+                                }
                             } else {
                                 logger.error("Wrong tile name format: " + fileName);
                             }
                         });
                     } catch (IOException e) {
-                        logger.error(e, "Error building SVT: " + location);
+                        logger.error(e, "Error building SVT quadtree: " + location);
                     }
                 } else {
                     logger.warn("Wrong directory name format, skipping: " + dirName);
                 }
             });
+            logger.debug("Initialized SVT quadtree with " + depth + " levels and " + tree.numTiles + " tiles.");
         } catch (Exception e) {
-            logger.error(e, "Error building SVT: " + location);
+            logger.error(e, "Error building SVT quadtree: " + location);
             return null;
         }
         return tree;
