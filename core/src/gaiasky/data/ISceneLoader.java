@@ -37,4 +37,6 @@ public interface ISceneLoader {
 
     void setParams(Map<String, Object> params);
 
+    void setIndex(Map<String, Entity> index);
+
 }

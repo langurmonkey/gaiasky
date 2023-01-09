@@ -1,13 +1,11 @@
 package gaiasky.data;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.Scene;
-import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import uk.ac.starlink.util.DataSource;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractSceneLoader implements ISceneLoader {
@@ -21,6 +19,7 @@ public abstract class AbstractSceneLoader implements ISceneLoader {
     protected Scene scene;
     protected Set<String> loggedArchetypes;
     protected String parentName;
+    protected Map<String, Entity> index;
 
     @Override
     public void initialize(String[] files, Scene scene) throws RuntimeException {
@@ -44,6 +43,10 @@ public abstract class AbstractSceneLoader implements ISceneLoader {
 
     public void setParentName(String parentName) {
         this.parentName = parentName;
+    }
+
+    public void setIndex(Map<String, Entity> index) {
+        this.index = index;
     }
 
 }

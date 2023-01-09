@@ -9,6 +9,8 @@ import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Consumers.Consumer10;
 import gaiasky.util.gdx.IntModelBatch;
 
+import java.util.Map;
+
 public class Model implements Component {
 
     /** The model. **/
@@ -24,6 +26,30 @@ public class Model implements Component {
 
     public void setModel(ModelComponent model) {
         this.model = model;
+    }
+
+    public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
+        if (this.model != null) {
+            if (this.model.mtc != null) {
+                this.model.mtc.setDiffuseSVT(this.model.mtc.convertToComponent(virtualTexture));
+            }
+        }
+    }
+
+    public void setSpecularSVT(Map<Object, Object> virtualTexture) {
+        if (this.model != null) {
+            if (this.model.mtc != null) {
+                this.model.mtc.setSpecularSVT(this.model.mtc.convertToComponent(virtualTexture));
+            }
+        }
+    }
+
+    public void setHeightSVT(Map<Object, Object> virtualTexture) {
+        if (this.model != null) {
+            if (this.model.mtc != null) {
+                this.model.mtc.setHeightSVT(this.model.mtc.convertToComponent(virtualTexture));
+            }
+        }
     }
 
 }

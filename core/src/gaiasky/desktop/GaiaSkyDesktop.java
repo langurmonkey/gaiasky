@@ -59,7 +59,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static final int SOURCE_VERSION = 30301;
+    public static final int SOURCE_VERSION = 30400;
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
     private static final String REQUIRED_JAVA_VERSION = "15";
     private static final int DEFAULT_OPENGL_MAJOR = 4;

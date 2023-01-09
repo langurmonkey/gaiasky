@@ -90,6 +90,7 @@ public class DatasetManagerWindow extends GenericDialog {
         iconMap.put("spacecraft", "icon-elem-satellites");
         iconMap.put("system", "iconic-target");
         iconMap.put("texture-pack", "icon-elem-moons");
+        iconMap.put("virtualtex-pack", "iconic-image");
     }
 
     private final DatasetDesc[] selectedDataset;

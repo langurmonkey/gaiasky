@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -91,6 +92,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
     public NoiseComponent nc;
+    // VIRTUAL TEXTURES
+    public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt;
     // CUBEMAPS
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
     // Biome lookup texture
@@ -788,6 +791,37 @@ public class MaterialComponent extends NamedComponent implements IObserver {
 
     public void setSkybox(String diffuseCubemap) {
         setDiffuseCubemap(diffuseCubemap);
+    }
+
+    public void setDiffuseSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.diffuseSvt = virtualTextureComponent;
+    }
+    public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
+                setDiffuseSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setSpecularSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.specularSvt = virtualTextureComponent;
+    }
+    public void setSpecularSVT(Map<Object, Object> virtualTexture) {
+        setSpecularSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setHeightSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.heightSvt = virtualTextureComponent;
+    }
+    public void setHeightSVT(Map<Object, Object> virtualTexture) {
+        setHeightSVT(convertToComponent(virtualTexture));
+    }
+
+
+    public VirtualTextureComponent convertToComponent(Map<Object, Object> map) {
+        var vt = new VirtualTextureComponent();
+        if (map.containsKey("location"))
+            vt.location = (String) map.get("location");
+        if (map.containsKey("size"))
+            vt.size = ((Long) map.get("size")).intValue();
+        return vt;
     }
 
     public boolean hasHeight() {

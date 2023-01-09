@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class SceneJsonLoader {
     private static final Log logger = Logger.getLogger(SceneJsonLoader.class);
+    private static final Map<String, Entity> globalIndex = new HashMap<>();
 
     public synchronized static void loadScene(FileHandle[] jsonFiles, Scene scene) throws FileNotFoundException, ReflectionException {
         logger.info(I18n.msg("notif.loading", "JSON data descriptor files:"));
@@ -92,6 +93,7 @@ public class SceneJsonLoader {
 
                     Constructor c = ClassReflection.getConstructor(clazz);
                     ISceneLoader loader = (ISceneLoader) c.newInstance();
+                    loader.setIndex(globalIndex);
 
                     if (name != null)
                         loader.setName(name);
@@ -139,7 +141,7 @@ public class SceneJsonLoader {
             }
         } else {
             // Use regular JsonLoader.
-            JsonLoader loader = new JsonLoader();
+            JsonLoader loader = new JsonLoader(globalIndex);
             loader.initialize(new String[] { jsonFile.file().getAbsolutePath() }, scene);
             // Load data.
             var data = loader.loadData();

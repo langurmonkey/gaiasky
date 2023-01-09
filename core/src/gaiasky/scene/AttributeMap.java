@@ -70,7 +70,7 @@ public class AttributeMap {
         putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locVaMultiplier", "locthoverfactor", "locThresholdLabel", "shadowvalues");
 
         // Model
-        putAll(Model.class, "model");
+        putAll(Model.class, "model", "diffuseSVT", "heightSVT", "specularSVT");
 
         // Atmosphere
         putAll(Atmosphere.class, "atmosphere");

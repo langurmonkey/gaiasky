@@ -65,11 +65,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     /**
      * COMPONENTS
      */
-    // Texture
+    // Material with textures, colors, and other properties.
     public MaterialComponent mtc;
-    // Relativistic effects
+    // Relativistic effects.
     public RelativisticEffectsComponent rec;
-    // Velocity buffer
+    // Velocity buffer.
     public VelocityBufferComponent vbc;
     /**
      * Light never changes; set fixed ambient light for this model
