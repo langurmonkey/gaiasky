@@ -1,6 +1,7 @@
 package gaiasky.util.svt;
 
 import gaiasky.util.Logger;
+import gaiasky.util.comp.FilenameComparator;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,6 +42,7 @@ public class SVTQuadtreeBuilder {
      * @return The SVT quadtree object.
      */
     public SVTQuadtree<Path> build(final Path location, final int tileSize) {
+        var comp = new FilenameComparator();
         var tree = new SVTQuadtree<Path>(tileSize, 2);
 
         var level0 = location.resolve("level0");
@@ -49,13 +51,13 @@ public class SVTQuadtreeBuilder {
             return null;
         }
         try (Stream<Path> stream = Files.list(location)) {
-            stream.sorted().forEach(directory -> {
+            stream.sorted(comp).forEach(directory -> {
                 var dirName = directory.getFileName().toString();
                 if (dirName.matches("level\\d+")) {
                     var level = Integer.parseInt(dirName.substring(5));
                     logger.info("visit: " + dirName + " (l" + level + ")");
                     try (Stream<Path> files = Files.list(directory)) {
-                        files.sorted().forEach(file -> {
+                        files.sorted(comp).forEach(file -> {
                             var fileName = file.getFileName().toString();
                             // Accepted file names: tx[_|-| ]COLNUM[_|-| ]ROWNUM.ext
                             if (fileName.matches("tx[_\\-\\s.]\\d+[_\\-\\s.]\\d+\\.\\w+")) {

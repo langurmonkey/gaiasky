@@ -45,7 +45,7 @@ public class SVTMain {
             return;
         }
 
-        var loc = Paths.get("/home/tsagrista/Downloads/SVT/Earth/EarthSVT/JestrEarth JPG/textures/hires/JestrMarble JPG/");
+        var loc = Paths.get("/media/tsagrista/Daten/Gaia/gaiasky/data/virtualtex-earth-diffuse/tex/");
         var builder = new SVTQuadtreeBuilder();
         var tree = builder.build(loc, 512);
         logger.info("SVT initialized with " + tree.numTiles + " " + tree.tileSize + "x" + tree.tileSize + " tiles");
