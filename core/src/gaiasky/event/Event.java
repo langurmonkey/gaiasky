@@ -1023,6 +1023,14 @@ public enum Event {
      **/
     SHOW_DEBUG_CMD,
     SHOW_KEYFRAMES_WINDOW_ACTION,
+    /**
+     * Creates and shows a new frame buffer window with the contents of a frame buffer.
+     * <ol start='0'>
+     * <li>window title [string]</li>
+     * <li>frame buffer object [FrameBuffer]</li>
+     * </ol>
+     */
+    SHOW_FRAME_BUFFER_WINDOW_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
     SHOW_LOAD_CATALOG_ACTION,
     SHOW_LOG_ACTION,

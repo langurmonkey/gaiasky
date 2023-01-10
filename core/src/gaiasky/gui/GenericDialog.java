@@ -413,9 +413,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
         focusFirstInputWidget();
         EventManager.publish(Event.CLEAN_PRESSED_KEYS, this);
 
-        if (this.modal)
+        if (this.modal) {
             // Disable input
             EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
+        }
 
         return this;
     }

@@ -379,7 +379,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         if (diffuseSvt != null) {
             material.set(new FloatAttribute(FloatAttribute.SvtId, diffuseSvt.id));
             material.set(new FloatAttribute(FloatAttribute.SvtTileSize, diffuseSvt.tileSize));
-            material.set(new FloatAttribute(FloatAttribute.SvtDepth, diffuseSvt.tileSize * diffuseSvt.tree.depth));
+            material.set(new FloatAttribute(FloatAttribute.SvtDepth, diffuseSvt.tree.depth));
         }
     }
 

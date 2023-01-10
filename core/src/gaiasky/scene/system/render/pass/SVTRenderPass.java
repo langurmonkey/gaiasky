@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.camera.ICamera;
@@ -28,20 +31,19 @@ import static gaiasky.render.RenderGroup.MODEL_PIX;
 public class SVTRenderPass {
     /** The scene renderer object. **/
     private final SceneRenderer sceneRenderer;
-    /** Contains the code to render models. **/
-    private final ModelEntityRenderSystem modelRenderer;
 
     /** The model view object. **/
     private final ModelView view;
 
-    private final Array<Entity> entities;
+    private final Array<IRenderable> entities;
 
     /** The frame buffer to render the SVT view determination. Format should be at least RGBAF16. **/
     private FrameBuffer frameBuffer;
 
+    private boolean uiViewCreated = false;
+
     public SVTRenderPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
-        this.modelRenderer = new ModelEntityRenderSystem(sceneRenderer);
         this.view = new ModelView();
         this.entities = new Array<>();
     }
@@ -49,7 +51,8 @@ public class SVTRenderPass {
     public void initialize() {
         // Initialize frame buffer with 16 bits per channel.
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution, true);
-        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(640, 480);
+        float fbScale = 1.8F;
+        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder((int) (640 * fbScale), (int) (360 * fbScale));
         frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
         frameBuffer = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
     }
@@ -61,7 +64,7 @@ public class SVTRenderPass {
         models.forEach(e -> {
             view.setEntity(((Render) e).getEntity());
             if (view.hasSVT()) {
-                entities.add(view.getEntity());
+                entities.add(e);
             }
         });
 
@@ -69,14 +72,23 @@ public class SVTRenderPass {
 
         // Render SVT view determination to frame buffer.
         frameBuffer.begin();
+        Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         renderAssets.mbPixelLightingSvtView.begin(camera.getCamera());
         for (var candidate : entities) {
-            modelRenderer.render(candidate, renderAssets.mbPixelLightingSvtView, camera, 1, 0, null, RenderGroup.MODEL_PIX, false);
+            sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtView);
         }
         renderAssets.mbPixelLightingSvtView.end();
 
         frameBuffer.end();
+
+        if (!uiViewCreated) {
+            GaiaSky.postRunnable(() -> {
+                // Create UI view
+                EventManager.publish(Event.SHOW_FRAME_BUFFER_WINDOW_ACTION, this, "SVT", frameBuffer);
+            });
+            uiViewCreated = true;
+        }
     }
 }

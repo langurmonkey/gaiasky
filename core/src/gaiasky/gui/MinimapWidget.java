@@ -22,13 +22,13 @@ import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
-import gaiasky.util.scene2d.TextureWidget;
+import gaiasky.util.scene2d.FrameBufferWidget;
 
 public class MinimapWidget implements Disposable {
     private final FrameBuffer tfb;
     private final FrameBuffer sfb;
-    private final TextureWidget topProjection;
-    private final TextureWidget sideProjection;
+    private final FrameBufferWidget topProjection;
+    private final FrameBufferWidget sideProjection;
     private final Vector3d aux3d;
     private final Array<IMinimapScale> scales;
     int side, side2;
@@ -41,7 +41,7 @@ public class MinimapWidget implements Disposable {
         sideShort = (int) (0.7f * Settings.settings.program.minimap.size);
         sideShort2 = sideShort / 2;
 
-        OrthographicCamera ortho = new OrthographicCamera();
+        OrthographicCamera orthographic = new OrthographicCamera();
 
         ShapeRenderer sr = new ShapeRenderer(200, shapeShader);
         sr.setAutoShapeType(true);
@@ -53,30 +53,30 @@ public class MinimapWidget implements Disposable {
         tfb = new FrameBuffer(Format.RGBA8888, side, side, true);
         sfb = new FrameBuffer(Format.RGBA8888, side, sideShort, true);
 
-        topProjection = new TextureWidget(tfb);
-        sideProjection = new TextureWidget(sfb);
+        topProjection = new FrameBufferWidget(tfb);
+        sideProjection = new FrameBufferWidget(sfb);
 
         // Init scales
         scales = new Array<>();
 
         InnerSolarSystemMinimapScale issms = new InnerSolarSystemMinimapScale();
-        issms.initialize(ortho, sb, sr, font, side, sideShort);
+        issms.initialize(orthographic, sb, sr, font, side, sideShort);
         OuterSolarSystemMinimapScale ossms = new OuterSolarSystemMinimapScale();
-        ossms.initialize(ortho, sb, sr, font, side, sideShort);
+        ossms.initialize(orthographic, sb, sr, font, side, sideShort);
         HeliosphereMinimapScale hsms = new HeliosphereMinimapScale();
-        hsms.initialize(ortho, sb, sr, font, side, sideShort);
+        hsms.initialize(orthographic, sb, sr, font, side, sideShort);
         OortCloudMinimapScale ocms = new OortCloudMinimapScale();
-        ocms.initialize(ortho, sb, sr, font, side, sideShort);
+        ocms.initialize(orthographic, sb, sr, font, side, sideShort);
         SolarNeighbourhoodMinimapScale snms = new SolarNeighbourhoodMinimapScale();
-        snms.initialize(ortho, sb, sr, font, side, sideShort);
+        snms.initialize(orthographic, sb, sr, font, side, sideShort);
         MilkyWayMinimapScale mmms = new MilkyWayMinimapScale();
-        mmms.initialize(ortho, sb, sr, font, side, sideShort);
+        mmms.initialize(orthographic, sb, sr, font, side, sideShort);
         LocalGroup1MinimapScale lg1ms = new LocalGroup1MinimapScale();
-        lg1ms.initialize(ortho, sb, sr, font, side, sideShort);
+        lg1ms.initialize(orthographic, sb, sr, font, side, sideShort);
         LocalGroup2MinimapScale lg2ms = new LocalGroup2MinimapScale();
-        lg2ms.initialize(ortho, sb, sr, font, side, sideShort);
+        lg2ms.initialize(orthographic, sb, sr, font, side, sideShort);
         HighZMinimapScale hzms = new HighZMinimapScale();
-        hzms.initialize(ortho, sb, sr, font, side, sideShort);
+        hzms.initialize(orthographic, sb, sr, font, side, sideShort);
 
         scales.add(issms);
         scales.add(ossms);
@@ -112,11 +112,11 @@ public class MinimapWidget implements Disposable {
         }
     }
 
-    public TextureWidget getSideProjection() {
+    public FrameBufferWidget getSideProjection() {
         return sideProjection;
     }
 
-    public TextureWidget getTopProjection() {
+    public FrameBufferWidget getTopProjection() {
         return topProjection;
     }
 

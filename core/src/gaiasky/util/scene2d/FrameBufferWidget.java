@@ -9,34 +9,48 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
-public class TextureWidget extends Widget {
+/**
+ * A UI widget that shows the contents of a frame buffer.
+ */
+public class FrameBufferWidget extends Widget {
 
     private final FrameBuffer fb;
     private final float width;
     private final float height;
 
-    public TextureWidget(FrameBuffer fb) {
+    private boolean flipX, flipY;
+
+    public FrameBufferWidget(FrameBuffer fb) {
         super();
         this.fb = fb;
         this.width = fb.getWidth();
         this.height = fb.getHeight();
     }
 
+    public void setFlip(boolean x, boolean y) {
+        this.flipX = x;
+        this.flipY = y;
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         if (fb != null) {
-            batch.draw(fb.getColorBufferTexture(), getX(), getY(), width, height);
+            if (flipX || flipY) {
+                batch.draw(fb.getColorBufferTexture(), getX(), getY(), 0F, 0F, width, height, 1F, 1F, 0F, 0, 0, (int) width, (int) height, flipX, flipY);
+            } else {
+                batch.draw(fb.getColorBufferTexture(), getX(), getY(), width, height);
+            }
         }
     }
 
     @Override
-    public float getMinWidth() { //-V6032
+    public float getMinWidth() {
         return width;
     }
 
     @Override
-    public float getMinHeight() { //-V6032
+    public float getMinHeight() {
         return height;
     }
 

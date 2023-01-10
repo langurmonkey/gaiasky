@@ -8,6 +8,7 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -108,7 +109,7 @@ public class GuiRegistry implements IObserver {
         this.catalogManager = catalogManager;
         this.view = new FocusView();
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
+        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.SHOW_FRAME_BUFFER_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
     }
 
     public InputMultiplexer getInputMultiplexer() {
@@ -304,19 +305,19 @@ public class GuiRegistry implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (current != null) {
-            Stage ui = current.getGuiStage();
+            Stage stage = current.getGuiStage();
             // Treats windows that can appear in any GUI
             switch (event) {
-            case SHOW_SEARCH_ACTION:
+            case SHOW_SEARCH_ACTION -> {
                 if (searchDialog == null) {
-                    searchDialog = new SearchDialog(skin, ui, scene, true);
+                    searchDialog = new SearchDialog(skin, stage, scene, true);
                 } else {
                     searchDialog.clearText();
                 }
                 if (!searchDialog.isVisible() | !searchDialog.hasParent())
-                    searchDialog.show(ui);
-                break;
-            case SHOW_QUIT_ACTION:
+                    searchDialog.show(stage);
+            }
+            case SHOW_QUIT_ACTION -> {
                 if (!removeModeChangePopup() && !removeGamepadGui()) {
                     if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
                         // Release mouse if captured
@@ -324,11 +325,11 @@ public class GuiRegistry implements IObserver {
                     } else {
                         Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
                         if (Settings.settings.program.exitConfirmation) {
-                            QuitWindow quit = new QuitWindow(ui, skin);
+                            QuitWindow quit = new QuitWindow(stage, skin);
                             if (data.length > 0) {
                                 quit.setAcceptRunnable(quitRunnable);
                             }
-                            quit.show(ui);
+                            quit.show(stage);
                         } else {
                             if (quitRunnable != null)
                                 quitRunnable.run();
@@ -336,26 +337,24 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                break;
-            case CAMERA_MODE_CMD:
-                removeModeChangePopup();
-                break;
-            case SHOW_ABOUT_ACTION:
+            }
+            case CAMERA_MODE_CMD -> removeModeChangePopup();
+            case SHOW_ABOUT_ACTION -> {
                 if (aboutWindow == null) {
-                    aboutWindow = new AboutWindow(ui, skin);
+                    aboutWindow = new AboutWindow(stage, skin);
                 }
                 if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
-                    aboutWindow.show(ui);
+                    aboutWindow.show(stage);
                 }
-                break;
-            case SHOW_PREFERENCES_ACTION:
+            }
+            case SHOW_PREFERENCES_ACTION -> {
                 Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
                 if (prefs.isEmpty()) {
                     if (preferencesWindow == null) {
-                        preferencesWindow = new PreferencesWindow(ui, skin, GaiaSky.instance.getGlobalResources());
+                        preferencesWindow = new PreferencesWindow(stage, skin, GaiaSky.instance.getGlobalResources());
                     }
                     if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
-                        preferencesWindow.show(ui);
+                        preferencesWindow.show(stage);
                     }
                 } else {
                     // Close current windows
@@ -366,25 +365,25 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                break;
-            case SHOW_PER_OBJECT_VISIBILITY_ACTION:
+            }
+            case SHOW_PER_OBJECT_VISIBILITY_ACTION -> {
                 if (indVisWindow == null) {
-                    indVisWindow = new IndividualVisibilityWindow(scene, ui, skin);
+                    indVisWindow = new IndividualVisibilityWindow(scene, stage, skin);
                 }
                 if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
-                    indVisWindow.show(ui);
-                break;
-            case SHOW_SLAVE_CONFIG_ACTION:
+                    indVisWindow.show(stage);
+            }
+            case SHOW_SLAVE_CONFIG_ACTION -> {
                 if (MasterManager.hasSlaves()) {
                     if (slaveConfigWindow == null) {
-                        slaveConfigWindow = new SlaveConfigWindow(ui, skin);
+                        slaveConfigWindow = new SlaveConfigWindow(stage, skin);
                     }
                     if (!slaveConfigWindow.isVisible() || !slaveConfigWindow.hasParent()) {
-                        slaveConfigWindow.show(ui);
+                        slaveConfigWindow.show(stage);
                     }
                 }
-                break;
-            case SHOW_LOAD_CATALOG_ACTION:
+            }
+            case SHOW_LOAD_CATALOG_ACTION -> {
                 if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
                     try {
                         lastOpenLocation = Paths.get(Settings.settings.program.fileChooser.lastLocation);
@@ -397,8 +396,7 @@ public class GuiRegistry implements IObserver {
                 } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
                     lastOpenLocation = SysUtils.getHomeDir();
                 }
-
-                FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.loadcatalog"));
@@ -416,7 +414,7 @@ public class GuiRegistry implements IObserver {
                                         GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
                                     });
                                 } else {
-                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
+                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, stage);
                                     Runnable doLoad = () -> {
                                         GaiaSky.instance.getExecutorService().execute(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
@@ -445,7 +443,7 @@ public class GuiRegistry implements IObserver {
                                         });
                                     };
                                     dld.setAcceptRunnable(doLoad);
-                                    dld.show(ui);
+                                    dld.show(stage);
                                 }
 
                                 lastOpenLocation = result.getParent();
@@ -471,27 +469,35 @@ public class GuiRegistry implements IObserver {
                     }
                     return false;
                 });
-                fc.show(ui);
-                break;
-            case SHOW_KEYFRAMES_WINDOW_ACTION:
+                fc.show(stage);
+            }
+            case SHOW_KEYFRAMES_WINDOW_ACTION -> {
                 if (keyframesWindow == null) {
-                    keyframesWindow = new KeyframesWindow(scene, ui, skin);
+                    keyframesWindow = new KeyframesWindow(scene, stage, skin);
                 }
                 if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                    keyframesWindow.show(ui, 0, 0);
+                    keyframesWindow.show(stage, 0, 0);
                 if (!GaiaSky.instance.isOn(ComponentType.Others)) {
                     // Notify that the user needs to enable 'others'
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.keyframe.ct"), 10f);
                 }
-                break;
-            case UI_THEME_RELOAD_INFO:
+            }
+            case SHOW_FRAME_BUFFER_WINDOW_ACTION -> {
+                var title = (String) data[0];
+                var frameBuffer = (FrameBuffer) data[1];
+                var frameBufferWindow = new FrameBufferWindow(title, skin, stage, frameBuffer);
+                frameBufferWindow.setFlip(false, true);
+                frameBufferWindow.setModal(false);
+                frameBufferWindow.show(stage);
+            }
+            case UI_THEME_RELOAD_INFO -> {
                 if (keyframesWindow != null) {
                     keyframesWindow.dispose();
                     keyframesWindow = null;
                 }
                 this.skin = (Skin) data[0];
-                break;
-            case MODE_POPUP_CMD:
+            }
+            case MODE_POPUP_CMD -> {
                 if (Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
                     ModePopupInfo mpi = (ModePopupInfo) data[0];
                     String name = (String) data[1];
@@ -559,7 +565,7 @@ public class GuiRegistry implements IObserver {
                         mct.setFillParent(true);
                         mct.top();
                         mct.pad(pad10 * 2, 0, 0, 0);
-                        ui.addActor(mct);
+                        stage.addActor(mct);
 
                         // Cancel and schedule task
                         cancelRemovePopupTask();
@@ -581,8 +587,8 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                break;
-            case DISPLAY_GUI_CMD:
+            }
+            case DISPLAY_GUI_CMD -> {
                 boolean displayGui = (Boolean) data[0];
                 if (!displayGui) {
                     // Remove processor
@@ -591,15 +597,15 @@ public class GuiRegistry implements IObserver {
                     // Add processor
                     inputMultiplexer.addProcessor(0, current.getGuiStage());
                 }
-                break;
-            case SHOW_RESTART_ACTION:
+            }
+            case SHOW_RESTART_ACTION -> {
                 String text;
                 if (data.length > 0) {
                     text = (String) data[0];
                 } else {
                     text = I18n.msg("gui.restart.default");
                 }
-                GenericDialog restart = new GenericDialog(I18n.msg("gui.restart.title"), skin, ui) {
+                GenericDialog restart = new GenericDialog(I18n.msg("gui.restart.title"), skin, stage) {
 
                     @Override
                     protected void build() {
@@ -660,21 +666,19 @@ public class GuiRegistry implements IObserver {
                 restart.setAcceptText(I18n.msg("gui.yes"));
                 restart.setCancelText(I18n.msg("gui.no"));
                 restart.buildSuper();
-                restart.show(ui);
-                break;
-            case CLOSE_ALL_GUI_WINDOWS_CMD:
-                var actors = ui.getActors();
+                restart.show(stage);
+            }
+            case CLOSE_ALL_GUI_WINDOWS_CMD -> {
+                var actors = stage.getActors();
                 for (var actor : actors) {
                     if (actor instanceof GenericDialog) {
                         closeWindow((GenericDialog) actor);
                     }
                 }
-                break;
-            case UI_RELOAD_CMD:
-                reloadUI((GlobalResources) data[0]);
-                break;
-            default:
-                break;
+            }
+            case UI_RELOAD_CMD -> reloadUI((GlobalResources) data[0]);
+            default -> {
+            }
             }
         }
 
