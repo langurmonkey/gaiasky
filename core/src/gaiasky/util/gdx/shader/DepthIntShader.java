@@ -3,22 +3,6 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.Gdx;
@@ -32,6 +16,8 @@ import gaiasky.util.gdx.shader.attribute.Attributes;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+
+import java.util.Objects;
 
 public class DepthIntShader extends DefaultIntShader {
     private final static Attributes tmpAttributes = new Attributes();
@@ -72,13 +58,13 @@ public class DepthIntShader extends DefaultIntShader {
         alphaTestAttribute = new FloatAttribute(FloatAttribute.AlphaTest, config.defaultAlphaTest);
     }
 
-    public final static String getDefaultVertexShader() {
+    public static String getDefaultVertexShader() {
         if (defaultVertexShader == null)
             defaultVertexShader = Gdx.files.classpath("com/badlogic/gdx/graphics/g3d/shaders/depth.vertex.glsl").readString();
         return defaultVertexShader;
     }
 
-    public final static String getDefaultFragmentShader() {
+    public static String getDefaultFragmentShader() {
         if (defaultFragmentShader == null)
             defaultFragmentShader = Gdx.files.classpath("com/badlogic/gdx/graphics/g3d/shaders/depth.fragment.glsl").readString();
         return defaultFragmentShader;
@@ -92,26 +78,13 @@ public class DepthIntShader extends DefaultIntShader {
     }
 
     // TODO: Move responsibility for combining attributes to IntRenderableProvider
-    private static final Attributes combineAttributes(final IntRenderable renderable) {
+    private static Attributes combineAttributes(final IntRenderable renderable) {
         tmpAttributes.clear();
         if (renderable.environment != null)
             tmpAttributes.set(renderable.environment);
         if (renderable.material != null)
             tmpAttributes.set(renderable.material);
         return tmpAttributes;
-    }
-
-    @Override
-    public void begin(Camera camera, RenderContext context) {
-        super.begin(camera, context);
-        // Gdx.gl20.glEnable(GL20.GL_POLYGON_OFFSET_FILL);
-        // Gdx.gl20.glPolygonOffset(2.f, 100.f);
-    }
-
-    @Override
-    public void end() {
-        super.end();
-        // Gdx.gl20.glDisable(GL20.GL_POLYGON_OFFSET_FILL);
     }
 
     @Override
@@ -144,7 +117,8 @@ public class DepthIntShader extends DefaultIntShader {
             final boolean hasAlphaTest = combinedAttributes.has(FloatAttribute.AlphaTest);
             if (!hasAlphaTest)
                 combinedAttributes.set(alphaTestAttribute);
-            if (blending.opacity >= ((FloatAttribute) combinedAttributes.get(FloatAttribute.AlphaTest)).value)
+            assert blending != null;
+            if (blending.opacity >= ((FloatAttribute) Objects.requireNonNull(combinedAttributes.get(FloatAttribute.AlphaTest))).value)
                 super.render(renderable, combinedAttributes);
             if (!hasAlphaTest)
                 combinedAttributes.remove(FloatAttribute.AlphaTest);

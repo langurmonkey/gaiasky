@@ -85,6 +85,7 @@ public class SVTQuadtreeBuilder {
                     logger.warn("Wrong directory name format, skipping: " + dirName);
                 }
             });
+            tree.depth = depth.get();
             logger.debug("Initialized SVT quadtree with " + depth + " levels and " + tree.numTiles + " tiles.");
         } catch (Exception e) {
             logger.error(e, "Error building SVT quadtree: " + location);

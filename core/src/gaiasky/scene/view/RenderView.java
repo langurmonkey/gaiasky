@@ -1,7 +1,6 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.ParticleExtra;
@@ -44,10 +43,6 @@ public class RenderView extends BaseView implements IRenderable {
         this.starSet = null;
     }
 
-    @Override
-    public ComponentTypes getComponentType() {
-        return base.ct;
-    }
 
     @Override
     public double getDistToCamera() {

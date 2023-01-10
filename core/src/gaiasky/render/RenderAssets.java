@@ -66,6 +66,7 @@ public class RenderAssets {
             mbPixelLightingDust,
             mbPixelLightingDepth,
             mbPixelLightingOpaque,
+            mbPixelLightingSvtView,
             mbPixelLightingTessellation,
             mbPixelLightingOpaqueTessellation,
             mbPixelLightingDepthTessellation,
@@ -163,6 +164,7 @@ public class RenderAssets {
         manager.load("per-pixel-lighting-depth-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.depth.control.glsl", "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.depth.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl", "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
+        manager.load("per-pixel-lighting-svtview", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/svt.view.fragment.glsl"));
 
         manager.load("skybox", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/skybox.vertex.glsl", "shader/skybox.fragment.glsl"));
         manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));
@@ -280,6 +282,7 @@ public class RenderAssets {
         IntShaderProvider perPixelLightingDepthTessellation = manager.get("per-pixel-lighting-depth-tessellation");
         IntShaderProvider perPixelLightingOpaque = manager.get("per-pixel-lighting-opaque");
         TessellationShaderProvider perPixelLightingOpaqueTessellation = manager.get("per-pixel-lighting-opaque-tessellation");
+        IntShaderProvider perPixelLightingSvtView = manager.get("per-pixel-lighting-svtview");
 
         // Others
         IntShaderProvider skybox = manager.get("skybox");
@@ -300,6 +303,7 @@ public class RenderAssets {
         mbPixelLightingDust = new IntModelBatch(perPixelLightingDust);
         mbPixelLightingDepth = new IntModelBatch(perPixelLightingDepth);
         mbPixelLightingOpaque = new IntModelBatch(perPixelLightingOpaque);
+        mbPixelLightingSvtView = new IntModelBatch(perPixelLightingSvtView);
         mbPixelLightingTessellation = new IntModelBatch(perPixelLightingTessellation);
         mbPixelLightingOpaqueTessellation = new IntModelBatch(perPixelLightingOpaqueTessellation);
         mbPixelLightingDepthTessellation = new IntModelBatch(perPixelLightingDepthTessellation);

@@ -117,7 +117,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         this.renderAssets = new RenderAssets(globalResources);
         this.shadowMapPass = new ShadowMapRenderPass(this);
         this.lightGlowPass = new LightGlowPass(this);
-        this.svtPass = new SVTRenderPass();
+        this.svtPass = new SVTRenderPass(this);
     }
 
     @Override
@@ -161,6 +161,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         if (Settings.settings.postprocess.lightGlow.active) {
             lightGlowPass.buildLightGlowData();
         }
+
+        svtPass.initialize();
     }
 
     public void doneLoading(final AssetManager manager) {
@@ -236,7 +238,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         AbstractRenderSystem billboardStarsProc = new BillboardRenderer(this, BILLBOARD_STAR, alphas, renderAssets.starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars, true);
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         billboardStarsProc.addPostRunnables(lightGlowPass.getLpu());
-        lightGlowPass.setBillboardStarsProc(billboardStarsProc);
+        lightGlowPass.setBillboardStarsRenderer(billboardStarsProc);
 
         // BILLBOARD GALAXIES
         AbstractRenderSystem billboardGalaxiesProc = new BillboardRenderer(this, BILLBOARD_GAL, alphas, renderAssets.galShaders, Constants.DATA_LOCATION_TOKEN + "tex/base/static.jpg", ComponentType.Galaxies, false);
@@ -502,7 +504,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 lightGlowPass.renderGlowPass(camera, null);
             }
 
-            // SVT tile determination pass.
+            // SVT view determination pass.
             svtPass.render(camera);
 
             // Main render operation.

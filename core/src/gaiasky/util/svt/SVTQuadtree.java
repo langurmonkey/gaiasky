@@ -15,6 +15,8 @@ public class SVTQuadtree<T> {
 
     /** Size in pixels of each tile. Tiles are square, so width and height are equal. **/
     public final long tileSize;
+    /** Depth of the tree, e.g., the deepest level, in [0,n]. **/
+    public long depth = 0;
 
     /** Root node(s) of the tree. **/
     public SVTQuadtreeNode<T>[] root;

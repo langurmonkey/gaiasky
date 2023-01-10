@@ -30,9 +30,9 @@ public class LightGlowPass {
     // Light glow pre-render
     private FrameBuffer glowFrameBuffer;
     private final List<IRenderable> stars;
-    private LightPositionUpdater lpu;
-    private Array<Entity> controllers = new Array<>();
-    private AbstractRenderSystem billboardStarsProc;
+    private final LightPositionUpdater lpu;
+    private final Array<Entity> controllers = new Array<>();
+    private AbstractRenderSystem billboardStarsRenderer;
 
     public LightGlowPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
@@ -89,7 +89,7 @@ public class LightGlowPass {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // Render billboard stars
-            billboardStarsProc.render(stars, camera, 0, null);
+            billboardStarsRenderer.render(stars, camera, 0, null);
 
             // Render models
             renderAssets.mbPixelLightingOpaque.begin(camera.getCamera());
@@ -109,9 +109,7 @@ public class LightGlowPass {
             //}
 
             // Set texture to updater
-            if (lpu != null) {
-                lpu.setGlowTexture(frameBuffer.getColorBufferTexture());
-            }
+            lpu.setGlowTexture(frameBuffer.getColorBufferTexture());
 
             frameBuffer.end();
 
@@ -119,8 +117,8 @@ public class LightGlowPass {
 
     }
 
-    public void setBillboardStarsProc(AbstractRenderSystem system) {
-        this.billboardStarsProc = system;
+    public void setBillboardStarsRenderer(AbstractRenderSystem system) {
+        this.billboardStarsRenderer = system;
     }
 
     public FrameBuffer getGlowFrameBuffer(){

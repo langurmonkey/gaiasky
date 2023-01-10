@@ -30,8 +30,10 @@ import static gaiasky.render.RenderGroup.MODEL_PIX;
  * Render pass for shadow maps.
  */
 public class ShadowMapRenderPass {
+    /** The scene renderer object. **/
+    private final SceneRenderer sceneRenderer;
     /** Contains the code to render models. **/
-    private final ModelEntityRenderSystem shadowModelRenderer;
+    private final ModelEntityRenderSystem modelRenderer;
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
     /** Contains the candidates for regular and tessellated shadow maps. **/
@@ -44,8 +46,6 @@ public class ShadowMapRenderPass {
     public Map<Entity, Texture> smTexMap;
     /** Map containing the combined matrix for each model body. **/
     public Map<Entity, Matrix4> smCombinedMap;
-    /** The scene renderer object. **/
-    private final SceneRenderer sceneRenderer;
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
@@ -53,7 +53,7 @@ public class ShadowMapRenderPass {
 
     public ShadowMapRenderPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
-        this.shadowModelRenderer = new ModelEntityRenderSystem(sceneRenderer);
+        this.modelRenderer = new ModelEntityRenderSystem(sceneRenderer);
     }
 
     public void initialize() {
@@ -152,7 +152,7 @@ public class ShadowMapRenderPass {
 
             // No tessellation
             renderAssets.mbPixelLightingDepth.begin(cameraLight);
-            shadowModelRenderer.render(candidate, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, true);
+            modelRenderer.render(candidate, renderAssets.mbPixelLightingDepth, camera, 1, 0, null, RenderGroup.MODEL_PIX, true);
             renderAssets.mbPixelLightingDepth.end();
 
             // Save frame buffer and combined matrix
@@ -248,7 +248,7 @@ public class ShadowMapRenderPass {
 
                 // Tessellation
                 renderAssets.mbPixelLightingDepthTessellation.begin(cameraLight);
-                shadowModelRenderer.render(candidate, renderAssets.mbPixelLightingDepthTessellation, camera, 1, 0, rc, RenderGroup.MODEL_PIX, true);
+                modelRenderer.render(candidate, renderAssets.mbPixelLightingDepthTessellation, camera, 1, 0, rc, RenderGroup.MODEL_PIX, true);
                 renderAssets.mbPixelLightingDepthTessellation.end();
 
                 // Save frame buffer and combined matrix

@@ -46,6 +46,16 @@ public class FloatAttribute extends Attribute {
 
     public static final String TimeAlias = "time";
     public static final int Time = register(TimeAlias);
+
+    public static final String SvtTileSizeAlias = "svtTileSize";
+    public static final int SvtTileSize = register(SvtTileSizeAlias);
+
+    public static final String SvtDepthAlias = "svtDepth";
+    public static final int SvtDepth = register(SvtDepthAlias);
+
+    public static final String SvtIdAlias = "svtId";
+    public static final int SvtId = register(SvtIdAlias);
+
     public float value;
 
     public FloatAttribute(int index) {

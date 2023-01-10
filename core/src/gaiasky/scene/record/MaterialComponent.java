@@ -47,14 +47,16 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * A basic component that contains the info on a material
+ * A basic component that fully describes the material of an object.
+ * It contains basic textures (diffuse, specular, reflection, emissive, etc.),
+ * cubemaps (same as textures), and even some sparse virtual texture trees (SVT).
  */
 public class MaterialComponent extends NamedComponent implements IObserver {
     /** Default texture parameters **/
     protected static final OwnTextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
-    // DEFAULT REFLECTION CUBEMAP
+    // Default reflection cubemap for all materials.
     public static CubemapComponent reflectionCubemap;
 
     static {
@@ -77,11 +79,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         reflectionCubemap = new CubemapComponent();
     }
 
-    // TEXTURES
+    // Texture location strings.
     public boolean texInitialised, texLoading;
     public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao;
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked;
-    // Material properties
+    // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
     public float[] metallicColor;
@@ -92,11 +94,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
     public NoiseComponent nc;
-    // VIRTUAL TEXTURES
+    // Sparse virtual texture sets.
     public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt;
-    // CUBEMAPS
+    // Cubemaps.
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
-    // Biome lookup texture
+    // Biome lookup texture.
     public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png";
     public float biomeHueShift = 0;
     /** Add also color even if texture is present **/
@@ -186,6 +188,10 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public boolean isFinishedLoading(AssetManager manager) {
         return TextureUtils.isLoaded(diffuseUnpacked, manager) && TextureUtils.isLoaded(normalUnpacked, manager) && TextureUtils.isLoaded(specularUnpacked, manager) && TextureUtils.isLoaded(emissiveUnpacked, manager) && TextureUtils.isLoaded(ringUnpacked, manager) && TextureUtils.isLoaded(ringnormalUnpacked, manager) && TextureUtils.isLoaded(heightUnpacked, manager) && TextureUtils.isLoaded(roughnessUnapcked, manager) && TextureUtils.isLoaded(metallicUnpacked, manager)
                 && TextureUtils.isLoaded(aoUnapcked, manager) && TextureUtils.isLoaded(diffuseCubemap, manager) && TextureUtils.isLoaded(normalCubemap, manager) && TextureUtils.isLoaded(emissiveCubemap, manager) && TextureUtils.isLoaded(specularCubemap, manager) && TextureUtils.isLoaded(roughnessCubemap, manager) && TextureUtils.isLoaded(metallicCubemap, manager) && TextureUtils.isLoaded(heightCubemap, manager);
+    }
+
+    public boolean hasSVT() {
+        return diffuseSvt != null || specularSvt != null || heightSvt != null;
     }
 
     /**
@@ -338,6 +344,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 material.set(new TextureAttribute(TextureAttribute.AO, tex));
             }
         }
+
+        // Cubemaps.
         if (diffuseCubemap != null) {
             diffuseCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.cubemap));
@@ -365,6 +373,13 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         if (heightCubemap != null) {
             heightCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.HeightCubemap, heightCubemap.cubemap));
+        }
+
+        // SVT.
+        if (diffuseSvt != null) {
+            material.set(new FloatAttribute(FloatAttribute.SvtId, diffuseSvt.id));
+            material.set(new FloatAttribute(FloatAttribute.SvtTileSize, diffuseSvt.tileSize));
+            material.set(new FloatAttribute(FloatAttribute.SvtDepth, diffuseSvt.tileSize * diffuseSvt.tree.depth));
         }
     }
 
@@ -829,8 +844,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         var vt = new VirtualTextureComponent();
         if (map.containsKey("location"))
             vt.setLocation((String) map.get("location"));
-        if (map.containsKey("size"))
-            vt.setSize((Long) map.get("size"));
+        if (map.containsKey("tileSize"))
+            vt.setTileSize((Long) map.get("tileSize"));
         return vt;
     }
 

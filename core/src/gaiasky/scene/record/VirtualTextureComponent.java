@@ -8,11 +8,18 @@ import java.nio.file.Path;
 
 public class VirtualTextureComponent extends NamedComponent {
 
+    private static int sequenceId = 0;
+
+    public int id;
     public String location;
     public String locationUnpacked;
-    public int size;
+    public int tileSize;
 
     public SVTQuadtree<Path> tree;
+
+    public VirtualTextureComponent() {
+       this.id = sequenceId++;
+    }
 
     public void initialize(String name) {
         super.initialize(name);
@@ -22,19 +29,19 @@ public class VirtualTextureComponent extends NamedComponent {
     public void buildTree() {
         var builder = new SVTQuadtreeBuilder();
         locationUnpacked = Settings.settings.data.dataFile(location);
-        tree = builder.build(Path.of(locationUnpacked), size);
+        tree = builder.build(Path.of(locationUnpacked), tileSize);
     }
 
     public void setLocation(String location) {
         this.location = location;
     }
 
-    public void setSize(Integer size) {
-        this.size = size;
+    public void setTileSize(Integer size) {
+        this.tileSize = size;
     }
 
-    public void setSize(Long size) {
-        this.size = Math.toIntExact(size);
+    public void setTileSize(Long size) {
+        this.tileSize = Math.toIntExact(size);
     }
 
     @Override
