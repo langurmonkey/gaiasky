@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * auto-tone mapping HDR and gamma correction.
  */
 public final class Levels extends PostProcessorEffect {
-    private static final int LUMA_SIZE = 400;
+    private static final int LUMA_SIZE = 300;
     private final Luma luma;
     private final FrameBuffer lumaBuffer;
     /** Is the max/avg process running? **/

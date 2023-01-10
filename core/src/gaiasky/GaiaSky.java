@@ -579,10 +579,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, (int) (settings.graphics.backBufferResolution[0] / 2f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
-
-        // GL clear state.
-        Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClearDepthf(1f);
     }
 
     /**

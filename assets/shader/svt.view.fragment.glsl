@@ -69,5 +69,4 @@ void main() {
 
     // ID
     fragColor.w = u_svtId;
-    fragColor.w = 1.0;
 }

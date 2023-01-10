@@ -5,10 +5,17 @@ import gaiasky.util.svt.SVTQuadtree;
 import gaiasky.util.svt.SVTQuadtreeBuilder;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VirtualTextureComponent extends NamedComponent {
 
-    private static int sequenceId = 0;
+    private static int sequenceId = 1;
+    private static Map<Integer, VirtualTextureComponent> index = new HashMap<>();
+
+    public static VirtualTextureComponent getSVT(int id) {
+        return index.get(id);
+    }
 
     public int id;
     public String location;
@@ -19,6 +26,7 @@ public class VirtualTextureComponent extends NamedComponent {
 
     public VirtualTextureComponent() {
        this.id = sequenceId++;
+       index.put(this.id, this);
     }
 
     public void initialize(String name) {

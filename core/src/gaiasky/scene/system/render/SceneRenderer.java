@@ -438,6 +438,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
         EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
 
+        // Set clear color, depth and stencil.
+        Gdx.gl.glClearColor(0, 0, 0, 0);
+        Gdx.gl.glClearDepthf(1);
+        Gdx.gl.glClearStencil(0);
     }
 
     public synchronized void setRendering(boolean rendering) {

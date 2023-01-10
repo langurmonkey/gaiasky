@@ -1,6 +1,5 @@
 package gaiasky.scene.system.render.pass;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -10,17 +9,18 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
+import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.view.ModelView;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
+import java.nio.FloatBuffer;
 import java.util.List;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
@@ -39,6 +39,7 @@ public class SVTRenderPass {
 
     /** The frame buffer to render the SVT view determination. Format should be at least RGBAF16. **/
     private FrameBuffer frameBuffer;
+    private FloatBuffer pixels;
 
     private boolean uiViewCreated = false;
 
@@ -51,10 +52,15 @@ public class SVTRenderPass {
     public void initialize() {
         // Initialize frame buffer with 16 bits per channel.
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution, true);
-        float fbScale = 1.8F;
-        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder((int) (640 * fbScale), (int) (360 * fbScale));
+        float fbScale = 1.0F;
+        int w = (int) (640 * fbScale);
+        int h = (int) (360 * fbScale);
+        FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(w, h);
         frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
         frameBuffer = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
+
+        // Pixels for readout: w * h * 4 (RGBA).
+        pixels = BufferUtils.createFloatBuffer(w * h * 4);
     }
 
     public void render(ICamera camera) {
@@ -82,6 +88,31 @@ public class SVTRenderPass {
         renderAssets.mbPixelLightingSvtView.end();
 
         frameBuffer.end();
+
+        // Read out pixels to float buffer.
+        GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
+
+        // Compute visible tiles.
+        int size = frameBuffer.getWidth() * frameBuffer.getHeight();
+        float maxLevel = 0;
+        pixels.rewind();
+        for (int i = 0; i < size; i++) {
+            float level = pixels.get();
+            float x = pixels.get();
+            float y = pixels.get();
+            float id = pixels.get();
+
+            var svt = VirtualTextureComponent.getSVT((int) id);
+            if(svt != null) {
+                level = level * svt.tree.depth;
+                if (level > maxLevel) {
+                    maxLevel = level;
+                }
+            }
+
+        }
+        pixels.clear();
+        //System.out.println(maxLevel);
 
         if (!uiViewCreated) {
             GaiaSky.postRunnable(() -> {
