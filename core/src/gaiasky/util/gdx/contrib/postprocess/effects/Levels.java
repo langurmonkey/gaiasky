@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2012 tsagrista
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.Gdx;
@@ -37,13 +21,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * auto-tone mapping HDR and gamma correction.
  */
 public final class Levels extends PostProcessorEffect {
-    private static final int LUMA_SIZE = 500;
+    private static final int LUMA_SIZE = 400;
     private final Luma luma;
     private final FrameBuffer lumaBuffer;
     /** Is the max/avg process running? **/
     private final AtomicBoolean processRunning;
     FloatBuffer pixels = BufferUtils.createFloatBuffer(LUMA_SIZE * LUMA_SIZE * 3);
-    private int lumaLodLevels;
     private LevelsFilter levels;
     private float lumaMax = 0.9f, lumaAvg = 0.09f;
     private float currLumaMax = -1f, currLumaAvg = -1f;
@@ -61,10 +44,8 @@ public final class Levels extends PostProcessorEffect {
 
         // Compute number of lod levels based on LUMA_SIZE
         int size = LUMA_SIZE;
-        lumaLodLevels = 1;
         while (size > 1) {
             size = (int) Math.floor(size / 2f);
-            lumaLodLevels++;
         }
 
         GLFrameBuffer.FrameBufferBuilder builder = new GLFrameBuffer.FrameBufferBuilder(LUMA_SIZE, LUMA_SIZE);
@@ -255,8 +236,7 @@ public final class Levels extends PostProcessorEffect {
         while (buff.hasRemaining()) {
             double v = buff.get();
 
-            // Skip g, b, a
-            buff.get();
+            // Skip g, b
             buff.get();
             buff.get();
 

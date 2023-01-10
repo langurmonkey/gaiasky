@@ -274,7 +274,7 @@ public final class PostProcessor implements Disposable {
      * Starts capturing the scene, clears the buffer with the clear color specified by {@link #setClearColor(Color)} or
      * {@link #setClearColor(float r, float g, float b, float a)}.
      *
-     * @return true or false, whether or not capturing has been initiated. Capturing will fail in case there are no enabled effects
+     * @return true or false, whether capturing has been initiated. Capturing will fail in case there are no enabled effects
      * in the chain or this instance is not enabled or capturing is already started.
      */
     public boolean capture() {
@@ -283,8 +283,6 @@ public final class PostProcessor implements Disposable {
         if (enabled && !capturing) {
             if (buildEnabledEffectsList() == 0) {
                 // no enabled effects
-                // Gdx.app.log( "PostProcessor::capture()",
-                // "No post-processor effects enabled" );
                 return false;
             }
 
