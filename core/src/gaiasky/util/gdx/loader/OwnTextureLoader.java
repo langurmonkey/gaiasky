@@ -87,6 +87,16 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, OwnTextur
     }
 
     @Override
+    public void unloadAsync(AssetManager manager, String fileName, FileHandle file, OwnTextureParameter parameter) {
+        if (parameter.texture != null) {
+            parameter.texture.dispose();
+        }
+        if(parameter.textureData != null) {
+            parameter.textureData.disposePixmap();
+        }
+    }
+
+    @Override
     public Texture loadSync(AssetManager manager, String fileName, FileHandle file, OwnTextureParameter parameter) {
         if (info == null)
             return null;

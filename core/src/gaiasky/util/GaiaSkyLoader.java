@@ -67,12 +67,13 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
 
         // SVT.
         assets.svtManager = new SVTManager();
-        assets.svtManager.initialize(parameter.gaiaSky.assetManager);
 
     }
 
     @Override
     public GaiaSkyAssets loadSync(AssetManager manager, String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
+        // Needs initialization of textures.
+        assets.svtManager.initialize(parameter.gaiaSky.assetManager);
         return assets;
     }
 

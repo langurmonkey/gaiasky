@@ -8,6 +8,7 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -109,7 +110,7 @@ public class GuiRegistry implements IObserver {
         this.catalogManager = catalogManager;
         this.view = new FocusView();
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.SHOW_FRAME_BUFFER_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
+        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
     }
 
     public InputMultiplexer getInputMultiplexer() {
@@ -482,12 +483,22 @@ public class GuiRegistry implements IObserver {
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.keyframe.ct"), 10f);
                 }
             }
-            case SHOW_FRAME_BUFFER_WINDOW_ACTION -> {
+            case SHOW_TEXTURE_WINDOW_ACTION -> {
                 var title = (String) data[0];
-                var frameBuffer = (FrameBuffer) data[1];
-                var frameBufferWindow = new FrameBufferWindow(title, skin, stage, frameBuffer, 1f);
-                frameBufferWindow.setFlip(false, true);
-                frameBufferWindow.show(stage);
+                var scale = 1f;
+                if (data.length > 2) {
+                    scale = (Float) data[2];
+                }
+                TextureWindow textureWindow;
+                if (data[1] instanceof FrameBuffer) {
+                    var frameBuffer = (FrameBuffer) data[1];
+                    textureWindow = new TextureWindow(title, skin, stage, frameBuffer, scale);
+                } else {
+                    var texture = (Texture) data[1];
+                    textureWindow = new TextureWindow(title, skin, stage, texture, scale);
+
+                }
+                textureWindow.show(stage);
             }
             case UI_THEME_RELOAD_INFO -> {
                 if (keyframesWindow != null) {

@@ -2,7 +2,6 @@ package gaiasky.scene.system.render.pass;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.utils.Array;
@@ -12,10 +11,8 @@ import gaiasky.event.EventManager;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
-import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.ModelView;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
@@ -41,7 +38,7 @@ public class SVTRenderPass {
     private FrameBuffer frameBuffer;
     private FloatBuffer pixels;
 
-    private boolean uiViewCreated = false;
+    private boolean uiViewCreated = true;
 
     public SVTRenderPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
@@ -51,7 +48,6 @@ public class SVTRenderPass {
 
     public void initialize() {
         // Initialize frame buffer with 16 bits per channel.
-        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution, true);
         float fbScale = 1.0F;
         int w = (int) (320 * fbScale);
         int h = (int) (180 * fbScale);
@@ -94,9 +90,6 @@ public class SVTRenderPass {
         GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
 
         // Compute visible tiles.
-        int size = frameBuffer.getWidth() * frameBuffer.getHeight();
-        float maxLevel = 0;
-        float minLevel = 1000;
         GaiaSky.postRunnable(() -> {
             EventManager.publish(Event.SVT_VIEW_DETERMINATION_PROCESS, this, pixels);
         });
@@ -104,7 +97,7 @@ public class SVTRenderPass {
         if (!uiViewCreated) {
             GaiaSky.postRunnable(() -> {
                 // Create UI view
-                EventManager.publish(Event.SHOW_FRAME_BUFFER_WINDOW_ACTION, this, "SVT", frameBuffer);
+                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT", frameBuffer);
             });
             uiViewCreated = true;
         }

@@ -30,6 +30,10 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
     public final int col;
     public final int row;
     public final T object;
+    // Node state.
+    public int state = 0;
+    // Node last access time.
+    public long accessed = 0;
 
     public SVTQuadtreeNode(final SVTQuadtreeNode<T> parent, final int level, final int col, final int row, final T object) {
         this.parent = parent;

@@ -80,50 +80,6 @@ public class ModelUpdater extends AbstractUpdateSystem {
         if (engine != null && engine.render) {
             EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(), MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
         }
-
-        // Virtual textures. Attempt at tile visibility determination.
-        double radius = body.size * 0.5;
-        double distanceInRadii = camera.getFovFactor() * (body.distToCamera - radius) / radius;
-        double maxRadii = 6.5;
-        // Activation: closer than a certain multiple of the radius.
-        if (distanceInRadii < maxRadii) {
-            int maxLevel = 11;
-            int level = (int) Math.floor(maxLevel * (1.0 - distanceInRadii / maxRadii));
-            if (lastLevel != level) {
-                Logger.getLogger(ModelUpdater.class).info("L:" + level);
-                lastLevel = level;
-                if (model.model != null && model.model.mtc != null && model.model.mtc.diffuse != null) {
-                    // Update texture in one-time runnable.
-                    var r = new OneTimeRunnable("texupdater-" + Mapper.base.get(entity).getName()) {
-                        @Override
-                        protected void process() {
-                            var mtc = model.model.mtc;
-                            var mat = mtc.getMaterial();
-                            if (mat != null && mat.has(TextureAttribute.Diffuse)) {
-                                var ta = (TextureAttribute) mat.get(TextureAttribute.Diffuse);
-                                if (ta != null) {
-                                    var tex = ta.textureDescription.texture;
-                                    Pixmap p = new Pixmap(64, 64, Format.RGBA8888);
-                                    p.setColor((float) StdRandom.uniform(0.2, 1.0), (float) StdRandom.uniform(0.2, 1.0), (float) StdRandom.uniform(0.2, 1.0), 1f);
-                                    p.fillCircle(32, 32, StdRandom.uniform(6, 29));
-                                    int x = StdRandom.uniform(tex.getWidth() - 64);
-                                    int y = StdRandom.uniform(tex.getHeight() - 64);
-                                    if (!tex.isManaged()) {
-                                        // Draw directly.
-                                        tex.draw(p, x, y);
-                                        Logger.getLogger(ModelUpdater.class).info("Updated pixmap at " + x + ", " + y);
-                                    } else {
-                                        // Can't update texture!
-                                        Logger.getLogger(ModelUpdater.class).warn("Can't update non-pixmap backed texture!");
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    r.post();
-                }
-            }
-        }
     }
 
     int lastLevel = -1;

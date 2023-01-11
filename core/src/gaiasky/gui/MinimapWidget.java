@@ -22,13 +22,13 @@ import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
-import gaiasky.util.scene2d.FrameBufferWidget;
+import gaiasky.util.scene2d.TextureWidget;
 
 public class MinimapWidget implements Disposable {
     private final FrameBuffer tfb;
     private final FrameBuffer sfb;
-    private final FrameBufferWidget topProjection;
-    private final FrameBufferWidget sideProjection;
+    private final TextureWidget topProjection;
+    private final TextureWidget sideProjection;
     private final Vector3d aux3d;
     private final Array<IMinimapScale> scales;
     int side, side2;
@@ -53,8 +53,8 @@ public class MinimapWidget implements Disposable {
         tfb = new FrameBuffer(Format.RGBA8888, side, side, true);
         sfb = new FrameBuffer(Format.RGBA8888, side, sideShort, true);
 
-        topProjection = new FrameBufferWidget(tfb);
-        sideProjection = new FrameBufferWidget(sfb);
+        topProjection = new TextureWidget(tfb);
+        sideProjection = new TextureWidget(sfb);
 
         // Init scales
         scales = new Array<>();
@@ -112,11 +112,11 @@ public class MinimapWidget implements Disposable {
         }
     }
 
-    public FrameBufferWidget getSideProjection() {
+    public TextureWidget getSideProjection() {
         return sideProjection;
     }
 
-    public FrameBufferWidget getTopProjection() {
+    public TextureWidget getTopProjection() {
         return topProjection;
     }
 

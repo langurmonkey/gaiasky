@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.FrameBufferWidget;
+import gaiasky.util.scene2d.TextureWidget;
 
 public class MinimapWindow extends GenericDialog {
     private final MinimapWidget minimap;
@@ -35,10 +35,10 @@ public class MinimapWindow extends GenericDialog {
         float pb = 16f;
         mapName = new OwnLabel("", skin, "header");
         OwnLabel headerSide = new OwnLabel(I18n.msg("gui.minimap.side"), skin);
-        Container<FrameBufferWidget> mapSide = new Container<>();
+        Container<TextureWidget> mapSide = new Container<>();
         mapSide.setActor(minimap.getSideProjection());
         OwnLabel headerTop = new OwnLabel(I18n.msg("gui.minimap.top"), skin);
-        Container<FrameBufferWidget> mapTop = new Container<>();
+        Container<TextureWidget> mapTop = new Container<>();
         mapTop.setActor(minimap.getTopProjection());
 
         content.add(mapName).left().padBottom(pad18).row();
