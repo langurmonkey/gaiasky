@@ -1454,6 +1454,14 @@ public enum Event {
      *     <li>not found.</li>
      * </ol>
      */
-    DATASET_DOWNLOAD_FINISH_INFO;
+    DATASET_DOWNLOAD_FINISH_INFO,
+
+    /**
+     * Sparse virtual texture operation.
+     * Triggers the processing of the SVT view determination buffer and the loading/updating
+     * of the SVT cache and indirection buffers. Contains the {@link java.nio.FloatBuffer}
+     * with the contents of the view determination buffer.
+     */
+    SVT_VIEW_DETERMINATION_PROCESS;
 
 }

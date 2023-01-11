@@ -15,10 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 public class FrameBufferWidget extends Widget {
 
     private final FrameBuffer fb;
-    private final float width;
-    private final float height;
+    private float width;
+    private float height;
 
     private boolean flipX, flipY;
+    private float scaleX = 1F, scaleY = 1F;
 
     public FrameBufferWidget(FrameBuffer fb) {
         super();
@@ -27,21 +28,49 @@ public class FrameBufferWidget extends Widget {
         this.height = fb.getHeight();
     }
 
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+        if (fb != null) {
+            if (flipX || flipY || scaleX != 1F || scaleY != 1F) {
+                batch.draw(fb.getColorBufferTexture(), getX(), getY(), 0F, 0F, width, height, scaleX, scaleY, 0F, 0, 0, (int) width, (int) height, flipX, flipY);
+            } else {
+                batch.draw(fb.getColorBufferTexture(), getX(), getY(), width, height);
+            }
+        }
+    }
+
+    /**
+     * Flip the frame buffer.
+     *
+     * @param x Flip horizontally.
+     * @param y Flip vertically.
+     */
     public void setFlip(boolean x, boolean y) {
         this.flipX = x;
         this.flipY = y;
     }
 
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
-        if (fb != null) {
-            if (flipX || flipY) {
-                batch.draw(fb.getColorBufferTexture(), getX(), getY(), 0F, 0F, width, height, 1F, 1F, 0F, 0, 0, (int) width, (int) height, flipX, flipY);
-            } else {
-                batch.draw(fb.getColorBufferTexture(), getX(), getY(), width, height);
-            }
-        }
+    /**
+     * Set the scale factor of the frame buffer.
+     *
+     * @param scale The scale factor in both x and y dimensions.
+     */
+    public void setScale(float scale) {
+        this.setScale(scale, scale);
+    }
+
+    /**
+     * Set the scale factor of the frame buffer.
+     *
+     * @param scaleX The scale factor in x.
+     * @param scaleY The scale factor in y.
+     */
+    public void setScale(float scaleX, float scaleY) {
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
+        this.width *= scaleX;
+        this.height *= scaleY;
     }
 
     @Override

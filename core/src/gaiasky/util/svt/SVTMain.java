@@ -63,7 +63,7 @@ public class SVTMain {
 
     private static void test(SVTQuadtree<Path> tree, int level, double u, double v) {
         logger.info("L" + level + " u: " + u + ", v: " + v);
-        var tile = tree.getTile(level, u, v);
+        var tile = tree.getTileFromUV(level, u, v);
         logger.info(tile != null ? tile : "null");
     }
 }

@@ -23,7 +23,7 @@ package gaiasky.util.svt;
  * coordinate, corresponding to the rows, is inverted.
  * </p>
  */
-public class SVTQuadtreeNode<T> {
+public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
 
     public final SVTQuadtreeNode<T> parent;
     public final int level;
@@ -42,5 +42,11 @@ public class SVTQuadtreeNode<T> {
     @Override
     public String toString() {
         return "Node {" + "L" + level + ", col=" + col + ", row=" + row + ", o=" + object + '}';
+    }
+
+    @Override
+    public int compareTo(SVTQuadtreeNode o) {
+        // The natural order of nodes depends only on their depth.
+        return Integer.compare(this.level, o.level);
     }
 }

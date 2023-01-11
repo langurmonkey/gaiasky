@@ -17,6 +17,7 @@ import gaiasky.script.ScriptingServer;
 import gaiasky.util.GaiaSkyLoader.GaiaSkyLoaderParameters;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
+import gaiasky.util.svt.SVTManager;
 
 public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSkyLoaderParameters> {
 
@@ -63,6 +64,10 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
          */
         assets.sampClient = new SAMPClient(parameter.gaiaSky.getCatalogManager());
         assets.sampClient.initialize(parameter.gaiaSky.getGlobalResources().getSkin());
+
+        // SVT.
+        assets.svtManager = new SVTManager();
+        assets.svtManager.initialize(parameter.gaiaSky.assetManager);
 
     }
 

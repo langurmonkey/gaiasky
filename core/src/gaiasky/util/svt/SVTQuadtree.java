@@ -46,7 +46,7 @@ public class SVTQuadtree<T> {
         if (level > 0) {
             // Find parent.
             var uv = getUV(level, col, row);
-            parent = getTile(level - 1, uv.getFirst(), uv.getSecond());
+            parent = getTileFromUV(level - 1, uv.getFirst(), uv.getSecond());
         }
 
         var tile = new SVTQuadtreeNode<>(parent, level, col, row, object);
@@ -54,7 +54,14 @@ public class SVTQuadtree<T> {
         numTiles++;
     }
 
-    public SVTQuadtreeNode<T> getNode(int level, int col, int row) {
+    /**
+     * Gets a tile in the tree given its level, column and row.
+     * @param level The level.
+     * @param col The column.
+     * @param row The row.
+     * @return The tile with the given level, column and row, if it exists.
+     */
+    public SVTQuadtreeNode<T> getTile(int level, int col, int row) {
         assert level >= 0 && level <= MAX_LEVEL : "Level out of bounds: " + level;
         assert col >= 0 && row >= 0 : "Invalid Col/Row: " + col + ", " + row;
 
@@ -73,9 +80,9 @@ public class SVTQuadtree<T> {
      * @param v     The V texture coordinate in [0,1].
      * @return The tile at the given level and UV.
      */
-    public SVTQuadtreeNode<T> getTile(int level, double u, double v) {
+    public SVTQuadtreeNode<T> getTileFromUV(int level, double u, double v) {
         final var pair = getColRow(level, u, v);
-        return getNode(level, pair.getFirst(), pair.getSecond());
+        return getTile(level, pair.getFirst(), pair.getSecond());
     }
 
     public long getUTileCount(int level) {

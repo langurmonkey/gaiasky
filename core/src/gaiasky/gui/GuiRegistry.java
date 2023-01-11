@@ -485,9 +485,8 @@ public class GuiRegistry implements IObserver {
             case SHOW_FRAME_BUFFER_WINDOW_ACTION -> {
                 var title = (String) data[0];
                 var frameBuffer = (FrameBuffer) data[1];
-                var frameBufferWindow = new FrameBufferWindow(title, skin, stage, frameBuffer);
+                var frameBufferWindow = new FrameBufferWindow(title, skin, stage, frameBuffer, 1f);
                 frameBufferWindow.setFlip(false, true);
-                frameBufferWindow.setModal(false);
                 frameBufferWindow.show(stage);
             }
             case UI_THEME_RELOAD_INFO -> {

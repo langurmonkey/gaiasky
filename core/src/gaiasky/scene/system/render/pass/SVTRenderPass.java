@@ -53,8 +53,8 @@ public class SVTRenderPass {
         // Initialize frame buffer with 16 bits per channel.
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution, true);
         float fbScale = 1.0F;
-        int w = (int) (640 * fbScale);
-        int h = (int) (360 * fbScale);
+        int w = (int) (320 * fbScale);
+        int h = (int) (180 * fbScale);
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(w, h);
         frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
         frameBuffer = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
@@ -90,29 +90,16 @@ public class SVTRenderPass {
         frameBuffer.end();
 
         // Read out pixels to float buffer.
+        frameBuffer.getColorBufferTexture().bind();
         GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
 
         // Compute visible tiles.
         int size = frameBuffer.getWidth() * frameBuffer.getHeight();
         float maxLevel = 0;
-        pixels.rewind();
-        for (int i = 0; i < size; i++) {
-            float level = pixels.get();
-            float x = pixels.get();
-            float y = pixels.get();
-            float id = pixels.get();
-
-            var svt = VirtualTextureComponent.getSVT((int) id);
-            if(svt != null) {
-                level = level * svt.tree.depth;
-                if (level > maxLevel) {
-                    maxLevel = level;
-                }
-            }
-
-        }
-        pixels.clear();
-        //System.out.println(maxLevel);
+        float minLevel = 1000;
+        GaiaSky.postRunnable(() -> {
+            EventManager.publish(Event.SVT_VIEW_DETERMINATION_PROCESS, this, pixels);
+        });
 
         if (!uiViewCreated) {
             GaiaSky.postRunnable(() -> {
