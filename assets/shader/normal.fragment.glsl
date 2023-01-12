@@ -97,6 +97,14 @@ uniform samplerCube u_heightCubemap;
 uniform samplerCube u_reflectionCubemap;
 #endif
 
+#ifdef svtBufferTextureFlag
+uniform sampler2D u_svtBufferTexture;
+#endif
+
+#ifdef svtIndirectionTextureFlag
+uniform sampler2D u_svtIndirectionTexture;
+#endif
+
 #ifdef shininessFlag
 uniform float u_shininess;
 #endif
@@ -150,10 +158,26 @@ float getShadow(vec3 shadowMapUv) {
     //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
 }
 #endif // shadowMapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////
+////// CUBEMAPS
+//////////////////////////////////////////////////////
 #ifdef cubemapFlag
-    #include shader/lib_cubemap.glsl
+#include shader/lib_cubemap.glsl
 #endif // cubemapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////
+////// SVT
+//////////////////////////////////////////////////////
+#ifdef svtFlag
+#include shader/lib_svt.glsl
+#endif // cubemapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
@@ -166,7 +190,9 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
 #endif // diffuse
 
-#if defined(diffuseCubemapFlag)
+#if defined(svtFlag)
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtBufferTexture, svtTexCoords(texCoord))
+#elif defined(diffuseCubemapFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(texCoord, defaultValue)

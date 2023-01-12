@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -92,7 +93,7 @@ public class SVTManager implements IObserver {
     private Pixmap[] indirectionPixmaps;
 
     // Is the cache displaying in the UI already?
-    private boolean cacheInUi = false;
+    private boolean cacheInUi = true;
 
     public SVTManager() {
         super();
@@ -108,6 +109,7 @@ public class SVTManager implements IObserver {
         // Initialize cache buffer.
         var cacheTextureData = new PixmapTextureData(new Pixmap(CACHE_BUFFER_SIZE, CACHE_BUFFER_SIZE, Format.RGBA8888), Format.RGBA8888, false, false, false);
         cacheBuffer = new Texture(cacheTextureData);
+        cacheBuffer.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY);
     }
@@ -133,8 +135,9 @@ public class SVTManager implements IObserver {
 
                     // Initialize indirection buffer.
                     var indirectionSize = (int) Math.pow(2.0, svt.tree.depth);
-                    var indirectionTextureData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, true, false, false);
+                    var indirectionTextureData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, false, false, false);
                     indirectionBuffer = new Texture(indirectionTextureData);
+                    indirectionBuffer.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
                     // Initialize indirection pixmaps.
                     indirectionPixmaps = new Pixmap[svt.tree.depth + 1];
@@ -261,6 +264,14 @@ public class SVTManager implements IObserver {
 
     }
 
+    /**
+     * Puts the given tile at the given location in the cache buffer.
+     *
+     * @param tile The tile.
+     * @param i    The column in the cache.
+     * @param j    The row in the cache.
+     * @param now  The current time.
+     */
     private void putTileInCache(SVTQuadtreeNode<Path> tile, int i, int j, long now) {
         assert !tileLocation.containsKey(tile) : "Tile is already in the cache: " + tile;
         tileLocation.put(tile, new Pair<>(i, j));
@@ -280,22 +291,12 @@ public class SVTManager implements IObserver {
         /*
          * Update indirection buffer.
          * Each pixel in the indirection buffer has:
-         * - R: x position in cache buffer.
-         * - G: y position in cache buffer.
-         * - B: level.
+         * - R: U coordinate in cache buffer.
+         * - G: V coordinate in cache buffer.
+         * - B: level/depth.
          * - A: 1
          */
-        var level = tile.level;
-        indirectionPixmaps[level].setColor(x, y, tile.level, 1.0f);
-        // DEBUG CODE ============================================================================================
-        // ==== Uncomment the following two lines to debug the indirection buffer visually. ======================
-        //var size = (float) Math.pow(2, tile.level) * tileSize;
-        //indirectionPixmaps[level].setColor(x / (size * tile.tree.root.length), y / size, tile.level / 5f, 1.0f);
-        // =======================================================================================================
-        indirectionPixmaps[level].fill();
-        var tileUV = tile.getUV();
-        var xy = tile.tree.getColRow(tile.tree.depth, tileUV[0], tileUV[1]);
-        indirectionBuffer.draw(indirectionPixmaps[level], xy[0], xy[1]);
+        fillIndirectionBuffer(tile, i, j, tile.level);
 
         // Update tile last accessed time and status.
         tile.accessed = now;
@@ -304,6 +305,11 @@ public class SVTManager implements IObserver {
         logger.debug("Tile added -> xy[" + x + "," + y + "] ij[" + i + "," + j + "]: " + tile);
     }
 
+    /**
+     * Remove the current tile from the cache buffer, if it is cached.
+     *
+     * @param tile The tile to remove.
+     */
     private void removeTileFromCache(SVTQuadtreeNode<Path> tile) {
         var pair = tileLocation.remove(tile);
         int i = pair.getFirst();
@@ -316,9 +322,7 @@ public class SVTManager implements IObserver {
         while ((parent = tile.parent) != null) {
             if (tileLocation.containsKey(parent)) {
                 // Parent is cached, use it.
-                indirectionPixmaps[tile.level].setColor(parent.level / 5f, 0f, 1f, 1f);
-                indirectionPixmaps[tile.level].fill();
-                indirectionBuffer.draw(indirectionPixmaps[tile.level], i, j);
+                fillIndirectionBuffer(tile, i, j, parent.level);
                 break;
             }
         }
@@ -328,6 +332,34 @@ public class SVTManager implements IObserver {
         tile.state = STATE_LOADED;
 
         logger.debug("Tile removed -> ij[" + i + "," + j + "]: " + tile);
+    }
+
+    /**
+     * Fill the indirection buffer at the coordinate [i,j] with the given tile.
+     * Each pixel in the indirection buffer has:
+     * <ul>
+     * <li>R: U coordinate in cache buffer.</li>
+     * <li>G: V coordinate in cache buffer.</li>
+     * <li>B: level/depth.</li>
+     * <li>A: 1</li>
+     * </ul>
+     *
+     * @param tile         The tile.
+     * @param i            The column in the indirection buffer.
+     * @param j            The row in the indirection buffer.
+     * @param contentLevel The level to put in the indirection buffer. Typically it is the same as the tile level,
+     *                     but when deleting a tile from the cache, this is the level of the first ancestor found in
+     *                     the cache.
+     */
+    private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile, int i, int j, int contentLevel) {
+        var u = (float) i / (float) cacheSize;
+        var v = (float) j / (float) cacheSize;
+        var levelOverDepth = (float) contentLevel / (float) tile.tree.depth;
+        indirectionPixmaps[tile.level].setColor(u, v, levelOverDepth, 1.0f);
+        indirectionPixmaps[tile.level].fill();
+        var tileUV = tile.getUV();
+        var xy = tile.tree.getColRow(tile.tree.depth, tileUV[0], tileUV[1]);
+        indirectionBuffer.draw(indirectionPixmaps[tile.level], xy[0], xy[1]);
     }
 
     @Override

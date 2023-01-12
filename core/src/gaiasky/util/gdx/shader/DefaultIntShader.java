@@ -417,19 +417,20 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define cubemapFlag\n");
         }
 
-        boolean svt = false;
-        if(attributes.has(TextureAttribute.SvtBuffer)) {
+        boolean svtTextures = true;
+        if (attributes.has(TextureAttribute.SvtBuffer)) {
             prefix.append("#define " + TextureAttribute.SvtBufferAlias + "Flag\n");
-            svt = true;
+        } else {
+            svtTextures = false;
         }
-        if(attributes.has(TextureAttribute.SvtIndirection)) {
+        if (attributes.has(TextureAttribute.SvtIndirection)) {
             prefix.append("#define " + TextureAttribute.SvtIndirectionAlias + "Flag\n");
-            svt = true;
+        } else {
+            svtTextures = false;
         }
-        if(svt || attributes.has(FloatAttribute.SvtId) && attributes.has(FloatAttribute.SvtDepth) && attributes.has(FloatAttribute.SvtTileSize)) {
+        if (svtTextures && attributes.has(FloatAttribute.SvtId) && attributes.has(FloatAttribute.SvtDepth) && attributes.has(FloatAttribute.SvtTileSize)) {
             prefix.append("#define svtFlag\n");
         }
-
 
         if (renderable.bones != null && config.numBones > 0)
             prefix.append("#define numBones ").append(config.numBones).append("\n");
