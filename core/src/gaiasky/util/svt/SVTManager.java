@@ -239,10 +239,10 @@ public class SVTManager implements IObserver {
         }
 
         if (addedTiles > 0) {
-            logger.info("Paged in " + addedTiles + " virtual tiles.");
+            logger.debug("Paged in " + addedTiles + " virtual tiles.");
         }
         if (removedTiles > 0) {
-            logger.info("Paged out " + removedTiles + " virtual tiles.");
+            logger.debug("Paged out " + removedTiles + " virtual tiles.");
         }
 
         if (!cacheInUi && (addedTiles > 0 || removedTiles > 0) && tileLocation.size() > 1) {
@@ -252,6 +252,11 @@ public class SVTManager implements IObserver {
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 8f);
             });
             cacheInUi = true;
+        }
+
+        if (addedTiles > 0 || removedTiles > 0) {
+            // Post update through event system.
+            EventManager.publish(Event.SVT_CACHE_INDIRECTION_UPDATE, this, cacheBuffer, indirectionBuffer);
         }
 
     }
@@ -264,23 +269,29 @@ public class SVTManager implements IObserver {
         var path = tile.object.toString();
         var pixmap = tilePixmaps.get(path);
 
-        // Update cache buffer.
+        /*
+         * Update cache buffer with tile at [x,y].
+         */
+
         int x = i * tileSize;
         int y = j * tileSize;
         cacheBuffer.draw(pixmap, x, y);
 
-        // Update indirection buffer.
         /*
+         * Update indirection buffer.
          * Each pixel in the indirection buffer has:
-         * - x position in cache buffer (R channel).
-         * - y position in cache buffer (G channel).
-         * - level (B channel).
+         * - R: x position in cache buffer.
+         * - G: y position in cache buffer.
+         * - B: level.
+         * - A: 1
          */
-        var size = (float) Math.pow(2, tile.level) * tileSize;
         var level = tile.level;
         indirectionPixmaps[level].setColor(x, y, tile.level, 1.0f);
-        indirectionPixmaps[level].setColor(x / (size * 2f), y / size, tile.level / 5f, 1.0f);
-        indirectionPixmaps[level].setColor(tile.level / 5f, 0f, 1f, 1f);
+        // DEBUG CODE ============================================================================================
+        // ==== Uncomment the following two lines to debug the indirection buffer visually. ======================
+        //var size = (float) Math.pow(2, tile.level) * tileSize;
+        //indirectionPixmaps[level].setColor(x / (size * tile.tree.root.length), y / size, tile.level / 5f, 1.0f);
+        // =======================================================================================================
         indirectionPixmaps[level].fill();
         var tileUV = tile.getUV();
         var xy = tile.tree.getColRow(tile.tree.depth, tileUV[0], tileUV[1]);
@@ -290,7 +301,7 @@ public class SVTManager implements IObserver {
         tile.accessed = now;
         tile.state = STATE_CACHED;
 
-        logger.info("Tile added -> xy[" + x + "," + y + "] ij[" + i + "," + j + "]: " + tile);
+        logger.debug("Tile added -> xy[" + x + "," + y + "] ij[" + i + "," + j + "]: " + tile);
     }
 
     private void removeTileFromCache(SVTQuadtreeNode<Path> tile) {
@@ -316,7 +327,7 @@ public class SVTManager implements IObserver {
         tile.accessed = 0;
         tile.state = STATE_LOADED;
 
-        logger.info("Tile removed -> ij[" + i + "," + j + "]: " + tile);
+        logger.debug("Tile removed -> ij[" + i + "," + j + "]: " + tile);
     }
 
     @Override

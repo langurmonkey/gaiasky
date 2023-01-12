@@ -45,8 +45,8 @@ public class TextureAttribute extends Attribute {
     public final static int Height = register(HeightAlias);
     public final static String SvtBufferAlias = "svtBufferTexture";
     public final static int SvtBuffer = register(SvtBufferAlias);
-    public final static String SvtLookupAlias = "svtLookupTexture";
-    public final static int SvtLookup = register(SvtLookupAlias);
+    public final static String SvtIndirectionAlias = "svtIndirectionTexture";
+    public final static int SvtIndirection = register(SvtIndirectionAlias);
     public final TextureDescriptor<Texture> textureDescription;
     public float offsetU = 0;
     public float offsetV = 0;

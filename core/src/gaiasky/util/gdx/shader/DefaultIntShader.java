@@ -90,7 +90,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtDepth;
     protected final int u_svtId;
     protected final int u_svtBufferTexture;
-    protected final int u_svtLookupTexture;
+    protected final int u_svtIndirectionTexture;
     // Lighting uniforms
     protected final int u_ambientCubemap;
     protected final int u_dirLights0color;
@@ -244,7 +244,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtDepth = register(Inputs.svtDepth, Setters.svtDepth);
         u_svtId = register(Inputs.svtId, Setters.svtId);
         u_svtBufferTexture = register(Inputs.svtBufferTexture, Setters.svtBufferTexture);
-        u_svtLookupTexture = register(Inputs.svtLookupTexture, Setters.svtLookupTexture);
+        u_svtIndirectionTexture = register(Inputs.svtIndirectionTexture, Setters.svtIndirectionTexture);
     }
 
     public static String getDefaultVertexShader() {
@@ -422,8 +422,8 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define " + TextureAttribute.SvtBufferAlias + "Flag\n");
             svt = true;
         }
-        if(attributes.has(TextureAttribute.SvtLookup)) {
-            prefix.append("#define " + TextureAttribute.SvtLookupAlias + "Flag\n");
+        if(attributes.has(TextureAttribute.SvtIndirection)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionAlias + "Flag\n");
             svt = true;
         }
         if(svt || attributes.has(FloatAttribute.SvtId) && attributes.has(FloatAttribute.SvtDepth) && attributes.has(FloatAttribute.SvtTileSize)) {
@@ -741,7 +741,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform svtDepth = new Uniform("u_svtDepth", FloatAttribute.SvtDepth);
         public final static Uniform svtId = new Uniform("u_svtId", FloatAttribute.SvtId);
         public final static Uniform svtBufferTexture = new Uniform("u_svtBufferTexture");
-        public final static Uniform svtLookupTexture = new Uniform("u_svtLookupTexture");
+        public final static Uniform svtIndirectionTexture = new Uniform("u_svtIndirectionTexture");
     }
 
     public static class Setters {
@@ -1037,11 +1037,11 @@ public class DefaultIntShader extends BaseIntShader {
                 }
             }
         };
-        public final static Setter svtLookupTexture = new LocalSetter() {
+        public final static Setter svtIndirectionTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(TextureAttribute.SvtLookup)) {
-                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtLookup)))).textureDescription));
+                if (combinedAttributes.has(TextureAttribute.SvtIndirection)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirection)))).textureDescription));
                 }
             }
         };
