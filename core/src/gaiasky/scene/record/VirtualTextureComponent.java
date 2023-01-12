@@ -18,15 +18,22 @@ public class VirtualTextureComponent extends NamedComponent {
     }
 
     public int id;
+    /**
+     * The location of the tiles in the file system.
+     * This directory should contain a list of directories, one for each level,
+     * following the naming convention "level[LEVEL_NUMBER]", starting at "level0".
+     * The files should be named "tx_[COL]_[ROW].ext".
+     **/
     public String location;
     public String locationUnpacked;
+    /** A power of two with a maximum of 1024. **/
     public int tileSize;
 
     public SVTQuadtree<Path> tree;
 
     public VirtualTextureComponent() {
-       this.id = sequenceId++;
-       index.put(this.id, this);
+        this.id = sequenceId++;
+        index.put(this.id, this);
     }
 
     public void initialize(String name) {
@@ -45,11 +52,16 @@ public class VirtualTextureComponent extends NamedComponent {
     }
 
     public void setTileSize(Integer size) {
+        assert validTileSizeCheck(size) : "Tile size must be a power of two in [4,1024].";
         this.tileSize = size;
     }
 
+    private boolean validTileSizeCheck(int x) {
+        return (x == 4 || x == 8 || x == 16 || x == 32 || x == 64 || x == 128 || x == 256 || x == 512 || x == 1024);
+    }
+
     public void setTileSize(Long size) {
-        this.tileSize = Math.toIntExact(size);
+        setTileSize(Math.toIntExact(size));
     }
 
     @Override

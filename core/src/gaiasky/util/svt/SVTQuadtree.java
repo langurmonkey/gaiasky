@@ -13,10 +13,14 @@ import java.util.Map;
 public class SVTQuadtree<T> {
     private final int MAX_LEVEL = 15;
 
-    /** Size in pixels of each tile. Tiles are square, so width and height are equal. **/
+    /**
+     * Size in pixels of each tile. Tiles are square, so width and height are equal.
+     * The tile size is a power of two, capping at 1024.
+     * One of 8, 16, 32, 64, 128, 256, 512 or 1024.
+     **/
     public final long tileSize;
     /** Depth of the tree, e.g., the deepest level, in [0,n]. **/
-    public long depth = 0;
+    public int depth = 0;
 
     /** Root node(s) of the tree. **/
     public SVTQuadtreeNode<T>[] root;
@@ -46,19 +50,20 @@ public class SVTQuadtree<T> {
         if (level > 0) {
             // Find parent.
             var uv = getUV(level, col, row);
-            parent = getTileFromUV(level - 1, uv.getFirst(), uv.getSecond());
+            parent = getTileFromUV(level - 1, uv[0], uv[1]);
         }
 
-        var tile = new SVTQuadtreeNode<>(parent, level, col, row, object);
+        var tile = new SVTQuadtreeNode<>(this, parent, level, col, row, object);
         levels[level].put(getKey(col, row), tile);
         numTiles++;
     }
 
     /**
      * Gets a tile in the tree given its level, column and row.
+     *
      * @param level The level.
-     * @param col The column.
-     * @param row The row.
+     * @param col   The column.
+     * @param row   The row.
      * @return The tile with the given level, column and row, if it exists.
      */
     public SVTQuadtreeNode<T> getTile(int level, int col, int row) {
@@ -82,11 +87,11 @@ public class SVTQuadtree<T> {
      */
     public SVTQuadtreeNode<T> getTileFromUV(int level, double u, double v) {
         final var pair = getColRow(level, u, v);
-        return getTile(level, pair.getFirst(), pair.getSecond());
+        return getTile(level, pair[0], pair[1]);
     }
 
     public long getUTileCount(int level) {
-        return 2 * (2L << level);
+        return root.length * (1L << level);
     }
 
     public long getVTileCount(int level) {
@@ -97,20 +102,20 @@ public class SVTQuadtree<T> {
         }
     }
 
-    public Pair<Integer, Integer> getColRow(int level, double u, double v) {
+    public int[] getColRow(int level, double u, double v) {
         long vCount = getVTileCount(level);
-        long uCount = vCount * 2;
+        long uCount = vCount * root.length;
         final var col = (int) (u * uCount);
-        final var row = (int) ((1.0 - v) * vCount);
-        return new Pair<>(col, row);
+        final var row = (int) (v * vCount);
+        return new int[] { col, row };
     }
 
-    public Pair<Double, Double> getUV(int level, int col, int row) {
+    public double[] getUV(int level, int col, int row) {
         double vCount = getVTileCount(level);
-        double uCount = vCount * 2;
+        double uCount = vCount * root.length;
         final var u = (double) col / uCount;
         final var v = (vCount - row) / vCount;
-        return new Pair<>(u, v);
+        return new double[] { u, v };
     }
 
     public boolean contains(int level, int col, int row) {

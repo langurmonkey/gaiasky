@@ -19,7 +19,6 @@ public class TextureWindow extends GenericDialog {
     public TextureWindow(String title, Skin skin, Stage stage, Texture texture, float scale) {
         super(title, skin, stage);
         textureWidget = new TextureWidget(texture);
-        textureWidget.setDebug(true);
         textureWidget.setScale(scale);
 
         setCancelText(I18n.msg("gui.close"));

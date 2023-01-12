@@ -25,6 +25,9 @@ package gaiasky.util.svt;
  */
 public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
 
+    /** The tree this node belongs to. **/
+    public final SVTQuadtree<T> tree;
+    /** The parent of this tile, if it is not at the root level. **/
     public final SVTQuadtreeNode<T> parent;
     public final int level;
     public final int col;
@@ -35,12 +38,24 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
     // Node last access time.
     public long accessed = 0;
 
-    public SVTQuadtreeNode(final SVTQuadtreeNode<T> parent, final int level, final int col, final int row, final T object) {
+    public SVTQuadtreeNode(final SVTQuadtree<T> tree, final SVTQuadtreeNode<T> parent, final int level, final int col, final int row, final T object) {
+        this.tree = tree;
         this.parent = parent;
         this.level = level;
         this.col = col;
         this.row = row;
         this.object = object;
+    }
+
+    /**
+     * Get the UV coordinates in [0,1] of the top left position of this tile.
+     * @return The UV coordinates of this tile.
+     */
+    public double[] getUV(){
+        var numCols = (double) tree.getUTileCount(level);
+        var numRows = (double) tree.getVTileCount(level);
+
+        return new double[]{ (double) col / numCols, (double) row / numRows };
     }
 
     @Override
