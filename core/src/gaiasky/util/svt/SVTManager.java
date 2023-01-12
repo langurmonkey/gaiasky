@@ -83,9 +83,14 @@ public class SVTManager implements IObserver {
     private Map<SVTQuadtreeNode<Path>, Pair<Integer, Integer>> tileLocation;
 
     /**
-     * The actual textures that hold the cache and the indirection buffers.
+     * The cache buffer texture.
      */
-    private Texture cacheBuffer, indirectionBuffer;
+    private Texture cacheBuffer;
+    /**
+     * The indirection buffer texture. {@link TextureExt} enables drawing to
+     * any mipmap level.
+     */
+    private TextureExt indirectionBuffer;
 
     /**
      * A pixmap for each tree level used to draw in the indirection texture.
@@ -135,8 +140,8 @@ public class SVTManager implements IObserver {
 
                     // Initialize indirection buffer.
                     var indirectionSize = (int) Math.pow(2.0, svt.tree.depth);
-                    var indirectionTextureData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, false, false, false);
-                    indirectionBuffer = new Texture(indirectionTextureData);
+                    var indirectionTextureData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, true, false, false);
+                    indirectionBuffer = new TextureExt(indirectionTextureData);
                     indirectionBuffer.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
                     // Initialize indirection pixmaps.
@@ -359,7 +364,7 @@ public class SVTManager implements IObserver {
         indirectionPixmaps[tile.level].fill();
         var tileUV = tile.getUV();
         var xy = tile.tree.getColRow(tile.tree.depth, tileUV[0], tileUV[1]);
-        indirectionBuffer.draw(indirectionPixmaps[tile.level], xy[0], xy[1]);
+        indirectionBuffer.draw(indirectionPixmaps[tile.level], xy[0], xy[1], 0);
     }
 
     @Override
