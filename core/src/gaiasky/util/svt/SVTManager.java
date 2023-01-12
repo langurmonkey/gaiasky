@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Manages the SVT cache and indirection buffers. It processes the view determination
+ * Manages the SVT cache and indirection buffers. It processes the tile detection
  * buffer, determines the observed tiles, loads them, adds them to the cache and
  * updates the indirection buffer.
  */
@@ -112,15 +112,15 @@ public class SVTManager implements IObserver {
         EventManager.instance.subscribe(this, Event.SVT_VIEW_DETERMINATION_PROCESS);
     }
 
-    public void update(final FloatBuffer pixels) {
+    public void update(final FloatBuffer tileDetectionBuffer) {
         observedTiles.clear();
-        int size = pixels.capacity() / 4;
-        pixels.rewind();
+        int size = tileDetectionBuffer.capacity() / 4;
+        tileDetectionBuffer.rewind();
         for (int i = 0; i < size; i++) {
-            float level = pixels.get();
-            float x = pixels.get();
-            float y = pixels.get();
-            float id = pixels.get();
+            float level = tileDetectionBuffer.get();
+            float x = tileDetectionBuffer.get();
+            float y = tileDetectionBuffer.get();
+            float id = tileDetectionBuffer.get();
 
             if (id > 0) {
                 var svt = VirtualTextureComponent.getSVT((int) id);
@@ -152,7 +152,7 @@ public class SVTManager implements IObserver {
                 }
             }
         }
-        pixels.clear();
+        tileDetectionBuffer.clear();
 
         var now = TimeUtils.millis();
 

@@ -23,7 +23,7 @@ import java.util.List;
 import static gaiasky.render.RenderGroup.MODEL_PIX;
 
 /**
- * Sparse virtual texture (SVT) view determination render pass.
+ * Sparse virtual texture (SVT) tile detection render pass.
  */
 public class SVTRenderPass {
     /** The scene renderer object. **/
@@ -34,7 +34,7 @@ public class SVTRenderPass {
 
     private final Array<IRenderable> entities;
 
-    /** The frame buffer to render the SVT view determination. Format should be at least RGBAF16. **/
+    /** The frame buffer to render the SVT tile detection. Format should be at least RGBAF16. **/
     private FrameBuffer frameBuffer;
     private FloatBuffer pixels;
 
@@ -72,7 +72,7 @@ public class SVTRenderPass {
 
         var renderAssets = sceneRenderer.getRenderAssets();
 
-        // Render SVT view determination to frame buffer.
+        // Render SVT tile detection to frame buffer.
         frameBuffer.begin();
         Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -97,7 +97,7 @@ public class SVTRenderPass {
         if (!uiViewCreated) {
             GaiaSky.postRunnable(() -> {
                 // Create UI view
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT", frameBuffer);
+                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
             });
             uiViewCreated = true;
         }
