@@ -89,9 +89,9 @@ public class SVTRenderPass {
         frameBuffer.getColorBufferTexture().bind();
         GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
 
-        // Compute visible tiles.
+        // Send message informing a new tile detection buffer is ready.
         GaiaSky.postRunnable(() -> {
-            EventManager.publish(Event.SVT_VIEW_DETERMINATION_PROCESS, this, pixels);
+            EventManager.publish(Event.SVT_TILE_DETECTION_READY, this, pixels);
         });
 
         if (!uiViewCreated) {

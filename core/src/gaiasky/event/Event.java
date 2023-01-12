@@ -1463,6 +1463,6 @@ public enum Event {
      * of the SVT cache and indirection buffers. Contains the {@link java.nio.FloatBuffer}
      * with the contents of the view determination buffer.
      */
-    SVT_VIEW_DETERMINATION_PROCESS;
+    SVT_TILE_DETECTION_READY;
 
 }

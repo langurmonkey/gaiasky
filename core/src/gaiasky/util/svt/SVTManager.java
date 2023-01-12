@@ -109,7 +109,7 @@ public class SVTManager implements IObserver {
         var cacheTextureData = new PixmapTextureData(new Pixmap(CACHE_BUFFER_SIZE, CACHE_BUFFER_SIZE, Format.RGBA8888), Format.RGBA8888, false, false, false);
         cacheBuffer = new Texture(cacheTextureData);
 
-        EventManager.instance.subscribe(this, Event.SVT_VIEW_DETERMINATION_PROCESS);
+        EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY);
     }
 
     public void update(final FloatBuffer tileDetectionBuffer) {
@@ -321,7 +321,7 @@ public class SVTManager implements IObserver {
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if (event == Event.SVT_VIEW_DETERMINATION_PROCESS) {
+        if (event == Event.SVT_TILE_DETECTION_READY) {
             // Compute visible tiles.
             var pixels = (FloatBuffer) data[0];
             update(pixels);
