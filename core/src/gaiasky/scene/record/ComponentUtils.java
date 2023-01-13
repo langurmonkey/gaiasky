@@ -2,7 +2,7 @@ package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
 
-public class TextureUtils {
+public class ComponentUtils {
     /**
      * Checks whether the texture with the given name is loaded.
      *

@@ -1,12 +1,11 @@
 package gaiasky.util.svt;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.glutils.FloatTextureData;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -17,7 +16,9 @@ import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
+import gaiasky.util.gdx.graphics.TextureExt;
 
+import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
 import java.util.*;
@@ -146,7 +147,7 @@ public class SVTManager implements IObserver {
                     //var indirectionData = new FloatTextureDataExt(indirectionSize * svt.tree.root.length, indirectionSize, GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
                     var indirectionData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, true, false, false);
                     indirectionBuffer = new TextureExt(indirectionData);
-                    indirectionBuffer.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
+                    indirectionBuffer.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
                     // Initialize indirection pixmaps.
                     indirectionPixmaps = new Pixmap[svt.tree.depth + 1];
@@ -305,7 +306,7 @@ public class SVTManager implements IObserver {
          * - B: level/depth.
          * - A: 1
          */
-        fillIndirectionBuffer(tile, i, j, tile.level, false);
+        fillIndirectionBuffer(tile, i, j, tile.level, true);
 
         // Update tile last accessed time and status.
         tile.accessed = now;
@@ -327,11 +328,11 @@ public class SVTManager implements IObserver {
 
         // Update indirection buffer with the closest cached parent tile. Traverse tree upwards until
         // we find a cached parent.
-        SVTQuadtreeNode<Path> parent;
-        while ((parent = tile.parent) != null) {
-            if (tileLocation.containsKey(parent)) {
+        SVTQuadtreeNode<Path> currentTile = tile;
+        while ((currentTile = currentTile.parent) != null) {
+            if (tileLocation.containsKey(currentTile)) {
                 // Parent is cached, use it.
-                fillIndirectionBuffer(tile, i, j, parent.level, false);
+                fillIndirectionBuffer(tile, i, j, currentTile.level, false);
                 break;
             }
         }
@@ -377,12 +378,13 @@ public class SVTManager implements IObserver {
                 int dLevel = level - tile.level;
                 indirectionPixmaps[dLevel].setColor(u, v, (float) contentLevel / (float) tile.tree.depth, 1.0f);
                 indirectionPixmaps[dLevel].fill();
-                // Draw to correct mip level.
+                // Draw texture to the correct mip level.
                 var xyLevel = tile.tree.getColRow(level, tileUV[0], tileUV[1]);
                 indirectionBuffer.draw(indirectionPixmaps[dLevel], xyLevel[0], xyLevel[1], tile.tree.depth - level);
             }
         }
     }
+
 
     @Override
     public void notify(Event event, Object source, Object... data) {

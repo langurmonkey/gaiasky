@@ -1,4 +1,4 @@
-package gaiasky.util.svt;
+package gaiasky.util.gdx.graphics;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;

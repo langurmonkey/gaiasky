@@ -1,7 +1,5 @@
 package gaiasky.util.gdx.g2d;
 
-import com.badlogic.gdx.Files.FileType;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;

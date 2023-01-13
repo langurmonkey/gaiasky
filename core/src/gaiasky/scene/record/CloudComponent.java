@@ -97,7 +97,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return TextureUtils.isLoaded(diffuseUnpacked, manager) && TextureUtils.isLoaded(diffuseCubemap, manager);
+        return ComponentUtils.isLoaded(diffuseUnpacked, manager) && ComponentUtils.isLoaded(diffuseCubemap, manager);
     }
 
     /**
