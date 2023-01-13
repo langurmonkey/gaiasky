@@ -1,10 +1,12 @@
 package gaiasky.util.svt;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.glutils.FloatTextureData;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -69,7 +71,7 @@ public class SVTManager implements IObserver {
      * The dimension in tiles of each dimension of the cache buffer. This is also equal to
      * each dimension of the indirection buffer.
      */
-    private int cacheSize = -1;
+    private int cacheSizeInTiles = -1;
 
     /**
      * Contains the currently paged tile in each position of the matrix.
@@ -80,7 +82,7 @@ public class SVTManager implements IObserver {
     /**
      * Direct access to the location in the cache for each paged tile.
      */
-    private Map<SVTQuadtreeNode<Path>, Pair<Integer, Integer>> tileLocation;
+    private final Map<SVTQuadtreeNode<Path>, Pair<Integer, Integer>> tileLocation;
 
     /**
      * The cache buffer texture.
@@ -98,7 +100,7 @@ public class SVTManager implements IObserver {
     private Pixmap[] indirectionPixmaps;
 
     // Is the cache displaying in the UI already?
-    private boolean cacheInUi = true;
+    private boolean cacheInUi = false;
 
     public SVTManager() {
         super();
@@ -135,20 +137,22 @@ public class SVTManager implements IObserver {
                     tileSize = svt.tileSize;
 
                     // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
-                    cacheSize = CACHE_BUFFER_SIZE / tileSize;
-                    cacheBufferArray = new SVTQuadtreeNode[cacheSize][cacheSize];
+                    cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
+                    cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
 
                     // Initialize indirection buffer.
                     var indirectionSize = (int) Math.pow(2.0, svt.tree.depth);
-                    var indirectionTextureData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, true, false, false);
-                    indirectionBuffer = new TextureExt(indirectionTextureData);
-                    indirectionBuffer.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+                    // We need RGBA with 16 bits per channel.
+                    //var indirectionData = new FloatTextureDataExt(indirectionSize * svt.tree.root.length, indirectionSize, GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
+                    var indirectionData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, true, false, false);
+                    indirectionBuffer = new TextureExt(indirectionData);
+                    indirectionBuffer.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Nearest);
 
                     // Initialize indirection pixmaps.
                     indirectionPixmaps = new Pixmap[svt.tree.depth + 1];
-                    for (int pm = 0; pm <= svt.tree.depth; pm++) {
-                        var tilesPerLevel = (int) Math.pow(2.0, pm);
-                        indirectionPixmaps[svt.tree.depth - pm] = new Pixmap(tilesPerLevel * svt.tree.root.length, tilesPerLevel, Format.RGBA8888);
+                    for (int treeLevel = 0; treeLevel <= svt.tree.depth; treeLevel++) {
+                        var tilesPerLevel = (int) Math.pow(2.0, treeLevel);
+                        indirectionPixmaps[treeLevel] = new Pixmap(tilesPerLevel, tilesPerLevel, Format.RGBA8888);
                     }
                 }
 
@@ -202,11 +206,11 @@ public class SVTManager implements IObserver {
         while ((tile = queuedTiles.poll()) != null && addedTiles < MAX_TILES_PER_FRAME) {
             if (tile.state == STATE_QUEUED) {
                 if (!tileLocation.containsKey(tile)) {
-                    if (tileLocation.size() < cacheSize * cacheSize) {
+                    if (tileLocation.size() < cacheSizeInTiles * cacheSizeInTiles) {
                         // Find first free location in cache.
                         outer1:
-                        for (int j = 0; j < cacheSize; j++) {
-                            for (int i = 0; i < cacheSize; i++) {
+                        for (int j = 0; j < cacheSizeInTiles; j++) {
+                            for (int i = 0; i < cacheSizeInTiles; i++) {
                                 if (cacheBufferArray[i][j] == null) {
                                     // Use this location.
                                     putTileInCache(tile, i, j, now);
@@ -219,8 +223,8 @@ public class SVTManager implements IObserver {
                     } else {
                         // We have no free locations, offload least recently used tile.
                         SVTQuadtreeNode<Path> lru = null;
-                        for (int j = 0; j < cacheSize; j++) {
-                            for (int i = 0; i < cacheSize; i++) {
+                        for (int j = 0; j < cacheSizeInTiles; j++) {
+                            for (int i = 0; i < cacheSizeInTiles; i++) {
                                 var candidate = cacheBufferArray[i][j];
                                 // Do not touch level-0 tiles.
                                 if (candidate.level > 0 && (lru == null || candidate.accessed < lru.accessed)) {
@@ -256,8 +260,8 @@ public class SVTManager implements IObserver {
         if (!cacheInUi && (addedTiles > 0 || removedTiles > 0) && tileLocation.size() > 1) {
             GaiaSky.postRunnable(() -> {
                 // Create UI view
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.2f);
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 8f);
+                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.1f);
+                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 6f);
             });
             cacheInUi = true;
         }
@@ -301,7 +305,7 @@ public class SVTManager implements IObserver {
          * - B: level/depth.
          * - A: 1
          */
-        fillIndirectionBuffer(tile, i, j, tile.level);
+        fillIndirectionBuffer(tile, i, j, tile.level, false);
 
         // Update tile last accessed time and status.
         tile.accessed = now;
@@ -327,7 +331,7 @@ public class SVTManager implements IObserver {
         while ((parent = tile.parent) != null) {
             if (tileLocation.containsKey(parent)) {
                 // Parent is cached, use it.
-                fillIndirectionBuffer(tile, i, j, parent.level);
+                fillIndirectionBuffer(tile, i, j, parent.level, false);
                 break;
             }
         }
@@ -352,19 +356,32 @@ public class SVTManager implements IObserver {
      * @param tile         The tile.
      * @param i            The column in the indirection buffer.
      * @param j            The row in the indirection buffer.
-     * @param contentLevel The level to put in the indirection buffer. Typically it is the same as the tile level,
+     * @param contentLevel The level to put in the indirection buffer. Typically, it is the same as the tile level,
      *                     but when deleting a tile from the cache, this is the level of the first ancestor found in
      *                     the cache.
+     * @param cascade      Fill deeper mip levels in cascade with the same tile.
      */
-    private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile, int i, int j, int contentLevel) {
-        var u = (float) i / (float) cacheSize;
-        var v = (float) j / (float) cacheSize;
-        var levelOverDepth = (float) contentLevel / (float) tile.tree.depth;
-        indirectionPixmaps[tile.level].setColor(u, v, levelOverDepth, 1.0f);
+    private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile, int i, int j, int contentLevel, boolean cascade) {
+        var u = (float) i / (float) cacheSizeInTiles;
+        var v = (float) j / (float) cacheSizeInTiles;
+        indirectionPixmaps[tile.level].setColor(u, v, (float) contentLevel / (float) tile.tree.depth, 1.0f);
         indirectionPixmaps[tile.level].fill();
         var tileUV = tile.getUV();
-        var xy = tile.tree.getColRow(tile.tree.depth, tileUV[0], tileUV[1]);
-        indirectionBuffer.draw(indirectionPixmaps[tile.level], xy[0], xy[1], 0);
+        var xy = tile.tree.getColRow(tile.level, tileUV[0], tileUV[1]);
+        // In OpenGL, level 0 is the base level with the highest resolution, while n is the nth mipmap reduction image.
+        // In our system, 0 is the root, the lowest detailed tiles, while depth is the base level (the highest resolution).
+        indirectionBuffer.draw(indirectionPixmaps[tile.level], xy[0], xy[1], tile.mipLevel());
+        if (cascade) {
+            // Fill all lower mipmap levels with this tile.
+            for (int level = tile.level + 1; level <= tile.tree.depth; level++) {
+                int dLevel = level - tile.level;
+                indirectionPixmaps[dLevel].setColor(u, v, (float) contentLevel / (float) tile.tree.depth, 1.0f);
+                indirectionPixmaps[dLevel].fill();
+                // Draw to correct mip level.
+                var xyLevel = tile.tree.getColRow(level, tileUV[0], tileUV[1]);
+                indirectionBuffer.draw(indirectionPixmaps[dLevel], xyLevel[0], xyLevel[1], tile.tree.depth - level);
+            }
+        }
     }
 
     @Override

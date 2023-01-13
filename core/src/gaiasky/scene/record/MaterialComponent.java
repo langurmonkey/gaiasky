@@ -963,11 +963,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             }
         }
         case SVT_CACHE_INDIRECTION_UPDATE -> {
-            if (this.hasSVT() && this.material != null && !material.has(TextureAttribute.SvtBuffer)) {
+            if (this.hasSVT() && this.material != null && !material.has(TextureAttribute.SvtCache)) {
                 var buffer = (Texture) data[0];
                 var indirection = (Texture) data[1];
                 GaiaSky.postRunnable(() -> {
-                    material.set(new TextureAttribute(TextureAttribute.SvtBuffer, buffer));
+                    material.set(new TextureAttribute(TextureAttribute.SvtCache, buffer));
                     material.set(new TextureAttribute(TextureAttribute.SvtIndirection, indirection));
                 });
 

@@ -52,8 +52,7 @@ float mipmapLevel(in vec2 texelCoord) {
     vec2  dxVtc        = dFdx(texelCoord);
     vec2  dyVtc        = dFdy(texelCoord);
     float deltaMaxSqr  = max(dot(dxVtc, dxVtc), dot(dyVtc, dyVtc));
-    float mml          = 0.5 * log2(deltaMaxSqr);
-    return max(0.0, mml);
+    return             0.5 * log2(deltaMaxSqr);
 }
 
 void main() {
@@ -62,7 +61,9 @@ void main() {
     // Level, clamp to [0,depth]. SVT level = floor(depth - clamp(mipmapLevel, 0, depth)).
     float svtTextureSize = u_svtTileSize * nTiles;
     vec2 svtDimension = vec2(svtTextureSize * 2.0, svtTextureSize);
-    float svtLevel = floor(u_svtDepth - clamp(mipmapLevel(v_data.texCoords.xy * svtDimension), 0.0, u_svtDepth));
+    // u_svtDepth is also the maximum mip level, u_svtDepth = log2(svtTextureSize/u_svtTileSize)
+    float mip = clamp(floor(mipmapLevel(v_data.texCoords.xy * svtDimension)), 0.0, u_svtDepth);
+    float svtLevel = u_svtDepth - mip;
     fragColor.x = svtLevel;
 
     // Tile XY at the current level.

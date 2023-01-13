@@ -243,7 +243,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtTileSize = register(Inputs.svtTileSize, Setters.svtTileSize);
         u_svtDepth = register(Inputs.svtDepth, Setters.svtDepth);
         u_svtId = register(Inputs.svtId, Setters.svtId);
-        u_svtBufferTexture = register(Inputs.svtBufferTexture, Setters.svtBufferTexture);
+        u_svtBufferTexture = register(Inputs.svtCacheTexture, Setters.svtBufferTexture);
         u_svtIndirectionTexture = register(Inputs.svtIndirectionTexture, Setters.svtIndirectionTexture);
     }
 
@@ -418,8 +418,8 @@ public class DefaultIntShader extends BaseIntShader {
         }
 
         boolean svtTextures = true;
-        if (attributes.has(TextureAttribute.SvtBuffer)) {
-            prefix.append("#define " + TextureAttribute.SvtBufferAlias + "Flag\n");
+        if (attributes.has(TextureAttribute.SvtCache)) {
+            prefix.append("#define " + TextureAttribute.SvtCacheAlias + "Flag\n");
         } else {
             svtTextures = false;
         }
@@ -741,7 +741,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform svtTileSize = new Uniform("u_svtTileSize", FloatAttribute.SvtTileSize);
         public final static Uniform svtDepth = new Uniform("u_svtDepth", FloatAttribute.SvtDepth);
         public final static Uniform svtId = new Uniform("u_svtId", FloatAttribute.SvtId);
-        public final static Uniform svtBufferTexture = new Uniform("u_svtBufferTexture");
+        public final static Uniform svtCacheTexture = new Uniform("u_svtCacheTexture");
         public final static Uniform svtIndirectionTexture = new Uniform("u_svtIndirectionTexture");
     }
 
@@ -1033,8 +1033,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Setter svtBufferTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(TextureAttribute.SvtBuffer)) {
-                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtBuffer))).textureDescription));
+                if (combinedAttributes.has(TextureAttribute.SvtCache)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtCache))).textureDescription));
                 }
             }
         };

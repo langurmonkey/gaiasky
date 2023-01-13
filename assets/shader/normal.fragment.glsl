@@ -97,8 +97,8 @@ uniform samplerCube u_heightCubemap;
 uniform samplerCube u_reflectionCubemap;
 #endif
 
-#ifdef svtBufferTextureFlag
-uniform sampler2D u_svtBufferTexture;
+#ifdef svtCacheTextureFlag
+uniform sampler2D u_svtCacheTexture;
 #endif
 
 #ifdef svtIndirectionTextureFlag
@@ -191,7 +191,7 @@ float getShadow(vec3 shadowMapUv) {
 #endif // diffuse
 
 #if defined(svtFlag)
-    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtBufferTexture, svtTexCoords(texCoord))
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(texCoord))
 #elif defined(diffuseCubemapFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)

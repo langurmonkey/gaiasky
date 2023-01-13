@@ -58,6 +58,14 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
         return new double[]{ (double) col / numCols, (double) row / numRows };
     }
 
+    /**
+     * Computes the OpenGL mip level for this tile.
+     * @return The OpenGL mip level for this tile.
+     */
+    public int mipLevel() {
+        return tree.depth - level;
+    }
+
     @Override
     public String toString() {
         return "Node {" + "L" + level + ", col=" + col + ", row=" + row + ", o=" + object + '}';
