@@ -39,7 +39,7 @@ public class SVTManager implements IObserver {
      * This needs to be a multiple of the tile size, and tile sizes are powers of two,
      * capping at 1024, so this should be a multiple of 1024 to be on the safe side.
      **/
-    private static final int CACHE_BUFFER_SIZE = 5120;
+    private static final int CACHE_BUFFER_SIZE = 1024 * 6;
 
     // Tile state tokens.
     private static final int STATE_NOT_LOADED = 0;
@@ -262,7 +262,7 @@ public class SVTManager implements IObserver {
             GaiaSky.postRunnable(() -> {
                 // Create UI view
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.1f);
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 6f);
+                //EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 4f);
             });
             cacheInUi = true;
         }
@@ -363,20 +363,20 @@ public class SVTManager implements IObserver {
      * @param cascade      Fill deeper mip levels in cascade with the same tile.
      */
     private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile, int i, int j, int contentLevel, boolean cascade) {
-        var u = (float) i / (float) 255;
-        var v = (float) j / (float) 255;
-        indirectionPixmaps[tile.level].setColor(u, v, (float) contentLevel / (float) 255, 1.0f);
+        var u = (float) i / 255f;
+        var v = (float) j / 255f;
+        indirectionPixmaps[tile.level].setColor(u, v, (float) contentLevel / 255f, 1.0f);
         indirectionPixmaps[tile.level].fill();
         var tileUV = tile.getUV();
         var xy = tile.tree.getColRow(tile.level, tileUV[0], tileUV[1]);
         // In OpenGL, level 0 is the base level with the highest resolution, while n is the nth mipmap reduction image.
         // In our system, 0 is the root, the lowest detailed tiles, while depth is the base level (the highest resolution).
-        indirectionBuffer.draw(indirectionPixmaps[tile.level], xy[0], xy[1], tile.mipLevel());
+        indirectionBuffer.draw(indirectionPixmaps[tile.level], xy[0], xy[1], tile.tree.depth - contentLevel);
         if (cascade) {
             // Fill all lower mipmap levels with this tile.
             for (int level = tile.level + 1; level <= tile.tree.depth; level++) {
                 int dLevel = level - tile.level;
-                indirectionPixmaps[dLevel].setColor(u, v, (float) contentLevel / (float) 255, 1.0f);
+                indirectionPixmaps[dLevel].setColor(u, v, (float) contentLevel / 255f, 1.0f);
                 indirectionPixmaps[dLevel].fill();
                 // Draw texture to the correct mip level.
                 var xyLevel = tile.tree.getColRow(level, tileUV[0], tileUV[1]);

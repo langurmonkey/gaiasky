@@ -18,9 +18,8 @@ vec2 svtTexCoords(vec2 texCoords) {
         float bias = log2(u_svtTileSize) - 0.5 + mipBias;
         vec4 indirectionEntry = texture2D(u_svtIndirectionTexture, texCoords, bias) * 255.0;
         vec2 pageCoord = indirectionEntry.rg; // red-green has the XY coordinates of the tile in the cache texture.
-        float level = indirectionEntry.b;// blue channel has reverse-mipmap-level over depth.
-        float mipmapLevel = u_svtDepth - level;// From reverse-mipmap-level to mipmap-level.
-        float mipExp = exp2(level);
+        float reverseMipmapLevel = indirectionEntry.b;// blue channel has the reverse mipmap-level.
+        float mipExp = exp2(reverseMipmapLevel);
         // Need to account for the aspect ratio of our virtual texture (2:1).
         vec2 withinPageCoord = fract(texCoords * mipExp * vec2(2.0, 1.0));
         return ((pageCoord + withinPageCoord) / cacheSizeInTiles);

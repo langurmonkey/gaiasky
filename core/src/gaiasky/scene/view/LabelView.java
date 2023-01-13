@@ -94,7 +94,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextLocation() {
-        if (renderTextBase() && (body.solidAngle >= LocationMark.LOWER_LIMIT && body.solidAngle <= LocationMark.UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || base.forceLabel)) {
+        if (renderTextBase() && (body.solidAngle >= LocationMark.LOWER_LIMIT / 10 && body.solidAngle <= LocationMark.UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || base.forceLabel)) {
             Vector3d aux = D31;
             graph.translation.put(aux).scl(-1);
 
@@ -155,7 +155,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
         if (constel != null) {
             return .2e7f * (float) Constants.DISTANCE_SCALE_FACTOR;
         } else if (loc != null) {
-            return body.size / 1.5f;
+            return body.size * 0.3f;
         } else if (Mapper.keyframes.has(entity)) {
             return label.labelMax * (float) Constants.DISTANCE_SCALE_FACTOR;
         }
