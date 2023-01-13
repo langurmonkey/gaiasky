@@ -47,12 +47,14 @@ layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_cubemap.glsl
 
+const float mipBias = -1.0;
+
 // Does not take into account GL_TEXTURE_MIN_LOD/GL_TEXTURE_MAX_LOD/GL_TEXTURE_LOD_BIAS.
-float mipmapLevel(in vec2 texelCoord) {
+float mipmapLevel(in vec2 texelCoord, in float bias) {
     vec2  dxVtc        = dFdx(texelCoord);
     vec2  dyVtc        = dFdy(texelCoord);
     float deltaMaxSqr  = max(dot(dxVtc, dxVtc), dot(dyVtc, dyVtc));
-    return             0.5 * log2(deltaMaxSqr);
+    return             0.5 * log2(deltaMaxSqr) + bias;
 }
 
 void main() {
@@ -62,7 +64,7 @@ void main() {
     float svtTextureSize = u_svtTileSize * nTiles;
     vec2 svtDimension = vec2(svtTextureSize * 2.0, svtTextureSize);
     // u_svtDepth is also the maximum mip level, u_svtDepth = log2(svtTextureSize/u_svtTileSize)
-    float mip = clamp(floor(mipmapLevel(v_data.texCoords.xy * svtDimension)), 0.0, u_svtDepth);
+    float mip = clamp(floor(mipmapLevel(v_data.texCoords.xy * svtDimension, mipBias)), 0.0, u_svtDepth);
     float svtLevel = u_svtDepth - mip;
     fragColor.x = svtLevel;
 

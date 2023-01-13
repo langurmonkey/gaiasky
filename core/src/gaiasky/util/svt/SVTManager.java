@@ -332,7 +332,7 @@ public class SVTManager implements IObserver {
         while ((currentTile = currentTile.parent) != null) {
             if (tileLocation.containsKey(currentTile)) {
                 // Parent is cached, use it.
-                fillIndirectionBuffer(tile, i, j, currentTile.level, false);
+                fillIndirectionBuffer(tile, i, j, currentTile.level, true);
                 break;
             }
         }
@@ -363,9 +363,9 @@ public class SVTManager implements IObserver {
      * @param cascade      Fill deeper mip levels in cascade with the same tile.
      */
     private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile, int i, int j, int contentLevel, boolean cascade) {
-        var u = (float) i / (float) cacheSizeInTiles;
-        var v = (float) j / (float) cacheSizeInTiles;
-        indirectionPixmaps[tile.level].setColor(u, v, (float) contentLevel / (float) tile.tree.depth, 1.0f);
+        var u = (float) i / (float) 255;
+        var v = (float) j / (float) 255;
+        indirectionPixmaps[tile.level].setColor(u, v, (float) contentLevel / (float) 255, 1.0f);
         indirectionPixmaps[tile.level].fill();
         var tileUV = tile.getUV();
         var xy = tile.tree.getColRow(tile.level, tileUV[0], tileUV[1]);
@@ -376,7 +376,7 @@ public class SVTManager implements IObserver {
             // Fill all lower mipmap levels with this tile.
             for (int level = tile.level + 1; level <= tile.tree.depth; level++) {
                 int dLevel = level - tile.level;
-                indirectionPixmaps[dLevel].setColor(u, v, (float) contentLevel / (float) tile.tree.depth, 1.0f);
+                indirectionPixmaps[dLevel].setColor(u, v, (float) contentLevel / (float) 255, 1.0f);
                 indirectionPixmaps[dLevel].fill();
                 // Draw texture to the correct mip level.
                 var xyLevel = tile.tree.getColRow(level, tileUV[0], tileUV[1]);
