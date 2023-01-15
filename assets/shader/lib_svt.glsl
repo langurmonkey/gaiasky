@@ -22,9 +22,9 @@ vec4 queryIndirectionBuffer(vec2 texCoords, float bias) {
     float lod = mipmapLevel(texCoords * u_svtResolution, bias);
     lod = floor(lod + bias);
     vec4 indirectionEntry = textureLod(u_svtIndirectionTexture, texCoords, lod);
-    while (indirectionEntry.a != 1.0 && lod >= 0.0) {
+    while (indirectionEntry.a != 1.0 && lod <= u_svtDepth) {
         // Go one level up in the mipmap sequence.
-        lod = lod - 1.0;
+        lod = lod + 1.0;
         // Query again.
         indirectionEntry = textureLod(u_svtIndirectionTexture, texCoords, lod);
     }
