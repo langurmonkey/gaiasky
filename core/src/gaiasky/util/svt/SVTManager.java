@@ -259,7 +259,7 @@ public class SVTManager implements IObserver {
             GaiaSky.postRunnable(() -> {
                 // Create UI view
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.1f);
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 4f);
+                //EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 4f);
             });
             uiViewCreated = true;
         }
