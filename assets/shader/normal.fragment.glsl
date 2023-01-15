@@ -209,7 +209,7 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
 #endif // emissive
 
-#ifdef emissiveCubemapFlag
+#if defined(emissiveCubemapFlag)
     #define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
 #elif defined(emissiveTextureFlag) || defined(emissiveColorFlag)
     #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)

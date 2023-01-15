@@ -1,3 +1,5 @@
+#ifdef svtFlag
+
 uniform vec2 u_svtResolution;
 uniform float u_svtTileSize;
 uniform float u_svtDepth;
@@ -6,6 +8,10 @@ uniform float u_svtId;
 const float mipBias = 0.0;
 
 // Does not take into account GL_TEXTURE_MIN_LOD/GL_TEXTURE_MAX_LOD/GL_TEXTURE_LOD_BIAS.
+/*
+Computes the mipmap level with the given textel coordinate and bias, similar to
+what textureQueryLod() does.
+*/
 float mipmapLevel(in vec2 texelCoord, in float bias) {
     vec2  dxVtc        = dFdx(texelCoord);
     vec2  dyVtc        = dFdy(texelCoord);
@@ -70,3 +76,4 @@ vec2 svtTexCoords(vec2 texCoords) {
         return (pageCoord + withinPageCoord);
     }
 }
+#end // svtFlag
