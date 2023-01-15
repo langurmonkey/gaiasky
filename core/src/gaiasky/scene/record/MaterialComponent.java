@@ -375,9 +375,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
 
         // SVT.
         if (diffuseSvt != null) {
-            material.set(new FloatAttribute(FloatAttribute.SvtId, diffuseSvt.id));
+            double svtResolution = diffuseSvt.tileSize * Math.pow(2.0, diffuseSvt.tree.depth);
+            material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * diffuseSvt.tree.root.length), (float) svtResolution)));
             material.set(new FloatAttribute(FloatAttribute.SvtTileSize, diffuseSvt.tileSize));
             material.set(new FloatAttribute(FloatAttribute.SvtDepth, diffuseSvt.tree.depth));
+            material.set(new FloatAttribute(FloatAttribute.SvtId, diffuseSvt.id));
 
             /*
              * In SVT, the cache and indirection textures are updated whenever the view changes and new tiles

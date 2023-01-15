@@ -3,6 +3,7 @@
 // UNIFORMS
 uniform float u_svtId;
 uniform float u_svtDepth;
+uniform vec2 u_svtResolution;
 uniform float u_svtTileSize;
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
@@ -47,7 +48,9 @@ layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_cubemap.glsl
 
-const float mipBias = -1.0;
+// The reduction factor of the frame buffer of this pass has an impact on the determined mipmap level.
+#define SVT_TILE_DETECTION_REDUCTION_FACTOR 4.0
+const float svtDetectionScaleFactor = -log2(SVT_TILE_DETECTION_REDUCTION_FACTOR);
 
 // Does not take into account GL_TEXTURE_MIN_LOD/GL_TEXTURE_MAX_LOD/GL_TEXTURE_LOD_BIAS.
 float mipmapLevel(in vec2 texelCoord, in float bias) {
@@ -58,19 +61,17 @@ float mipmapLevel(in vec2 texelCoord, in float bias) {
 }
 
 void main() {
-    float nTiles = pow(2.0, u_svtDepth);
+    // Aspect ratio of virtual texture.
+    vec2 ar = vec2(u_svtResolution.x / u_svtResolution.y, 1.0);
 
-    // Level, clamp to [0,depth]. SVT level = floor(depth - clamp(mipmapLevel, 0, depth)).
-    float svtTextureSize = u_svtTileSize * nTiles;
-    vec2 svtDimension = vec2(svtTextureSize * 2.0, svtTextureSize);
     // u_svtDepth is also the maximum mip level, u_svtDepth = log2(svtTextureSize/u_svtTileSize)
-    float mip = clamp(floor(mipmapLevel(v_data.texCoords.xy * svtDimension, mipBias)), 0.0, u_svtDepth);
+    float mip = clamp(floor(mipmapLevel(v_data.texCoords * u_svtResolution, svtDetectionScaleFactor)), 0.0, u_svtDepth);
     float svtLevel = u_svtDepth - mip;
     fragColor.x = svtLevel;
 
     // Tile XY at the current level.
     float nTilesLevel = pow(2.0, svtLevel);
-    vec2 nTilesDimension =  vec2(nTilesLevel * 2.0, nTilesLevel);
+    vec2 nTilesDimension =  ar * nTilesLevel;
     fragColor.yz = floor(v_data.texCoords.xy * nTilesDimension);
 
     // ID.

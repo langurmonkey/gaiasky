@@ -87,6 +87,7 @@ public class DefaultIntShader extends BaseIntShader {
 
     // SVT.
     protected final int u_svtTileSize;
+    protected final int u_svtResolution;
     protected final int u_svtDepth;
     protected final int u_svtId;
     protected final int u_svtBufferTexture;
@@ -241,6 +242,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_roughnessCubemap = register(Inputs.roughnessCubemap, Setters.roughnessCubemap);
         u_metallicCubemap = register(Inputs.metallicCubemap, Setters.metallicCubemap);
         u_svtTileSize = register(Inputs.svtTileSize, Setters.svtTileSize);
+        u_svtResolution = register(Inputs.svtResolution, Setters.svtResolution);
         u_svtDepth = register(Inputs.svtDepth, Setters.svtDepth);
         u_svtId = register(Inputs.svtId, Setters.svtId);
         u_svtBufferTexture = register(Inputs.svtCacheTexture, Setters.svtBufferTexture);
@@ -428,7 +430,10 @@ public class DefaultIntShader extends BaseIntShader {
         } else {
             svtTextures = false;
         }
-        if (svtTextures && attributes.has(FloatAttribute.SvtId) && attributes.has(FloatAttribute.SvtDepth) && attributes.has(FloatAttribute.SvtTileSize)) {
+        if (svtTextures && attributes.has(FloatAttribute.SvtId)
+                && attributes.has(FloatAttribute.SvtDepth)
+                && attributes.has(FloatAttribute.SvtTileSize)
+                && attributes.has(Vector2Attribute.SvtResolution)) {
             prefix.append("#define svtFlag\n");
         }
 
@@ -739,6 +744,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform metallicCubemap = new Uniform("u_metallicCubemap");
         public final static Uniform roughnessCubemap = new Uniform("u_roughnessCubemap");
         public final static Uniform svtTileSize = new Uniform("u_svtTileSize", FloatAttribute.SvtTileSize);
+        public final static Uniform svtResolution = new Uniform("u_svtResolution", Vector2Attribute.SvtResolution);
         public final static Uniform svtDepth = new Uniform("u_svtDepth", FloatAttribute.SvtDepth);
         public final static Uniform svtId = new Uniform("u_svtId", FloatAttribute.SvtId);
         public final static Uniform svtCacheTexture = new Uniform("u_svtCacheTexture");
@@ -1016,6 +1022,12 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.SvtTileSize)))).value);
+            }
+        };
+        public final static Setter svtResolution = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, ((Vector2Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector2Attribute.SvtResolution)))).value);
             }
         };
         public final static Setter svtDepth = new LocalSetter() {

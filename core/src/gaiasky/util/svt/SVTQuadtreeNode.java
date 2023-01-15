@@ -71,6 +71,10 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
         return "Node {" + "L" + level + ", col=" + col + ", row=" + row + ", o=" + object + '}';
     }
 
+    public String toStringShort() {
+        return "L" + level + "[" + col + "," + row + "]";
+    }
+
     @Override
     public int compareTo(SVTQuadtreeNode o) {
         // The natural order of nodes depends only on their depth.

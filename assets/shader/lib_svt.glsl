@@ -1,12 +1,41 @@
+uniform vec2 u_svtResolution;
 uniform float u_svtTileSize;
 uniform float u_svtDepth;
 uniform float u_svtId;
 
-const float mipBias = -1.0;
+const float mipBias = 0.0;
 
-// This function converts regular texture coordinates
-// to texture coordinates in the SVT buffer texture
-// using the indirection texture.
+// Does not take into account GL_TEXTURE_MIN_LOD/GL_TEXTURE_MAX_LOD/GL_TEXTURE_LOD_BIAS.
+float mipmapLevel(in vec2 texelCoord, in float bias) {
+    vec2  dxVtc        = dFdx(texelCoord);
+    vec2  dyVtc        = dFdy(texelCoord);
+    float deltaMaxSqr  = max(dot(dxVtc, dxVtc), dot(dyVtc, dyVtc));
+    return             0.5 * log2(deltaMaxSqr) + bias;
+}
+
+/*
+This function queries the indirection buffer with the given texture coordinates
+and bias. If the tile is invalid, it sequentially loops through the upper levels
+until a valid tile is found. The root level is always guaranteed to be found.
+*/
+vec4 queryIndirectionBuffer(vec2 texCoords, float bias) {
+    float lod = mipmapLevel(texCoords * u_svtResolution, bias);
+    lod = floor(lod + bias);
+    vec4 indirectionEntry = textureLod(u_svtIndirectionTexture, texCoords, lod);
+    while (indirectionEntry.a != 1.0 && lod >= 0.0) {
+        // Go one level up in the mipmap sequence.
+        lod = lod - 1.0;
+        // Query again.
+        indirectionEntry = textureLod(u_svtIndirectionTexture, texCoords, lod);
+    }
+    return indirectionEntry;
+}
+
+/*
+This function converts regular texture coordinates
+to texture coordinates in the SVT buffer texture
+using the indirection texture.
+*/
 vec2 svtTexCoords(vec2 texCoords) {
     float mode = 1.0;
 
@@ -16,7 +45,8 @@ vec2 svtTexCoords(vec2 texCoords) {
     if (mode == 1.0) {
         // DECENT BOOK-ACCURATE IMPLEMENTATION
         float bias = log2(u_svtTileSize) - 0.5 + mipBias;
-        vec4 indirectionEntry = texture2D(u_svtIndirectionTexture, texCoords, bias) * 255.0;
+        vec4 indirectionEntry = queryIndirectionBuffer(texCoords, 0.0) * 255.0;
+        //vec4 indirectionEntry = textureLod(u_svtIndirectionTexture, texCoords, bias) * 255.0;
         vec2 pageCoord = indirectionEntry.rg; // red-green has the XY coordinates of the tile in the cache texture.
         float reverseMipmapLevel = indirectionEntry.b;// blue channel has the reverse mipmap-level.
         float mipExp = exp2(reverseMipmapLevel);

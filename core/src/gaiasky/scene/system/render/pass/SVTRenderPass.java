@@ -26,6 +26,12 @@ import static gaiasky.render.RenderGroup.MODEL_PIX;
  * Sparse virtual texture (SVT) tile detection render pass.
  */
 public class SVTRenderPass {
+    /**
+     * The tile detection buffer is smaller than the main window by this factor.
+     * Should match the constant with the same name in svt.detection.fragment.glsl.
+     **/
+    public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = 4f;
+
     /** The scene renderer object. **/
     private final SceneRenderer sceneRenderer;
 
@@ -48,9 +54,8 @@ public class SVTRenderPass {
 
     public void initialize() {
         // Initialize frame buffer with 16 bits per channel.
-        float fbScale = 1.0F;
-        int w = (int) (320 * fbScale);
-        int h = (int) (180 * fbScale);
+        int w = (int) (Gdx.graphics.getWidth() / SVT_TILE_DETECTION_REDUCTION_FACTOR);
+        int h = (int) (Gdx.graphics.getHeight() / SVT_TILE_DETECTION_REDUCTION_FACTOR);
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(w, h);
         frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
         frameBuffer = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
@@ -77,11 +82,11 @@ public class SVTRenderPass {
         Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        renderAssets.mbPixelLightingSvtView.begin(camera.getCamera());
+        renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
         for (var candidate : entities) {
-            sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtView);
+            sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
         }
-        renderAssets.mbPixelLightingSvtView.end();
+        renderAssets.mbPixelLightingSvtDetection.end();
 
         frameBuffer.end();
 
