@@ -16,15 +16,11 @@ import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
-import gaiasky.util.gdx.graphics.ByteTextureData;
 import gaiasky.util.gdx.graphics.FloatTextureDataExt;
-import gaiasky.util.gdx.graphics.ShortTextureData;
 import gaiasky.util.gdx.graphics.TextureExt;
 import org.lwjgl.BufferUtils;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -52,7 +48,6 @@ public class SVTManager implements IObserver {
     private static final int STATE_LOADED = 2;
     private static final int STATE_QUEUED = 3;
     private static final int STATE_CACHED = 4;
-
 
     private AssetManager manager;
     /**

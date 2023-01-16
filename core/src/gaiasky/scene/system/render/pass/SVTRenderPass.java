@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
@@ -21,6 +22,7 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
+import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
 
 /**
  * Sparse virtual texture (SVT) tile detection render pass.
@@ -38,7 +40,7 @@ public class SVTRenderPass {
     /** The model view object. **/
     private final ModelView view;
 
-    private final Array<IRenderable> entities;
+    private final Array<IRenderable> candidates, candidatesTess;
 
     /** The frame buffer to render the SVT tile detection. Format should be at least RGBAF16. **/
     private FrameBuffer frameBuffer;
@@ -49,7 +51,8 @@ public class SVTRenderPass {
     public SVTRenderPass(final SceneRenderer sceneRenderer) {
         this.sceneRenderer = sceneRenderer;
         this.view = new ModelView();
-        this.entities = new Array<>();
+        this.candidates = new Array<>();
+        this.candidatesTess = new Array<>();
     }
 
     public void initialize() {
@@ -64,16 +67,21 @@ public class SVTRenderPass {
         pixels = BufferUtils.createFloatBuffer(w * h * 4);
     }
 
-    public void render(ICamera camera) {
-        List<IRenderable> models = sceneRenderer.getRenderLists().get(MODEL_PIX.ordinal());
-        entities.clear();
+    private void fetchCandidates(RenderGroup renderGroup, Array<IRenderable> candidates){
+        List<IRenderable> models = sceneRenderer.getRenderLists().get(renderGroup.ordinal());
+        candidates.clear();
         // Collect SVT-enabled models.
         models.forEach(e -> {
             view.setEntity(((Render) e).getEntity());
             if (view.hasSVT()) {
-                entities.add(e);
+                candidates.add(e);
             }
         });
+    }
+
+    public void render(ICamera camera) {
+        fetchCandidates(MODEL_PIX, candidates);
+        fetchCandidates(MODEL_PIX_TESS, candidatesTess);
 
         var renderAssets = sceneRenderer.getRenderAssets();
 
@@ -82,11 +90,19 @@ public class SVTRenderPass {
         Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        // Non-tessellated models.
         renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
-        for (var candidate : entities) {
+        for (var candidate : candidates) {
             sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
         }
         renderAssets.mbPixelLightingSvtDetection.end();
+
+        // Tessellated models
+        renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
+        for (var candidate : candidatesTess) {
+            sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
+        }
+        renderAssets.mbPixelLightingSvtDetectionTessellation.end();
 
         frameBuffer.end();
 

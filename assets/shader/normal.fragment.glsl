@@ -295,7 +295,7 @@ in VertexData v_data;
 #ifdef atmosphereGround
 in vec4 v_atmosphereColor;
 in float v_fadeFactor;
-#endif
+#endif // atmosphereGround
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -532,7 +532,7 @@ void main() {
     #ifdef atmosphereGround
     #define exposure 4.0
         fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
-    #endif
+    #endif // atmosphereGround
 
     if (fragColor.a <= 0.0) {
         discard;
@@ -547,5 +547,5 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBuffer();
-    #endif
+    #endif // velocityBufferFlag
 }

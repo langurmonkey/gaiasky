@@ -52,13 +52,7 @@ layout (location = 0) out vec4 fragColor;
 #define SVT_TILE_DETECTION_REDUCTION_FACTOR 4.0
 const float svtDetectionScaleFactor = -log2(SVT_TILE_DETECTION_REDUCTION_FACTOR);
 
-// Does not take into account GL_TEXTURE_MIN_LOD/GL_TEXTURE_MAX_LOD/GL_TEXTURE_LOD_BIAS.
-float mipmapLevel(in vec2 texelCoord, in float bias) {
-    vec2  dxVtc        = dFdx(texelCoord);
-    vec2  dyVtc        = dFdy(texelCoord);
-    float deltaMaxSqr  = max(dot(dxVtc, dxVtc), dot(dyVtc, dyVtc));
-    return             0.5 * log2(deltaMaxSqr) + bias;
-}
+#include shader/lib_mipmap.glsl
 
 void main() {
     // Aspect ratio of virtual texture.
@@ -72,7 +66,7 @@ void main() {
     // Tile XY at the current level.
     float nTilesLevel = pow(2.0, svtLevel);
     vec2 nTilesDimension =  ar * nTilesLevel;
-    fragColor.yz = floor(v_data.texCoords.xy * nTilesDimension);
+    fragColor.yz = floor(v_data.texCoords * nTilesDimension);
 
     // ID.
     fragColor.w = u_svtId;

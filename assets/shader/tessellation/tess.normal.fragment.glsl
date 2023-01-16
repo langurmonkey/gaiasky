@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - FRAGMENT
@@ -81,6 +81,14 @@ uniform samplerCube u_roughnessCubemap;
 uniform samplerCube u_reflectionCubemap;
 #endif
 
+#ifdef svtCacheTextureFlag
+uniform sampler2D u_svtCacheTexture;
+#endif
+
+#ifdef svtIndirectionTextureFlag
+uniform sampler2D u_svtIndirectionTexture;
+#endif
+
 #ifdef shininessFlag
 uniform float u_shininess;
 #endif
@@ -129,11 +137,27 @@ float getShadow(vec3 shadowMapUv) {
     // Simple lookup
     //return getShadowness(o_data.shadowMapUv.xy, vec2(0.0), o_data.shadowMapUv.z);
 }
-#endif //shadowMapFlag
+#endif // shadowMapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////
+////// CUBEMAPS
+//////////////////////////////////////////////////////
 #ifdef cubemapFlag
     #include shader/lib_cubemap.glsl
 #endif // cubemapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////
+////// SVT
+//////////////////////////////////////////////////////
+#ifdef svtFlag
+#include shader/lib_svt.glsl
+#endif // cubemapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
@@ -146,7 +170,9 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
 #endif // diffuse
 
-#if defined(diffuseCubemapFlag)
+#if defined(svtFlag)
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(texCoord))
+#elif defined(diffuseCubemapFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(texCoord, defaultValue)
@@ -163,7 +189,7 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
 #endif // emissive
 
-#ifdef emissiveCubemapFlag
+#if defined(emissiveCubemapFlag)
     #define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
 #elif defined(emissiveTextureFlag) || defined(emissiveColorFlag)
     #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
@@ -401,13 +427,12 @@ void main() {
     #define exposure 4.0
         fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor;
         fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
-    #endif
+    #endif // atmosphereGround
 
-    // Prevent saturation
-    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
     if (fragColor.a <= 0.0) {
         discard;
     }
+
     #ifdef ssrFlag
         normalBuffer = vec4(normalVector.xyz, 1.0);
     #endif // ssrFlag
