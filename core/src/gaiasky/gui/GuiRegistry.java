@@ -498,7 +498,7 @@ public class GuiRegistry implements IObserver {
                     textureWindow = new TextureWindow(title, skin, stage, texture, scale);
 
                 }
-                textureWindow.show(stage);
+                textureWindow.show(stage, 0, 50);
             }
             case UI_THEME_RELOAD_INFO -> {
                 if (keyframesWindow != null) {
