@@ -1,6 +1,7 @@
 package gaiasky.util.svt;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,13 +13,18 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scene.record.VirtualTextureComponent;
-import gaiasky.scene.system.render.pass.SVTRenderPass;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
+import gaiasky.util.gdx.graphics.ByteTextureData;
+import gaiasky.util.gdx.graphics.FloatTextureDataExt;
+import gaiasky.util.gdx.graphics.ShortTextureData;
 import gaiasky.util.gdx.graphics.TextureExt;
+import org.lwjgl.BufferUtils;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -38,7 +44,7 @@ public class SVTManager implements IObserver {
      * This needs to be a multiple of the tile size, and tile sizes are powers of two,
      * capping at 1024, so this should be a multiple of 1024 to be on the safe side.
      **/
-    private static final int CACHE_BUFFER_SIZE = 1024 * 6;
+    private static final int CACHE_BUFFER_SIZE = 1024 * 8;
 
     // Tile state tokens.
     private static final int STATE_NOT_LOADED = 0;
@@ -46,6 +52,7 @@ public class SVTManager implements IObserver {
     private static final int STATE_LOADED = 2;
     private static final int STATE_QUEUED = 3;
     private static final int STATE_CACHED = 4;
+
 
     private AssetManager manager;
     /**
@@ -95,9 +102,9 @@ public class SVTManager implements IObserver {
     private TextureExt indirectionBuffer;
 
     /**
-     * A pixmap used to draw in the indirection texture.
+     * Buffer used to draw in the indirection buffer.
      */
-    private Pixmap indirectionPixmap;
+    private FloatBuffer floatBuffer;
 
     // Are the textures displaying in the UI already?
     private boolean uiViewCreated = false;
@@ -118,8 +125,8 @@ public class SVTManager implements IObserver {
         cacheBuffer = new Texture(cacheTextureData);
         cacheBuffer.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-        // Initialize pixmap to write to indirection buffer.
-        indirectionPixmap = new Pixmap(1, 1, Format.RGBA8888);
+        // Initialize float buffer to draw pixels (1x1 with 4 components per pixel).
+        floatBuffer = BufferUtils.createFloatBuffer(4);
 
         EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY);
     }
@@ -146,9 +153,8 @@ public class SVTManager implements IObserver {
 
                     // Initialize indirection buffer.
                     var indirectionSize = (int) Math.pow(2.0, svt.tree.depth);
-                    // We need RGBA with 16 bits per channel.
-                    //var indirectionData = new FloatTextureDataExt(indirectionSize * svt.tree.root.length, indirectionSize, GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
-                    var indirectionData = new PixmapTextureData(new Pixmap(indirectionSize * svt.tree.root.length, indirectionSize, Format.RGBA8888), null, true, false, false);
+                    // We use RGBA with 32-bit floating point numbers per channel for the indirection buffer.
+                    var indirectionData = new FloatTextureDataExt(indirectionSize * svt.tree.root.length, indirectionSize, GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
                     indirectionBuffer = new TextureExt(indirectionData);
                     // Important to set the minification filter to use mipmaps.
                     indirectionBuffer.setFilter(TextureFilter.MipMapNearestNearest, TextureFilter.Nearest);
@@ -358,28 +364,33 @@ public class SVTManager implements IObserver {
      * @param cacheY The tile row in the cache buffer.
      */
     private void fillIndirectionBuffer(SVTQuadtreeNode<Path> tile, int cacheX, int cacheY) {
-        var x = (float) cacheX / 255f;
-        var y = (float) cacheY / 255f;
-        fillIndirectionTileWith(tile, x, y, (float) tile.level / 255f, 1f);
+        var x = (float) cacheX;
+        var y = (float) cacheY;
+        fillIndirectionTileWith(tile, x, y, tile.level, 1f);
     }
 
     /**
      * Fills the given tile in the indirection buffer with the given data.
+     *
      * @param tile The tile.
-     * @param r The red channel, in [0,1].
-     * @param g The green channel, in [0,1].
-     * @param b The blue channel, in [0,1].
-     * @param a The alpha channel, in [0,1].
+     * @param r    The red channel, in [0,1].
+     * @param g    The green channel, in [0,1].
+     * @param b    The blue channel, in [0,1].
+     * @param a    The alpha channel, in [0,1].
      */
     private void fillIndirectionTileWith(SVTQuadtreeNode<Path> tile, float r, float g, float b, float a) {
         // a=0 means the tile is not valid.
-        indirectionPixmap.setColor(r, g, b, a);
-        indirectionPixmap.fill();
+        floatBuffer.rewind();
+        floatBuffer.put(0, r);
+        floatBuffer.put(1, g);
+        floatBuffer.put(2, b);
+        floatBuffer.put(3, a);
+
         var tileUV = tile.getUV();
         var xy = tile.tree.getColRow(tile.level, tileUV[0], tileUV[1]);
         // In OpenGL, level 0 is the base level with the highest resolution, while n is the nth mipmap reduction image.
         // In our system, 0 is the root, the lowest detailed tiles, while depth is the base level (the highest resolution).
-        indirectionBuffer.draw(indirectionPixmap, xy[0], xy[1], tile.mipLevel());
+        indirectionBuffer.draw(floatBuffer, xy[0], xy[1], 1, 1, tile.mipLevel(), GL30.GL_RGBA, GL30.GL_FLOAT);
     }
 
     @Override
@@ -390,4 +401,5 @@ public class SVTManager implements IObserver {
             update(pixels);
         }
     }
+
 }

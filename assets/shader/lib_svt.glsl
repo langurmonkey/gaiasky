@@ -5,6 +5,7 @@ uniform float u_svtTileSize;
 uniform float u_svtDepth;
 uniform float u_svtId;
 
+// Best leave this to 0 unless a very good reason exists.
 const float mipBias = 0.0;
 
 // Does not take into account GL_TEXTURE_MIN_LOD/GL_TEXTURE_MAX_LOD/GL_TEXTURE_LOD_BIAS.
@@ -42,12 +43,10 @@ to texture coordinates in the SVT buffer texture
 using the indirection texture.
 */
 vec2 svtTexCoords(vec2 texCoords) {
-    float mode = 1.0;
-
     // Size of the buffer texture, in tiles.
     float cacheSizeInTiles = textureSize(u_svtCacheTexture, 0).x / u_svtTileSize;
 
-    vec4 indirectionEntry = queryIndirectionBuffer(texCoords, mipBias) * 255.0;
+    vec4 indirectionEntry = queryIndirectionBuffer(texCoords, mipBias);
     vec2 pageCoord = indirectionEntry.rg;// red-green has the XY coordinates of the tile in the cache texture.
     float reverseMipmapLevel = indirectionEntry.b;// blue channel has the reverse mipmap-level.
     float mipExp = exp2(reverseMipmapLevel);

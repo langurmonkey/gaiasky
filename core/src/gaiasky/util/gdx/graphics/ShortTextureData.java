@@ -4,19 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Blending;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.GLVersion;
+import com.badlogic.gdx.graphics.glutils.MipMapGenerator;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 /**
- * Provides a texture data object backed by a 32-bit float buffer.
- * Ideal to use with GL_R[GBA]32[F|I|UI].
+ * Provides a texture data object backed by a 16-bit short buffer.
+ * Ideal to use with GL_R[GBA]16[F|I|UI].
  */
-public class FloatTextureDataExt implements TextureData {
+public class ShortTextureData implements TextureData {
 
     int width = 0;
     int height = 0;
@@ -29,9 +31,9 @@ public class FloatTextureDataExt implements TextureData {
     boolean useMipMaps;
 
     boolean isPrepared = false;
-    FloatBuffer buffer;
+    ShortBuffer buffer;
 
-    public FloatTextureDataExt(int w, int h, int internalFormat, int format, int type, boolean useMipMaps, boolean isGpuOnly) {
+    public ShortTextureData(int w, int h, int internalFormat, int format, int type, boolean useMipMaps, boolean isGpuOnly) {
         this.width = w;
         this.height = h;
         this.internalFormat = internalFormat;
@@ -56,18 +58,18 @@ public class FloatTextureDataExt implements TextureData {
         if (isPrepared)
             throw new GdxRuntimeException("Already prepared");
         if (!isGpuOnly) {
-            int amountOfFloats = 0;
+            int amountOfShorts = 0;
             if (Gdx.graphics.getGLVersion().getType().equals(GLVersion.Type.OpenGL)) {
-                if (internalFormat == GL30.GL_RGBA16F || internalFormat == GL30.GL_RGBA32F)
-                    amountOfFloats = 4;
-                if (internalFormat == GL30.GL_RGB16F || internalFormat == GL30.GL_RGB32F)
-                    amountOfFloats = 3;
-                if (internalFormat == GL30.GL_RG16F || internalFormat == GL30.GL_RG32F)
-                    amountOfFloats = 2;
-                if (internalFormat == GL30.GL_R16F || internalFormat == GL30.GL_R32F)
-                    amountOfFloats = 1;
+                if (internalFormat == GL30.GL_RGBA16F || internalFormat == GL30.GL_RGBA16I || internalFormat == GL30.GL_RGBA16UI)
+                    amountOfShorts = 4;
+                if (internalFormat == GL30.GL_RGB16F || internalFormat == GL30.GL_RGB16I || internalFormat == GL30.GL_RGB16UI)
+                    amountOfShorts = 3;
+                if (internalFormat == GL30.GL_RG16F || internalFormat == GL30.GL_RG16I || internalFormat == GL30.GL_RG16UI)
+                    amountOfShorts = 2;
+                if (internalFormat == GL30.GL_R16F || internalFormat == GL30.GL_R16I || internalFormat == GL30.GL_R16UI)
+                    amountOfShorts = 1;
             }
-            this.buffer = BufferUtils.newFloatBuffer(width * height * amountOfFloats);
+            this.buffer = BufferUtils.newShortBuffer(width * height * amountOfShorts);
         }
         isPrepared = true;
     }
@@ -142,7 +144,7 @@ public class FloatTextureDataExt implements TextureData {
 
     @Override
     public Format getFormat() {
-        return Format.RGBA8888; // it's not true, but FloatTextureData.getFormat() isn't used anywhere
+        return Format.RGBA8888; // it's not true, but ShortTextureData.getFormat() isn't used anywhere
     }
 
     @Override
@@ -155,7 +157,7 @@ public class FloatTextureDataExt implements TextureData {
         return false;
     }
 
-    public FloatBuffer getBuffer() {
+    public ShortBuffer getBuffer() {
         return buffer;
     }
 }
