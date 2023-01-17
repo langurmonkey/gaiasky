@@ -13,12 +13,20 @@ const float mipBias = 0.0;
 Computes the mipmap level with the given textel coordinate and bias, similar to
 what textureQueryLod() does.
 */
+#if defined(tessellationEvaluationShader)
+// We request the deepest level by default.
+float mipmapLevel(in vec2 texelCoord, in float bias) {
+    return 0.0;
+}
+#else
+// dFd[x|y] and textureQueryLod are only available in fragment shaders.
 float mipmapLevel(in vec2 texelCoord, in float bias) {
     vec2  dxVtc        = dFdx(texelCoord);
     vec2  dyVtc        = dFdy(texelCoord);
     float deltaMaxSqr  = max(dot(dxVtc, dxVtc), dot(dyVtc, dyVtc));
     return 0.5 * log2(deltaMaxSqr) + bias;
 }
+#endif // tessellationEvaluationShader
 
 /*
 This function queries the indirection buffer with the given texture coordinates
@@ -42,11 +50,11 @@ This function converts regular texture coordinates
 to texture coordinates in the SVT buffer texture
 using the indirection texture.
 */
-vec2 svtTexCoords(sampler2D indirection, vec2 texCoords) {
+vec2 svtTexCoords(sampler2D indirection, vec2 texCoords, float bias) {
     // Size of the buffer texture, in tiles.
     float cacheSizeInTiles = textureSize(u_svtCacheTexture, 0).x / u_svtTileSize;
 
-    vec4 indirectionEntry = queryIndirectionBuffer(indirection, texCoords, mipBias);
+    vec4 indirectionEntry = queryIndirectionBuffer(indirection, texCoords, bias);
     vec2 pageCoord = indirectionEntry.rg;// red-green has the XY coordinates of the tile in the cache texture.
     float reverseMipmapLevel = indirectionEntry.b;// blue channel has the reverse mipmap-level.
     float mipExp = exp2(reverseMipmapLevel);
@@ -58,5 +66,12 @@ vec2 svtTexCoords(sampler2D indirection, vec2 texCoords) {
     // noticable at all if the border is not set up in the tiles.
     withinPageCoord = ((withinPageCoord * (u_svtTileSize - 2.0)) / u_svtTileSize) + (1.0 / u_svtTileSize);
     return ((pageCoord + withinPageCoord) / cacheSizeInTiles);
+}
+
+/*
+Same as previous, but using the default constant bias.
+*/
+vec2 svtTexCoords(sampler2D indirection, vec2 texCoords) {
+    return svtTexCoords(indirection, texCoords, mipBias);
 }
 #endif// svtFlag

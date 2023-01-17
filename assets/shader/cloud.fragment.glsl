@@ -27,13 +27,26 @@ uniform sampler2D u_diffuseTexture;
 uniform samplerCube u_diffuseCubemap;
 #endif
 
+#ifdef svtCacheTextureFlag
+uniform sampler2D u_svtCacheTexture;
+#endif
+
+#ifdef svtIndirectionDiffuseTextureFlag
+uniform sampler2D u_svtIndirectionDiffuseTexture;
+#endif
+
 // AMBIENT LIGHT
 in vec3 v_ambientLight;
 
 #include shader/lib_luma.glsl
 
 // CLOUD TEXTURE
-#if defined(diffuseCubemapFlag)
+#if defined(svtIndirectionDiffuseTextureFlag)
+#include shader/lib_svt.glsl
+vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
+    return texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord));
+}
+#elif defined(diffuseCubemapFlag)
 #include shader/lib_cubemap.glsl
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return texture(u_diffuseCubemap, UVtoXYZ(texCoord));
@@ -73,10 +86,10 @@ void main() {
     // Normal in pixel space
     vec3 N = vec3(0.0, 0.0, 1.0);
     vec3 L = normalize(v_lightDir);
-    float NL = clamp(dot(N, L), 0.0, 1.0);
+    float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
 
     vec3 cloudColor = clamp(v_lightCol * cloud.rgb, 0.0, 1.0);
-    float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0);
+    float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0) * 1.6;
     fragColor = vec4(cloudColor, cloud.a) * opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

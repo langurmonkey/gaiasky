@@ -334,6 +334,7 @@ public class ModelInitializer extends AbstractInitSystem {
             atmosphere.atmosphere.print(logger);
         }
         if (cloud.cloud != null) {
+            cloud.cloud.materialComponent = model.model.mtc;
             cloud.cloud.initialize(base.getName(), false);
         }
     }

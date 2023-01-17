@@ -32,6 +32,7 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.svt.SVTManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -51,7 +52,7 @@ import java.util.stream.IntStream;
  * It contains basic textures (diffuse, specular, reflection, emissive, etc.),
  * cubemaps (same as textures), and even some sparse virtual texture trees (SVT).
  */
-public class MaterialComponent extends NamedComponent implements IObserver {
+public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider {
     /** Default texture parameters **/
     protected static final OwnTextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
@@ -96,6 +97,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public NoiseComponent nc;
     // Sparse virtual texture sets.
     public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt, normalSvt, emissiveSvt, roughnessSvt, metallicSvt;
+    public Array<VirtualTextureComponent> svts;
     // Cubemaps.
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
     // Biome lookup texture.
@@ -207,6 +209,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
@@ -228,6 +231,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams) {
@@ -381,14 +385,48 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             material.set(new CubemapAttribute(CubemapAttribute.HeightCubemap, heightCubemap.cubemap));
         }
 
-        // SVT.
+        // Sparse Virtual Textures.
+        svts = new Array<>();
+        int svtId = SVTManager.nextSvtId();
+        // Add attributes.
         if (diffuseSvt != null) {
-            double svtResolution = diffuseSvt.tileSize * Math.pow(2.0, diffuseSvt.tree.depth);
-            material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * diffuseSvt.tree.root.length), (float) svtResolution)));
-            material.set(new FloatAttribute(FloatAttribute.SvtTileSize, diffuseSvt.tileSize));
-            material.set(new FloatAttribute(FloatAttribute.SvtDepth, diffuseSvt.tree.depth));
-            material.set(new FloatAttribute(FloatAttribute.SvtId, diffuseSvt.id));
+            addSVTAttributes(material, diffuseSvt, svtId);
         }
+        if (normalSvt != null) {
+            addSVTAttributes(material, normalSvt, svtId);
+        }
+        if (emissiveSvt != null) {
+            addSVTAttributes(material, emissiveSvt, svtId);
+        }
+        if (specularSvt != null) {
+            addSVTAttributes(material, specularSvt, svtId);
+        }
+        if (heightSvt != null) {
+            addSVTAttributes(material, heightSvt, svtId);
+        }
+        if (metallicSvt != null) {
+            addSVTAttributes(material, metallicSvt, svtId);
+        }
+        if (roughnessSvt != null) {
+            addSVTAttributes(material, roughnessSvt, svtId);
+        }
+        // Broadcast this material for SVT manager.
+        EventManager.publish(Event.SVT_MATERIAL_INFO, this, svtId, this);
+
+    }
+
+    private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
+        // Set ID.
+        svt.id = id;
+        // Set attributes.
+        double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
+        material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
+        material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
+        material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
+        material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
+
+        // Add to list.
+        svts.add(svt);
     }
 
     private void addHeightTex(Texture heightTex) {
@@ -627,6 +665,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
     }
 
+    @Override
     public Material getMaterial() {
         return material;
     }
@@ -840,6 +879,14 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         setSpecularSVT(convertToComponent(virtualTexture));
     }
 
+    public void setNormalSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.normalSvt = virtualTextureComponent;
+    }
+
+    public void setNormalSVT(Map<Object, Object> virtualTexture) {
+        setNormalSVT(convertToComponent(virtualTexture));
+    }
+
     public void setHeightSVT(VirtualTextureComponent virtualTextureComponent) {
         this.heightSvt = virtualTextureComponent;
     }
@@ -848,7 +895,31 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         setHeightSVT(convertToComponent(virtualTexture));
     }
 
-    public VirtualTextureComponent convertToComponent(Map<Object, Object> map) {
+    public void setEmissiveSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.emissiveSvt = virtualTextureComponent;
+    }
+
+    public void setEmissiveSVT(Map<Object, Object> virtualTexture) {
+        setEmissiveSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setMetallicSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.metallicSvt = virtualTextureComponent;
+    }
+
+    public void setMetallicSVT(Map<Object, Object> virtualTexture) {
+        setMetallicSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setRoughnessSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.roughnessSvt = virtualTextureComponent;
+    }
+
+    public void setRoughnessSVT(Map<Object, Object> virtualTexture) {
+        setRoughnessSVT(convertToComponent(virtualTexture));
+    }
+
+    public static VirtualTextureComponent convertToComponent(Map<Object, Object> map) {
         var vt = new VirtualTextureComponent();
         if (map.containsKey("location"))
             vt.setLocation((String) map.get("location"));

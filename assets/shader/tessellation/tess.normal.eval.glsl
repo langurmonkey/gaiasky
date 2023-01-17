@@ -2,6 +2,8 @@
 
 layout (triangles) in;
 
+#define tessellationEvaluationShader
+
 // GEOMETRY (QUATERNIONS)
 #if defined(velocityBufferFlag) || defined(relativisticEffects)
 #include shader/lib_geometry.glsl
@@ -15,6 +17,10 @@ uniform sampler2D u_normalTexture;
 uniform samplerCube u_normalCubemap;
 #endif
 
+#ifdef svtIndirectionNormalTextureFlag
+uniform sampler2D u_svtIndirectionNormalTexture;
+#endif
+
 #ifdef heightTextureFlag
 uniform sampler2D u_heightTexture;
 #endif
@@ -23,19 +29,35 @@ uniform sampler2D u_heightTexture;
 uniform samplerCube u_heightCubemap;
 #endif
 
+#ifdef svtIndirectionHeightTextureFlag
+uniform sampler2D u_svtIndirectionHeightTexture;
+#endif
+
+#ifdef svtCacheTextureFlag
+uniform sampler2D u_svtCacheTexture;
+#endif
+
 #ifdef cubemapFlag
     #include shader/lib_cubemap.glsl
 #endif // cubemapFlag
 
+#ifdef svtFlag
+    #include shader/lib_svt.glsl
+#endif // svtFlag
+
 // COLOR NORMAL
-#ifdef normalCubemapFlag
+#if defined(svtIndirectionNormalTextureFlag)
+    #define fetchColorNormal(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionNormalTexture, texCoord))
+#elif defined(normalCubemapFlag)
     #define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
 #elif defined(normalTextureFlag)
     #define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
 #endif // normal
 
 // HEIGHT
-#ifdef heightCubemapFlag
+#if defined(svtIndirectionHeightTextureFlag)
+    #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
+#elif defined(heightCubemapFlag)
     #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
 #elif defined(heightTextureFlag)
     #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
@@ -114,12 +136,12 @@ out float o_fragHeight;
 #include shader/lib_velbuffer.vert.glsl
 #endif
 
-#if defined(normalCubemapFlag) || defined(normalTextureFlag)
+#if defined(normalCubemapFlag) || defined(normalTextureFlag) || defined(svtIndirectionNormalTextureFlag)
     // Use normal map
     vec3 calcNormal(vec2 p, vec2 dp) {
         return normalize(fetchColorNormal(p).rgb * 2.0 - 1.0);
     }
-#elif defined(heightCubemapFlag) || defined(heightTextureFlag)
+#elif defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
     // maps the height scale in internal units to a normal strength
     float computeNormalStrength(float heightScale){
         // to [0,100] km

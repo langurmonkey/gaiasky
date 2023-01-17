@@ -12,23 +12,14 @@ import gaiasky.util.svt.SVTQuadtree;
 import gaiasky.util.svt.SVTQuadtreeBuilder;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 public class VirtualTextureComponent extends NamedComponent {
-
-    private static int sequenceId = 1;
-    private static final Map<Integer, VirtualTextureComponent> index = new HashMap<>();
 
     /**
      * The indirection buffer texture. {@link TextureExt} enables drawing to
      * any mipmap level.
      */
     public TextureExt indirectionBuffer;
-
-    public static VirtualTextureComponent getSVT(int id) {
-        return index.get(id);
-    }
 
     public int id;
     /**
@@ -44,16 +35,14 @@ public class VirtualTextureComponent extends NamedComponent {
 
     public SVTQuadtree<Path> tree;
 
-    private MaterialComponent materialComponent;
+    private IMaterialProvider materialProvider;
 
     public VirtualTextureComponent() {
-        this.id = sequenceId++;
-        index.put(this.id, this);
     }
 
-    public void initialize(String name, MaterialComponent materialComponent) {
+    public void initialize(String name, IMaterialProvider materialProvider) {
         super.initialize(name);
-        this.materialComponent = materialComponent;
+        this.materialProvider = materialProvider;
         buildTree();
         buildIndirectionBuffer();
     }
@@ -78,7 +67,7 @@ public class VirtualTextureComponent extends NamedComponent {
         tree.aux = this;
 
         int maxResolution = (int) (tree.tileSize * Math.pow(2, tree.depth));
-        Logger.getLogger(VirtualTextureComponent.class).info("SVT (id " + id + ") initialized with " + tree.root.length + " roots, " + tree.numTiles + " tiles (" + tree.tileSize + "x" + tree.tileSize + "), depth " + tree.depth + " and maximum resolution of " + (maxResolution * tree.root.length) + "x" + maxResolution);
+        Logger.getLogger(VirtualTextureComponent.class).info("SVT initialized with " + tree.root.length + " roots, " + tree.numTiles + " tiles (" + tree.tileSize + "x" + tree.tileSize + "), depth " + tree.depth + " and maximum resolution of " + (maxResolution * tree.root.length) + "x" + maxResolution);
     }
 
     /**
@@ -87,20 +76,20 @@ public class VirtualTextureComponent extends NamedComponent {
      * @param cacheBufferTexture The cache buffer, which is global.
      */
     public void setSVTAttributes(Texture cacheBufferTexture) {
-        if (materialComponent != null) {
-            var material = materialComponent.getMaterial();
+        if (materialProvider != null) {
+            var material = materialProvider.getMaterial();
             if (material != null) {
                 material.set(new TextureAttribute(TextureAttribute.SvtCache, cacheBufferTexture));
                 if (indirectionBuffer != null && !material.has(TextureAttribute.SvtIndirectionDiffuse)) {
-                    materialComponent.getMaterial().set(new TextureAttribute(TextureAttribute.SvtIndirectionDiffuse, indirectionBuffer));
+                    materialProvider.getMaterial().set(new TextureAttribute(TextureAttribute.SvtIndirectionDiffuse, indirectionBuffer));
                 }
             }
         }
     }
 
     public boolean svtAttributesSet() {
-        if (materialComponent != null) {
-            var material = materialComponent.getMaterial();
+        if (materialProvider != null) {
+            var material = materialProvider.getMaterial();
             if (material != null) {
                 return material.has(TextureAttribute.SvtIndirectionDiffuse) && material.has(TextureAttribute.SvtCache);
             }

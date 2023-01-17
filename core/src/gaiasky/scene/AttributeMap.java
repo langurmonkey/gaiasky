@@ -70,13 +70,13 @@ public class AttributeMap {
         putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locVaMultiplier", "locthoverfactor", "locThresholdLabel", "shadowvalues");
 
         // Model
-        putAll(Model.class, "model", "diffuseSVT", "heightSVT", "specularSVT");
+        putAll(Model.class, "model", "diffuseSVT", "heightSVT", "specularSVT", "emissiveSVT", "normalSVT", "metallicSVT", "roughnessSVT");
 
         // Atmosphere
         putAll(Atmosphere.class, "atmosphere");
 
         // Cloud
-        putAll(Cloud.class, "cloud");
+        putAll(Cloud.class, "cloud", "cloudSVT");
 
         // RenderFlags
         putAll(RenderFlags.class, "renderquad");

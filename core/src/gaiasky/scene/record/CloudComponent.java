@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -36,7 +37,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CloudComponent extends NamedComponent implements IObserver {
+import static gaiasky.scene.record.MaterialComponent.convertToComponent;
+
+public class CloudComponent extends NamedComponent implements IObserver, IMaterialProvider {
     /** Default texture parameters **/
     protected static final TextureParameter textureParams;
     private static final Log logger = Logger.getLogger(CloudComponent.class);
@@ -56,14 +59,18 @@ public class CloudComponent extends NamedComponent implements IObserver {
     /** RGB color of generated clouds **/
     public float[] color = new float[] { 1f, 1f, 1f, 0.7f };
     public String diffuse, diffuseUnpacked;
-    // CUBEMAPS
+    /** The material component associated to the same model. **/
+    public MaterialComponent materialComponent;
+    // Cubemap.
     public CubemapComponent diffuseCubemap;
+    // Virtual texture.
+    public VirtualTextureComponent diffuseSvt;
     // Model parameters
     public Map<String, Object> params;
     Vector3 aux;
     Vector3d aux3;
     private AssetManager manager;
-    private AtomicBoolean generated = new AtomicBoolean(false);
+    private final AtomicBoolean generated = new AtomicBoolean(false);
     private Texture cloudTex;
     private Material material;
     private boolean texInitialised, texLoading;
@@ -92,6 +99,8 @@ public class CloudComponent extends NamedComponent implements IObserver {
             }
             if (diffuseCubemap != null)
                 diffuseCubemap.initialize(manager);
+            if (diffuseSvt != null)
+                diffuseSvt.initialize("diffuseSvt", this);
         }
         this.generated.set(false);
     }
@@ -122,8 +131,9 @@ public class CloudComponent extends NamedComponent implements IObserver {
         // CREATE CLOUD MODEL
         mc.instance = new IntModelInstance(cloudModel, this.localTransform);
 
-        if (!Settings.settings.scene.initialization.lazyTexture)
+        if (!Settings.settings.scene.initialization.lazyTexture) {
             initMaterial();
+        }
 
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
@@ -171,9 +181,26 @@ public class CloudComponent extends NamedComponent implements IObserver {
             diffuseCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.cubemap));
         }
+        if (diffuseSvt != null && materialComponent != null) {
+            if (materialComponent.diffuseSvt != null) {
+                addSVTAttributes(material, diffuseSvt, materialComponent.diffuseSvt.id);
+                materialComponent.svts.add(diffuseSvt);
+            }
+        }
         material.set(new BlendingAttribute(1.0f));
         // Do not cull
         material.set(new IntAttribute(IntAttribute.CullFace, 0));
+    }
+
+    private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
+        // Set ID.
+        svt.id = id;
+        // Set attributes.
+        double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
+        material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
+        material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
+        material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
+        material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
     }
 
     public void setGenerated(boolean generated) {
@@ -304,6 +331,19 @@ public class CloudComponent extends NamedComponent implements IObserver {
     public void setDiffuseCubemap(String diffuseCubemap) {
         this.diffuseCubemap = new CubemapComponent();
         this.diffuseCubemap.setLocation(diffuseCubemap);
+    }
+
+    public void setDiffuseSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.diffuseSvt = virtualTextureComponent;
+    }
+
+    public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
+        setDiffuseSVT(convertToComponent(virtualTexture));
+    }
+
+    @Override
+    public Material getMaterial() {
+        return material;
     }
 
     @Override

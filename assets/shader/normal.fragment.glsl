@@ -191,7 +191,7 @@ float getShadow(vec3 shadowMapUv) {
 //////////////////////////////////////////////////////
 #ifdef svtFlag
 #include shader/lib_svt.glsl
-#endif // cubemapFlag
+#endif // svtFlag
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 
@@ -206,7 +206,7 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
 #endif // diffuse
 
-#if defined(svtFlag)
+#if defined(svtIndirectionDiffuseTextureFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord))
 #elif defined(diffuseCubemapFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
@@ -225,7 +225,9 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
 #endif // emissive
 
-#if defined(emissiveCubemapFlag)
+#if defined(svtIndirectionEmissiveTextureFlag)
+    #define fetchColorEmissive(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionEmissiveTexture, texCoord))
+#elif defined(emissiveCubemapFlag)
     #define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
 #elif defined(emissiveTextureFlag) || defined(emissiveColorFlag)
     #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
@@ -234,7 +236,9 @@ float getShadow(vec3 shadowMapUv) {
 #endif // emissive
 
 // COLOR SPECULAR
-#ifdef specularCubemapFlag
+#if defined(svtIndirectionSpecularTextureFlag)
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionSpecularTexture, texCoord))
+#elif defined(specularCubemapFlag)
     #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularCubemap, UVtoXYZ(texCoord))
 #elif defined(specularTextureFlag) && defined(specularColorFlag)
     #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
@@ -247,14 +251,18 @@ float getShadow(vec3 shadowMapUv) {
 #endif // specular
 
 // COLOR NORMAL
-#ifdef normalCubemapFlag
+#if defined(svtIndirectionNormalTextureFlag)
+    #define fetchColorNormal(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionNormalTexture, texCoord))
+#elif defined(normalCubemapFlag)
     #define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
 #elif defined(normalTextureFlag)
     #define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
 #endif // normal
 
 // COLOR METALLIC
-#ifdef metallicCubemapFlag
+#if defined(svtIndirectionMetallicTextureFlag)
+    #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
+#elif defined(metallicCubemapFlag)
     #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
 #elif defined(metallicTextureFlag)
     #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
@@ -263,14 +271,18 @@ float getShadow(vec3 shadowMapUv) {
 #endif // metallic
 
 // COLOR ROUGHNESS
-#ifdef roughnessCubemapFlag
+#if defined(svtIndirectionRoughnessTextureFlag)
+    #define fetchColorRoughness(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionRoughnessTexture, texCoord))
+#elif defined(roughnessCubemapFlag)
     #define fetchColorRoughness(texCoord) texture(u_roughnessCubemap, UVtoXYZ(texCoord))
 #elif defined(roughnessTextureFlag)
     #define fetchColorRoughness(texCoord) texture(u_roughnessTexture, texCoord)
 #endif // roughness
 
 // HEIGHT
-#ifdef heightCubemapFlag
+#if defined(svtIndirectionRoughnessTextureFlag)
+    #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
+#elif defined(heightCubemapFlag)
     #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
 #elif defined(heightTextureFlag)
     #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)

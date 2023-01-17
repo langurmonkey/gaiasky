@@ -7,11 +7,13 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -46,7 +48,19 @@ public class SVTManager implements IObserver {
     private static final int STATE_QUEUED = 3;
     private static final int STATE_CACHED = 4;
 
+    private static int svtSequenceId = 1;
+
+    public static int nextSvtId() {
+        return svtSequenceId++;
+    }
+
     private AssetManager manager;
+
+    /**
+     * Map with all material components that have at least one
+     * SVT.
+     */
+    private final IntMap<MaterialComponent> materials;
     /**
      * The set of observed tiles from the camera.
      */
@@ -101,6 +115,7 @@ public class SVTManager implements IObserver {
         this.observedTiles = new HashSet<>();
         this.tilePixmaps = new HashMap<>();
         this.tileLocation = new HashMap<>();
+        this.materials = new IntMap<>(10);
         this.queuedTiles = new ArrayBlockingQueue<>(150);
     }
 
@@ -115,7 +130,7 @@ public class SVTManager implements IObserver {
         // Initialize float buffer to draw pixels (1x1 with 4 components per pixel).
         floatBuffer = BufferUtils.createFloatBuffer(4);
 
-        EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY);
+        EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY, Event.SVT_MATERIAL_INFO);
     }
 
     public void update(final FloatBuffer tileDetectionBuffer) {
@@ -129,12 +144,12 @@ public class SVTManager implements IObserver {
             float y = tileDetectionBuffer.get(); // b
             float id = tileDetectionBuffer.get(); // a
 
-            if (id > 0) {
-                var svtComponent = VirtualTextureComponent.getSVT((int) id);
-                if (svtComponent != null) {
+            if (id > 0 && materials.containsKey((int) id)) {
+                var material = materials.get((int) id);
+                for (var svtComponent : material.svts) {
+                    // Initialize tile size first time.
                     if (tileSize < 0) {
                         tileSize = svtComponent.tileSize;
-
                         // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
                         cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
                         cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
@@ -167,11 +182,11 @@ public class SVTManager implements IObserver {
                 if (manager.isLoaded(path)) {
                     var pixmap = (Pixmap) manager.get(path);
                     // Rescale if necessary.
-                    if (pixmap.getWidth() != tileSize) {
-                        Pixmap aux = new Pixmap(tileSize, tileSize, pixmap.getFormat());
+                    if (pixmap.getWidth() != tile.tree.tileSize) {
+                        Pixmap aux = new Pixmap(tile.tree.tileSize, tile.tree.tileSize, pixmap.getFormat());
                         aux.drawPixmap(pixmap,
                                 0, 0, pixmap.getWidth(), pixmap.getHeight(),
-                                0, 0, tileSize, tileSize);
+                                0, 0, tile.tree.tileSize, tile.tree.tileSize);
                         manager.unload(path);
                         pixmap = aux;
                     }
@@ -283,8 +298,8 @@ public class SVTManager implements IObserver {
         /*
          * Update cache buffer with tile at [x,y].
          */
-        int x = i * tileSize;
-        int y = j * tileSize;
+        int x = i * tile.tree.tileSize;
+        int y = j * tile.tree.tileSize;
         cacheBuffer.draw(pixmap, x, y);
 
         /*
@@ -399,6 +414,11 @@ public class SVTManager implements IObserver {
             // Compute visible tiles.
             var pixels = (FloatBuffer) data[0];
             update(pixels);
+        } else if (event == Event.SVT_MATERIAL_INFO) {
+            // Put in list.
+            var id = (Integer) data[0];
+            var mc = (MaterialComponent) data[1];
+            materials.put(id, mc);
         }
     }
 

@@ -1463,7 +1463,13 @@ public enum Event {
      * of the SVT cache and indirection buffers. Contains the {@link java.nio.FloatBuffer}
      * with the contents of the view determination buffer.
      */
-    SVT_TILE_DETECTION_READY;
+    SVT_TILE_DETECTION_READY,
+
+    /**
+     * Broadcasts material component [1] which has at least one sparse virtual
+     * texture, and the sparse virtual texture ID for that material [0].
+     */
+    SVT_MATERIAL_INFO;
 
 
 }

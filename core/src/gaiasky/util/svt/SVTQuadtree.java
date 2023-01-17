@@ -18,7 +18,9 @@ public class SVTQuadtree<T> {
      * The tile size is a power of two, capping at 1024.
      * One of 8, 16, 32, 64, 128, 256, 512 or 1024.
      **/
-    public final long tileSize;
+    public final int tileSize;
+    /** The total number of tiles in the tree. **/
+    public int numTiles;
     /** Depth of the tree, e.g., the deepest level, in [0,n]. **/
     public int depth = 0;
 
@@ -28,8 +30,6 @@ public class SVTQuadtree<T> {
     /** Each tile is identified by its level and its UV. Here we can access tiles directly. **/
     public Map<Long, SVTQuadtreeNode<T>>[] levels;
 
-    /** The total number of tiles in the tree. **/
-    public int numTiles;
 
     /** Auxiliary object to store additional data. **/
     public Object aux;
