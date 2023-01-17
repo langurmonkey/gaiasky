@@ -91,7 +91,13 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtDepth;
     protected final int u_svtId;
     protected final int u_svtBufferTexture;
-    protected final int u_svtIndirectionTexture;
+    protected final int u_svtIndirectionDiffuseTexture;
+    protected final int u_svtIndirectionSpecularTexture;
+    protected final int u_svtIndirectionNormalTexture;
+    protected final int u_svtIndirectionHeightTexture;
+    protected final int u_svtIndirectionEmissiveTexture;
+    protected final int u_svtIndirectionMetallicTexture;
+    protected final int u_svtIndirectionRoughnessTexture;
     // Lighting uniforms
     protected final int u_ambientCubemap;
     protected final int u_dirLights0color;
@@ -246,7 +252,13 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtDepth = register(Inputs.svtDepth, Setters.svtDepth);
         u_svtId = register(Inputs.svtId, Setters.svtId);
         u_svtBufferTexture = register(Inputs.svtCacheTexture, Setters.svtBufferTexture);
-        u_svtIndirectionTexture = register(Inputs.svtIndirectionTexture, Setters.svtIndirectionTexture);
+        u_svtIndirectionDiffuseTexture = register(Inputs.svtIndirectionDiffuseTexture, Setters.svtIndirectionDiffuseTexture);
+        u_svtIndirectionNormalTexture = register(Inputs.svtIndirectionNormalTexture, Setters.svtIndirectionNormalTexture);
+        u_svtIndirectionSpecularTexture = register(Inputs.svtIndirectionSpecularTexture, Setters.svtIndirectionSpecularTexture);
+        u_svtIndirectionHeightTexture = register(Inputs.svtIndirectionHeightTexture, Setters.svtIndirectionHeightTexture);
+        u_svtIndirectionMetallicTexture = register(Inputs.svtIndirectionMetallicTexture, Setters.svtIndirectionMetallicTexture);
+        u_svtIndirectionEmissiveTexture = register(Inputs.svtIndirectionEmissiveTexture, Setters.svtIndirectionEmissiveTexture);
+        u_svtIndirectionRoughnessTexture = register(Inputs.svtIndirectionRoughnessTexture, Setters.svtIndirectionRoughnessTexture);
     }
 
     public static String getDefaultVertexShader() {
@@ -425,8 +437,8 @@ public class DefaultIntShader extends BaseIntShader {
         } else {
             svtTextures = false;
         }
-        if (attributes.has(TextureAttribute.SvtIndirection)) {
-            prefix.append("#define " + TextureAttribute.SvtIndirectionAlias + "Flag\n");
+        if (attributes.has(TextureAttribute.SvtIndirectionDiffuse)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionDiffuseAlias + "Flag\n");
         } else {
             svtTextures = false;
         }
@@ -748,7 +760,13 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform svtDepth = new Uniform("u_svtDepth", FloatAttribute.SvtDepth);
         public final static Uniform svtId = new Uniform("u_svtId", FloatAttribute.SvtId);
         public final static Uniform svtCacheTexture = new Uniform("u_svtCacheTexture");
-        public final static Uniform svtIndirectionTexture = new Uniform("u_svtIndirectionTexture");
+        public final static Uniform svtIndirectionDiffuseTexture = new Uniform("u_svtIndirectionDiffuseTexture");
+        public final static Uniform svtIndirectionSpecularTexture = new Uniform("u_svtIndirectionSpecularTexture");
+        public final static Uniform svtIndirectionNormalTexture = new Uniform("u_svtIndirectionNormalTexture");
+        public final static Uniform svtIndirectionHeightTexture = new Uniform("u_svtIndirectionHeightTexture");
+        public final static Uniform svtIndirectionEmissiveTexture = new Uniform("u_svtIndirectionEmissiveTexture");
+        public final static Uniform svtIndirectionMetallicTexture = new Uniform("u_svtIndirectionMetallicTexture");
+        public final static Uniform svtIndirectionRoughnessTexture = new Uniform("u_svtIndirectionRoughnessTexture");
     }
 
     public static class Setters {
@@ -1050,11 +1068,59 @@ public class DefaultIntShader extends BaseIntShader {
                 }
             }
         };
-        public final static Setter svtIndirectionTexture = new LocalSetter() {
+        public final static Setter svtIndirectionDiffuseTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(TextureAttribute.SvtIndirection)) {
-                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirection)))).textureDescription));
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionDiffuse)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionDiffuse)))).textureDescription));
+                }
+            }
+        };
+        public final static Setter svtIndirectionSpecularTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionSpecular)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionSpecular)))).textureDescription));
+                }
+            }
+        };
+        public final static Setter svtIndirectionNormalTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionNormal)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionNormal)))).textureDescription));
+                }
+            }
+        };
+        public final static Setter svtIndirectionHeightTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionHeight)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionHeight)))).textureDescription));
+                }
+            }
+        };
+        public final static Setter svtIndirectionEmissiveTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionEmissive)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionEmissive)))).textureDescription));
+                }
+            }
+        };
+        public final static Setter svtIndirectionMetallicTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionMetallic)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionMetallic)))).textureDescription));
+                }
+            }
+        };
+        public final static Setter svtIndirectionRoughnessTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(TextureAttribute.SvtIndirectionRoughness)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.SvtIndirectionRoughness)))).textureDescription));
                 }
             }
         };

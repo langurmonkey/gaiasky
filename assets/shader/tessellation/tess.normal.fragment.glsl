@@ -85,8 +85,20 @@ uniform samplerCube u_reflectionCubemap;
 uniform sampler2D u_svtCacheTexture;
 #endif
 
-#ifdef svtIndirectionTextureFlag
-uniform sampler2D u_svtIndirectionTexture;
+#ifdef svtIndirectionDiffuseTextureFlag
+uniform sampler2D u_svtIndirectionDiffuseTexture;
+#endif
+
+#ifdef svtIndirectionSpecularTextureFlag
+uniform sampler2D u_svtIndirectionSpecularTexture;
+#endif
+
+#ifdef svtIndirectionEmissiveTextureFlag
+uniform sampler2D u_svtIndirectionEmissiveTexture;
+#endif
+
+#ifdef svtIndirectionMetallicTextureFlag
+uniform sampler2D u_svtIndirectionMetallicTexture;
 #endif
 
 #ifdef shininessFlag
@@ -171,7 +183,7 @@ float getShadow(vec3 shadowMapUv) {
 #endif // diffuse
 
 #if defined(svtFlag)
-    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(texCoord))
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord))
 #elif defined(diffuseCubemapFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)

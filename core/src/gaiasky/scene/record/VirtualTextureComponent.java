@@ -91,8 +91,8 @@ public class VirtualTextureComponent extends NamedComponent {
             var material = materialComponent.getMaterial();
             if (material != null) {
                 material.set(new TextureAttribute(TextureAttribute.SvtCache, cacheBufferTexture));
-                if (indirectionBuffer != null && !material.has(TextureAttribute.SvtIndirection)) {
-                    materialComponent.getMaterial().set(new TextureAttribute(TextureAttribute.SvtIndirection, indirectionBuffer));
+                if (indirectionBuffer != null && !material.has(TextureAttribute.SvtIndirectionDiffuse)) {
+                    materialComponent.getMaterial().set(new TextureAttribute(TextureAttribute.SvtIndirectionDiffuse, indirectionBuffer));
                 }
             }
         }
@@ -102,7 +102,7 @@ public class VirtualTextureComponent extends NamedComponent {
         if (materialComponent != null) {
             var material = materialComponent.getMaterial();
             if (material != null) {
-                return material.has(TextureAttribute.SvtIndirection) && material.has(TextureAttribute.SvtCache);
+                return material.has(TextureAttribute.SvtIndirectionDiffuse) && material.has(TextureAttribute.SvtCache);
             }
         }
         return false;
