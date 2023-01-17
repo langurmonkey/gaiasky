@@ -31,6 +31,9 @@ public class SVTQuadtree<T> {
     /** The total number of tiles in the tree. **/
     public int numTiles;
 
+    /** Auxiliary object to store additional data. **/
+    public Object aux;
+
     public SVTQuadtree(int tileSize, int rootPositions) {
         this.tileSize = tileSize;
         this.root = new SVTQuadtreeNode[rootPositions];

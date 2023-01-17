@@ -95,7 +95,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public float[][] heightMap;
     public NoiseComponent nc;
     // Sparse virtual texture sets.
-    public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt;
+    public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt, normalSvt, emissiveSvt, roughnessSvt, metallicSvt;
     // Cubemaps.
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
     // Biome lookup texture.
@@ -170,13 +170,21 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         if (metallicCubemap != null)
             metallicCubemap.initialize(manager);
 
-        // SVT
+        // SVTs
         if (diffuseSvt != null)
-            diffuseSvt.initialize("diffuseSvt");
+            diffuseSvt.initialize("diffuseSvt", this);
         if (heightSvt != null)
-            heightSvt.initialize("heightSvt");
+            heightSvt.initialize("heightSvt", this);
         if (specularSvt != null)
-            specularSvt.initialize("specularSvt");
+            specularSvt.initialize("specularSvt", this);
+        if (normalSvt != null)
+            normalSvt.initialize("normalSvt", this);
+        if (emissiveSvt != null)
+            emissiveSvt.initialize("emissiveSvt", this);
+        if (roughnessSvt != null)
+            roughnessSvt.initialize("roughnessSvt", this);
+        if (metallicSvt != null)
+            metallicSvt.initialize("metallicSvt", this);
 
         this.heightGenerated.set(false);
     }
@@ -380,13 +388,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             material.set(new FloatAttribute(FloatAttribute.SvtTileSize, diffuseSvt.tileSize));
             material.set(new FloatAttribute(FloatAttribute.SvtDepth, diffuseSvt.tree.depth));
             material.set(new FloatAttribute(FloatAttribute.SvtId, diffuseSvt.id));
-
-            /*
-             * In SVT, the cache and indirection textures are updated whenever the view changes and new tiles
-             * come into view. Due to that, we get updates to these textures via the event system.
-             * Check out SVTManager.
-             */
-            EventManager.instance.subscribe(this, Event.SVT_CACHE_INDIRECTION_UPDATE);
         }
     }
 
@@ -962,17 +963,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             if (this.hasHeight() && this.material != null) {
                 float newQuality = (Float) data[0];
                 GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.TessQuality, newQuality)));
-            }
-        }
-        case SVT_CACHE_INDIRECTION_UPDATE -> {
-            if (this.hasSVT() && this.material != null && !material.has(TextureAttribute.SvtCache)) {
-                var buffer = (Texture) data[0];
-                var indirection = (Texture) data[1];
-                GaiaSky.postRunnable(() -> {
-                    material.set(new TextureAttribute(TextureAttribute.SvtCache, buffer));
-                    material.set(new TextureAttribute(TextureAttribute.SvtIndirection, indirection));
-                });
-
             }
         }
         default -> {

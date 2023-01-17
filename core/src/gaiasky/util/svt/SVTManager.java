@@ -16,8 +16,6 @@ import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
-import gaiasky.util.gdx.graphics.FloatTextureDataExt;
-import gaiasky.util.gdx.graphics.TextureExt;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -36,9 +34,9 @@ public class SVTManager implements IObserver {
     /** Maximum number of tiles to process per frame. */
     private static final int MAX_TILES_PER_FRAME = 3;
     /**
-     * Size of the square cache texture.
-     * This needs to be a multiple of the tile size, and tile sizes are powers of two,
-     * capping at 1024, so this should be a multiple of 1024 to be on the safe side.
+     * Size of the square cache texture. All SVTs share the same cache, so
+     * the size needs to be a multiple of the tile size, and tile sizes are powers of two,
+     * capping at 1024. Hence, the cache size needs to be a multiple of 1024.
      **/
     private static final int CACHE_BUFFER_SIZE = 1024 * 8;
 
@@ -90,11 +88,6 @@ public class SVTManager implements IObserver {
      * The cache buffer texture.
      */
     private Texture cacheBuffer;
-    /**
-     * The indirection buffer texture. {@link TextureExt} enables drawing to
-     * any mipmap level.
-     */
-    private TextureExt indirectionBuffer;
 
     /**
      * Buffer used to draw in the indirection buffer.
@@ -131,35 +124,29 @@ public class SVTManager implements IObserver {
         int size = tileDetectionBuffer.capacity() / 4;
         tileDetectionBuffer.rewind();
         for (int i = 0; i < size; i++) {
-            // We need to add the
+            // Check each pixel and add the leve, x and y.
             float level = tileDetectionBuffer.get();
             float x = tileDetectionBuffer.get();
             float y = tileDetectionBuffer.get();
             float id = tileDetectionBuffer.get();
 
             if (id > 0) {
-                var svt = VirtualTextureComponent.getSVT((int) id);
+                var svtComponent = VirtualTextureComponent.getSVT((int) id);
+
                 if (tileSize < 0) {
-                    tileSize = svt.tileSize;
+                    tileSize = svtComponent.tileSize;
 
                     // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
                     cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
                     cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
 
                     // Initialize indirection buffer.
-                    var indirectionSize = (int) Math.pow(2.0, svt.tree.depth);
-                    // We use RGBA with 32-bit floating point numbers per channel for the indirection buffer.
-                    var indirectionData = new FloatTextureDataExt(indirectionSize * svt.tree.root.length, indirectionSize, GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
-                    indirectionBuffer = new TextureExt(indirectionData);
-                    // Important to set the minification filter to use mipmaps.
-                    indirectionBuffer.setFilter(TextureFilter.MipMapNearestNearest, TextureFilter.Nearest);
+                    svtComponent.buildIndirectionBuffer();
                 }
 
-                if (svt != null) {
-                    var tile = svt.tree.getTile((int) level, (int) x, (int) y);
-                    if (tile != null) {
-                        observedTiles.add(tile);
-                    }
+                var tile = svtComponent.tree.getTile((int) level, (int) x, (int) y);
+                if (tile != null) {
+                    observedTiles.add(tile);
                 }
             }
         }
@@ -257,17 +244,15 @@ public class SVTManager implements IObserver {
         }
 
         if (!uiViewCreated && (addedTiles > 0 || removedTiles > 0) && tileLocation.size() > 1) {
+            final var lastTile = tile;
             GaiaSky.postRunnable(() -> {
                 // Create UI view
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.1f);
-                //EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", indirectionBuffer, 4f);
+                if(lastTile != null) {
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", ((VirtualTextureComponent) lastTile.tree.aux).indirectionBuffer, 4f);
+                }
             });
             uiViewCreated = true;
-        }
-
-        if (addedTiles > 0 || removedTiles > 0) {
-            // Post update through event system.
-            EventManager.publish(Event.SVT_CACHE_INDIRECTION_UPDATE, this, cacheBuffer, indirectionBuffer);
         }
 
     }
@@ -308,6 +293,14 @@ public class SVTManager implements IObserver {
         // Update tile last accessed time and status.
         tile.accessed = now;
         tile.state = STATE_CACHED;
+
+        // Set material attributes if needed.
+        if (tile.tree.aux instanceof VirtualTextureComponent) {
+            var component = (VirtualTextureComponent) tile.tree.aux;
+            if (!component.svtAttributesSet()) {
+                component.setSVTAttributes(cacheBuffer);
+            }
+        }
 
         logger.debug("Tile added -> xy[" + x + "," + y + "] ij[" + i + "," + j + "]: " + tile);
     }
@@ -385,7 +378,12 @@ public class SVTManager implements IObserver {
         var xy = tile.tree.getColRow(tile.level, tileUV[0], tileUV[1]);
         // In OpenGL, level 0 is the base level with the highest resolution, while n is the nth mipmap reduction image.
         // In our system, 0 is the root, the lowest detailed tiles, while depth is the base level (the highest resolution).
-        indirectionBuffer.draw(floatBuffer, xy[0], xy[1], 1, 1, tile.mipLevel(), GL30.GL_RGBA, GL30.GL_FLOAT);
+        if (tile.tree.aux instanceof VirtualTextureComponent) {
+            var component = (VirtualTextureComponent) tile.tree.aux;
+            if (component.indirectionBuffer != null) {
+                component.indirectionBuffer.draw(floatBuffer, xy[0], xy[1], 1, 1, tile.mipLevel(), GL30.GL_RGBA, GL30.GL_FLOAT);
+            }
+        }
     }
 
     @Override

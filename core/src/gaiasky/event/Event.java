@@ -1463,14 +1463,7 @@ public enum Event {
      * of the SVT cache and indirection buffers. Contains the {@link java.nio.FloatBuffer}
      * with the contents of the view determination buffer.
      */
-    SVT_TILE_DETECTION_READY,
-
-    /**
-     * Sparse virtual texture operation.
-     * Informs of an update in the cache and indirection textures.
-     * Both textures are included in [1] and [2] respectively.
-     */
-    SVT_CACHE_INDIRECTION_UPDATE;
+    SVT_TILE_DETECTION_READY;
 
 
 }

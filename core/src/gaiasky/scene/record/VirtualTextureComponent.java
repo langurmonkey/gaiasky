@@ -1,6 +1,12 @@
 package gaiasky.scene.record;
 
+import com.badlogic.gdx.graphics.GL30;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.graphics.FloatTextureDataExt;
+import gaiasky.util.gdx.graphics.TextureExt;
+import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.svt.SVTQuadtree;
 import gaiasky.util.svt.SVTQuadtreeBuilder;
 
@@ -11,7 +17,13 @@ import java.util.Map;
 public class VirtualTextureComponent extends NamedComponent {
 
     private static int sequenceId = 1;
-    private static Map<Integer, VirtualTextureComponent> index = new HashMap<>();
+    private static final Map<Integer, VirtualTextureComponent> index = new HashMap<>();
+
+    /**
+     * The indirection buffer texture. {@link TextureExt} enables drawing to
+     * any mipmap level.
+     */
+    public TextureExt indirectionBuffer;
 
     public static VirtualTextureComponent getSVT(int id) {
         return index.get(id);
@@ -31,20 +43,62 @@ public class VirtualTextureComponent extends NamedComponent {
 
     public SVTQuadtree<Path> tree;
 
+    private MaterialComponent materialComponent;
+
     public VirtualTextureComponent() {
         this.id = sequenceId++;
         index.put(this.id, this);
     }
 
-    public void initialize(String name) {
+    public void initialize(String name, MaterialComponent materialComponent) {
         super.initialize(name);
+        this.materialComponent = materialComponent;
         buildTree();
+    }
+
+    public void buildIndirectionBuffer() {
+        // Initialize indirection buffer.
+        var indirectionSize = (int) Math.pow(2.0, tree.depth);
+        // We use RGBA with 32-bit floating point numbers per channel for the indirection buffer.
+        var indirectionData = new FloatTextureDataExt(indirectionSize * tree.root.length, indirectionSize, GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
+        indirectionBuffer = new TextureExt(indirectionData);
+        // Important to set the minification filter to use mipmaps.
+        indirectionBuffer.setFilter(TextureFilter.MipMapNearestNearest, TextureFilter.Nearest);
     }
 
     public void buildTree() {
         var builder = new SVTQuadtreeBuilder();
         locationUnpacked = Settings.settings.data.dataFile(location);
         tree = builder.build(Path.of(locationUnpacked), tileSize);
+        // In our implementation, we keep a reference to the component in the auxiliary data of the tree.
+        tree.aux = this;
+    }
+
+    /**
+     * Sets the SVT cache and indirection buffers to the material for this VT.
+     *
+     * @param cacheBufferTexture The cache buffer, which is global.
+     */
+    public void setSVTAttributes(Texture cacheBufferTexture) {
+        if (materialComponent != null) {
+            var material = materialComponent.getMaterial();
+            if (material != null) {
+                material.set(new TextureAttribute(TextureAttribute.SvtCache, cacheBufferTexture));
+                if (indirectionBuffer != null && !material.has(TextureAttribute.SvtIndirection)) {
+                    materialComponent.getMaterial().set(new TextureAttribute(TextureAttribute.SvtIndirection, indirectionBuffer));
+                }
+            }
+        }
+    }
+
+    public boolean svtAttributesSet() {
+        if (materialComponent != null) {
+            var material = materialComponent.getMaterial();
+            if (material != null) {
+                return material.has(TextureAttribute.SvtIndirection) && material.has(TextureAttribute.SvtCache);
+            }
+        }
+        return false;
     }
 
     public void setLocation(String location) {
@@ -52,7 +106,7 @@ public class VirtualTextureComponent extends NamedComponent {
     }
 
     public void setTileSize(Integer size) {
-        assert validTileSizeCheck(size) : "Tile size must be a power of two in [4,1024].";
+        assert validTileSizeCheck(size) : "Tile size must be a power of two, with a maximum of 1024.";
         this.tileSize = size;
     }
 
