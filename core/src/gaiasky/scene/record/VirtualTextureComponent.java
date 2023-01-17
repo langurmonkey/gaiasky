@@ -3,6 +3,7 @@ package gaiasky.scene.record;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.graphics.FloatTextureDataExt;
 import gaiasky.util.gdx.graphics.TextureExt;
@@ -54,16 +55,19 @@ public class VirtualTextureComponent extends NamedComponent {
         super.initialize(name);
         this.materialComponent = materialComponent;
         buildTree();
+        buildIndirectionBuffer();
     }
 
     public void buildIndirectionBuffer() {
-        // Initialize indirection buffer.
-        var indirectionSize = (int) Math.pow(2.0, tree.depth);
-        // We use RGBA with 32-bit floating point numbers per channel for the indirection buffer.
-        var indirectionData = new FloatTextureDataExt(indirectionSize * tree.root.length, indirectionSize, GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
-        indirectionBuffer = new TextureExt(indirectionData);
-        // Important to set the minification filter to use mipmaps.
-        indirectionBuffer.setFilter(TextureFilter.MipMapNearestNearest, TextureFilter.Nearest);
+        if (indirectionBuffer == null) {
+            // Initialize indirection buffer.
+            var indirectionSize = (int) Math.pow(2.0, tree.depth);
+            // We use RGBA with 32-bit floating point numbers per channel for the indirection buffer.
+            var indirectionData = new FloatTextureDataExt(indirectionSize * tree.root.length, indirectionSize, GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
+            indirectionBuffer = new TextureExt(indirectionData);
+            // Important to set the minification filter to use mipmaps.
+            indirectionBuffer.setFilter(TextureFilter.MipMapNearestNearest, TextureFilter.Nearest);
+        }
     }
 
     public void buildTree() {
@@ -72,6 +76,9 @@ public class VirtualTextureComponent extends NamedComponent {
         tree = builder.build(Path.of(locationUnpacked), tileSize);
         // In our implementation, we keep a reference to the component in the auxiliary data of the tree.
         tree.aux = this;
+
+        int maxResolution = (int) (tree.tileSize * Math.pow(2, tree.depth));
+        Logger.getLogger(VirtualTextureComponent.class).info("SVT (id " + id + ") initialized with " + tree.root.length + " roots, " + tree.numTiles + " tiles (" + tree.tileSize + "x" + tree.tileSize + "), depth " + tree.depth + " and maximum resolution of " + (maxResolution * tree.root.length) + "x" + maxResolution);
     }
 
     /**

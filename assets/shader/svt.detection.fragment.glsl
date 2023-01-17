@@ -5,17 +5,19 @@ uniform float u_svtId;
 uniform float u_svtDepth;
 uniform vec2 u_svtResolution;
 uniform float u_svtTileSize;
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
-#endif // numDirectionalLights
+#endif// numDirectionalLights
 
 #ifdef directionalLightsFlag
 struct DirectionalLight {
     vec3 color;
     vec3 direction;
 };
-#endif // directionalLightsFlag
+#endif// directionalLightsFlag
 
 // INPUT
 struct VertexData {
@@ -23,18 +25,18 @@ struct VertexData {
     vec3 normal;
 #ifdef directionalLightsFlag
     DirectionalLight directionalLights[numDirectionalLights];
-#endif // directionalLightsFlag
+#endif// directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
     vec4 color;
 #ifdef shadowMapFlag
     vec3 shadowMapUv;
-#endif // shadowMapFlag
+#endif// shadowMapFlag
     vec3 fragPosWorld;
 #ifdef metallicFlag
     vec3 reflect;
-#endif // metallicFlag
+#endif// metallicFlag
 };
 in VertexData v_data;
 
@@ -52,6 +54,7 @@ layout (location = 0) out vec4 fragColor;
 #define SVT_TILE_DETECTION_REDUCTION_FACTOR 4.0
 const float svtDetectionScaleFactor = -log2(SVT_TILE_DETECTION_REDUCTION_FACTOR);
 
+#include shader/lib_logdepthbuff.glsl
 #include shader/lib_mipmap.glsl
 
 void main() {
@@ -70,4 +73,7 @@ void main() {
 
     // ID.
     fragColor.w = u_svtId;
+
+    // Logarithmic depth buffer
+    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 }

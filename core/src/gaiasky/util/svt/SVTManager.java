@@ -15,7 +15,6 @@ import gaiasky.event.IObserver;
 import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Pair;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -82,7 +81,7 @@ public class SVTManager implements IObserver {
     /**
      * Direct access to the location in the cache for each paged tile.
      */
-    private final Map<SVTQuadtreeNode<Path>, Pair<Integer, Integer>> tileLocation;
+    private final Map<SVTQuadtreeNode<Path>, int[]> tileLocation;
 
     /**
      * The cache buffer texture.
@@ -124,29 +123,27 @@ public class SVTManager implements IObserver {
         int size = tileDetectionBuffer.capacity() / 4;
         tileDetectionBuffer.rewind();
         for (int i = 0; i < size; i++) {
-            // Check each pixel and add the leve, x and y.
-            float level = tileDetectionBuffer.get();
-            float x = tileDetectionBuffer.get();
-            float y = tileDetectionBuffer.get();
-            float id = tileDetectionBuffer.get();
+            // Each pixel has level, x, y, and id.
+            float level = tileDetectionBuffer.get(); // r
+            float x = tileDetectionBuffer.get(); // g
+            float y = tileDetectionBuffer.get(); // b
+            float id = tileDetectionBuffer.get(); // a
 
             if (id > 0) {
                 var svtComponent = VirtualTextureComponent.getSVT((int) id);
+                if (svtComponent != null) {
+                    if (tileSize < 0) {
+                        tileSize = svtComponent.tileSize;
 
-                if (tileSize < 0) {
-                    tileSize = svtComponent.tileSize;
+                        // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
+                        cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
+                        cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
+                    }
 
-                    // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
-                    cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
-                    cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
-
-                    // Initialize indirection buffer.
-                    svtComponent.buildIndirectionBuffer();
-                }
-
-                var tile = svtComponent.tree.getTile((int) level, (int) x, (int) y);
-                if (tile != null) {
-                    observedTiles.add(tile);
+                    var tile = svtComponent.tree.getTile((int) level, (int) x, (int) y);
+                    if (tile != null) {
+                        observedTiles.add(tile);
+                    }
                 }
             }
         }
@@ -168,8 +165,18 @@ public class SVTManager implements IObserver {
             case STATE_LOADING -> {
                 // Check if done.
                 if (manager.isLoaded(path)) {
+                    var pixmap = (Pixmap) manager.get(path);
+                    // Rescale if necessary.
+                    if (pixmap.getWidth() != tileSize) {
+                        Pixmap aux = new Pixmap(tileSize, tileSize, pixmap.getFormat());
+                        aux.drawPixmap(pixmap,
+                                0, 0, pixmap.getWidth(), pixmap.getHeight(),
+                                0, 0, tileSize, tileSize);
+                        manager.unload(path);
+                        pixmap = aux;
+                    }
                     // Retrieve texture and put in queue.
-                    tilePixmaps.put(path, manager.get(path));
+                    tilePixmaps.put(path, pixmap);
                     queuedTiles.add(tile);
                     tile.state = STATE_QUEUED;
                 }
@@ -225,7 +232,7 @@ public class SVTManager implements IObserver {
                             removeTileFromCache(lru);
                             removedTiles++;
                             // Page in the new tile in [i,j].
-                            putTileInCache(tile, pair.getFirst(), pair.getSecond(), now);
+                            putTileInCache(tile, pair[0], pair[1], now);
                             addedTiles++;
                         }
                     }
@@ -243,12 +250,12 @@ public class SVTManager implements IObserver {
             logger.debug("Paged out " + removedTiles + " virtual tiles.");
         }
 
-        if (!uiViewCreated && (addedTiles > 0 || removedTiles > 0) && tileLocation.size() > 1) {
+        if (!uiViewCreated && (addedTiles > 0 || removedTiles > 0)) {
             final var lastTile = tile;
             GaiaSky.postRunnable(() -> {
                 // Create UI view
                 EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.1f);
-                if(lastTile != null) {
+                if (lastTile != null) {
                     EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", ((VirtualTextureComponent) lastTile.tree.aux).indirectionBuffer, 4f);
                 }
             });
@@ -267,7 +274,7 @@ public class SVTManager implements IObserver {
      */
     private void putTileInCache(SVTQuadtreeNode<Path> tile, int i, int j, long now) {
         assert !tileLocation.containsKey(tile) : "Tile is already in the cache: " + tile;
-        tileLocation.put(tile, new Pair<>(i, j));
+        tileLocation.put(tile, new int[] { i, j });
         cacheBufferArray[i][j] = tile;
 
         var path = tile.object.toString();
@@ -312,8 +319,8 @@ public class SVTManager implements IObserver {
      */
     private void removeTileFromCache(SVTQuadtreeNode<Path> tile) {
         var pair = tileLocation.remove(tile);
-        int i = pair.getFirst();
-        int j = pair.getSecond();
+        int i = pair[0];
+        int j = pair[1];
         // Remove from buffer array.
         cacheBufferArray[i][j] = null;
         // Clear tile in indirection buffer.

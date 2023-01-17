@@ -86,8 +86,6 @@ public class SVTQuadtreeBuilder {
                 }
             });
             tree.depth = depth.get();
-            int maxResolution = (int) (tree.tileSize * Math.pow(2, tree.depth));
-            logger.info("SVT initialized with " + tree.root.length + " roots, " + tree.numTiles + " tiles (" + tree.tileSize + "x" + tree.tileSize + "), depth " + tree.depth + " and maximum resolution of " + (maxResolution * tree.root.length) + "x" + maxResolution);
         } catch (Exception e) {
             logger.error(e, "Error building SVT quadtree: " + location);
             return null;

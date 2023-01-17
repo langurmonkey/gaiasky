@@ -90,9 +90,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     private AssetManager manager;
     private float[] cc;
     private int primitiveType = GL20.GL_TRIANGLES;
+
     public ModelComponent() {
         this(true);
     }
+
     public ModelComponent(Boolean initEnvironment) {
         if (initEnvironment) {
             env = new Environment();
@@ -269,12 +271,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void update(boolean relativistic, Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
+    public void update(boolean relativistic, Matrix4 localTransform, float alpha, int blendSrc, int blendDst, boolean blendEnabled) {
         touch(localTransform);
         if (instance != null) {
             ICamera cam = GaiaSky.instance.getICamera();
             setVROffset(GaiaSky.instance.getCameraManager().naturalCamera);
-            setTransparency(alpha, blendSrc, blendDst);
+            setTransparency(alpha, blendSrc, blendDst, blendEnabled);
             if (relativistic) {
                 updateRelativisticEffects(cam);
             } else {
@@ -284,15 +286,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
-        update(true, localTransform, alpha, blendSrc, blendDst);
+    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst, boolean blendEnabled) {
+        update(true, localTransform, alpha, blendSrc, blendDst, blendEnabled);
     }
 
     public void update(boolean relativistic, Matrix4 localTransform, float alpha) {
         switch (blendMode) {
-        case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
-        case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE);
+        case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+        case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
+        case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, true);
+        case NONE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
     }
 
@@ -408,21 +411,40 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void setTransparency(float alpha, int blendSrc, int blendDest) {
+    public void setTransparency(float alpha, int blendSrc, int blendDest, boolean blendEnabled) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
             BlendingAttribute ba;
             if (mat.has(BlendingAttribute.Type)) {
                 ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
+                assert ba != null;
                 ba.destFunction = blendDest;
                 ba.sourceFunction = blendSrc;
             } else {
                 ba = new BlendingAttribute(blendSrc, blendDest);
                 mat.set(ba);
             }
+            ba.blended = blendEnabled;
             ba.opacity = alpha;
         }
+    }
+
+    public void disableBlending() {
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            BlendingAttribute ba;
+            if (mat.has(BlendingAttribute.Type)) {
+                ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
+            } else {
+                ba = new BlendingAttribute(false, 1);
+                mat.set(ba);
+            }
+            assert ba != null;
+            ba.blended = false;
+        }
+
     }
 
     /**
@@ -436,7 +458,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void updateDepthTest() {
         switch (blendMode) {
         // Read-write depth test.
-        case ALPHA, COLOR -> depthTestReadWrite();
+        case ALPHA, COLOR, NONE -> depthTestReadWrite();
         // Read-only depth test.
         case ADDITIVE -> depthTestReadOnly();
         }
@@ -483,9 +505,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void setTransparency(float alpha) {
         switch (blendMode) {
-        case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
-        case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE);
+        case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+        case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
+        case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, true);
+        case NONE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
     }
 
@@ -493,7 +516,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
-                ((ColorAttribute) instance.materials.get(i).get(ColorAttribute.Diffuse)).color.a = alpha;
+                ((ColorAttribute) Objects.requireNonNull(instance.materials.get(i).get(ColorAttribute.Diffuse))).color.a = alpha;
             }
         }
     }
@@ -596,6 +619,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             this.useColor = usecolor;
         } catch (Exception ignored) {
         }
+    }
+
+    public BlendMode getBlendMode() {
+        return blendMode;
     }
 
     public void setBlendMode(BlendMode blendMode) {

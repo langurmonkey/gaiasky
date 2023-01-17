@@ -241,7 +241,7 @@ public class ModelEntityRenderSystem {
             var mc = model.model;
 
             if (mesh.shading == Mesh.MeshShading.ADDITIVE) {
-                mc.update(relativistic, graph.localTransform, alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE);
+                mc.update(relativistic, graph.localTransform, alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE, true);
                 // Depth reads, no depth writes
                 mc.depthTestReadOnly();
             } else {

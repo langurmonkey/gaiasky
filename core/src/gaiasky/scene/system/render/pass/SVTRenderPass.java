@@ -8,8 +8,10 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.BlendMode;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.api.IRenderable;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
@@ -61,13 +63,14 @@ public class SVTRenderPass {
         int h = (int) (Gdx.graphics.getHeight() / SVT_TILE_DETECTION_REDUCTION_FACTOR);
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(w, h);
         frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
+        frameBufferBuilder.addDepthRenderBuffer(GL20.GL_DEPTH_COMPONENT16);
         frameBuffer = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
 
         // Pixels for readout: w * h * 4 (RGBA).
         pixels = BufferUtils.createFloatBuffer(w * h * 4);
     }
 
-    private void fetchCandidates(RenderGroup renderGroup, Array<IRenderable> candidates){
+    private void fetchCandidates(RenderGroup renderGroup, Array<IRenderable> candidates) {
         List<IRenderable> models = sceneRenderer.getRenderLists().get(renderGroup.ordinal());
         candidates.clear();
         // Collect SVT-enabled models.
@@ -93,14 +96,18 @@ public class SVTRenderPass {
         // Non-tessellated models.
         renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
         for (var candidate : candidates) {
+            pushBlend(candidate);
             sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
+            popBlend(candidate);
         }
         renderAssets.mbPixelLightingSvtDetection.end();
 
         // Tessellated models
         renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
         for (var candidate : candidatesTess) {
+            pushBlend(candidate);
             sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
+            popBlend(candidate);
         }
         renderAssets.mbPixelLightingSvtDetectionTessellation.end();
 
@@ -120,5 +127,20 @@ public class SVTRenderPass {
             });
             uiViewCreated = true;
         }
+    }
+
+    BlendMode blendBak = null;
+
+    private void pushBlend(IRenderable candidate) {
+        var modelComponent = Mapper.model.get(((Render) candidate).entity);
+        var model = modelComponent.model;
+        blendBak = model.getBlendMode();
+        model.setBlendMode(BlendMode.NONE);
+    }
+
+    private void popBlend(IRenderable candidate) {
+        var modelComponent = Mapper.model.get(((Render) candidate).entity);
+        var model = modelComponent.model;
+        model.setBlendMode(blendBak);
     }
 }
