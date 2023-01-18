@@ -47,7 +47,7 @@ public class SVTMain {
 
         var loc = Paths.get("/media/tsagrista/Daten/Gaia/gaiasky/data/virtualtex-earth-diffuse/tex/");
         var builder = new SVTQuadtreeBuilder();
-        var tree = builder.build(loc, 512);
+        var tree = builder.build("test", loc, 512);
         int maxResolution = (int) (tree.tileSize * Math.pow(2, tree.depth));
         logger.info("SVT initialized with " + tree.root.length + " roots, " + tree.numTiles + " tiles (" + tree.tileSize + "x" + tree.tileSize + "), depth " + tree.depth + " and maximum resolution of " + (maxResolution * tree.root.length) + "x" + maxResolution);
 

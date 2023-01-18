@@ -100,7 +100,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
             if (diffuseCubemap != null)
                 diffuseCubemap.initialize(manager);
             if (diffuseSvt != null)
-                diffuseSvt.initialize("diffuseSvt", this);
+                diffuseSvt.initialize("diffuseSvt", this, TextureAttribute.SvtIndirectionDiffuse);
         }
         this.generated.set(false);
     }

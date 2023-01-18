@@ -280,7 +280,7 @@ float getShadow(vec3 shadowMapUv) {
 #endif // roughness
 
 // HEIGHT
-#if defined(svtIndirectionRoughnessTextureFlag)
+#if defined(svtIndirectionHeightTextureFlag)
     #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
 #elif defined(heightCubemapFlag)
     #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
@@ -376,7 +376,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 
     // get depth after and before collision for linear interpolation
     float afterDepth  = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(u_heightTexture, prevTexCoords).r - currentLayerDepth + layerDepth;
+    float beforeDepth = fetchHeight(prevTexCoords).r - currentLayerDepth + layerDepth;
 
     // interpolation of texture coordinates
     float weight = afterDepth / (afterDepth - beforeDepth);

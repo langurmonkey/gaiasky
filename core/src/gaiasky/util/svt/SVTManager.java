@@ -39,7 +39,7 @@ public class SVTManager implements IObserver {
      * the size needs to be a multiple of the tile size, and tile sizes are powers of two,
      * capping at 1024. Hence, the cache size needs to be a multiple of 1024.
      **/
-    private static final int CACHE_BUFFER_SIZE = 1024 * 8;
+    private static final int CACHE_BUFFER_SIZE = 1024 * 12;
 
     // Tile state tokens.
     private static final int STATE_NOT_LOADED = 0;
@@ -116,7 +116,7 @@ public class SVTManager implements IObserver {
         this.tilePixmaps = new HashMap<>();
         this.tileLocation = new HashMap<>();
         this.materials = new IntMap<>(10);
-        this.queuedTiles = new ArrayBlockingQueue<>(150);
+        this.queuedTiles = new ArrayBlockingQueue<>(500);
     }
 
     public void initialize(AssetManager manager) {
@@ -175,14 +175,20 @@ public class SVTManager implements IObserver {
                 if (!manager.contains(path)) {
                     manager.load(path, Pixmap.class);
                     tile.state = STATE_LOADING;
+                } else {
+                    // In case the same SVT is used for multiple channels.
+                    if(tile.state == STATE_NOT_LOADED) {
+                        tile.state = STATE_LOADING;
+                    }
                 }
             }
             case STATE_LOADING -> {
                 // Check if done.
                 if (manager.isLoaded(path)) {
                     var pixmap = (Pixmap) manager.get(path);
-                    // Rescale if necessary.
+                    // Rescale if necessary, this should be avoided, as it is SLOW.
                     if (pixmap.getWidth() != tile.tree.tileSize) {
+                        logger.warn("Rescaling tile: " + tile.toStringShort());
                         Pixmap aux = new Pixmap(tile.tree.tileSize, tile.tree.tileSize, pixmap.getFormat());
                         aux.drawPixmap(pixmap,
                                 0, 0, pixmap.getWidth(), pixmap.getHeight(),
@@ -269,7 +275,7 @@ public class SVTManager implements IObserver {
             final var lastTile = tile;
             GaiaSky.postRunnable(() -> {
                 // Create UI view
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.1f);
+                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT cache", cacheBuffer, 0.05f);
                 if (lastTile != null) {
                     EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT indirection", ((VirtualTextureComponent) lastTile.tree.aux).indirectionBuffer, 4f);
                 }

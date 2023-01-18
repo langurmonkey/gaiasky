@@ -16,7 +16,7 @@ what textureQueryLod() does.
 #if defined(tessellationEvaluationShader)
 // We request the deepest level by default.
 float mipmapLevel(in vec2 texelCoord, in float bias) {
-    return 0.0;
+    return bias;
 }
 #else
 // dFd[x|y] and textureQueryLod are only available in fragment shaders.

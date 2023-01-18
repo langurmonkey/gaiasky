@@ -7,7 +7,9 @@ import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.graphics.FloatTextureDataExt;
 import gaiasky.util.gdx.graphics.TextureExt;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+import gaiasky.util.gdx.shader.attribute.Vector2Attribute;
 import gaiasky.util.svt.SVTQuadtree;
 import gaiasky.util.svt.SVTQuadtreeBuilder;
 
@@ -37,12 +39,16 @@ public class VirtualTextureComponent extends NamedComponent {
 
     private IMaterialProvider materialProvider;
 
+    /** Texture attribute ID for the indirection texture **/
+    private int indirectionAttributeId;
+
     public VirtualTextureComponent() {
     }
 
-    public void initialize(String name, IMaterialProvider materialProvider) {
+    public void initialize(String name, IMaterialProvider materialProvider, int indirectionAttributeId) {
         super.initialize(name);
         this.materialProvider = materialProvider;
+        this.indirectionAttributeId = indirectionAttributeId;
         buildTree();
         buildIndirectionBuffer();
     }
@@ -62,7 +68,7 @@ public class VirtualTextureComponent extends NamedComponent {
     public void buildTree() {
         var builder = new SVTQuadtreeBuilder();
         locationUnpacked = Settings.settings.data.dataFile(location);
-        tree = builder.build(Path.of(locationUnpacked), tileSize);
+        tree = builder.build(name, Path.of(locationUnpacked), tileSize);
         // In our implementation, we keep a reference to the component in the auxiliary data of the tree.
         tree.aux = this;
 
@@ -80,8 +86,19 @@ public class VirtualTextureComponent extends NamedComponent {
             var material = materialProvider.getMaterial();
             if (material != null) {
                 material.set(new TextureAttribute(TextureAttribute.SvtCache, cacheBufferTexture));
-                if (indirectionBuffer != null && !material.has(TextureAttribute.SvtIndirectionDiffuse)) {
-                    materialProvider.getMaterial().set(new TextureAttribute(TextureAttribute.SvtIndirectionDiffuse, indirectionBuffer));
+                if (indirectionBuffer != null && !material.has(indirectionAttributeId)) {
+                    materialProvider.getMaterial().set(new TextureAttribute(indirectionAttributeId, indirectionBuffer));
+                    // Height textures need more information!
+                    if (indirectionAttributeId == TextureAttribute.SvtIndirectionHeight) {
+                        if (materialProvider != null && materialProvider instanceof MaterialComponent) {
+                            var mc = (MaterialComponent) materialProvider;
+                            int[] resolution = tree.getResolution();
+                            mc.heightSize.set(resolution[0], resolution[1]);
+                            material.set(new FloatAttribute(FloatAttribute.HeightScale, mc.heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
+                            material.set(new Vector2Attribute(Vector2Attribute.HeightSize, mc.heightSize));
+                            material.set(new FloatAttribute(FloatAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
+                        }
+                    }
                 }
             }
         }
@@ -91,7 +108,7 @@ public class VirtualTextureComponent extends NamedComponent {
         if (materialProvider != null) {
             var material = materialProvider.getMaterial();
             if (material != null) {
-                return material.has(TextureAttribute.SvtIndirectionDiffuse) && material.has(TextureAttribute.SvtCache);
+                return material.has(indirectionAttributeId) && material.has(TextureAttribute.SvtCache);
             }
         }
         return false;

@@ -431,18 +431,41 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define cubemapFlag\n");
         }
 
-        boolean svtTextures = true;
+        boolean svtCache = false;
+        boolean svtIndirection = false;
         if (attributes.has(TextureAttribute.SvtCache)) {
             prefix.append("#define " + TextureAttribute.SvtCacheAlias + "Flag\n");
-        } else {
-            svtTextures = false;
+            svtCache = true;
         }
         if (attributes.has(TextureAttribute.SvtIndirectionDiffuse)) {
             prefix.append("#define " + TextureAttribute.SvtIndirectionDiffuseAlias + "Flag\n");
-        } else {
-            svtTextures = false;
+            svtIndirection = true;
         }
-        if (svtTextures && attributes.has(FloatAttribute.SvtId)
+        if (attributes.has(TextureAttribute.SvtIndirectionNormal)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionNormalAlias + "Flag\n");
+            svtIndirection = true;
+        }
+        if (attributes.has(TextureAttribute.SvtIndirectionSpecular)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionSpecularAlias + "Flag\n");
+            svtIndirection = true;
+        }
+        if (attributes.has(TextureAttribute.SvtIndirectionHeight)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionHeightAlias + "Flag\n");
+            svtIndirection = true;
+        }
+        if (attributes.has(TextureAttribute.SvtIndirectionEmissive)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionEmissiveAlias + "Flag\n");
+            svtIndirection = true;
+        }
+        if (attributes.has(TextureAttribute.SvtIndirectionMetallic)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionMetallicAlias + "Flag\n");
+            svtIndirection = true;
+        }
+        if (attributes.has(TextureAttribute.SvtIndirectionRoughness)) {
+            prefix.append("#define " + TextureAttribute.SvtIndirectionRoughnessAlias + "Flag\n");
+            svtIndirection = true;
+        }
+        if (svtCache && svtIndirection && attributes.has(FloatAttribute.SvtId)
                 && attributes.has(FloatAttribute.SvtDepth)
                 && attributes.has(FloatAttribute.SvtTileSize)
                 && attributes.has(Vector2Attribute.SvtResolution)) {

@@ -38,15 +38,16 @@ public class SVTQuadtreeBuilder {
      * Creates a new SVT quadtree and initializes it with the given file system location and
      * the given tile size.
      *
+     * @param name     The name of the tree.
      * @param location The location where the levels are. A directory for each level is expected within this
      *                 location, with the name "level[num]". Usually, "level0" is mandatory.
      * @param tileSize The size (width and height) of each tile in the SVT.
      *
      * @return The SVT quadtree object.
      */
-    public SVTQuadtree<Path> build(final Path location, final int tileSize) {
+    public SVTQuadtree<Path> build(final String name, final Path location, final int tileSize) {
         var comp = new FilenameComparator();
-        var tree = new SVTQuadtree<Path>(tileSize, 2);
+        var tree = new SVTQuadtree<Path>(name, tileSize, 2);
 
         var level0 = location.resolve("level0");
         if (!Files.exists(level0)) {

@@ -174,19 +174,19 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
         // SVTs
         if (diffuseSvt != null)
-            diffuseSvt.initialize("diffuseSvt", this);
+            diffuseSvt.initialize("diffuseSvt", this, TextureAttribute.SvtIndirectionDiffuse);
         if (heightSvt != null)
-            heightSvt.initialize("heightSvt", this);
+            heightSvt.initialize("heightSvt", this, TextureAttribute.SvtIndirectionHeight);
         if (specularSvt != null)
-            specularSvt.initialize("specularSvt", this);
+            specularSvt.initialize("specularSvt", this, TextureAttribute.SvtIndirectionSpecular);
         if (normalSvt != null)
-            normalSvt.initialize("normalSvt", this);
+            normalSvt.initialize("normalSvt", this, TextureAttribute.SvtIndirectionNormal);
         if (emissiveSvt != null)
-            emissiveSvt.initialize("emissiveSvt", this);
+            emissiveSvt.initialize("emissiveSvt", this, TextureAttribute.SvtIndirectionEmissive);
         if (roughnessSvt != null)
-            roughnessSvt.initialize("roughnessSvt", this);
+            roughnessSvt.initialize("roughnessSvt", this, TextureAttribute.SvtIndirectionRoughness);
         if (metallicSvt != null)
-            metallicSvt.initialize("metallicSvt", this);
+            metallicSvt.initialize("metallicSvt", this, TextureAttribute.SvtIndirectionMetallic);
 
         this.heightGenerated.set(false);
     }
@@ -201,7 +201,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public boolean hasSVT() {
-        return diffuseSvt != null || specularSvt != null || heightSvt != null;
+        return diffuseSvt != null || normalSvt != null || emissiveSvt != null || specularSvt != null || heightSvt != null || metallicSvt != null || roughnessSvt != null;
     }
 
     /**
@@ -387,7 +387,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
         // Sparse Virtual Textures.
         svts = new Array<>();
-        int svtId = SVTManager.nextSvtId();
+        int svtId = 0;
+        if (diffuseSvt != null || normalSvt != null || emissiveSvt != null || specularSvt != null || heightSvt != null || metallicSvt != null || roughnessSvt != null) {
+            svtId = SVTManager.nextSvtId();
+        }
         // Add attributes.
         if (diffuseSvt != null) {
             addSVTAttributes(material, diffuseSvt, svtId);
@@ -410,8 +413,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (roughnessSvt != null) {
             addSVTAttributes(material, roughnessSvt, svtId);
         }
-        // Broadcast this material for SVT manager.
-        EventManager.publish(Event.SVT_MATERIAL_INFO, this, svtId, this);
+        if (svtId > 0) {
+            // Broadcast this material for SVT manager.
+            EventManager.publish(Event.SVT_MATERIAL_INFO, this, svtId, this);
+        }
 
     }
 
@@ -419,11 +424,16 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         // Set ID.
         svt.id = id;
         // Set attributes.
-        double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
-        material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
         material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
-        material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
         material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
+        // Only update depth and resolution if it does not exist, or if it exists and its value is less than ours.
+        if (!material.has(FloatAttribute.SvtDepth) || ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.SvtDepth))).value < svt.tree.depth) {
+            // Depth.
+            material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
+            // Resolution.
+            double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
+            material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
+        }
 
         // Add to list.
         svts.add(svt);

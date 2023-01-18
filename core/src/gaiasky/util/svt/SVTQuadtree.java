@@ -1,7 +1,5 @@
 package gaiasky.util.svt;
 
-import gaiasky.util.Pair;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +11,10 @@ import java.util.Map;
 public class SVTQuadtree<T> {
     private final int MAX_LEVEL = 15;
 
+    /**
+     * Name of the tree.
+     */
+    public final String name;
     /**
      * Size in pixels of each tile. Tiles are square, so width and height are equal.
      * The tile size is a power of two, capping at 1024.
@@ -30,11 +32,11 @@ public class SVTQuadtree<T> {
     /** Each tile is identified by its level and its UV. Here we can access tiles directly. **/
     public Map<Long, SVTQuadtreeNode<T>>[] levels;
 
-
     /** Auxiliary object to store additional data. **/
     public Object aux;
 
-    public SVTQuadtree(int tileSize, int rootPositions) {
+    public SVTQuadtree(String name, int tileSize, int rootPositions) {
+        this.name = name;
         this.tileSize = tileSize;
         this.root = new SVTQuadtreeNode[rootPositions];
         this.levels = new Map[MAX_LEVEL];
@@ -67,6 +69,7 @@ public class SVTQuadtree<T> {
      * @param level The level.
      * @param col   The column.
      * @param row   The row.
+     *
      * @return The tile with the given level, column and row, if it exists.
      */
     public SVTQuadtreeNode<T> getTile(int level, int col, int row) {
@@ -86,6 +89,7 @@ public class SVTQuadtree<T> {
      * @param level The level.
      * @param u     The U texture coordinate in [0,1].
      * @param v     The V texture coordinate in [0,1].
+     *
      * @return The tile at the given level and UV.
      */
     public SVTQuadtreeNode<T> getTileFromUV(int level, double u, double v) {
@@ -127,5 +131,15 @@ public class SVTQuadtree<T> {
 
     public long getKey(int col, int row) {
         return ((long) col << MAX_LEVEL) + (long) row;
+    }
+
+    /**
+     * Get the resolution of this SVT at the most-detailed level.
+     *
+     * @return The resolution at the most detailed level.
+     */
+    public int[] getResolution() {
+        int tiles = (int) Math.pow(2, depth);
+        return new int[] { tileSize * tiles * root.length, tileSize * tiles };
     }
 }

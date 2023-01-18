@@ -1,5 +1,7 @@
 package gaiasky.util.svt;
 
+import gaiasky.scene.record.VirtualTextureComponent;
+
 /**
  * <p>
  * A quadtree node that represents a single tile with a specific level of detail (LOD)
@@ -72,7 +74,7 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
     }
 
     public String toStringShort() {
-        return "L" + level + "[" + col + "," + row + "]";
+        return "id" + ((VirtualTextureComponent)tree.aux).id + "-L" + level + "[" + col + "," + row + "]";
     }
 
     @Override
