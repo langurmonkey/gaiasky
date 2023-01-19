@@ -62,7 +62,7 @@ public class SVTRenderPass {
         int w = (int) (Gdx.graphics.getWidth() / SVT_TILE_DETECTION_REDUCTION_FACTOR);
         int h = (int) (Gdx.graphics.getHeight() / SVT_TILE_DETECTION_REDUCTION_FACTOR);
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(w, h);
-        frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
+        frameBufferBuilder.addFloatAttachment(GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, false);
         frameBufferBuilder.addDepthRenderBuffer(GL20.GL_DEPTH_COMPONENT16);
         frameBuffer = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
 
