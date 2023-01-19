@@ -461,6 +461,8 @@ public class ModelEntityRenderSystem {
      * Renders the cloud layer of a planet.
      */
     public void renderClouds(Entity entity, Base base, Model model, Cloud cloud, IntModelBatch batch, float alpha, double t) {
+        // Update cull face depending on distance.
+        cloud.cloud.updateCullFace(Mapper.body.get(entity).distToCamera);
         cloud.cloud.touch();
         ICamera cam = GaiaSky.instance.getICamera();
         cloud.cloud.mc.updateRelativisticEffects(cam);

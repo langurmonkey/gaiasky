@@ -874,6 +874,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void setDiffuseSVT(VirtualTextureComponent virtualTextureComponent) {
+        if(this.diffuseSvt != null && !this.diffuseSvt.location.equals(virtualTextureComponent.location)) {
+            logger.warn("Overwriting diffuse SVT: " + this.diffuseSvt.location + " -> " + virtualTextureComponent.location);
+        }
         this.diffuseSvt = virtualTextureComponent;
     }
 
@@ -882,6 +885,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void setSpecularSVT(VirtualTextureComponent virtualTextureComponent) {
+        if(this.specularSvt != null && !this.specularSvt.location.equals(virtualTextureComponent.location)) {
+            logger.warn("Overwriting specular SVT: " + this.specularSvt.location + " -> " + virtualTextureComponent.location);
+        }
         this.specularSvt = virtualTextureComponent;
     }
 

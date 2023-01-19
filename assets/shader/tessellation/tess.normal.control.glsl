@@ -50,6 +50,12 @@ out vec4 l_atmosphereColor[N_VERTICES];
 out float l_fadeFactor[N_VERTICES];
 #endif
 
+#ifdef svtIndirectionHeightTextureFlag
+#define QUALITY_SCALE 300.0
+#else
+#define QUALITY_SCALE 100.0
+#endif
+
 #define U_TO_KM 1.0E6
 
 vec3 center(vec3 p1, vec3 p2){
@@ -62,7 +68,7 @@ vec3 center(vec3 p1, vec3 p2, vec3 p3){
 
 float tessellationLevel(vec3 center){
     // Distance scaling variable
-    float tessellationFactor = u_tessQuality * 400.0;
+    float tessellationFactor = u_tessQuality * QUALITY_SCALE;
     const float tessellationSlope = 1.0;
 
     float d = length(center) * U_TO_KM;

@@ -34,6 +34,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -166,6 +167,23 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         transform.setToTranslation(localTransform).scl(size);
     }
 
+    /**
+     * Updates the cull face strategy depending on the distance to the camera.
+     *
+     * @param distToCamera The distance to the camera in internal units.
+     */
+    public void updateCullFace(double distToCamera) {
+        if (material != null) {
+            if (distToCamera > size) {
+                // Outside. Cull back faces.
+                ((IntAttribute) Objects.requireNonNull(material.get(IntAttribute.CullFace))).value = GL20.GL_BACK;
+            } else {
+                // Inside. Do not cull faces.
+                ((IntAttribute) Objects.requireNonNull(material.get(IntAttribute.CullFace))).value = GL20.GL_NONE;
+            }
+        }
+    }
+
     public void initMaterial() {
         material = mc.instance.materials.first();
 
@@ -188,8 +206,8 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
             }
         }
         material.set(new BlendingAttribute(1.0f));
-        // Do not cull
-        material.set(new IntAttribute(IntAttribute.CullFace, 0));
+        // Do not cull, only when below the clouds!
+        material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_BACK));
     }
 
     private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
