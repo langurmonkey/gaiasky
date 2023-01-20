@@ -58,6 +58,8 @@ public class VirtualTextureComponent extends NamedComponent {
             // Initialize indirection buffer.
             var indirectionSize = (int) Math.pow(2.0, tree.depth);
             // We use RGBA with 32-bit floating point numbers per channel for the indirection buffer.
+            // The indirection buffer only needs to store XY coordinates in the cache (which are usually small), and the level, so we could
+            // use a 16-bit float per channel. However, java does not have a half-precision float, so we go with RGBA32F.
             var indirectionData = new FloatTextureDataExt(indirectionSize * tree.root.length, indirectionSize, GL30.GL_RGBA32F, GL30.GL_RGBA, GL30.GL_FLOAT, true, false);
             indirectionBuffer = new TextureExt(indirectionData);
             // Important to set the minification filter to use mipmaps.
