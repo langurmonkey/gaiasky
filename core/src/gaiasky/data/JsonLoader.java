@@ -49,7 +49,6 @@ public class JsonLoader extends AbstractSceneLoader {
     /** Maps old attributes to components. **/
     private final AttributeMap attributeMap;
 
-
     /**
      * Creates a new instance with the given index.
      */
@@ -84,11 +83,11 @@ public class JsonLoader extends AbstractSceneLoader {
         JsonReader json = new JsonReader();
         for (String filePath : filePaths) {
             FileHandle file = Settings.settings.data.dataFileHandle(filePath, datasetDirectory);
-            JsonValue model = json.parse(file.read());
-            if (model.has("objects")) {
+            JsonValue root = json.parse(file.read());
+            if (root.has("objects")) {
                 // If the top element is 'objects', we have a list of new objects.
-                JsonValue child = model.get("objects").child;
-                final int count = model.get("objects").size;
+                JsonValue child = root.get("objects").child;
+                final int count = root.get("objects").size;
                 int processed = 0;
                 int loaded = 0;
                 while (child != null) {
@@ -108,7 +107,7 @@ public class JsonLoader extends AbstractSceneLoader {
                         var archetype = scene.archetypes().get(className);
                         var entity = archetype.createEntity();
                         try {
-                            fillEntity(child, entity, TextUtils.classSimpleName(className));
+                            fillEntity(child, entity, TextUtils.classSimpleName(className), false);
                             // Add to return list.
                             loadedEntities.add(entity);
                             // Add to index for possible later updates.
@@ -123,10 +122,10 @@ public class JsonLoader extends AbstractSceneLoader {
                 }
                 EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), 2f);
                 logger.info(I18n.msg("notif.nodeloader", loaded, filePath));
-            } else if (model.has("updates")) {
+            } else if (root.has("updates")) {
                 // If the top element is 'updates', we update existing objects with additional attributes.
                 // Store updates and run them afterwards.
-                updates.add(model);
+                updates.add(root);
                 updateFiles.add(file);
             }
         }
@@ -138,7 +137,6 @@ public class JsonLoader extends AbstractSceneLoader {
             JsonValue child = model.get("updates").child;
             final int count = model.get("updates").size;
             int processed = 0;
-            int loaded = 0;
             while (child != null) {
                 String name = child.getString("name");
                 if (name != null) {
@@ -147,10 +145,9 @@ public class JsonLoader extends AbstractSceneLoader {
                         var entity = index.get(nameLowerCase);
                         if (entity != null) {
                             try {
-                                loaded++;
                                 var archetype = scene.archetypes().findArchetype(entity);
                                 // Update entity.
-                                fillEntity(child, entity, archetype.getName());
+                                fillEntity(child, entity, archetype.getName(), true);
                             } catch (ReflectionException e) {
                                 logger.error(e);
                             }
@@ -274,22 +271,32 @@ public class JsonLoader extends AbstractSceneLoader {
         }
     }
 
-    public void fillEntity(final JsonValue json, final Entity entity, final String className) throws ReflectionException {
+    public void fillEntity(final JsonValue json, final Entity entity, final String className, boolean update) throws ReflectionException {
         processJson(json, (valueClass, value, attribute) -> {
             try {
+                // We can't update the name!
+                if(update && attribute.name.equalsIgnoreCase("name")){
+                    return true;
+                }
                 String key = findAttribute(attribute.name, className);
                 if (key != null) {
                     Class<? extends Component> componentClass = attributeMap.get(key);
                     Component comp = entity.getComponent(componentClass);
 
                     if (comp != null) {
-                        if (!set(attribute, comp, value, valueClass, componentClass)) {
-                            // Setter set did not work, try setting the attribute directly
-                            boolean succeed = set(comp, attribute.name, value);
-                            if (!succeed) {
-                                logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                        if (update) {
+                            if(!update(attribute, comp, value, valueClass, componentClass)) {
+                                logger.error("Update operation failed (unsupported?) for attribute: " + attribute.name);
                             }
-                            return succeed;
+                        } else {
+                            if (!set(attribute, comp, value, valueClass, componentClass)) {
+                                // Setter set did not work, try setting the attribute directly
+                                boolean succeed = set(comp, attribute.name, value);
+                                if (!succeed) {
+                                    logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                                }
+                                return succeed;
+                            }
                         }
                     } else {
                         logger.error("Error, component of class " + componentClass + " is null: " + json.name);
@@ -323,7 +330,6 @@ public class JsonLoader extends AbstractSceneLoader {
      *
      * @param json  The {@link JsonValue} for the object to convert.
      * @param clazz The class of the object.
-     *
      * @return The java object of the given class.
      */
     private Object convertJsonToObject(JsonValue json, Class<?> clazz) throws ReflectionException {
@@ -387,6 +393,21 @@ public class JsonLoader extends AbstractSceneLoader {
         }
     }
 
+    private boolean update(JsonValue attribute, Object instance, Object value, Class<?> valueClass, Class<?> instanceClass) {
+        String methodName = "update" + TextUtils.propertyToMethodName(attribute.name);
+        Method m = searchMethod(methodName, valueClass, instanceClass, false);
+        if (m != null) {
+            try {
+                m.invoke(instance, value);
+            } catch (ReflectionException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Searches for the given method with the given class. If none is found, it looks for fitting methods
      * with the class' interfaces and superclasses recursively.
@@ -395,7 +416,6 @@ public class JsonLoader extends AbstractSceneLoader {
      * @param parameterType  The parameter class type.
      * @param source         The class of the source object.
      * @param printException Whether to print an exception if no method is found.
-     *
      * @return The method, if found. Null otherwise.
      */
     private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source, boolean printException) {

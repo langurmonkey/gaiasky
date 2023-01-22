@@ -22,6 +22,7 @@ import gaiasky.event.IObserver;
 import gaiasky.event.Observer;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.render.BlendMode;
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.*;
@@ -37,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ModelComponent extends NamedComponent implements Disposable, IObserver {
+public class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
     private static final ColorAttribute ambient;
 
@@ -785,5 +786,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void print(Log log) {
         if (mtc != null)
             mtc.print(log);
+    }
+
+    @Override
+    public void updateWith(ModelComponent object) {
+        if(object.mtc != null) {
+            if(this.mtc == null) {
+                setMaterial(object.mtc);
+            } else {
+                this.mtc.updateWith(object.mtc);
+            }
+        }
     }
 }

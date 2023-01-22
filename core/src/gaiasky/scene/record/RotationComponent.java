@@ -5,6 +5,7 @@
 
 package gaiasky.scene.record;
 
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -12,7 +13,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 /**
  * Provides the information for the rotation of this body
  */
-public class RotationComponent {
+public class RotationComponent implements IUpdatable<RotationComponent> {
     /** Angular velocity [deg/hour] around the rotation axis. **/
     public double angularVelocity;
     /** Current angle with respect to the rotationAxis in degrees. **/
@@ -106,4 +107,29 @@ public class RotationComponent {
         return "{" + "angVel=" + angularVelocity + ", angle=" + angle + ", period=" + period + ", axialTilt=" + axialTilt + ", inclination=" + inclination + ", ascendingNode=" + ascendingNode + ", meridianAngle=" + meridianAngle + '}';
     }
 
+    public void copyFrom(RotationComponent other) {
+        if (other.period > 0) {
+            this.period = other.period;
+        }
+        if (other.angularVelocity > 0) {
+            this.angularVelocity = other.angularVelocity;
+        }
+        if (other.axialTilt > 0) {
+            this.axialTilt = other.axialTilt;
+        }
+        if (other.inclination > 0) {
+            this.inclination = other.inclination;
+        }
+        if (other.ascendingNode > 0) {
+            this.ascendingNode = other.ascendingNode;
+        }
+        if (other.meridianAngle > 0) {
+            this.meridianAngle = other.meridianAngle;
+        }
+    }
+
+    @Override
+    public void updateWith(RotationComponent object) {
+        copyFrom(object);
+    }
 }

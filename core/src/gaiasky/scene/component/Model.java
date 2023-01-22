@@ -29,59 +29,11 @@ public class Model implements Component {
         this.model = model;
     }
 
-    public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
-        if (this.model != null) {
-            if (this.model.mtc != null) {
-                this.model.mtc.setDiffuseSVT(MaterialComponent.convertToComponent(virtualTexture));
-            }
-        }
-    }
-
-    public void setSpecularSVT(Map<Object, Object> virtualTexture) {
-        if (this.model != null) {
-            if (this.model.mtc != null) {
-                this.model.mtc.setSpecularSVT(MaterialComponent.convertToComponent(virtualTexture));
-            }
-        }
-    }
-
-    public void setHeightSVT(Map<Object, Object> virtualTexture) {
-        if (this.model != null) {
-            if (this.model.mtc != null) {
-                this.model.mtc.setHeightSVT(MaterialComponent.convertToComponent(virtualTexture));
-            }
-        }
-    }
-
-    public void setNormalSVT(Map<Object, Object> virtualTexture) {
-        if (this.model != null) {
-            if (this.model.mtc != null) {
-                this.model.mtc.setNormalSVT(MaterialComponent.convertToComponent(virtualTexture));
-            }
-        }
-    }
-
-    public void setEmissiveSVT(Map<Object, Object> virtualTexture) {
-        if (this.model != null) {
-            if (this.model.mtc != null) {
-                this.model.mtc.setEmissiveSVT(MaterialComponent.convertToComponent(virtualTexture));
-            }
-        }
-    }
-
-    public void setMetallicSVT(Map<Object, Object> virtualTexture) {
-        if (this.model != null) {
-            if (this.model.mtc != null) {
-                this.model.mtc.setMetallicSVT(MaterialComponent.convertToComponent(virtualTexture));
-            }
-        }
-    }
-
-    public void setRoughnessSVT(Map<Object, Object> virtualTexture) {
-        if (this.model != null) {
-            if (this.model.mtc != null) {
-                this.model.mtc.setRoughnessSVT(MaterialComponent.convertToComponent(virtualTexture));
-            }
+    public void updateModel(ModelComponent model) {
+        if(this.model != null) {
+            this.model.updateWith(model);
+        } else {
+            setModel(model);
         }
     }
 

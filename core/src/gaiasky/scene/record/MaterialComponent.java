@@ -21,6 +21,7 @@ import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
@@ -52,11 +53,14 @@ import java.util.stream.IntStream;
  * It contains basic textures (diffuse, specular, reflection, emissive, etc.),
  * cubemaps (same as textures), and even some sparse virtual texture trees (SVT).
  */
-public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider {
+public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
     /** Default texture parameters **/
     protected static final OwnTextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
+
+    private static final float DEFAULT_HEIGHT_SCALE = 0.005f;
+
     // Default reflection cubemap for all materials.
     public static CubemapComponent reflectionCubemap;
 
@@ -91,7 +95,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public float[] emissiveColor;
     public float roughnessColor = Float.NaN;
     // HEIGHT
-    public Float heightScale = 0.005f;
+    public Float heightScale = DEFAULT_HEIGHT_SCALE;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
     public NoiseComponent nc;
@@ -209,7 +213,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
@@ -231,7 +234,6 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams) {
@@ -874,7 +876,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void setDiffuseSVT(VirtualTextureComponent virtualTextureComponent) {
-        if(this.diffuseSvt != null && !this.diffuseSvt.location.equals(virtualTextureComponent.location)) {
+        if (this.diffuseSvt != null && !this.diffuseSvt.location.equals(virtualTextureComponent.location)) {
             logger.warn("Overwriting diffuse SVT: " + this.diffuseSvt.location + " -> " + virtualTextureComponent.location);
         }
         this.diffuseSvt = virtualTextureComponent;
@@ -885,7 +887,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void setSpecularSVT(VirtualTextureComponent virtualTextureComponent) {
-        if(this.specularSvt != null && !this.specularSvt.location.equals(virtualTextureComponent.location)) {
+        if (this.specularSvt != null && !this.specularSvt.location.equals(virtualTextureComponent.location)) {
             logger.warn("Overwriting specular SVT: " + this.specularSvt.location + " -> " + virtualTextureComponent.location);
         }
         this.specularSvt = virtualTextureComponent;
@@ -1146,5 +1148,94 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public void dispose() {
         disposeTextures(GaiaSky.instance.assetManager);
         EventManager.instance.removeAllSubscriptions(this);
+    }
+
+    @Override
+    public void updateWith(MaterialComponent object) {
+        // Random attributes.
+        if (object.specularColor != null) {
+            this.specularColor = object.specularColor;
+        }
+        if (object.diffuseColor != null) {
+            this.diffuseColor = object.diffuseColor;
+        }
+        if (object.emissiveColor != null) {
+            this.emissiveColor = object.emissiveColor;
+        }
+        if (object.metallicColor != null) {
+            this.metallicColor = object.metallicColor;
+        }
+        if (!Float.isNaN(object.roughnessColor)) {
+            this.roughnessColor = object.roughnessColor;
+        }
+        if (object.heightScale != DEFAULT_HEIGHT_SCALE) {
+            this.heightScale = object.heightScale;
+        }
+        // Regular textures.
+        if (object.diffuse != null) {
+            this.diffuse = object.diffuse;
+        }
+        if (object.specular != null) {
+            this.specular = object.specular;
+        }
+        if (object.normal != null) {
+            this.normal = object.normal;
+        }
+        if (object.height != null) {
+            this.height = object.height;
+        }
+        if (object.emissive != null) {
+            this.emissive = object.emissive;
+        }
+        if (object.metallic != null) {
+            this.metallic = object.metallic;
+        }
+        if (object.roughness != null) {
+            this.roughness = object.roughness;
+        }
+        // Cubemaps.
+        if (object.diffuseCubemap != null) {
+            this.diffuseCubemap = object.diffuseCubemap;
+        }
+        if (object.specularCubemap != null) {
+            this.specularCubemap = object.specularCubemap;
+        }
+        if (object.normalCubemap != null) {
+            this.normalCubemap = object.normalCubemap;
+        }
+        if (object.heightCubemap != null) {
+            this.heightCubemap = object.heightCubemap;
+        }
+        if (object.emissiveCubemap != null) {
+            this.emissiveCubemap = object.emissiveCubemap;
+        }
+        if (object.metallicCubemap != null) {
+            this.metallicCubemap = object.metallicCubemap;
+        }
+        if (object.roughnessCubemap != null) {
+            this.roughnessCubemap = object.roughnessCubemap;
+        }
+        // SVTs.
+        if (object.diffuseSvt != null) {
+            this.diffuseSvt = object.diffuseSvt;
+        }
+        if (object.specularSvt != null) {
+            this.specularSvt = object.specularSvt;
+        }
+        if (object.normalSvt != null) {
+            this.normalSvt = object.normalSvt;
+        }
+        if (object.heightSvt != null) {
+            this.heightSvt = object.heightSvt;
+        }
+        if (object.emissiveSvt != null) {
+            this.emissiveSvt = object.emissiveSvt;
+        }
+        if (object.metallicSvt != null) {
+            this.metallicSvt = object.metallicSvt;
+        }
+        if (object.roughnessSvt != null) {
+            this.roughnessSvt = object.roughnessSvt;
+        }
     }
 }

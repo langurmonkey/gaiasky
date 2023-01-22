@@ -22,6 +22,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.BlendMode;
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
@@ -40,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.scene.record.MaterialComponent.convertToComponent;
 
-public class CloudComponent extends NamedComponent implements IObserver, IMaterialProvider {
+public class CloudComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<CloudComponent> {
     /** Default texture parameters **/
     protected static final TextureParameter textureParams;
     private static final Log logger = Logger.getLogger(CloudComponent.class);
@@ -441,5 +442,25 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
     public void dispose() {
         disposeTextures(manager);
         EventManager.instance.removeAllSubscriptions(this);
+    }
+
+    @Override
+    public void updateWith(CloudComponent object) {
+        // Random attributes.
+        if(object.size > 0) {
+            this.size = object.size;
+        }
+        // Regular texture.
+        if (object.diffuse != null) {
+            this.diffuse = object.diffuse;
+        }
+        // Cubemap.
+        if (object.diffuseCubemap != null) {
+            this.diffuseCubemap = object.diffuseCubemap;
+        }
+        // SVT.
+        if (object.diffuseSvt != null) {
+            this.diffuseSvt = object.diffuseSvt;
+        }
     }
 }

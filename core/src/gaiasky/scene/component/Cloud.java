@@ -2,6 +2,7 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.scene.record.CloudComponent;
+import gaiasky.scene.record.ModelComponent;
 
 import java.util.Map;
 
@@ -11,10 +12,17 @@ public class Cloud implements Component {
 
     public CloudComponent cloud;
 
-    public void setCloudSVT(Map<Object, Object> virtualTexture) {
+    public void setCloud(String diffuseCloud) {
         if (this.cloud != null) {
-            this.cloud.setDiffuseSVT(convertToComponent(virtualTexture));
+            this.cloud.setDiffuse(diffuseCloud);
         }
     }
 
+    public void updateCloud(CloudComponent cloud) {
+        if(this.cloud != null) {
+            this.cloud.updateWith(cloud);
+        } else {
+            this.cloud = cloud;
+        }
+    }
 }
