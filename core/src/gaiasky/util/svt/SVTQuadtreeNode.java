@@ -51,17 +51,19 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
 
     /**
      * Get the UV coordinates in [0,1] of the top left position of this tile.
+     *
      * @return The UV coordinates of this tile.
      */
-    public double[] getUV(){
+    public double[] getUV() {
         var numCols = (double) tree.getUTileCount(level);
         var numRows = (double) tree.getVTileCount(level);
 
-        return new double[]{ (double) col / numCols, (double) row / numRows };
+        return new double[] { (double) col / numCols, (double) row / numRows };
     }
 
     /**
      * Computes the OpenGL mip level for this tile.
+     *
      * @return The OpenGL mip level for this tile.
      */
     public int mipLevel() {
@@ -74,12 +76,21 @@ public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
     }
 
     public String toStringShort() {
-        return "id" + ((VirtualTextureComponent)tree.aux).id + "-L" + level + "[" + col + "," + row + "]";
+        return "id" + ((VirtualTextureComponent) tree.aux).id + "-L" + level + "[" + col + "," + row + "]";
     }
 
     @Override
     public int compareTo(SVTQuadtreeNode o) {
         // The natural order of nodes depends only on their depth.
         return Integer.compare(this.level, o.level);
+    }
+
+    /**
+     * Gets a unique 64-bit integer key for this tile, including the level, the column and the row.
+     *
+     * @return The unique key.
+     */
+    public long getKey() {
+        return tree.getKey(level, col, row);
     }
 }

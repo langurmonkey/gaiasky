@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -64,7 +65,7 @@ public class SVTManager implements IObserver {
     /**
      * The set of observed tiles from the camera.
      */
-    private final Set<SVTQuadtreeNode<Path>> observedTiles;
+    private final List<SVTQuadtreeNode<Path>> observedTiles;
     /**
      * Maps tile path objects to actual pixmaps.
      */
@@ -112,7 +113,7 @@ public class SVTManager implements IObserver {
 
     public SVTManager() {
         super();
-        this.observedTiles = new HashSet<>();
+        this.observedTiles = new ArrayList<>(50);
         this.tilePixmaps = new HashMap<>();
         this.tileLocation = new HashMap<>();
         this.materials = new IntMap<>(10);

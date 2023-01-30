@@ -51,7 +51,7 @@ layout (location = 0) out vec4 fragColor;
 #include shader/lib_cubemap.glsl
 
 // The reduction factor of the frame buffer of this pass has an impact on the determined mipmap level.
-#define SVT_TILE_DETECTION_REDUCTION_FACTOR 4.0
+#define SVT_TILE_DETECTION_REDUCTION_FACTOR 8.0
 const float svtDetectionScaleFactor = -log2(SVT_TILE_DETECTION_REDUCTION_FACTOR);
 
 #include shader/lib_logdepthbuff.glsl

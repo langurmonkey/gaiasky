@@ -36,7 +36,6 @@ public class HeightDataSVT implements IHeightData {
                         double tileU = (u - tileUV[0]) * tilesPerLevel * svt.root.length;
                         double tileV = 1.0 - (v - tileUV[1]) * tilesPerLevel;
                         model.setPixmap(pm);
-                        System.out.println(cr[0] + ", " + cr[1] + " : " + tileU + ", " + tileV);
                         return BilinearInterpolator.interpolate(tileU, tileV, model, false, false);
                     }
                 }
@@ -45,9 +44,9 @@ public class HeightDataSVT implements IHeightData {
         return 0;
     }
 
-    private class PixmapGridModel implements GridModel {
+    private static class PixmapGridModel implements GridModel {
         private Pixmap pixmap;
-        private Color color;
+        private final Color color;
 
         public PixmapGridModel() {
             this.color = new Color();

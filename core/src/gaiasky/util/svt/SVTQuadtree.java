@@ -1,5 +1,7 @@
 package gaiasky.util.svt;
 
+import com.badlogic.gdx.utils.LongMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import java.util.Map;
  * since the textures that wrap around spherical objects have an aspect ratio of 2:1.
  */
 public class SVTQuadtree<T> {
-    private final int MAX_LEVEL = 15;
+    public final int MAX_LEVEL = 15;
 
     /**
      * Name of the tree.
@@ -30,7 +32,7 @@ public class SVTQuadtree<T> {
     public SVTQuadtreeNode<T>[] root;
 
     /** Each tile is identified by its level and its UV. Here we can access tiles directly. **/
-    public Map<Long, SVTQuadtreeNode<T>>[] levels;
+    public LongMap<SVTQuadtreeNode<T>>[] levels;
 
     /** Auxiliary object to store additional data. **/
     public Object aux;
@@ -39,7 +41,7 @@ public class SVTQuadtree<T> {
         this.name = name;
         this.tileSize = tileSize;
         this.root = new SVTQuadtreeNode[rootPositions];
-        this.levels = new Map[MAX_LEVEL];
+        this.levels = new LongMap[MAX_LEVEL];
     }
 
     public void insert(final int level, final int col, final int row, T object) {
@@ -48,7 +50,7 @@ public class SVTQuadtree<T> {
 
         if (levels[level] == null) {
             // Create map.
-            levels[level] = new HashMap<>();
+            levels[level] = new LongMap<>();
         }
 
         SVTQuadtreeNode<T> parent = null;
@@ -59,7 +61,7 @@ public class SVTQuadtree<T> {
         }
 
         var tile = new SVTQuadtreeNode<>(this, parent, level, col, row, object);
-        levels[level].put(getKey(col, row), tile);
+        levels[level].put(tile.getKey(), tile);
         numTiles++;
     }
 
@@ -80,7 +82,7 @@ public class SVTQuadtree<T> {
             return null;
         }
 
-        return levels[level].get(getKey(col, row));
+        return levels[level].get(getKey(level, col, row));
     }
 
     /**
@@ -126,11 +128,14 @@ public class SVTQuadtree<T> {
     }
 
     public boolean contains(int level, int col, int row) {
-        return levels[level] != null && levels[level].containsKey(getKey(col, row));
+        return levels[level] != null && levels[level].containsKey(getKey(level, col, row));
     }
 
-    public long getKey(int col, int row) {
-        return ((long) col << MAX_LEVEL) + (long) row;
+    public long getKey(int level, int col, int row) {
+        return (long) (level) << 45 | (long) col << 26 | (long) row;
+    }
+    public long getKey(SVTQuadtreeNode<T> tile) {
+        return tile.getKey();
     }
 
     /**

@@ -32,9 +32,10 @@ import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
 public class SVTRenderPass {
     /**
      * The tile detection buffer is smaller than the main window by this factor.
-     * Should match the constant with the same name in svt.detection.fragment.glsl.
+     * Should match the constant with the same name in svt.detection.fragment.glsl
+     * and tess.svt.detection.fragment.glsl.
      **/
-    public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = 4f;
+    public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = 8f;
 
     /** The scene renderer object. **/
     private final SceneRenderer sceneRenderer;
@@ -83,49 +84,52 @@ public class SVTRenderPass {
     }
 
     public void render(ICamera camera) {
-        fetchCandidates(MODEL_PIX, candidates);
-        fetchCandidates(MODEL_PIX_TESS, candidatesTess);
+        // Costly operation, every 4th frame.
+        if (GaiaSky.instance.frames % 4 == 0) {
+            fetchCandidates(MODEL_PIX, candidates);
+            fetchCandidates(MODEL_PIX_TESS, candidatesTess);
 
-        var renderAssets = sceneRenderer.getRenderAssets();
+            var renderAssets = sceneRenderer.getRenderAssets();
 
-        // Render SVT tile detection to frame buffer.
-        frameBuffer.begin();
-        Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            // Render SVT tile detection to frame buffer.
+            frameBuffer.begin();
+            Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        // Non-tessellated models.
-        renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
-        for (var candidate : candidates) {
-            pushBlend(candidate);
-            sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
-            popBlend(candidate);
-        }
-        renderAssets.mbPixelLightingSvtDetection.end();
+            // Non-tessellated models.
+            renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
+            for (var candidate : candidates) {
+                pushBlend(candidate);
+                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
+                popBlend(candidate);
+            }
+            renderAssets.mbPixelLightingSvtDetection.end();
 
-        // Tessellated models
-        renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
-        for (var candidate : candidatesTess) {
-            pushBlend(candidate);
-            sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
-            popBlend(candidate);
-        }
-        renderAssets.mbPixelLightingSvtDetectionTessellation.end();
+            // Tessellated models
+            renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
+            for (var candidate : candidatesTess) {
+                pushBlend(candidate);
+                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
+                popBlend(candidate);
+            }
+            renderAssets.mbPixelLightingSvtDetectionTessellation.end();
 
-        frameBuffer.end();
+            frameBuffer.end();
 
-        // Read out pixels to float buffer.
-        frameBuffer.getColorBufferTexture().bind();
-        GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
+            // Read out pixels to float buffer.
+            frameBuffer.getColorBufferTexture().bind();
+            GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
 
-        // Send message informing a new tile detection buffer is ready.
-        EventManager.publish(Event.SVT_TILE_DETECTION_READY, this, pixels);
+            // Send message informing a new tile detection buffer is ready.
+            EventManager.publish(Event.SVT_TILE_DETECTION_READY, this, pixels);
 
-        if (!uiViewCreated) {
-            GaiaSky.postRunnable(() -> {
-                // Create UI view
-                EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
-            });
-            uiViewCreated = true;
+            if (!uiViewCreated) {
+                GaiaSky.postRunnable(() -> {
+                    // Create UI view
+                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
+                });
+                uiViewCreated = true;
+            }
         }
     }
 
