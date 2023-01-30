@@ -248,7 +248,7 @@ public interface IFocus {
     double getRadius();
 
     /**
-     * Returns the height of the projected position of the current camera
+     * Returns the surface elevation of the projected position of the current camera
      * on this focus object, which is usually the radius plus a value lookup
      * in the height texture (if exists).
      *
@@ -256,10 +256,10 @@ public interface IFocus {
      *
      * @return The height of the projected position of the current camera.
      */
-    double getHeight(Vector3b camPos);
+    double getElevationAt(Vector3b camPos);
 
     /**
-     * Same as {@link #getHeight(Vector3b)} but with the option to use the
+     * Same as {@link #getElevationAt(Vector3b)} but with the option to use the
      * future position of the body instead of the current one.
      *
      * @param camPos            The camera position.
@@ -267,10 +267,10 @@ public interface IFocus {
      *
      * @return The height of the projected position of the current camera on the surface.
      */
-    double getHeight(Vector3b camPos, boolean useFuturePosition);
+    double getElevationAt(Vector3b camPos, boolean useFuturePosition);
 
     /**
-     * Same as {@link #getHeight(Vector3b)} but with the option to use the
+     * Same as {@link #getElevationAt(Vector3b)} but with the option to use the
      * given future position of the body instead of the current one.
      *
      * @param camPos  The camera position.
@@ -278,7 +278,7 @@ public interface IFocus {
      *
      * @return The height of the projected position of the current camera on the surface.
      */
-    double getHeight(Vector3b camPos, Vector3b nextPos);
+    double getElevationAt(Vector3b camPos, Vector3b nextPos);
 
     /**
      * Returns the height scale of this focus, or 0 if it has no height info.

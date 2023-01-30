@@ -59,7 +59,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     protected static final PFMTextureParameter pfmTextureParams;
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
 
-    private static final float DEFAULT_HEIGHT_SCALE = 0.005f;
+    // Default height scale is 4 km.
+    private static final float DEFAULT_HEIGHT_SCALE = (float) (4.0 * Constants.KM_TO_U);
 
     // Default reflection cubemap for all materials.
     public static CubemapComponent reflectionCubemap;
@@ -94,10 +95,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public float[] metallicColor;
     public float[] emissiveColor;
     public float roughnessColor = Float.NaN;
-    // HEIGHT
+    /**
+     * Height scale in internal units. The mapping value of white in the height map (maximum height value in this body). Black is mapped to 0.
+     */
     public Float heightScale = DEFAULT_HEIGHT_SCALE;
     public Vector2 heightSize = new Vector2();
-    public float[][] heightMap;
+    public IHeightData heightData;
     public NoiseComponent nc;
     // Sparse virtual texture sets.
     public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt, normalSvt, emissiveSvt, roughnessSvt, metallicSvt;
@@ -135,12 +138,21 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
     }
 
+    private static OwnTextureParameter getTPPixmap(String tex, boolean mipmap) {
+        var textureParams = new OwnTextureParameter();
+        textureParams.pixmapBacked = true;
+        textureParams.genMipMaps = mipmap;
+        textureParams.magFilter = TextureFilter.Linear;
+        textureParams.minFilter = TextureFilter.Linear;
+        return textureParams;
+    }
+
     public void initialize(String name, AssetManager manager) {
         super.initialize(name);
 
         // Regular textures
         if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD))
-            diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
+            diffuseUnpacked = addToLoad(diffuse, getTPPixmap(diffuse, true), manager);
         if (normal != null && !normal.endsWith(Constants.GEN_KEYWORD))
             normalUnpacked = addToLoad(normal, getTP(normal), manager);
         if (specular != null && !specular.endsWith(Constants.GEN_KEYWORD))
@@ -154,7 +166,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (ao != null && !ao.endsWith(Constants.GEN_KEYWORD))
             aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
         if (height != null && !height.endsWith(Constants.GEN_KEYWORD))
-            heightUnpacked = addToLoad(height, getTP(height, true), manager);
+            heightUnpacked = addToLoad(height, getTPPixmap(height, true), manager);
         if (ring != null)
             ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         if (ringnormal != null)
@@ -213,6 +225,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
@@ -234,6 +247,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, OwnTextureParameter texParams) {
@@ -583,7 +597,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                         GaiaSky.postRunnable(() -> {
                             if (heightPixmap != null) {
                                 // Create texture, populate material
-                                heightMap = elevationData;
+                                heightData = new HeightDataPixmap(heightPixmap, null);
                                 if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
                                     heightTex = new Texture(heightPixmap, true);
                                     heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
@@ -657,22 +671,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             heightInitialized.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Construct RAM height map from texture
-                String heightUnpacked = GlobalResources.unpackAssetPath(height);
-                GaiaSky.postRunnable(() -> logger.info("Constructing elevation data from texture: " + heightUnpacked));
-                Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
-                float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
-                for (int i = 0; i < heightPixmap.getWidth(); i++) {
-                    for (int j = 0; j < heightPixmap.getHeight(); j++) {
-                        Color col = new Color(heightPixmap.getPixel(i, j));
-                        partialData[i][j] = (1f - col.r) * heightScale;
-                    }
-                }
-
-                GaiaSky.postRunnable(() -> {
-                    // Populate material
-                    heightMap = partialData;
-                    addHeightTex(tex);
-                });
+                heightData = new HeightDataPixmap(tex, () -> addHeightTex(tex));
             });
         }
     }
@@ -687,7 +686,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     private void removeElevationData() {
-        heightMap = null;
+        heightData = null;
         material.remove(TextureAttribute.Height);
         material.remove(FloatAttribute.HeightScale);
         material.remove(Vector2Attribute.HeightSize);
@@ -773,8 +772,24 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         this.height = Settings.settings.data.dataFile(height);
     }
 
-    public void setHeightScale(Double heightScale) {
+    public void setHeightScaleKm(Double heightScale) {
         this.heightScale = (float) (heightScale * Constants.KM_TO_U);
+    }
+
+    public void setHeightScaleM(Double heightScale) {
+        this.heightScale = (float) (heightScale * Constants.M_TO_U);
+    }
+
+    public void setHeightScale(Double heightScale) {
+        setHeightScaleKm(heightScale);
+    }
+
+    public void setHeightMapTopKm(Double heightMapTopKm) {
+        setHeightScaleKm(heightMapTopKm);
+    }
+
+    public void setHeightMapTopM(Double heightMapTopM) {
+        setHeightScaleM(heightMapTopM);
     }
 
     public void setColorIfTexture(Boolean colorIfTexture) {
@@ -1024,7 +1039,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                     } else {
                         if (height.endsWith(Constants.GEN_KEYWORD))
                             initializeGenElevationData();
-                        else if (heightMap == null) {
+                        else if (heightData == null) {
                             if (this.material.has(TextureAttribute.Height)) {
                                 initializeElevationData(((TextureAttribute) Objects.requireNonNull(this.material.get(TextureAttribute.Height))).textureDescription.texture);
                             } else if (AssetBean.manager().isLoaded(heightUnpacked)) {

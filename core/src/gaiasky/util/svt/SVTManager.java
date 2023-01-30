@@ -108,7 +108,7 @@ public class SVTManager implements IObserver {
     private FloatBuffer floatBuffer;
 
     // Are the textures displaying in the UI already?
-    private boolean uiViewCreated = false;
+    private boolean uiViewCreated = true;
 
     public SVTManager() {
         super();

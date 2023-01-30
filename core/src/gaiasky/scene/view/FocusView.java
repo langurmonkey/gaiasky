@@ -1,6 +1,8 @@
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -543,35 +545,38 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     @Override
-    public double getHeight(Vector3b camPos) {
+    public double getElevationAt(Vector3b camPos) {
         if (isModel()) {
-            return getHeight(camPos, false);
+            return getElevationAt(camPos, false);
         } else {
             return getRadius();
         }
     }
 
     @Override
-    public double getHeight(Vector3b camPos, boolean useFuturePosition) {
+    public double getElevationAt(Vector3b camPos, boolean useFuturePosition) {
         if (isModel()) {
             if (useFuturePosition) {
                 Vector3b nextPos = getPredictedPosition(B33, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
-                return getHeight(camPos, nextPos);
+                return getElevationAt(camPos, nextPos);
             } else {
-                return getHeight(camPos, null);
+                return getElevationAt(camPos, null);
             }
         } else {
             return getRadius();
         }
     }
 
+    Pixmap p = new Pixmap(1, 1, Format.RGBA8888);
+
     @Override
-    public double getHeight(Vector3b camPos, Vector3b nextPos) {
+    public double getElevationAt(Vector3b camPos, Vector3b nextPos) {
         if (isModel()) {
             var model = Mapper.model.get(entity);
             var mc = model.model;
+            double multiplier = Settings.settings.scene.renderer.elevation.multiplier;
             double height = 0;
-            if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
+            if (mc != null && mc.mtc != null && mc.mtc.heightData != null) {
                 double dCam;
                 Vector3b cart = B31;
                 if (nextPos != null) {
@@ -582,12 +587,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                     getAbsolutePosition(cart);
                     dCam = getDistToCamera();
                 }
-                // Only when we have height map and we are below the highest point in the surface
-                if (dCam < getRadius() + mc.mtc.heightScale * Settings.settings.scene.renderer.elevation.multiplier * 4) {
-                    float[][] m = mc.mtc.heightMap;
-                    int W = mc.mtc.heightMap.length;
-                    int H = mc.mtc.heightMap[0].length;
-
+                // Only when we have height map, and we are below the highest point in the surface.
+                if (dCam < getRadius() + mc.mtc.heightScale * multiplier) {
                     // Object-camera normalised vector
                     cart.scl(-1).add(camPos).nor();
 
@@ -599,32 +600,25 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                     Vector3d sph = D32;
                     Coordinates.cartesianToSpherical(cart, sph);
 
-                    double x = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
-                    double y = 1d - (sph.y * Nature.TO_DEG + 90.0) / 180.0;
+                    double u = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
+                    double v = (sph.y * Nature.TO_DEG + 90.0) / 180.0;
+                    // Get the height at the given UV position, and scale it properly.
+                    double heightNormalized = mc.mtc.heightData.getNormalizedHeight(u, v);
+                    height = heightNormalized * mc.mtc.heightScale;
 
-                    // Bilinear interpolation
-                    int i1 = (int) (W * x);
-                    int i2 = (i1 + 1) % W;
-                    int j1 = (int) (H * y);
-                    int j2 = (j1 + 1) % H;
-
-                    double dx = 1.0 / W;
-                    double dy = 1.0 / H;
-                    double x1 = (double) i1 / (double) W;
-                    double x2 = (x1 + dx) % 1.0;
-                    double y1 = (double) j1 / (double) H;
-                    double y2 = (y1 + dy) % 1.0;
-
-                    double f11 = m[i1][j1];
-                    double f21 = m[i2][j1];
-                    double f12 = m[i1][j2];
-                    double f22 = m[i2][j2];
-
-                    double denominator = (x2 - x1) * (y2 - y1);
-                    height = (((x2 - x) * (y2 - y)) / denominator) * f11 + ((x - x1) * (y2 - y) / denominator) * f21 + ((x2 - x) * (y - y1) / denominator) * f12 + ((x - x1) * (y - y1) / denominator) * f22;
+                    // Debug by painting on diffuse texture at same position.
+                    //var mat =mc.mtc.getMaterial();
+                    //if(mat.has(TextureAttribute.Diffuse)) {
+                    //    Texture diffuse = ((TextureAttribute) Objects.requireNonNull(mat.get(TextureAttribute.Diffuse))).textureDescription.texture;
+                    //    if(!diffuse.isManaged()){
+                    //        p.setColor((float) heightNormalized, 1, 0, 1);
+                    //        p.fill();
+                    //        diffuse.draw(p, (int) (u * diffuse.getWidth()), (int) ((1 - v) * diffuse.getHeight()));
+                    //    }
+                    //}
                 }
             }
-            return getRadius() + height * Settings.settings.scene.renderer.elevation.multiplier;
+            return getRadius() + height * multiplier;
 
         } else {
             return getRadius();
@@ -636,7 +630,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (isModel()) {
             var model = Mapper.model.get(entity);
             var mc = model.model;
-            if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
+            if (mc != null && mc.mtc != null && mc.mtc.heightData != null) {
                 return mc.mtc.heightScale;
             }
         }
@@ -1016,7 +1010,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     }
 
     public boolean isOctree() {
-        return entity != null && Mapper.octree.has(entity);
+        return isValid() && Mapper.octree.has(entity);
     }
 
     public Array<Entity> getOctreeObjects(Array<Entity> list) {
@@ -1024,6 +1018,10 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
             return list;
         }
         return getOctreeObjects(octant.octant, list);
+    }
+
+    public boolean isPlanet() {
+        return isValid() && base.archetype != null && base.archetype.getName().equals("Planet");
     }
 
     private Array<Entity> getOctreeObjects(OctreeNode node, Array<Entity> list) {

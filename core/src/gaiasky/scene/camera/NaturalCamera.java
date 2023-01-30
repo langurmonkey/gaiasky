@@ -538,7 +538,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case GAME_MODE:
             synchronized (updateLock) {
-                if (gravity && (closestBody.getEntity() != null) && Mapper.atmosphere.has(closestBody.getEntity()) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
+                if (gravity && (closestBody.getEntity() != null) && closestBody.isPlanet() && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                     // Add gravity to force, pulling to the closest body
                     final Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
                     final double dist = camObj.lend();
@@ -953,12 +953,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // New position
             closestBody.getPredictedPosition(aux5b, GaiaSky.instance.time, this, false);
 
-            double h = closestBody.getHeight(pos, aux5b);
-            double hs = closestBody.getHeightScale() * Settings.settings.scene.renderer.elevation.multiplier;
-            double minDist = h + hs / 10.0;
+            double elevation = closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / Math.max(4.0, 20.0 - Settings.settings.scene.renderer.elevation.multiplier);
             double newDist = aux5b.scl(-1).add(pos).lend();
-            if (newDist < minDist) {
-                aux5b.nor().scl(minDist - newDist);
+            if (newDist < elevation) {
+                aux5b.nor().scl(elevation - newDist);
                 pos.add(aux5b);
                 posinv.set(pos).scl(-1);
             }
@@ -1175,11 +1173,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double starEdge = 0.5 * Constants.PC_TO_U;
         if (parent.mode.useFocus() && focus != null && !focus.isEmpty()) {
             // FOCUS mode -> use focus object
-            dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
+            dist = focus.getDistToCamera() - (focus.getElevationAt(pos, false) + MIN_DIST);
         } else if (parent.mode.useClosest() && proximity.effective[0] != null) {
             // FREE/GAME mode -> use closest object
             if (closestBody != null && closestBody.getDistToCamera() < proximity.effective[0].getDistToCamera()) {
-                dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
+                dist = closestBody.getDistToCamera() - (closestBody.getElevationAt(pos, false) + MIN_DIST);
             } else if (proximity.effective[0] != null && !proximity.effective[0].isStar() && (proximity.effective[0].getClosestDistToCamera() + MIN_DIST) < starEdge) {
                 dist = distance * Math.pow((proximity.effective[0].getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
             } else {
@@ -1201,7 +1199,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             func = MathUtilsDouble.lint(dist, DIST_B, DIST_C, 1e10, 2e16) * Constants.DISTANCE_SCALE_FACTOR;
         }
 
-        return dist > 0 ? Math.max(func, min) * Settings.settings.scene.camera.speed : 0;
+        return dist >= 0 ? Math.max(func, min) * Settings.settings.scene.camera.speed : 0;
     }
 
     /**
