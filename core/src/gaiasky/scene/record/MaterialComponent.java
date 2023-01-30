@@ -314,7 +314,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (height != null && material.get(TextureAttribute.Height) == null) {
             if (!height.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(heightUnpacked, Texture.class);
-                if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                if (!Settings.settings.scene.renderer.elevation.type.isNone() && heightSvt == null) {
                     initializeElevationData(tex);
                 }
             } else {
@@ -422,6 +422,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
         if (heightSvt != null) {
             addSVTAttributes(material, heightSvt, svtId);
+            if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                initializeElevationData(heightSvt, manager);
+            }
         }
         if (metallicSvt != null) {
             addSVTAttributes(material, metallicSvt, svtId);
@@ -662,6 +665,16 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
                 // End
                 EventManager.publish(Event.PROCEDURAL_GENERATION_SURFACE_INFO, this, false);
+            });
+        }
+    }
+
+    private void initializeElevationData(VirtualTextureComponent svt, AssetManager manager) {
+        if (!heightInitialized.get()) {
+            heightInitialized.set(true);
+            GaiaSky.instance.getExecutorService().execute(() -> {
+                // Construct RAM height map from texture
+                heightData = new HeightDataSVT(svt.tree, manager);
             });
         }
     }

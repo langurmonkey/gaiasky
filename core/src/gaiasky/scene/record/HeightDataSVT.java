@@ -23,6 +23,7 @@ public class HeightDataSVT implements IHeightData {
     @Override
     public double getNormalizedHeight(double u, double v) {
         if (svt != null) {
+            v = 1.0 - v;
             for (int level = svt.depth; level >= 0; level--) {
                 int[] cr = svt.getColRow(level, u, v);
                 if (svt.contains(level, cr[0], cr[1])) {
@@ -31,9 +32,11 @@ public class HeightDataSVT implements IHeightData {
                     if (manager.contains(tile.object.toString())) {
                         Pixmap pm = manager.get(tile.object.toString());
                         double[] tileUV = tile.getUV();
-                        double tileU = u - tileUV[0];
-                        double tileV = v - tileUV[1];
+                        double tilesPerLevel = Math.pow(2.0, level);
+                        double tileU = (u - tileUV[0]) * tilesPerLevel * svt.root.length;
+                        double tileV = 1.0 - (v - tileUV[1]) * tilesPerLevel;
                         model.setPixmap(pm);
+                        System.out.println(cr[0] + ", " + cr[1] + " : " + tileU + ", " + tileV);
                         return BilinearInterpolator.interpolate(tileU, tileV, model, false, false);
                     }
                 }
