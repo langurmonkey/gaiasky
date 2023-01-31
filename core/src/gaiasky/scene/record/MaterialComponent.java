@@ -6,7 +6,6 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -314,7 +313,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (height != null && material.get(TextureAttribute.Height) == null) {
             if (!height.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(heightUnpacked, Texture.class);
-                if (!Settings.settings.scene.renderer.elevation.type.isNone() && heightSvt == null) {
+                if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
                     initializeElevationData(tex);
                 }
             } else {
@@ -421,8 +420,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             addSVTAttributes(material, specularSvt, svtId);
         }
         if (heightSvt != null) {
-            addSVTAttributes(material, heightSvt, svtId);
             if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                addSVTAttributes(material, heightSvt, svtId);
                 initializeElevationData(heightSvt, manager);
             }
         }
@@ -600,8 +599,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
                         GaiaSky.postRunnable(() -> {
                             if (heightPixmap != null) {
                                 // Create texture, populate material
-                                heightData = new HeightDataPixmap(heightPixmap, null);
                                 if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                                    heightData = new HeightDataPixmap(heightPixmap, null);
                                     heightTex = new Texture(heightPixmap, true);
                                     heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
 
