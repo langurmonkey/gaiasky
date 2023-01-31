@@ -6,9 +6,13 @@
 package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
 import com.badlogic.gdx.utils.Null;
 import gaiasky.util.i18n.I18n;
@@ -24,33 +28,71 @@ import gaiasky.util.validator.IntValidator;
  */
 public class OwnTextField extends TextField {
 
-    private Skin skin;
+    private final Skin skin;
     private float ownWidth = 0f, ownHeight = 0f;
     private IValidator validator = null;
     private String lastCorrectText = "";
     private Color regularColor;
     private Color errorColor;
+    private final boolean clearButtonFlag = true;
+    private final String clearButtonDrawableUp = "clear";
+    private final String clearButtonDrawableDown = "clear-down";
+    private Drawable clearDrawable;
+    private float clearX, clearY, clearW, clearH;
 
     public OwnTextField(@Null String text, Skin skin) {
         super(text, new TextFieldStyle(skin.get(TextFieldStyle.class)));
         this.skin = skin;
+        initClearButton();
     }
 
     public OwnTextField(String text, Skin skin, IValidator validator) {
         this(text, skin);
         this.validator = validator;
         initValidator();
+        initClearButton();
     }
 
     public OwnTextField(String text, Skin skin, String styleName) {
         super(text, new TextFieldStyle(skin.get(styleName, TextFieldStyle.class)));
         this.skin = skin;
+        initClearButton();
     }
 
     public OwnTextField(String text, Skin skin, String styleName, IValidator validator) {
         this(text, skin, styleName);
         this.validator = validator;
         initValidator();
+    }
+
+    public void initClearButton() {
+        if (clearButtonFlag) {
+            clearDrawable = skin.getDrawable(clearButtonDrawableUp);
+            clearW = clearDrawable.getMinWidth();
+            clearH = clearDrawable.getMinHeight();
+            final var me = this;
+            // Clear text if collision with drawable.
+            this.addListener(new ClickListener() {
+                public void clicked(InputEvent event, float x, float y) {
+                    if (!me.isDisabled() && x >= clearX && x <= clearX + clearW && y >= clearY && y <= clearY + clearH) {
+                        // Collision!
+                        me.setText("");
+                    }
+                }
+
+                @Override
+                public boolean mouseMoved(InputEvent event, float x, float y) {
+                    if (!me.isDisabled()) {
+                        if (x >= clearX && x <= clearX + clearW && y >= clearY && y <= clearY + clearH) {
+                            clearDrawable = skin.getDrawable(clearButtonDrawableDown);
+                        } else {
+                            clearDrawable = skin.getDrawable(clearButtonDrawableUp);
+                        }
+                    }
+                    return super.mouseMoved(event, x, y);
+                }
+            });
+        }
     }
 
     public void setValidator(IValidator validator) {
@@ -200,5 +242,20 @@ public class OwnTextField extends TextField {
 
     public void goEnd(boolean jump) {
         cursor = text.length();
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+        if (clearButtonFlag) {
+            float x = getX();
+            float y = getY();
+            float width = getWidth();
+            float height = getHeight();
+            clearX = width - clearW - 6f;
+            clearY = (height - clearH) / 2f;
+            clearDrawable.draw(batch, x + clearX, y + clearY, clearW, clearH);
+        }
+
     }
 }

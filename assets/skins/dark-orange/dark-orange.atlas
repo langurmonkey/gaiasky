@@ -277,6 +277,20 @@ check-on-over
   orig: 19, 19
   offset: 0, 0
   index: -1
+clear
+  rotate: false
+  xy: 739, 530
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+clear-down
+  rotate: false
+  xy: 739, 507
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
 clock
   rotate: false
   xy: 592, 942
@@ -473,7 +487,7 @@ default-select-focused
   index: -1
 default-slider
   rotate: false
-  xy: 766, 741
+  xy: 766, 653
   size: 11, 18
   split: 0, 0, 0, 0
   orig: 11, 18
@@ -481,7 +495,7 @@ default-slider
   index: -1
 default-slider-focused
   rotate: false
-  xy: 616, 338
+  xy: 766, 741
   size: 11, 18
   split: 2, 2, 2, 2
   orig: 11, 18
@@ -489,7 +503,7 @@ default-slider-focused
   index: -1
 default-slider-knob
   rotate: false
-  xy: 631, 345
+  xy: 766, 719
   size: 11, 18
   orig: 11, 18
   offset: 0, 0
@@ -524,14 +538,14 @@ default-slider-knob-before-vertical
   index: -1
 default-slider-knob-over
   rotate: false
-  xy: 646, 345
+  xy: 766, 697
   size: 11, 18
   orig: 11, 18
   offset: 0, 0
   index: -1
 default-slider-over
   rotate: false
-  xy: 661, 345
+  xy: 766, 675
   size: 11, 18
   split: 0, 0, 0, 0
   orig: 11, 18
@@ -577,7 +591,7 @@ detach-icon
   index: -1
 disabled-icon
   rotate: false
-  xy: 798, 747
+  xy: 781, 730
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
@@ -2812,7 +2826,7 @@ map-icon
   index: -1
 minus-icon
   rotate: false
-  xy: 815, 747
+  xy: 798, 747
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
@@ -2861,7 +2875,7 @@ play-icon
   index: -1
 plus-icon
   rotate: false
-  xy: 832, 747
+  xy: 781, 713
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
@@ -2975,56 +2989,56 @@ quit-icon
   index: -1
 radio-off
   rotate: false
-  xy: 739, 530
+  xy: 739, 484
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-off-disabled
   rotate: false
-  xy: 739, 507
+  xy: 713, 426
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-off-focused
   rotate: false
-  xy: 739, 484
+  xy: 709, 403
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-off-over
   rotate: false
-  xy: 713, 426
+  xy: 709, 380
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on
   rotate: false
-  xy: 709, 403
+  xy: 593, 337
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on-disabled
   rotate: false
-  xy: 709, 380
+  xy: 739, 461
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on-focused
   rotate: false
-  xy: 593, 337
+  xy: 736, 438
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on-over
   rotate: false
-  xy: 739, 461
+  xy: 736, 415
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -3081,14 +3095,14 @@ sc-engine-power-bg
   index: -1
 sc-engine-power-down
   rotate: false
-  xy: 736, 438
+  xy: 732, 392
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 sc-engine-power-down-checked
   rotate: false
-  xy: 736, 415
+  xy: 732, 369
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -3109,14 +3123,14 @@ sc-engine-power-knob-before
   index: -1
 sc-engine-power-up
   rotate: false
-  xy: 732, 392
+  xy: 709, 357
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 sc-engine-power-up-checked
   rotate: false
-  xy: 732, 369
+  xy: 732, 346
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -3274,7 +3288,7 @@ table-border
   index: -1
 textfield-disabled
   rotate: false
-  xy: 709, 357
+  xy: 683, 355
   size: 19, 19
   split: 3, 3, 3, 3
   orig: 19, 19
@@ -3303,14 +3317,14 @@ transparent
   index: -1
 tree-minus
   rotate: false
-  xy: 732, 346
+  xy: 623, 344
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 tree-plus
   rotate: false
-  xy: 683, 355
+  xy: 646, 344
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -3338,14 +3352,14 @@ white
   index: -1
 window-collapse
   rotate: false
-  xy: 849, 747
+  xy: 798, 730
   size: 13, 13
   orig: 13, 13
   offset: 0, 0
   index: -1
 window-expand
   rotate: false
-  xy: 866, 747
+  xy: 815, 747
   size: 13, 13
   orig: 13, 13
   offset: 0, 0

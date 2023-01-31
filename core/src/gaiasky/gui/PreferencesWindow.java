@@ -219,12 +219,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Get current resolution
         Table windowedResolutions = new Table(skin);
         IValidator widthValidator = new IntValidator(100, 10000);
-        widthField = new OwnTextField(Integer.toString(MathUtils.clamp(Gdx.graphics.getWidth(), 100, 10000)), skin, widthValidator);
+        widthField = new OwnTextField("", skin, widthValidator);
         widthField.setWidth(inputSmallWidth);
         IValidator heightValidator = new IntValidator(100, 10000);
-        heightField = new OwnTextField(Integer.toString(MathUtils.clamp(Gdx.graphics.getHeight(), 100, 10000)), skin, heightValidator);
+        heightField = new OwnTextField("", skin, heightValidator);
         heightField.setWidth(inputSmallWidth);
         final OwnLabel xLabel = new OwnLabel("x", skin);
+        populateWidthHeight();
 
         windowedResolutions.add(widthField).left().padRight(pad10);
         windowedResolutions.add(xLabel).left().padRight(pad10);
@@ -1889,6 +1890,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         setUpTabListeners();
     }
 
+    private void populateWidthHeight() {
+        if (widthField != null && widthField.getText().isBlank()) {
+            widthField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getWidth(), 100, 10000)));
+        }
+        if (heightField != null && heightField.getText().isBlank()) {
+            heightField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getHeight(), 100, 10000)));
+        }
+    }
+
     private Label getRequiresRestartLabel() {
         OwnLabel restart = new OwnLabel("*", skin, "default-pink");
         restart.addListener(new OwnTextTooltip(I18n.msg("gui.restart"), skin));
@@ -1899,6 +1909,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     public GenericDialog show(Stage stage, Action action) {
         GenericDialog result = super.show(stage, action);
         updateBackupValues();
+        populateWidthHeight();
         return result;
     }
 
@@ -2404,9 +2415,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (fullscreen) {
             settings.graphics.resolution[0] = fullScreenResolutions.getSelected().width;
             settings.graphics.resolution[1] = fullScreenResolutions.getSelected().height;
-        } else {
+        } else if (!widthField.getText().isBlank() && !heightField.getText().isBlank()) {
             settings.graphics.resolution[0] = Integer.parseInt(widthField.getText());
             settings.graphics.resolution[1] = Integer.parseInt(heightField.getText());
+        } else {
+            populateWidthHeight();
         }
 
         enableComponents(!fullscreen, widthField, heightField, xLabel);

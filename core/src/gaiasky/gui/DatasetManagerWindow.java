@@ -378,6 +378,10 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private int reloadLeftPane(Cell<?> left, Cell<?> right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
+        OwnTextField filter = new OwnTextField("", skin, "big");
+        filter.setMessageText("filter...");
+        filter.setWidth(400f);
+        Table leftContent = new Table(skin);
         Table leftTable = new Table(skin);
         leftTable.align(Align.topRight);
         leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
@@ -651,7 +655,10 @@ public class DatasetManagerWindow extends GenericDialog {
         leftScroll.layout();
         leftScroll.setScrollX(scroll[mode.ordinal()][0]);
         leftScroll.setScrollY(scroll[mode.ordinal()][1]);
-        left.setActor(leftScroll);
+
+        leftContent.add(filter).top().center().row();
+        leftContent.add(leftScroll).top().left();
+        left.setActor(leftContent);
 
         return added;
     }

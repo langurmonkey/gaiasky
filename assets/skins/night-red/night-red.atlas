@@ -261,6 +261,20 @@ check-on-over
   orig: 19, 19
   offset: 0, 0
   index: -1
+clear
+  rotate: false
+  xy: 396, 585
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+clear-down
+  rotate: false
+  xy: 419, 585
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
 clock
   rotate: false
   xy: 260, 491
@@ -2959,56 +2973,56 @@ quit-icon
   index: -1
 radio-off
   rotate: false
-  xy: 396, 585
+  xy: 442, 585
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-off-disabled
   rotate: false
-  xy: 419, 585
+  xy: 465, 589
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-off-focused
   rotate: false
-  xy: 442, 585
+  xy: 488, 592
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-off-over
   rotate: false
-  xy: 442, 585
+  xy: 488, 592
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on
   rotate: false
-  xy: 465, 589
+  xy: 404, 562
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on-disabled
   rotate: false
-  xy: 488, 592
+  xy: 404, 539
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on-focused
   rotate: false
-  xy: 404, 562
+  xy: 427, 562
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 radio-on-over
   rotate: false
-  xy: 404, 562
+  xy: 427, 562
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -3065,14 +3079,14 @@ sc-engine-power-bg
   index: -1
 sc-engine-power-down
   rotate: false
-  xy: 404, 539
+  xy: 427, 539
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 sc-engine-power-down-checked
   rotate: false
-  xy: 427, 562
+  xy: 417, 516
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -3093,14 +3107,14 @@ sc-engine-power-knob-before
   index: -1
 sc-engine-power-up
   rotate: false
-  xy: 427, 539
+  xy: 450, 562
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 sc-engine-power-up-checked
   rotate: false
-  xy: 417, 516
+  xy: 450, 539
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
@@ -3265,7 +3279,7 @@ table-border
   index: -1
 textfield
   rotate: false
-  xy: 440, 516
+  xy: 451, 493
   size: 19, 19
   split: 3, 3, 3, 3
   orig: 19, 19
@@ -3273,7 +3287,7 @@ textfield
   index: -1
 textfield-disabled
   rotate: false
-  xy: 450, 562
+  xy: 440, 516
   size: 19, 19
   split: 3, 3, 3, 3
   orig: 19, 19
@@ -3281,7 +3295,7 @@ textfield-disabled
   index: -1
 textfield-focused
   rotate: false
-  xy: 450, 539
+  xy: 428, 493
   size: 19, 19
   split: 3, 3, 3, 3
   orig: 19, 19
@@ -3303,14 +3317,14 @@ tooltip-icon
   index: -1
 tree-minus
   rotate: false
-  xy: 428, 493
+  xy: 463, 516
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
   index: -1
 tree-plus
   rotate: false
-  xy: 451, 493
+  xy: 474, 493
   size: 19, 19
   orig: 19, 19
   offset: 0, 0
