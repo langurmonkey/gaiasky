@@ -382,7 +382,7 @@ public class DatasetManagerWindow extends GenericDialog {
         final Table leftTable = new Table(skin);
 
         OwnTextField filter = new OwnTextField("", skin, "big");
-        filter.setMessageText("filter...");
+        filter.setMessageText(I18n.msg("gui.filter"));
         filter.setWidth(400f);
         filter.addListener(new ChangeListener() {
             @Override
