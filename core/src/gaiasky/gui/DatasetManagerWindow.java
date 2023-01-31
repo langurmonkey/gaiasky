@@ -378,11 +378,18 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private int reloadLeftPane(Cell<?> left, Cell<?> right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
+        final Table leftContent = new Table(skin);
+        final Table leftTable = new Table(skin);
+
         OwnTextField filter = new OwnTextField("", skin, "big");
         filter.setMessageText("filter...");
         filter.setWidth(400f);
-        Table leftContent = new Table(skin);
-        Table leftTable = new Table(skin);
+        filter.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                populateLeftTable(leftTable, mode, dataDescriptor, Settings.settings.data.dataFiles, width, filter.getText());
+            }
+        });
         leftTable.align(Align.topRight);
         leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
         leftScroll.setScrollingDisabled(true, false);
@@ -401,16 +408,31 @@ public class DatasetManagerWindow extends GenericDialog {
             return false;
         });
 
-        // Current selected datasets
-        List<String> currentSetting = Settings.settings.data.dataFiles;
-
         selectionOrder.clear();
         selectedIndex = 0;
 
+        // Add datasets to table.
+        int added = populateLeftTable(leftTable, mode, dataDescriptor, Settings.settings.data.dataFiles, width, "");
+
+        leftScroll.setWidth(width * 0.52f);
+        leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+        leftScroll.layout();
+        leftScroll.setScrollX(scroll[mode.ordinal()][0]);
+        leftScroll.setScrollY(scroll[mode.ordinal()][1]);
+
+        leftContent.add(filter).top().center().row();
+        leftContent.add(leftScroll).top().left();
+        left.setActor(leftContent);
+
+        return added;
+    }
+
+    private int populateLeftTable(Table leftTable, DatasetMode mode, DataDescriptor dataDescriptor, List<String> currentSetting, float width, String filter) {
+        leftTable.clear();
         int added = 0;
         for (DatasetType type : dataDescriptor.types) {
             List<DatasetDesc> datasets = type.datasets;
-            List<DatasetDesc> filtered = datasets.stream().filter(d -> mode != DatasetMode.AVAILABLE || !d.exists).collect(Collectors.toList());
+            List<DatasetDesc> filtered = datasets.stream().filter(d -> d.filter(filter) && (mode != DatasetMode.AVAILABLE || !d.exists)).collect(Collectors.toList());
             if (!filtered.isEmpty()) {
                 OwnLabel dsType = new OwnLabel(I18n.msg("gui.download.type." + type.typeStr), skin, "hud-header");
                 leftTable.add(dsType).left().padTop(pad34 * 2f).padBottom(pad18).row();
@@ -650,16 +672,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
         }
-        leftScroll.setWidth(width * 0.52f);
-        leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
-        leftScroll.layout();
-        leftScroll.setScrollX(scroll[mode.ordinal()][0]);
-        leftScroll.setScrollY(scroll[mode.ordinal()][1]);
-
-        leftContent.add(filter).top().center().row();
-        leftContent.add(leftScroll).top().left();
-        left.setActor(leftContent);
-
+        leftTable.pack();
         return added;
     }
 

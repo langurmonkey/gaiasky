@@ -76,7 +76,10 @@ public class OwnTextField extends TextField {
                 public void clicked(InputEvent event, float x, float y) {
                     if (!me.isDisabled() && x >= clearX && x <= clearX + clearW && y >= clearY && y <= clearY + clearH) {
                         // Collision!
+                        boolean bak = me.getProgrammaticChangeEvents();
+                        me.setProgrammaticChangeEvents(true);
                         me.setText("");
+                        me.setProgrammaticChangeEvents(bak);
                     }
                 }
 
