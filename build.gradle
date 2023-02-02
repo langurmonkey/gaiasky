@@ -33,10 +33,12 @@ allprojects {
         jacksonVersion = "2.13.2"
         joiseVersion = "1.+"
         ashleyVersion = "+"
+        jpegxlVersion = "+"
     }
 
     repositories {
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -157,6 +159,8 @@ project(":core") {
         // Joise
         api group: "com.sudoplay.joise", name: "joise", version: "$joiseVersion"
 
+        // JPEG XL bindings
+        api group: "com.github.umjammer", name: "vavi-image-jpegxl", version: "$jpegxlVersion"
 
         // ****************
         // REST SERVER DEPS
