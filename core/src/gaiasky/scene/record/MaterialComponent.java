@@ -137,21 +137,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         }
     }
 
-    private static OwnTextureParameter getTPPixmap(String tex, boolean mipmap) {
-        var textureParams = new OwnTextureParameter();
-        textureParams.pixmapBacked = true;
-        textureParams.genMipMaps = mipmap;
-        textureParams.magFilter = TextureFilter.Linear;
-        textureParams.minFilter = TextureFilter.Linear;
-        return textureParams;
-    }
-
     public void initialize(String name, AssetManager manager) {
         super.initialize(name);
 
         // Regular textures
         if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD))
-            diffuseUnpacked = addToLoad(diffuse, getTPPixmap(diffuse, true), manager);
+            diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
         if (normal != null && !normal.endsWith(Constants.GEN_KEYWORD))
             normalUnpacked = addToLoad(normal, getTP(normal), manager);
         if (specular != null && !specular.endsWith(Constants.GEN_KEYWORD))
@@ -165,7 +156,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (ao != null && !ao.endsWith(Constants.GEN_KEYWORD))
             aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
         if (height != null && !height.endsWith(Constants.GEN_KEYWORD))
-            heightUnpacked = addToLoad(height, getTPPixmap(height, true), manager);
+            heightUnpacked = addToLoad(height, getTP(height, true), manager);
         if (ring != null)
             ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         if (ringnormal != null)

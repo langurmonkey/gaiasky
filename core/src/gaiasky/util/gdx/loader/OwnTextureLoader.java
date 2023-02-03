@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.graphics.glutils.KTXTextureData;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.util.gdx.graphics.BufferedImageTextureData;
 import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 
 /**
@@ -83,6 +84,8 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, OwnTextur
             return new KTXTextureData(file, useMipMaps);
         } else if (pixmapBacked) {
             return new PixmapTextureData(loadPixmap(file), format, useMipMaps, false, false);
+        } else if (file.name().endsWith(".jxl")) {
+            return new BufferedImageTextureData(file, useMipMaps);
         } else {
             return new FileTextureData(file, loadPixmap(file), format, useMipMaps);
         }
