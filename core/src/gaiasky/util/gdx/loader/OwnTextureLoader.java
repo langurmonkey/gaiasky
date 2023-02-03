@@ -6,6 +6,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.AssetLoader;
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.PixmapLoader;
+import com.badlogic.gdx.assets.loaders.PixmapLoader.PixmapParameter;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -80,10 +82,16 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, OwnTextur
         } else if (file.name().endsWith(".ktx") || file.name().endsWith(".zktx")) {
             return new KTXTextureData(file, useMipMaps);
         } else if (pixmapBacked) {
-            return new PixmapTextureData(new Pixmap(file), format, useMipMaps, false, false);
+            return new PixmapTextureData(loadPixmap(file), format, useMipMaps, false, false);
         } else {
-            return new FileTextureData(file, new Pixmap(file), format, useMipMaps);
+            return new FileTextureData(file, loadPixmap(file), format, useMipMaps);
         }
+    }
+
+    private Pixmap loadPixmap(FileHandle file) {
+        var pixLoader = new OwnPixmapLoader(null);
+        pixLoader.loadAsync(null, file.name(), file, new PixmapParameter());
+        return pixLoader.loadSync(null, null, null, null);
     }
 
     @Override
@@ -91,7 +99,7 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, OwnTextur
         if (parameter.texture != null) {
             parameter.texture.dispose();
         }
-        if(parameter.textureData != null) {
+        if (parameter.textureData != null) {
             parameter.textureData.disposePixmap();
         }
     }

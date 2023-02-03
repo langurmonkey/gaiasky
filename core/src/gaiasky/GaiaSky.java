@@ -15,6 +15,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -504,6 +505,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager = new AssetManager(internalResolver);
         assetManager.setLoader(Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
+        assetManager.setLoader(Pixmap.class, new OwnPixmapLoader(dataResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         assetManager.setLoader(IAttitudeServer.class, new AttitudeLoader(dataResolver));

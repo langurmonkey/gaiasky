@@ -29,8 +29,10 @@ public class Java2DTexture extends Texture {
         this(width, height, Pixmap.Format.RGBA8888);
     }
 
-    public Java2DTexture() {
-        this(1024, 1024);
+    public Java2DTexture(BufferedImage image) {
+        super(image.getWidth(), image.getHeight(), Format.RGBA8888);
+        bufferImg = image;
+        buffer = BufferUtils.newIntBuffer(image.getWidth() * image.getHeight());
     }
 
     public BufferedImage getBufferedImage() {
