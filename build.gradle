@@ -137,11 +137,11 @@ project(":core") {
         // File utilities
         api group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         // Compression
-        api "org.apache.commons:commons-compress:$compressVersion"
+        api group: "org.apache.commons", name: "commons-compress", version: "$compressVersion"
         // Command line arguments
-        api "com.beust:jcommander:$jcommanderVersion"
+        api group: "com.beust", name: "jcommander", version: "$jcommanderVersion"
         // Fast math
-        api "net.jafama:jafama:$jafamaVersion"
+        api group: "net.jafama", name: "jafama", version: "$jafamaVersion"
 
         // Scripting
         api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
@@ -161,6 +161,7 @@ project(":core") {
 
         // JPEG XL bindings
         api group: "com.github.umjammer", name: "vavi-image-jpegxl", version: "$jpegxlVersion"
+        //api files("lib/jxlatte.jar")
 
         // ****************
         // REST SERVER DEPS
