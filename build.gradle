@@ -161,7 +161,6 @@ project(":core") {
 
         // JPEG XL bindings
         api group: "com.github.umjammer", name: "vavi-image-jpegxl", version: "$jpegxlVersion"
-        //api files("lib/jxlatte.jar")
 
         // ****************
         // REST SERVER DEPS
