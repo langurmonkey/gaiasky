@@ -83,7 +83,6 @@ public class ModelEntityRenderSystem {
                 if (shadow) {
                     prepareShadowEnvironment(entity, model, scaffolding);
                 }
-
                 mc.update(alpha * scaffolding.fadeOpacity);
                 modelBatch.render(mc.instance, mc.env);
             } else {

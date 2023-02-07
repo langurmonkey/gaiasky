@@ -32,6 +32,7 @@ import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.svt.SVTManager;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -202,8 +203,18 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         }
         if (diffuseSvt != null && materialComponent != null) {
             if (materialComponent.diffuseSvt != null) {
+                // Use the ID of the main material.
                 addSVTAttributes(material, diffuseSvt, materialComponent.diffuseSvt.id);
                 materialComponent.svts.add(diffuseSvt);
+            } else {
+                // We have no diffuse SVT in the main material!
+                int svtId = SVTManager.nextSvtId();
+                addSVTAttributes(material, diffuseSvt, svtId);
+                materialComponent.svts.add(diffuseSvt);
+            }
+            if (diffuseSvt.id > 0) {
+                // Broadcast this material for SVT manager.
+                EventManager.publish(Event.SVT_MATERIAL_INFO, this, diffuseSvt.id, this);
             }
         }
         material.set(new BlendingAttribute(1.0f));
@@ -377,6 +388,10 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
                 }
             });
         }
+    }
+
+    public boolean hasSVT() {
+        return diffuseSvt != null;
     }
 
     /**

@@ -21,6 +21,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import static gaiasky.render.RenderGroup.MODEL_PIX;
@@ -43,7 +44,7 @@ public class SVTRenderPass {
     /** The model view object. **/
     private final ModelView view;
 
-    private final Array<IRenderable> candidates, candidatesTess;
+    private final Array<IRenderable> candidates, candidatesTess, candidatesCloud;
 
     /** The frame buffer to render the SVT tile detection. Format should be at least RGBAF16. **/
     private FrameBuffer frameBuffer;
@@ -56,6 +57,7 @@ public class SVTRenderPass {
         this.view = new ModelView();
         this.candidates = new Array<>();
         this.candidatesTess = new Array<>();
+        this.candidatesCloud = new Array<>();
     }
 
     public void initialize() {
@@ -71,23 +73,52 @@ public class SVTRenderPass {
         pixels = BufferUtils.createFloatBuffer(w * h * 4);
     }
 
+    /**
+     * Collects the candidate entities in the given render group that have a non-cloud SVT.
+     * @param renderGroup The render group.
+     * @param candidates The entities in the given render group with at least one non-cloud SVT.
+     */
     private void fetchCandidates(RenderGroup renderGroup, Array<IRenderable> candidates) {
         List<IRenderable> models = sceneRenderer.getRenderLists().get(renderGroup.ordinal());
         candidates.clear();
         // Collect SVT-enabled models.
         models.forEach(e -> {
             view.setEntity(((Render) e).getEntity());
-            if (view.hasSVT()) {
+            if (view.hasSVTNoCloud()) {
                 candidates.add(e);
             }
         });
     }
 
+    /**
+     * Collects the candidate entities in the given render groups that have no non-cloud SVT and
+     * a cloud SVT.
+     * @param renderGroups The render groups.
+     * @param candidates The candidates with only cloud SVT.
+     */
+    private void fetchCandidatesCloud(RenderGroup[] renderGroups, Array<IRenderable> candidates) {
+        List<IRenderable> models = new ArrayList<>();
+        for (var rg : renderGroups) {
+            models.addAll(sceneRenderer.getRenderLists().get(rg.ordinal()));
+        }
+        candidates.clear();
+        // Collect SVT-enabled models with only clouds.
+        models.forEach(e -> {
+            view.setEntity(((Render) e).getEntity());
+            if (!view.hasSVTNoCloud() && view.hasSVTCloud()) {
+                candidates.add(e);
+            }
+        });
+    }
+
+    private final RenderGroup[] renderGroups = new RenderGroup[] { MODEL_PIX, MODEL_PIX_TESS };
+
     public void render(ICamera camera) {
         // Costly operation, every 4th frame.
         if (GaiaSky.instance.frames % 4 == 0) {
-            fetchCandidates(MODEL_PIX, candidates);
-            fetchCandidates(MODEL_PIX_TESS, candidatesTess);
+            fetchCandidates(renderGroups[0], candidates);
+            fetchCandidates(renderGroups[1], candidatesTess);
+            fetchCandidatesCloud(renderGroups, candidatesCloud);
 
             var renderAssets = sceneRenderer.getRenderAssets();
 
@@ -99,13 +130,24 @@ public class SVTRenderPass {
             // Non-tessellated models.
             renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
             for (var candidate : candidates) {
+                var e = ((Render) candidate).getEntity();
+                var m = Mapper.model.get(e);
                 pushBlend(candidate);
                 sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
                 popBlend(candidate);
             }
+            // Models with only cloud SVT.
+            for (var candidate : candidatesCloud) {
+                var e = ((Render) candidate).getEntity();
+                var m = Mapper.model.get(e);
+                var c = Mapper.cloud.get(e);
+                if (c.cloud.hasSVT()) {
+                    sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
+                }
+            }
             renderAssets.mbPixelLightingSvtDetection.end();
 
-            // Tessellated models
+            // Tessellated models.
             renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
             for (var candidate : candidatesTess) {
                 pushBlend(candidate);

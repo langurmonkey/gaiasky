@@ -426,8 +426,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // The whole update thread must lock the value of direction and up
         distance = pos.lend();
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
-        double realTransUnits = m.isGame() ? speedScaling(1e-5) : speedScaling();
-        double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
+        double speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
+        double speedScalingCapped = Math.max(10d * Constants.M_TO_U, speedScaling);
         switch (m) {
         case FOCUS_MODE:
             if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow()) {
@@ -485,7 +485,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                 // Set ori to this frame's inv(ori)
                                 previousOrientation.set(ori).inv();
                             }
-
                         }
                         // Add dx to camera position
                         pos.add(dx);
@@ -503,7 +502,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         updateRoll(dt, Settings.settings.scene.camera.turn);
                     }
 
-                    updatePosition(dt, translateUnits, realTransUnits);
+                    updatePosition(dt, speedScalingCapped, speedScaling);
                     updateRotation(dt, aux4b);
 
                     // Update focus direction
@@ -555,7 +554,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
         case FREE_MODE:
             synchronized (updateLock) {
-                updatePosition(dt, translateUnits, Settings.settings.scene.camera.targetMode ? realTransUnits : 1);
+                updatePosition(dt, speedScalingCapped, Settings.settings.scene.camera.targetMode ? speedScaling : 1);
                 if (!Settings.settings.runtime.openVr) {
                     // If target is present, update direction
                     if (freeTargetOn) {
@@ -569,7 +568,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     updateRotationFree(dt, Settings.settings.scene.camera.turn);
                     updateRoll(dt, Settings.settings.scene.camera.turn);
                 }
-                updateLateral(dt, translateUnits);
+                updateLateral(dt, speedScalingCapped);
             }
             break;
         default:
@@ -894,16 +893,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 double factor = cinematic ? 100 : 1;
                 counterAmount *= factor / ((focus.getDistToCamera() - focus.getRadius()) / focus.getRadius());
             }
+            // The last term applies a greater scale when the direction and velocity vector face in the same general direction.
             double scl = -velocity * counterAmount * dt;
-            if (Double.isFinite(scl))
+            if (Double.isFinite(scl)) {
                 friction.set(vel).nor().scl(scl);
+            }
         } else {
             friction.set(force).nor().scl(-forceLen * dt);
         }
 
         force.add(friction);
 
-        if (lastFwdTime > (cinematic ? 250 : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
+        if (lastFwdTime > (cinematic ? 250f : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
             stopForwardMovement();
         }
 

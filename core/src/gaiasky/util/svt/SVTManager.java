@@ -8,13 +8,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.record.CloudComponent;
 import gaiasky.scene.record.MaterialComponent;
+import gaiasky.scene.record.NamedComponent;
 import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -58,10 +59,10 @@ public class SVTManager implements IObserver {
     private AssetManager manager;
 
     /**
-     * Map with all material components that have at least one
+     * Map with all material and cloud components that have at least one
      * SVT.
      */
-    private final IntMap<MaterialComponent> materials;
+    private final IntMap<NamedComponent> components;
     /**
      * The set of observed tiles from the camera.
      */
@@ -116,7 +117,7 @@ public class SVTManager implements IObserver {
         this.observedTiles = new ArrayList<>(50);
         this.tilePixmaps = new HashMap<>();
         this.tileLocation = new HashMap<>();
-        this.materials = new IntMap<>(10);
+        this.components = new IntMap<>(10);
         this.queuedTiles = new ArrayBlockingQueue<>(500);
     }
 
@@ -145,20 +146,17 @@ public class SVTManager implements IObserver {
             float y = tileDetectionBuffer.get(); // b
             float id = tileDetectionBuffer.get(); // a
 
-            if (id > 0 && materials.containsKey((int) id)) {
-                var material = materials.get((int) id);
-                for (var svtComponent : material.svts) {
-                    // Initialize tile size first time.
-                    if (tileSize < 0) {
-                        tileSize = svtComponent.tileSize;
-                        // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
-                        cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
-                        cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
+            if (id > 0 && components.containsKey((int) id)) {
+                var component = components.get((int) id);
+                if (component instanceof MaterialComponent) {
+                    var material = (MaterialComponent) component;
+                    for (var svtComponent : material.svts) {
+                        observeSvt(svtComponent, level, x, y);
                     }
-
-                    var tile = svtComponent.tree.getTile((int) level, (int) x, (int) y);
-                    if (tile != null) {
-                        observedTiles.add(tile);
+                } else if (component instanceof CloudComponent) {
+                    var cloud = (CloudComponent) component;
+                    if (cloud.hasSVT()) {
+                        observeSvt(cloud.diffuseSvt, level, x, y);
                     }
                 }
             }
@@ -176,9 +174,10 @@ public class SVTManager implements IObserver {
                 if (!manager.contains(path)) {
                     manager.load(path, Pixmap.class);
                     tile.state = STATE_LOADING;
+                    logger.info("Loading tile: " + tile.toStringShort());
                 } else {
                     // In case the same SVT is used for multiple channels.
-                    if(tile.state == STATE_NOT_LOADED) {
+                    if (tile.state == STATE_NOT_LOADED) {
                         tile.state = STATE_LOADING;
                     }
                 }
@@ -284,6 +283,21 @@ public class SVTManager implements IObserver {
             uiViewCreated = true;
         }
 
+    }
+
+    private void observeSvt(VirtualTextureComponent svt, float level, float x, float y) {
+        // Initialize tile size first time.
+        if (tileSize < 0) {
+            tileSize = svt.tileSize;
+            // This must be exact, CACHE_BUFFER_SIZE must be divisible by tileSize.
+            cacheSizeInTiles = CACHE_BUFFER_SIZE / tileSize;
+            cacheBufferArray = new SVTQuadtreeNode[cacheSizeInTiles][cacheSizeInTiles];
+        }
+
+        var tile = svt.tree.getTile((int) level, (int) x, (int) y);
+        if (tile != null) {
+            observedTiles.add(tile);
+        }
     }
 
     /**
@@ -424,8 +438,7 @@ public class SVTManager implements IObserver {
         } else if (event == Event.SVT_MATERIAL_INFO) {
             // Put in list.
             var id = (Integer) data[0];
-            var mc = (MaterialComponent) data[1];
-            materials.put(id, mc);
+            components.put(id, (NamedComponent) data[1]);
         }
     }
 

@@ -89,7 +89,7 @@ void main() {
     float NL = clamp(dot(N, L) * 2.0, 0.0, 1.0);
 
     vec3 cloudColor = clamp(v_lightCol * cloud.rgb, 0.0, 1.0);
-    float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0) * 1.6;
+    float opacity = v_opacity * clamp(NL + luma(ambient), 0.0, 1.0) * 1.3;
     fragColor = vec4(cloudColor, cloud.a) * opacity;
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

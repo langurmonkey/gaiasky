@@ -83,7 +83,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Alpha values for each type.
      **/
     public float[] alphas;
-    ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
+    private ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
     /**
      * Render lists for all render groups.
      * The front render lists contain the objects which are actually rendered in the current cycle. The back
@@ -484,7 +484,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
                 renderObject.renderOpaque(render.entity, batch, (float) 1, false);
             }
         }
-
     }
 
     public void clearScreen() {
@@ -573,6 +572,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if a given component type is on
      *
      * @param comp The component
+     *
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -583,6 +583,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Checks if the component types are all on
      *
      * @param comp The components
+     *
      * @return Whether the components are all on
      */
     public boolean allOn(ComponentTypes comp) {
@@ -606,6 +607,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * of all components
      *
      * @param comp The components
+     *
      * @return The alpha value
      */
     public float alpha(ComponentTypes comp) {
@@ -704,6 +706,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      *
      * @param type The component type.
      * @param t    The current time in seconds.
+     *
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type, double t) {
@@ -825,7 +828,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         return this.lightGlowPass;
     }
 
-
     /**
      * Resets the render flags for all systems.
      */
@@ -856,5 +858,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     private int getKey(final int w, final int h) {
         return 31 * h + w;
+    }
+
+    public ModelEntityRenderSystem getModelRenderSystem() {
+        return renderObject;
     }
 }
