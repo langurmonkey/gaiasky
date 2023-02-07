@@ -174,7 +174,6 @@ public class SVTManager implements IObserver {
                 if (!manager.contains(path)) {
                     manager.load(path, Pixmap.class);
                     tile.state = STATE_LOADING;
-                    logger.info("Loading tile: " + tile.toStringShort());
                 } else {
                     // In case the same SVT is used for multiple channels.
                     if (tile.state == STATE_NOT_LOADED) {
