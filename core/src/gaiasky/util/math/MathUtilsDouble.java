@@ -5,10 +5,8 @@
 
 package gaiasky.util.math;
 
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.RandomXS128;
 
-import java.nio.FloatBuffer;
 import java.util.Random;
 
 /**
