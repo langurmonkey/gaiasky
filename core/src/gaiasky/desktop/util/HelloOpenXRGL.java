@@ -2,16 +2,22 @@ package gaiasky.desktop.util;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
-import gaiasky.util.math.MathUtilsd;
-import gaiasky.vr.openxr.*;
-
-import org.lwjgl.*;
-import org.lwjgl.opengl.*;
+import gaiasky.util.math.Matrix4Utils;
+import gaiasky.vr.openxr.ShadersGL;
+import gaiasky.vr.openxr.XRHelper;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL31;
 import org.lwjgl.openxr.*;
-import org.lwjgl.system.*;
+import org.lwjgl.system.MemoryStack;
 
-import java.nio.*;
-import java.util.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -19,9 +25,10 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.openxr.EXTDebugUtils.*;
 import static org.lwjgl.openxr.KHROpenGLEnable.*;
-import static org.lwjgl.openxr.MNDXEGLEnable.*;
+import static org.lwjgl.openxr.MNDXEGLEnable.XR_MNDX_EGL_ENABLE_EXTENSION_NAME;
 import static org.lwjgl.openxr.XR10.*;
-import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryStack.stackMalloc;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class HelloOpenXRGL {
@@ -620,7 +627,7 @@ public class HelloOpenXRGL {
         }
 
         switch (sessionState) {
-        case XR_SESSION_STATE_READY: {
+        case XR_SESSION_STATE_READY -> {
             assert (xrSession != null);
             try (MemoryStack stack = stackPush()) {
                 check(xrBeginSession(
@@ -634,24 +641,25 @@ public class HelloOpenXRGL {
                 return false;
             }
         }
-        case XR_SESSION_STATE_STOPPING: {
+        case XR_SESSION_STATE_STOPPING -> {
             assert (xrSession != null);
             sessionRunning = false;
             check(xrEndSession(xrSession));
             return false;
         }
-        case XR_SESSION_STATE_EXITING: {
+        case XR_SESSION_STATE_EXITING -> {
             // Do not attempt to restart because user closed this session.
             //*requestRestart = false;
             return true;
         }
-        case XR_SESSION_STATE_LOSS_PENDING: {
+        case XR_SESSION_STATE_LOSS_PENDING -> {
             // Poll for a new instance.
             //*requestRestart = true;
             return true;
         }
-        default:
+        default -> {
             return false;
+        }
         }
     }
 
@@ -786,13 +794,13 @@ public class HelloOpenXRGL {
         return true;
     }
 
-    private static Matrix4 modelviewMatrix = new Matrix4();
-    private static Matrix4 projectionMatrix = new Matrix4();
-    private static Matrix4 viewMatrix = new Matrix4();
+    private static final Matrix4 modelviewMatrix = new Matrix4();
+    private static final Matrix4 projectionMatrix = new Matrix4();
+    private static final Matrix4 viewMatrix = new Matrix4();
 
-    private static FloatBuffer mvpMatrix = BufferUtils.createFloatBuffer(16);
+    private static final FloatBuffer mvpMatrix = BufferUtils.createFloatBuffer(16);
 
-    private static Quaternion quaternion = new Quaternion();
+    private static final Quaternion quaternion = new Quaternion();
 
     private void OpenGLRenderView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, int viewIndex) {
         glBindFramebuffer(GL_FRAMEBUFFER, swapchainFramebuffer);
@@ -834,16 +842,16 @@ public class HelloOpenXRGL {
         {   // Rotating plane
             modelviewMatrix.translate(0, 0, -3).rotate((float) -glfwGetTime(), 1, 0, 0);
             glUseProgram(colorShader);
-            glUniformMatrix4fv(glGetUniformLocation(colorShader, "projection"), false, MathUtilsd.put(projectionMatrix, mvpMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(colorShader, "view"), false, MathUtilsd.put(viewMatrix, mvpMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(colorShader, "model"), false, MathUtilsd.put(modelviewMatrix, mvpMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(colorShader, "projection"), false, Matrix4Utils.put(projectionMatrix, mvpMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(colorShader, "view"), false, Matrix4Utils.put(viewMatrix, mvpMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(colorShader, "model"), false, Matrix4Utils.put(modelviewMatrix, mvpMatrix));
             glBindVertexArray(quadVAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 
         {   // World-space cube
             modelviewMatrix.idt().scl(10);
-            glUniformMatrix4fv(glGetUniformLocation(colorShader, "model"), false, MathUtilsd.put(modelviewMatrix, mvpMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(colorShader, "model"), false, Matrix4Utils.put(modelviewMatrix, mvpMatrix));
             glBindVertexArray(cubeVAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBuffer);
             glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
@@ -896,7 +904,6 @@ public class HelloOpenXRGL {
         throw new XrResultException("XR method returned " + result);
     }
 
-    @SuppressWarnings("serial")
     public static class XrResultException extends RuntimeException {
         public XrResultException(String s) {
             super(s);
