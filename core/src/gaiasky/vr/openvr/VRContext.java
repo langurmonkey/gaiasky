@@ -398,32 +398,21 @@ public class VRContext implements Disposable {
         VRDeviceType type;
         int deviceClass = VRSystem.VRSystem_GetTrackedDeviceClass(index);
         switch (deviceClass) {
-        case VR.ETrackedDeviceClass_TrackedDeviceClass_HMD:
-            type = VRDeviceType.HeadMountedDisplay;
-            break;
-        case VR.ETrackedDeviceClass_TrackedDeviceClass_Controller:
-            type = VRDeviceType.Controller;
-            break;
-        case VR.ETrackedDeviceClass_TrackedDeviceClass_TrackingReference:
-            type = VRDeviceType.BaseStation;
-            break;
-        case VR.ETrackedDeviceClass_TrackedDeviceClass_GenericTracker:
-            type = VRDeviceType.Generic;
-            break;
-        default:
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_HMD -> type = VRDeviceType.HeadMountedDisplay;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_Controller -> type = VRDeviceType.Controller;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_TrackingReference -> type = VRDeviceType.BaseStation;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_GenericTracker -> type = VRDeviceType.Generic;
+        default -> {
             return;
+        }
         }
 
         VRControllerRole role = VRControllerRole.OptOut;
         if (type == VRDeviceType.Controller) {
             int r = VRSystem.VRSystem_GetControllerRoleForTrackedDeviceIndex(index);
             switch (r) {
-            case VR.ETrackedControllerRole_TrackedControllerRole_LeftHand:
-                role = VRControllerRole.LeftHand;
-                break;
-            case VR.ETrackedControllerRole_TrackedControllerRole_RightHand:
-                role = VRControllerRole.RightHand;
-                break;
+            case VR.ETrackedControllerRole_TrackedControllerRole_LeftHand -> role = VRControllerRole.LeftHand;
+            case VR.ETrackedControllerRole_TrackedControllerRole_RightHand -> role = VRControllerRole.RightHand;
             }
         }
         devices[index] = new VRDevice(devicePoses[index], type, role);
@@ -438,113 +427,30 @@ public class VRContext implements Disposable {
         if (models.containsKey(name))
             return models.get(name);
 
-        // FIXME we load the models synchronously cause we are lazy
         IntModel model = null;
-        if (false) {
-            int error;
-            PointerBuffer modelPointer = PointerBuffer.allocateDirect(1);
-            while (true) {
-                error = VRRenderModels.VRRenderModels_LoadRenderModel_Async(name, modelPointer);
-                if (error != VR.EVRRenderModelError_VRRenderModelError_Loading)
-                    break;
-            }
-
-            if (error != VR.EVRRenderModelError_VRRenderModelError_None)
-                return null;
-            RenderModel renderModel = new RenderModel(modelPointer.getByteBuffer(RenderModel.SIZEOF));
-
-            PointerBuffer texturePointer = PointerBuffer.allocateDirect(1);
-            while (true) {
-                error = VRRenderModels.VRRenderModels_LoadTexture_Async(renderModel.diffuseTextureId(), texturePointer);
-                if (error != VR.EVRRenderModelError_VRRenderModelError_Loading)
-                    break;
-            }
-
-            if (error != VR.EVRRenderModelError_VRRenderModelError_None) {
-                VRRenderModels.VRRenderModels_FreeRenderModel(renderModel);
-                return null;
-            }
-
-            RenderModelTextureMap renderModelTexture = new RenderModelTextureMap(texturePointer.getByteBuffer(RenderModelTextureMap.SIZEOF));
-
-            // convert to a Model
-            IntMesh mesh = new IntMesh(true, renderModel.unVertexCount(), renderModel.unTriangleCount() * 3, new VertexAttribute[] { VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0) });
-            IntMeshPart meshPart = new IntMeshPart(name, mesh, 0, renderModel.unTriangleCount() * 3, GL20.GL_TRIANGLES);
-            RenderModelVertex.Buffer vertices = renderModel.rVertexData();
-            float[] packedVertices = new float[8 * renderModel.unVertexCount()];
-            int i = 0;
-            while (vertices.remaining() > 0) {
-                RenderModelVertex v = vertices.get();
-                packedVertices[i++] = v.vPosition().v(0);
-                packedVertices[i++] = v.vPosition().v(1);
-                packedVertices[i++] = v.vPosition().v(2);
-
-                packedVertices[i++] = v.vNormal().v(0);
-                packedVertices[i++] = v.vNormal().v(1);
-                packedVertices[i++] = v.vNormal().v(2);
-
-                packedVertices[i++] = v.rfTextureCoord().get(0);
-                packedVertices[i++] = v.rfTextureCoord().get(1);
-            }
-            mesh.setVertices(packedVertices);
-
-            // Shorts to Integers
-            int[] indices = new int[renderModel.unTriangleCount() * 3];
-            ShortBuffer sb = renderModel.IndexData();
-            sb.rewind();
-            int j = 0;
-            while (sb.hasRemaining()) {
-                short index = sb.get();
-                indices[j++] = index;
-            }
-
-            mesh.setIndices(indices);
-
-            Pixmap pixmap = new Pixmap(renderModelTexture.unWidth(), renderModelTexture.unHeight(), Format.RGBA8888);
-            byte[] pixels = new byte[renderModelTexture.unWidth() * renderModelTexture.unHeight() * 4];
-            renderModelTexture.rubTextureMapData(pixels.length).get(pixels);
-            pixmap.getPixels().put(pixels);
-            pixmap.getPixels().position(0);
-            Texture texture = new Texture(new PixmapTextureData(pixmap, pixmap.getFormat(), true, true));
-            Material material = new Material(new TextureAttribute(TextureAttribute.Diffuse, texture));
-
-            model = new IntModel();
-            model.meshes.add(mesh);
-            model.meshParts.add(meshPart);
-            model.materials.add(material);
-            IntNode node = new IntNode();
-            node.id = name;
-            node.parts.add(new IntNodePart(meshPart, material));
-            model.nodes.add(node);
-            model.manageDisposable(mesh);
-            model.manageDisposable(texture);
-
-            VRRenderModels.VRRenderModels_FreeRenderModel(renderModel);
-            VRRenderModels.VRRenderModels_FreeTexture(renderModelTexture);
-        } else {
-            OwnObjLoader ol = new OwnObjLoader();
-            if (manufacturer == null || manufacturer.equalsIgnoreCase("Oculus")) {
-                if (isControllerLeft(name, modelNumber, role)) {
-                    model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
-                } else if (isControllerRight(name, modelNumber, role)) {
-                    model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
-                } else {
-                    logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
-                }
+        OwnObjLoader ol = new OwnObjLoader();
+        if (manufacturer == null || manufacturer.equalsIgnoreCase("Oculus")) {
+            // Oculus Rift CV1.
+            if (isControllerLeft(name, modelNumber, role)) {
+                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
+            } else if (isControllerRight(name, modelNumber, role)) {
+                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-right.obj"));
             } else {
-                // HTC
-                if (isControllerRight(name, modelNumber, role) || isControllerLeft(name, modelNumber, role)) {
-                    model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
-                } else {
-                    logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
-                }
+                logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
             }
+        } else {
+            // Default to HTC vive controller model.
+            if (isControllerRight(name, modelNumber, role) || isControllerLeft(name, modelNumber, role)) {
+                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
+            } else {
+                logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
+            }
+        }
 
-            // Load default
-            if (model == null) {
-                logger.info("WARN: Could not find suitable controller model, using default...");
-                model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
-            }
+        // Load default
+        if (model == null) {
+            logger.info("WARN: Could not find suitable controller model, using default...");
+            model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
         }
 
         models.put(name, model);
@@ -553,14 +459,22 @@ public class VRContext implements Disposable {
     }
 
     private boolean isControllerLeft(String name, String modelNumber, VRControllerRole role) {
-        return (role != null && role == VRControllerRole.LeftHand)
-                || (name != null && name.equals("renderLeftHand") || name.contains("_left"))
+        if ((role == VRControllerRole.LeftHand))
+            return true;
+        if (name != null && name.equals("renderLeftHand"))
+            return true;
+        assert name != null;
+        return (name.contains("_left"))
                 || (modelNumber != null && modelNumber.contains("Left"));
     }
 
     private boolean isControllerRight(String name, String modelNumber, VRControllerRole role) {
-        return (role != null && role == VRControllerRole.RightHand)
-                || (name != null && name.equals("renderRightHand") || name.contains("_right"))
+        if ((role == VRControllerRole.RightHand))
+            return true;
+        if (name != null && name.equals("renderRightHand"))
+            return true;
+        assert name != null;
+        return (name.contains("_right"))
                 || (modelNumber != null && modelNumber.contains("Right"));
     }
 
@@ -961,14 +875,14 @@ public class VRContext implements Disposable {
         public boolean isButtonPressed(int button) {
             if (button < 0 || button >= 64)
                 return false;
-            return (buttons & (1l << button)) != 0;
+            return (buttons & (1L << button)) != 0;
         }
 
         void setButton(int button, boolean pressed) {
             if (pressed) {
-                buttons |= (1l << button);
+                buttons |= (1L << button);
             } else {
-                buttons ^= (1l << button);
+                buttons ^= (1L << button);
             }
         }
 
@@ -1092,13 +1006,13 @@ public class VRContext implements Disposable {
          */
         public boolean pollAxis(int axis) {
             if (axes != null) {
-                float currx = this.axes[axis][0];
-                float curry = this.axes[axis][1];
+                float currentX = this.axes[axis][0];
+                float currentY = this.axes[axis][1];
 
                 this.axes[axis][0] = getAxisX(axis);
                 this.axes[axis][1] = getAxisY(axis);
 
-                return currx != this.axes[axis][0] || curry != this.axes[axis][1];
+                return currentX != this.axes[axis][0] || currentY != this.axes[axis][1];
             }
             return false;
         }
