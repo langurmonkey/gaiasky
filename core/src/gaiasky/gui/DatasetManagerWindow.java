@@ -25,7 +25,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
-import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.input.WindowGamepadListener;
@@ -365,7 +364,7 @@ public class DatasetManagerWindow extends GenericDialog {
             left = content.add().top().left().padRight(pad34);
             right = content.add().top().left();
 
-            int datasets = reloadLeftPane(left, right, dataDescriptor, mode, width);
+            int datasets = reloadLeftPane(left, dataDescriptor, mode, width);
             if (datasets > 0) {
                 reloadRightPane(right, selectedDataset[mode.ordinal()], mode);
             } else {
@@ -377,7 +376,7 @@ public class DatasetManagerWindow extends GenericDialog {
         me.pack();
     }
 
-    private int reloadLeftPane(Cell<?> left, Cell<?> right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
+    private int reloadLeftPane(Cell<?> left, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
         final Table leftContent = new Table(skin);
         final Table leftTable = new Table(skin);
 
@@ -488,18 +487,18 @@ public class DatasetManagerWindow extends GenericDialog {
                         if (dataset.baseData || dataset.type.equals("texture-pack")) {
                             select.setChecked(true);
                             select.setDisabled(true);
-                        } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                        } else if (dataset.minGsVersion > Settings.SOURCE_VERSION) {
                             select.setChecked(false);
                             select.setDisabled(true);
                             title.setColor(ColorUtils.gRedC);
-                            tooltipText = I18n.msg("gui.download.version.gs.mismatch", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion));
+                            tooltipText = I18n.msg("gui.download.version.gs.mismatch", Integer.toString(Settings.SOURCE_VERSION), Integer.toString(dataset.minGsVersion));
                             select.getStyle().disabledFontColor = ColorUtils.gRedC;
 
                             // Remove from selected, if it is
                             String filePath = dataset.catalogFile.path();
                             if (Settings.settings.data.dataFiles.contains(filePath)) {
                                 Settings.settings.data.dataFiles.remove(filePath);
-                                logger.info(I18n.msg("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
+                                logger.info(I18n.msg("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(Settings.SOURCE_VERSION)));
                             }
                         } else {
                             select.setChecked(isPathIn(Settings.settings.data.dataFile(dataset.checkStr), currentSetting));
@@ -587,7 +586,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     });
                                                     datasetContext.addItem(update);
                                                 }
-                                                if (!dataset.baseData && !dataset.type.equals("texture-pack") && dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
+                                                if (!dataset.baseData && !dataset.type.equals("texture-pack") && dataset.minGsVersion <= Settings.SOURCE_VERSION) {
                                                     boolean enabled = isPathIn(dataset.catalogFile.path(), currentSetting);
                                                     if (enabled) {
                                                         // Disable
@@ -717,9 +716,9 @@ public class DatasetManagerWindow extends GenericDialog {
                 if (dataset.baseData || dType.equals("texture-pack")) {
                     // Always enabled
                     status = new OwnLabel(I18n.msg("gui.download.enabled"), skin, "mono");
-                } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                } else if (dataset.minGsVersion > Settings.SOURCE_VERSION) {
                     // Notify version mismatch
-                    status = new OwnLabel(I18n.msg("gui.download.version.gs.mismatch.short", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
+                    status = new OwnLabel(I18n.msg("gui.download.version.gs.mismatch.short", Integer.toString(Settings.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
                     status.setColor(ColorUtils.gRedC);
                 } else {
                     // Notify status

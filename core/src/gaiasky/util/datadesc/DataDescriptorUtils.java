@@ -10,7 +10,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.DatasetManagerWindow;
@@ -171,7 +170,7 @@ public class DataDescriptorUtils {
 
                 // Only datasets with minGsVersion are supported.
                 // Only datasets with new format in 3.3.1 supported.
-                if (hasMinGsVersion && GaiaSkyDesktop.SOURCE_VERSION >= minGsVersion && minGsVersion >= 30301) {
+                if (hasMinGsVersion && Settings.SOURCE_VERSION >= minGsVersion && minGsVersion >= 30301) {
                     // Dataset type
                     String type = dst.getString("type");
 
@@ -325,7 +324,7 @@ public class DataDescriptorUtils {
             dd.datasetType = dt;
 
             // Only datasets without "mingsversion" or with new format in 3.3.1 supported.
-            if (dd.minGsVersion < 0 || GaiaSkyDesktop.SOURCE_VERSION >= dd.minGsVersion && dd.minGsVersion >= 30301) {
+            if (dd.minGsVersion < 0 || Settings.SOURCE_VERSION >= dd.minGsVersion && dd.minGsVersion >= 30301) {
                 dt.datasets.add(dd);
             }
         }

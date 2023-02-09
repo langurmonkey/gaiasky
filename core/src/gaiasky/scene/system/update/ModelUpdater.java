@@ -2,8 +2,6 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import gaiasky.GaiaSky;
@@ -18,14 +16,10 @@ import gaiasky.scene.component.MotorEngine;
 import gaiasky.scene.entity.LightingUtils;
 import gaiasky.scene.record.RotationComponent;
 import gaiasky.util.DecalUtils;
-import gaiasky.util.Logger;
-import gaiasky.util.OneTimeRunnable;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Quaterniond;
-import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 

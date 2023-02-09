@@ -5,28 +5,18 @@
 
 package gaiasky.vr.openvr;
 
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnObjLoader;
-import gaiasky.util.gdx.mesh.IntMesh;
-import gaiasky.util.gdx.model.*;
-import gaiasky.util.gdx.shader.Material;
-import gaiasky.util.gdx.shader.attribute.TextureAttribute;
-import org.lwjgl.PointerBuffer;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.model.IntModelInstance;
 import org.lwjgl.openvr.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 
 import static gaiasky.util.Logger.Log;
 import static gaiasky.util.Logger.getLogger;

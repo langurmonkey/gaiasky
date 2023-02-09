@@ -6,11 +6,9 @@
 package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.attribute.Attributes;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;

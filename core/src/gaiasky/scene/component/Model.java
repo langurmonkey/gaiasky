@@ -4,13 +4,10 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.render.RenderGroup;
 import gaiasky.render.RenderingContext;
-import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Consumers.Consumer10;
 import gaiasky.util.gdx.IntModelBatch;
-
-import java.util.Map;
 
 public class Model implements Component {
 

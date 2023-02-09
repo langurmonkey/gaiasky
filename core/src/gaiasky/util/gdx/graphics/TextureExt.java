@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.nio.Buffer;
-import java.nio.FloatBuffer;
 
 /**
  * Extends texture to be able to use draw operations on any mipmap level.

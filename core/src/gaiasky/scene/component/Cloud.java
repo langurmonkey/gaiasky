@@ -2,11 +2,6 @@ package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
 import gaiasky.scene.record.CloudComponent;
-import gaiasky.scene.record.ModelComponent;
-
-import java.util.Map;
-
-import static gaiasky.scene.record.MaterialComponent.convertToComponent;
 
 public class Cloud implements Component {
 

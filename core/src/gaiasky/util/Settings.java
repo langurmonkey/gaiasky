@@ -45,6 +45,18 @@ import java.util.*;
  * several inner classes by topic.
  */
 public class Settings {
+
+    /*
+     * Source version, used to enable or disable datasets.
+     * This is usually tag where each number is allocated 2 digits.
+     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
+     * Version = major * 10000 + minor * 100 + rev
+     * So 1.2.5 -> 10205
+     *    2.1.7 -> 20107
+     *
+     * Leading zeroes are omitted to avoid octal literal interpretation.
+     */
+    public static final int SOURCE_VERSION = 30400;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the {@link File#getAbsolutePath()} call.

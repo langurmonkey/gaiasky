@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 
 /**
  * Provides a texture data object backed by a byte buffer.

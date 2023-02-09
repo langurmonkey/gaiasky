@@ -2,9 +2,6 @@ package gaiasky.util.svt;
 
 import com.badlogic.gdx.utils.LongMap;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * A Sparse Virtual Texture (SVT) quadtree with a certain LOD depth and tile size.
  * Only square tiles are supported. The tree typically contains two root nodes,
