@@ -128,33 +128,35 @@ public class SVTRenderPass {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // Non-tessellated models.
-            renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
-            for (var candidate : candidates) {
-                var e = ((Render) candidate).getEntity();
-                var m = Mapper.model.get(e);
-                pushBlend(candidate);
-                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
-                popBlend(candidate);
-            }
-            // Models with only cloud SVT.
-            for (var candidate : candidatesCloud) {
-                var e = ((Render) candidate).getEntity();
-                var m = Mapper.model.get(e);
-                var c = Mapper.cloud.get(e);
-                if (c.cloud.hasSVT()) {
-                    sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
+            if(!candidates.isEmpty() || !candidatesCloud.isEmpty()) {
+                renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
+                for (var candidate : candidates) {
+                    pushBlend(candidate);
+                    sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
+                    popBlend(candidate);
                 }
+                // Models with only cloud SVT.
+                for (var candidate : candidatesCloud) {
+                    var e = ((Render) candidate).getEntity();
+                    var m = Mapper.model.get(e);
+                    var c = Mapper.cloud.get(e);
+                    if (c.cloud.hasSVT()) {
+                        sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
+                    }
+                }
+                renderAssets.mbPixelLightingSvtDetection.end();
             }
-            renderAssets.mbPixelLightingSvtDetection.end();
 
             // Tessellated models.
-            renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
-            for (var candidate : candidatesTess) {
-                pushBlend(candidate);
-                sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
-                popBlend(candidate);
+            if(!candidatesTess.isEmpty()) {
+                renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
+                for (var candidate : candidatesTess) {
+                    pushBlend(candidate);
+                    sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
+                    popBlend(candidate);
+                }
+                renderAssets.mbPixelLightingSvtDetectionTessellation.end();
             }
-            renderAssets.mbPixelLightingSvtDetectionTessellation.end();
 
             frameBuffer.end();
 

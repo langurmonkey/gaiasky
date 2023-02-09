@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -42,6 +43,7 @@ public class LoadingGui extends AbstractGui {
     private TipsGenerator tipGenerator;
     private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
+    private Container tipContainer;
     private HorizontalGroup tip;
     private long lastFunnyTime;
     private long lastTipTime;
@@ -108,11 +110,14 @@ public class LoadingGui extends AbstractGui {
         tipGenerator = new TipsGenerator(skin);
         tip = new HorizontalGroup();
         tip.space(pad10);
+        tip.pad(10, 30, 10, 30);
+        tipContainer = new Container(tip);
+        tipContainer.setBackground(skin.getDrawable("table-bg"));
         bottomMiddle = new Table(skin);
         bottomMiddle.setFillParent(true);
         bottomMiddle.center().bottom();
         bottomMiddle.padLeft(pad30).padBottom(pad10);
-        bottomMiddle.add(tip);
+        bottomMiddle.add(tipContainer);
 
         // Version and build
         topLeft = new VersionLineTable(skin);

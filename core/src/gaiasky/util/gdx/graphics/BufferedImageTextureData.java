@@ -7,7 +7,10 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.MipMapGenerator;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
+import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -17,6 +20,7 @@ import java.io.IOException;
  * image data to textures.
  */
 public class BufferedImageTextureData implements TextureData {
+    private static final Log logger = Logger.getLogger(BufferedImageTextureData.class);
     private final FileHandle file;
     private final boolean useMipMaps;
     private BufferedImage image = null;
@@ -45,10 +49,11 @@ public class BufferedImageTextureData implements TextureData {
 
         // Prepare
         try {
-            image = ImageIO.read(file.file());
+            image = ImageIO.read(file.read());
             width = image.getWidth();
             height = image.getHeight();
-        } catch (IOException ignored) {
+        } catch (Exception e) {
+            logger.error(e, "Error loading image file: " + file.file().getAbsolutePath());
         }
 
     }

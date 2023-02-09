@@ -30,7 +30,7 @@ public class OwnPixmapLoader extends PixmapLoader {
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, PixmapParameter parameter) {
         if (file.extension().equalsIgnoreCase("jxl")) {
             try {
-                BufferedImage image = ImageIO.read(file.file());
+                BufferedImage image = ImageIO.read(file.read());
 
                 int w = image.getWidth();
                 int h = image.getHeight();

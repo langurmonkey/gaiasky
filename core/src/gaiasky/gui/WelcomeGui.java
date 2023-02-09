@@ -11,11 +11,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -46,6 +48,8 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
+import gaiasky.util.gdx.loader.OwnTextureLoader;
+import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -208,8 +212,10 @@ public class WelcomeGui extends AbstractGui {
         Table center = new Table(skin);
         center.setFillParent(true);
         center.center();
-        if (bgTex == null)
-            bgTex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
+        if (bgTex == null) {
+            var splash = "img/splash/splash.jxl";
+            bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal(splash), false));
+        }
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);
 

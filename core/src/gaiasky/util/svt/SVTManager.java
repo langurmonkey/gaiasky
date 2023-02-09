@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -23,7 +24,9 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
@@ -59,14 +62,13 @@ public class SVTManager implements IObserver {
     private AssetManager manager;
 
     /**
-     * Map with all material and cloud components that have at least one
-     * SVT.
+     * Map IDs to virtual texture components.
      */
-    private final IntMap<NamedComponent> components;
+    private final IntMap<Array<VirtualTextureComponent>> vtIdMap;
     /**
      * The set of observed tiles from the camera.
      */
-    private final List<SVTQuadtreeNode<Path>> observedTiles;
+    private final Array<SVTQuadtreeNode<Path>> observedTiles;
     /**
      * Maps tile path objects to actual pixmaps.
      */
@@ -114,10 +116,10 @@ public class SVTManager implements IObserver {
 
     public SVTManager() {
         super();
-        this.observedTiles = new ArrayList<>(50);
+        this.observedTiles = new Array<>(50);
         this.tilePixmaps = new HashMap<>();
         this.tileLocation = new HashMap<>();
-        this.components = new IntMap<>(10);
+        this.vtIdMap = new IntMap<>(10);
         this.queuedTiles = new ArrayBlockingQueue<>(500);
     }
 
@@ -146,18 +148,10 @@ public class SVTManager implements IObserver {
             float y = tileDetectionBuffer.get(); // b
             float id = tileDetectionBuffer.get(); // a
 
-            if (id > 0 && components.containsKey((int) id)) {
-                var component = components.get((int) id);
-                if (component instanceof MaterialComponent) {
-                    var material = (MaterialComponent) component;
-                    for (var svtComponent : material.svts) {
-                        observeSvt(svtComponent, level, x, y);
-                    }
-                } else if (component instanceof CloudComponent) {
-                    var cloud = (CloudComponent) component;
-                    if (cloud.hasSVT()) {
-                        observeSvt(cloud.diffuseSvt, level, x, y);
-                    }
+            if (id > 0 && vtIdMap.containsKey((int) id)) {
+                var svts = vtIdMap.get((int) id);
+                for (var svt : svts) {
+                    observeSvt(svt, level, x, y);
                 }
             }
         }
@@ -294,7 +288,7 @@ public class SVTManager implements IObserver {
         }
 
         var tile = svt.tree.getTile((int) level, (int) x, (int) y);
-        if (tile != null) {
+        if (tile != null && !observedTiles.contains(tile, true)) {
             observedTiles.add(tile);
         }
     }
@@ -437,7 +431,29 @@ public class SVTManager implements IObserver {
         } else if (event == Event.SVT_MATERIAL_INFO) {
             // Put in list.
             var id = (Integer) data[0];
-            components.put(id, (NamedComponent) data[1]);
+            var comp = (NamedComponent) data[1];
+            if (comp instanceof MaterialComponent) {
+                var mc = (MaterialComponent) comp;
+                for (var vtc : mc.svts) {
+                    addToVTMap(id, vtc);
+                }
+            } else if (comp instanceof CloudComponent) {
+                var cc = (CloudComponent) comp;
+                addToVTMap(id, cc.diffuseSvt);
+            }
+        }
+    }
+
+    private void addToVTMap(int id, VirtualTextureComponent component) {
+        if (component == null) {
+            return;
+        }
+        if (!vtIdMap.containsKey(id)) {
+            vtIdMap.put(id, new Array<>());
+        }
+        var array = vtIdMap.get(id);
+        if (!array.contains(component, true)) {
+            array.add(component);
         }
     }
 

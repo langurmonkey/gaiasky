@@ -28,10 +28,6 @@ public class ImageUtils {
      * @param file The image to convert
      *
      * @return A boolean indicating whether the conversion was carried out (i.e. the image was actually monochrome)
-     *
-     * @throws IOException
-     * @throws ImageReadException
-     * @throws ImageWriteException
      */
     public static boolean monochromeToRGB(final File file) throws IOException, ImageReadException, ImageWriteException {
         final ImageInfo imageInfo = Imaging.getImageInfo(file);

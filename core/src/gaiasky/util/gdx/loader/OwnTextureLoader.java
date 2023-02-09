@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.TextureData;
+import com.badlogic.gdx.graphics.TextureData.Factory;
 import com.badlogic.gdx.graphics.glutils.ETC1TextureData;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.graphics.glutils.KTXTextureData;
@@ -63,7 +64,7 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, OwnTextur
                 info.texture = parameter.texture;
             }
 
-            info.data = loadFromFile(file, format, genMipMaps, pixmapBacked);
+            info.data = Factory.loadFromFile(file, format, genMipMaps, pixmapBacked);
         } else {
             info.data = parameter.textureData;
             info.texture = parameter.texture;
@@ -72,29 +73,6 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, OwnTextur
             info.data.prepare();
     }
 
-    private TextureData loadFromFile(FileHandle file, Format format, boolean useMipMaps, boolean pixmapBacked) {
-        if (file == null) {
-            return null;
-        } else if (file.name().endsWith(".cim")) {
-            return new FileTextureData(file, PixmapIO.readCIM(file), format, useMipMaps);
-        } else if (file.name().endsWith(".etc1")) {
-            return new ETC1TextureData(file, useMipMaps);
-        } else if (file.name().endsWith(".ktx") || file.name().endsWith(".zktx")) {
-            return new KTXTextureData(file, useMipMaps);
-        } else if (pixmapBacked) {
-            return new PixmapTextureData(loadPixmap(file), format, useMipMaps, false, false);
-        } else if (file.name().endsWith(".jxl")) {
-            return new BufferedImageTextureData(file, useMipMaps);
-        } else {
-            return new FileTextureData(file, loadPixmap(file), format, useMipMaps);
-        }
-    }
-
-    private Pixmap loadPixmap(FileHandle file) {
-        var pixLoader = new OwnPixmapLoader(null);
-        pixLoader.loadAsync(null, file.name(), file, new PixmapParameter());
-        return pixLoader.loadSync(null, null, null, null);
-    }
 
     @Override
     public void unloadAsync(AssetManager manager, String fileName, FileHandle file, OwnTextureParameter parameter) {
@@ -146,5 +124,37 @@ public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, OwnTextur
         public TextureFilter magFilter = TextureFilter.Nearest;
         public TextureWrap wrapU = TextureWrap.ClampToEdge;
         public TextureWrap wrapV = TextureWrap.ClampToEdge;
+    }
+
+    public static class Factory {
+
+        public static TextureData loadFromFile (FileHandle file, boolean useMipMaps) {
+            return loadFromFile(file, null, useMipMaps, false);
+        }
+
+        private static TextureData loadFromFile(FileHandle file, Format format, boolean useMipMaps, boolean pixmapBacked) {
+            if (file == null) {
+                return null;
+            } else if (file.name().endsWith(".cim")) {
+                return new FileTextureData(file, PixmapIO.readCIM(file), format, useMipMaps);
+            } else if (file.name().endsWith(".etc1")) {
+                return new ETC1TextureData(file, useMipMaps);
+            } else if (file.name().endsWith(".ktx") || file.name().endsWith(".zktx")) {
+                return new KTXTextureData(file, useMipMaps);
+            } else if (pixmapBacked) {
+                return new PixmapTextureData(loadPixmap(file), format, useMipMaps, false, false);
+            } else if (file.name().endsWith(".jxl")) {
+                return new BufferedImageTextureData(file, useMipMaps);
+            } else {
+                return new FileTextureData(file, loadPixmap(file), format, useMipMaps);
+            }
+        }
+
+        private static Pixmap loadPixmap(FileHandle file) {
+            var pixLoader = new OwnPixmapLoader(null);
+            pixLoader.loadAsync(null, file.name(), file, new PixmapParameter());
+            return pixLoader.loadSync(null, null, null, null);
+        }
+
     }
 }
