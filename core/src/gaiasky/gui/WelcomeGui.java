@@ -213,8 +213,7 @@ public class WelcomeGui extends AbstractGui {
         center.setFillParent(true);
         center.center();
         if (bgTex == null) {
-            var splash = "img/splash/splash.jxl";
-            bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal(splash), false));
+            bgTex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jxl"), false));
         }
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);

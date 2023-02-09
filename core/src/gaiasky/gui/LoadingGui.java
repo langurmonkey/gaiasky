@@ -27,6 +27,7 @@ import gaiasky.event.EventManager;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
 import gaiasky.util.TipsGenerator;
+import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
@@ -78,7 +79,7 @@ public class LoadingGui extends AbstractGui {
 
         center = new Table(skin);
         if (!vr) {
-            Texture tex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
+            Texture tex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jxl"), false));
             Drawable bg = new SpriteDrawable(new Sprite(tex));
             center.setBackground(bg);
         }
