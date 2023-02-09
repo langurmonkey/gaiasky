@@ -79,7 +79,7 @@ public class LoadingGui extends AbstractGui {
 
         center = new Table(skin);
         if (!vr) {
-            Texture tex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jxl"), false));
+            Texture tex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
             Drawable bg = new SpriteDrawable(new Sprite(tex));
             center.setBackground(bg);
         }
