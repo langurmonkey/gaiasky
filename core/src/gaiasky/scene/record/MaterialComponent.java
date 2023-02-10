@@ -435,6 +435,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         // Set attributes.
         material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
         material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
+        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor, (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
         // Only update depth and resolution if it does not exist, or if it exists and its value is less than ours.
         if (!material.has(FloatAttribute.SvtDepth) || ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.SvtDepth))).value < svt.tree.depth) {
             // Depth.

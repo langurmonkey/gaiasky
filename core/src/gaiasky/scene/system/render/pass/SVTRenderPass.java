@@ -16,6 +16,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.ModelView;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
@@ -36,7 +37,7 @@ public class SVTRenderPass {
      * Should match the constant with the same name in svt.detection.fragment.glsl
      * and tess.svt.detection.fragment.glsl.
      **/
-    public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = 8f;
+    public static float SVT_TILE_DETECTION_REDUCTION_FACTOR = (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor;
 
     /** The scene renderer object. **/
     private final SceneRenderer sceneRenderer;
@@ -75,8 +76,9 @@ public class SVTRenderPass {
 
     /**
      * Collects the candidate entities in the given render group that have a non-cloud SVT.
+     *
      * @param renderGroup The render group.
-     * @param candidates The entities in the given render group with at least one non-cloud SVT.
+     * @param candidates  The entities in the given render group with at least one non-cloud SVT.
      */
     private void fetchCandidates(RenderGroup renderGroup, Array<IRenderable> candidates) {
         List<IRenderable> models = sceneRenderer.getRenderLists().get(renderGroup.ordinal());
@@ -93,8 +95,9 @@ public class SVTRenderPass {
     /**
      * Collects the candidate entities in the given render groups that have no non-cloud SVT and
      * a cloud SVT.
+     *
      * @param renderGroups The render groups.
-     * @param candidates The candidates with only cloud SVT.
+     * @param candidates   The candidates with only cloud SVT.
      */
     private void fetchCandidatesCloud(RenderGroup[] renderGroups, Array<IRenderable> candidates) {
         List<IRenderable> models = new ArrayList<>();
@@ -122,57 +125,66 @@ public class SVTRenderPass {
 
             var renderAssets = sceneRenderer.getRenderAssets();
 
+            int rendered = 0;
+
             // Render SVT tile detection to frame buffer.
-            frameBuffer.begin();
-            Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            if(!candidates.isEmpty() || !candidatesTess.isEmpty() || !candidatesCloud.isEmpty()) {
+                frameBuffer.begin();
+                Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            // Non-tessellated models.
-            if(!candidates.isEmpty() || !candidatesCloud.isEmpty()) {
-                renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
-                for (var candidate : candidates) {
-                    pushBlend(candidate);
-                    sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
-                    popBlend(candidate);
-                }
-                // Models with only cloud SVT.
-                for (var candidate : candidatesCloud) {
-                    var e = ((Render) candidate).getEntity();
-                    var m = Mapper.model.get(e);
-                    var c = Mapper.cloud.get(e);
-                    if (c.cloud.hasSVT()) {
-                        sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
+                // Non-tessellated models.
+                if (!candidates.isEmpty() || !candidatesCloud.isEmpty()) {
+                    renderAssets.mbPixelLightingSvtDetection.begin(camera.getCamera());
+                    for (var candidate : candidates) {
+                        pushBlend(candidate);
+                        sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetection);
+                        popBlend(candidate);
+                        rendered++;
                     }
+                    // Models with only cloud SVT.
+                    for (var candidate : candidatesCloud) {
+                        var e = ((Render) candidate).getEntity();
+                        var m = Mapper.model.get(e);
+                        var c = Mapper.cloud.get(e);
+                        if (c.cloud.hasSVT()) {
+                            sceneRenderer.getModelRenderSystem().renderClouds(e, Mapper.base.get(e), m, c, renderAssets.mbPixelLightingSvtDetection, 1f, 0);
+                            rendered++;
+                        }
+                    }
+                    renderAssets.mbPixelLightingSvtDetection.end();
                 }
-                renderAssets.mbPixelLightingSvtDetection.end();
+
+                // Tessellated models.
+                if (!candidatesTess.isEmpty()) {
+                    renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
+                    for (var candidate : candidatesTess) {
+                        pushBlend(candidate);
+                        sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
+                        popBlend(candidate);
+                        rendered++;
+                    }
+                    renderAssets.mbPixelLightingSvtDetectionTessellation.end();
+                }
+
+                frameBuffer.end();
             }
 
-            // Tessellated models.
-            if(!candidatesTess.isEmpty()) {
-                renderAssets.mbPixelLightingSvtDetectionTessellation.begin(camera.getCamera());
-                for (var candidate : candidatesTess) {
-                    pushBlend(candidate);
-                    sceneRenderer.renderModel(candidate, renderAssets.mbPixelLightingSvtDetectionTessellation);
-                    popBlend(candidate);
+            if (rendered > 0) {
+                // Read out pixels to float buffer.
+                frameBuffer.getColorBufferTexture().bind();
+                GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
+
+                // Send message informing a new tile detection buffer is ready.
+                EventManager.publish(Event.SVT_TILE_DETECTION_READY, this, pixels);
+
+                if (!uiViewCreated) {
+                    GaiaSky.postRunnable(() -> {
+                        // Create UI view
+                        EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
+                    });
+                    uiViewCreated = true;
                 }
-                renderAssets.mbPixelLightingSvtDetectionTessellation.end();
-            }
-
-            frameBuffer.end();
-
-            // Read out pixels to float buffer.
-            frameBuffer.getColorBufferTexture().bind();
-            GL30.glGetTexImage(frameBuffer.getColorBufferTexture().glTarget, 0, GL30.GL_RGBA, GL30.GL_FLOAT, pixels);
-
-            // Send message informing a new tile detection buffer is ready.
-            EventManager.publish(Event.SVT_TILE_DETECTION_READY, this, pixels);
-
-            if (!uiViewCreated) {
-                GaiaSky.postRunnable(() -> {
-                    // Create UI view
-                    EventManager.publish(Event.SHOW_TEXTURE_WINDOW_ACTION, this, "SVT tile detection", frameBuffer);
-                });
-                uiViewCreated = true;
             }
         }
     }

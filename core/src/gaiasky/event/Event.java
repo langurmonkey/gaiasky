@@ -1469,7 +1469,9 @@ public enum Event {
      * Broadcasts material component [1] which has at least one sparse virtual
      * texture, and the sparse virtual texture ID for that material [0].
      */
-    SVT_MATERIAL_INFO;
+    SVT_MATERIAL_INFO,
 
+    /** Set cache size **/
+    SVT_CACHE_SIZE_CMD;
 
 }

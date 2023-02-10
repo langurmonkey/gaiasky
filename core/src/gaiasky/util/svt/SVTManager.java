@@ -20,6 +20,7 @@ import gaiasky.scene.record.NamedComponent;
 import gaiasky.scene.record.VirtualTextureComponent;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -44,7 +45,7 @@ public class SVTManager implements IObserver {
      * the size needs to be a multiple of the tile size, and tile sizes are powers of two,
      * capping at 1024. Hence, the cache size needs to be a multiple of 1024.
      **/
-    private static final int CACHE_BUFFER_SIZE = 1024 * 12;
+    private static final int CACHE_BUFFER_SIZE = 1024 * Settings.settings.scene.renderer.virtualTextures.cacheSize;
 
     // Tile state tokens.
     private static final int STATE_NOT_LOADED = 0;
@@ -126,14 +127,6 @@ public class SVTManager implements IObserver {
     public void initialize(AssetManager manager) {
         this.manager = manager;
 
-        // Initialize cache buffer.
-        var cacheTextureData = new PixmapTextureData(new Pixmap(CACHE_BUFFER_SIZE, CACHE_BUFFER_SIZE, Format.RGBA8888), Format.RGBA8888, false, false, false);
-        cacheBuffer = new Texture(cacheTextureData);
-        cacheBuffer.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        // Initialize float buffer to draw pixels (1x1 with 4 components per pixel).
-        floatBuffer = BufferUtils.createFloatBuffer(4);
-
         EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY, Event.SVT_MATERIAL_INFO);
     }
 
@@ -156,6 +149,16 @@ public class SVTManager implements IObserver {
             }
         }
         tileDetectionBuffer.clear();
+
+        if (!observedTiles.isEmpty() && cacheBuffer == null) {
+            // Initialize cache buffer.
+            var cacheTextureData = new PixmapTextureData(new Pixmap(CACHE_BUFFER_SIZE, CACHE_BUFFER_SIZE, Format.RGBA8888), Format.RGBA8888, false, false, false);
+            cacheBuffer = new Texture(cacheTextureData);
+            cacheBuffer.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+            // Initialize float buffer to draw pixels (1x1 with 4 components per pixel).
+            floatBuffer = BufferUtils.createFloatBuffer(4);
+        }
 
         var now = TimeUtils.millis();
 

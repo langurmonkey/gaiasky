@@ -3,6 +3,7 @@
 // UNIFORMS
 uniform float u_svtId;
 uniform float u_svtDepth;
+uniform float u_svtDetectionFactor;
 uniform vec2 u_svtResolution;
 uniform float u_svtTileSize;
 uniform vec2 u_cameraNearFar;
@@ -51,8 +52,7 @@ layout (location = 0) out vec4 fragColor;
 #include shader/lib_cubemap.glsl
 
 // The reduction factor of the frame buffer of this pass has an impact on the determined mipmap level.
-#define SVT_TILE_DETECTION_REDUCTION_FACTOR 8.0
-const float svtDetectionScaleFactor = -log2(SVT_TILE_DETECTION_REDUCTION_FACTOR);
+float svtDetectionScaleFactor = -log2(u_svtDetectionFactor);
 
 #include shader/lib_logdepthbuff.glsl
 #include shader/lib_mipmap.glsl

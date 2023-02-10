@@ -1010,11 +1010,12 @@ public class Settings {
             public double ambient;
             public ShadowSettings shadow;
             public ElevationSettings elevation;
+            public VirtualTextureSettings virtualTextures;
             @JsonIgnore
             public double orbitSolidAngleThreshold = Math.toRadians(1.5);
 
             public RendererSettings() {
-                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD);
+                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD, Event.SVT_CACHE_SIZE_CMD);
             }
 
             @JsonProperty("pointCloud")
@@ -1047,6 +1048,7 @@ public class Settings {
                 case ELEVATION_TYPE_CMD -> elevation.type = (ElevationType) data[0];
                 case TESSELLATION_QUALITY_CMD -> elevation.quality = (float) data[0];
                 case ORBIT_SOLID_ANGLE_TH_CMD -> orbitSolidAngleThreshold = (double) data[0];
+                case SVT_CACHE_SIZE_CMD -> virtualTextures.cacheSize = (int) data[0];
                 }
             }
 
@@ -1066,6 +1068,16 @@ public class Settings {
                 public void setType(final String typeString) {
                     this.type = ElevationType.valueOf(typeString.toUpperCase());
                 }
+            }
+
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            public static class VirtualTextureSettings {
+                /** Cache size, in tiles. **/
+                public int cacheSize;
+                /**
+                 * The tile detection buffer is smaller than the main window by this factor.
+                 **/
+                public double detectionBufferFactor;
             }
 
         }
@@ -1160,7 +1172,7 @@ public class Settings {
         @Override
         public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
-            case STEREOSCOPIC_CMD:
+            case STEREOSCOPIC_CMD -> {
                 if (!GaiaSky.instance.cameraManager.mode.isGaiaFov()) {
                     modeStereo.active = (boolean) (Boolean) data[0];
                     if (modeStereo.active && modeCubemap.active) {
@@ -1168,14 +1180,12 @@ public class Settings {
                         EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                     }
                 }
-                break;
-            case STEREO_PROFILE_CMD:
-                modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
-                break;
-            case CUBEMAP_CMD:
+            }
+            case STEREO_PROFILE_CMD -> modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
+            case CUBEMAP_CMD -> {
                 modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openVr;
                 if (modeCubemap.active) {
-                    modeCubemap.projection = (CubemapProjections.CubemapProjection) data[1];
+                    modeCubemap.projection = (CubemapProjection) data[1];
 
                     // Post a message to the screen
                     ModePopupInfo mpi = new ModePopupInfo();
@@ -1207,30 +1217,18 @@ public class Settings {
                 } else {
                     EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                 }
-                break;
-            case CUBEMAP_PROJECTION_CMD:
-                modeCubemap.projection = (CubemapProjections.CubemapProjection) data[0];
+            }
+            case CUBEMAP_PROJECTION_CMD -> {
+                modeCubemap.projection = (CubemapProjection) data[0];
                 logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
-                break;
-            case INDEXOFREFRACTION_CMD:
-                modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
-                break;
-            case CUBEMAP_RESOLUTION_CMD:
-                modeCubemap.faceResolution = (int) data[0];
-                break;
-            case SHOW_MINIMAP_ACTION:
-                minimap.active = (boolean) (Boolean) data[0];
-                break;
-            case TOGGLE_MINIMAP:
-                minimap.active = !minimap.active;
-                break;
-            case PLANETARIUM_APERTURE_CMD:
-                modeCubemap.planetarium.aperture = (float) data[0];
-                break;
-            case PLANETARIUM_ANGLE_CMD:
-                modeCubemap.planetarium.angle = (float) data[0];
-                break;
-            case POINTER_GUIDES_CMD:
+            }
+            case INDEXOFREFRACTION_CMD -> modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
+            case CUBEMAP_RESOLUTION_CMD -> modeCubemap.faceResolution = (int) data[0];
+            case SHOW_MINIMAP_ACTION -> minimap.active = (boolean) (Boolean) data[0];
+            case TOGGLE_MINIMAP -> minimap.active = !minimap.active;
+            case PLANETARIUM_APERTURE_CMD -> modeCubemap.planetarium.aperture = (float) data[0];
+            case PLANETARIUM_ANGLE_CMD -> modeCubemap.planetarium.angle = (float) data[0];
+            case POINTER_GUIDES_CMD -> {
                 if (data.length > 0 && data[0] != null) {
                     pointer.guides.active = (boolean) data[0];
                     if (data.length > 1 && data[1] != null) {
@@ -1240,12 +1238,10 @@ public class Settings {
                         }
                     }
                 }
-                break;
-            case UI_SCALE_CMD:
-                ui.scale = (Float) data[0];
-                break;
-            default:
-                break;
+            }
+            case UI_SCALE_CMD -> ui.scale = (Float) data[0];
+            default -> {
+            }
             }
         }
 

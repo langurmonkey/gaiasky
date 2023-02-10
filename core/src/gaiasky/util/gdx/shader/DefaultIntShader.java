@@ -90,6 +90,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_svtResolution;
     protected final int u_svtDepth;
     protected final int u_svtId;
+    protected final int u_svtDetectionFactor;
     protected final int u_svtBufferTexture;
     protected final int u_svtIndirectionDiffuseTexture;
     protected final int u_svtIndirectionSpecularTexture;
@@ -251,6 +252,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_svtResolution = register(Inputs.svtResolution, Setters.svtResolution);
         u_svtDepth = register(Inputs.svtDepth, Setters.svtDepth);
         u_svtId = register(Inputs.svtId, Setters.svtId);
+        u_svtDetectionFactor = register(Inputs.svtDetectionFactor, Setters.svtDetectionFactor);
         u_svtBufferTexture = register(Inputs.svtCacheTexture, Setters.svtBufferTexture);
         u_svtIndirectionDiffuseTexture = register(Inputs.svtIndirectionDiffuseTexture, Setters.svtIndirectionDiffuseTexture);
         u_svtIndirectionNormalTexture = register(Inputs.svtIndirectionNormalTexture, Setters.svtIndirectionNormalTexture);
@@ -782,6 +784,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform svtResolution = new Uniform("u_svtResolution", Vector2Attribute.SvtResolution);
         public final static Uniform svtDepth = new Uniform("u_svtDepth", FloatAttribute.SvtDepth);
         public final static Uniform svtId = new Uniform("u_svtId", FloatAttribute.SvtId);
+        public final static Uniform svtDetectionFactor = new Uniform("u_svtDetectionFactor", FloatAttribute.SvtDetectionFactor);
         public final static Uniform svtCacheTexture = new Uniform("u_svtCacheTexture");
         public final static Uniform svtIndirectionDiffuseTexture = new Uniform("u_svtIndirectionDiffuseTexture");
         public final static Uniform svtIndirectionSpecularTexture = new Uniform("u_svtIndirectionSpecularTexture");
@@ -1081,6 +1084,12 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.SvtId)))).value);
+            }
+        };
+        public final static Setter svtDetectionFactor = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.SvtDetectionFactor)))).value);
             }
         };
         public final static Setter svtBufferTexture = new LocalSetter() {

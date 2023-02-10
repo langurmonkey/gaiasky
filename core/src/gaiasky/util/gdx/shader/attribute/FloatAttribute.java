@@ -56,6 +56,9 @@ public class FloatAttribute extends Attribute {
     public static final String SvtIdAlias = "svtId";
     public static final int SvtId = register(SvtIdAlias);
 
+    public static final String SvtDetectionFactorAlias = "svtDetectionFactor";
+    public static final int SvtDetectionFactor = register(SvtDetectionFactorAlias);
+
     public float value;
 
     public FloatAttribute(int index) {

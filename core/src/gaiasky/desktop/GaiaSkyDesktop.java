@@ -43,6 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -292,7 +293,10 @@ public class GaiaSkyDesktop implements IObserver {
         if (overwrite || !userConfExists) {
             // Copy file
             if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
-                // Running released package
+                // Back up user configuration.
+                Path backup = userFolderConfFile.getParent().resolve(userFolderConfFile.getFileName() + "." + LocalDateTime.now());
+                GlobalResources.copyFile(userFolderConfFile, backup, true);
+                // Overwrite user configuration with internal configuration.
                 GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
             } else {
                 logger.warn("Configuration folder does not exist: " + confFolder);

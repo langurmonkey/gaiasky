@@ -231,6 +231,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
         material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
         material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
         material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
+        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor, (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
     }
 
     public void setGenerated(boolean generated) {

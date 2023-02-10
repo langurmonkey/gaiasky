@@ -75,7 +75,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, unsharpMask;
+    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, unsharpMask, svtCacheSize;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
@@ -717,6 +717,28 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentGraphicsTable.add(imageLevels).left().padBottom(pad34).row();
 
         if (!settings.runtime.openVr) {
+            // VIRTUAL TEXTURES
+            Label titleSVT = new OwnLabel(I18n.msg("gui.svt"), skin, "header");
+            Table svtTable = new Table();
+
+            /* Cache size */
+            OwnLabel svtCacheSizeLabel = new OwnLabel(I18n.msg("gui.svt.cachesize"), skin, "default");
+            svtCacheSize = new OwnSliderPlus("", Constants.MIN_TILE_CACHE, Constants.MAX_TILE_CACHE, 1, skin);
+            svtCacheSize.setValueLabelTransform((val) -> Integer.toString((int) (val * val)));
+            svtCacheSize.setName("cacheSize");
+            svtCacheSize.setWidth(sliderWidth);
+            svtCacheSize.setValue(settings.scene.renderer.virtualTextures.cacheSize);
+
+            svtTable.add(svtCacheSizeLabel).left().padRight(pad34).padBottom(pad10);
+            svtTable.add(svtCacheSize).left().padRight(pad18).padBottom(pad10);
+            svtTable.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+
+            labels.addAll(svtCacheSizeLabel);
+
+            // Add to content
+            contentGraphicsTable.add(titleSVT).left().padBottom(pad18).row();
+            contentGraphicsTable.add(svtTable).left().padBottom(pad34).row();
+
             // EXPERIMENTAL
             Label titleExperimental = new OwnLabel(I18n.msg("gui.experimental"), skin, "header");
             Table experimental = new Table();
@@ -2182,6 +2204,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (motionBlur != null) {
             resetRenderFlags = settings.postprocess.motionBlur.active != motionBlur.isChecked();
             GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked()));
+        }
+
+        // SVT cache size
+        if (svtCacheSize != null) {
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.SVT_CACHE_SIZE_CMD, this, (int) svtCacheSize.getValue()));
         }
 
         // SSR

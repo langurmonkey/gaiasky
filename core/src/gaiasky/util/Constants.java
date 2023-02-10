@@ -153,6 +153,8 @@ public class Constants {
     public final static float MAX_COLOR_NOISE = 1.0f;
     public final static float MIN_POINTER_GUIDES_WIDTH = 0.5f;
     public final static float MAX_POINTER_GUIDES_WIDTH = 20f;
+    public final static int MIN_TILE_CACHE = 4;
+    public final static int MAX_TILE_CACHE = 16;
     public static final float UI_SCALE_INTERNAL_MIN = 0.4f;
     public static final float UI_SCALE_INTERNAL_MAX = 1.7f;
     public static final float UI_SCALE_MIN = 0.75f;
