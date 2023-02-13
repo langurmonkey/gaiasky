@@ -2335,7 +2335,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // Index of refraction
-        EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
+        if (celestialSphereIndexOfRefraction != null) {
+            EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
+        }
 
         // Controllers
         if (gamepadMappings.getSelected() != null) {
