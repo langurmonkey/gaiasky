@@ -53,7 +53,7 @@ jar {
 }
 
 install4j {
-    installDir = file('/home/tsagrista/Programs/install4j9')
+    installDir = file("${System.properties['user.home']}/Programs/install4j10")
 }
 
 sourceSets {
