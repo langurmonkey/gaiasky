@@ -359,14 +359,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
         // Only if not VR, the triangles break in VR
-        if (!settings.runtime.openVr) {
             // POINT CLOUD
             ComboBoxBean[] pointCloudItems = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()), new ComboBoxBean(I18n.msg("gui.pointcloud.instancedtris"), PointCloudMode.TRIANGLES_INSTANCED.ordinal()), new ComboBoxBean(I18n.msg("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
             pointCloudRenderer = new OwnSelectBox<>(skin);
             pointCloudRenderer.setItems(pointCloudItems);
             pointCloudRenderer.setWidth(selectWidth);
             pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
-        }
 
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(I18n.msg("gui.linerenderer"), skin);
@@ -449,7 +447,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(aaLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(aa).left().padRight(pad18).padBottom(pad10);
         graphics.add(aaTooltip).left().padBottom(pad10).row();
-        if (!settings.runtime.openVr) {
             OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
             OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
             pointCloudTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.pointcloud.info"), skin));
@@ -457,7 +454,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             graphics.add(pointCloudRenderer).left().padBottom(pad10);
             graphics.add(pointCloudTooltip).left().padRight(pad10).padBottom(pad10);
             graphics.add(getRequiresRestartLabel()).width(40).left().padBottom(pad10).row();
-        }
         graphics.add(lrLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(lineRenderer).left().padBottom(pad10).row();
         graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
