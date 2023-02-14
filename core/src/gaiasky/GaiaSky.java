@@ -36,6 +36,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
+import gaiasky.gui.vr.VRGui;
+import gaiasky.gui.vr.WelcomeGuiVR;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.MainPostProcessor;
