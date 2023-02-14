@@ -293,9 +293,11 @@ public class GaiaSkyDesktop implements IObserver {
         if (overwrite || !userConfExists) {
             // Copy file
             if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
-                // Back up user configuration.
-                Path backup = userFolderConfFile.getParent().resolve(userFolderConfFile.getFileName() + "." + LocalDateTime.now().toString().replaceAll("[^a-zA-Z0-9_\\.\\-]", "_"));
-                GlobalResources.copyFile(userFolderConfFile, backup, true);
+                // Back up user configuration, if it exists.
+                if (Files.exists(userFolderConfFile)) {
+                    Path backup = userFolderConfFile.getParent().resolve(userFolderConfFile.getFileName() + "." + LocalDateTime.now().toString().replaceAll("[^a-zA-Z0-9_\\.\\-]", "_"));
+                    GlobalResources.copyFile(userFolderConfFile, backup, true);
+                }
                 // Overwrite user configuration with internal configuration.
                 GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
             } else {
