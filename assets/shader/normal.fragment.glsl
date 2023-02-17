@@ -532,11 +532,14 @@ void main() {
     #ifdef directionalLightsFlag
     vec3 V = viewDir;
     // Loop for directional light contributitons
+    int validLights = 0;
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = lightCol[i];
         // Skip non-lights
         if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
             continue;
+        } else {
+            validLights++;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = lightDir[i];
@@ -550,7 +553,16 @@ void main() {
         shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
         diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
     }
-    diffuseColor *= diffuse.rgb;
+    // Diffuse texture contribution.
+    if (validLights == 0) {
+        // Only ambient contribution, we have no illuminating directional lights.
+        diffuseColor = saturate(diffuse.rgb * ambient);
+    } else {
+        // Regular shading.
+        diffuseColor *= diffuse.rgb;
+    }
+    #else
+    diffuseColor = saturate(diffuse.rgb * ambient);
     #endif // directionalLightsFlag
 
     // Final color equation

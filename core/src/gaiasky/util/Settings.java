@@ -22,7 +22,6 @@ import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -773,34 +772,43 @@ public class Settings {
             public void updateSpeedLimit() {
                 switch (speedLimitIndex) {
                 case 0 ->
+                    // 1 km/h is 0.00027 km/s
+                        speedLimit = 0.000277777778 * Constants.KM_TO_U;
+                case 1 ->
+                    // 10 km/h is 0.0027 km/s
+                        speedLimit = 0.00277777778 * Constants.KM_TO_U;
+                case 2 ->
                     // 100 km/h is 0.027 km/s
                         speedLimit = 0.0277777778 * Constants.KM_TO_U;
-                case 1 -> speedLimit = 0.5 * Constants.C * Constants.M_TO_U;
-                case 2 -> speedLimit = 0.8 * Constants.C * Constants.M_TO_U;
-                case 3 -> speedLimit = 0.9 * Constants.C * Constants.M_TO_U;
-                case 4 -> speedLimit = 0.99 * Constants.C * Constants.M_TO_U;
-                case 5 -> speedLimit = 0.99999 * Constants.C * Constants.M_TO_U;
-                case 6 -> speedLimit = Constants.C * Constants.M_TO_U;
-                case 7 -> speedLimit = 2.0 * Constants.C * Constants.M_TO_U;
-                case 8 ->
+                case 3 ->
+                    // 1000 km/h is 0.27 km/s
+                        speedLimit = 0.277777778 * Constants.KM_TO_U;
+                case 4 -> speedLimit = 0.5 * Constants.C * Constants.M_TO_U;
+                case 5 -> speedLimit = 0.8 * Constants.C * Constants.M_TO_U;
+                case 6 -> speedLimit = 0.9 * Constants.C * Constants.M_TO_U;
+                case 7 -> speedLimit = 0.99 * Constants.C * Constants.M_TO_U;
+                case 8 -> speedLimit = 0.99999 * Constants.C * Constants.M_TO_U;
+                case 9 -> speedLimit = Constants.C * Constants.M_TO_U;
+                case 10 -> speedLimit = 2.0 * Constants.C * Constants.M_TO_U;
+                case 11 ->
                     // 10 c
                         speedLimit = 10.0 * Constants.C * Constants.M_TO_U;
-                case 9 ->
+                case 12 ->
                     // 1000 c
                         speedLimit = 1000.0 * Constants.C * Constants.M_TO_U;
-                case 10 -> speedLimit = Constants.AU_TO_U;
-                case 11 -> speedLimit = 10.0 * Constants.AU_TO_U;
-                case 12 -> speedLimit = 1000.0 * Constants.AU_TO_U;
-                case 13 -> speedLimit = 10000.0 * Constants.AU_TO_U;
-                case 14 -> speedLimit = Constants.PC_TO_U;
-                case 15 -> speedLimit = 2.0 * Constants.PC_TO_U;
-                case 16 ->
+                case 13 -> speedLimit = Constants.AU_TO_U;
+                case 14 -> speedLimit = 10.0 * Constants.AU_TO_U;
+                case 15 -> speedLimit = 1000.0 * Constants.AU_TO_U;
+                case 16 -> speedLimit = 10000.0 * Constants.AU_TO_U;
+                case 17 -> speedLimit = Constants.PC_TO_U;
+                case 18 -> speedLimit = 2.0 * Constants.PC_TO_U;
+                case 19 ->
                     // 10 pc/s
                         speedLimit = 10.0 * Constants.PC_TO_U;
-                case 17 ->
+                case 20 ->
                     // 1000 pc/s
                         speedLimit = 1000.0 * Constants.PC_TO_U;
-                case 18 ->
+                case 21 ->
                     // No limit
                         speedLimit = -1;
                 }

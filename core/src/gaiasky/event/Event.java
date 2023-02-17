@@ -1012,6 +1012,9 @@ public enum Event {
 
     SHOW_ABOUT_ACTION,
 
+    /** Brings up the VR user interface. **/
+    SHOW_VR_UI,
+
     /** Shows the slave configuration window **/
     SHOW_SLAVE_CONFIG_ACTION,
     /** Slave connection event. Contains slave index, url and a boolean with the state (true-connected, false-disconnected). **/

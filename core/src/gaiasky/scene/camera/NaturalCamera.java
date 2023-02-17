@@ -740,7 +740,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 double radius = focus.getRadius();
                 double distanceInRadii = getFovFactor() * (focus.getDistToCamera() - radius) / radius;
                 double maxRadii = 2.0;
-                double factor = ((distanceInRadii < maxRadii) ? distanceInRadii/maxRadii : 1.0);
+                double factor = ((distanceInRadii < maxRadii) ? distanceInRadii / maxRadii : 1.0);
                 // This factor slows the rotation as the focus gets closer and closer
                 addHorizontal(deltaX * factor, acceleration);
                 addVertical(deltaY * factor, acceleration);
@@ -1024,10 +1024,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void updateLateral(double dt, double translateUnits) {
         // Pan with hor
         aux1.set(direction).crs(up).nor();
-        aux1.scl(horizontal.y * gamepadMultiplier * dt * translateUnits);
-        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * dt * translateUnits);
+        aux1.scl(horizontal.y * gamepadMultiplier * translateUnits);
+        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * translateUnits);
         aux1.add(aux2);
-        translate(aux1);
+        if (Settings.settings.scene.camera.speedLimit > 0 && aux1.len() > Settings.settings.scene.camera.speedLimit) {
+            aux1.clamp(0, Settings.settings.scene.camera.speedLimit);
+        }
+
+        translate(aux1.scl(dt));
 
     }
 

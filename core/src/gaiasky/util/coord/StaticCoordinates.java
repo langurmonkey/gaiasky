@@ -85,6 +85,10 @@ public class StaticCoordinates implements IBodyCoordinates {
         return position;
     }
 
+    public void setPosition(Vector3b pos) {
+        this.position = new Vector3b(pos);
+    }
+
     public void setPosition(double[] position) {
         setPositionKm(position);
     }

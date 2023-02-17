@@ -34,15 +34,13 @@ public class OpenVRListener implements VRDeviceListener {
     /** Aux vectors **/
     private final Vector3d p0;
     private final Vector3d p1;
-    // Selection
-    private final long SELECTION_COUNTDOWN_MS = 2000;
     private final Set<Integer> pressedButtons;
     private final FocusView focusView;
     /** Map from VR device to model object **/
     private HashMap<VRDevice, Entity> vrDeviceToModel;
     private boolean vrControllerHint = false;
     private boolean vrInfoGui = false;
-    private long lastDoublePress = 0l;
+    private long lastDoublePress = 0L;
     private boolean selecting = false;
     private long selectingTime = 0;
     private VRDevice selectingDevice;
@@ -89,16 +87,16 @@ public class OpenVRListener implements VRDeviceListener {
     }
 
     /**
-     * Returns true if all given buttons are pressed
+     * Returns true if all given buttons are pressed.
      *
-     * @param buttons
+     * @param buttons the buttons to check.
      *
-     * @return
+     * @return True if all buttons are pressed.
      */
     private boolean arePressed(int... buttons) {
         boolean result = true;
-        for (int i = 0; i < buttons.length; i++)
-            result = result && pressedButtons.contains(buttons[i]);
+        for (int button : buttons)
+            result = result && pressedButtons.contains(button);
         return result;
     }
 
@@ -162,6 +160,8 @@ public class OpenVRListener implements VRDeviceListener {
         if (selecting) {
             if (isPressed(VRControllerButtons.SteamVR_Trigger)) {
                 long elapsed = System.currentTimeMillis() - selectingTime;
+                // Selection
+                long SELECTION_COUNTDOWN_MS = 2000;
                 double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
                 if (completion >= 1f) {
                     // Select object!

@@ -80,10 +80,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * Ambient light level for static light objects
      **/
     private float staticLightLevel = 0.6f;
-    /**
-     * Flag
-     **/
-    private boolean updateStaticLight = false;
     private boolean modelInitialised, modelLoading;
     private boolean useColor = true;
     /** The blend mode **/
@@ -97,16 +93,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public ModelComponent(Boolean initEnvironment) {
-        if (initEnvironment) {
-            env = new Environment();
-            env.set(ambient);
-            // Directional lights
-            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
-                DirectionalLight dLight = new DirectionalLight();
-                dLight.color.set(0f, 0f, 0f, 1f);
-                env.add(dLight);
-            }
-        }
     }
 
     public static void toggleAmbientLight(boolean on) {
@@ -169,10 +155,29 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             mtc.texLoading = true;
         }
 
+        initializeEnvironment();
+
         rec = new RelativisticEffectsComponent();
         vbc = new VelocityBufferComponent();
 
         MaterialComponent.reflectionCubemap.initialize();
+    }
+
+    public void initializeEnvironment() {
+        env = new Environment();
+        if (staticLight) {
+            // If lazy texture init, we turn off the lights until the texture is loaded
+            ColorAttribute staticAmbientLight = new ColorAttribute(ColorAttribute.AmbientLight, staticLightLevel, staticLightLevel, staticLightLevel, 1f);
+            env.set(staticAmbientLight);
+        } else {
+            env.set(ambient);
+            // Directional lights
+            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
+                DirectionalLight dLight = new DirectionalLight();
+                dLight.color.set(0f, 0f, 0f, 1f);
+                env.add(dLight);
+            }
+        }
     }
 
     public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc) {
@@ -183,13 +188,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         this.manager = manager;
         this.cc = cc;
         IntModel model;
-        if (staticLight) {
-            // If lazy texture init, we turn off the lights until the texture is loaded
-            float level = Settings.settings.scene.initialization.lazyTexture ? 0f : staticLightLevel;
-            ColorAttribute alight = new ColorAttribute(ColorAttribute.AmbientLight, level, level, level, 1f);
-            env.set(alight);
-            updateStaticLight = Settings.settings.scene.initialization.lazyTexture;
-        }
+
 
         // CREATE MAIN MODEL INSTANCE
         if (!mesh || !Settings.settings.scene.initialization.lazyMesh) {
@@ -327,8 +326,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             } else if (mtc.isFinishedLoading(manager)) {
                 GaiaSky.postRunnable(() -> {
                     mtc.initMaterial(manager, instance, cc, culling);
-                    // Set to initialised
-                    updateStaticLightImmediate();
                 });
                 mtc.texLoading = false;
                 mtc.texInitialised = true;
@@ -347,8 +344,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 model = modMat.getFirst();
                 instance = new IntModelInstance(model, localTransform);
 
-                updateStaticLightImmediate();
-
                 // COLOR IF NO TEXTURE
                 if (mtc == null && instance != null) {
                     addColorToMat();
@@ -362,16 +357,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void setModelInitialized(boolean initialized) {
         this.modelInitialised = initialized;
-    }
-
-    private void updateStaticLightImmediate() {
-        // Update static
-        if (updateStaticLight) {
-            ColorAttribute ambient = (ColorAttribute) env.get(ColorAttribute.AmbientLight);
-            if (ambient != null)
-                ambient.color.set(staticLightLevel, staticLightLevel, staticLightLevel, 1.0f);
-            updateStaticLight = false;
-        }
     }
 
     public void addColorToMat() {

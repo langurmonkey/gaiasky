@@ -590,7 +590,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraSpeedLimit(int index) {
-        if (checkNum(index, 0, 18, "index"))
+        if (checkNum(index, 0, 21, "index"))
             postRunnable(() -> em.post(Event.SPEED_LIMIT_CMD, this, index));
     }
 

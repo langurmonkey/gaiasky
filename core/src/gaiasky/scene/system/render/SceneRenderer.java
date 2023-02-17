@@ -349,6 +349,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL CLOUDS
         AbstractRenderSystem modelCloudProc = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
 
+
+        // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
+        AbstractRenderSystem modelPerPixelLightingTransp = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPixelLighting);
+
         // PARTICLE EFFECTS
         AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderer(this, null, alphas, renderAssets.particleEffectShaders);
         particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
@@ -419,6 +423,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // Special models
         addRenderSystem(modelAtmProc);
         addRenderSystem(modelCloudProc);
+        addRenderSystem(modelPerPixelLightingTransp);
 
         addRenderSystem(shapeProc);
         addRenderSystem(particleEffectsProc);

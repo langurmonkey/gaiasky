@@ -37,6 +37,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
 import gaiasky.gui.vr.VRGui;
+import gaiasky.gui.vr.VRUI;
 import gaiasky.gui.vr.WelcomeGuiVR;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -165,6 +166,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Loading texture.
      **/
     public org.lwjgl.openvr.Texture vrLoadingLeftTex, vrLoadingRightTex;
+    public VRUI vrui;
     /**
      * The asset manager.
      */
@@ -345,6 +347,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     guiRegistry.render(settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1]);
                 } else {
                     guiRegistry.render(tw, th);
+                }
+                if (vrui != null) {
+                    vrui.render(0, 0);
                 }
             }
         }
@@ -734,7 +739,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Initialize input multiplexer to handle various input processors.
         inputMultiplexer.clear();
-        guiRegistry = new GuiRegistry(this.globalResources.getSkin(), this.scene, this.catalogManager);
+        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, catalogManager);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -774,6 +779,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Resize GUIs to current size.
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
+
+        // Initialize VR UI.
+        vrui = new VRUI(scene);
+        vrui.initialize(assetManager, globalResources.getSpriteBatch());
+        vrui.build(globalResources.getSkin());
+        inputMultiplexer.addProcessor(vrui);
 
         if (settings.runtime.openVr) {
             // Resize post-processors and render systems.
@@ -1182,6 +1193,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Update GUI.
         guiRegistry.update(dtGs);
+        if (vrui != null) {
+            vrui.update(dtGs);
+        }
         EventManager.publish(Event.UPDATE_GUI, this, dtGs);
 
         // Update clock.

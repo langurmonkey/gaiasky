@@ -37,72 +37,78 @@ public class ModelCache {
         } else {
             mat = new Material();
             switch (shape) {
-            case "sphere":
-                int quality = ((Long) params.get("quality")).intValue();
-                float diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
-                boolean flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+            case "sphere" -> {
+                var quality = ((Long) params.get("quality")).intValue();
+                var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
+                var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
                 model = mb.createSphere(diameter, diameter, diameter, quality, quality, flip, primitiveType, mat, attributes);
                 modelCache.put(key, model);
-                break;
-            case "icosphere":
-                int recursion = ((Long) params.get("recursion")).intValue();
-                diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
-                flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+            }
+            case "icosphere" -> {
+                var recursion = ((Long) params.get("recursion")).intValue();
+                var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
+                var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
                 model = mb.createIcoSphere(diameter / 2, recursion, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
-                break;
-            case "octahedronsphere":
-                int divisions = ((Long) params.get("divisions")).intValue();
-                diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
-                flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+            }
+            case "octahedronsphere" -> {
+                var divisions = ((Long) params.get("divisions")).intValue();
+                var diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
+                var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
                 model = mb.createOctahedronSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
-                break;
-            case "plane":
-            case "patch":
-                int divisionsU = ((Long) params.get("divisionsu")).intValue();
-                int divisionsV = ((Long) params.get("divisionsv")).intValue();
-                float side = ((Double) params.get("side")).floatValue();
-                model = mb.createPlane(side, divisionsU, divisionsV, primitiveType, mat, attributes);
+            }
+            case "plane", "patch", "surface", "billboard" -> {
+                var divisionsU = ((Long) params.get("divisionsu")).intValue();
+                var divisionsV = ((Long) params.get("divisionsv")).intValue();
+                var side = params.containsKey("size") ? ((Double) params.get("size")).floatValue() : (params.containsKey("side") ? ((Double) params.get("side")).floatValue() : -1);
+                var width = side;
+                var height = side;
+                if (side < 0) {
+                    width = ((Double) params.get("width")).floatValue();
+                    height = ((Double) params.get("height")).floatValue();
+                }
+                var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                model = mb.createPlane(width, height, divisionsU, divisionsV, flip, primitiveType, mat, attributes);
                 modelCache.put(key, model);
-                break;
-            case "disc":
+            }
+            case "disc" -> {
                 // Prepare model
-                float diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
+                var diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
                 // Initialize disc model
 
                 // TOP VERTICES
-                VertexInfo vt00 = new VertexInfo();
+                var vt00 = new VertexInfo();
                 vt00.setPos(-diameter2, 0, -diameter2);
                 vt00.setNor(0, 1, 0);
                 vt00.setUV(0, 0);
-                VertexInfo vt01 = new VertexInfo();
+                var vt01 = new VertexInfo();
                 vt01.setPos(diameter2, 0, -diameter2);
                 vt01.setNor(0, 1, 0);
                 vt01.setUV(0, 1);
-                VertexInfo vt11 = new VertexInfo();
+                var vt11 = new VertexInfo();
                 vt11.setPos(diameter2, 0, diameter2);
                 vt11.setNor(0, 1, 0);
                 vt11.setUV(1, 1);
-                VertexInfo vt10 = new VertexInfo();
+                var vt10 = new VertexInfo();
                 vt10.setPos(-diameter2, 0, diameter2);
                 vt10.setNor(0, 1, 0);
                 vt10.setUV(1, 0);
 
                 // BOTTOM VERTICES
-                VertexInfo vb00 = new VertexInfo();
+                var vb00 = new VertexInfo();
                 vb00.setPos(-diameter2, 0, -diameter2);
                 vb00.setNor(0, 1, 0);
                 vb00.setUV(0, 0);
-                VertexInfo vb01 = new VertexInfo();
+                var vb01 = new VertexInfo();
                 vb01.setPos(diameter2, 0, -diameter2);
                 vb01.setNor(0, 1, 0);
                 vb01.setUV(0, 1);
-                VertexInfo vb11 = new VertexInfo();
+                var vb11 = new VertexInfo();
                 vb11.setPos(diameter2, 0, diameter2);
                 vb11.setNor(0, 1, 0);
                 vb11.setUV(1, 1);
-                VertexInfo vb10 = new VertexInfo();
+                var vb10 = new VertexInfo();
                 vb10.setPos(-diameter2, 0, diameter2);
                 vb10.setNor(0, 1, 0);
                 vb10.setUV(1, 0);
@@ -111,50 +117,50 @@ public class ModelCache {
                 mb.part("up", primitiveType, attributes, mat).rect(vt00, vt01, vt11, vt10);
                 mb.part("down", primitiveType, attributes, mat).rect(vb00, vb10, vb11, vb01);
                 model = mb.end();
-                break;
-            case "twofacedbillboard":
+            }
+            case "twofacedbillboard" -> {
                 // Prepare model
-                diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
+                var diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
                 // Initialize disc model
 
                 // TOP VERTICES
-                vt00 = new VertexInfo();
+                var vt00 = new VertexInfo();
                 vt00.setPos(-diameter2, -diameter2, 0);
                 vt00.setNor(0, 1, 0);
                 vt00.setUV(1, 1);
 
-                vt01 = new VertexInfo();
+                var vt01 = new VertexInfo();
                 vt01.setPos(-diameter2, diameter2, 0);
                 vt01.setNor(0, 1, 0);
                 vt01.setUV(1, 0);
 
-                vt11 = new VertexInfo();
+                var vt11 = new VertexInfo();
                 vt11.setPos(diameter2, diameter2, 0);
                 vt11.setNor(0, 1, 0);
                 vt11.setUV(0, 0);
 
-                vt10 = new VertexInfo();
+                var vt10 = new VertexInfo();
                 vt10.setPos(diameter2, -diameter2, 0);
                 vt10.setNor(0, 1, 0);
                 vt10.setUV(0, 1);
 
                 // BOTTOM VERTICES
-                vb00 = new VertexInfo();
+                var vb00 = new VertexInfo();
                 vb00.setPos(-diameter2, -diameter2, 0);
                 vb00.setNor(0, 1, 0);
                 vb00.setUV(1, 1);
 
-                vb01 = new VertexInfo();
+                var vb01 = new VertexInfo();
                 vb01.setPos(-diameter2, diameter2, 0);
                 vb01.setNor(0, 1, 0);
                 vb01.setUV(1, 0);
 
-                vb11 = new VertexInfo();
+                var vb11 = new VertexInfo();
                 vb11.setPos(diameter2, diameter2, 0);
                 vb11.setNor(0, 1, 0);
                 vb11.setUV(0, 0);
 
-                vb10 = new VertexInfo();
+                var vb10 = new VertexInfo();
                 vb10.setPos(diameter2, -diameter2, 0);
                 vb10.setNor(0, 1, 0);
                 vb10.setUV(0, 1);
@@ -163,40 +169,39 @@ public class ModelCache {
                 mb.part("up", primitiveType, attributes, mat).rect(vt00, vt01, vt11, vt10);
                 mb.part("down", primitiveType, attributes, mat).rect(vb00, vb10, vb11, vb01);
                 model = mb.end();
-                break;
-            case "cylinder":
+            }
+            case "cylinder" -> {
                 // Use builder
-                float width = ((Double) params.get("width")).floatValue();
-                float height = ((Double) params.get("height")).floatValue();
-                float depth = ((Double) params.get("depth")).floatValue();
-                divisions = ((Long) params.get("divisions")).intValue();
-                flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
+                var width = ((Double) params.get("width")).floatValue();
+                var height = ((Double) params.get("height")).floatValue();
+                var depth = ((Double) params.get("depth")).floatValue();
+                var divisions = ((Long) params.get("divisions")).intValue();
+                var flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
 
                 model = mb.createCylinder(width, height, depth, divisions, flip, primitiveType, mat, attributes);
-
-                break;
-            case "ring":
+            }
+            case "ring" -> {
                 // Sphere with cylinder
                 Material ringMat = new Material();
                 materials.put("ring", ringMat);
 
-                quality = ((Long) params.get("quality")).intValue();
-                divisions = ((Long) params.get("divisions")).intValue();
-                float innerRad = ((Double) params.get("innerradius")).floatValue();
-                float outerRad = ((Double) params.get("outerradius")).floatValue();
-                boolean sph = params.containsKey("sphere-in-ring") ? (Boolean) params.get("sphere-in-ring") : true;
+                var quality = ((Long) params.get("quality")).intValue();
+                var divisions = ((Long) params.get("divisions")).intValue();
+                var innerRad = ((Double) params.get("innerradius")).floatValue();
+                var outerRad = ((Double) params.get("outerradius")).floatValue();
+                var sph = params.containsKey("sphere-in-ring") ? (Boolean) params.get("sphere-in-ring") : true;
 
                 if (sph) {
                     model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, attributes);
                 } else {
                     model = ModelCache.cache.mb.createRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, attributes);
                 }
-                break;
-            case "cone":
-                width = ((Double) params.get("width")).floatValue();
-                height = ((Double) params.get("height")).floatValue();
-                depth = ((Double) params.get("depth")).floatValue();
-                divisions = ((Long) params.get("divisions")).intValue();
+            }
+            case "cone" -> {
+                var width = ((Double) params.get("width")).floatValue();
+                var height = ((Double) params.get("height")).floatValue();
+                var depth = ((Double) params.get("depth")).floatValue();
+                var divisions = ((Long) params.get("divisions")).intValue();
                 int hDivisions = 0;
                 if (params.containsKey("hdivisions")) {
                     hDivisions = ((Long) params.get("hdivisions")).intValue();
@@ -207,20 +212,20 @@ public class ModelCache {
                 else
                     model = mb.createCone(width, height, depth, divisions, hDivisions, primitiveType, mat, attributes);
 
-                break;
-            case "cube":
-            case "box":
+            }
+            case "cube", "box" -> {
+                float width, height, depth;
                 if (params.containsKey("width")) {
                     width = ((Double) params.get("width")).floatValue();
                     height = ((Double) params.get("height")).floatValue();
                     depth = ((Double) params.get("depth")).floatValue();
                 } else {
                     width = ((Double) params.get("size")).floatValue();
-                    height = width;
-                    depth = width;
+                    height = ((Double) params.get("size")).floatValue();
+                    depth = ((Double) params.get("size")).floatValue();
                 }
                 model = mb.createBox(width, height, depth, mat, attributes);
-                break;
+            }
             }
         }
         materials.put("base", mat);
@@ -232,8 +237,8 @@ public class ModelCache {
         StringBuilder key = new StringBuilder(shape + "-" + attributes + "-" + primitiveType);
         Set<String> keys = params.keySet();
         Object[] par = keys.toArray();
-        for (Object o : par) {
-            key.append("-").append(params.get(o));
+        for (Object object : par) {
+            key.append("-").append(params.get(object.toString()));
         }
         return key.toString();
 

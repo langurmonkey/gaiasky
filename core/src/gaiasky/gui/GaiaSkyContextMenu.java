@@ -379,6 +379,16 @@ public class GaiaSkyContextMenu extends ContextMenu {
             addItem(dsVisibility);
         }
 
+        MenuItem VRUI = new MenuItem("VR UI", skin, "default");
+        VRUI.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_VR_UI, this);
+                return true;
+            }
+            return false;
+        });
+        //addItem(VRUI);
+
         if (relativisticEffects) {
             // Spawn gravitational waves
             MenuItem gravWaveStart = new MenuItem(I18n.msg("context.startgravwave"), skin, "default");

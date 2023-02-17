@@ -70,7 +70,7 @@ public class Families {
         shapes = Family.all(Shape.class).exclude(TagNoProcess.class).get();
         perimeters = Family.all(Perimeter.class).exclude(TagNoProcess.class).get();
         verts = Family.all(Verts.class).exclude(Keyframes.class, Trajectory.class, TagNoProcess.class).get();
-        vrdevices = Family.all(VRDevice.class).exclude(TagNoProcess.class).get();
+        vrdevices = Family.one(VRDevice.class, TagVRUI.class).exclude(TagNoProcess.class).get();
     }
 
 }
