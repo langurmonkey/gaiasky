@@ -35,7 +35,7 @@ public abstract class AbstractExtractSystem extends IteratingSystem {
 
     public void setRenderer(ISceneRenderer renderer) {
         this.renderer = renderer;
-        this.renderLists = renderer.renderListsFront();
+        this.renderLists = renderer.getRenderLists();
     }
 
     /**

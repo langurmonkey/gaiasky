@@ -26,4 +26,12 @@ public class Model implements Component {
         this.model = model;
     }
 
+    public void updateModel(ModelComponent model) {
+        if(this.model != null) {
+            this.model.updateWith(model);
+        } else {
+            setModel(model);
+        }
+    }
+
 }

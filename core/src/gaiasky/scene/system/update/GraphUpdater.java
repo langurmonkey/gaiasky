@@ -33,9 +33,9 @@ public class GraphUpdater extends AbstractUpdateSystem {
     private final ITimeFrameProvider time;
     int processed = 0, lastProcessed;
     private ICamera camera;
-    private Vector3d D31;
-    private Vector3b B31;
-    private SpacecraftView view;
+    private final Vector3d D31;
+    private final Vector3b B31;
+    private final SpacecraftView view;
 
     /**
      * Instantiates a system that will iterate over the entities described by the Family.

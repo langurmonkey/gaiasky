@@ -75,7 +75,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, unsharpMask;
+    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, unsharpMask, svtCacheSize;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
@@ -219,12 +219,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Get current resolution
         Table windowedResolutions = new Table(skin);
         IValidator widthValidator = new IntValidator(100, 10000);
-        widthField = new OwnTextField(Integer.toString(MathUtils.clamp(Gdx.graphics.getWidth(), 100, 10000)), skin, widthValidator);
+        widthField = new OwnTextField("", skin, widthValidator);
         widthField.setWidth(inputSmallWidth);
         IValidator heightValidator = new IntValidator(100, 10000);
-        heightField = new OwnTextField(Integer.toString(MathUtils.clamp(Gdx.graphics.getHeight(), 100, 10000)), skin, heightValidator);
+        heightField = new OwnTextField("", skin, heightValidator);
         heightField.setWidth(inputSmallWidth);
         final OwnLabel xLabel = new OwnLabel("x", skin);
+        populateWidthHeight();
 
         windowedResolutions.add(widthField).left().padRight(pad10);
         windowedResolutions.add(xLabel).left().padRight(pad10);
@@ -358,14 +359,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         aaTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.aa.info"), skin));
 
         // Only if not VR, the triangles break in VR
-        if (!settings.runtime.openVr) {
             // POINT CLOUD
             ComboBoxBean[] pointCloudItems = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()), new ComboBoxBean(I18n.msg("gui.pointcloud.instancedtris"), PointCloudMode.TRIANGLES_INSTANCED.ordinal()), new ComboBoxBean(I18n.msg("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
             pointCloudRenderer = new OwnSelectBox<>(skin);
             pointCloudRenderer.setItems(pointCloudItems);
             pointCloudRenderer.setWidth(selectWidth);
             pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
-        }
 
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(I18n.msg("gui.linerenderer"), skin);
@@ -448,7 +447,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(aaLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(aa).left().padRight(pad18).padBottom(pad10);
         graphics.add(aaTooltip).left().padBottom(pad10).row();
-        if (!settings.runtime.openVr) {
             OwnLabel pointCloudLabel = new OwnLabel(I18n.msg("gui.pointcloud"), skin);
             OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
             pointCloudTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.pointcloud.info"), skin));
@@ -456,7 +454,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             graphics.add(pointCloudRenderer).left().padBottom(pad10);
             graphics.add(pointCloudTooltip).left().padRight(pad10).padBottom(pad10);
             graphics.add(getRequiresRestartLabel()).width(40).left().padBottom(pad10).row();
-        }
         graphics.add(lrLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(lineRenderer).left().padBottom(pad10).row();
         graphics.add(bloomLabel).left().padRight(pad34).padBottom(pad10);
@@ -716,6 +713,28 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentGraphicsTable.add(imageLevels).left().padBottom(pad34).row();
 
         if (!settings.runtime.openVr) {
+            // VIRTUAL TEXTURES
+            Label titleSVT = new OwnLabel(I18n.msg("gui.svt"), skin, "header");
+            Table svtTable = new Table();
+
+            /* Cache size */
+            OwnLabel svtCacheSizeLabel = new OwnLabel(I18n.msg("gui.svt.cachesize"), skin, "default");
+            svtCacheSize = new OwnSliderPlus("", Constants.MIN_TILE_CACHE, Constants.MAX_TILE_CACHE, 1, skin);
+            svtCacheSize.setValueLabelTransform((val) -> Integer.toString((int) (val * val)));
+            svtCacheSize.setName("cacheSize");
+            svtCacheSize.setWidth(sliderWidth);
+            svtCacheSize.setValue(settings.scene.renderer.virtualTextures.cacheSize);
+
+            svtTable.add(svtCacheSizeLabel).left().padRight(pad34).padBottom(pad10);
+            svtTable.add(svtCacheSize).left().padRight(pad18).padBottom(pad10);
+            svtTable.add(getRequiresRestartLabel()).left().padBottom(pad10).row();
+
+            labels.addAll(svtCacheSizeLabel);
+
+            // Add to content
+            contentGraphicsTable.add(titleSVT).left().padBottom(pad18).row();
+            contentGraphicsTable.add(svtTable).left().padBottom(pad34).row();
+
             // EXPERIMENTAL
             Label titleExperimental = new OwnLabel(I18n.msg("gui.experimental"), skin, "header");
             Table experimental = new Table();
@@ -1889,6 +1908,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         setUpTabListeners();
     }
 
+    private void populateWidthHeight() {
+        if (widthField != null && widthField.getText().isBlank()) {
+            widthField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getWidth(), 100, 10000)));
+        }
+        if (heightField != null && heightField.getText().isBlank()) {
+            heightField.setText(Integer.toString(MathUtils.clamp(Gdx.graphics.getHeight(), 100, 10000)));
+        }
+    }
+
     private Label getRequiresRestartLabel() {
         OwnLabel restart = new OwnLabel("*", skin, "default-pink");
         restart.addListener(new OwnTextTooltip(I18n.msg("gui.restart"), skin));
@@ -1899,6 +1927,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     public GenericDialog show(Stage stage, Action action) {
         GenericDialog result = super.show(stage, action);
         updateBackupValues();
+        populateWidthHeight();
         return result;
     }
 
@@ -2173,6 +2202,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked()));
         }
 
+        // SVT cache size
+        if (svtCacheSize != null) {
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.SVT_CACHE_SIZE_CMD, this, (int) svtCacheSize.getValue()));
+        }
+
         // SSR
         if (ssr != null) {
             resetRenderFlags = resetRenderFlags || settings.postprocess.ssr.active != ssr.isChecked();
@@ -2297,7 +2331,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // Index of refraction
-        EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
+        if (celestialSphereIndexOfRefraction != null) {
+            EventManager.publish(Event.INDEXOFREFRACTION_CMD, this, celestialSphereIndexOfRefraction.getValue());
+        }
 
         // Controllers
         if (gamepadMappings.getSelected() != null) {
@@ -2404,9 +2440,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (fullscreen) {
             settings.graphics.resolution[0] = fullScreenResolutions.getSelected().width;
             settings.graphics.resolution[1] = fullScreenResolutions.getSelected().height;
-        } else {
+        } else if (!widthField.getText().isBlank() && !heightField.getText().isBlank()) {
             settings.graphics.resolution[0] = Integer.parseInt(widthField.getText());
             settings.graphics.resolution[1] = Integer.parseInt(heightField.getText());
+        } else {
+            populateWidthHeight();
         }
 
         enableComponents(!fullscreen, widthField, heightField, xLabel);

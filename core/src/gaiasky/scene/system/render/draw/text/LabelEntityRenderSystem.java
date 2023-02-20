@@ -61,7 +61,7 @@ public class LabelEntityRenderSystem {
         shader.setUniformf("u_viewAngle", base.forceLabel ? 2f : (float) (body.solidAngleApparent * scaffolding.locVaMultiplier * Constants.U_TO_KM));
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", base.forceLabel ? 1f : scaffolding.locThresholdLabel / (float) Constants.DISTANCE_SCALE_FACTOR);
-        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), base.forceLabel);
+        render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor() * 0.5f, view.getRadius(), base.forceLabel);
     }
 
     public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
@@ -69,7 +69,7 @@ public class LabelEntityRenderSystem {
 
         Vector3d pos = D31;
         view.textPosition(camera, pos);
-        shader.setUniformf("u_viewAngle", (float) body.solidAngle * 500f);
+        shader.setUniformf("u_viewAngle", (float) body.solidAngle);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
 

@@ -37,6 +37,6 @@ public interface ISceneLoader {
 
     void setParams(Map<String, Object> params);
 
-    Object interceptDataFilePath(Class<?> valueClass, Object val);
+    void setIndex(Map<String, Entity> index);
 
 }

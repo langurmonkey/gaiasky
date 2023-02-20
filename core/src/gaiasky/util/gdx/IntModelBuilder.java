@@ -609,24 +609,38 @@ public class IntModelBuilder {
         return createXYZCoordinates(axisLength, 0.1f, 0.1f, 5, GL20.GL_TRIANGLES, material, attributes);
     }
 
-    public IntModel createPlane(float side, int divisionsU, int divisionsV, int primitiveType, Material material, Bits attributes) {
-        float hs = side / 2f;
+    public IntModel createPlane(float side, int divisionsU, int divisionsV, boolean flip, int primitiveType, Material material, Bits attributes) {
+        return createPlane(side, side, divisionsU, divisionsV, flip, primitiveType, material, attributes);
+    }
+
+    public IntModel createPlane(float width, float height, int divisionsU, int divisionsV, boolean flip, int primitiveType, Material material, Bits attributes) {
+        float zhs = width / 2f;
+        float xhs = height / 2f;
         IntMeshPartBuilder.VertexInfo vt00 = new IntMeshPartBuilder.VertexInfo();
-        vt00.setPos(-hs, 0, -hs);
+        vt00.setPos(-xhs, 0, -zhs);
         vt00.setNor(0, -1, 0);
-        vt00.setUV(0, 0);
         IntMeshPartBuilder.VertexInfo vt01 = new IntMeshPartBuilder.VertexInfo();
-        vt01.setPos(hs, 0, -hs);
+        vt01.setPos(xhs, 0, -zhs);
         vt01.setNor(0, -1, 0);
-        vt01.setUV(0, 1);
         IntMeshPartBuilder.VertexInfo vt11 = new IntMeshPartBuilder.VertexInfo();
-        vt11.setPos(hs, 0, hs);
+        vt11.setPos(xhs, 0, zhs);
         vt11.setNor(0, -1, 0);
-        vt11.setUV(1, 1);
         IntMeshPartBuilder.VertexInfo vt10 = new IntMeshPartBuilder.VertexInfo();
-        vt10.setPos(-hs, 0, hs);
+        vt10.setPos(-xhs, 0, zhs);
         vt10.setNor(0, -1, 0);
-        vt10.setUV(1, 0);
+
+        if(flip) {
+            vt00.setUV(0, 0);
+            vt01.setUV(1, 0);
+            vt11.setUV(1, 1);
+            vt10.setUV(0, 1);
+        } else {
+            vt01.setUV(0, 0);
+            vt00.setUV(0, 1);
+            vt10.setUV(1, 1);
+            vt11.setUV(1, 0);
+        }
+
         begin();
         part("plane", primitiveType, attributes, material).patch(vt00, vt01, vt11, vt10, divisionsU, divisionsV);
         return end();

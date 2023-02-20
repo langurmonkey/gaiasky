@@ -415,17 +415,17 @@ public class Proximity {
         }
 
         @Override
-        public double getHeight(Vector3b camPos) {
+        public double getElevationAt(Vector3b camPos) {
             return 0;
         }
 
         @Override
-        public double getHeight(Vector3b camPos, boolean useFuturePosition) {
+        public double getElevationAt(Vector3b camPos, boolean useFuturePosition) {
             return 0;
         }
 
         @Override
-        public double getHeight(Vector3b camPos, Vector3b nextPos) {
+        public double getElevationAt(Vector3b camPos, Vector3b nextPos) {
             return 0;
         }
 

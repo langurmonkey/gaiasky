@@ -10,7 +10,7 @@ import java.util.List;
 public class ModelScaffolding implements Component {
 
     /** Multiplier for Loc view angle **/
-    public float locVaMultiplier = 1f;
+    public float locVaMultiplier = 4f;
     /** ThresholdLabel for children locations. **/
     public float locThresholdLabel = 1f;
 

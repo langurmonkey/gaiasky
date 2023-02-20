@@ -8,6 +8,8 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -41,35 +43,35 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
- * Manages the Graphical User Interfaces of Gaia Sky
+ * Manages the Graphical User Interfaces of Gaia Sky.
  */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
     /** Scene reference. **/
     protected final Scene scene;
     /**
-     * Registered GUI array
+     * Registered GUI array.
      **/
     private final Array<IGui> guis;
     /**
-     * Render lock object
+     * Render lock object.
      */
     private final Object renderLock = new Object();
     /**
-     * The catalog manager
+     * The catalog manager.
      */
     private final CatalogManager catalogManager;
     private final FocusView view;
     /**
-     * Mode change info popup
+     * Mode change info popup.
      */
     public Table modeChangeInfoPopup;
     /**
-     * Current GUI object
+     * Current GUI object.
      **/
     public IGui current;
     /**
-     * Previous GUI object, if any
+     * Previous GUI object, if any.
      **/
     public IGui previous;
     private Skin skin;
@@ -77,23 +79,23 @@ public class GuiRegistry implements IObserver {
     private AboutWindow aboutWindow;
     private SearchDialog searchDialog;
     /**
-     * Keyframes window
+     * Keyframes window.
      **/
     private KeyframesWindow keyframesWindow;
     /**
-     * Individual visibility
+     * Individual visibility.
      */
     private IndividualVisibilityWindow indVisWindow;
     /** Task to remove the information pop-up. **/
     private Task removePopup;
     /**
-     * Last open location
+     * Last open location.
      */
     private Path lastOpenLocation;
-    /* Slave config window */
+    /* Slave config window. */
     private SlaveConfigWindow slaveConfigWindow;
     /**
-     * Global input multiplexer
+     * Global input multiplexer.
      **/
     private InputMultiplexer inputMultiplexer = null;
 
@@ -107,8 +109,8 @@ public class GuiRegistry implements IObserver {
         this.guis = new Array<>(true, 2);
         this.catalogManager = catalogManager;
         this.view = new FocusView();
-        // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
+        // Windows which are visible from any GUI.
+        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
     }
 
     public InputMultiplexer getInputMultiplexer() {
@@ -123,8 +125,8 @@ public class GuiRegistry implements IObserver {
      * Switches the current GUI with the given one, updating the processors.
      * It also sets the previous GUI to the given value.
      *
-     * @param gui      The new GUI
-     * @param previous The new previous GUI
+     * @param gui      The new GUI.
+     * @param previous The new previous GUI.
      */
     public void change(IGui gui, IGui previous) {
         if (current != gui) {
@@ -134,9 +136,9 @@ public class GuiRegistry implements IObserver {
     }
 
     /**
-     * Switches the current GUI with the given one, updating the processors
+     * Switches the current GUI with the given one, updating the processors.
      *
-     * @param gui The new gui
+     * @param gui The new gui.
      */
     public void change(IGui gui) {
         if (current != gui) {
@@ -146,16 +148,16 @@ public class GuiRegistry implements IObserver {
     }
 
     /**
-     * Unsets the current GUI and sets it as previous
+     * Unsets the current GUI and sets it as previous.
      */
     public void unset() {
         unset(current);
     }
 
     /**
-     * Unsets the given GUI and sets it as previous
+     * Unsets the given GUI and sets it as previous.
      *
-     * @param gui The GUI
+     * @param gui The GUI.
      */
     public void unset(IGui gui) {
         if (gui != null) {
@@ -166,9 +168,9 @@ public class GuiRegistry implements IObserver {
     }
 
     /**
-     * Sets the given GUI as current
+     * Sets the given GUI as current.
      *
-     * @param gui The new GUI
+     * @param gui The new GUI.
      */
     public void set(IGui gui) {
         if (gui != null) {
@@ -179,18 +181,18 @@ public class GuiRegistry implements IObserver {
     }
 
     /**
-     * Sets the given GUI as previous
+     * Sets the given GUI as previous.
      *
-     * @param gui The new previous GUI
+     * @param gui The new previous GUI.
      */
     public void setPrevious(IGui gui) {
         previous = gui;
     }
 
     /**
-     * Registers a new GUI
+     * Registers a new GUI.
      *
-     * @param gui The GUI to register
+     * @param gui The GUI to register.
      */
     public void registerGui(IGui gui) {
         if (!guis.contains(gui, true)) {
@@ -199,20 +201,20 @@ public class GuiRegistry implements IObserver {
     }
 
     /**
-     * Unregisters a GUI
+     * Unregisters a GUI.
      *
-     * @param gui The GUI to unregister
+     * @param gui The GUI to unregister.
      *
-     * @return True if the GUI was unregistered
+     * @return True if the GUI was unregistered.
      */
     public boolean unregisterGui(IGui gui) {
         return guis.removeValue(gui, true);
     }
 
     /**
-     * Unregisters all GUIs
+     * Unregisters all GUIs.
      *
-     * @return True if operation succeeded
+     * @return True if operation succeeded.
      */
     public boolean unregisterAll() {
         guis.clear();
@@ -220,10 +222,10 @@ public class GuiRegistry implements IObserver {
     }
 
     /**
-     * Renders the registered GUIs
+     * Renders the registered GUIs.
      *
-     * @param rw The render width
-     * @param rh The render height
+     * @param rw The render width.
+     * @param rh The render height.
      */
     public void render(int rw, int rh) {
         if (Settings.settings.runtime.displayGui) {
@@ -242,9 +244,9 @@ public class GuiRegistry implements IObserver {
 
     /**
      * Adds the stage of the given GUI to the processors in
-     * the input multiplexer
+     * the input multiplexer.
      *
-     * @param gui The gui
+     * @param gui The gui.
      */
     public void addProcessor(IGui gui) {
         if (inputMultiplexer != null && gui != null)
@@ -257,9 +259,9 @@ public class GuiRegistry implements IObserver {
     }
 
     /**
-     * Updates the registered GUIs
+     * Updates the registered GUIs.
      *
-     * @param dt The delta time in seconds
+     * @param dt The delta time in seconds.
      */
     public void update(double dt) {
         for (IGui gui : guis)
@@ -267,7 +269,7 @@ public class GuiRegistry implements IObserver {
     }
 
     public void publishReleaseNotes() {
-        // Check release notes if needed
+        // Check release notes if needed.
         Path releaseNotesRev = SysUtils.getReleaseNotesRevisionFile();
         int releaseNotesVersion = 0;
         if (Files.exists(releaseNotesRev) && Files.isRegularFile(releaseNotesRev)) {
@@ -304,31 +306,31 @@ public class GuiRegistry implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (current != null) {
-            Stage ui = current.getGuiStage();
-            // Treats windows that can appear in any GUI
+            Stage stage = current.getGuiStage();
+            // Treats windows that can appear in any GUI.
             switch (event) {
-            case SHOW_SEARCH_ACTION:
+            case SHOW_SEARCH_ACTION -> {
                 if (searchDialog == null) {
-                    searchDialog = new SearchDialog(skin, ui, scene, true);
+                    searchDialog = new SearchDialog(skin, stage, scene, true);
                 } else {
                     searchDialog.clearText();
                 }
                 if (!searchDialog.isVisible() | !searchDialog.hasParent())
-                    searchDialog.show(ui);
-                break;
-            case SHOW_QUIT_ACTION:
+                    searchDialog.show(stage);
+            }
+            case SHOW_QUIT_ACTION -> {
                 if (!removeModeChangePopup() && !removeGamepadGui()) {
                     if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
-                        // Release mouse if captured
+                        // Release mouse if captured.
                         GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
                     } else {
                         Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
                         if (Settings.settings.program.exitConfirmation) {
-                            QuitWindow quit = new QuitWindow(ui, skin);
+                            QuitWindow quit = new QuitWindow(stage, skin);
                             if (data.length > 0) {
                                 quit.setAcceptRunnable(quitRunnable);
                             }
-                            quit.show(ui);
+                            quit.show(stage);
                         } else {
                             if (quitRunnable != null)
                                 quitRunnable.run();
@@ -336,29 +338,27 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                break;
-            case CAMERA_MODE_CMD:
-                removeModeChangePopup();
-                break;
-            case SHOW_ABOUT_ACTION:
+            }
+            case CAMERA_MODE_CMD -> removeModeChangePopup();
+            case SHOW_ABOUT_ACTION -> {
                 if (aboutWindow == null) {
-                    aboutWindow = new AboutWindow(ui, skin);
+                    aboutWindow = new AboutWindow(stage, skin);
                 }
                 if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
-                    aboutWindow.show(ui);
+                    aboutWindow.show(stage);
                 }
-                break;
-            case SHOW_PREFERENCES_ACTION:
+            }
+            case SHOW_PREFERENCES_ACTION -> {
                 Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
                 if (prefs.isEmpty()) {
                     if (preferencesWindow == null) {
-                        preferencesWindow = new PreferencesWindow(ui, skin, GaiaSky.instance.getGlobalResources());
+                        preferencesWindow = new PreferencesWindow(stage, skin, GaiaSky.instance.getGlobalResources());
                     }
                     if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
-                        preferencesWindow.show(ui);
+                        preferencesWindow.show(stage);
                     }
                 } else {
-                    // Close current windows
+                    // Close current windows.
                     for (Actor pref : prefs) {
                         if (pref instanceof PreferencesWindow) {
                             ((PreferencesWindow) pref).cancel();
@@ -366,25 +366,25 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                break;
-            case SHOW_PER_OBJECT_VISIBILITY_ACTION:
+            }
+            case SHOW_PER_OBJECT_VISIBILITY_ACTION -> {
                 if (indVisWindow == null) {
-                    indVisWindow = new IndividualVisibilityWindow(scene, ui, skin);
+                    indVisWindow = new IndividualVisibilityWindow(scene, stage, skin);
                 }
                 if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
-                    indVisWindow.show(ui);
-                break;
-            case SHOW_SLAVE_CONFIG_ACTION:
+                    indVisWindow.show(stage);
+            }
+            case SHOW_SLAVE_CONFIG_ACTION -> {
                 if (MasterManager.hasSlaves()) {
                     if (slaveConfigWindow == null) {
-                        slaveConfigWindow = new SlaveConfigWindow(ui, skin);
+                        slaveConfigWindow = new SlaveConfigWindow(stage, skin);
                     }
                     if (!slaveConfigWindow.isVisible() || !slaveConfigWindow.hasParent()) {
-                        slaveConfigWindow.show(ui);
+                        slaveConfigWindow.show(stage);
                     }
                 }
-                break;
-            case SHOW_LOAD_CATALOG_ACTION:
+            }
+            case SHOW_LOAD_CATALOG_ACTION -> {
                 if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
                     try {
                         lastOpenLocation = Paths.get(Settings.settings.program.fileChooser.lastLocation);
@@ -397,8 +397,7 @@ public class GuiRegistry implements IObserver {
                 } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
                     lastOpenLocation = SysUtils.getHomeDir();
                 }
-
-                FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                FileChooser fc = new FileChooser(I18n.msg("gui.loadcatalog"), skin, stage, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.loadcatalog"));
@@ -407,22 +406,22 @@ public class GuiRegistry implements IObserver {
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.exists(result) && Files.exists(result)) {
-                            // Load selected file
+                            // Load selected file.
                             try {
                                 String fileName = result.getFileName().toString();
                                 if (fileName.endsWith(".json")) {
-                                    // Load internal JSON catalog file
+                                    // Load internal JSON catalog file.
                                     GaiaSky.instance.getExecutorService().execute(() -> {
                                         GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
                                     });
                                 } else {
-                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
+                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, stage);
                                     Runnable doLoad = () -> {
                                         GaiaSky.instance.getExecutorService().execute(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
-                                            // Load dataset
+                                            // Load dataset.
                                             GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI, datasetOptions, true);
-                                            // Select first
+                                            // Select first.
                                             CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
                                             if (datasetOptions.type.isSelectable() && ci != null && ci.entity != null) {
                                                 view.setEntity(ci.entity);
@@ -436,7 +435,7 @@ public class GuiRegistry implements IObserver {
                                                     EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
                                                     EventManager.publish(Event.FOCUS_CHANGE_CMD, this, EntityUtils.isVisibilityOn(view.getGraph().children.get(0)));
                                                 }
-                                                // Open UI datasets
+                                                // Open UI datasets.
                                                 GaiaSky.instance.scripting().maximizeInterfaceWindow();
                                                 GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
                                             } else {
@@ -445,7 +444,7 @@ public class GuiRegistry implements IObserver {
                                         });
                                     };
                                     dld.setAcceptRunnable(doLoad);
-                                    dld.show(ui);
+                                    dld.show(stage);
                                 }
 
                                 lastOpenLocation = result.getParent();
@@ -461,7 +460,7 @@ public class GuiRegistry implements IObserver {
                             return false;
                         }
                     } else {
-                        // Still, update last location
+                        // Still, update last location.
                         if (!Files.isDirectory(result)) {
                             lastOpenLocation = result.getParent();
                         } else {
@@ -471,27 +470,52 @@ public class GuiRegistry implements IObserver {
                     }
                     return false;
                 });
-                fc.show(ui);
-                break;
-            case SHOW_KEYFRAMES_WINDOW_ACTION:
+                fc.show(stage);
+            }
+            case SHOW_KEYFRAMES_WINDOW_ACTION -> {
                 if (keyframesWindow == null) {
-                    keyframesWindow = new KeyframesWindow(scene, ui, skin);
+                    keyframesWindow = new KeyframesWindow(scene, stage, skin);
                 }
                 if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                    keyframesWindow.show(ui, 0, 0);
+                    keyframesWindow.show(stage, 0, 0);
                 if (!GaiaSky.instance.isOn(ComponentType.Others)) {
-                    // Notify that the user needs to enable 'others'
+                    // Notify that the user needs to enable 'others'.
                     EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.keyframe.ct"), 10f);
                 }
-                break;
-            case UI_THEME_RELOAD_INFO:
+            }
+            case SHOW_TEXTURE_WINDOW_ACTION -> {
+                var title = (String) data[0];
+                var scale = 1f;
+                if (data.length > 2) {
+                    scale = (Float) data[2];
+                }
+                var flipX = false;
+                var flipY = false;
+                if (data.length > 3) {
+                    flipX = (Boolean) data[3];
+                }
+                if (data.length > 4) {
+                    flipY = (Boolean) data[4];
+                }
+                TextureWindow textureWindow;
+                if (data[1] instanceof FrameBuffer) {
+                    var frameBuffer = (FrameBuffer) data[1];
+                    textureWindow = new TextureWindow(title, skin, stage, frameBuffer, scale);
+                } else {
+                    var texture = (Texture) data[1];
+                    textureWindow = new TextureWindow(title, skin, stage, texture, scale);
+                }
+                textureWindow.setFlip(flipX, flipY);
+                textureWindow.show(stage, 0, 50);
+            }
+            case UI_THEME_RELOAD_INFO -> {
                 if (keyframesWindow != null) {
                     keyframesWindow.dispose();
                     keyframesWindow = null;
                 }
                 this.skin = (Skin) data[0];
-                break;
-            case MODE_POPUP_CMD:
+            }
+            case MODE_POPUP_CMD -> {
                 if (Settings.settings.runtime.displayGui && Settings.settings.program.ui.modeChangeInfo) {
                     ModePopupInfo mpi = (ModePopupInfo) data[0];
                     String name = (String) data[1];
@@ -554,14 +578,14 @@ public class GuiRegistry implements IObserver {
 
                         modeChangeInfoPopup.pack();
 
-                        // Add table to UI
+                        // Add table to UI.
                         Container<Table> mct = new Container<>(modeChangeInfoPopup);
                         mct.setFillParent(true);
                         mct.top();
                         mct.pad(pad10 * 2, 0, 0, 0);
-                        ui.addActor(mct);
+                        stage.addActor(mct);
 
-                        // Cancel and schedule task
+                        // Cancel and schedule task.
                         cancelRemovePopupTask();
                         removePopup = new Task() {
                             @Override
@@ -581,25 +605,25 @@ public class GuiRegistry implements IObserver {
                         }
                     }
                 }
-                break;
-            case DISPLAY_GUI_CMD:
+            }
+            case DISPLAY_GUI_CMD -> {
                 boolean displayGui = (Boolean) data[0];
                 if (!displayGui) {
-                    // Remove processor
+                    // Remove processor.
                     inputMultiplexer.removeProcessor(current.getGuiStage());
                 } else {
-                    // Add processor
+                    // Add processor.
                     inputMultiplexer.addProcessor(0, current.getGuiStage());
                 }
-                break;
-            case SHOW_RESTART_ACTION:
+            }
+            case SHOW_RESTART_ACTION -> {
                 String text;
                 if (data.length > 0) {
                     text = (String) data[0];
                 } else {
                     text = I18n.msg("gui.restart.default");
                 }
-                GenericDialog restart = new GenericDialog(I18n.msg("gui.restart.title"), skin, ui) {
+                GenericDialog restart = new GenericDialog(I18n.msg("gui.restart.title"), skin, stage) {
 
                     @Override
                     protected void build() {
@@ -609,10 +633,10 @@ public class GuiRegistry implements IObserver {
 
                     @Override
                     protected boolean accept() {
-                        // Shut down
+                        // Shut down.
                         GaiaSky.postRunnable(() -> {
                             Gdx.app.exit();
-                            // Attempt restart
+                            // Attempt restart.
                             Path workingDir = Path.of(System.getProperty("user.dir"));
                             Path[] scripts;
                             if (SysUtils.isWindows()) {
@@ -624,13 +648,13 @@ public class GuiRegistry implements IObserver {
                                 if (Files.exists(file) && Files.isRegularFile(file) && Files.isExecutable(file)) {
                                     try {
                                         if (file.getFileName().toString().contains("gaiasky")) {
-                                            // Just use the script
+                                            // Just use the script.
                                             final ArrayList<String> command = new ArrayList<>();
                                             command.add(file.toString());
                                             final ProcessBuilder builder = new ProcessBuilder(command);
                                             builder.start();
                                         } else if (file.getFileName().toString().contains("gradlew")) {
-                                            // Gradle script
+                                            // Gradle script.
                                             final ArrayList<String> command = new ArrayList<>();
                                             command.add(file.toString());
                                             command.add("core:run");
@@ -649,32 +673,30 @@ public class GuiRegistry implements IObserver {
 
                     @Override
                     protected void cancel() {
-                        // Nothing
+                        // Nothing.
                     }
 
                     @Override
                     public void dispose() {
-                        // Nothing
+                        // Nothing.
                     }
                 };
                 restart.setAcceptText(I18n.msg("gui.yes"));
                 restart.setCancelText(I18n.msg("gui.no"));
                 restart.buildSuper();
-                restart.show(ui);
-                break;
-            case CLOSE_ALL_GUI_WINDOWS_CMD:
-                var actors = ui.getActors();
+                restart.show(stage);
+            }
+            case CLOSE_ALL_GUI_WINDOWS_CMD -> {
+                var actors = stage.getActors();
                 for (var actor : actors) {
                     if (actor instanceof GenericDialog) {
                         closeWindow((GenericDialog) actor);
                     }
                 }
-                break;
-            case UI_RELOAD_CMD:
-                reloadUI((GlobalResources) data[0]);
-                break;
-            default:
-                break;
+            }
+            case UI_RELOAD_CMD -> reloadUI((GlobalResources) data[0]);
+            default -> {
+            }
             }
         }
 
@@ -741,22 +763,22 @@ public class GuiRegistry implements IObserver {
      * @param globalResources The global resources object to update.
      */
     private void reloadUI(GlobalResources globalResources) {
-        // Reinitialise user interface
+        // Reinitialise user interface.
         GaiaSky.postRunnable(() -> {
-            // Reinitialise GUI system
+            // Reinitialise GUI system.
             globalResources.updateSkin();
             GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
             EventManager.publish(Event.SPACECRAFT_LOADED, this, scene.getEntity("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();
-            // Time init
+            // Time init.
             EventManager.publish(Event.TIME_CHANGE_INFO, this, GaiaSky.instance.time.getTime());
             if (GaiaSky.instance.cameraManager.mode == CameraManager.CameraMode.FOCUS_MODE) {
-                // Refocus
+                // Refocus.
                 FocusView focus = (FocusView) GaiaSky.instance.cameraManager.getFocus();
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus.getEntity());
             }
-            // UI theme reload broadcast
+            // UI theme reload broadcast.
             EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
             EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("notif.ui.reload"));
         });

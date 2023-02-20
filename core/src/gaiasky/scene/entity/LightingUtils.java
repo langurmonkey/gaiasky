@@ -22,7 +22,7 @@ public class LightingUtils {
     private static final ThreadLocal<Vector3> F31 = new TLV3();
 
     public static void updateLights(Model model, Body body, GraphNode graph, ICamera camera) {
-        if (model.model != null && body.distToCamera <= LIGHT_X1) {
+        if (model.model != null && !model.model.isStaticLight() && body.distToCamera <= LIGHT_X1) {
             for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
                 IFocus lightSource = camera.getCloseLightSource(i);
                 if (lightSource != null) {

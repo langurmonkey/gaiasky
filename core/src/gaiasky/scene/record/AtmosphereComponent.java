@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.ModelScaffolding;
 import gaiasky.scene.component.Rotation;
@@ -33,7 +34,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 
-public class AtmosphereComponent extends NamedComponent {
+public class AtmosphereComponent extends NamedComponent implements IUpdatable<AtmosphereComponent> {
 
     public int quality;
     public float size;
@@ -180,15 +181,7 @@ public class AtmosphereComponent extends NamedComponent {
      * @param parentTranslation The parent translation vector.
      * @param vrOffset          The VR offset vector.
      */
-    public void updateAtmosphericScatteringParams(
-            Material mat,
-            float alpha,
-            boolean ground,
-            Vector3b translation,
-            RotationComponent rc,
-            String inverseRefPlaneTransform,
-            Vector3b parentTranslation,
-            Vector3d vrOffset) {
+    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Vector3b translation, RotationComponent rc, String inverseRefPlaneTransform, Vector3b parentTranslation, Vector3d vrOffset) {
 
         translation.put(aux3);
         if (vrOffset != null) {
@@ -361,6 +354,11 @@ public class AtmosphereComponent extends NamedComponent {
 
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public void updateWith(AtmosphereComponent object) {
+        copyFrom(object);
     }
 }
 

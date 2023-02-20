@@ -272,7 +272,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
     }
 
     private void renderFacePart(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
-        sgr.renderGlowPass(camera, null);
+        sgr.getLightGlowPass().renderGlowPass(camera, null);
 
         boolean postProcess = postProcessCapture(ppb, fb, wh, wh);
         sgr.renderScene(camera, t, rc);
@@ -281,7 +281,7 @@ public abstract class RenderModeCubemap extends RenderModeAbstract {
     }
 
     protected void renderRegularFace90(FrameBuffer fb, ICamera camera, ISceneRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
-        sgr.renderGlowPass(camera, null);
+        sgr.getLightGlowPass().renderGlowPass(camera, null);
 
         boolean postProcess = postProcessCapture(ppb, fb, wh, wh);
         sgr.renderScene(camera, t, rc);

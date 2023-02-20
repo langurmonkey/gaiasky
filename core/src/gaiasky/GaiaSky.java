@@ -15,6 +15,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -35,6 +36,9 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
+import gaiasky.gui.vr.VRGui;
+import gaiasky.gui.vr.VRUI;
+import gaiasky.gui.vr.WelcomeGuiVR;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.MainPostProcessor;
@@ -162,6 +166,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Loading texture.
      **/
     public org.lwjgl.openvr.Texture vrLoadingLeftTex, vrLoadingRightTex;
+    public VRUI vrui;
     /**
      * The asset manager.
      */
@@ -343,6 +348,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 } else {
                     guiRegistry.render(tw, th);
                 }
+                if (vrui != null) {
+                    vrui.render(0, 0);
+                }
             }
         }
         // Clean lists
@@ -475,6 +483,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         logger.info(I18n.msg("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
         logger.info(I18n.msg("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
         logger.info(I18n.msg("notif.info.maxattribs", GL30.glGetInteger(GL30.GL_MAX_VERTEX_ATTRIBS)));
+        logger.info(I18n.msg("notif.info.maxtexsize", GL30.glGetInteger(GL30.GL_MAX_TEXTURE_SIZE)));
 
         // Disable all kinds of input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
@@ -503,11 +512,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager = new AssetManager(internalResolver);
         assetManager.setLoader(Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
+        assetManager.setLoader(Pixmap.class, new OwnPixmapLoader(dataResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         assetManager.setLoader(IAttitudeServer.class, new AttitudeLoader(dataResolver));
         assetManager.setLoader(ExtShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
         assetManager.setLoader(BitmapFont.class, new BitmapFontLoader(internalResolver));
+        assetManager.setLoader(Texture.class, new OwnTextureLoader(internalResolver));
         assetManager.setLoader(AtmosphereShaderProvider.class, new AtmosphereShaderProviderLoader<>(internalResolver));
         assetManager.setLoader(GroundShaderProvider.class, new GroundShaderProviderLoader<>(internalResolver));
         assetManager.setLoader(TessellationShaderProvider.class, new TessellationShaderProviderLoader<>(internalResolver));
@@ -578,10 +589,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, (int) (settings.graphics.backBufferResolution[0] / 2f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
-
-        // GL clear state.
-        Gdx.gl.glClearColor(0, 0, 0, 0);
-        Gdx.gl.glClearDepthf(1f);
     }
 
     /**
@@ -732,7 +739,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Initialize input multiplexer to handle various input processors.
         inputMultiplexer.clear();
-        guiRegistry = new GuiRegistry(this.globalResources.getSkin(), this.scene, this.catalogManager);
+        guiRegistry = new GuiRegistry(globalResources.getSkin(), scene, catalogManager);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -772,6 +779,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Resize GUIs to current size.
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
+
+        // Initialize VR UI.
+        vrui = new VRUI(scene);
+        vrui.initialize(assetManager, globalResources.getSpriteBatch());
+        vrui.build(globalResources.getSkin());
+        inputMultiplexer.addProcessor(vrui);
 
         if (settings.runtime.openVr) {
             // Resize post-processors and render systems.
@@ -1180,6 +1193,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Update GUI.
         guiRegistry.update(dtGs);
+        if (vrui != null) {
+            vrui.update(dtGs);
+        }
         EventManager.publish(Event.UPDATE_GUI, this, dtGs);
 
         // Update clock.

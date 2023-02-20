@@ -1,5 +1,7 @@
 # Gaia Sky Virtual Reality
 
+Gaia Sky VR is **alpha** software!
+
 The most up-to-date information on Gaia Sky VR, as well as how to install and run it, is available in the official Gaia Sky VR documentation:
 
 - [Gaia Sky VR documentation](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/Gaia-sky-vr.html)

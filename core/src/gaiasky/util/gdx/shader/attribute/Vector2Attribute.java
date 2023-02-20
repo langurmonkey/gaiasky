@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.NumberUtils;
 public class Vector2Attribute extends Attribute {
     public static final String HeightSizeAlias = "heightSize";
     public static final int HeightSize = register(HeightSizeAlias);
+    public static final String SvtResolutionAlias = "svtResolution";
+    public static final int SvtResolution = register(SvtResolutionAlias);
     public Vector2 value;
 
     public Vector2Attribute(int index) {

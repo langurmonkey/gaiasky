@@ -142,7 +142,6 @@ public class TipsGenerator {
             } else if (skin.has(part.style, Label.LabelStyle.class)) {
                 // Simple styled label.
                 OwnLabel label = new OwnLabel(part.text, skin, part.style);
-                label.setColor(0.5f, 0.5f, 0.5f, 1f);
                 g.addActor(label);
             } else if (skin.has(part.style, TextButton.TextButtonStyle.class)) {
                 // Probably key mappings.

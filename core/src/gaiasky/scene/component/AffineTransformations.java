@@ -3,12 +3,10 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scene.record.ITransform;
-import gaiasky.scene.record.RotateTransform;
-import gaiasky.scene.record.ScaleTransform;
-import gaiasky.scene.record.TranslateTransform;
+import gaiasky.scene.record.*;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Provides an arbitrary number of affine transformations (rotate, scale, translate) to be applied
@@ -20,20 +18,20 @@ public class AffineTransformations implements Component {
     public Array<ITransform> transformations;
 
     public void setTransformations(Object[] transformations) {
-        initArray();
+        initialize();
         for (Object transformation : transformations) {
             this.transformations.add((ITransform) transformation);
         }
     }
 
-    private void initArray() {
+    public void initialize() {
         if (this.transformations == null) {
             this.transformations = new Array<>(3);
         }
     }
 
     public void setTranslate(double[] translation) {
-        initArray();
+        initialize();
         TranslateTransform tt = new TranslateTransform();
         tt.setVector(translation);
         this.transformations.add(tt);
@@ -47,8 +45,15 @@ public class AffineTransformations implements Component {
         setTranslate(iu);
     }
 
+    public void setQuaternion(double[] axis, double angle) {
+        initialize();
+        QuaternionTransform qt = new QuaternionTransform();
+        qt.setQuaternion(new Vector3d(axis), angle);
+        this.transformations.add(qt);
+    }
+
     public void setRotate(double[] axisDegrees) {
-        initArray();
+        initialize();
         RotateTransform rt = new RotateTransform();
         rt.setAxis(new double[] { axisDegrees[0], axisDegrees[1], axisDegrees[2] });
         rt.setAngle(axisDegrees[3]);
@@ -56,7 +61,7 @@ public class AffineTransformations implements Component {
     }
 
     public void setScale(double[] sc) {
-        initArray();
+        initialize();
         ScaleTransform st = new ScaleTransform();
         st.setScale(sc);
         this.transformations.add(st);

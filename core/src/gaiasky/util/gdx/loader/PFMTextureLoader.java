@@ -9,7 +9,6 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -19,6 +18,7 @@ import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 
 public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextureLoader.PFMTextureParameter> {
     private static final Log logger = Logger.getLogger(PFMTextureLoader.class);
@@ -38,6 +38,7 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
                 info.texture = parameter.texture;
             }
             logger.info("Loading PFM: " + file.path());
+            assert parameter != null;
             if (parameter.internalFormat == GL20.GL_FLOAT) {
                 info.data = PFMReader.readPFMTextureData(file, parameter.invert);
             } else {
@@ -69,6 +70,7 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
         return texture;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, PFMTextureParameter parameter) {
         return null;
@@ -80,7 +82,7 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
         Texture texture;
     }
 
-    static public class PFMTextureParameter extends TextureParameter {
+    static public class PFMTextureParameter extends OwnTextureParameter {
         /** Whether to compute the inverse mapping **/
         public boolean invert = false;
         /** Either GL_RGB or GL_FLOAT **/
@@ -88,7 +90,7 @@ public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextur
 
         public PFMTextureParameter() {
         }
-        public PFMTextureParameter(TextureParameter other) {
+        public PFMTextureParameter(OwnTextureParameter other) {
             this.format = other.format;
             this.genMipMaps = other.genMipMaps;
             this.magFilter = other.magFilter;

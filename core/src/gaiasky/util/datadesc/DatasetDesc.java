@@ -213,6 +213,27 @@ public class DatasetDesc {
         }
     }
 
+    /**
+     * Filters the dataset using a given text. It checks the filter against
+     * name, description, key and type.
+     *
+     * @param filterText The filter text.
+     *
+     * @return True if the filter passes, false otherwise.
+     */
+    public boolean filter(String filterText) {
+        if (filterText != null) {
+            filterText = filterText.toLowerCase();
+            return filterText.isBlank()
+                    || (this.name != null && this.name.toLowerCase().contains(filterText))
+                    || (this.description != null && this.description.toLowerCase().contains(filterText))
+                    || (this.key != null && this.key.toLowerCase().contains(filterText))
+                    || (this.type != null && this.type.toLowerCase().contains(filterText));
+        } else {
+            return true;
+        }
+    }
+
     public boolean isStarDataset() {
         return this.type != null && (this.type.equals("catalog-lod") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
     }

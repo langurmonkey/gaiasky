@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - FRAGMENT
@@ -97,11 +97,35 @@ uniform samplerCube u_heightCubemap;
 uniform samplerCube u_reflectionCubemap;
 #endif
 
+#ifdef svtCacheTextureFlag
+uniform sampler2D u_svtCacheTexture;
+#endif
+
+#ifdef svtIndirectionDiffuseTextureFlag
+uniform sampler2D u_svtIndirectionDiffuseTexture;
+#endif
+
+#ifdef svtIndirectionSpecularTextureFlag
+uniform sampler2D u_svtIndirectionSpecularTexture;
+#endif
+
+#ifdef svtIndirectionHeightTextureFlag
+uniform sampler2D u_svtIndirectionHeightTexture;
+#endif
+
+#ifdef svtIndirectionEmissiveTextureFlag
+uniform sampler2D u_svtIndirectionEmissiveTexture;
+#endif
+
+#ifdef svtIndirectionMetallicTextureFlag
+uniform sampler2D u_svtIndirectionMetallicTexture;
+#endif
+
 #ifdef shininessFlag
 uniform float u_shininess;
 #endif
 
-#if defined(heightTextureFlag) || defined(heightCubemapFlag)
+#if defined(heightTextureFlag) || defined(heightCubemapFlag) || defined(svtIndirectionHeightTextureFlag)
 #define heightFlag
 #endif //heightTextureFlag
 
@@ -150,10 +174,26 @@ float getShadow(vec3 shadowMapUv) {
     //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
 }
 #endif // shadowMapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////
+////// CUBEMAPS
+//////////////////////////////////////////////////////
 #ifdef cubemapFlag
-    #include shader/lib_cubemap.glsl
+#include shader/lib_cubemap.glsl
 #endif // cubemapFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////
+////// SVT
+//////////////////////////////////////////////////////
+#ifdef svtFlag
+#include shader/lib_svt.glsl
+#endif // svtFlag
+//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
@@ -166,7 +206,9 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
 #endif // diffuse
 
-#if defined(diffuseCubemapFlag)
+#if defined(svtIndirectionDiffuseTextureFlag)
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionDiffuseTexture, texCoord))
+#elif defined(diffuseCubemapFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(texCoord, defaultValue)
@@ -183,7 +225,9 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
 #endif // emissive
 
-#ifdef emissiveCubemapFlag
+#if defined(svtIndirectionEmissiveTextureFlag)
+    #define fetchColorEmissive(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionEmissiveTexture, texCoord))
+#elif defined(emissiveCubemapFlag)
     #define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
 #elif defined(emissiveTextureFlag) || defined(emissiveColorFlag)
     #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
@@ -192,7 +236,9 @@ float getShadow(vec3 shadowMapUv) {
 #endif // emissive
 
 // COLOR SPECULAR
-#ifdef specularCubemapFlag
+#if defined(svtIndirectionSpecularTextureFlag)
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionSpecularTexture, texCoord))
+#elif defined(specularCubemapFlag)
     #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularCubemap, UVtoXYZ(texCoord))
 #elif defined(specularTextureFlag) && defined(specularColorFlag)
     #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
@@ -205,14 +251,18 @@ float getShadow(vec3 shadowMapUv) {
 #endif // specular
 
 // COLOR NORMAL
-#ifdef normalCubemapFlag
+#if defined(svtIndirectionNormalTextureFlag)
+    #define fetchColorNormal(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionNormalTexture, texCoord))
+#elif defined(normalCubemapFlag)
     #define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
 #elif defined(normalTextureFlag)
     #define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
 #endif // normal
 
 // COLOR METALLIC
-#ifdef metallicCubemapFlag
+#if defined(svtIndirectionMetallicTextureFlag)
+    #define fetchColorMetallic(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionMetallicTexture, texCoord))
+#elif defined(metallicCubemapFlag)
     #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
 #elif defined(metallicTextureFlag)
     #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
@@ -221,14 +271,18 @@ float getShadow(vec3 shadowMapUv) {
 #endif // metallic
 
 // COLOR ROUGHNESS
-#ifdef roughnessCubemapFlag
+#if defined(svtIndirectionRoughnessTextureFlag)
+    #define fetchColorRoughness(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionRoughnessTexture, texCoord))
+#elif defined(roughnessCubemapFlag)
     #define fetchColorRoughness(texCoord) texture(u_roughnessCubemap, UVtoXYZ(texCoord))
 #elif defined(roughnessTextureFlag)
     #define fetchColorRoughness(texCoord) texture(u_roughnessTexture, texCoord)
 #endif // roughness
 
 // HEIGHT
-#ifdef heightCubemapFlag
+#if defined(svtIndirectionHeightTextureFlag)
+    #define fetchHeight(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionHeightTexture, texCoord))
+#elif defined(heightCubemapFlag)
     #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
 #elif defined(heightTextureFlag)
     #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
@@ -269,7 +323,7 @@ in VertexData v_data;
 #ifdef atmosphereGround
 in vec4 v_atmosphereColor;
 in float v_fadeFactor;
-#endif
+#endif // atmosphereGround
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -322,7 +376,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 
     // get depth after and before collision for linear interpolation
     float afterDepth  = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(u_heightTexture, prevTexCoords).r - currentLayerDepth + layerDepth;
+    float beforeDepth = fetchHeight(prevTexCoords).r - currentLayerDepth + layerDepth;
 
     // interpolation of texture coordinates
     float weight = afterDepth / (afterDepth - beforeDepth);
@@ -478,11 +532,14 @@ void main() {
     #ifdef directionalLightsFlag
     vec3 V = viewDir;
     // Loop for directional light contributitons
+    int validLights = 0;
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = lightCol[i];
         // Skip non-lights
         if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
             continue;
+        } else {
+            validLights++;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = lightDir[i];
@@ -496,7 +553,16 @@ void main() {
         shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
         diffuseColor = saturate(diffuseColor + col * NL * shdw + ambient * (1.0 - NL));
     }
-    diffuseColor *= diffuse.rgb;
+    // Diffuse texture contribution.
+    if (validLights == 0) {
+        // Only ambient contribution, we have no illuminating directional lights.
+        diffuseColor = saturate(diffuse.rgb * ambient);
+    } else {
+        // Regular shading.
+        diffuseColor *= diffuse.rgb;
+    }
+    #else
+    diffuseColor = saturate(diffuse.rgb * ambient);
     #endif // directionalLightsFlag
 
     // Final color equation
@@ -506,7 +572,7 @@ void main() {
     #ifdef atmosphereGround
     #define exposure 4.0
         fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
-    #endif
+    #endif // atmosphereGround
 
     if (fragColor.a <= 0.0) {
         discard;
@@ -521,5 +587,5 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBuffer();
-    #endif
+    #endif // velocityBufferFlag
 }

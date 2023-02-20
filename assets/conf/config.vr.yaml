@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30301
+configVersion: 30400
 
 #
 # Data configuration
@@ -222,6 +222,12 @@ scene:
       multiplier: 2.5
       # Tessellation quality, in [1.0, 7.0]
       quality: 4.0
+    # Sparse Virtual Texture global settings
+    virtualTextures:
+      # Cache size, in tiles per side
+      cacheSize: 6
+      # The detection buffer reduction factor
+      detectionBufferFactor: 8.0
   # Crosshair settings
   crosshair:
     # Show crosshair on focus object
@@ -281,8 +287,6 @@ program:
   debugInfo: false
   # Offline mode: never attempt any connection - disables updates and dataset downloads
   offlineMode: false
-  # Whether to display the HUD
-  hud: false
   # Save all procedurally-generated textures to the data folder
   # WARN: watch your disk space!
   saveProceduralTextures: false

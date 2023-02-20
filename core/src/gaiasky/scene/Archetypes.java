@@ -68,6 +68,12 @@ public class Archetypes {
      * @return The matching archetype if it exists, or null if it does not.
      */
     public Archetype findArchetype(Entity entity) {
+        // Get entity archetype if it exists.
+        var base = Mapper.base.get(entity);
+        if (base != null && base.archetype != null) {
+            return base.archetype;
+        }
+        // Find match by looking at components.
         Collection<Archetype> archetypes = this.archetypes.values();
         for (Archetype archetype : archetypes) {
             if (archetype.matches(entity)) {
@@ -96,7 +102,7 @@ public class Archetypes {
                     Coordinates.class, Rotation.class, Label.class, SolidAngle.class, Focus.class, Billboard.class);
 
             // ModelBody
-            addArchetype(modelName("ModelBody"), modelName("CelestialBody"), Model.class, ModelScaffolding.class, AffineTransformations.class);
+            addArchetype(modelName("ModelBody"), modelName("CelestialBody"), Model.class, RenderType.class, ModelScaffolding.class, AffineTransformations.class);
 
             // Planet
             addArchetype(modelName("Planet"), modelName("ModelBody"), Atmosphere.class, Cloud.class);
@@ -197,8 +203,11 @@ public class Archetypes {
             // OctreeWrapper
             addArchetype(modelName("octreewrapper.OctreeWrapper"), modelName("SceneGraphNode"), Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
 
+            // Model - a generic model
+            addArchetype(modelName("Model"), modelName("SceneGraphNode"), Model.class, RenderType.class, Coordinates.class, SolidAngle.class, RefSysTransform.class, AffineTransformations.class);
+
             // ShapeObject
-            addArchetype(modelName("ShapeObject"), modelName("SceneGraphNode"), Model.class, Shape.class, RenderType.class, Label.class, Line.class, Coordinates.class, SolidAngle.class, RefSysTransform.class);
+            addArchetype(modelName("ShapeObject"), modelName("Model"), Shape.class, Label.class, Line.class);
 
             // KeyframesPathObject
             addArchetype(modelName("KeyframesPathObject"), modelName("VertsObject"), Keyframes.class, Label.class);

@@ -9,6 +9,7 @@ import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
+import gaiasky.util.Settings.SceneSettings.RendererSettings.VirtualTextureSettings;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsDouble;
 
@@ -35,6 +36,7 @@ public class SettingsManager {
     private Settings settings;
     private Properties vp;
     private ObjectMapper mapper;
+
     public SettingsManager(boolean vr) {
         super();
         try {
@@ -62,6 +64,7 @@ public class SettingsManager {
             logger.error(e);
         }
     }
+
     public SettingsManager(InputStream fis, InputStream vis) {
         super();
         try {
@@ -275,6 +278,13 @@ public class SettingsManager {
         }
         // Set up proxy authenticator
         initializeProxyAuthenticator();
+
+        // Virtual texture settings
+        if (settings.scene.renderer.virtualTextures == null) {
+            settings.scene.renderer.virtualTextures = new VirtualTextureSettings();
+            settings.scene.renderer.virtualTextures.cacheSize = 8;
+            settings.scene.renderer.virtualTextures.detectionBufferFactor = 8.0;
+        }
 
         settings.initialized = true;
     }

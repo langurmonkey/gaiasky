@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -26,6 +27,7 @@ import gaiasky.event.EventManager;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
 import gaiasky.util.TipsGenerator;
+import gaiasky.util.gdx.loader.OwnTextureLoader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
@@ -42,6 +44,7 @@ public class LoadingGui extends AbstractGui {
     private TipsGenerator tipGenerator;
     private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
+    private Container tipContainer;
     private HorizontalGroup tip;
     private long lastFunnyTime;
     private long lastTipTime;
@@ -76,7 +79,7 @@ public class LoadingGui extends AbstractGui {
 
         center = new Table(skin);
         if (!vr) {
-            Texture tex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
+            Texture tex = new Texture(OwnTextureLoader.Factory.loadFromFile(Gdx.files.internal("img/splash/splash.jpg"), false));
             Drawable bg = new SpriteDrawable(new Sprite(tex));
             center.setBackground(bg);
         }
@@ -108,11 +111,14 @@ public class LoadingGui extends AbstractGui {
         tipGenerator = new TipsGenerator(skin);
         tip = new HorizontalGroup();
         tip.space(pad10);
+        tip.pad(10, 30, 10, 30);
+        tipContainer = new Container(tip);
+        tipContainer.setBackground(skin.getDrawable("table-bg"));
         bottomMiddle = new Table(skin);
         bottomMiddle.setFillParent(true);
         bottomMiddle.center().bottom();
         bottomMiddle.padLeft(pad30).padBottom(pad10);
-        bottomMiddle.add(tip);
+        bottomMiddle.add(tipContainer);
 
         // Version and build
         topLeft = new VersionLineTable(skin);

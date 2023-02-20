@@ -19,8 +19,8 @@ package gaiasky.util.gdx.g2d;
 import com.badlogic.gdx.graphics.Texture;
 
 /**
- * Defines a rectangular area of a texture. The coordinate system used has its origin in the upper left corner with the x-axis
- * pointing to the right and the y axis pointing downwards.
+ * Defines a rectangular area of a texture. The coordinate system used has its origin in the upper left corner with the X axis
+ * pointing to the right and the Y axis pointing downwards.
  *
  * @author mzechner
  * @author Nathan Sweet

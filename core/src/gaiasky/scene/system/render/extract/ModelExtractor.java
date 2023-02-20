@@ -115,7 +115,13 @@ public class ModelExtractor extends AbstractExtractSystem {
     }
 
     private void addToRenderModel(Render render, Model model) {
-        RenderGroup rg = renderTessellated(model) ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
+        RenderGroup rg;
+        var rt = Mapper.renderType.get(render.entity);
+        if (rt != null && rt.renderGroup != null) {
+            rg = rt.renderGroup;
+        } else {
+            rg = renderTessellated(model) ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
+        }
         addToRender(render, rg);
     }
 

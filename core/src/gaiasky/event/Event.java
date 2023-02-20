@@ -1012,6 +1012,9 @@ public enum Event {
 
     SHOW_ABOUT_ACTION,
 
+    /** Brings up the VR user interface. **/
+    SHOW_VR_UI,
+
     /** Shows the slave configuration window **/
     SHOW_SLAVE_CONFIG_ACTION,
     /** Slave connection event. Contains slave index, url and a boolean with the state (true-connected, false-disconnected). **/
@@ -1023,6 +1026,15 @@ public enum Event {
      **/
     SHOW_DEBUG_CMD,
     SHOW_KEYFRAMES_WINDOW_ACTION,
+    /**
+     * Creates and shows a new texture window with the contents of a texture or frame buffer.
+     * <ol start='0'>
+     * <li>window title [string]</li>
+     * <li>frame buffer or texture object [FrameBuffer|Texture]</li>
+     * <li>(optional) scale [float]</li>
+     * </ol>
+     */
+    SHOW_TEXTURE_WINDOW_ACTION,
     SHOW_LAND_AT_LOCATION_ACTION,
     SHOW_LOAD_CATALOG_ACTION,
     SHOW_LOG_ACTION,
@@ -1446,6 +1458,23 @@ public enum Event {
      *     <li>not found.</li>
      * </ol>
      */
-    DATASET_DOWNLOAD_FINISH_INFO;
+    DATASET_DOWNLOAD_FINISH_INFO,
+
+    /**
+     * Sparse virtual texture operation.
+     * Triggers the processing of the SVT view determination buffer and the loading/updating
+     * of the SVT cache and indirection buffers. Contains the {@link java.nio.FloatBuffer}
+     * with the contents of the view determination buffer.
+     */
+    SVT_TILE_DETECTION_READY,
+
+    /**
+     * Broadcasts material component [1] which has at least one sparse virtual
+     * texture, and the sparse virtual texture ID for that material [0].
+     */
+    SVT_MATERIAL_INFO,
+
+    /** Set cache size **/
+    SVT_CACHE_SIZE_CMD;
 
 }

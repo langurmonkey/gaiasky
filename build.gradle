@@ -1,7 +1,7 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
-  id "com.install4j.gradle" version "9.0.2"
+  id "com.install4j.gradle" version "10.0.4"
   id "com.dorongold.task-tree" version "1.5"
   id "de.undercouch.download" version "4.1.1"
 }
@@ -33,10 +33,12 @@ allprojects {
         jacksonVersion = "2.13.2"
         joiseVersion = "1.+"
         ashleyVersion = "+"
+        jpegxlVersion = "+"
     }
 
     repositories {
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -135,11 +137,11 @@ project(":core") {
         // File utilities
         api group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         // Compression
-        api "org.apache.commons:commons-compress:$compressVersion"
+        api group: "org.apache.commons", name: "commons-compress", version: "$compressVersion"
         // Command line arguments
-        api "com.beust:jcommander:$jcommanderVersion"
+        api group: "com.beust", name: "jcommander", version: "$jcommanderVersion"
         // Fast math
-        api "net.jafama:jafama:$jafamaVersion"
+        api group: "net.jafama", name: "jafama", version: "$jafamaVersion"
 
         // Scripting
         api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
@@ -157,6 +159,8 @@ project(":core") {
         // Joise
         api group: "com.sudoplay.joise", name: "joise", version: "$joiseVersion"
 
+        // JPEG XL bindings
+        api group: "com.github.umjammer", name: "vavi-image-jpegxl", version: "$jpegxlVersion"
 
         // ****************
         // REST SERVER DEPS

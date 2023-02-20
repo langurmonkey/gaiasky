@@ -83,12 +83,10 @@ public class ModelEntityRenderSystem {
                 if (shadow) {
                     prepareShadowEnvironment(entity, model, scaffolding);
                 }
-
                 mc.update(alpha * scaffolding.fadeOpacity);
                 modelBatch.render(mc.instance, mc.env);
             } else {
-                var vr = Mapper.vr.get(entity);
-                setTransparency(model, vr, alpha);
+                mc.setTransparency(alpha);
                 modelBatch.render(mc.instance, mc.env);
 
             }
@@ -96,29 +94,8 @@ public class ModelEntityRenderSystem {
     }
 
     public void renderVRDeviceModel(Entity entity, Model model, IntModelBatch batch, float alpha, double t, RenderingContext rc, RenderGroup renderGroup, boolean relativistic, boolean shadow) {
-        var vr = Mapper.vr.get(entity);
-        setTransparency(model, vr, alpha);
+        model.model.setTransparency(alpha);
         batch.render(model.model.instance, model.model.env);
-    }
-
-    private void setTransparency(Model model, VRDevice vr, float alpha) {
-
-        if (model != null && model.model != null && model.model.instance != null) {
-            var instance = model.model.instance;
-            int n = instance.materials.size;
-            for (int i = 0; i < n; i++) {
-                gaiasky.util.gdx.shader.Material mat = instance.materials.get(i);
-                BlendingAttribute blendingAttribute;
-                if (mat.has(BlendingAttribute.Type)) {
-                    blendingAttribute = (BlendingAttribute) mat.get(BlendingAttribute.Type);
-                } else {
-                    blendingAttribute = new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-                    mat.set(blendingAttribute);
-                }
-                assert blendingAttribute != null;
-                blendingAttribute.opacity = alpha;
-            }
-        }
     }
 
     /**
@@ -241,7 +218,7 @@ public class ModelEntityRenderSystem {
             var mc = model.model;
 
             if (mesh.shading == Mesh.MeshShading.ADDITIVE) {
-                mc.update(relativistic, graph.localTransform, alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE);
+                mc.update(relativistic, graph.localTransform, alpha * base.opacity, GL20.GL_ONE, GL20.GL_ONE, true);
                 // Depth reads, no depth writes
                 mc.depthTestReadOnly();
             } else {
@@ -461,6 +438,8 @@ public class ModelEntityRenderSystem {
      * Renders the cloud layer of a planet.
      */
     public void renderClouds(Entity entity, Base base, Model model, Cloud cloud, IntModelBatch batch, float alpha, double t) {
+        // Update cull face depending on distance.
+        cloud.cloud.updateCullFace(Mapper.body.get(entity).distToCamera);
         cloud.cloud.touch();
         ICamera cam = GaiaSky.instance.getICamera();
         cloud.cloud.mc.updateRelativisticEffects(cam);
@@ -475,9 +454,10 @@ public class ModelEntityRenderSystem {
     protected void prepareShadowEnvironment(Entity entity, Model model, ModelScaffolding scaffolding) {
         if (Settings.settings.scene.renderer.shadow.active) {
             Environment env = model.model.env;
-            if (scaffolding.shadow > 0 && sceneRenderer.smTexMap.containsKey(entity)) {
-                Matrix4 combined = sceneRenderer.smCombinedMap.get(entity);
-                Texture tex = sceneRenderer.smTexMap.get(entity);
+            var shadowMapPass = sceneRenderer.getShadowMapPass();
+            if (scaffolding.shadow > 0 && shadowMapPass.smTexMap.containsKey(entity)) {
+                Matrix4 combined = shadowMapPass.smCombinedMap.get(entity);
+                Texture tex = shadowMapPass.smTexMap.get(entity);
                 if (env.shadowMap == null) {
                     if (scaffolding.shadowMap == null)
                         scaffolding.shadowMap = new ShadowMapImpl(combined, tex);

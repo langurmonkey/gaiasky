@@ -426,8 +426,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // The whole update thread must lock the value of direction and up
         distance = pos.lend();
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
-        double realTransUnits = m.isGame() ? speedScaling(1e-5) : speedScaling();
-        double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
+        double speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
+        double speedScalingCapped = Math.max(10d * Constants.M_TO_U, speedScaling);
         switch (m) {
         case FOCUS_MODE:
             if (!focus.isEmpty() && !focus.isCoordinatesTimeOverflow()) {
@@ -485,7 +485,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                 // Set ori to this frame's inv(ori)
                                 previousOrientation.set(ori).inv();
                             }
-
                         }
                         // Add dx to camera position
                         pos.add(dx);
@@ -503,7 +502,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         updateRoll(dt, Settings.settings.scene.camera.turn);
                     }
 
-                    updatePosition(dt, translateUnits, realTransUnits);
+                    updatePosition(dt, speedScalingCapped, speedScaling);
                     updateRotation(dt, aux4b);
 
                     // Update focus direction
@@ -538,7 +537,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case GAME_MODE:
             synchronized (updateLock) {
-                if (gravity && (closestBody.getEntity() != null) && Mapper.atmosphere.has(closestBody.getEntity()) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
+                if (gravity && (closestBody.getEntity() != null) && closestBody.isPlanet() && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                     // Add gravity to force, pulling to the closest body
                     final Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
                     final double dist = camObj.lend();
@@ -555,7 +554,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
         case FREE_MODE:
             synchronized (updateLock) {
-                updatePosition(dt, translateUnits, Settings.settings.scene.camera.targetMode ? realTransUnits : 1);
+                updatePosition(dt, speedScalingCapped, Settings.settings.scene.camera.targetMode ? speedScaling : 1);
                 if (!Settings.settings.runtime.openVr) {
                     // If target is present, update direction
                     if (freeTargetOn) {
@@ -569,7 +568,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     updateRotationFree(dt, Settings.settings.scene.camera.turn);
                     updateRoll(dt, Settings.settings.scene.camera.turn);
                 }
-                updateLateral(dt, translateUnits);
+                updateLateral(dt, speedScalingCapped);
             }
             break;
         default:
@@ -741,7 +740,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 double radius = focus.getRadius();
                 double distanceInRadii = getFovFactor() * (focus.getDistToCamera() - radius) / radius;
                 double maxRadii = 2.0;
-                double factor = ((distanceInRadii < maxRadii) ? distanceInRadii/maxRadii : 1.0);
+                double factor = ((distanceInRadii < maxRadii) ? distanceInRadii / maxRadii : 1.0);
                 // This factor slows the rotation as the focus gets closer and closer
                 addHorizontal(deltaX * factor, acceleration);
                 addVertical(deltaY * factor, acceleration);
@@ -894,16 +893,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 double factor = cinematic ? 100 : 1;
                 counterAmount *= factor / ((focus.getDistToCamera() - focus.getRadius()) / focus.getRadius());
             }
+            // The last term applies a greater scale when the direction and velocity vector face in the same general direction.
             double scl = -velocity * counterAmount * dt;
-            if (Double.isFinite(scl))
+            if (Double.isFinite(scl)) {
                 friction.set(vel).nor().scl(scl);
+            }
         } else {
             friction.set(force).nor().scl(-forceLen * dt);
         }
 
         force.add(friction);
 
-        if (lastFwdTime > (cinematic ? 250 : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
+        if (lastFwdTime > (cinematic ? 250f : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
             stopForwardMovement();
         }
 
@@ -953,12 +954,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // New position
             closestBody.getPredictedPosition(aux5b, GaiaSky.instance.time, this, false);
 
-            double h = closestBody.getHeight(pos, aux5b);
-            double hs = closestBody.getHeightScale() * Settings.settings.scene.renderer.elevation.multiplier;
-            double minDist = h + hs / 10.0;
+            double elevation = closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / Math.max(4.0, 20.0 - Settings.settings.scene.renderer.elevation.multiplier);
             double newDist = aux5b.scl(-1).add(pos).lend();
-            if (newDist < minDist) {
-                aux5b.nor().scl(minDist - newDist);
+            if (newDist < elevation) {
+                aux5b.nor().scl(elevation - newDist);
                 pos.add(aux5b);
                 posinv.set(pos).scl(-1);
             }
@@ -1025,10 +1024,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void updateLateral(double dt, double translateUnits) {
         // Pan with hor
         aux1.set(direction).crs(up).nor();
-        aux1.scl(horizontal.y * gamepadMultiplier * dt * translateUnits);
-        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * dt * translateUnits);
+        aux1.scl(horizontal.y * gamepadMultiplier * translateUnits);
+        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * translateUnits);
         aux1.add(aux2);
-        translate(aux1);
+        if (Settings.settings.scene.camera.speedLimit > 0 && aux1.len() > Settings.settings.scene.camera.speedLimit) {
+            aux1.clamp(0, Settings.settings.scene.camera.speedLimit);
+        }
+
+        translate(aux1.scl(dt));
 
     }
 
@@ -1175,11 +1178,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double starEdge = 0.5 * Constants.PC_TO_U;
         if (parent.mode.useFocus() && focus != null && !focus.isEmpty()) {
             // FOCUS mode -> use focus object
-            dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
+            dist = focus.getDistToCamera() - (focus.getElevationAt(pos, false) + MIN_DIST);
         } else if (parent.mode.useClosest() && proximity.effective[0] != null) {
             // FREE/GAME mode -> use closest object
             if (closestBody != null && closestBody.getDistToCamera() < proximity.effective[0].getDistToCamera()) {
-                dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
+                dist = closestBody.getDistToCamera() - (closestBody.getElevationAt(pos, false) + MIN_DIST);
             } else if (proximity.effective[0] != null && !proximity.effective[0].isStar() && (proximity.effective[0].getClosestDistToCamera() + MIN_DIST) < starEdge) {
                 dist = distance * Math.pow((proximity.effective[0].getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
             } else {
@@ -1201,7 +1204,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             func = MathUtilsDouble.lint(dist, DIST_B, DIST_C, 1e10, 2e16) * Constants.DISTANCE_SCALE_FACTOR;
         }
 
-        return dist > 0 ? Math.max(func, min) * Settings.settings.scene.camera.speed : 0;
+        return dist >= 0 ? Math.max(func, min) * Settings.settings.scene.camera.speed : 0;
     }
 
     /**

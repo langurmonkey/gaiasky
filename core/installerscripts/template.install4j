@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="9.0.6" transformSequenceNumber="9">
-  <directoryPresets config="@gs-git-folder@/assets/cert/cert.pfx" />
-  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="11">
+<install4j version="10.0.4" transformSequenceNumber="10">
+  <directoryPresets config="../../assets/cert/cert.pfx" />
+  <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="3.3.1.d6f853125" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="11">
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
     <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" />
   </application>
-  <files defaultOverwriteMode="1" defaultUninstallMode="2" preserveSymlinks="false">
+  <files defaultOverwriteMode="1" defaultUninstallMode="2">
     <mountPoints>
       <mountPoint id="24" />
     </mountPoints>
@@ -26,7 +26,6 @@
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
       </java>
-      <macStaticAssociationActions mode="selected" />
       <iconImageFiles>
         <file path="@gs-git-folder@/assets/icon/gs_016.png" />
         <file path="@gs-git-folder@/assets/icon/gs_032.png" />
@@ -43,7 +42,6 @@
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
       </java>
-      <macStaticAssociationActions mode="selected" />
       <iconImageFiles>
         <file path="@gs-git-folder@/assets/icon/gs_016.png" />
         <file path="@gs-git-folder@/assets/icon/gs_032.png" />
@@ -60,7 +58,6 @@
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
       </java>
-      <macStaticAssociationActions mode="selected" />
       <iconImageFiles>
         <file path="@gs-git-folder@/assets/icon/gsvr_016.png" />
         <file path="@gs-git-folder@/assets/icon/gsvr_032.png" />
@@ -1292,7 +1289,7 @@ return true;</property>
     </styles>
   </installerGui>
   <mediaSets>
-    <windows name="Windows x64" id="25" installDir="${compiler:sys.fullName}">
+    <windows name="Windows x64" id="25" installDir="${compiler:sys.fullName}" architecture="64">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>
@@ -1368,7 +1365,7 @@ return true;</property>
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
-    <windowsArchive name="Windows Archive" id="951">
+    <windowsArchive name="Windows Archive" id="951" architecture="64">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>

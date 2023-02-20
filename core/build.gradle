@@ -53,7 +53,7 @@ jar {
 }
 
 install4j {
-    installDir = file('/home/tsagrista/Programs/install4j9')
+    installDir = file("${System.properties['user.home']}/Programs/install4j10")
 }
 
 sourceSets {
@@ -137,6 +137,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
         // Copy deps to dist lib folder
         ['runtimeClasspath'].each { mode ->
             copy {
+                duplicatesStrategy = 'include'
                 from configurations.getByName(mode).files
                 into project.distLib
                 exclude "**/data"
@@ -162,6 +163,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
         delete project.distLib + '/shaders'
         delete project.distLib + '/skins'
         delete project.distLib + '/text'
+        delete project.distLib + '/cert'
     }
 }
 
@@ -225,7 +227,7 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
         }
 
         // Copy music
-        mkdir "$distDir/music"
+        //mkdir "$distDir/music"
         //copy {
         //    from "../assets/music"
         //    into "$distDir/music"
@@ -264,6 +266,7 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
             from "exe"
             into "$distDir"
             exclude "octreegen"
+            exclude ".idea"
         }
         copy {
             from "$baseDir/"

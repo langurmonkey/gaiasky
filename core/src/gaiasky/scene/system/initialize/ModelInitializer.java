@@ -67,6 +67,8 @@ public class ModelInitializer extends AbstractInitSystem {
                 model.modelSize = (Double) model.model.params.get("height");
             } else if (model.model.params.containsKey("depth")) {
                 model.modelSize = (Double) model.model.params.get("depth");
+            } else if (model.model.params.containsKey("side")) {
+                model.modelSize = (Double) model.model.params.get("side");
             }
         }
     }
@@ -334,6 +336,7 @@ public class ModelInitializer extends AbstractInitSystem {
             atmosphere.atmosphere.print(logger);
         }
         if (cloud.cloud != null) {
+            cloud.cloud.materialComponent = model.model.mtc;
             cloud.cloud.initialize(base.getName(), false);
         }
     }
@@ -373,7 +376,7 @@ public class ModelInitializer extends AbstractInitSystem {
      */
     private void setToMachine(final MachineDefinition machine, final boolean initialize, Body body, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
         model.model = machine.getModel();
-        engine.thrustMagnitude = machine.getPower() * engine.thrustBase;
+        engine.thrustMagnitude = machine.getPower() * MotorEngine.thrustBase;
         engine.fullPowerTime = machine.getFullpowertime();
         engine.mass = machine.getMass();
         scaffolding.shadowMapValues = machine.getShadowvalues();

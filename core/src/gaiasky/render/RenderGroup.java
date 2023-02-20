@@ -8,9 +8,13 @@ import com.badlogic.gdx.utils.Bits;
  */
 public enum RenderGroup {
     /**
-     * Using normal shader for per-pixel lighting
+     * Using normal shader for per-pixel lighting.
      **/
     MODEL_PIX,
+    /**
+     * Using normal shader for per-pixel lighting, rendered late for items with transparency.
+     **/
+    MODEL_PIX_TRANSPARENT,
     /**
      * Using default shader, no normal map
      **/
@@ -185,7 +189,7 @@ public enum RenderGroup {
     }
 
     public boolean is(Bits renderGroupMask) {
-        return (this.ordinal() < 0 && renderGroupMask.isEmpty()) || renderGroupMask.get(this.ordinal());
+        return renderGroupMask.get(ordinal());
     }
 
 }

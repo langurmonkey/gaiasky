@@ -223,9 +223,13 @@ public class ParticleSetInitializer extends AbstractInitSystem {
     public void computeMeanPosition(Entity entity, ParticleSet set) {
         var body = Mapper.body.get(entity);
         if (set.meanPosition != null) {
+            // Use given mean position.
             body.pos.set(set.meanPosition);
+        } else if (set.data() == null || set.data().size() == 0) {
+            // Mean position is 0.
+            body.pos.set(0, 0, 0);
         } else {
-            // Mean position
+            // Compute mean position from particles.
             for (IParticleRecord point : set.data()) {
                 body.pos.add(point.x(), point.y(), point.z());
             }

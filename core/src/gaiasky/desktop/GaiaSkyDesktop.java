@@ -43,23 +43,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
  * Main class for the Gaia Sky desktop and VR launcher.
  */
 public class GaiaSkyDesktop implements IObserver {
-    /*
-     * Source version, used to enable or disable datasets.
-     * This is usually tag where each number is allocated 2 digits.
-     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
-     * Version = major * 10000 + minor * 100 + rev
-     * So 1.2.5 -> 10205
-     *    2.1.7 -> 20107
-     *
-     * Leading zeroes are omitted to avoid octal literal interpretation.
-     */
-    public static final int SOURCE_VERSION = 30301;
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
     private static final String REQUIRED_JAVA_VERSION = "15";
     private static final int DEFAULT_OPENGL_MAJOR = 4;
@@ -303,7 +293,12 @@ public class GaiaSkyDesktop implements IObserver {
         if (overwrite || !userConfExists) {
             // Copy file
             if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
-                // Running released package
+                // Back up user configuration, if it exists.
+                if (Files.exists(userFolderConfFile)) {
+                    Path backup = userFolderConfFile.getParent().resolve(userFolderConfFile.getFileName() + "." + LocalDateTime.now().toString().replaceAll("[^a-zA-Z0-9_\\.\\-]", "_"));
+                    GlobalResources.copyFile(userFolderConfFile, backup, true);
+                }
+                // Overwrite user configuration with internal configuration.
                 GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
             } else {
                 logger.warn("Configuration folder does not exist: " + confFolder);

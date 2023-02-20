@@ -19,6 +19,21 @@ public class VRDeviceInitializer extends AbstractInitSystem {
 
     @Override
     public void initializeEntity(Entity entity) {
+        if (Mapper.vr.has(entity)) {
+            initializeVRDevice(entity);
+        }
+
+        if (Mapper.tagVRUI.has(entity)) {
+            initializeVRUI(entity);
+        }
+
+    }
+
+    private void initializeVRUI(Entity entity) {
+
+    }
+
+    private void initializeVRDevice(Entity entity) {
         // VR device.
         var vr = Mapper.vr.get(entity);
         vr.beamP0 = new Vector3();

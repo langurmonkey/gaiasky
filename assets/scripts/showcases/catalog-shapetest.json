@@ -10,7 +10,7 @@
     "nobjects" : 1,
     "data" : [
         {
-            "loader": "gaiasky.data.NewJsonLoader",
+            "loader": "gaiasky.data.JsonLoader",
             "files": [ "./assets/scripts/showcases/particles-shapetest.json" ]
         }
     ]

@@ -16,6 +16,14 @@ public class Rotation implements Component, ICopy {
         this.rc = rc;
     }
 
+    public void updateRotation(RotationComponent rc) {
+        if (this.rc != null) {
+            this.rc.updateWith(rc);
+        } else {
+            this.rc = rc;
+        }
+    }
+
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());

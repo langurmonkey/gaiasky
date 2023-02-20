@@ -19,6 +19,10 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
+import gaiasky.gui.vr.VRControllerInfoGui;
+import gaiasky.gui.vr.VRGui;
+import gaiasky.gui.vr.VRInfoGui;
+import gaiasky.gui.vr.VRSelectionGui;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
@@ -210,7 +214,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             // Camera to left
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFrameBuffer());
+            sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
             boolean postProcess = postProcessCapture(ppb, fbLeft, rw, rh);
 
@@ -238,7 +242,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             // Camera to right
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFrameBuffer());
+            sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
             postProcess = postProcessCapture(ppb, fbRight, rw, rh);
 

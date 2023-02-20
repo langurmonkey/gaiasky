@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.AttributeMap;
+import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.record.BillboardDataset;
 import gaiasky.scene.record.MachineDefinition;
@@ -49,11 +50,19 @@ public class JsonLoader extends AbstractSceneLoader {
     private final AttributeMap attributeMap;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance with the given index.
      */
-    public JsonLoader() {
+    public JsonLoader(Map<String, Entity> index) {
         this.attributeMap = new AttributeMap();
         this.attributeMap.initialize();
+        this.index = index;
+    }
+
+    /**
+     * Creates a new instance with an empty index.
+     */
+    public JsonLoader() {
+        this(null);
     }
 
     private static String replace(String key) {
@@ -67,51 +76,110 @@ public class JsonLoader extends AbstractSceneLoader {
     public Array<Entity> loadData() throws FileNotFoundException {
         Array<Entity> loadedEntities = new Array<>();
         Array<String> filePaths = new Array<>(this.filePaths);
+        Array<JsonValue> updates = new Array<>();
+        Array<FileHandle> updateFiles = new Array<>();
 
         // Actually load the files.
         JsonReader json = new JsonReader();
         for (String filePath : filePaths) {
-            try {
-                FileHandle file = Settings.settings.data.dataFileHandle(filePath, datasetDirectory);
-                JsonValue model = json.parse(file.read());
-                // Must have an 'objects' element.
-                if (model.has("objects")) {
-                    JsonValue child = model.get("objects").child;
-                    final int count = model.get("objects").size;
-                    int processed = 0;
-                    int loaded = 0;
-                    while (child != null) {
-                        processed++;
-                        String className = child.getString("impl");
-                        className = className.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+            FileHandle file = Settings.settings.data.dataFileHandle(filePath, datasetDirectory);
+            JsonValue root = json.parse(file.read());
+            if (root.has("objects")) {
+                // If the top element is 'objects', we have a list of new objects.
+                JsonValue child = root.get("objects").child;
+                final int count = root.get("objects").size;
+                int processed = 0;
+                int loaded = 0;
+                while (child != null) {
+                    processed++;
+                    String className = child.getString("impl");
+                    className = className.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
-                        if (!scene.archetypes().contains(className)) {
-                            // Do not know what to do
-                            if (!loggedArchetypes.contains(className)) {
-                                logger.warn("Skipping " + TextUtils.classSimpleName(className) + ": no suitable archetype found.");
-                                loggedArchetypes.add(className);
-                            }
-                        } else {
-                            loaded++;
-                            // Create entity and fill it up
-                            var archetype = scene.archetypes().get(className);
-                            var entity = archetype.createEntity();
-                            fillEntity(child, entity, TextUtils.classSimpleName(className));
-                            // Add to return list
-                            loadedEntities.add(entity);
+                    if (!scene.archetypes().contains(className)) {
+                        // Do not know what to do
+                        if (!loggedArchetypes.contains(className)) {
+                            logger.warn("Skipping " + TextUtils.classSimpleName(className) + ": no suitable archetype found.");
+                            loggedArchetypes.add(className);
                         }
-
-                        child = child.next;
-                        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) processed / (float) count);
+                    } else {
+                        loaded++;
+                        // Create entity and fill it up
+                        var archetype = scene.archetypes().get(className);
+                        var entity = archetype.createEntity();
+                        try {
+                            fillEntity(child, entity, TextUtils.classSimpleName(className), false);
+                            // Add to return list.
+                            loadedEntities.add(entity);
+                            // Add to index for possible later updates.
+                            addToIndex(entity);
+                        } catch (ReflectionException e) {
+                            logger.error(e);
+                        }
                     }
-                    EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), 2f);
-                    logger.info(I18n.msg("notif.nodeloader", loaded, filePath));
+
+                    child = child.next;
+                    EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) processed / (float) count);
                 }
-            } catch (Exception e) {
-                logger.error(e);
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), 2f);
+                logger.info(I18n.msg("notif.nodeloader", loaded, filePath));
+            } else if (root.has("updates")) {
+                // If the top element is 'updates', we update existing objects with additional attributes.
+                // Store updates and run them afterwards.
+                updates.add(root);
+                updateFiles.add(file);
             }
         }
+
+        // Run the cached updates.
+        int i = 0;
+        for (var model : updates) {
+            var file = updateFiles.get(i);
+            JsonValue child = model.get("updates").child;
+            final int count = model.get("updates").size;
+            int processed = 0;
+            while (child != null) {
+                String name = child.getString("name");
+                if (name != null) {
+                    String nameLowerCase = name.toLowerCase().trim();
+                    if (index.containsKey(nameLowerCase)) {
+                        var entity = index.get(nameLowerCase);
+                        if (entity != null) {
+                            try {
+                                var archetype = scene.archetypes().findArchetype(entity);
+                                // Update entity.
+                                fillEntity(child, entity, archetype.getName(), true);
+                            } catch (ReflectionException e) {
+                                logger.error(e);
+                            }
+                        } else {
+                            logger.warn("Entity retrieved from index is null: " + nameLowerCase);
+                        }
+                    } else {
+                        logger.warn("Update name not found in index: " + nameLowerCase);
+                    }
+                } else {
+                    logger.warn("Update element does not contain a name attribute: " + file.name());
+                }
+
+                child = child.next;
+                EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) processed / (float) count);
+            }
+            i++;
+        }
         return loadedEntities;
+    }
+
+    /**
+     * Adds the given entity to the map using its first name in lower case, trimmed.
+     *
+     * @param entity The entity.
+     */
+    private void addToIndex(Entity entity) {
+        var base = Mapper.base.get(entity);
+        var name = base.getName().toLowerCase().trim();
+        if (!index.containsKey(name)) {
+            index.put(name, entity);
+        }
     }
 
     /**
@@ -134,7 +202,6 @@ public class JsonLoader extends AbstractSceneLoader {
                     value = getValue(attribute);
                     if (value instanceof String) {
                         value = ((String) value).replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
-                        value = interceptDataFilePath(String.class, value);
                     }
                 } else if (attribute.isArray()) {
                     // We suppose our children are of the same type
@@ -142,7 +209,6 @@ public class JsonLoader extends AbstractSceneLoader {
                     case stringValue -> {
                         valueClass = String[].class;
                         value = attribute.asStringArray();
-                        value = interceptDataFilePaths((String[]) value);
                     }
                     case doubleValue -> {
                         valueClass = double[].class;
@@ -159,15 +225,15 @@ public class JsonLoader extends AbstractSceneLoader {
                     case object -> {
                         valueClass = Object[].class;
                         value = new Object[attribute.size];
-                        JsonValue vectorattrib = attribute.child;
+                        JsonValue vectorAttribute = attribute.child;
                         int i = 0;
-                        while (vectorattrib != null) {
-                            String clazzName = vectorattrib.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                        while (vectorAttribute != null) {
+                            String clazzName = vectorAttribute.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
                             clazzName = replace(clazzName);
-                            @SuppressWarnings("unchecked") Class<Object> childclazz = (Class<Object>) ClassReflection.forName(clazzName);
-                            ((Object[]) value)[i] = convertJsonToObject(vectorattrib, childclazz);
+                            @SuppressWarnings("unchecked") Class<Object> childClazz = (Class<Object>) ClassReflection.forName(clazzName);
+                            ((Object[]) value)[i] = convertJsonToObject(vectorAttribute, childClazz);
                             i++;
-                            vectorattrib = vectorattrib.next;
+                            vectorAttribute = vectorAttribute.next;
                         }
                     }
                     case array -> {
@@ -188,8 +254,12 @@ public class JsonLoader extends AbstractSceneLoader {
                         value = convertJsonToObject(attribute, valueClass);
                     } catch (Exception e1) {
                         // We use a map
-                        valueClass = Map.class;
-                        value = convertJsonToMap(attribute);
+                        try {
+                            valueClass = Map.class;
+                            value = convertJsonToMap(attribute);
+                        } catch (Exception e2) {
+                            logger.error("Could not convert attribute to value, object or map: " + attribute);
+                        }
                     }
                 }
                 // Here we have value and valueClass -> run function.
@@ -201,29 +271,44 @@ public class JsonLoader extends AbstractSceneLoader {
         }
     }
 
-    public void fillEntity(final JsonValue json, final Entity entity, final String className) throws ReflectionException {
+    public void fillEntity(final JsonValue json, final Entity entity, final String className, boolean update) throws ReflectionException {
         processJson(json, (valueClass, value, attribute) -> {
-            String key = findAttribute(attribute.name, className);
-            if (key != null) {
-                Class<? extends Component> componentClass = attributeMap.get(key);
-                Component comp = entity.getComponent(componentClass);
+            try {
+                // We can't update the name!
+                if(update && attribute.name.equalsIgnoreCase("name")){
+                    return true;
+                }
+                String key = findAttribute(attribute.name, className);
+                if (key != null) {
+                    Class<? extends Component> componentClass = attributeMap.get(key);
+                    Component comp = entity.getComponent(componentClass);
 
-                if (comp != null) {
-                    if (!set(attribute, comp, value, valueClass, componentClass)) {
-                        // Setter set did not work, try setting the attribute directly
-                        boolean succeed = set(comp, attribute.name, value);
-                        if (!succeed) {
-                            logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                    if (comp != null) {
+                        if (update) {
+                            if(!update(attribute, comp, value, valueClass, componentClass)) {
+                                logger.error("Update operation failed (unsupported?) for attribute: " + attribute.name);
+                            }
+                        } else {
+                            if (!set(attribute, comp, value, valueClass, componentClass)) {
+                                // Setter set did not work, try setting the attribute directly
+                                boolean succeed = set(comp, attribute.name, value);
+                                if (!succeed) {
+                                    logger.error("Could not set attribute " + attribute.name + " (" + valueClass.getName() + ") in class " + componentClass + " or its superclass/interfaces.");
+                                }
+                                return succeed;
+                            }
                         }
-                        return succeed;
+                    } else {
+                        logger.error("Error, component of class " + componentClass + " is null: " + json.name);
+                        return false;
                     }
+                    return true;
                 } else {
-                    logger.error("Error, component of class " + componentClass + " is null: " + json.name);
+                    logger.warn("Component not found for attribute '" + attribute.name + "' and class '" + className + "'");
                     return false;
                 }
-                return true;
-            } else {
-                logger.warn("Component not found for attribute '" + attribute.name + "' and class '" + className + "'");
+            } catch (Exception e) {
+                logger.error(e);
                 return false;
             }
         });
@@ -245,7 +330,6 @@ public class JsonLoader extends AbstractSceneLoader {
      *
      * @param json  The {@link JsonValue} for the object to convert.
      * @param clazz The class of the object.
-     *
      * @return The java object of the given class.
      */
     private Object convertJsonToObject(JsonValue json, Class<?> clazz) throws ReflectionException {
@@ -309,6 +393,21 @@ public class JsonLoader extends AbstractSceneLoader {
         }
     }
 
+    private boolean update(JsonValue attribute, Object instance, Object value, Class<?> valueClass, Class<?> instanceClass) {
+        String methodName = "update" + TextUtils.propertyToMethodName(attribute.name);
+        Method m = searchMethod(methodName, valueClass, instanceClass, false);
+        if (m != null) {
+            try {
+                m.invoke(instance, value);
+            } catch (ReflectionException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Searches for the given method with the given class. If none is found, it looks for fitting methods
      * with the class' interfaces and superclasses recursively.
@@ -317,7 +416,6 @@ public class JsonLoader extends AbstractSceneLoader {
      * @param parameterType  The parameter class type.
      * @param source         The class of the source object.
      * @param printException Whether to print an exception if no method is found.
-     *
      * @return The method, if found. Null otherwise.
      */
     private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source, boolean printException) {
@@ -440,7 +538,6 @@ public class JsonLoader extends AbstractSceneLoader {
         JsonValue child = json.child;
         while (child != null) {
             Object val = getValue(child);
-            val = interceptDataFilePath(val.getClass(), val);
             if (val != null) {
                 map.put(child.name, val);
             }

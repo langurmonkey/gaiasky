@@ -5,22 +5,6 @@
 
 package gaiasky.util.gdx.shader;
 
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
@@ -34,16 +18,12 @@ import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.gdx.shader.provider.ShaderProgramProvider;
 
+import java.util.Objects;
+
 public class AtmosphereShader extends BaseIntShader {
     /** Material attributes which are not required but always supported. */
     private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
     private final static Attributes tmpAttributes = new Attributes();
-    /** @deprecated Replaced by {@link Config#defaultCullFace} Set to 0 to disable culling */
-    @Deprecated
-    public static int defaultCullFace = GL20.GL_BACK;
-    /** @deprecated Replaced by {@link Config#defaultDepthFunc} Set to 0 to disable depth test */
-    @Deprecated
-    public static int defaultDepthFunc = GL20.GL_LEQUAL;
     protected static Bits implementedFlags = Bits.indexes(BlendingAttribute.Type, TextureAttribute.Diffuse, ColorAttribute.Diffuse, ColorAttribute.Specular, FloatAttribute.Shininess);
     private static String defaultVertexShader = null;
     private static String defaultFragmentShader = null;
@@ -270,8 +250,8 @@ public class AtmosphereShader extends BaseIntShader {
         if (currentMaterial == renderable.material)
             return;
 
-        int cullFace = config.defaultCullFace == -1 ? defaultCullFace : config.defaultCullFace;
-        int depthFunc = config.defaultDepthFunc == -1 ? defaultDepthFunc : config.defaultDepthFunc;
+        int cullFace = config.defaultCullFace;
+        int depthFunc = config.defaultDepthFunc;
         float depthRangeNear = 0f;
         float depthRangeFar = 1f;
         boolean depthMask = true;
@@ -305,7 +285,7 @@ public class AtmosphereShader extends BaseIntShader {
     }
 
     public int getDefaultCullFace() {
-        return config.defaultCullFace == -1 ? defaultCullFace : config.defaultCullFace;
+        return config.defaultCullFace;
     }
 
     public void setDefaultCullFace(int cullFace) {
@@ -313,7 +293,7 @@ public class AtmosphereShader extends BaseIntShader {
     }
 
     public int getDefaultDepthFunc() {
-        return config.defaultDepthFunc == -1 ? defaultDepthFunc : config.defaultDepthFunc;
+        return config.defaultDepthFunc;
     }
 
     public void setDefaultDepthFunc(int depthFunc) {
@@ -327,10 +307,10 @@ public class AtmosphereShader extends BaseIntShader {
         public String fragmentShader = null;
         /**  */
         public boolean ignoreUnimplemented = true;
-        /** Set to 0 to disable culling, -1 to inherit from {@link AtmosphereShader#defaultCullFace} */
-        public int defaultCullFace = -1;
-        /** Set to 0 to disable depth test, -1 to inherit from {@link AtmosphereShader#defaultDepthFunc} */
-        public int defaultDepthFunc = -1;
+        /** Set to 0 to disable culling. */
+        public int defaultCullFace = GL20.GL_BACK;
+        /** Set to 0 to disable depth test. */
+        public int defaultDepthFunc = GL20.GL_LEQUAL;
 
         public Config() {
         }
@@ -525,7 +505,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Alpha))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Alpha)))).value);
             }
         };
 
@@ -537,7 +517,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.CameraHeight))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.CameraHeight)))).value);
             }
         };
 
@@ -549,7 +529,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.OuterRadius))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.OuterRadius)))).value);
             }
         };
 
@@ -561,7 +541,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.InnerRadius))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.InnerRadius)))).value);
             }
         };
 
@@ -573,7 +553,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.KrESun))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.KrESun)))).value);
             }
         };
 
@@ -585,7 +565,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.KmESun))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.KmESun)))).value);
             }
         };
 
@@ -597,7 +577,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Kr4PI))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Kr4PI)))).value);
             }
         };
 
@@ -609,7 +589,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Km4PI))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Km4PI)))).value);
             }
         };
 
@@ -621,7 +601,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.Scale))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.Scale)))).value);
             }
         };
 
@@ -633,7 +613,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.ScaleDepth))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.ScaleDepth)))).value);
             }
         };
 
@@ -645,7 +625,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.ScaleOverScaleDepth))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.ScaleOverScaleDepth)))).value);
             }
         };
 
@@ -657,7 +637,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, (int) ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.nSamples))).value);
+                shader.set(inputID, (int) ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.nSamples)))).value);
             }
         };
 
@@ -669,7 +649,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.G))).value);
+                shader.set(inputID, ((AtmosphereAttribute) (Objects.requireNonNull(combinedAttributes.get(AtmosphereAttribute.G)))).value);
             }
         };
 
@@ -681,7 +661,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.PlanetPos))).value);
+                shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.PlanetPos)))).value);
             }
         };
         public final static Setter cameraPos = new Setter() {
@@ -692,7 +672,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.CameraPos))).value);
+                shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.CameraPos)))).value);
             }
         };
         public final static Setter lightPos = new Setter() {
@@ -703,7 +683,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.LightPos))).value);
+                shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.LightPos)))).value);
             }
         };
         public final static Setter invWavelength = new Setter() {
@@ -714,7 +694,7 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.InvWavelength))).value);
+                shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.InvWavelength)))).value);
             }
         };
 
@@ -727,7 +707,7 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(FloatAttribute.Vc))
-                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Vc))).value);
+                    shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Vc)))).value);
             }
         };
 
@@ -740,7 +720,7 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.VelDir))
-                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.VelDir))).value);
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.VelDir)))).value);
             }
         };
 
@@ -753,7 +733,7 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector4Attribute.Hterms)) {
-                    float[] val = ((Vector4Attribute) (combinedAttributes.get(Vector4Attribute.Hterms))).value;
+                    float[] val = ((Vector4Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector4Attribute.Hterms)))).value;
                     shader.set(inputID, val[0], val[1], val[2], val[3]);
                 }
             }
@@ -768,7 +748,7 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Vector3Attribute.Gw))
-                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.Gw))).value);
+                    shader.set(inputID, ((Vector3Attribute) (Objects.requireNonNull(combinedAttributes.get(Vector3Attribute.Gw)))).value);
             }
         };
 
@@ -781,7 +761,7 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(Matrix3Attribute.Gwmat3))
-                    shader.set(inputID, ((Matrix3Attribute) (combinedAttributes.get(Matrix3Attribute.Gwmat3))).value);
+                    shader.set(inputID, ((Matrix3Attribute) (Objects.requireNonNull(combinedAttributes.get(Matrix3Attribute.Gwmat3)))).value);
             }
         };
 
@@ -794,7 +774,7 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(FloatAttribute.Ts))
-                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Ts))).value);
+                    shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Ts)))).value);
             }
         };
 
@@ -807,7 +787,7 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(FloatAttribute.Omgw))
-                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Omgw))).value);
+                    shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Omgw)))).value);
             }
         };
 

@@ -1,3 +1,44 @@
+<a name="3.4.0"></a>
+## [3.4.0](https://codeberg.org/gaiasky/gaiasky/tree/3.3.2) (2023-02-13)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.2...3.4.0)
+
+### Features
+- sparse virtual texture support.
+- add initial support for the JPEG-XL (.jxl) image format.
+- add filter box to dataset lists in the dataset manager.
+- add 'clear' button to text fields to clear the contents at once.
+- implement proper update mechanism for objects via JSON descriptors.
+
+### Bug Fixes
+- escape config file backup path in Windows.
+- VR controller paths in VR context. Fixes [#702](https://codeberg.org/gaiasky/gaiasky/issues/702).
+- build task including certs and other unneeded stuff.
+- implement bilinear interpolation on SVT, make interpolation generic regardless of data structure used.
+- skip only GB instead of GBA in RGB buffer readout in automatic tone mapping effect.
+- error computing mean position in particle set when there are no particles.
+
+### Build System
+- upgrade build script to install4j 10.0.4.
+
+### Code Refactoring
+- move source version to settings.
+- move light glow code to own render pass class.
+- move shadow map code to own render pass class.
+
+### Documentation
+- flag Gaia Sky VR as alpha software.
+
+<a name="3.3.2"></a>
+## [3.3.2](https://codeberg.org/gaiasky/gaiasky/tree/3.3.1) (2022-12-18)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.1...3.3.2)
+
+### Bug Fixes
+- stop intercepting data location in paths, implementation did not work for Windows when the original path contained '*', and it was useless anyway, as we always use fully-defined paths. 
+- avoid expanding dataset file paths in dataset manager to prevent horizontal overflow. 
+### Features
+- improve drag rotation behaviour when very close to objects. 
+
+
 <a name="3.3.1"></a>
 ## [3.3.1](https://codeberg.org/gaiasky/gaiasky/tree/3.3.0) (2022-12-13)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.0...3.3.1)

@@ -22,6 +22,7 @@ import gaiasky.event.IObserver;
 import gaiasky.event.Observer;
 import gaiasky.gui.beans.PrimitiveComboBoxBean.Primitive;
 import gaiasky.render.BlendMode;
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.*;
@@ -37,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ModelComponent extends NamedComponent implements Disposable, IObserver {
+public class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
     private static final ColorAttribute ambient;
 
@@ -65,11 +66,11 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     /**
      * COMPONENTS
      */
-    // Texture
+    // Material with textures, colors, and other properties.
     public MaterialComponent mtc;
-    // Relativistic effects
+    // Relativistic effects.
     public RelativisticEffectsComponent rec;
-    // Velocity buffer
+    // Velocity buffer.
     public VelocityBufferComponent vbc;
     /**
      * Light never changes; set fixed ambient light for this model
@@ -79,10 +80,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * Ambient light level for static light objects
      **/
     private float staticLightLevel = 0.6f;
-    /**
-     * Flag
-     **/
-    private boolean updateStaticLight = false;
     private boolean modelInitialised, modelLoading;
     private boolean useColor = true;
     /** The blend mode **/
@@ -90,20 +87,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     private AssetManager manager;
     private float[] cc;
     private int primitiveType = GL20.GL_TRIANGLES;
+
     public ModelComponent() {
         this(true);
     }
+
     public ModelComponent(Boolean initEnvironment) {
-        if (initEnvironment) {
-            env = new Environment();
-            env.set(ambient);
-            // Directional lights
-            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
-                DirectionalLight dLight = new DirectionalLight();
-                dLight.color.set(0f, 0f, 0f, 1f);
-                env.add(dLight);
-            }
-        }
     }
 
     public static void toggleAmbientLight(boolean on) {
@@ -166,10 +155,29 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             mtc.texLoading = true;
         }
 
+        initializeEnvironment();
+
         rec = new RelativisticEffectsComponent();
         vbc = new VelocityBufferComponent();
 
         MaterialComponent.reflectionCubemap.initialize();
+    }
+
+    public void initializeEnvironment() {
+        env = new Environment();
+        if (staticLight) {
+            // If lazy texture init, we turn off the lights until the texture is loaded
+            ColorAttribute staticAmbientLight = new ColorAttribute(ColorAttribute.AmbientLight, staticLightLevel, staticLightLevel, staticLightLevel, 1f);
+            env.set(staticAmbientLight);
+        } else {
+            env.set(ambient);
+            // Directional lights
+            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
+                DirectionalLight dLight = new DirectionalLight();
+                dLight.color.set(0f, 0f, 0f, 1f);
+                env.add(dLight);
+            }
+        }
     }
 
     public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc) {
@@ -180,13 +188,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         this.manager = manager;
         this.cc = cc;
         IntModel model;
-        if (staticLight) {
-            // If lazy texture init, we turn off the lights until the texture is loaded
-            float level = Settings.settings.scene.initialization.lazyTexture ? 0f : staticLightLevel;
-            ColorAttribute alight = new ColorAttribute(ColorAttribute.AmbientLight, level, level, level, 1f);
-            env.set(alight);
-            updateStaticLight = Settings.settings.scene.initialization.lazyTexture;
-        }
+
 
         // CREATE MAIN MODEL INSTANCE
         if (!mesh || !Settings.settings.scene.initialization.lazyMesh) {
@@ -269,12 +271,12 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void update(boolean relativistic, Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
+    public void update(boolean relativistic, Matrix4 localTransform, float alpha, int blendSrc, int blendDst, boolean blendEnabled) {
         touch(localTransform);
         if (instance != null) {
             ICamera cam = GaiaSky.instance.getICamera();
             setVROffset(GaiaSky.instance.getCameraManager().naturalCamera);
-            setTransparency(alpha, blendSrc, blendDst);
+            setTransparency(alpha, blendSrc, blendDst, blendEnabled);
             if (relativistic) {
                 updateRelativisticEffects(cam);
             } else {
@@ -284,15 +286,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
-        update(true, localTransform, alpha, blendSrc, blendDst);
+    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst, boolean blendEnabled) {
+        update(true, localTransform, alpha, blendSrc, blendDst, blendEnabled);
     }
 
     public void update(boolean relativistic, Matrix4 localTransform, float alpha) {
         switch (blendMode) {
-        case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
-        case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE);
+        case ALPHA -> update(relativistic, localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+        case COLOR -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
+        case ADDITIVE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, true);
+        case NONE -> update(relativistic, localTransform, alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
     }
 
@@ -323,8 +326,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             } else if (mtc.isFinishedLoading(manager)) {
                 GaiaSky.postRunnable(() -> {
                     mtc.initMaterial(manager, instance, cc, culling);
-                    // Set to initialised
-                    updateStaticLightImmediate();
                 });
                 mtc.texLoading = false;
                 mtc.texInitialised = true;
@@ -343,8 +344,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 model = modMat.getFirst();
                 instance = new IntModelInstance(model, localTransform);
 
-                updateStaticLightImmediate();
-
                 // COLOR IF NO TEXTURE
                 if (mtc == null && instance != null) {
                     addColorToMat();
@@ -358,16 +357,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void setModelInitialized(boolean initialized) {
         this.modelInitialised = initialized;
-    }
-
-    private void updateStaticLightImmediate() {
-        // Update static
-        if (updateStaticLight) {
-            ColorAttribute ambient = (ColorAttribute) env.get(ColorAttribute.AmbientLight);
-            if (ambient != null)
-                ambient.color.set(staticLightLevel, staticLightLevel, staticLightLevel, 1.0f);
-            updateStaticLight = false;
-        }
     }
 
     public void addColorToMat() {
@@ -408,21 +397,40 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void setTransparency(float alpha, int blendSrc, int blendDest) {
+    public void setTransparency(float alpha, int blendSrc, int blendDest, boolean blendEnabled) {
         int n = instance.materials.size;
         for (int i = 0; i < n; i++) {
             Material mat = instance.materials.get(i);
             BlendingAttribute ba;
             if (mat.has(BlendingAttribute.Type)) {
                 ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
+                assert ba != null;
                 ba.destFunction = blendDest;
                 ba.sourceFunction = blendSrc;
             } else {
                 ba = new BlendingAttribute(blendSrc, blendDest);
                 mat.set(ba);
             }
+            ba.blended = blendEnabled;
             ba.opacity = alpha;
         }
+    }
+
+    public void disableBlending() {
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            BlendingAttribute ba;
+            if (mat.has(BlendingAttribute.Type)) {
+                ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
+            } else {
+                ba = new BlendingAttribute(false, 1);
+                mat.set(ba);
+            }
+            assert ba != null;
+            ba.blended = false;
+        }
+
     }
 
     /**
@@ -436,7 +444,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void updateDepthTest() {
         switch (blendMode) {
         // Read-write depth test.
-        case ALPHA, COLOR -> depthTestReadWrite();
+        case ALPHA, COLOR, NONE -> depthTestReadWrite();
         // Read-only depth test.
         case ADDITIVE -> depthTestReadOnly();
         }
@@ -483,9 +491,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void setTransparency(float alpha) {
         switch (blendMode) {
-        case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
-        case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE);
+        case ALPHA -> setTransparency(alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, true);
+        case COLOR -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, true);
+        case ADDITIVE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, true);
+        case NONE -> setTransparency(alpha, GL20.GL_ONE, GL20.GL_ONE, false);
         }
     }
 
@@ -493,7 +502,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
-                ((ColorAttribute) instance.materials.get(i).get(ColorAttribute.Diffuse)).color.a = alpha;
+                ((ColorAttribute) Objects.requireNonNull(instance.materials.get(i).get(ColorAttribute.Diffuse))).color.a = alpha;
             }
         }
     }
@@ -596,6 +605,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             this.useColor = usecolor;
         } catch (Exception ignored) {
         }
+    }
+
+    public BlendMode getBlendMode() {
+        return blendMode;
     }
 
     public void setBlendMode(BlendMode blendMode) {
@@ -758,5 +771,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void print(Log log) {
         if (mtc != null)
             mtc.print(log);
+    }
+
+    @Override
+    public void updateWith(ModelComponent object) {
+        if(object.mtc != null) {
+            if(this.mtc == null) {
+                setMaterial(object.mtc);
+            } else {
+                this.mtc.updateWith(object.mtc);
+            }
+        }
     }
 }

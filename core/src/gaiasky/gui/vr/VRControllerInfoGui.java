@@ -1,4 +1,4 @@
-package gaiasky.gui;
+package gaiasky.gui.vr;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.AbstractGui;
 import gaiasky.util.Settings;
 
 public class VRControllerInfoGui extends AbstractGui {

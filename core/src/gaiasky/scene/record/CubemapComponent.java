@@ -6,7 +6,6 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureData;
@@ -17,6 +16,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.OwnCubemap;
+import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.i18n.I18n;
 
 public class CubemapComponent implements Disposable {
@@ -33,7 +33,7 @@ public class CubemapComponent implements Disposable {
 
     public synchronized void initialize(AssetManager manager) {
         if (!loaded) {
-            TextureParameter textureParams = new TextureParameter();
+            OwnTextureParameter textureParams = new OwnTextureParameter();
             textureParams.genMipMaps = true;
             textureParams.magFilter = TextureFilter.Linear;
             textureParams.minFilter = TextureFilter.MipMapLinearLinear;
@@ -91,7 +91,7 @@ public class CubemapComponent implements Disposable {
      *
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
+    private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
         if (manager == null)
             return addToLoad(tex, texParams);
 
@@ -113,7 +113,7 @@ public class CubemapComponent implements Disposable {
      *
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex, TextureParameter texParams) {
+    private String addToLoad(String tex, OwnTextureParameter texParams) {
         if (tex == null)
             return null;
 

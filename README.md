@@ -99,7 +99,9 @@ You can also download the **data packs manually** [here](https://gaia.ari.uni-he
 
 ##  4. Gaia Sky VR
 
-You can run Gaia Sky in VR with Valve's OpenVR with the `-vr` flag.
+Gaia Sky supports rendering to a VR headset using SteamVR and the OpenVR API. This mode is currently in **alpha** stage, meaning that it is incomplete and may break for some configurations.
+
+Run Gaia Sky in VR using the `-vr` flag from the CLI, or, on Windows, run the `gaiaskyvr.exe` file.
 
 ```console
 gaiasky -vr

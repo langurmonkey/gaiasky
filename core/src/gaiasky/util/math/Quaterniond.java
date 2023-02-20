@@ -25,6 +25,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.utils.NumberUtils;
 import net.jafama.FastMath;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -36,7 +37,7 @@ import java.io.Serializable;
  * @see <a href="http://en.wikipedia.org/wiki/Quaternion">http://en.wikipedia.org/wiki/Quaternion</a>
  */
 public class Quaterniond implements Serializable {
-    private static final long serialVersionUID = -7661875440774897168L;
+    @Serial private static final long serialVersionUID = -7661875440774897168L;
     private static final double NORMALIZATION_TOLERANCE = 0.00001;
     private static final Quaterniond tmp1 = new Quaterniond(0, 0, 0, 0);
     private static final Quaterniond tmp2 = new Quaterniond(0, 0, 0, 0);
@@ -70,7 +71,7 @@ public class Quaterniond implements Serializable {
      * @param quaternion The quaternion to copy.
      */
     public Quaterniond(Quaterniond quaternion) {
-        this.set(quaternion);
+        this.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
     }
 
     /**
@@ -93,11 +94,11 @@ public class Quaterniond implements Serializable {
     }
 
     /** @return the euclidian length of the specified quaternion */
-    public final static double len(final double x, final double y, final double z, final double w) {
+    public static double len(final double x, final double y, final double z, final double w) {
         return Math.sqrt(x * x + y * y + z * z + w * w);
     }
 
-    public final static double len2(final double x, final double y, final double z, final double w) {
+    public static double len2(final double x, final double y, final double z, final double w) {
         return x * x + y * y + z * z + w * w;
     }
 
@@ -115,7 +116,7 @@ public class Quaterniond implements Serializable {
      *
      * @return the dot product between the first and second quaternion.
      */
-    public final static double dot(final double x1, final double y1, final double z1, final double w1, final double x2, final double y2, final double z2, final double w2) {
+    public static double dot(final double x1, final double y1, final double z1, final double w1, final double x2, final double y2, final double z2, final double w2) {
         return x1 * x2 + y1 * y2 + z1 * z2 + w1 * w2;
     }
 
@@ -176,7 +177,7 @@ public class Quaterniond implements Serializable {
         return new Quaterniond(this);
     }
 
-    /** @return the euclidian length of this quaternion */
+    /** @return the Euclidean length of this quaternion */
     public double len() {
         return Math.sqrt(x * x + y * y + z * z + w * w);
     }
@@ -189,9 +190,9 @@ public class Quaterniond implements Serializable {
     /**
      * Sets the quaternion to the given euler angles in degrees.
      *
-     * @param yaw   the rotation around the y axis in degrees
-     * @param pitch the rotation around the x axis in degrees
-     * @param roll  the rotation around the z axis degrees
+     * @param yaw   the rotation around the y-axis in degrees
+     * @param pitch the rotation around the x-axis in degrees
+     * @param roll  the rotation around the z-axis degrees
      *
      * @return this quaternion
      */

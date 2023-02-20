@@ -30,10 +30,10 @@ import java.util.Date;
  */
 public class ModelUpdater extends AbstractUpdateSystem {
 
-    private ICamera camera;
-    private Vector3d D32;
-    private Matrix4d MD4;
-    private Quaternion QF;
+    private final ICamera camera;
+    private final Vector3d D32;
+    private final Matrix4d MD4;
+    private final Quaternion QF;
     private Quaterniond QD;
 
     public ModelUpdater(Family family, int priority) {
@@ -41,7 +41,6 @@ public class ModelUpdater extends AbstractUpdateSystem {
         this.camera = GaiaSky.instance.cameraManager;
         this.D32 = new Vector3d();
         this.QF = new Quaternion();
-        this.QD = new Quaterniond();
         this.MD4 = new Matrix4d();
     }
 
@@ -60,11 +59,11 @@ public class ModelUpdater extends AbstractUpdateSystem {
         var cloud = Mapper.cloud.get(entity);
         var engine = Mapper.engine.get(entity);
 
-        // Update light with global position
+        // Update light with global position.
         LightingUtils.updateLights(model, body, graph, camera);
         updateLocalTransform(entity, body, graph, scaffolding);
 
-        // Atmosphere and cloud
+        // Atmosphere and cloud.
         if (atmosphere != null && atmosphere.atmosphere != null) {
             atmosphere.atmosphere.update(graph.translation);
         }
@@ -76,6 +75,8 @@ public class ModelUpdater extends AbstractUpdateSystem {
             EventManager.publish(Event.SPACECRAFT_INFO, this, engine.yaw % 360, engine.pitch % 360, engine.roll % 360, engine.vel.len(), MotorEngine.thrustFactor[engine.thrustFactorIndex], engine.currentEnginePower, engine.yawp, engine.pitchp, engine.rollp);
         }
     }
+
+    int lastLevel = -1;
 
     protected void updateLocalTransform(Entity entity, Body body, GraphNode graph, ModelScaffolding scaffolding) {
         setToLocalTransform(entity, body, graph, scaffolding.sizeScaleFactor, graph.localTransform, true);

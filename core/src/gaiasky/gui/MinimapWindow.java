@@ -72,13 +72,6 @@ public class MinimapWindow extends GenericDialog {
 
     public void act(float delta) {
         super.act(delta);
-        if (minimap != null) {
-            minimap.update();
-            String mapName = minimap.getCurrentName();
-            if (!mapName.equals(this.mapName.getName())) {
-                updateMapName(mapName);
-            }
-        }
     }
 
 }

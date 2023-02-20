@@ -1,13 +1,11 @@
 package gaiasky.data;
 
+import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.Scene;
-import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import uk.ac.starlink.util.DataSource;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractSceneLoader implements ISceneLoader {
@@ -21,6 +19,7 @@ public abstract class AbstractSceneLoader implements ISceneLoader {
     protected Scene scene;
     protected Set<String> loggedArchetypes;
     protected String parentName;
+    protected Map<String, Entity> index;
 
     @Override
     public void initialize(String[] files, Scene scene) throws RuntimeException {
@@ -46,30 +45,8 @@ public abstract class AbstractSceneLoader implements ISceneLoader {
         this.parentName = parentName;
     }
 
-    public Object interceptDataFilePath(Class<?> valueClass, Object val) {
-        // Intercept file paths.
-        if (valueClass == String.class && ((String) val).startsWith(Constants.DATA_LOCATION_TOKEN)) {
-            // Path is in data directory, just remove leading '$data/' and prepend data location
-            String resolvedPathStr = (String) val;
-            String pathFromDataStr = resolvedPathStr.replace(Constants.DATA_LOCATION_TOKEN, "");
-            Path pathFromData = Path.of(pathFromDataStr);
-            Path resolvedPath = Path.of(Settings.settings.data.location).resolve(pathFromDataStr);
-            // We inject the location if:
-            // - the current resolved path does not exist, and
-            // - the dataset location is not null or empty, and
-            // - the injected dataset location is not already in the path.
-            if (!Files.exists(resolvedPath) && datasetDirectory != null && !datasetDirectory.isEmpty() && !pathFromData.getName(0).toString().equals(datasetDirectory)) {
-                // Use dsLocation
-                return Path.of(Constants.DATA_LOCATION_TOKEN).resolve(datasetDirectory).resolve(pathFromDataStr).toString();
-            }
-        }
-        return val;
+    public void setIndex(Map<String, Entity> index) {
+        this.index = index;
     }
 
-    public String[] interceptDataFilePaths(String[] values) {
-        for (int i = 0; i < values.length; i++) {
-            values[i] = (String) interceptDataFilePath(String.class, values[i]);
-        }
-        return values;
-    }
 }

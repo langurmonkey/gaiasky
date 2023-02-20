@@ -22,7 +22,6 @@ import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
@@ -45,6 +44,18 @@ import java.util.*;
  * several inner classes by topic.
  */
 public class Settings {
+
+    /*
+     * Source version, used to enable or disable datasets.
+     * This is usually tag where each number is allocated 2 digits.
+     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
+     * Version = major * 10000 + minor * 100 + rev
+     * So 1.2.5 -> 10205
+     *    2.1.7 -> 20107
+     *
+     * Leading zeroes are omitted to avoid octal literal interpretation.
+     */
+    public static final int SOURCE_VERSION = 30400;
     /**
      * Assets location for this instance of Gaia Sky.
      * macOS needs fully qualified paths when run as an app (GaiaSky.app), that's why we use the {@link File#getAbsolutePath()} call.
@@ -761,34 +772,43 @@ public class Settings {
             public void updateSpeedLimit() {
                 switch (speedLimitIndex) {
                 case 0 ->
+                    // 1 km/h is 0.00027 km/s
+                        speedLimit = 0.000277777778 * Constants.KM_TO_U;
+                case 1 ->
+                    // 10 km/h is 0.0027 km/s
+                        speedLimit = 0.00277777778 * Constants.KM_TO_U;
+                case 2 ->
                     // 100 km/h is 0.027 km/s
                         speedLimit = 0.0277777778 * Constants.KM_TO_U;
-                case 1 -> speedLimit = 0.5 * Constants.C * Constants.M_TO_U;
-                case 2 -> speedLimit = 0.8 * Constants.C * Constants.M_TO_U;
-                case 3 -> speedLimit = 0.9 * Constants.C * Constants.M_TO_U;
-                case 4 -> speedLimit = 0.99 * Constants.C * Constants.M_TO_U;
-                case 5 -> speedLimit = 0.99999 * Constants.C * Constants.M_TO_U;
-                case 6 -> speedLimit = Constants.C * Constants.M_TO_U;
-                case 7 -> speedLimit = 2.0 * Constants.C * Constants.M_TO_U;
-                case 8 ->
+                case 3 ->
+                    // 1000 km/h is 0.27 km/s
+                        speedLimit = 0.277777778 * Constants.KM_TO_U;
+                case 4 -> speedLimit = 0.5 * Constants.C * Constants.M_TO_U;
+                case 5 -> speedLimit = 0.8 * Constants.C * Constants.M_TO_U;
+                case 6 -> speedLimit = 0.9 * Constants.C * Constants.M_TO_U;
+                case 7 -> speedLimit = 0.99 * Constants.C * Constants.M_TO_U;
+                case 8 -> speedLimit = 0.99999 * Constants.C * Constants.M_TO_U;
+                case 9 -> speedLimit = Constants.C * Constants.M_TO_U;
+                case 10 -> speedLimit = 2.0 * Constants.C * Constants.M_TO_U;
+                case 11 ->
                     // 10 c
                         speedLimit = 10.0 * Constants.C * Constants.M_TO_U;
-                case 9 ->
+                case 12 ->
                     // 1000 c
                         speedLimit = 1000.0 * Constants.C * Constants.M_TO_U;
-                case 10 -> speedLimit = Constants.AU_TO_U;
-                case 11 -> speedLimit = 10.0 * Constants.AU_TO_U;
-                case 12 -> speedLimit = 1000.0 * Constants.AU_TO_U;
-                case 13 -> speedLimit = 10000.0 * Constants.AU_TO_U;
-                case 14 -> speedLimit = Constants.PC_TO_U;
-                case 15 -> speedLimit = 2.0 * Constants.PC_TO_U;
-                case 16 ->
+                case 13 -> speedLimit = Constants.AU_TO_U;
+                case 14 -> speedLimit = 10.0 * Constants.AU_TO_U;
+                case 15 -> speedLimit = 1000.0 * Constants.AU_TO_U;
+                case 16 -> speedLimit = 10000.0 * Constants.AU_TO_U;
+                case 17 -> speedLimit = Constants.PC_TO_U;
+                case 18 -> speedLimit = 2.0 * Constants.PC_TO_U;
+                case 19 ->
                     // 10 pc/s
                         speedLimit = 10.0 * Constants.PC_TO_U;
-                case 17 ->
+                case 20 ->
                     // 1000 pc/s
                         speedLimit = 1000.0 * Constants.PC_TO_U;
-                case 18 ->
+                case 21 ->
                     // No limit
                         speedLimit = -1;
                 }
@@ -998,11 +1018,12 @@ public class Settings {
             public double ambient;
             public ShadowSettings shadow;
             public ElevationSettings elevation;
+            public VirtualTextureSettings virtualTextures;
             @JsonIgnore
             public double orbitSolidAngleThreshold = Math.toRadians(1.5);
 
             public RendererSettings() {
-                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD);
+                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD, Event.SVT_CACHE_SIZE_CMD);
             }
 
             @JsonProperty("pointCloud")
@@ -1035,6 +1056,7 @@ public class Settings {
                 case ELEVATION_TYPE_CMD -> elevation.type = (ElevationType) data[0];
                 case TESSELLATION_QUALITY_CMD -> elevation.quality = (float) data[0];
                 case ORBIT_SOLID_ANGLE_TH_CMD -> orbitSolidAngleThreshold = (double) data[0];
+                case SVT_CACHE_SIZE_CMD -> virtualTextures.cacheSize = (int) data[0];
                 }
             }
 
@@ -1054,6 +1076,16 @@ public class Settings {
                 public void setType(final String typeString) {
                     this.type = ElevationType.valueOf(typeString.toUpperCase());
                 }
+            }
+
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            public static class VirtualTextureSettings {
+                /** Cache size, in tiles. **/
+                public int cacheSize;
+                /**
+                 * The tile detection buffer is smaller than the main window by this factor.
+                 **/
+                public double detectionBufferFactor;
             }
 
         }
@@ -1148,7 +1180,7 @@ public class Settings {
         @Override
         public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
-            case STEREOSCOPIC_CMD:
+            case STEREOSCOPIC_CMD -> {
                 if (!GaiaSky.instance.cameraManager.mode.isGaiaFov()) {
                     modeStereo.active = (boolean) (Boolean) data[0];
                     if (modeStereo.active && modeCubemap.active) {
@@ -1156,14 +1188,12 @@ public class Settings {
                         EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.msg("notif.cleanmode"));
                     }
                 }
-                break;
-            case STEREO_PROFILE_CMD:
-                modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
-                break;
-            case CUBEMAP_CMD:
+            }
+            case STEREO_PROFILE_CMD -> modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
+            case CUBEMAP_CMD -> {
                 modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openVr;
                 if (modeCubemap.active) {
-                    modeCubemap.projection = (CubemapProjections.CubemapProjection) data[1];
+                    modeCubemap.projection = (CubemapProjection) data[1];
 
                     // Post a message to the screen
                     ModePopupInfo mpi = new ModePopupInfo();
@@ -1195,30 +1225,18 @@ public class Settings {
                 } else {
                     EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                 }
-                break;
-            case CUBEMAP_PROJECTION_CMD:
-                modeCubemap.projection = (CubemapProjections.CubemapProjection) data[0];
+            }
+            case CUBEMAP_PROJECTION_CMD -> {
+                modeCubemap.projection = (CubemapProjection) data[0];
                 logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
-                break;
-            case INDEXOFREFRACTION_CMD:
-                modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
-                break;
-            case CUBEMAP_RESOLUTION_CMD:
-                modeCubemap.faceResolution = (int) data[0];
-                break;
-            case SHOW_MINIMAP_ACTION:
-                minimap.active = (boolean) (Boolean) data[0];
-                break;
-            case TOGGLE_MINIMAP:
-                minimap.active = !minimap.active;
-                break;
-            case PLANETARIUM_APERTURE_CMD:
-                modeCubemap.planetarium.aperture = (float) data[0];
-                break;
-            case PLANETARIUM_ANGLE_CMD:
-                modeCubemap.planetarium.angle = (float) data[0];
-                break;
-            case POINTER_GUIDES_CMD:
+            }
+            case INDEXOFREFRACTION_CMD -> modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
+            case CUBEMAP_RESOLUTION_CMD -> modeCubemap.faceResolution = (int) data[0];
+            case SHOW_MINIMAP_ACTION -> minimap.active = (boolean) (Boolean) data[0];
+            case TOGGLE_MINIMAP -> minimap.active = !minimap.active;
+            case PLANETARIUM_APERTURE_CMD -> modeCubemap.planetarium.aperture = (float) data[0];
+            case PLANETARIUM_ANGLE_CMD -> modeCubemap.planetarium.angle = (float) data[0];
+            case POINTER_GUIDES_CMD -> {
                 if (data.length > 0 && data[0] != null) {
                     pointer.guides.active = (boolean) data[0];
                     if (data.length > 1 && data[1] != null) {
@@ -1228,12 +1246,10 @@ public class Settings {
                         }
                     }
                 }
-                break;
-            case UI_SCALE_CMD:
-                ui.scale = (Float) data[0];
-                break;
-            default:
-                break;
+            }
+            case UI_SCALE_CMD -> ui.scale = (Float) data[0];
+            default -> {
+            }
             }
         }
 

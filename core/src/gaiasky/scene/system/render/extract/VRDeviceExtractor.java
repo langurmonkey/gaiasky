@@ -20,7 +20,9 @@ public class VRDeviceExtractor extends AbstractExtractSystem {
         if (this.mustRender(base)) {
             var render = Mapper.render.get(entity);
             addToRender(render, RenderGroup.MODEL_PIX);
-            addToRender(render, RenderGroup.LINE);
+            if (Mapper.line.has(entity)) {
+                addToRender(render, RenderGroup.LINE);
+            }
         }
     }
 }

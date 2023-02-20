@@ -6,8 +6,6 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -22,16 +20,19 @@ import gaiasky.data.AssetBean;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.svt.SVTManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -39,29 +40,37 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * A basic component that contains the info on a material
+ * A basic component that fully describes the material of an object.
+ * It contains basic textures (diffuse, specular, reflection, emissive, etc.),
+ * cubemaps (same as textures), and even some sparse virtual texture trees (SVT).
  */
-public class MaterialComponent extends NamedComponent implements IObserver {
+public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
     /** Default texture parameters **/
-    protected static final TextureParameter textureParamsMipMap, textureParams;
+    protected static final OwnTextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
-    // DEFAULT REFLECTION CUBEMAP
+
+    // Default height scale is 4 km.
+    private static final float DEFAULT_HEIGHT_SCALE = (float) (4.0 * Constants.KM_TO_U);
+
+    // Default reflection cubemap for all materials.
     public static CubemapComponent reflectionCubemap;
 
     static {
-        textureParamsMipMap = new TextureParameter();
+        textureParamsMipMap = new OwnTextureParameter();
         textureParamsMipMap.genMipMaps = true;
         textureParamsMipMap.magFilter = TextureFilter.Linear;
         textureParamsMipMap.minFilter = TextureFilter.MipMapLinearLinear;
 
-        textureParams = new TextureParameter();
+        textureParams = new OwnTextureParameter();
         textureParams.genMipMaps = false;
         textureParams.magFilter = TextureFilter.Linear;
         textureParams.minFilter = TextureFilter.Linear;
@@ -75,43 +84,49 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         reflectionCubemap = new CubemapComponent();
     }
 
-    // TEXTURES
+    // Texture location strings.
     public boolean texInitialised, texLoading;
     public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao;
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked;
-    // Material properties
+    // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
     public float[] metallicColor;
     public float[] emissiveColor;
     public float roughnessColor = Float.NaN;
-    // HEIGHT
-    public Float heightScale = 0.005f;
+    /**
+     * Height scale in internal units. The mapping value of white in the height map (maximum height value in this body). Black is mapped to 0.
+     */
+    public Float heightScale = DEFAULT_HEIGHT_SCALE;
     public Vector2 heightSize = new Vector2();
-    public float[][] heightMap;
+    public IHeightData heightData;
     public NoiseComponent nc;
-    // CUBEMAPS
+    // Sparse virtual texture sets.
+    public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt, normalSvt, emissiveSvt, roughnessSvt, metallicSvt;
+    public Array<VirtualTextureComponent> svts;
+    // Cubemaps.
     public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
-    // Biome lookup texture
+    // Biome lookup texture.
     public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png";
     public float biomeHueShift = 0;
     /** Add also color even if texture is present **/
     public boolean colorIfTexture = false;
     /** The actual material **/
     private Material material, ringMaterial;
-    private AtomicBoolean heightGenerated = new AtomicBoolean(false);
-    private AtomicBoolean heightInitialized = new AtomicBoolean(false);
+    private final AtomicBoolean heightGenerated = new AtomicBoolean(false);
+    private final AtomicBoolean heightInitialized = new AtomicBoolean(false);
     private Texture heightTex, specularTex, diffuseTex, normalTex;
+
     public MaterialComponent() {
         super();
         EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.TESSELLATION_QUALITY_CMD);
     }
 
-    private static TextureParameter getTP(String tex) {
+    private static OwnTextureParameter getTP(String tex) {
         return getTP(tex, false);
     }
 
-    private static TextureParameter getTP(String tex, boolean mipmap) {
+    private static OwnTextureParameter getTP(String tex, boolean mipmap) {
         if (tex != null && tex.endsWith(".pfm")) {
             return pfmTextureParams;
         } else {
@@ -163,6 +178,22 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         if (metallicCubemap != null)
             metallicCubemap.initialize(manager);
 
+        // SVTs
+        if (diffuseSvt != null)
+            diffuseSvt.initialize("diffuseSvt", this, TextureAttribute.SvtIndirectionDiffuse);
+        if (heightSvt != null)
+            heightSvt.initialize("heightSvt", this, TextureAttribute.SvtIndirectionHeight);
+        if (specularSvt != null)
+            specularSvt.initialize("specularSvt", this, TextureAttribute.SvtIndirectionSpecular);
+        if (normalSvt != null)
+            normalSvt.initialize("normalSvt", this, TextureAttribute.SvtIndirectionNormal);
+        if (emissiveSvt != null)
+            emissiveSvt.initialize("emissiveSvt", this, TextureAttribute.SvtIndirectionEmissive);
+        if (roughnessSvt != null)
+            roughnessSvt.initialize("roughnessSvt", this, TextureAttribute.SvtIndirectionRoughness);
+        if (metallicSvt != null)
+            metallicSvt.initialize("metallicSvt", this, TextureAttribute.SvtIndirectionMetallic);
+
         this.heightGenerated.set(false);
     }
 
@@ -171,8 +202,12 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return TextureUtils.isLoaded(diffuseUnpacked, manager) && TextureUtils.isLoaded(normalUnpacked, manager) && TextureUtils.isLoaded(specularUnpacked, manager) && TextureUtils.isLoaded(emissiveUnpacked, manager) && TextureUtils.isLoaded(ringUnpacked, manager) && TextureUtils.isLoaded(ringnormalUnpacked, manager) && TextureUtils.isLoaded(heightUnpacked, manager) && TextureUtils.isLoaded(roughnessUnapcked, manager) && TextureUtils.isLoaded(metallicUnpacked, manager)
-                && TextureUtils.isLoaded(aoUnapcked, manager) && TextureUtils.isLoaded(diffuseCubemap, manager) && TextureUtils.isLoaded(normalCubemap, manager) && TextureUtils.isLoaded(emissiveCubemap, manager) && TextureUtils.isLoaded(specularCubemap, manager) && TextureUtils.isLoaded(roughnessCubemap, manager) && TextureUtils.isLoaded(metallicCubemap, manager) && TextureUtils.isLoaded(heightCubemap, manager);
+        return ComponentUtils.isLoaded(diffuseUnpacked, manager) && ComponentUtils.isLoaded(normalUnpacked, manager) && ComponentUtils.isLoaded(specularUnpacked, manager) && ComponentUtils.isLoaded(emissiveUnpacked, manager) && ComponentUtils.isLoaded(ringUnpacked, manager) && ComponentUtils.isLoaded(ringnormalUnpacked, manager) && ComponentUtils.isLoaded(heightUnpacked, manager) && ComponentUtils.isLoaded(roughnessUnapcked, manager) && ComponentUtils.isLoaded(metallicUnpacked, manager)
+                && ComponentUtils.isLoaded(aoUnapcked, manager) && ComponentUtils.isLoaded(diffuseCubemap, manager) && ComponentUtils.isLoaded(normalCubemap, manager) && ComponentUtils.isLoaded(emissiveCubemap, manager) && ComponentUtils.isLoaded(specularCubemap, manager) && ComponentUtils.isLoaded(roughnessCubemap, manager) && ComponentUtils.isLoaded(metallicCubemap, manager) && ComponentUtils.isLoaded(heightCubemap, manager);
+    }
+
+    public boolean hasSVT() {
+        return diffuseSvt != null || normalSvt != null || emissiveSvt != null || specularSvt != null || heightSvt != null || metallicSvt != null || roughnessSvt != null;
     }
 
     /**
@@ -183,7 +218,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      *
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
+    private String addToLoad(String tex, OwnTextureParameter texParams, AssetManager manager) {
         if (manager == null)
             return addToLoad(tex, texParams);
 
@@ -205,7 +240,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      *
      * @return The actual loaded texture path
      */
-    private String addToLoad(String tex, TextureParameter texParams) {
+    private String addToLoad(String tex, OwnTextureParameter texParams) {
         if (tex == null)
             return null;
 
@@ -216,11 +251,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         return tex;
     }
 
-    public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] diffuseCol, boolean culling) {
-        return initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, diffuseCol, culling);
+    public void initMaterial(AssetManager manager, IntModelInstance instance, float[] diffuseCol, boolean culling) {
+        initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, diffuseCol, culling);
     }
 
-    public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {
+    public void initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {
         reflectionCubemap.initialize();
         this.material = mat;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
@@ -236,7 +271,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             diffuseColor[1] = diffuseCol[1];
             diffuseColor[2] = diffuseCol[2];
             diffuseColor[3] = diffuseCol[3];
-            if (diffuseColor != null && (colorIfTexture || diffuse == null)) {
+            if (colorIfTexture || diffuse == null) {
                 // Add diffuse colour
                 material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
             }
@@ -325,6 +360,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 material.set(new TextureAttribute(TextureAttribute.AO, tex));
             }
         }
+
+        // Cubemaps.
         if (diffuseCubemap != null) {
             diffuseCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.cubemap));
@@ -354,7 +391,62 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             material.set(new CubemapAttribute(CubemapAttribute.HeightCubemap, heightCubemap.cubemap));
         }
 
-        return material;
+        // Sparse Virtual Textures.
+        svts = new Array<>();
+        int svtId = 0;
+        if (diffuseSvt != null || normalSvt != null || emissiveSvt != null || specularSvt != null || heightSvt != null || metallicSvt != null || roughnessSvt != null) {
+            svtId = SVTManager.nextSvtId();
+        }
+        // Add attributes.
+        if (diffuseSvt != null) {
+            addSVTAttributes(material, diffuseSvt, svtId);
+        }
+        if (normalSvt != null) {
+            addSVTAttributes(material, normalSvt, svtId);
+        }
+        if (emissiveSvt != null) {
+            addSVTAttributes(material, emissiveSvt, svtId);
+        }
+        if (specularSvt != null) {
+            addSVTAttributes(material, specularSvt, svtId);
+        }
+        if (heightSvt != null) {
+            if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                addSVTAttributes(material, heightSvt, svtId);
+                initializeElevationData(heightSvt, manager);
+            }
+        }
+        if (metallicSvt != null) {
+            addSVTAttributes(material, metallicSvt, svtId);
+        }
+        if (roughnessSvt != null) {
+            addSVTAttributes(material, roughnessSvt, svtId);
+        }
+        if (svtId > 0) {
+            // Broadcast this material for SVT manager.
+            EventManager.publish(Event.SVT_MATERIAL_INFO, this, svtId, this);
+        }
+
+    }
+
+    private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
+        // Set ID.
+        svt.id = id;
+        // Set attributes.
+        material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
+        material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
+        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor, (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
+        // Only update depth and resolution if it does not exist, or if it exists and its value is less than ours.
+        if (!material.has(FloatAttribute.SvtDepth) || ((FloatAttribute) Objects.requireNonNull(material.get(FloatAttribute.SvtDepth))).value < svt.tree.depth) {
+            // Depth.
+            material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
+            // Resolution.
+            double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
+            material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
+        }
+
+        // Add to list.
+        svts.add(svt);
     }
 
     private void addHeightTex(Texture heightTex) {
@@ -499,8 +591,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                         GaiaSky.postRunnable(() -> {
                             if (heightPixmap != null) {
                                 // Create texture, populate material
-                                heightMap = elevationData;
                                 if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
+                                    heightData = new HeightDataPixmap(heightPixmap, null);
                                     heightTex = new Texture(heightPixmap, true);
                                     heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
 
@@ -568,33 +660,37 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
     }
 
+    private void initializeElevationData(VirtualTextureComponent svt, AssetManager manager) {
+        if (!heightInitialized.get()) {
+            heightInitialized.set(true);
+            GaiaSky.instance.getExecutorService().execute(() -> {
+                // Construct RAM height map from texture
+                heightData = new HeightDataSVT(svt.tree, manager);
+            });
+        }
+    }
+
     private void initializeElevationData(Texture tex) {
         if (!heightInitialized.get()) {
             heightInitialized.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Construct RAM height map from texture
-                String heightUnpacked = GlobalResources.unpackAssetPath(height);
-                GaiaSky.postRunnable(() -> logger.info("Constructing elevation data from texture: " + heightUnpacked));
-                Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
-                float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
-                for (int i = 0; i < heightPixmap.getWidth(); i++) {
-                    for (int j = 0; j < heightPixmap.getHeight(); j++) {
-                        Color col = new Color(heightPixmap.getPixel(i, j));
-                        partialData[i][j] = (1f - col.r) * heightScale;
-                    }
-                }
-
-                GaiaSky.postRunnable(() -> {
-                    // Populate material
-                    heightMap = partialData;
-                    addHeightTex(tex);
-                });
+                heightData = new HeightDataPixmap(tex, () -> addHeightTex(tex));
             });
         }
     }
 
+    @Override
+    public Material getMaterial() {
+        return material;
+    }
+
+    public Material getRingMaterial() {
+        return ringMaterial;
+    }
+
     private void removeElevationData() {
-        heightMap = null;
+        heightData = null;
         material.remove(TextureAttribute.Height);
         material.remove(FloatAttribute.HeightScale);
         material.remove(Vector2Attribute.HeightSize);
@@ -680,8 +776,24 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         this.height = Settings.settings.data.dataFile(height);
     }
 
-    public void setHeightScale(Double heightScale) {
+    public void setHeightScaleKm(Double heightScale) {
         this.heightScale = (float) (heightScale * Constants.KM_TO_U);
+    }
+
+    public void setHeightScaleM(Double heightScale) {
+        this.heightScale = (float) (heightScale * Constants.M_TO_U);
+    }
+
+    public void setHeightScale(Double heightScale) {
+        setHeightScaleKm(heightScale);
+    }
+
+    public void setHeightMapTopKm(Double heightMapTopKm) {
+        setHeightScaleKm(heightMapTopKm);
+    }
+
+    public void setHeightMapTopM(Double heightMapTopM) {
+        setHeightScaleM(heightMapTopM);
     }
 
     public void setColorIfTexture(Boolean colorIfTexture) {
@@ -774,12 +886,83 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public void setReflectionCubemap(String reflectionCubemap) {
-        this.reflectionCubemap = new CubemapComponent();
-        this.reflectionCubemap.setLocation(reflectionCubemap);
+        MaterialComponent.reflectionCubemap = new CubemapComponent();
+        MaterialComponent.reflectionCubemap.setLocation(reflectionCubemap);
     }
 
     public void setSkybox(String diffuseCubemap) {
         setDiffuseCubemap(diffuseCubemap);
+    }
+
+    public void setDiffuseSVT(VirtualTextureComponent virtualTextureComponent) {
+        if (this.diffuseSvt != null && !this.diffuseSvt.location.equals(virtualTextureComponent.location)) {
+            logger.warn("Overwriting diffuse SVT: " + this.diffuseSvt.location + " -> " + virtualTextureComponent.location);
+        }
+        this.diffuseSvt = virtualTextureComponent;
+    }
+
+    public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
+        setDiffuseSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setSpecularSVT(VirtualTextureComponent virtualTextureComponent) {
+        if (this.specularSvt != null && !this.specularSvt.location.equals(virtualTextureComponent.location)) {
+            logger.warn("Overwriting specular SVT: " + this.specularSvt.location + " -> " + virtualTextureComponent.location);
+        }
+        this.specularSvt = virtualTextureComponent;
+    }
+
+    public void setSpecularSVT(Map<Object, Object> virtualTexture) {
+        setSpecularSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setNormalSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.normalSvt = virtualTextureComponent;
+    }
+
+    public void setNormalSVT(Map<Object, Object> virtualTexture) {
+        setNormalSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setHeightSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.heightSvt = virtualTextureComponent;
+    }
+
+    public void setHeightSVT(Map<Object, Object> virtualTexture) {
+        setHeightSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setEmissiveSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.emissiveSvt = virtualTextureComponent;
+    }
+
+    public void setEmissiveSVT(Map<Object, Object> virtualTexture) {
+        setEmissiveSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setMetallicSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.metallicSvt = virtualTextureComponent;
+    }
+
+    public void setMetallicSVT(Map<Object, Object> virtualTexture) {
+        setMetallicSVT(convertToComponent(virtualTexture));
+    }
+
+    public void setRoughnessSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.roughnessSvt = virtualTextureComponent;
+    }
+
+    public void setRoughnessSVT(Map<Object, Object> virtualTexture) {
+        setRoughnessSVT(convertToComponent(virtualTexture));
+    }
+
+    public static VirtualTextureComponent convertToComponent(Map<Object, Object> map) {
+        var vt = new VirtualTextureComponent();
+        if (map.containsKey("location"))
+            vt.setLocation((String) map.get("location"));
+        if (map.containsKey("tileSize"))
+            vt.setTileSize((Long) map.get("tileSize"));
+        return vt;
     }
 
     public boolean hasHeight() {
@@ -851,7 +1034,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case ELEVATION_TYPE_CMD:
+        case ELEVATION_TYPE_CMD -> {
             if (this.hasHeight() && this.material != null) {
                 ElevationType newType = (ElevationType) data[0];
                 GaiaSky.postRunnable(() -> {
@@ -860,9 +1043,9 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                     } else {
                         if (height.endsWith(Constants.GEN_KEYWORD))
                             initializeGenElevationData();
-                        else if (heightMap == null) {
+                        else if (heightData == null) {
                             if (this.material.has(TextureAttribute.Height)) {
-                                initializeElevationData(((TextureAttribute) this.material.get(TextureAttribute.Height)).textureDescription.texture);
+                                initializeElevationData(((TextureAttribute) Objects.requireNonNull(this.material.get(TextureAttribute.Height))).textureDescription.texture);
                             } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
                                 if (!height.endsWith(Constants.GEN_KEYWORD)) {
                                     Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
@@ -877,21 +1060,21 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                     }
                 });
             }
-            break;
-        case ELEVATION_MULTIPLIER_CMD:
+        }
+        case ELEVATION_MULTIPLIER_CMD -> {
             if (this.hasHeight() && this.material != null) {
                 float newMultiplier = (Float) data[0];
                 GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.HeightScale, heightScale * newMultiplier)));
             }
-            break;
-        case TESSELLATION_QUALITY_CMD:
+        }
+        case TESSELLATION_QUALITY_CMD -> {
             if (this.hasHeight() && this.material != null) {
                 float newQuality = (Float) data[0];
                 GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.TessQuality, newQuality)));
             }
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
     }
 
@@ -942,21 +1125,21 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         setNormal("generate");
         setSpecular("generate");
         var dataPath = Settings.settings.data.dataPath("tex/base");
-        Array<String> luts = new Array<>();
+        Array<String> lookUpTables = new Array<>();
         try (var paths = Files.list(dataPath)) {
             List<Path> l = paths.filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
             for (Path p : l) {
                 String name = p.toString();
-                luts.add("data" + name.substring(name.indexOf("/tex/base/")));
+                lookUpTables.add("data" + name.substring(name.indexOf("/tex/base/")));
             }
         } catch (Exception ignored) {
         }
 
-        if (luts.isEmpty()) {
-            luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
-            luts.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
+        if (lookUpTables.isEmpty()) {
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png");
+            lookUpTables.add(Constants.DATA_LOCATION_TOKEN + "tex/base/biome-smooth-lut.png");
         }
-        setBiomelut(luts.get(rand.nextInt(luts.size)));
+        setBiomelut(lookUpTables.get(rand.nextInt(lookUpTables.size)));
         setBiomehueshift(rand.nextDouble() * 360.0);
         double sizeKm = bodySize * Constants.U_TO_KM;
         setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0));
@@ -984,5 +1167,94 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public void dispose() {
         disposeTextures(GaiaSky.instance.assetManager);
         EventManager.instance.removeAllSubscriptions(this);
+    }
+
+    @Override
+    public void updateWith(MaterialComponent object) {
+        // Random attributes.
+        if (object.specularColor != null) {
+            this.specularColor = object.specularColor;
+        }
+        if (object.diffuseColor != null) {
+            this.diffuseColor = object.diffuseColor;
+        }
+        if (object.emissiveColor != null) {
+            this.emissiveColor = object.emissiveColor;
+        }
+        if (object.metallicColor != null) {
+            this.metallicColor = object.metallicColor;
+        }
+        if (!Float.isNaN(object.roughnessColor)) {
+            this.roughnessColor = object.roughnessColor;
+        }
+        if (object.heightScale != DEFAULT_HEIGHT_SCALE) {
+            this.heightScale = object.heightScale;
+        }
+        // Regular textures.
+        if (object.diffuse != null) {
+            this.diffuse = object.diffuse;
+        }
+        if (object.specular != null) {
+            this.specular = object.specular;
+        }
+        if (object.normal != null) {
+            this.normal = object.normal;
+        }
+        if (object.height != null) {
+            this.height = object.height;
+        }
+        if (object.emissive != null) {
+            this.emissive = object.emissive;
+        }
+        if (object.metallic != null) {
+            this.metallic = object.metallic;
+        }
+        if (object.roughness != null) {
+            this.roughness = object.roughness;
+        }
+        // Cubemaps.
+        if (object.diffuseCubemap != null) {
+            this.diffuseCubemap = object.diffuseCubemap;
+        }
+        if (object.specularCubemap != null) {
+            this.specularCubemap = object.specularCubemap;
+        }
+        if (object.normalCubemap != null) {
+            this.normalCubemap = object.normalCubemap;
+        }
+        if (object.heightCubemap != null) {
+            this.heightCubemap = object.heightCubemap;
+        }
+        if (object.emissiveCubemap != null) {
+            this.emissiveCubemap = object.emissiveCubemap;
+        }
+        if (object.metallicCubemap != null) {
+            this.metallicCubemap = object.metallicCubemap;
+        }
+        if (object.roughnessCubemap != null) {
+            this.roughnessCubemap = object.roughnessCubemap;
+        }
+        // SVTs.
+        if (object.diffuseSvt != null) {
+            this.diffuseSvt = object.diffuseSvt;
+        }
+        if (object.specularSvt != null) {
+            this.specularSvt = object.specularSvt;
+        }
+        if (object.normalSvt != null) {
+            this.normalSvt = object.normalSvt;
+        }
+        if (object.heightSvt != null) {
+            this.heightSvt = object.heightSvt;
+        }
+        if (object.emissiveSvt != null) {
+            this.emissiveSvt = object.emissiveSvt;
+        }
+        if (object.metallicSvt != null) {
+            this.metallicSvt = object.metallicSvt;
+        }
+        if (object.roughnessSvt != null) {
+            this.roughnessSvt = object.roughnessSvt;
+        }
     }
 }

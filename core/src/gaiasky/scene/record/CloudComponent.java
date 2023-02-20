@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -21,6 +22,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.BlendMode;
+import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
@@ -30,13 +32,17 @@ import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.svt.SVTManager;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CloudComponent extends NamedComponent implements IObserver {
+import static gaiasky.scene.record.MaterialComponent.convertToComponent;
+
+public class CloudComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<CloudComponent> {
     /** Default texture parameters **/
     protected static final TextureParameter textureParams;
     private static final Log logger = Logger.getLogger(CloudComponent.class);
@@ -56,14 +62,18 @@ public class CloudComponent extends NamedComponent implements IObserver {
     /** RGB color of generated clouds **/
     public float[] color = new float[] { 1f, 1f, 1f, 0.7f };
     public String diffuse, diffuseUnpacked;
-    // CUBEMAPS
+    /** The material component associated to the same model. **/
+    public MaterialComponent materialComponent;
+    // Cubemap.
     public CubemapComponent diffuseCubemap;
+    // Virtual texture.
+    public VirtualTextureComponent diffuseSvt;
     // Model parameters
     public Map<String, Object> params;
     Vector3 aux;
     Vector3d aux3;
     private AssetManager manager;
-    private AtomicBoolean generated = new AtomicBoolean(false);
+    private final AtomicBoolean generated = new AtomicBoolean(false);
     private Texture cloudTex;
     private Material material;
     private boolean texInitialised, texLoading;
@@ -92,12 +102,14 @@ public class CloudComponent extends NamedComponent implements IObserver {
             }
             if (diffuseCubemap != null)
                 diffuseCubemap.initialize(manager);
+            if (diffuseSvt != null)
+                diffuseSvt.initialize("diffuseSvt", this, TextureAttribute.SvtIndirectionDiffuse);
         }
         this.generated.set(false);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return TextureUtils.isLoaded(diffuseUnpacked, manager) && TextureUtils.isLoaded(diffuseCubemap, manager);
+        return ComponentUtils.isLoaded(diffuseUnpacked, manager) && ComponentUtils.isLoaded(diffuseCubemap, manager);
     }
 
     /**
@@ -122,8 +134,9 @@ public class CloudComponent extends NamedComponent implements IObserver {
         // CREATE CLOUD MODEL
         mc.instance = new IntModelInstance(cloudModel, this.localTransform);
 
-        if (!Settings.settings.scene.initialization.lazyTexture)
+        if (!Settings.settings.scene.initialization.lazyTexture) {
             initMaterial();
+        }
 
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
@@ -156,6 +169,23 @@ public class CloudComponent extends NamedComponent implements IObserver {
         transform.setToTranslation(localTransform).scl(size);
     }
 
+    /**
+     * Updates the cull face strategy depending on the distance to the camera.
+     *
+     * @param distToCamera The distance to the camera in internal units.
+     */
+    public void updateCullFace(double distToCamera) {
+        if (material != null) {
+            if (distToCamera > size) {
+                // Outside. Cull back faces.
+                ((IntAttribute) Objects.requireNonNull(material.get(IntAttribute.CullFace))).value = GL20.GL_BACK;
+            } else {
+                // Inside. Do not cull faces.
+                ((IntAttribute) Objects.requireNonNull(material.get(IntAttribute.CullFace))).value = GL20.GL_NONE;
+            }
+        }
+    }
+
     public void initMaterial() {
         material = mc.instance.materials.first();
 
@@ -171,9 +201,37 @@ public class CloudComponent extends NamedComponent implements IObserver {
             diffuseCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.cubemap));
         }
+        if (diffuseSvt != null && materialComponent != null) {
+            if (materialComponent.diffuseSvt != null) {
+                // Use the ID of the main material.
+                addSVTAttributes(material, diffuseSvt, materialComponent.diffuseSvt.id);
+                materialComponent.svts.add(diffuseSvt);
+            } else {
+                // We have no diffuse SVT in the main material!
+                int svtId = SVTManager.nextSvtId();
+                addSVTAttributes(material, diffuseSvt, svtId);
+                materialComponent.svts.add(diffuseSvt);
+            }
+            if (diffuseSvt.id > 0) {
+                // Broadcast this material for SVT manager.
+                EventManager.publish(Event.SVT_MATERIAL_INFO, this, diffuseSvt.id, this);
+            }
+        }
         material.set(new BlendingAttribute(1.0f));
-        // Do not cull
-        material.set(new IntAttribute(IntAttribute.CullFace, 0));
+        // Do not cull, only when below the clouds!
+        material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_BACK));
+    }
+
+    private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
+        // Set ID.
+        svt.id = id;
+        // Set attributes.
+        double svtResolution = svt.tileSize * Math.pow(2.0, svt.tree.depth);
+        material.set(new Vector2Attribute(Vector2Attribute.SvtResolution, new Vector2((float) (svtResolution * svt.tree.root.length), (float) svtResolution)));
+        material.set(new FloatAttribute(FloatAttribute.SvtTileSize, svt.tileSize));
+        material.set(new FloatAttribute(FloatAttribute.SvtDepth, svt.tree.depth));
+        material.set(new FloatAttribute(FloatAttribute.SvtId, svt.id));
+        material.set(new FloatAttribute(FloatAttribute.SvtDetectionFactor, (float) Settings.settings.scene.renderer.virtualTextures.detectionBufferFactor));
     }
 
     public void setGenerated(boolean generated) {
@@ -306,6 +364,19 @@ public class CloudComponent extends NamedComponent implements IObserver {
         this.diffuseCubemap.setLocation(diffuseCubemap);
     }
 
+    public void setDiffuseSVT(VirtualTextureComponent virtualTextureComponent) {
+        this.diffuseSvt = virtualTextureComponent;
+    }
+
+    public void setDiffuseSVT(Map<Object, Object> virtualTexture) {
+        setDiffuseSVT(convertToComponent(virtualTexture));
+    }
+
+    @Override
+    public Material getMaterial() {
+        return material;
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.GRAPHICS_QUALITY_UPDATED) {
@@ -318,6 +389,10 @@ public class CloudComponent extends NamedComponent implements IObserver {
                 }
             });
         }
+    }
+
+    public boolean hasSVT() {
+        return diffuseSvt != null;
     }
 
     /**
@@ -383,5 +458,25 @@ public class CloudComponent extends NamedComponent implements IObserver {
     public void dispose() {
         disposeTextures(manager);
         EventManager.instance.removeAllSubscriptions(this);
+    }
+
+    @Override
+    public void updateWith(CloudComponent object) {
+        // Random attributes.
+        if(object.size > 0) {
+            this.size = object.size;
+        }
+        // Regular texture.
+        if (object.diffuse != null) {
+            this.diffuse = object.diffuse;
+        }
+        // Cubemap.
+        if (object.diffuseCubemap != null) {
+            this.diffuseCubemap = object.diffuseCubemap;
+        }
+        // SVT.
+        if (object.diffuseSvt != null) {
+            this.diffuseSvt = object.diffuseSvt;
+        }
     }
 }

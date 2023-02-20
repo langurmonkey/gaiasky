@@ -392,11 +392,11 @@
       "imageUp": "iconic-caret-right"
     },
     "key-caret-left": {
-      "up" : "key",
+      "up": "key",
       "imageUp": "iconic-caret-left"
     },
     "key-caret-right": {
-      "up" : "key",
+      "up": "key",
       "imageUp": "iconic-caret-right"
     },
     "edit": {
@@ -700,6 +700,10 @@
     "link": {
       "imageUp": "link",
       "imageChecked": "link"
+    },
+    "clear": {
+      "imageUp": "clear",
+      "imageChecked": "clear-down"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {

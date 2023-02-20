@@ -706,6 +706,10 @@
     "link": {
       "imageUp": "link",
       "imageChecked": "link"
+    },
+    "clear": {
+      "imageUp": "clear",
+      "imageChecked": "clear-down"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {

@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class LocationMark implements Component {
-    public static final float LOWER_LIMIT = 3e-4f;
+    public static final float LOWER_LIMIT = 3e-5f;
     public static final float UPPER_LIMIT = 3e-3f;
 
     /**

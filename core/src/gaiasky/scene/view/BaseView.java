@@ -3,6 +3,7 @@ package gaiasky.scene.view;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.GaiaSky;
+import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.Base;
@@ -62,6 +63,9 @@ public class BaseView extends AbstractView {
         return base.opacity;
     }
 
+    public ComponentTypes getComponentType() {
+        return base.ct;
+    }
     public Base getBase() {
         return base;
     }

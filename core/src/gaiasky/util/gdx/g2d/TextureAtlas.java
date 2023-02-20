@@ -1,23 +1,5 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.g2d;
 
-import com.badlogic.gdx.Files.FileType;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -29,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Comparator;
+import java.util.Objects;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.ClampToEdge;
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
@@ -55,41 +38,6 @@ public class TextureAtlas implements Disposable {
     };
     private final ObjectSet<Texture> textures = new ObjectSet<>(4);
     private final Array<AtlasRegion> regions = new Array<>();
-
-    /** Creates an empty atlas to which regions can be added. */
-    public TextureAtlas() {
-    }
-
-    /**
-     * Loads the specified pack file using {@link FileType#Internal}, using the parent directory of the pack file to find the page
-     * images.
-     */
-    public TextureAtlas(String internalPackFile) {
-        this(Gdx.files.internal(internalPackFile));
-    }
-
-    /** Loads the specified pack file, using the parent directory of the pack file to find the page images. */
-    public TextureAtlas(FileHandle packFile) {
-        this(packFile, packFile.parent());
-    }
-
-    /**
-     * @param flip If true, all regions loaded will be flipped for use with a perspective where 0,0 is the upper left corner.
-     *
-     * @see #TextureAtlas(FileHandle)
-     */
-    public TextureAtlas(FileHandle packFile, boolean flip) {
-        this(packFile, packFile.parent(), flip);
-    }
-
-    public TextureAtlas(FileHandle packFile, FileHandle imagesDir) {
-        this(packFile, imagesDir, false);
-    }
-
-    /** @param flip If true, all regions loaded will be flipped for use with a perspective where 0,0 is the upper left corner. */
-    public TextureAtlas(FileHandle packFile, FileHandle imagesDir, boolean flip) {
-        this(new TextureAtlasData(packFile, imagesDir, flip));
-    }
 
     /** @param data May be null. */
     public TextureAtlas(TextureAtlasData data) {
@@ -127,15 +75,9 @@ public class TextureAtlas implements Disposable {
         ObjectMap<Page, Texture> pageToTexture = new ObjectMap<Page, Texture>();
         for (Page page : data.pages) {
             Texture texture = null;
-            if (page.texture == null) {
-                texture = new Texture(page.textureFile, page.format, page.useMipMaps);
-                texture.setFilter(page.minFilter, page.magFilter);
-                texture.setWrap(page.uWrap, page.vWrap);
-            } else {
-                texture = page.texture;
-                texture.setFilter(page.minFilter, page.magFilter);
-                texture.setWrap(page.uWrap, page.vWrap);
-            }
+            texture = Objects.requireNonNullElseGet(page.texture, () -> new Texture(page.textureFile, page.format, page.useMipMaps));
+            texture.setFilter(page.minFilter, page.magFilter);
+            texture.setWrap(page.uWrap, page.vWrap);
             textures.add(texture);
             pageToTexture.put(page, texture);
         }
@@ -375,19 +317,19 @@ public class TextureAtlas implements Disposable {
                         String direction = readValue(reader);
                         TextureWrap repeatX = ClampToEdge;
                         TextureWrap repeatY = ClampToEdge;
-                        if (direction.equals("x"))
+                        switch (direction) {
+                        case "x" -> repeatX = Repeat;
+                        case "y" -> repeatY = Repeat;
+                        case "xy" -> {
                             repeatX = Repeat;
-                        else if (direction.equals("y"))
                             repeatY = Repeat;
-                        else if (direction.equals("xy")) {
-                            repeatX = Repeat;
-                            repeatY = Repeat;
+                        }
                         }
 
                         pageImage = new Page(file, width, height, min.isMipMap(), format, min, max, repeatX, repeatY);
                         pages.add(pageImage);
                     } else {
-                        boolean rotate = Boolean.valueOf(readValue(reader));
+                        boolean rotate = Boolean.parseBoolean(readValue(reader));
 
                         readTuple(reader);
                         int left = Integer.parseInt(tuple[0]);
