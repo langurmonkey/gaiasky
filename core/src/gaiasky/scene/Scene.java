@@ -331,6 +331,7 @@ public class Scene {
             addUpdater(new ShapeUpdater(families.shapes, priority++));
             addUpdater(new LocUpdater(families.locations, priority++));
             addUpdater(new PerimeterUpdater(families.perimeters, priority++));
+            addUpdater(new VRDeviceUpdater(families.vrdevices, priority++));
 
             // Extract systems.
             extractors = new Array<>(23);

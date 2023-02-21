@@ -58,14 +58,9 @@ public class LineEntityRenderSystem {
     }
 
     public void renderVRDevice(Entity entity, LineRenderSystem renderer, ICamera camera, float alpha) {
-        var model = Mapper.model.get(entity);
         var vr = Mapper.vr.get(entity);
-
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(true);
-        Matrix4 transform = model.model.instance.transform;
-        vr.beamP0.set(0, -0.01f, 0).mul(transform);
-        vr.beamP1.set(0, (float) -(Constants.MPC_TO_U - Constants.PC_TO_U), (float) -Constants.MPC_TO_U).mul(transform);
         renderer.addLine(lineView, vr.beamP0.x, vr.beamP0.y, vr.beamP0.z, vr.beamP1.x, vr.beamP1.y - 0.1f, vr.beamP1.z, 1f, 0, 0, 1f);
     }
 

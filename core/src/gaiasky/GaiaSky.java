@@ -514,7 +514,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
         assetManager.setLoader(Pixmap.class, new OwnPixmapLoader(dataResolver));
-        assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
         assetManager.setLoader(PointCloudData.class, new OrbitDataLoader(dataResolver));
         assetManager.setLoader(IAttitudeServer.class, new AttitudeLoader(dataResolver));
         assetManager.setLoader(ExtShaderProgram.class, new ShaderProgramProvider(internalResolver, ".vertex.glsl", ".fragment.glsl"));
@@ -529,6 +528,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(IntModel.class, ".g3dj", new G3dModelLoader(new JsonReader(), internalResolver));
         assetManager.setLoader(IntModel.class, ".g3db", new G3dModelLoader(new UBJsonReader(), internalResolver));
         assetManager.setLoader(GaiaSkyAssets.class, new GaiaSkyLoader(internalResolver));
+        assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
 
         // Init global resources -- Can't be postponed!
         this.globalResources = new GlobalResources(assetManager);
