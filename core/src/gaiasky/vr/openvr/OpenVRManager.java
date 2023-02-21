@@ -17,8 +17,8 @@ import static org.lwjgl.openvr.VRSystem.VRSystem_GetRecommendedRenderTargetSize;
 import static org.lwjgl.openvr.VRSystem.VRSystem_GetStringTrackedDeviceProperty;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
-public class OpenVRQuery {
-    private static final Log logger = Logger.getLogger(OpenVRQuery.class);
+public class OpenVRManager {
+    private static final Log logger = Logger.getLogger(OpenVRManager.class);
 
     public static void queryOpenVr() {
         logger.info("==== Querying OpenVR status ====");

@@ -124,7 +124,7 @@ public class SVTManager implements IObserver {
         this.queuedTiles = new ArrayBlockingQueue<>(500);
     }
 
-    public void initialize(AssetManager manager) {
+    public void doneLoading(AssetManager manager) {
         this.manager = manager;
 
         EventManager.instance.subscribe(this, Event.SVT_TILE_DETECTION_READY, Event.SVT_MATERIAL_INFO);

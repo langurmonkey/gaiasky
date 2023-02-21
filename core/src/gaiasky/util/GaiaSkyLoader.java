@@ -1,5 +1,6 @@
 package gaiasky.util;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import gaiasky.GaiaSky;
 import gaiasky.gui.BookmarksManager;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.MainPostProcessor;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.HiddenHelperUser;
 import gaiasky.script.ScriptingServer;
@@ -31,49 +34,59 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
         assets = new GaiaSkyAssets();
 
-        // Tooltip to 1s
-        TooltipManager.getInstance().initialTime = 1f;
+        if(parameter.firstStage) {
+            // First stage async.
 
-        // Initialise hidden helper user
-        HiddenHelperUser.initialize();
+            // Tooltip to 1s
+            TooltipManager.getInstance().initialTime = 1f;
 
-        // Initialise gravitational waves helper
-        RelativisticEffectsManager.initialize(parameter.gaiaSky.time);
+            // Initialise hidden helper user
+            HiddenHelperUser.initialize();
 
-        // Location log
-        LocationLogManager.initialize();
+            // Initialise gravitational waves helper
+            RelativisticEffectsManager.initialize(parameter.gaiaSky.time);
 
-        // Init timer thread
-        Timer.instance();
+            // Location log
+            LocationLogManager.initialize();
 
-        /*
-         * SCRIPTING SERVER
-         */
-        if (!parameter.noScripting) {
-            assets.scriptingInterface = new EventScriptingInterface(parameter.gaiaSky.assetManager, parameter.gaiaSky.getCatalogManager());
-            ScriptingServer.initialize(assets.scriptingInterface);
+            // Init timer thread
+            Timer.instance();
+
+            // Scripting server.
+            if (!parameter.noScripting) {
+                assets.scriptingInterface = new EventScriptingInterface(parameter.gaiaSky.assetManager, parameter.gaiaSky.getCatalogManager());
+                ScriptingServer.initialize(assets.scriptingInterface);
+            }
+
+            // Bookmarks manager.
+            assets.bookmarksManager = new BookmarksManager();
+
+            // SAMP client.
+            assets.sampClient = new SAMPClient(parameter.gaiaSky.getCatalogManager());
+            assets.sampClient.initialize(parameter.gaiaSky.getGlobalResources().getSkin());
+
+            // SVT.
+            assets.svtManager = new SVTManager();
+
+            // Post processor.
+            assets.postProcessor = new MainPostProcessor(null);
+            assets.postProcessor.initialize(manager);
+        } else {
+            // Second stage async.
+
         }
-
-        /*
-         * BOOKMARKS
-         */
-        assets.bookmarksManager = new BookmarksManager();
-
-        /*
-         * SAMP client
-         */
-        assets.sampClient = new SAMPClient(parameter.gaiaSky.getCatalogManager());
-        assets.sampClient.initialize(parameter.gaiaSky.getGlobalResources().getSkin());
-
-        // SVT.
-        assets.svtManager = new SVTManager();
-
     }
 
     @Override
     public GaiaSkyAssets loadSync(AssetManager manager, String fileName, FileHandle file, GaiaSkyLoaderParameters parameter) {
-        // Needs initialization of textures.
-        assets.svtManager.initialize(parameter.gaiaSky.assetManager);
+        if(parameter.firstStage) {
+            // First stage sync.
+            assets.svtManager.doneLoading(manager);
+            assets.postProcessor.doneLoading(manager);
+        } else {
+            // Second stage sync.
+
+        }
         return assets;
     }
 
@@ -83,11 +96,16 @@ public class GaiaSkyLoader extends AsynchronousAssetLoader<GaiaSkyAssets, GaiaSk
     }
 
     static public class GaiaSkyLoaderParameters extends AssetLoaderParameters<GaiaSkyAssets> {
+        public boolean firstStage;
         public boolean noScripting;
         public GaiaSky gaiaSky;
-        public GaiaSkyLoaderParameters(GaiaSky gaiaSky, boolean noScripting) {
+        public GaiaSkyLoaderParameters(GaiaSky gaiaSky, boolean noScripting, boolean firstStage) {
             this.gaiaSky = gaiaSky;
             this.noScripting = noScripting;
+            this.firstStage = firstStage;
+        }
+        public GaiaSkyLoaderParameters(GaiaSky gaiaSky, boolean noScripting) {
+            this(gaiaSky, noScripting, true);
         }
     }
 }

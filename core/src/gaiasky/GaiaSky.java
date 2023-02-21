@@ -41,7 +41,6 @@ import gaiasky.gui.vr.VRUI;
 import gaiasky.gui.vr.WelcomeGuiVR;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.MainPostProcessor;
 import gaiasky.render.api.IPostProcessor;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IPostProcessor.RenderType;
@@ -130,7 +129,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     /**
      * Forbids the creation of the scripting server
      */
-    private final boolean noScripting;
+    private boolean noScripting = false;
     /**
      * Parked update runnables. Run after the update-scene stage.
      */
@@ -378,6 +377,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             }
         }
     };
+
     /**
      * Displays the loading GUI
      **/
@@ -390,8 +390,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
             logger.warn(e.getLocalizedMessage());
         }
         if (finished) {
-            doneLoading();
-            updateRenderProcess = runnableRender;
+                // Stages 1 and 2 are done, proceed.
+                doneLoading();
+                updateRenderProcess = runnableRender;
         } else {
             // Display loading screen
             if (settings.runtime.openVr) {
@@ -556,9 +557,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // GUI.
         guis = new ArrayList<>(3);
 
-        // Post-processor.
-        postProcessor = new MainPostProcessor(null);
-
         // Scene renderer.
         sceneRenderer = new SceneRenderer(vrContext, globalResources);
         sceneRenderer.initialize(assetManager);
@@ -665,6 +663,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * to their classes and removes the Loading message.
      */
     private void doneLoading() {
+        logger.info("DONE LOADING START");
         // Get assets.
         final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
 
@@ -699,11 +698,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         scripting = assets.scriptingInterface;
         bookmarksManager = assets.bookmarksManager;
         sampClient = assets.sampClient;
-
-        /*
-         * Complete post-processor loading.
-         */
-        postProcessor.doneLoading(assetManager);
+        postProcessor = assets.postProcessor;
 
         /*
          * Fetch scene object.
@@ -764,11 +759,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events.
-        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD,
-                Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD,
-                Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD,
-                Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD,
-                Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE);
+        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE);
 
         // Re-enable input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -870,6 +861,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.INITIALIZED_INFO, this);
         sceneRenderer.setRendering(true);
         initialized = true;
+        logger.info("DONE LOADING END");
     }
 
     /**
@@ -1390,7 +1382,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         switch (event) {
         case LOAD_DATA_CMD -> { // Init components that need assets in data folder.
             reinitialiseGUI1();
-            postProcessor.initialize(assetManager);
 
             // Initialise loading screen.
             loadingGui = new LoadingGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, false);

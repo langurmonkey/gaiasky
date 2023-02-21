@@ -39,10 +39,12 @@ public class ServiceThread extends Thread {
     /**
      * Stops the daemon iterations when the current task has finished.
      */
-    public void stopDaemon() {
+    public void stopDaemon(boolean notifyAll) {
         this.running.set(false);
-        synchronized (this.threadLock) {
-            this.threadLock.notifyAll();
+        if(notifyAll) {
+            synchronized (this.threadLock) {
+                this.threadLock.notifyAll();
+            }
         }
     }
 

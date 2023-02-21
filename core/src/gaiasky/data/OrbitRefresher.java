@@ -69,7 +69,7 @@ public class OrbitRefresher implements IObserver {
     @Override
     public void notify(Event event, Object source, Object... data) {
         if (event == Event.DISPOSE && daemon != null) {
-            daemon.stopDaemon();
+            daemon.stopDaemon(false);
         }
     }
 

@@ -590,7 +590,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
         case CLEAR_OCTANT_QUEUE -> clearQueue();
         case DISPOSE -> {
             if (daemon != null) {
-                daemon.stopDaemon();
+                daemon.stopDaemon(false);
             }
         }
         default -> {
