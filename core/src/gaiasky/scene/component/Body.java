@@ -24,6 +24,17 @@ public class Body implements Component, ICopy {
      * Body size in internal units.
      */
     public float size;
+    /**
+     * This flag indicates whether the size has already been set using the correct units.
+     * This is for backward compatibility with the data files.
+     */
+    public boolean sizeInUnitsFlag = false;
+    /**
+     * This flag enables backwards-compatibility. When true, the body size is assumed to be a radius,
+     * and will be doubled in the initialization. Setting the size using any of the
+     * setRadius() methods sets this to false.
+     */
+    public boolean sizeIsRadiusFlag = true;
 
     /**
      * The distance to the camera from the focus center.
@@ -85,6 +96,7 @@ public class Body implements Component, ICopy {
 
     public void setSizeKm(Double sizeKm) {
         this.size = (float) (sizeKm * Constants.KM_TO_U);
+        this.sizeInUnitsFlag = true;
     }
 
     public void setSizepc(Double sizePc) {
@@ -93,30 +105,37 @@ public class Body implements Component, ICopy {
 
     public void setSizePc(Double sizePc) {
         this.size = (float) (sizePc * Constants.PC_TO_U);
+        this.sizeInUnitsFlag = true;
     }
 
     public void setSizeM(Double sizeM) {
         this.size = (float) (sizeM * Constants.M_TO_U);
+        this.sizeInUnitsFlag = true;
     }
 
     public void setSizeAU(Double sizeAU) {
         this.size = (float) (sizeAU * Constants.AU_TO_U);
+        this.sizeInUnitsFlag = true;
     }
 
     public void setRadius(Double radius) {
         setSize(radius * 2.0);
+        this.sizeIsRadiusFlag = false;
     }
 
     public void setRadiusKm(Double radiusKm) {
         setSizeKm(radiusKm * 2.0);
+        this.sizeIsRadiusFlag = false;
     }
 
     public void setRadiusPc(Double radiusPc) {
         setSizePc(radiusPc * 2.0);
+        this.sizeIsRadiusFlag = false;
     }
 
     public void setDiameter(Double diameter) {
         setSize(diameter);
+        this.sizeIsRadiusFlag = false;
     }
 
     public void setDiameterKm(Double diameterKm) {

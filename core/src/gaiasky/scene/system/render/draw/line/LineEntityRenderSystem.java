@@ -1,6 +1,8 @@
 package gaiasky.scene.system.render.draw.line;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.GaiaSky;
@@ -59,6 +61,8 @@ public class LineEntityRenderSystem {
         var model = Mapper.model.get(entity);
         var vr = Mapper.vr.get(entity);
 
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDepthMask(true);
         Matrix4 transform = model.model.instance.transform;
         vr.beamP0.set(0, -0.01f, 0).mul(transform);
         vr.beamP1.set(0, (float) -(Constants.MPC_TO_U - Constants.PC_TO_U), (float) -Constants.MPC_TO_U).mul(transform);

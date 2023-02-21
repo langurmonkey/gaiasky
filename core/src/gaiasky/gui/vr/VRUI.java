@@ -271,26 +271,6 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         stage.draw();
         buffer.end();
-
-        if (verticesScreenSpace != null) {
-            shapeRenderer.begin(ShapeType.Filled);
-            // MOUSE WHITE
-            shapeRenderer.setColor(1, 0, 1, 1);
-            shapeRenderer.circle(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), 5);
-            // RED
-            shapeRenderer.setColor(1, 0, 0, 1);
-            shapeRenderer.circle(verticesScreenSpace[0].x, verticesScreenSpace[0].y, 10);
-            // GREEN
-            shapeRenderer.setColor(0, 1, 0, 1);
-            shapeRenderer.circle(verticesScreenSpace[1].x, verticesScreenSpace[1].y, 10);
-            // BLUE
-            shapeRenderer.setColor(0, 0, 1, 1);
-            shapeRenderer.circle(verticesScreenSpace[2].x, verticesScreenSpace[2].y, 10);
-            // YELLOW
-            shapeRenderer.setColor(1, 1, 0, 1);
-            shapeRenderer.circle(verticesScreenSpace[3].x, verticesScreenSpace[3].y, 10);
-            shapeRenderer.end();
-        }
     }
 
     @Override
@@ -368,8 +348,7 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
                     var body = Mapper.body.get(entity);
                     body.setColor(new float[] { 1, 1, 1, 1 });
                     body.setLabelColor(new float[] { 0, 0, 0, 0 });
-                    // Size of 10 meters.
-                    body.setSize(0.005);
+                    body.setSizeKm(100.0);
 
                     var affine = Mapper.affine.get(entity);
                     affine.initialize();
@@ -438,7 +417,8 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
                     dir.y = 0;
                     dir.nor();
                     var body = Mapper.body.get(entity);
-                    body.pos.set(camera.getPos().cpy().add(dir.scl(10 * Constants.M_TO_U)));
+                    body.pos.set(camera.getPos().cpy().add(dir.scl(150 * Constants.KM_TO_U)));
+                    body.pos.add(0, 80.0 * Constants.KM_TO_U, 0);
 
                     // Set new static coordinates.
                     var coord = Mapper.coordinates.get(entity);

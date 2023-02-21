@@ -107,14 +107,12 @@ public class ModelInitializer extends AbstractInitSystem {
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextCelestial;
 
-        if (!Mapper.tagQuatOrientation.has(entity)) {
-            // In celestial bodies, size is given as a radius in Km. The size is the diameter in internal units.
-            body.size = (float) ((body.size * 2.0) * Constants.KM_TO_U);
-        } else if (engine != null) {
+        if (engine != null) {
+            // In engines, the size is given in Km
             body.size = (float) (body.size * Constants.KM_TO_U);
         } else {
-            // Billboards, just double it.
-            body.size = body.size * 2f;
+            // The rest of the bodies use the flags.
+            body.size = (float) ((body.size * (body.sizeIsRadiusFlag ? 2.0 : 1.0)) * (body.sizeInUnitsFlag ?  1.0 : Constants.KM_TO_U));
         }
 
         // First init spacecraft if needed
@@ -277,8 +275,7 @@ public class ModelInitializer extends AbstractInitSystem {
         scaffolding.locVaMultiplier = 2.8f;
 
         sa.thresholdPoint = Math.toRadians(0.30);
-        sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number)
-                * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
+        sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
 
         label.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
         label.labelFactor = 1;

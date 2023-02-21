@@ -134,8 +134,7 @@ public class OpenVRListener implements VRDeviceListener {
                 vrControllerHint = false;
                 lastDoublePress = TimeUtils.millis();
             } else if (button == VRControllerButtons.B) {
-                vrInfoGui = !vrInfoGui;
-                EventManager.publish(Event.DISPLAY_VR_GUI_CMD, vrInfoGui);
+                EventManager.publish(Event.SHOW_VR_UI, this);
             } else if (button == VRControllerButtons.A) {
                 EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
             } else if (button == VRControllerButtons.SteamVR_Touchpad) {

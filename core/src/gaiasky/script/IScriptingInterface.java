@@ -555,24 +555,30 @@ public interface IScriptingInterface {
      * <li>1 - 10 Km/h</li>
      * <li>2 - 100 Km/h</li>
      * <li>3 - 1000 Km/h</li>
-     * <li>4 - 0.5 c</li>
-     * <li>5 - 0.8 c</li>
-     * <li>6 - 0.9 c</li>
-     * <li>7 - 0.99 c</li>
-     * <li>8 - 0.99999 c</li>
-     * <li>9 - 1 c</li>
-     * <li>10 - 2 c</li>
-     * <li>11 - 10 c</li>
-     * <li>12 - 1e3 c</li>
-     * <li>13 - 1 AU/s</li>
-     * <li>14 - 10 AU/s</li>
-     * <li>15 - 1000 AU/s</li>
-     * <li>16 - 10000 AU/s</li>
-     * <li>17 - 1 pc/s</li>
-     * <li>18 - 2 pc/s</li>
-     * <li>19 - 10 pc/s</li>
-     * <li>20 - 1000 pc/s</li>
-     * <li>21 - unlimited</li>
+     * <li>4 - 1 Km/s</li>
+     * <li>5 - 10 Km/s</li>
+     * <li>6 - 100 Km/s</li>
+     * <li>7 - 1000 Km/s</li>
+     * <li>8 - 0.01 c</li>
+     * <li>9 - 0.1 c</li>
+     * <li>10 - 0.5 c</li>
+     * <li>11 - 0.8 c</li>
+     * <li>12 - 0.9 c</li>
+     * <li>13 - 0.99 c</li>
+     * <li>14 - 0.99999 c</li>
+     * <li>15 - 1 c</li>
+     * <li>16 - 2 c</li>
+     * <li>17 - 10 c</li>
+     * <li>18 - 1e3 c</li>
+     * <li>19 - 1 AU/s</li>
+     * <li>20 - 10 AU/s</li>
+     * <li>21 - 1000 AU/s</li>
+     * <li>22 - 10000 AU/s</li>
+     * <li>23 - 1 pc/s</li>
+     * <li>24 - 2 pc/s</li>
+     * <li>25 - 10 pc/s</li>
+     * <li>26 - 1000 pc/s</li>
+     * <li>27 - unlimited</li>
      * </ul>
      *
      * @param index The index of the top speed.
