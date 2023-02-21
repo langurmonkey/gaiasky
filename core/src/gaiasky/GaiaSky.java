@@ -642,6 +642,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 if (!settings.scene.visibility.get(ComponentType.Others.name())) {
                     EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.others", false);
                 }
+
+                // Create VRUI object.
+                vrui = new VRUI();
+                vrui.initialize(assetManager, globalResources.getSpriteBatch());
+
                 return VRStatus.OK;
             } catch (Exception e) {
                 // If initializing the VRContext failed.
@@ -771,13 +776,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
 
-        // Initialize VR UI.
-        vrui = new VRUI(scene);
-        vrui.initialize(assetManager, globalResources.getSpriteBatch());
-        vrui.build(globalResources.getSkin());
-        inputMultiplexer.addProcessor(vrui);
 
         if (settings.runtime.openVr) {
+            // Build VR UI if needed.
+            vrui.setScene(scene);
+            vrui.build(globalResources.getSkin());
+
             // Resize post-processors and render systems.
             postRunnable(() -> resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, false, false, false));
         }

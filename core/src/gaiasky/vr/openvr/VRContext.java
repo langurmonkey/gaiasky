@@ -59,6 +59,7 @@ public class VRContext implements Disposable {
     // book keeping
     private boolean renderingStarted = false;
     private boolean initialDevicesReported = false;
+
     /**
      * Creates a new VRContext, initializes the VR system, and sets up rendering
      * surfaces with depth attachments.
@@ -84,9 +85,6 @@ public class VRContext implements Disposable {
 
         VR.VR_GetGenericInterface(VR.IVRCompositor_Version, error);
         checkInitError(error);
-
-        //VR.VR_GetGenericInterface(VR.IVRRenderModels_Version, error);
-        //checkInitError(error);
 
         for (int i = 0; i < devicePoses.length; i++) {
             devicePoses[i] = new VRDevicePose(i);
@@ -403,10 +401,13 @@ public class VRContext implements Disposable {
             switch (r) {
             case VR.ETrackedControllerRole_TrackedControllerRole_LeftHand -> role = VRControllerRole.LeftHand;
             case VR.ETrackedControllerRole_TrackedControllerRole_RightHand -> role = VRControllerRole.RightHand;
+            case VR.ETrackedControllerRole_TrackedControllerRole_Invalid -> role = VRControllerRole.Invalid;
             }
         }
-        devices[index] = new VRDevice(devicePoses[index], type, role);
-        devices[index].updateAxesAndPosition();
+        if (role != VRControllerRole.Invalid) {
+            devices[index] = new VRDevice(devicePoses[index], type, role);
+            devices[index].updateAxesAndPosition();
+        }
     }
 
     public void dispose() {
@@ -454,8 +455,7 @@ public class VRContext implements Disposable {
         if (name != null && name.equals("renderLeftHand"))
             return true;
         assert name != null;
-        return (name.contains("_left"))
-                || (modelNumber != null && modelNumber.contains("Left"));
+        return (name.contains("_left")) || (modelNumber != null && modelNumber.contains("Left"));
     }
 
     private boolean isControllerRight(String name, String modelNumber, VRControllerRole role) {
@@ -464,8 +464,7 @@ public class VRContext implements Disposable {
         if (name != null && name.equals("renderRightHand"))
             return true;
         assert name != null;
-        return (name.contains("_right"))
-                || (modelNumber != null && modelNumber.contains("Right"));
+        return (name.contains("_right")) || (modelNumber != null && modelNumber.contains("Right"));
     }
 
     /**
@@ -979,19 +978,13 @@ public class VRContext implements Disposable {
 
         @Override
         public String toString() {
-            return "VRDevice[manufacturer=" + manufacturerName
-                    + ", modelNumber=" + modelNumber
-                    + ", renderModel=" + renderModelName
-                    + ", index=" + (pose != null ? pose.index : "null")
-                    + ", type=" + type
-                    + ", role=" + role + "]";
+            return "VRDevice[manufacturer=" + manufacturerName + ", modelNumber=" + modelNumber + ", renderModel=" + renderModelName + ", index=" + (pose != null ? pose.index : "null") + ", type=" + type + ", role=" + role + "]";
         }
 
         /**
          * Updates the axis values and returns whether the values changed.
          *
          * @param axis The axis
-         *
          * @return Whether the values of this axis changed
          */
         public boolean pollAxis(int axis) {

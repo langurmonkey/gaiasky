@@ -2,8 +2,6 @@ package gaiasky.gui.vr;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -13,8 +11,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -35,6 +32,7 @@ import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.component.tag.TagNoClosest;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Constants;
@@ -44,9 +42,11 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
+public class VRUI implements IGui, IObserver, Disposable {
 
     private final int WIDTH = 1280;
     private final int HEIGHT = 720;
@@ -56,15 +56,16 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
     FrameBuffer buffer;
     Texture uiTexture;
     Entity entity;
-    /** The 4 vertices of the UI surface. **/
-    Vector3[] vertices;
-    /** Vertices transformed to be in screen coordinates. **/
-    Vector3[] verticesScreenSpace;
+    Vector3 pointer = new Vector3();
 
     FocusInfoInterface focusInfoInterface;
     ShapeRenderer shapeRenderer;
+    Set<VRDevice> vrControllers;
 
-    public VRUI(Scene scene) {
+    public VRUI() {
+    }
+
+    public void setScene(Scene scene) {
         this.scene = scene;
     }
 
@@ -74,6 +75,8 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
         stage = new Stage(vp, batch);
         shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
         shapeRenderer.setAutoShapeType(true);
+        // Create controllers set.
+        vrControllers = new HashSet();
 
         // Create buffer.
         var builder = new FrameBufferBuilder(WIDTH, HEIGHT);
@@ -82,7 +85,7 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
         uiTexture = buffer.getColorBufferTexture();
 
         // Events.
-        EventManager.instance.subscribe(this, Event.SHOW_VR_UI);
+        EventManager.instance.subscribe(this, Event.SHOW_VR_UI, Event.VR_CONTROLLER_INFO);
     }
 
     @Override
@@ -143,105 +146,65 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
     Vector2 b = new Vector2();
     Vector2 c = new Vector2();
     Vector2 d = new Vector2();
-    Vector2 q = new Vector2();
     Vector2 e = new Vector2();
     Vector2 f = new Vector2();
     Vector2 g = new Vector2();
     Vector2 h = new Vector2();
     Vector2 uv = new Vector2();
 
+    Vector3 intersection = new Vector3();
+    Vector3 point = new Vector3();
+    Vector3 normal = new Vector3();
+    Plane plane = new Plane();
+    Matrix4 inverse = new Matrix4();
+
     public void update(double dt) {
         stage.act((float) dt);
 
         // Compute screen-space vertex coordinates for the current camera.
         if (entity != null) {
-            ICamera iCamera = GaiaSky.instance.getICamera();
-            var camera = iCamera.getCamera();
             var model = Mapper.model.get(entity);
-            for (int i = 0; i < vertices.length; i++) {
-                var outVert = verticesScreenSpace[i];
-                var in = vertices[i];
-                outVert.set(in);
-                // To world space.
-                outVert.mul(model.model.instance.transform);
-                // To screen coordinates.
-                camera.project(outVert);
-            }
-        }
-    }
 
-    /**
-     * This function returns the projected position in VR UI coordinates for the
-     * given x and y screen coordinates.
-     * <p>First, the VR UI surface model is converted to world space and then
-     * to screen space. This happens every frame in the update() method.
-     * Then, we check whether the screen coordinates are inside
-     * the VR UI area, and if so, we perform an inverse bilinear interpolation to
-     * get the UV of our screen coordinates in VR UI space. Finally, we convert these
-     * to pixels and return.</p>
-     *
-     * @param x   The X screen coordinate.
-     * @param y   The y screen coordinate.
-     * @param out The output vector.
-     *
-     * @return The coordinates in VR UI space of the given screen coordinates, if the screen coordinates collide
-     * with the VR UI. Otherwise, it returns null.
-     */
-    public Vector2 getProjectedPosition(int x, int y, Vector2 out) {
-        if (verticesScreenSpace != null) {
-            float width = Gdx.graphics.getWidth();
-            float height = Gdx.graphics.getHeight();
-            y = (int) height - y;
+            if (!vrControllers.isEmpty()) {
+                inverse.set(model.model.instance.transform).inv();
+                // Original plane in object space.
+                point.set(0, 0, 0);
+                normal.set(0, -1, 0);
+                // Move to world space by applying transform.
+                point.mul(model.model.instance.transform);
+                normal.mul(model.model.instance.transform);
+                // Characterize plane.
+                plane.set(point, normal);
+                // Check intersection with each controller.
+                int i = 0;
+                for (var device : vrControllers) {
+                    if (device.device.isInitialized() && device.device.isConnected()) {
+                        if (Intersector.intersectSegmentPlane(device.beamP0, device.beamP1, plane, intersection)) {
+                            // Intersect!
+                            if (i == 0) {
+                                // Use inverse transform to position on ZX plane.
+                                intersection.mul(inverse);
+                                float x3d = MathUtils.clamp(intersection.x, -0.28125f, 0.28125f);
+                                float z3d = MathUtils.clamp(intersection.z, -0.5f, 0.5f);
+                                float u = z3d + 0.5f;
+                                float v =  (x3d + 0.28125f) * 1f / 0.5625f;
 
-            var in = contains(x, y, verticesScreenSpace);
-            if (in) {
-                p.set(x / width, y / height);
-                a.set(verticesScreenSpace[0].x / width, verticesScreenSpace[0].y / height);
-                b.set(verticesScreenSpace[1].x / width, verticesScreenSpace[1].y / height);
-                c.set(verticesScreenSpace[2].x / width, verticesScreenSpace[2].y / height);
-                d.set(verticesScreenSpace[3].x / width, verticesScreenSpace[3].y / height);
+                                int x = (int) (u * Gdx.graphics.getWidth());
+                                int y = (int) (v * Gdx.graphics.getHeight());
 
-                e.set(b).sub(a);
-                f.set(d).sub(a);
-                g.set(a).sub(b).add(c).sub(d);
-                h.set(p).sub(a);
+                                pointer.x = x;
+                                pointer.y = Gdx.graphics.getHeight() - y;
 
-                float k2 = g.crs(f);
-                float k1 = e.crs(f) + h.crs(g);
-                float k0 = h.crs(e);
-
-                if (Math.abs(k2) < 0.001) {
-                    // Linear form, edges are parallel.
-                    uv.x = (h.x * k1 + f.x * k0) / (e.x * k1 - g.x * k0);
-                    uv.y = -k0 / k1;
-                } else {
-                    // Quadratic form.
-                    float w = k1 * k1 - 4.0f * k0 * k2;
-                    if (w < 0.0) {
-                        uv.set(-1, -1);
-                    } else {
-                        w = (float) Math.sqrt(w);
-
-                        float ik2 = 0.5f / k2;
-                        float v = (-k1 - w) * ik2;
-                        float u = (h.x - f.x * v) / (e.x + g.x * v);
-
-                        if (u < 0.0 || u > 1.0 || v < 0.0 || v > 1.0) {
-                            v = (-k1 + w) * ik2;
-                            u = (h.x - f.x * v) / (e.x + g.x * v);
+                                stage.mouseMoved(x, y);
+                            }
                         }
-                        uv.set(1 - u, 1 - v);
+                        i++;
                     }
                 }
-
-                int xUI = (int) (uv.x * width);
-                int yUI = (int) (height - uv.y * height);
-
-                return out.set(xUI, yUI);
             }
         }
-        return null;
     }
+
 
     /**
      * Checks whether the quadrilateral or polygon defined by points contains the point [x,y].
@@ -249,7 +212,6 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
      * @param x      The coordinate X of the point to test.
      * @param y      The coordinate Y of the point to test.
      * @param points The points defining the polygon.
-     *
      * @return Whether the point is in the polygon.
      */
     public boolean contains(int x, int y, Vector3[] points) {
@@ -257,8 +219,7 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
         int j;
         boolean result = false;
         for (i = 0, j = points.length - 1; i < points.length; j = i++) {
-            if ((points[i].y > y) != (points[j].y > y) &&
-                    (x < (points[j].x - points[i].x) * (y - points[i].y) / (points[j].y - points[i].y) + points[i].x)) {
+            if ((points[i].y > y) != (points[j].y > y) && (x < (points[j].x - points[i].x) * (y - points[i].y) / (points[j].y - points[i].y) + points[i].x)) {
                 result = !result;
             }
         }
@@ -270,6 +231,14 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
         buffer.begin();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         stage.draw();
+
+        if (pointer != null) {
+            shapeRenderer.begin(ShapeType.Filled);
+            // POINTER
+            shapeRenderer.setColor(1, 1, 0, 1);
+            shapeRenderer.circle(pointer.x, pointer.y, 10);
+            shapeRenderer.end();
+        }
         buffer.end();
     }
 
@@ -391,20 +360,6 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
                     }
                     this.entity = entity;
 
-                    // Get vertices.
-                    this.vertices = new Vector3[4];
-                    this.verticesScreenSpace = new Vector3[4];
-                    int vertSize = 14;
-                    var verts = model.model.instance.model.meshes.get(0).getVertices(new float[vertSize * 4]);
-                    for (int i = 0; i < vertices.length; i++) {
-                        vertices[i] = new Vector3(verts[i * vertSize], 0, verts[i * vertSize + 2]);
-                        verticesScreenSpace[i] = new Vector3();
-                    }
-                    // Swap 0 and 1 to create correct order for polygon.
-                    var aux = vertices[0];
-                    vertices[0] = vertices[1];
-                    vertices[1] = aux;
-
                     // Add to scene.
                     EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, true);
                 }
@@ -440,67 +395,9 @@ public class VRUI implements InputProcessor, IGui, IObserver, Disposable {
                 r.run();
             });
 
+        } else if (event == Event.VR_CONTROLLER_INFO) {
+            vrControllers.add((VRDevice) data[0]);
         }
     }
 
-    private final Vector2 aux = new Vector2();
-
-    @Override
-    public boolean keyDown(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        return false;
-    }
-
-    @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        var pos = getProjectedPosition(screenX, screenY, aux);
-        if (pos != null) {
-            stage.touchDown((int) pos.x, (int) pos.y, pointer, button);
-            return button == Input.Buttons.LEFT;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        var pos = getProjectedPosition(screenX, screenY, aux);
-        if (pos != null) {
-            stage.touchUp((int) pos.x, (int) pos.y, pointer, button);
-            return button == Input.Buttons.LEFT;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        var pos = getProjectedPosition(screenX, screenY, aux);
-        if (pos != null) {
-            stage.touchDragged((int) pos.x, (int) pos.y, pointer);
-            return Gdx.input.isButtonPressed(Input.Buttons.LEFT) && stage.getKeyboardFocus() != null && !(stage.getKeyboardFocus() instanceof Slider);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        var pos = getProjectedPosition(screenX, screenY, aux);
-        if (pos != null) {
-            stage.mouseMoved((int) pos.x, (int) pos.y);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        return false;
-    }
 }

@@ -1014,6 +1014,8 @@ public enum Event {
 
     /** Brings up the VR user interface. **/
     SHOW_VR_UI,
+    /** Broadcasts a new VR controller which has just been initialized. **/
+    VR_CONTROLLER_INFO,
 
     /** Shows the slave configuration window **/
     SHOW_SLAVE_CONFIG_ACTION,

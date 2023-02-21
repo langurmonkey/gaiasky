@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Constants;
+import gaiasky.util.math.Intersectord;
 
 public class VRDeviceUpdater extends AbstractUpdateSystem {
 
@@ -24,5 +25,6 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
         Matrix4 transform = model.model.instance.transform;
         vr.beamP0.set(0, -0.01f, 0).mul(transform);
         vr.beamP1.set(0, (float) -(Constants.MPC_TO_U - Constants.PC_TO_U), (float) -Constants.MPC_TO_U).mul(transform);
+
     }
 }

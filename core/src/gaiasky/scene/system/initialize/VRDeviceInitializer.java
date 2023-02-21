@@ -3,6 +3,8 @@ package gaiasky.scene.system.initialize;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
@@ -62,6 +64,8 @@ public class VRDeviceInitializer extends AbstractInitSystem {
         if (model.renderConsumer == null) {
             model.renderConsumer = ModelEntityRenderSystem::renderVRDeviceModel;
         }
+
+        EventManager.publish(Event.VR_CONTROLLER_INFO, this, vr);
 
     }
 
