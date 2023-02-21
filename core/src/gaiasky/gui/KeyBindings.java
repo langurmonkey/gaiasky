@@ -529,8 +529,9 @@ public class KeyBindings {
      */
     private Optional<String> readFirstLine(Path file) {
         try {
-            BufferedReader brTest = new BufferedReader(new FileReader(file.toFile()));
-            String line = brTest.readLine();
+            BufferedReader reader = new BufferedReader(new FileReader(file.toFile()));
+            String line = reader.readLine();
+            reader.close();
             return Optional.of(line);
         } catch (Exception e) {
             return Optional.empty();
@@ -540,16 +541,17 @@ public class KeyBindings {
     private Array<Pair<String, String>> readMappingsFile(Path file) throws IOException {
         Array<Pair<String, String>> result = new Array<>();
         InputStream is = Files.newInputStream(file);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
         String line;
-        while ((line = br.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             line = line.trim();
             if (!line.isEmpty() && !line.startsWith("#")) {
                 String[] strPair = line.split("=");
                 result.add(new Pair<>(strPair[0].trim(), strPair[1].trim()));
             }
         }
+        reader.close();
         return result;
     }
 
