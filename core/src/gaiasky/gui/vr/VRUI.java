@@ -38,8 +38,13 @@ import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
+import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
+import org.apache.commons.math3.geometry.euclidean.threed.Line;
+import org.apache.commons.math3.geometry.euclidean.threed.Plane;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -152,11 +157,13 @@ public class VRUI implements IGui, IObserver, Disposable {
     Vector2 h = new Vector2();
     Vector2 uv = new Vector2();
 
-    Vector3 intersection = new Vector3();
-    Vector3 point = new Vector3();
-    Vector3 normal = new Vector3();
-    Plane plane = new Plane();
-    Matrix4 inverse = new Matrix4();
+    Vector3d point = new Vector3d();
+    Vector3d normal = new Vector3d();
+    Vector3d intersection = new Vector3d();
+    Plane plane3D = new Plane(Vector3D.ZERO, 0.1 * Constants.M_TO_U);
+    Line line3D = new Line(Vector3D.PLUS_I, Vector3D.MINUS_I, 0.1 * Constants.M_TO_U);
+    Matrix4d transform = new Matrix4d();
+    Matrix4d inverse = new Matrix4d();
 
     public void update(double dt) {
         stage.act((float) dt);
@@ -166,28 +173,34 @@ public class VRUI implements IGui, IObserver, Disposable {
             var model = Mapper.model.get(entity);
 
             if (!vrControllers.isEmpty()) {
-                inverse.set(model.model.instance.transform).inv();
+                transform.set(model.model.instance.transform);
+                inverse.set(transform).inv();
                 // Original plane in object space.
                 point.set(0, 0, 0);
                 normal.set(0, -1, 0);
                 // Move to world space by applying transform.
-                point.mul(model.model.instance.transform);
-                normal.mul(model.model.instance.transform);
+                point.mul(transform);
+                normal.mul(transform);
                 // Characterize plane.
-                plane.set(point, normal);
+                var p3d = new Vector3D(point.x, point.y, point.z);
+                var n3d = new Vector3D(normal.x, normal.y, normal.z);
+                plane3D.reset(p3d, n3d);
                 // Check intersection with each controller.
                 int i = 0;
                 for (var device : vrControllers) {
                     if (device.device.isInitialized() && device.device.isConnected()) {
-                        if (Intersector.intersectSegmentPlane(device.beamP0, device.beamP1, plane, intersection)) {
+                        line3D.reset(new Vector3D(device.beamP0.x, device.beamP0.y, device.beamP0.z), new Vector3D(device.beamP1.x, device.beamP1.y, device.beamP1.z));
+                        var intersection3D = plane3D.intersection(line3D);
+                        if (intersection3D != null) {
                             // Intersect!
                             if (i == 0) {
                                 // Use inverse transform to position on ZX plane.
+                                intersection.set(intersection3D.getX(), intersection3D.getY(), intersection3D.getZ());
                                 intersection.mul(inverse);
-                                float x3d = MathUtils.clamp(intersection.x, -0.28125f, 0.28125f);
-                                float z3d = MathUtils.clamp(intersection.z, -0.5f, 0.5f);
-                                float u = z3d + 0.5f;
-                                float v =  (x3d + 0.28125f) * 1f / 0.5625f;
+                                double x3d = MathUtilsDouble.clamp(intersection.x, -0.28125, 0.28125);
+                                double z3d = MathUtilsDouble.clamp(intersection.z, -0.5, 0.5);
+                                double u = z3d + 0.5;
+                                double v =  (x3d + 0.28125) * 1 / 0.5625;
 
                                 int x = (int) (u * Gdx.graphics.getWidth());
                                 int y = (int) (v * Gdx.graphics.getHeight());

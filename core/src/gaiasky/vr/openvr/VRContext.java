@@ -30,33 +30,25 @@ import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
  * <p>
  */
 public class VRContext implements Disposable {
-    /**
-     * device index of the head mounted display
-     **/
-    public static final int HMD_DEVICE_INDEX = VR.k_unTrackedDeviceIndex_Hmd;
-    /**
-     * maximum device index
-     **/
-    public static final int MAX_DEVICE_INDEX = VR.k_unMaxTrackedDeviceCount - 1;
     private static final Log logger = getLogger(VRContext.class);
     private final IntBuffer scratch = BufferUtils.newIntBuffer(1);
-    // internal native objects to get device poses
+    // Internal native objects to get device poses.
     private final TrackedDevicePose.Buffer trackedDevicePoses = TrackedDevicePose.create(VR.k_unMaxTrackedDeviceCount);
     private final TrackedDevicePose.Buffer trackedDeviceGamePoses = TrackedDevicePose.create(VR.k_unMaxTrackedDeviceCount);
-    // devices, their poses and listeners
+    // Devices, their poses and listeners.
     private final VRDevicePose[] devicePoses = new VRDevicePose[VR.k_unMaxTrackedDeviceCount];
     private final VRDevice[] devices = new VRDevice[VR.k_unMaxTrackedDeviceCount];
-    private final Array<VRDeviceListener> listeners = new Array<VRDeviceListener>();
+    private final Array<VRDeviceListener> listeners = new Array<>();
     private final VREvent event = VREvent.create();
-    // default size
+    // Default size.
     private final int width;
     private final int height;
-    // render models
+    // Render models.
     private final ObjectMap<String, IntModel> models = new ObjectMap<>();
-    // offsets for translation and rotation from tracker to world space
+    // Offsets for translation and rotation from tracker to world space.
     private final Vector3 trackerSpaceOriginToWorldSpaceTranslationOffset = new Vector3();
     private final Matrix4 trackerSpaceToWorldspaceRotationOffset = new Matrix4();
-    // book keeping
+    // This is for bookkeeping.
     private boolean renderingStarted = false;
     private boolean initialDevicesReported = false;
 
@@ -252,7 +244,7 @@ public class VRContext implements Disposable {
     }
 
     /**
-     * Start rendering. Call beginEye to setup rendering for each individual
+     * Start rendering. Call beginEye to set up rendering for each individual
      * eye. End rendering by calling #end
      */
     public void begin() {
