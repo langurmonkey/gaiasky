@@ -67,7 +67,7 @@ public final class OpenVR {
         //VRChaperone = getGenericInterface(IVRChaperone_Version, IVRChaperone::new);
         //VRChaperoneSetup = getGenericInterface(IVRChaperoneSetup_Version, IVRChaperoneSetup::new);
         VRCompositor = getGenericInterface(IVRCompositor_Version, IVRCompositor::new);
-        VRHeadsetView = getGenericInterface(IVRHeadsetView_Version, IVRHeadsetView::new);
+        //VRHeadsetView = getGenericInterface(IVRHeadsetView_Version, IVRHeadsetView::new);
         //VROverlay = getGenericInterface(IVROverlay_Version, IVROverlay::new);
         VROverlayView = getGenericInterface(IVROverlayView_Version, IVROverlayView::new);
         //VRResources = getGenericInterface(IVRResources_Version, IVRResources::new);

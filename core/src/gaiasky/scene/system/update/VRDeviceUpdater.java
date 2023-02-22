@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Constants;
-import gaiasky.util.math.Intersectord;
 
 public class VRDeviceUpdater extends AbstractUpdateSystem {
 
