@@ -11,6 +11,7 @@ import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.math.Vector3d;
 
 public class VRDeviceInitializer extends AbstractInitSystem {
     private static final Log logger = Logger.getLogger(VRDeviceInitializer.class);
@@ -38,8 +39,8 @@ public class VRDeviceInitializer extends AbstractInitSystem {
     private void initializeVRDevice(Entity entity) {
         // VR device.
         var vr = Mapper.vr.get(entity);
-        vr.beamP0 = new Vector3();
-        vr.beamP1 = new Vector3();
+        vr.beamP0 = new Vector3d();
+        vr.beamP1 = new Vector3d();
 
         // Base.
         var base = Mapper.base.get(entity);

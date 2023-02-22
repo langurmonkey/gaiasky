@@ -11,12 +11,13 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -61,13 +62,17 @@ public class VRUI implements IGui, IObserver, Disposable {
     FrameBuffer buffer;
     Texture uiTexture;
     Entity entity;
-    Vector3 pointer = new Vector3();
+    // 5 pointers
+    Vector2[] pointer = new Vector2[5];
 
     FocusInfoInterface focusInfoInterface;
     ShapeRenderer shapeRenderer;
     Set<VRDevice> vrControllers;
 
     public VRUI() {
+        for (int i = 0; i < pointer.length; i++) {
+            pointer[i] = new Vector2(Float.NaN, Float.NaN);
+        }
     }
 
     public void setScene(Scene scene) {
@@ -76,12 +81,12 @@ public class VRUI implements IGui, IObserver, Disposable {
 
     public void initialize(AssetManager manager, SpriteBatch batch) {
         // Create stage.
-        Viewport vp = new FillViewport(WIDTH, HEIGHT);
+        Viewport vp = new StretchViewport(WIDTH, HEIGHT);
         stage = new Stage(vp, batch);
         shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
         shapeRenderer.setAutoShapeType(true);
         // Create controllers set.
-        vrControllers = new HashSet();
+        vrControllers = new HashSet<>();
 
         // Create buffer.
         var builder = new FrameBufferBuilder(WIDTH, HEIGHT);
@@ -100,6 +105,7 @@ public class VRUI implements IGui, IObserver, Disposable {
 
     public void build(Skin skin) {
         Table content = new Table(skin);
+        content.setBackground("table-border");
         Table t = new Table(skin);
         t.setBackground("table-bg");
 
@@ -124,7 +130,7 @@ public class VRUI implements IGui, IObserver, Disposable {
         checkBox.setChecked(true);
         OwnCheckBox checkBoxNo = new OwnCheckBox(" Unchecked", skin);
         checkBoxNo.setChecked(false);
-        SelectBox selectBox = new OwnSelectBox(skin, "big");
+        SelectBox<String> selectBox = new OwnSelectBox<>(skin, "big");
         selectBox.setItems("First item", "Second item", "Third item");
 
         t.pad(20);
@@ -136,6 +142,7 @@ public class VRUI implements IGui, IObserver, Disposable {
         t.add(checkBoxNo).left().top().padBottom(10).row();
         t.add(selectBox).left().top().padBottom(10).row();
 
+        content.pad(15);
         content.add(focusInfoInterface).left().top().padRight(20);
         content.add(t).left().top();
 
@@ -146,28 +153,15 @@ public class VRUI implements IGui, IObserver, Disposable {
         stage.addActor(content);
     }
 
-    Vector2 p = new Vector2();
-    Vector2 a = new Vector2();
-    Vector2 b = new Vector2();
-    Vector2 c = new Vector2();
-    Vector2 d = new Vector2();
-    Vector2 e = new Vector2();
-    Vector2 f = new Vector2();
-    Vector2 g = new Vector2();
-    Vector2 h = new Vector2();
-    Vector2 uv = new Vector2();
-
     Vector3d point = new Vector3d();
     Vector3d normal = new Vector3d();
     Vector3d intersection = new Vector3d();
-    Plane plane3D = new Plane(Vector3D.ZERO, 0.1 * Constants.M_TO_U);
+    Plane plane3D = new Plane(Vector3D.PLUS_J, 0.1 * Constants.M_TO_U);
     Line line3D = new Line(Vector3D.PLUS_I, Vector3D.MINUS_I, 0.1 * Constants.M_TO_U);
     Matrix4d transform = new Matrix4d();
     Matrix4d inverse = new Matrix4d();
 
     public void update(double dt) {
-        stage.act((float) dt);
-
         // Compute screen-space vertex coordinates for the current camera.
         if (entity != null) {
             var model = Mapper.model.get(entity);
@@ -177,7 +171,7 @@ public class VRUI implements IGui, IObserver, Disposable {
                 inverse.set(transform).inv();
                 // Original plane in object space.
                 point.set(0, 0, 0);
-                normal.set(0, -1, 0);
+                normal.set(0, 1, 0);
                 // Move to world space by applying transform.
                 point.mul(transform);
                 normal.mul(transform);
@@ -193,22 +187,31 @@ public class VRUI implements IGui, IObserver, Disposable {
                         var intersection3D = plane3D.intersection(line3D);
                         if (intersection3D != null) {
                             // Intersect!
-                            if (i == 0) {
+                            if (i < pointer.length) {
                                 // Use inverse transform to position on ZX plane.
                                 intersection.set(intersection3D.getX(), intersection3D.getY(), intersection3D.getZ());
                                 intersection.mul(inverse);
                                 double x3d = MathUtilsDouble.clamp(intersection.x, -0.28125, 0.28125);
                                 double z3d = MathUtilsDouble.clamp(intersection.z, -0.5, 0.5);
                                 double u = z3d + 0.5;
-                                double v =  (x3d + 0.28125) * 1 / 0.5625;
+                                double v = (x3d + 0.28125) * 1 / 0.5625;
 
-                                int x = (int) (u * Gdx.graphics.getWidth());
-                                int y = (int) (v * Gdx.graphics.getHeight());
+                                // Update hit.
+                                device.hitUI = u > 0 && u < 1 && v > 0 && v < 1;
 
-                                pointer.x = x;
-                                pointer.y = Gdx.graphics.getHeight() - y;
+                                if (device.hitUI) {
+                                    int x = (int) (u * Gdx.graphics.getWidth());
+                                    int y = (int) (v * Gdx.graphics.getHeight());
 
-                                stage.mouseMoved(x, y);
+                                    pointer[i].x = x;
+                                    pointer[i].y = Gdx.graphics.getHeight() - y;
+
+                                    stage.mouseMoved(x, y);
+                                } else {
+                                    pointer[i].x = Float.NaN;
+                                    pointer[i].y = Float.NaN;
+                                }
+
                             }
                         }
                         i++;
@@ -216,8 +219,9 @@ public class VRUI implements IGui, IObserver, Disposable {
                 }
             }
         }
-    }
 
+        stage.act((float) dt);
+    }
 
     /**
      * Checks whether the quadrilateral or polygon defined by points contains the point [x,y].
@@ -247,9 +251,13 @@ public class VRUI implements IGui, IObserver, Disposable {
 
         if (pointer != null) {
             shapeRenderer.begin(ShapeType.Filled);
-            // POINTER
-            shapeRenderer.setColor(1, 1, 0, 1);
-            shapeRenderer.circle(pointer.x, pointer.y, 10);
+            for (int i = 0; i < pointer.length; i++) {
+                var pi = pointer[i];
+                if (Float.isFinite(pi.x) && Float.isFinite(pi.y)) {
+                    shapeRenderer.setColor(1f, (float) i / (pointer.length - 1f), 0f, 1f);
+                    shapeRenderer.circle(pi.x, pi.y, 10);
+                }
+            }
             shapeRenderer.end();
         }
         buffer.end();
@@ -385,7 +393,7 @@ public class VRUI implements IGui, IObserver, Disposable {
                     dir.y = 0;
                     dir.nor();
                     var body = Mapper.body.get(entity);
-                    body.pos.set(camera.getPos().cpy().add(dir.scl(150 * Constants.KM_TO_U)));
+                    body.pos.set(camera.getPos().cpy().add(dir.scl(190 * Constants.KM_TO_U)));
                     body.pos.add(0, 80.0 * Constants.KM_TO_U, 0);
 
                     // Set new static coordinates.

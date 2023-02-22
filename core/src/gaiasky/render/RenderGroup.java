@@ -44,6 +44,10 @@ public enum RenderGroup {
      **/
     LINE,
     /**
+     * Line late
+     **/
+    LINE_LATE,
+    /**
      * Annotations
      **/
     FONT_ANNOTATION,

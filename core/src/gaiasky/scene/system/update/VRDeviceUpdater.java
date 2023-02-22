@@ -2,9 +2,10 @@ package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Constants;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 
 public class VRDeviceUpdater extends AbstractUpdateSystem {
 
@@ -14,16 +15,27 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-       updateEntity(entity, deltaTime);
+        updateEntity(entity, deltaTime);
     }
+
+    private Vector3d aux = new Vector3d();
+    private Matrix4d deviceTransform = new Matrix4d();
 
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
         var model = Mapper.model.get(entity);
         var vr = Mapper.vr.get(entity);
-        Matrix4 transform = model.model.instance.transform;
-        vr.beamP0.set(0, -0.01f, 0).mul(transform);
-        vr.beamP1.set(0, (float) -(Constants.MPC_TO_U - Constants.PC_TO_U), (float) -Constants.MPC_TO_U).mul(transform);
+        vr.beamP0.set(0, -0.01f, 0);
+        vr.beamP1.set(0, (float) (-700 * Constants.KM_TO_U), (float) (-1000 * Constants.KM_TO_U));
+        if (vr.hitUI) {
+            // Shorten beam.
+            aux.set(vr.beamP1).sub(vr.beamP0).nor().scl(40 * Constants.KM_TO_U);
+            vr.beamP1.set(vr.beamP0).add(aux);
+        }
+
+        deviceTransform.set(model.model.instance.transform);
+        vr.beamP0.mul(deviceTransform);
+        vr.beamP1.mul(deviceTransform);
 
     }
 }

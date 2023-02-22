@@ -199,7 +199,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * VR velocity vectors
      **/
-    private Vector3 velocityVR0, velocityVR1;
+    private Vector3d velocityVR0, velocityVR1;
     /**
      * Magnitude of velocityVR vector. Sets the velocity in the direction
      * of the VR controller
@@ -663,7 +663,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param amountX Amount in the perpendicular direction of p0-p1
      * @param amountY Amount in the direction of p0-p1
      */
-    public void setVelocityVR(Vector3 p0, Vector3 p1, double amountX, double amountY) {
+    public void setVelocityVR(Vector3d p0, Vector3d p1, double amountX, double amountY) {
         if (getMode() == CameraMode.FOCUS_MODE) {
             setVelocity(amountY);
         } else {

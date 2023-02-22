@@ -353,6 +353,10 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
         AbstractRenderSystem modelPerPixelLightingTransp = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPixelLighting);
 
+        // LINE LATE (TRANSPARENCIES)
+        AbstractRenderSystem lineLateProc = new LinePrimitiveRenderer(this, LINE_LATE, alphas, renderAssets.lineShaders);
+        lineLateProc.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
+
         // PARTICLE EFFECTS
         AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderer(this, null, alphas, renderAssets.particleEffectShaders);
         particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
@@ -424,6 +428,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         addRenderSystem(modelAtmProc);
         addRenderSystem(modelCloudProc);
         addRenderSystem(modelPerPixelLightingTransp);
+        addRenderSystem(lineLateProc);
 
         addRenderSystem(shapeProc);
         addRenderSystem(particleEffectsProc);

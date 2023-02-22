@@ -668,7 +668,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * to their classes and removes the Loading message.
      */
     private void doneLoading() {
-        logger.info("DONE LOADING START");
         // Get assets.
         final var assets = assetManager.get("gaiasky-assets", GaiaSkyAssets.class);
 
@@ -865,7 +864,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.INITIALIZED_INFO, this);
         sceneRenderer.setRendering(true);
         initialized = true;
-        logger.info("DONE LOADING END");
     }
 
     /**
