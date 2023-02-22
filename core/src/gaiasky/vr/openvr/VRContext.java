@@ -178,8 +178,9 @@ public class VRContext implements Disposable {
      * Adds a {@link VRDeviceListener} to receive events
      */
     public void addListener(VRDeviceListener listener) {
-        if (!this.listeners.contains(listener, true))
+        if (!this.listeners.contains(listener, true)) {
             this.listeners.add(listener);
+        }
     }
 
     /**
@@ -320,7 +321,9 @@ public class VRContext implements Disposable {
                 button = event.data().controller().button();
                 devices[index].setButton(button, true);
                 for (VRDeviceListener l : listeners) {
-                    l.buttonPressed(devices[index], button);
+                    if (l.buttonPressed(devices[index], button)) {
+                        break;
+                    }
                 }
                 break;
             case VR.EVREventType_VREvent_ButtonUnpress:
@@ -329,7 +332,9 @@ public class VRContext implements Disposable {
                 button = event.data().controller().button();
                 devices[index].setButton(button, false);
                 for (VRDeviceListener l : listeners) {
-                    l.buttonReleased(devices[index], button);
+                    if (l.buttonReleased(devices[index], button)) {
+                        break;
+                    }
                 }
                 break;
             case VR.EVREventType_VREvent_ButtonTouch:
@@ -366,8 +371,9 @@ public class VRContext implements Disposable {
                 int n = device.axes != null ? device.axes.length : 5;
                 for (int axis = 0; axis < n; axis++) {
                     if (device.pollAxis(axis)) {
-                        for (VRDeviceListener l : listeners)
+                        for (VRDeviceListener l : listeners) {
                             l.axisMoved(device, axis, device.axes[axis][0], device.axes[axis][1]);
+                        }
                     }
                 }
             }

@@ -646,6 +646,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 // Create VRUI object.
                 vrui = new VRUI();
                 vrui.initialize(assetManager, globalResources.getSpriteBatch());
+                vrContext.addListener(vrui);
 
                 return VRStatus.OK;
             } catch (Exception e) {

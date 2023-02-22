@@ -321,8 +321,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         gamepadListener = new MainGamepadListener(this, Settings.settings.controls.gamepad.mappingsFile);
         ControllerConnectionListener controllerConnectionListener = new ControllerConnectionListener();
         Controllers.addListener(controllerConnectionListener);
-        if (vr)
+        if (vr) {
             openVRListener = new OpenVRListener(this);
+        }
 
         // Shape renderer (pointer guide lines)
         shapeRenderer = new ShapeRenderer(10, shapeShader);
@@ -378,11 +379,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD,
-                Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN,
-                Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD,
-                Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO,
-                Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
+        EventManager.instance.subscribe(this, Event.SCENE_LOADED, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD, Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -417,8 +414,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void camUpdate(double dt, ITimeFrameProvider time) {
         currentMouseKbdListener.update();
         gamepadListener.update();
-        if (Settings.settings.runtime.openVr)
+        if (vr) {
             openVRListener.update();
+        }
 
         // Next focus and closest positions
         computeNextPositions(time);
@@ -493,7 +491,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // aux4b <- foucs.abspos + dx
                     this.focus.getAbsolutePosition(aux4b).add(dx);
 
-                    if (!Settings.settings.runtime.openVr) {
+                    if (vr) {
                         if (!diverted) {
                             directionToTarget(dt, aux4b, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3f : 1e2f));
                         } else {
@@ -518,7 +516,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     }
 
                     // Track
-                    if (!Settings.settings.runtime.openVr && this.trackingObject != null && this.trackingName != null) {
+                    if (!vr && this.trackingObject != null && this.trackingName != null) {
                         // Track the tracking object
                         this.trackingObject.getAbsolutePosition(trackingName, aux5b);
                         directionToTrackingObject(aux5b);
@@ -555,7 +553,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FREE_MODE:
             synchronized (updateLock) {
                 updatePosition(dt, speedScalingCapped, Settings.settings.scene.camera.targetMode ? speedScaling : 1);
-                if (!Settings.settings.runtime.openVr) {
+                if (!vr) {
                     // If target is present, update direction
                     if (freeTargetOn) {
                         directionToTarget(dt, freeTargetPos, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3d : 1e2d));
@@ -647,7 +645,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             desired.set(direction);
         }
 
-        desired.nor().scl(amount * tu * (Settings.settings.runtime.openVr ? 10 : 100));
+        desired.nor().scl(amount * tu * (vr ? 10 : 100));
         force.add(desired);
         // We reset the time counter
         lastFwdTime = 0;
@@ -1127,16 +1125,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 AbstractMouseKbdListener newListener = newMode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
                 setMouseKbdListener(newListener);
                 addGamepadListener();
-                if (Settings.settings.runtime.openVr)
+                if (vr) {
                     GaiaSky.instance.vrContext.addListener(openVRListener);
+                }
                 break;
             default:
                 // Unregister input controllers.
                 im.removeProcessor(currentMouseKbdListener);
                 removeGamepadListener();
                 // Remove vr listener.
-                if (Settings.settings.runtime.openVr)
+                if (vr) {
                     GaiaSky.instance.vrContext.removeListener(openVRListener);
+                }
                 break;
             }
         }
@@ -1170,7 +1170,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * The speed scaling function.
      *
      * @param min The minimum speed.
-     *
      * @return The speed scaling.
      */
     public double speedScaling(double min) {
@@ -1231,7 +1230,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             Entity newFocus = null;
 
             // Center focus or not
-            boolean centerFocus = !Settings.settings.runtime.openVr;
+            boolean centerFocus = !vr;
             if (data.length > 1)
                 centerFocus = (Boolean) data[1];
 
@@ -1267,7 +1266,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case CUBEMAP_CMD:
             boolean state = (boolean) data[0];
             CubemapProjection p = (CubemapProjection) data[1];
-            if (p.isPlanetarium() && state && !Settings.settings.runtime.openVr) {
+            if (p.isPlanetarium() && state && !vr) {
                 fovBackup = GaiaSky.instance.cameraManager.getCamera().fieldOfView;
             }
             break;
@@ -1347,7 +1346,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     double dx = 0d;
                     double dy = f.getSize() / 4d;
                     double dz = -f.getSize() * 4d;
-                    if (Settings.settings.runtime.openVr) {
+                    if (vr) {
                         dz = -dz;
                     }
 
@@ -1665,7 +1664,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         boolean modeStereoVR = modeStereo && Settings.settings.program.modeStereo.isStereoVR();
         boolean modeCubemap = Settings.settings.program.modeCubemap.active;
         boolean modeReprojection = Settings.settings.postprocess.reprojection.active;
-        boolean modeVR = Settings.settings.runtime.openVr;
+        boolean modeVR = vr;
 
         if (modeStereoVR || modeReprojection) {
             // No pointer guides or cross-hairs

@@ -19,29 +19,34 @@ public interface VRDeviceListener {
     /**
      * A button from {@link VRControllerButtons} was pressed on the
      * {@link VRDevice}
+     * @return True if the event was handled.
      **/
-    void buttonPressed(VRDevice device, int button);
+    boolean buttonPressed(VRDevice device, int button);
 
     /**
      * A button from {@link VRControllerButtons} was released on the
      * {@link VRDevice}
+     * @return True if the event was handled.
      **/
-    void buttonReleased(VRDevice device, int button);
+    boolean buttonReleased(VRDevice device, int button);
 
     /**
      * A button from {@link VRControllerButtons} was touched on the {@link VRDevice}
+     * @return True if the event was handled.
      */
-    void buttonTouched(VRDevice device, int button);
+    boolean buttonTouched(VRDevice device, int button);
 
     /**
      * A button from {@link VRControllerButtons} was untouched on the {@link VRDevice}
+     * @return True if the event was handled.
      */
-    void buttonUntouched(VRDevice device, int button);
+    boolean buttonUntouched(VRDevice device, int button);
 
     /**
      * An axis from {@link VRControllerAxes} was moved on the {@link VRDevice}
+     * @return True if the event was handled.
      */
-    void axisMoved(VRDevice device, int axis, float valueX, float valueY);
+    boolean axisMoved(VRDevice device, int axis, float valueX, float valueY);
 
     /**
      * Unhandled event on the {@link VRDevice}

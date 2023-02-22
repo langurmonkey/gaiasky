@@ -39,7 +39,6 @@ public class OpenVRListener implements VRDeviceListener {
     /** Map from VR device to model object **/
     private HashMap<VRDevice, Entity> vrDeviceToModel;
     private boolean vrControllerHint = false;
-    private boolean vrInfoGui = false;
     private long lastDoublePress = 0L;
     private boolean selecting = false;
     private long selectingTime = 0;
@@ -100,7 +99,7 @@ public class OpenVRListener implements VRDeviceListener {
         return result;
     }
 
-    public void buttonPressed(VRDevice device, int button) {
+    public boolean buttonPressed(VRDevice device, int button) {
         logger.debug("vr button down [device/code]: " + device.toString() + " / " + button);
 
         lazyInit();
@@ -118,9 +117,10 @@ public class OpenVRListener implements VRDeviceListener {
             EventManager.publish(Event.DISPLAY_VR_CONTROLLER_HINT_CMD, this, true);
             vrControllerHint = true;
         }
+        return true;
     }
 
-    public void buttonReleased(VRDevice device, int button) {
+    public boolean buttonReleased(VRDevice device, int button) {
         logger.debug("vr button released [device/code]: " + device.toString() + " / " + button);
 
         // Removed from pressed
@@ -146,6 +146,7 @@ public class OpenVRListener implements VRDeviceListener {
                 EventManager.publish(Event.CAMERA_MODE_CMD, this, cm);
             }
         }
+        return true;
     }
 
     private void startSelectionCountdown(VRDevice device) {
@@ -230,17 +231,19 @@ public class OpenVRListener implements VRDeviceListener {
     }
 
     @Override
-    public void buttonTouched(VRDevice device, int button) {
+    public boolean buttonTouched(VRDevice device, int button) {
         logger.debug("vr button touched [device/code]: " + device.toString() + " / " + button);
+        return false;
     }
 
     @Override
-    public void buttonUntouched(VRDevice device, int button) {
+    public boolean buttonUntouched(VRDevice device, int button) {
         logger.debug("vr button untouched [device/code]: " + device.toString() + " / " + button);
+        return false;
     }
 
     @Override
-    public void axisMoved(VRDevice device, int axis, float valueX, float valueY) {
+    public boolean axisMoved(VRDevice device, int axis, float valueX, float valueY) {
         logger.debug("axis moved: [device/axis/x/y]: " + device.toString() + " / " + axis + " / " + valueX + " / " + valueY);
 
         lazyInit();
@@ -282,6 +285,6 @@ public class OpenVRListener implements VRDeviceListener {
 
             break;
         }
-
+        return true;
     }
 }

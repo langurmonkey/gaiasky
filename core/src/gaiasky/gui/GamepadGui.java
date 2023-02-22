@@ -108,9 +108,22 @@ public class GamepadGui extends AbstractGui {
         gamepadListener = new GamepadGuiListener(this, Settings.settings.controls.gamepad.mappingsFile);
 
         // Comment to hide this whole dialog and functionality
+        registerEvents();
+    }
+
+    public void initialize(Stage stage) {
+        this.stage = stage;
+        registerEvents();
+    }
+
+    private void registerEvents() {
         EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD);
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
         EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD);
+    }
+
+    public void build() {
+        rebuildGui();
     }
 
     @Override
@@ -1158,7 +1171,6 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
-     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1187,7 +1199,6 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
-     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1284,6 +1295,10 @@ public class GamepadGui extends AbstractGui {
 
     public void back() {
         EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this);
+    }
+
+    public Table getContent() {
+        return content;
     }
 
     @Override
