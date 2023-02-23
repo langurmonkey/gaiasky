@@ -1,5 +1,6 @@
 package gaiasky.scene.record;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -50,6 +51,9 @@ public class VirtualTextureComponent extends NamedComponent {
         this.materialProvider = materialProvider;
         this.indirectionAttributeId = indirectionAttributeId;
         buildTree();
+    }
+
+    public void doneLoading(AssetManager manager) {
         buildIndirectionBuffer();
     }
 

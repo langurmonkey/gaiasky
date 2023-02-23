@@ -430,6 +430,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
+        svt.doneLoading(null);
         // Set ID.
         svt.id = id;
         // Set attributes.

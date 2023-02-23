@@ -25,17 +25,14 @@ public class VRSelectionGui extends AbstractGui {
 
     public VRSelectionGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
+        this.vr = vr;
         this.skin = skin;
     }
 
-    @Override
-    public void initialize(AssetManager assetManager, SpriteBatch sb) {
-        // User interface
+    public void initialize(Stage stage) {
+        this.stage = stage;
         float ow = Settings.settings.graphics.backBufferResolution[0];
         float oh = Settings.settings.graphics.backBufferResolution[1];
-        ScreenViewport vp = new ScreenViewport();
-        vp.setUnitsPerPixel(unitsPerPixel);
-        stage = new Stage(vp, sb);
 
         container = new Container<>();
         container.setFillParent(true);
@@ -61,6 +58,13 @@ public class VRSelectionGui extends AbstractGui {
         rebuildGui();
 
         EventManager.instance.subscribe(this, Event.VR_SELECTING_STATE);
+    }
+
+    @Override
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        initialize(new Stage(vp, sb));
     }
 
     @Override

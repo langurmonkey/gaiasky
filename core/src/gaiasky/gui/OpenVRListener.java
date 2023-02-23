@@ -88,7 +88,6 @@ public class OpenVRListener implements VRDeviceListener {
      * Returns true if all given buttons are pressed.
      *
      * @param buttons the buttons to check.
-     *
      * @return True if all buttons are pressed.
      */
     private boolean arePressed(int... buttons) {
@@ -108,7 +107,7 @@ public class OpenVRListener implements VRDeviceListener {
         // Selection countdown
         if (button == VRControllerButtons.SteamVR_Trigger) {
             // Start countdown
-            startSelectionCountdown(device);
+            //startSelectionCountdown(device);
         }
 
         return true;
@@ -128,7 +127,7 @@ public class OpenVRListener implements VRDeviceListener {
             } else if (button == VRControllerButtons.A) {
                 EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
             } else if (button == VRControllerButtons.SteamVR_Touchpad) {
-                // Change mode from free to focus and viceversa
+                // Change mode from free to focus and vice-versa
                 CameraMode cm = cam.getMode().isFocus() ? CameraMode.FREE_MODE : CameraMode.FOCUS_MODE;
                 // Stop
                 cam.clearVelocityVR();
@@ -143,28 +142,47 @@ public class OpenVRListener implements VRDeviceListener {
         selecting = true;
         selectingTime = System.currentTimeMillis();
         selectingDevice = device;
-        EventManager.publish(Event.VR_SELECTING_STATE, this, true, 0d);
+        EventManager.publish(Event.VR_SELECTING_STATE, this, true, 0d, selectingDevice);
     }
+
+    final long SELECTION_COUNTDOWN_MS = 2000;
 
     private void updateSelectionCountdown() {
         if (selecting) {
             if (isPressed(VRControllerButtons.SteamVR_Trigger)) {
                 long elapsed = System.currentTimeMillis() - selectingTime;
                 // Selection
-                long SELECTION_COUNTDOWN_MS = 2000;
                 double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
                 if (completion >= 1f) {
                     // Select object!
                     select(selectingDevice);
+                    // Finish
+                    EventManager.publish(Event.VR_SELECTING_STATE, this, false, completion, selectingDevice);
                     selecting = false;
                     selectingDevice = null;
+                } else {
+                    // Keep on
+                    EventManager.publish(Event.VR_SELECTING_STATE, this, selecting, completion, selectingDevice);
                 }
-                EventManager.publish(Event.VR_SELECTING_STATE, this, selecting, completion);
             } else {
                 // Stop selecting
+                EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d, selectingDevice);
                 selecting = false;
                 selectingDevice = null;
-                EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d);
+            }
+        }
+    }
+
+    private void stopSelectionCountdown() {
+        if (selecting) {
+            // Stop selecting
+            EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d, selectingDevice);
+            selecting = false;
+            selectingDevice = null;
+            long elapsed = System.currentTimeMillis() - selectingTime;
+            double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
+            if (completion >= 1f) {
+                select(selectingDevice);
             }
         }
     }
@@ -241,20 +259,15 @@ public class OpenVRListener implements VRDeviceListener {
         Entity sm;
         switch (axis) {
         case VRControllerAxes.Axis1:
-            // Forward
-            //StubModel sm = vrDeviceToModel.get(device);
-            //if (sm != null) {
-            //    // Direct direction
-            //   cam.setVelocityVR(sm.getBeamP0(), sm.getBeamP1(), valueX);
-            //}
+            // Trigger in Oculus Rift controllers
+            // Selection.
+            if (!selecting && valueX > 0) {
+                startSelectionCountdown(device);
+            } else if (selecting && valueX == 0) {
+                stopSelectionCountdown();
+            }
             break;
         case VRControllerAxes.Axis2:
-            // Backward
-            //sm = vrDeviceToModel.get(device);
-            //if (sm != null) {
-            //    // Invert direction
-            //    cam.setVelocityVR(sm.getBeamP0(), sm.getBeamP1(), -valueX);
-            //}
             break;
         case VRControllerAxes.Axis0:
             // Joystick for forward/backward movement

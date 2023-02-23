@@ -2,7 +2,6 @@ package gaiasky.render.process;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,18 +10,13 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.*;
-import gaiasky.gui.vr.VRControllerInfoGui;
-import gaiasky.gui.vr.VRGui;
-import gaiasky.gui.vr.VRInfoGui;
-import gaiasky.gui.vr.VRSelectionGui;
+import gaiasky.gui.IGui;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
@@ -75,8 +69,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
 
     // GUI
     private SpriteBatch sb, sbScreen;
-    private VRGui<VRInfoGui> infoGui;
-    private VRGui<VRSelectionGui> selectionGui;
 
     private Vector3 auxf1;
     private Vector3d auxd1;
@@ -129,9 +121,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
                 addVRController(controller);
             }
 
-            // VR UI
-            initializeVRGUI((Lwjgl3Graphics) Gdx.graphics);
-
             // Screen
             sbScreen = new SpriteBatch();
 
@@ -157,27 +146,10 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
                 // Default
                 EventManager.publish(Event.FOV_CHANGED_CMD, this, 89f);
             }
-            EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.VR_DEVICE_CONNECTED, Event.VR_DEVICE_DISCONNECTED, Event.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.VR_DEVICE_CONNECTED, Event.VR_DEVICE_DISCONNECTED);
         }
     }
 
-    private void initializeVRGUI(Lwjgl3Graphics graphics) {
-        float uiScale = Settings.settings.program.ui.scale;
-        float uiDistance = 8f;
-        final Skin skin = GaiaSky.instance.getGlobalResources().getSkin();
-        // GUI
-        if (infoGui != null)
-            infoGui.dispose();
-        infoGui = new VRGui<>(VRInfoGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin, graphics, 1f / uiScale);
-        infoGui.initialize(null, sb);
-        infoGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
-
-        if (selectionGui != null)
-            selectionGui.dispose();
-        selectionGui = new VRGui<>(VRSelectionGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin, graphics, 1f / uiScale);
-        selectionGui.initialize(null, sb);
-        selectionGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
-    }
 
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
@@ -216,13 +188,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             // Camera
             camera.render(rw, rh);
 
-            // GUI
-            if (infoGui.mustDraw())
-                renderGui(infoGui.left());
-
-            if (selectionGui.mustDraw())
-                renderGui(selectionGui.left());
-
             sendOrientationUpdate(camera.getCamera(), rw, rh);
             postProcessRender(ppb, fbLeft, postProcess, camera, rw, rh);
 
@@ -239,15 +204,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             sgr.renderScene(camera, t, rc);
             // Camera
             camera.render(rw, rh);
-
-            // GUI
-            if (infoGui.mustDraw()) {
-                renderGui(infoGui.right());
-            }
-
-            if (selectionGui.mustDraw()) {
-                renderGui(selectionGui.right());
-            }
 
             sendOrientationUpdate(camera.getCamera(), rw, rh);
             postProcessRender(ppb, fbRight, postProcess, camera, rw, rh);
@@ -371,10 +327,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             if (device.getType() == VRDeviceType.Controller) {
                 GaiaSky.postRunnable(() -> removeVRController(device));
             }
-            break;
-        case UI_SCALE_CMD:
-            sb.getProjectionMatrix().setToOrtho2D(0, 0, Settings.settings.graphics.backBufferResolution[0] * Settings.settings.program.ui.scale, Settings.settings.graphics.backBufferResolution[1] * Settings.settings.program.ui.scale);
-            initializeVRGUI((Lwjgl3Graphics) Gdx.graphics);
             break;
         default:
             break;

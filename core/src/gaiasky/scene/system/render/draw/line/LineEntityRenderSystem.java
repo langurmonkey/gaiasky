@@ -61,7 +61,11 @@ public class LineEntityRenderSystem {
         var vr = Mapper.vr.get(entity);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(true);
-        renderer.addLine(lineView, vr.beamP0.x, vr.beamP0.y, vr.beamP0.z, vr.beamP1.x, vr.beamP1.y, vr.beamP1.z, 0.92f, 0.21f, 0.08f, 0.8f, 0.92f, 0.21f, 0.08f, 0.01f);
+        var p0c = vr.colorP0;
+        var p1c = vr.colorP1;
+        var p2c = vr.colorP2;
+        renderer.addLine(lineView, vr.beamP0.x, vr.beamP0.y, vr.beamP0.z, vr.beamP1.x, vr.beamP1.y, vr.beamP1.z, p0c[0], p0c[1], p0c[2], p0c[3], p1c[0], p1c[1], p1c[2], p1c[3]);
+        renderer.addLine(lineView, vr.beamP1.x, vr.beamP1.y, vr.beamP1.z, vr.beamP2.x, vr.beamP2.y, vr.beamP2.z, p1c[0], p1c[1], p1c[2], p1c[3], p2c[0], p2c[1], p2c[2], p2c[3]);
     }
 
     public void renderPolyline(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
