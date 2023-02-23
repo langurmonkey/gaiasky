@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.*;
@@ -20,12 +21,14 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.beans.CameraComboBoxBean;
+import gaiasky.gui.vr.VRUI;
 import gaiasky.input.GuiGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -33,6 +36,7 @@ import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
+import gaiasky.vr.openvr.VRContext;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -42,8 +46,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.*;
 
+import static org.lwjgl.openvr.OpenVR.VRSystem;
+
 /**
  * GUI that is operated with a game controller and optimized for that purpose.
+ * This is also used as the main means of interacting with Gaia Sky VR.
  */
 public class GamepadGui extends AbstractGui {
     private static final Logger.Log logger = Logger.getLogger(GamepadGui.class.getSimpleName());
@@ -62,16 +69,16 @@ public class GamepadGui extends AbstractGui {
     private final FocusView view;
     private final FilterView filterView;
     boolean hackProgrammaticChangeEvents = true;
-    private Table searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
+    private Table vrInfoT, searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
     private Cell<?> contentCell, infoCell;
-    private OwnTextButton searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
+    private OwnTextButton vrInfoButton, searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere;
     private OwnCheckBox cinematic;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
     private OwnTextField searchField;
-    private OwnLabel infoMessage;
+    private OwnLabel infoMessage, cameraModeLabel, cameraFocusLabel;
     private Actor[][] currentModel;
     private Scene scene;
     private GamepadGuiListener gamepadListener;
@@ -80,10 +87,11 @@ public class GamepadGui extends AbstractGui {
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
-    public GamepadGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+    public GamepadGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final boolean vrMode) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.em = EventManager.instance;
+        this.vr = vrMode;
         model = new ArrayList<>();
         content = new Table(skin);
         menu = new Table(skin);
@@ -96,6 +104,10 @@ public class GamepadGui extends AbstractGui {
         pad40 = 98;
         view = new FocusView();
         filterView = new FilterView();
+    }
+
+    public GamepadGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
+        this(skin, graphics, unitsPerPixel, false);
     }
 
     @Override
@@ -117,7 +129,7 @@ public class GamepadGui extends AbstractGui {
     }
 
     private void registerEvents() {
-        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD);
+        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
         EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD);
     }
@@ -136,8 +148,8 @@ public class GamepadGui extends AbstractGui {
         tabContents.clear();
         model.clear();
 
-        float w = Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
-        float h = Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
+        float w = vr ? VRUI.WIDTH : Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
+        float h = vr ? VRUI.HEIGHT : Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
         // Widget width
         float ww = 400f;
         float wh = 64f;
@@ -147,6 +159,34 @@ public class GamepadGui extends AbstractGui {
         float tw = 224f;
 
         // Create contents
+
+        if (vr) {
+            // VR INFO
+            Actor[][] vrInfoModel = null;
+            model.add(vrInfoModel);
+
+            vrInfoT = new Table(skin);
+            vrInfoT.setSize(w, h);
+
+            // Title
+            OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "header-large");
+            vrInfoT.add(welcomeTitle).center().top().padBottom(pad40).colspan(2).row();
+
+            var context = GaiaSky.instance.vrContext;
+
+            // Devices
+            var hmds = context.getDevicesByType(VRContext.VRDeviceType.HeadMountedDisplay);
+            addDeviceTypeInfo(vrInfoT, "HMD", hmds);
+            var baseStations = context.getDevicesByType(VRContext.VRDeviceType.BaseStation);
+            addDeviceTypeInfo(vrInfoT, "Base stations", baseStations);
+            var controllers = context.getDevicesByType(VRContext.VRDeviceType.Controller);
+            addDeviceTypeInfo(vrInfoT, "Controllers", controllers);
+            var generic = context.getDevicesByType(VRContext.VRDeviceType.Generic);
+            addDeviceTypeInfo(vrInfoT, "Other devices", generic);
+
+            tabContents.add(container(vrInfoT, w, h));
+            updatePads(vrInfoT);
+        }
 
         // SEARCH
         Actor[][] searchModel = new Actor[11][5];
@@ -257,65 +297,78 @@ public class GamepadGui extends AbstractGui {
         camT.setSize(w, h);
         CameraManager cm = GaiaSky.instance.getCameraManager();
 
-        // Camera mode
-        final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
-        final int cameraModes = CameraMode.values().length;
-        final CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
-        for (int i = 0; i < cameraModes; i++) {
-            cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
+        if (!vr) {
+            // Camera mode
+            final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
+            final int cameraModes = CameraMode.values().length;
+            final CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
+            for (int i = 0; i < cameraModes; i++) {
+                cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
+            }
+            cameraMode = new OwnSelectBox<>(skin, "big");
+            cameraModel[0][0] = cameraMode;
+            cameraMode.setWidth(ww);
+            cameraMode.setItems(cameraOptions);
+            cameraMode.setSelectedIndex(cm.getMode().ordinal());
+            cameraMode.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    CameraComboBoxBean selection = cameraMode.getSelected();
+                    CameraMode mode = selection.mode;
+
+                    EventManager.publish(Event.CAMERA_MODE_CMD, cameraMode, mode);
+                    return true;
+                }
+                return false;
+            });
+            camT.add(modeLabel).right().padBottom(pad20).padRight(pad20);
+            camT.add(cameraMode).left().padBottom(pad20).row();
+
+            // Cinematic
+            final Label cinematicLabel = new Label(I18n.msg("gui.camera.cinematic"), skin, "header-raw");
+            cinematic = new OwnCheckBox("", skin, 0f);
+            cameraModel[0][1] = cinematic;
+            cinematic.setChecked(Settings.settings.scene.camera.cinematic);
+            cinematic.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.CAMERA_CINEMATIC_CMD, cinematic, cinematic.isChecked());
+                    return true;
+                }
+                return false;
+            });
+            camT.add(cinematicLabel).right().padBottom(pad20).padRight(pad20);
+            camT.add(cinematic).left().padBottom(pad20).row();
+
+            // FOV
+            final Label fovLabel = new Label(I18n.msg("gui.camera.fov"), skin, "header-raw");
+            fovSlider = new OwnSliderPlus("", Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin, "header-raw");
+            cameraModel[0][2] = fovSlider;
+            fovSlider.setValueSuffix("°");
+            fovSlider.setName("field of view");
+            fovSlider.setWidth(ww);
+            fovSlider.setValue(Settings.settings.scene.camera.fov);
+            fovSlider.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
+            fovSlider.addListener(event -> {
+                if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
+                    float value = fovSlider.getMappedValue();
+                    EventManager.publish(Event.FOV_CHANGED_CMD, fovSlider, value);
+                    return true;
+                }
+                return false;
+            });
+            camT.add(fovLabel).right().padBottom(pad20).padRight(pad20);
+            camT.add(fovSlider).left().padBottom(pad20).row();
+        } else {
+            // In VR, we show the mode and the current focus, if any.
+            final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
+            cameraModeLabel = new OwnLabel("-", skin, "header");
+            camT.add(modeLabel).right().padBottom(pad20).padRight(pad20);
+            camT.add(cameraModeLabel).left().padBottom(pad20).row();
+
+            final Label focusLabel = new Label(I18n.msg("camera.FOCUS_MODE"), skin, "header-raw");
+            cameraFocusLabel = new OwnLabel("-", skin, "header");
+            camT.add(focusLabel).right().padBottom(pad20).padRight(pad20);
+            camT.add(cameraFocusLabel).left().padBottom(pad20).row();
         }
-        cameraMode = new OwnSelectBox<>(skin, "big");
-        cameraModel[0][0] = cameraMode;
-        cameraMode.setWidth(ww);
-        cameraMode.setItems(cameraOptions);
-        cameraMode.setSelectedIndex(cm.getMode().ordinal());
-        cameraMode.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                CameraComboBoxBean selection = cameraMode.getSelected();
-                CameraMode mode = selection.mode;
-
-                EventManager.publish(Event.CAMERA_MODE_CMD, cameraMode, mode);
-                return true;
-            }
-            return false;
-        });
-        camT.add(modeLabel).right().padBottom(pad20).padRight(pad20);
-        camT.add(cameraMode).left().padBottom(pad20).row();
-
-        // Cinematic
-        final Label cinematicLabel = new Label(I18n.msg("gui.camera.cinematic"), skin, "header-raw");
-        cinematic = new OwnCheckBox("", skin, 0f);
-        cameraModel[0][1] = cinematic;
-        cinematic.setChecked(Settings.settings.scene.camera.cinematic);
-        cinematic.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.CAMERA_CINEMATIC_CMD, cinematic, cinematic.isChecked());
-                return true;
-            }
-            return false;
-        });
-        camT.add(cinematicLabel).right().padBottom(pad20).padRight(pad20);
-        camT.add(cinematic).left().padBottom(pad20).row();
-
-        // FOV
-        final Label fovLabel = new Label(I18n.msg("gui.camera.fov"), skin, "header-raw");
-        fovSlider = new OwnSliderPlus("", Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin, "header-raw");
-        cameraModel[0][2] = fovSlider;
-        fovSlider.setValueSuffix("°");
-        fovSlider.setName("field of view");
-        fovSlider.setWidth(ww);
-        fovSlider.setValue(Settings.settings.scene.camera.fov);
-        fovSlider.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
-        fovSlider.addListener(event -> {
-            if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
-                float value = fovSlider.getMappedValue();
-                EventManager.publish(Event.FOV_CHANGED_CMD, fovSlider, value);
-                return true;
-            }
-            return false;
-        });
-        camT.add(fovLabel).right().padBottom(pad20).padRight(pad20);
-        camT.add(fovSlider).left().padBottom(pad20).row();
 
         // Speed
         final Label speedLabel = new Label(I18n.msg("gui.camera.speed"), skin, "header-raw");
@@ -368,115 +421,117 @@ public class GamepadGui extends AbstractGui {
         camT.add(turnLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camTurnSlider).left().padBottom(pad20).row();
 
-        // Mode buttons
-        Table modeButtons = new Table(skin);
+        if (!vr) {
+            // Mode buttons
+            Table modeButtons = new Table(skin);
 
-        final Image icon3d = new Image(skin.getDrawable("3d-icon"));
-        button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
-        cameraModel[0][6] = button3d;
-        button3d.setChecked(Settings.settings.program.modeStereo.active);
-        final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
-        button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
-        button3d.setName("3d");
-        button3d.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (button3d.isChecked()) {
-                    buttonCubemap.setProgrammaticChangeEvents(true);
-                    buttonCubemap.setChecked(false);
-                    buttonDome.setProgrammaticChangeEvents(true);
-                    buttonDome.setChecked(false);
-                    buttonOrthosphere.setProgrammaticChangeEvents(true);
-                    buttonOrthosphere.setChecked(false);
+            final Image icon3d = new Image(skin.getDrawable("3d-icon"));
+            button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
+            cameraModel[0][6] = button3d;
+            button3d.setChecked(Settings.settings.program.modeStereo.active);
+            final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
+            button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
+            button3d.setName("3d");
+            button3d.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (button3d.isChecked()) {
+                        buttonCubemap.setProgrammaticChangeEvents(true);
+                        buttonCubemap.setChecked(false);
+                        buttonDome.setProgrammaticChangeEvents(true);
+                        buttonDome.setChecked(false);
+                        buttonOrthosphere.setProgrammaticChangeEvents(true);
+                        buttonOrthosphere.setChecked(false);
+                    }
+                    // Enable/disable
+                    EventManager.publish(Event.STEREOSCOPIC_CMD, button3d, button3d.isChecked());
+                    return true;
                 }
-                // Enable/disable
-                EventManager.publish(Event.STEREOSCOPIC_CMD, button3d, button3d.isChecked());
-                return true;
-            }
-            return false;
-        });
-        modeButtons.add(button3d).padRight(pad20);
+                return false;
+            });
+            modeButtons.add(button3d).padRight(pad20);
 
-        final Image iconDome = new Image(skin.getDrawable("dome-icon"));
-        buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
-        cameraModel[1][6] = buttonDome;
-        buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
-        final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
-        buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
-        buttonDome.setName("dome");
-        buttonDome.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (buttonDome.isChecked()) {
-                    buttonCubemap.setProgrammaticChangeEvents(true);
-                    buttonCubemap.setChecked(false);
-                    button3d.setProgrammaticChangeEvents(true);
-                    button3d.setChecked(false);
-                    buttonOrthosphere.setProgrammaticChangeEvents(true);
-                    buttonOrthosphere.setChecked(false);
+            final Image iconDome = new Image(skin.getDrawable("dome-icon"));
+            buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
+            cameraModel[1][6] = buttonDome;
+            buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
+            final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
+            buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
+            buttonDome.setName("dome");
+            buttonDome.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (buttonDome.isChecked()) {
+                        buttonCubemap.setProgrammaticChangeEvents(true);
+                        buttonCubemap.setChecked(false);
+                        button3d.setProgrammaticChangeEvents(true);
+                        button3d.setChecked(false);
+                        buttonOrthosphere.setProgrammaticChangeEvents(true);
+                        buttonOrthosphere.setChecked(false);
+                    }
+                    // Enable/disable
+                    EventManager.publish(Event.CUBEMAP_CMD, buttonDome, buttonDome.isChecked(), CubemapProjection.AZIMUTHAL_EQUIDISTANT);
+                    fovSlider.setDisabled(buttonDome.isChecked());
+                    return true;
                 }
-                // Enable/disable
-                EventManager.publish(Event.CUBEMAP_CMD, buttonDome, buttonDome.isChecked(), CubemapProjection.AZIMUTHAL_EQUIDISTANT);
-                fovSlider.setDisabled(buttonDome.isChecked());
-                return true;
-            }
-            return false;
-        });
-        modeButtons.add(buttonDome).padRight(pad20);
+                return false;
+            });
+            modeButtons.add(buttonDome).padRight(pad20);
 
-        final Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
-        buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
-        cameraModel[2][6] = buttonCubemap;
-        buttonCubemap.setProgrammaticChangeEvents(false);
-        buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
-        final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
-        buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
-        buttonCubemap.setName("cubemap");
-        buttonCubemap.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (buttonCubemap.isChecked()) {
-                    buttonDome.setProgrammaticChangeEvents(true);
-                    buttonDome.setChecked(false);
-                    button3d.setProgrammaticChangeEvents(true);
-                    button3d.setChecked(false);
-                    buttonOrthosphere.setProgrammaticChangeEvents(true);
-                    buttonOrthosphere.setChecked(false);
+            final Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
+            buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
+            cameraModel[2][6] = buttonCubemap;
+            buttonCubemap.setProgrammaticChangeEvents(false);
+            buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
+            final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
+            buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.360")), hkCubemap, skin));
+            buttonCubemap.setName("cubemap");
+            buttonCubemap.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (buttonCubemap.isChecked()) {
+                        buttonDome.setProgrammaticChangeEvents(true);
+                        buttonDome.setChecked(false);
+                        button3d.setProgrammaticChangeEvents(true);
+                        button3d.setChecked(false);
+                        buttonOrthosphere.setProgrammaticChangeEvents(true);
+                        buttonOrthosphere.setChecked(false);
+                    }
+                    // Enable/disable
+                    EventManager.publish(Event.CUBEMAP_CMD, buttonCubemap, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR);
+                    fovSlider.setDisabled(buttonCubemap.isChecked());
+                    return true;
                 }
-                // Enable/disable
-                EventManager.publish(Event.CUBEMAP_CMD, buttonCubemap, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR);
-                fovSlider.setDisabled(buttonCubemap.isChecked());
-                return true;
-            }
-            return false;
-        });
-        modeButtons.add(buttonCubemap).padRight(pad20);
+                return false;
+            });
+            modeButtons.add(buttonCubemap).padRight(pad20);
 
-        final Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
-        buttonOrthosphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
-        cameraModel[3][6] = buttonOrthosphere;
-        buttonOrthosphere.setProgrammaticChangeEvents(false);
-        buttonOrthosphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
-        final String hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere");
-        buttonOrthosphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
-        buttonOrthosphere.setName("orthosphere");
-        buttonOrthosphere.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (buttonOrthosphere.isChecked()) {
-                    buttonCubemap.setProgrammaticChangeEvents(true);
-                    buttonCubemap.setChecked(false);
-                    buttonDome.setProgrammaticChangeEvents(true);
-                    buttonDome.setChecked(false);
-                    button3d.setProgrammaticChangeEvents(true);
-                    button3d.setChecked(false);
+            final Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
+            buttonOrthosphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
+            cameraModel[3][6] = buttonOrthosphere;
+            buttonOrthosphere.setProgrammaticChangeEvents(false);
+            buttonOrthosphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
+            final String hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere");
+            buttonOrthosphere.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.orthosphere")), hkOrthosphere, skin));
+            buttonOrthosphere.setName("orthosphere");
+            buttonOrthosphere.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (buttonOrthosphere.isChecked()) {
+                        buttonCubemap.setProgrammaticChangeEvents(true);
+                        buttonCubemap.setChecked(false);
+                        buttonDome.setProgrammaticChangeEvents(true);
+                        buttonDome.setChecked(false);
+                        button3d.setProgrammaticChangeEvents(true);
+                        button3d.setChecked(false);
+                    }
+                    // Enable/disable
+                    EventManager.publish(Event.CUBEMAP_CMD, buttonOrthosphere, buttonOrthosphere.isChecked(), CubemapProjection.ORTHOSPHERE);
+                    fovSlider.setDisabled(buttonOrthosphere.isChecked());
+                    return true;
                 }
-                // Enable/disable
-                EventManager.publish(Event.CUBEMAP_CMD, buttonOrthosphere, buttonOrthosphere.isChecked(), CubemapProjection.ORTHOSPHERE);
-                fovSlider.setDisabled(buttonOrthosphere.isChecked());
-                return true;
-            }
-            return false;
-        });
-        modeButtons.add(buttonOrthosphere).padRight(pad20);
+                return false;
+            });
+            modeButtons.add(buttonOrthosphere).padRight(pad20);
 
-        camT.add(modeButtons).colspan(2).center().padTop(pad40);
+            camT.add(modeButtons).colspan(2).center().padTop(pad40);
+        }
 
         tabContents.add(container(camT, w, h));
         updatePads(camT);
@@ -600,84 +655,94 @@ public class GamepadGui extends AbstractGui {
 
         controlsT = new Table(skin);
 
-        // Controllers list
-        var controllers = Controllers.getControllers();
-        Controller controller = null;
-        for (var c : controllers) {
-            if (!Settings.settings.controls.gamepad.isControllerBlacklisted(c.getName())) {
-                // Found it!
-                controller = c;
-                break;
-            }
-        }
-        if (controller == null) {
-            // Error!
-            OwnLabel noControllers = new OwnLabel(I18n.msg("gui.controller.nocontrollers"), skin, "header-blue");
-            controlsT.add(noControllers).padBottom(pad10).row();
-            controlsModel[0][0] = new OwnTextButton("", skin, "toggle-big");
+        if (vr) {
+            // In VR, show usage info.
+            Texture vrctrl_tex = new Texture(Gdx.files.internal("img/controller/hud-info-ui.png"));
+            vrctrl_tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            Image vrctrl = new Image(vrctrl_tex);
+
+            controlsT.add(vrctrl).top().pad(pad20);
         } else {
-            final var controllerName = controller.getName();
-            Table controllerTable = new Table(skin);
+            // In desktop, show regular controller configuration widgets.
+            // Controllers list
+            var controllers = Controllers.getControllers();
+            Controller controller = null;
+            for (var c : controllers) {
+                if (!Settings.settings.controls.gamepad.isControllerBlacklisted(c.getName())) {
+                    // Found it!
+                    controller = c;
+                    break;
+                }
+            }
+            if (controller == null) {
+                // Error!
+                OwnLabel noControllers = new OwnLabel(I18n.msg("gui.controller.nocontrollers"), skin, "header-blue");
+                controlsT.add(noControllers).padBottom(pad10).row();
+                controlsModel[0][0] = new OwnTextButton("", skin, "toggle-big");
+            } else {
+                final var controllerName = controller.getName();
+                Table controllerTable = new Table(skin);
 
-            OwnLabel detectedController = new OwnLabel(I18n.msg("gui.controller.detected"), skin, "header-raw");
-            OwnLabel controllerNameLabel = new OwnLabel(controllerName, skin, "header-blue");
+                OwnLabel detectedController = new OwnLabel(I18n.msg("gui.controller.detected"), skin, "header-raw");
+                OwnLabel controllerNameLabel = new OwnLabel(controllerName, skin, "header-blue");
 
-            OwnTextButton configureControllerButton = new OwnTextButton(I18n.msg("gui.controller.configure"), skin, "big");
-            configureControllerButton.setWidth(ww);
-            configureControllerButton.setHeight(wh);
-            configureControllerButton.addListener(event -> {
+                OwnTextButton configureControllerButton = new OwnTextButton(I18n.msg("gui.controller.configure"), skin, "big");
+                configureControllerButton.setWidth(ww);
+                configureControllerButton.setHeight(wh);
+                configureControllerButton.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        // Get currently selected mappings
+                        GamepadMappings mappings = new GamepadMappings(controllerName, Path.of(Settings.settings.controls.gamepad.mappingsFile));
+                        GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, mappings, stage, skin);
+                        ccw.setAcceptRunnable(() -> {
+                            if (ccw.savedFile != null) {
+                                // File was saved, reload, select
+                                EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, ccw.savedFile.toAbsolutePath().toString());
+                            }
+                        });
+                        ccw.show(stage);
+                        return true;
+                    }
+                    return false;
+                });
+
+                controllerTable.add(detectedController).padBottom(pad10).padRight(pad20);
+                controllerTable.add(controllerNameLabel).padBottom(pad10).row();
+                controllerTable.add(configureControllerButton).center().colspan(2);
+
+                controlsT.add(controllerTable).padBottom(pad20 * 2).row();
+
+                controlsModel[0][0] = configureControllerButton;
+            }
+
+            // Invert X
+            invertXButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "X"), skin, "toggle-big");
+            controlsModel[0][1] = invertXButton;
+            invertXButton.setWidth(ww);
+            invertXButton.setChecked(Settings.settings.controls.gamepad.invertX);
+            invertXButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    // Get currently selected mappings
-                    GamepadMappings mappings = new GamepadMappings(controllerName, Path.of(Settings.settings.controls.gamepad.mappingsFile));
-                    GamepadConfigWindow ccw = new GamepadConfigWindow(controllerName, mappings, stage, skin);
-                    ccw.setAcceptRunnable(() -> {
-                        if (ccw.savedFile != null) {
-                            // File was saved, reload, select
-                            EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, ccw.savedFile.toAbsolutePath().toString());
-                        }
-                    });
-                    ccw.show(stage);
+                    EventManager.publish(Event.INVERT_X_CMD, invertXButton, invertXButton.isChecked());
                     return true;
                 }
                 return false;
             });
+            controlsT.add(invertXButton).padBottom(pad10).row();
 
-            controllerTable.add(detectedController).padBottom(pad10).padRight(pad20);
-            controllerTable.add(controllerNameLabel).padBottom(pad10).row();
-            controllerTable.add(configureControllerButton).center().colspan(2);
-
-            controlsT.add(controllerTable).padBottom(pad20 * 2).row();
-
-            controlsModel[0][0] = configureControllerButton;
+            // Invert Y
+            invertYButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "Y"), skin, "toggle-big");
+            controlsModel[0][2] = invertYButton;
+            invertYButton.setWidth(ww);
+            invertYButton.setChecked(Settings.settings.controls.gamepad.invertY);
+            invertYButton.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.INVERT_Y_CMD, invertYButton, invertYButton.isChecked());
+                    return true;
+                }
+                return false;
+            });
+            controlsT.add(invertYButton);
         }
-
-        // Invert X
-        invertXButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "X"), skin, "toggle-big");
-        controlsModel[0][1] = invertXButton;
-        invertXButton.setWidth(ww);
-        invertXButton.setChecked(Settings.settings.controls.gamepad.invertX);
-        invertXButton.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.INVERT_X_CMD, invertXButton, invertXButton.isChecked());
-                return true;
-            }
-            return false;
-        });
-        controlsT.add(invertXButton).padBottom(pad10).row();
-
-        // Invert Y
-        invertYButton = new OwnTextButton(I18n.msg("gui.controller.axis.invert", "Y"), skin, "toggle-big");
-        controlsModel[0][2] = invertYButton;
-        invertYButton.setWidth(ww);
-        invertYButton.setChecked(Settings.settings.controls.gamepad.invertY);
-        invertYButton.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.INVERT_Y_CMD, invertYButton, invertYButton.isChecked());
-                return true;
-            }
-            return false;
-        });
-        controlsT.add(invertYButton);
 
         controlsT.setSize(w, h);
         tabContents.add(container(controlsT, w, h));
@@ -791,18 +856,20 @@ public class GamepadGui extends AbstractGui {
             return false;
         });
 
-        // Lens flare
-        flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
-        graphicsModel[1][0] = flareButton;
-        flareButton.setWidth(ww);
-        flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
-        flareButton.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LENS_FLARE_CMD, flareButton, flareButton.isChecked());
-                return true;
-            }
-            return false;
-        });
+        if (!vr) {
+            // Lens flare
+            flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
+            graphicsModel[1][0] = flareButton;
+            flareButton.setWidth(ww);
+            flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
+            flareButton.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.LENS_FLARE_CMD, flareButton, flareButton.isChecked());
+                    return true;
+                }
+                return false;
+            });
+        }
 
         // Star glow
         starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
@@ -817,18 +884,20 @@ public class GamepadGui extends AbstractGui {
             return false;
         });
 
-        // Motion blur
-        motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
-        graphicsModel[1][2] = motionBlurButton;
-        motionBlurButton.setWidth(ww);
-        motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur.active);
-        motionBlurButton.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.MOTION_BLUR_CMD, motionBlurButton, motionBlurButton.isChecked());
-                return true;
-            }
-            return false;
-        });
+        if (!vr) {
+            // Motion blur
+            motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
+            graphicsModel[1][2] = motionBlurButton;
+            motionBlurButton.setWidth(ww);
+            motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur.active);
+            motionBlurButton.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.MOTION_BLUR_CMD, motionBlurButton, motionBlurButton.isChecked());
+                    return true;
+                }
+                return false;
+            });
+        }
 
         /* Reset defaults */
         OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.msg("gui.resetdefaults"), skin, "reset");
@@ -878,11 +947,13 @@ public class GamepadGui extends AbstractGui {
 
         // Add to table
         graphicsT.add(starBrightness).padBottom(pad10).padRight(pad40);
-        graphicsT.add(flareButton).padBottom(pad10).row();
+        if (!vr)
+            graphicsT.add(flareButton).padBottom(pad10).row();
         graphicsT.add(magnitudeMultiplier).padBottom(pad10).padRight(pad40);
         graphicsT.add(starGlowButton).padBottom(pad10).row();
         graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad40);
-        graphicsT.add(motionBlurButton).padBottom(pad10).row();
+        if (!vr)
+            graphicsT.add(motionBlurButton).padBottom(pad10).row();
         graphicsT.add(pointSize).padBottom(pad10).padRight(pad40);
         graphicsT.add(resetDefaults).padBottom(pad10).row();
         graphicsT.add(starBaseLevel).padBottom(pad10).padRight(pad40);
@@ -917,6 +988,18 @@ public class GamepadGui extends AbstractGui {
         updatePads(sysT);
 
         // Create tab buttons
+        if (vr) {
+            vrInfoButton = new OwnTextButton(I18n.msg("gui.info"), skin, "toggle-big");
+            tabButtons.add(vrInfoButton);
+            vrInfoButton.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    selectedTab = tabButtons.indexOf(vrInfoButton);
+                    updateTabs();
+                }
+                return false;
+            });
+        }
+
         searchButton = new OwnTextButton(I18n.msg("gui.search"), skin, "toggle-big");
         tabButtons.add(searchButton);
         searchButton.addListener((event) -> {
@@ -1012,6 +1095,9 @@ public class GamepadGui extends AbstractGui {
         });
         lb.pad(pad10);
         menu.add(lb).center().padBottom(pad30).row();
+        if (vr) {
+            menu.add(vrInfoButton).left().row();
+        }
         menu.add(searchButton).left().row();
         menu.add(cameraButton).left().row();
         menu.add(timeButton).left().row();
@@ -1039,6 +1125,29 @@ public class GamepadGui extends AbstractGui {
 
         if (scene == null)
             scene = GaiaSky.instance.scene;
+    }
+
+    private void addDeviceTypeInfo(Table table, String name, Array<VRContext.VRDevice> devices) {
+        if (devices != null && !devices.isEmpty()) {
+            int i = 0;
+            for (var device : devices) {
+                if (i == 0) {
+                    table.add(new OwnLabel(name, skin, "header")).top().left().padRight(pad40).padBottom(pad10);
+                } else {
+                    table.add().top().left().padRight(pad40).padBottom(pad10);
+                }
+                String text;
+                if (device.getType() == VRContext.VRDeviceType.Controller) {
+                    text = device.modelNumber;
+                } else {
+                    text = device.getType() + (device.getPose() != null ? " - " + device.getPose().getIndex() : "");
+                }
+                table.add(new OwnLabel(text, skin, "big")).top().left().padBottom(pad10).row();
+                i++;
+            }
+
+        }
+
     }
 
     private void addTextKey(String text, Actor[][] m, int i, int j, boolean nl) {
@@ -1321,7 +1430,7 @@ public class GamepadGui extends AbstractGui {
             timeStartStop.setProgrammaticChangeEvents(true);
         }
         case CAMERA_MODE_CMD -> {
-            if (source != cameraMode) {
+            if (cameraMode != null && source != cameraMode && !vr) {
                 // Update camera mode selection
                 final var mode = (CameraMode) data[0];
                 var cModes = cameraMode.getItems();
@@ -1337,6 +1446,25 @@ public class GamepadGui extends AbstractGui {
                     cameraMode.setSelected(selected);
                     cameraMode.getSelection().setProgrammaticChangeEvents(true);
                 }
+            } else if (cameraModeLabel != null) {
+                final var mode = (CameraMode) data[0];
+                cameraModeLabel.setText(mode.toStringI18n());
+                if (mode != CameraMode.FOCUS_MODE && cameraFocusLabel != null) {
+                    cameraFocusLabel.setText("-");
+                }
+            }
+        }
+        case FOCUS_CHANGE_CMD -> {
+            if (cameraFocusLabel != null) {
+                String focusName;
+                if (data[0] instanceof String) {
+                    focusName = (String) data[0];
+                } else {
+                    var entity = (Entity) data[0];
+                    view.setEntity(entity);
+                    focusName = view.getLocalizedName();
+                }
+                cameraFocusLabel.setText(focusName);
             }
         }
         case STAR_POINT_SIZE_CMD -> {
@@ -1380,14 +1508,14 @@ public class GamepadGui extends AbstractGui {
             }
         }
         case STEREOSCOPIC_CMD -> {
-            if (source != button3d && !Settings.settings.runtime.openVr) {
+            if (button3d != null && source != button3d && !vr) {
                 button3d.setProgrammaticChangeEvents(false);
                 button3d.setChecked((boolean) data[0]);
                 button3d.setProgrammaticChangeEvents(true);
             }
         }
         case CUBEMAP_CMD -> {
-            if (!Settings.settings.runtime.openVr) {
+            if (!vr) {
                 final CubemapProjection proj = (CubemapProjection) data[1];
                 final boolean enable = (boolean) data[0];
                 if (proj.isPanorama() && source != buttonCubemap) {

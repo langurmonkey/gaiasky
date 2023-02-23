@@ -38,7 +38,6 @@ public class OpenVRListener implements VRDeviceListener {
     private final FocusView focusView;
     /** Map from VR device to model object **/
     private HashMap<VRDevice, Entity> vrDeviceToModel;
-    private boolean vrControllerHint = false;
     private long lastDoublePress = 0L;
     private boolean selecting = false;
     private long selectingTime = 0;
@@ -112,11 +111,6 @@ public class OpenVRListener implements VRDeviceListener {
             startSelectionCountdown(device);
         }
 
-        // VR controller hint
-        if (arePressed(VRControllerButtons.A, VRControllerButtons.B)) {
-            EventManager.publish(Event.DISPLAY_VR_CONTROLLER_HINT_CMD, this, true);
-            vrControllerHint = true;
-        }
         return true;
     }
 
@@ -129,11 +123,7 @@ public class OpenVRListener implements VRDeviceListener {
         if (TimeUtils.millis() - lastDoublePress > 250) {
             // Give some time to recover from double press
             lazyInit();
-            if (vrControllerHint && !arePressed(VRControllerButtons.A, VRControllerButtons.B)) {
-                EventManager.publish(Event.DISPLAY_VR_CONTROLLER_HINT_CMD, this, false);
-                vrControllerHint = false;
-                lastDoublePress = TimeUtils.millis();
-            } else if (button == VRControllerButtons.B) {
+            if (button == VRControllerButtons.B) {
                 EventManager.publish(Event.SHOW_VR_UI, this);
             } else if (button == VRControllerButtons.A) {
                 EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");

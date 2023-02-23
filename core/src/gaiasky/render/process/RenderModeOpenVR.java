@@ -76,7 +76,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
     // GUI
     private SpriteBatch sb, sbScreen;
     private VRGui<VRInfoGui> infoGui;
-    private VRGui<VRControllerInfoGui> controllerHintGui;
     private VRGui<VRSelectionGui> selectionGui;
 
     private Vector3 auxf1;
@@ -173,12 +172,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
         infoGui.initialize(null, sb);
         infoGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
 
-        if (controllerHintGui != null)
-            controllerHintGui.dispose();
-        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin, graphics, 1f / uiScale);
-        controllerHintGui.initialize(null, sb);
-        controllerHintGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
-
         if (selectionGui != null)
             selectionGui.dispose();
         selectionGui = new VRGui<>(VRSelectionGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin, graphics, 1f / uiScale);
@@ -224,15 +217,11 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             camera.render(rw, rh);
 
             // GUI
-            if (controllerHintGui.mustDraw()) {
-                renderGui(controllerHintGui.left());
-            } else {
-                if (infoGui.mustDraw())
-                    renderGui(infoGui.left());
+            if (infoGui.mustDraw())
+                renderGui(infoGui.left());
 
-                if (selectionGui.mustDraw())
-                    renderGui(selectionGui.left());
-            }
+            if (selectionGui.mustDraw())
+                renderGui(selectionGui.left());
 
             sendOrientationUpdate(camera.getCamera(), rw, rh);
             postProcessRender(ppb, fbLeft, postProcess, camera, rw, rh);
@@ -252,16 +241,12 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             camera.render(rw, rh);
 
             // GUI
-            if (controllerHintGui.mustDraw()) {
-                renderGui(controllerHintGui.right());
-            } else {
-                if (infoGui.mustDraw()) {
-                    renderGui(infoGui.right());
-                }
+            if (infoGui.mustDraw()) {
+                renderGui(infoGui.right());
+            }
 
-                if (selectionGui.mustDraw()) {
-                    renderGui(selectionGui.right());
-                }
+            if (selectionGui.mustDraw()) {
+                renderGui(selectionGui.right());
             }
 
             sendOrientationUpdate(camera.getCamera(), rw, rh);
