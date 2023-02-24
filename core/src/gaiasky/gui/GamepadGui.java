@@ -28,7 +28,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.camera.CameraManager.CameraMode;
-import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.view.FilterView;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
@@ -45,8 +44,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
-
-import static org.lwjgl.openvr.OpenVR.VRSystem;
 
 /**
  * GUI that is operated with a game controller and optimized for that purpose.
@@ -84,6 +81,7 @@ public class GamepadGui extends AbstractGui {
     private GamepadGuiListener gamepadListener;
     private Set<ControllerListener> backupGamepadListeners;
     private String currentInputText = "";
+    private final Map<String, Button> visibilityButtonMap;
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
@@ -97,6 +95,7 @@ public class GamepadGui extends AbstractGui {
         menu = new Table(skin);
         tabButtons = new ArrayList<>();
         tabContents = new ArrayList<>();
+        visibilityButtonMap = new HashMap<>();
         pad5 = 8f;
         pad10 = 16f;
         pad20 = 32f;
@@ -131,7 +130,7 @@ public class GamepadGui extends AbstractGui {
     private void registerEvents() {
         EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
-        EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD);
+        EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD, Event.TOGGLE_VISIBILITY_CMD);
     }
 
     public void build() {
@@ -593,7 +592,7 @@ public class GamepadGui extends AbstractGui {
         tabContents.add(container(timeT, w, h));
         updatePads(timeT);
 
-        // TYPES
+        // TYPE VISIBILITY
         int visTableCols = 6;
         Actor[][] typesModel = new Actor[visTableCols][7];
         model.add(typesModel);
@@ -624,6 +623,7 @@ public class GamepadGui extends AbstractGui {
                 typesModel[di][dj] = button;
 
                 button.setChecked(visible[i]);
+                button.addListener(new OwnTextTooltip(ct.getName(), skin));
                 button.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, button, ct.key, button.isChecked());
@@ -631,6 +631,7 @@ public class GamepadGui extends AbstractGui {
                     }
                     return false;
                 });
+                visibilityButtonMap.put(ct.key, button);
                 Cell<?> c = typesT.add(button).padBottom(buttonPadVert).left();
 
                 if ((i + 1) % visTableCols == 0) {
@@ -1420,6 +1421,19 @@ public class GamepadGui extends AbstractGui {
                 removeControllerGui();
             } else {
                 addControllerGui();
+            }
+        }
+        case TOGGLE_VISIBILITY_CMD -> {
+            String key = (String) data[0];
+            Button b = visibilityButtonMap.get(key);
+            if (b != null && source != b) {
+                b.setProgrammaticChangeEvents(false);
+                if (data.length == 2) {
+                    b.setChecked((Boolean) data[1]);
+                } else {
+                    b.setChecked(!b.isChecked());
+                }
+                b.setProgrammaticChangeEvents(true);
             }
         }
         case TIME_STATE_CMD -> {
