@@ -20,13 +20,13 @@ public class VRDevice implements Component, IObserver {
     public Vector3d beamP2 = new Vector3d();
 
     // Default colors for normal and select mode.
-    private static Color normal = ColorUtils.gRedC;
-    private static Color select = ColorUtils.gGreenC;
+    private static final Color normal = ColorUtils.gRedC;
+    private static final Color select = ColorUtils.gGreenC;
 
     // Color for each point.
     public float[] colorP0 = new float[] { normal.r, normal.g, normal.b, 0.7f };
-    public float[] colorP1 = new float[] { normal.r, normal.g, normal.b, 0.1f };
-    public float[] colorP2 = new float[] { normal.r, normal.g, normal.b, 0.001f };
+    public float[] colorP1 = new float[] { normal.r, normal.g, normal.b, 0.4f };
+    public float[] colorP2 = new float[] { normal.r, normal.g, normal.b, 0.0f };
     public boolean hitUI = false;
 
     public VRDevice() {
@@ -37,22 +37,21 @@ public class VRDevice implements Component, IObserver {
     public void notify(Event event, Object source, Object... data) {
         // Update colors!
         if (event == Event.VR_SELECTING_STATE) {
-            var selecting = (Boolean) data[0];
-            var completion = (Double) data[1];
             var dev = (VRContext.VRDevice) data[2];
             if (dev != null && dev == this.device) {
+                var selecting = (Boolean) data[0];
+                var completion = (Double) data[1];
                 if (selecting) {
-                    completion *= 0.7;
                     // Start.
                     colorP0[0] = select.r;
                     colorP0[1] = select.g;
                     colorP0[2] = select.b;
-                    colorP0[3] = (float) MathUtils.clamp(completion + 0.3f, 0f, 0.7f);
+                    colorP0[3] = (float) MathUtils.clamp(completion + 0.3f, 0f, 1.0f);
                     // Middle.
                     colorP1[0] = select.r;
                     colorP1[1] = select.g;
                     colorP1[2] = select.b;
-                    colorP1[3] = (float) MathUtils.clamp(completion + 0.1f, 0f, 0.7f);
+                    colorP1[3] = (float) MathUtils.clamp(completion + 0.1f, 0f, 1.0f);
                     // End.
                     colorP2[0] = select.r;
                     colorP2[1] = select.g;
@@ -69,12 +68,12 @@ public class VRDevice implements Component, IObserver {
                     colorP1[0] = normal.r;
                     colorP1[1] = normal.g;
                     colorP1[2] = normal.b;
-                    colorP1[3] = 0.2f;
+                    colorP1[3] = 0.4f;
                     // End.
                     colorP2[0] = normal.r;
                     colorP2[1] = normal.g;
                     colorP2[2] = normal.b;
-                    colorP2[3] = 0.01f;
+                    colorP2[3] = 0.0f;
                 }
             }
 

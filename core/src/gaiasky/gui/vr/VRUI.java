@@ -16,7 +16,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -25,7 +26,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.gui.FocusInfoInterface;
 import gaiasky.gui.GamepadGui;
 import gaiasky.gui.IGui;
 import gaiasky.render.BlendMode;
@@ -47,7 +47,6 @@ import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.scene2d.*;
 import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRDeviceListener;
 import org.apache.commons.math3.geometry.euclidean.threed.Line;
@@ -72,6 +71,8 @@ public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     FrameBuffer buffer;
     Texture uiTexture;
     Entity entity;
+    // VR UI position with respect to the user.
+    Vector3d relativePosition = new Vector3d();
     // 5 pointers
     Vector2[] pointer = new Vector2[5];
     boolean triggerPressed = false;
@@ -143,88 +144,91 @@ public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
         if (entity != null) {
             var base = Mapper.base.get(entity);
             if (base.isVisible()) {
+                var camera = GaiaSky.instance.getICamera();
                 var body = Mapper.body.get(entity);
-                if (TimeUtils.millis() - lastVisibilityChange > 500 && body.distToCamera > 400 * Constants.KM_TO_U) {
-                    // Too far, remove UI.
-                    hideVRUI(base);
-                } else {
+                var coord = Mapper.coordinates.get(entity);
+
+                // Update VR UI position.
+                body.pos.set(camera.getPos()).add(relativePosition);
+                ((StaticCoordinates) coord.coordinates).setPosition(body.pos);
+
+                // Handle controller interaction.
+                if (!vrControllers.isEmpty()) {
                     var model = Mapper.model.get(entity);
+                    transform.set(model.model.instance.transform);
+                    inverse.set(transform).inv();
+                    // Original plane in object space.
+                    point.set(0, 0, 0);
+                    normal.set(0, 1, 0);
+                    // Move to world space by applying transform.
+                    point.mul(transform);
+                    normal.mul(transform);
+                    // Characterize plane.
+                    var p3d = new Vector3D(point.x, point.y, point.z);
+                    var n3d = new Vector3D(normal.x, normal.y, normal.z);
+                    plane3D.reset(p3d, n3d);
+                    // Check intersection with each controller.
+                    int i = 0;
+                    for (var device : vrControllers) {
+                        if (device.device.isInitialized() && device.device.isConnected()) {
+                            line3D.reset(new Vector3D(device.beamP0.x, device.beamP0.y, device.beamP0.z), new Vector3D(device.beamP1.x, device.beamP1.y, device.beamP1.z));
+                            var intersection3D = plane3D.intersection(line3D);
+                            if (intersection3D != null) {
+                                // Intersect!
+                                if (i < pointer.length) {
+                                    // Use inverse transform to position on ZX plane.
+                                    intersection.set(intersection3D.getX(), intersection3D.getY(), intersection3D.getZ());
+                                    intersection.mul(inverse);
+                                    double x3d = MathUtilsDouble.clamp(intersection.x, -0.28125, 0.28125);
+                                    double z3d = MathUtilsDouble.clamp(intersection.z, -0.5, 0.5);
+                                    double u = z3d + 0.5;
+                                    double v = (x3d + 0.28125) * 1 / 0.5625;
 
-                    if (!vrControllers.isEmpty()) {
-                        transform.set(model.model.instance.transform);
-                        inverse.set(transform).inv();
-                        // Original plane in object space.
-                        point.set(0, 0, 0);
-                        normal.set(0, 1, 0);
-                        // Move to world space by applying transform.
-                        point.mul(transform);
-                        normal.mul(transform);
-                        // Characterize plane.
-                        var p3d = new Vector3D(point.x, point.y, point.z);
-                        var n3d = new Vector3D(normal.x, normal.y, normal.z);
-                        plane3D.reset(p3d, n3d);
-                        // Check intersection with each controller.
-                        int i = 0;
-                        for (var device : vrControllers) {
-                            if (device.device.isInitialized() && device.device.isConnected()) {
-                                line3D.reset(new Vector3D(device.beamP0.x, device.beamP0.y, device.beamP0.z), new Vector3D(device.beamP1.x, device.beamP1.y, device.beamP1.z));
-                                var intersection3D = plane3D.intersection(line3D);
-                                if (intersection3D != null) {
-                                    // Intersect!
-                                    if (i < pointer.length) {
-                                        // Use inverse transform to position on ZX plane.
-                                        intersection.set(intersection3D.getX(), intersection3D.getY(), intersection3D.getZ());
-                                        intersection.mul(inverse);
-                                        double x3d = MathUtilsDouble.clamp(intersection.x, -0.28125, 0.28125);
-                                        double z3d = MathUtilsDouble.clamp(intersection.z, -0.5, 0.5);
-                                        double u = z3d + 0.5;
-                                        double v = (x3d + 0.28125) * 1 / 0.5625;
+                                    // Update hit.
+                                    device.hitUI = u > 0 && u < 1 && v > 0 && v < 1;
 
-                                        // Update hit.
-                                        device.hitUI = u > 0 && u < 1 && v > 0 && v < 1;
+                                    if (device.hitUI) {
+                                        int x = (int) (u * Gdx.graphics.getWidth());
+                                        int y = (int) (v * Gdx.graphics.getHeight());
 
-                                        if (device.hitUI) {
-                                            int x = (int) (u * Gdx.graphics.getWidth());
-                                            int y = (int) (v * Gdx.graphics.getHeight());
+                                        pointer[i].x = x;
+                                        pointer[i].y = Gdx.graphics.getHeight() - y;
 
-                                            pointer[i].x = x;
-                                            pointer[i].y = Gdx.graphics.getHeight() - y;
-
-                                            if (triggerPressed) {
-                                                stage.touchDragged(x, y, 0);
-                                            } else {
-                                                stage.mouseMoved(x, y);
-                                            }
+                                        if (triggerPressed) {
+                                            stage.touchDragged(x, y, 0);
                                         } else {
-                                            pointer[i].x = Float.NaN;
-                                            pointer[i].y = Float.NaN;
+                                            stage.mouseMoved(x, y);
                                         }
-
+                                    } else {
+                                        pointer[i].x = Float.NaN;
+                                        pointer[i].y = Float.NaN;
                                     }
+
                                 }
-                                i++;
                             }
+                            i++;
                         }
                     }
-                    stage.act((float) dt);
                 }
+                stage.act((float) dt);
             }
         }
 
     }
 
-    private boolean isVRUIVisible(){
+    private boolean isVRUIVisible() {
         return entity != null && Mapper.base.get(entity).isVisible();
     }
 
     private void showVRUI(Base base) {
-        if(base != null) {
+        if (base != null) {
             base.visible = true;
             lastVisibilityChange = TimeUtils.millis();
         }
     }
-    private void hideVRUI(Base base){
-        if(base != null) {
+
+    private void hideVRUI(Base base) {
+        if (base != null) {
             base.visible = false;
             lastVisibilityChange = TimeUtils.millis();
             for (var device : vrControllers) {
@@ -239,6 +243,7 @@ public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
      * @param x      The coordinate X of the point to test.
      * @param y      The coordinate Y of the point to test.
      * @param points The points defining the polygon.
+     *
      * @return Whether the point is in the polygon.
      */
     public boolean contains(int x, int y, Vector3[] points) {
@@ -396,6 +401,7 @@ public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                     EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, true);
                 }
 
+                // Position UI.
                 Runnable r = () -> {
                     var base = Mapper.base.get(entity);
                     // Toggle visibility.
@@ -412,6 +418,9 @@ public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                         var body = Mapper.body.get(entity);
                         body.pos.set(camera.getPos().cpy().add(dir.scl(190 * Constants.KM_TO_U)));
                         body.pos.add(0, 80.0 * Constants.KM_TO_U, 0);
+
+                        // Save relative position.
+                        relativePosition.set(body.pos).sub(camera.getPos());
 
                         // Set new static coordinates.
                         var coord = Mapper.coordinates.get(entity);

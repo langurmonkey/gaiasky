@@ -2,7 +2,6 @@ package gaiasky.gui;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -19,14 +18,13 @@ import gaiasky.vr.openvr.VRContext.VRControllerButtons;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRDeviceListener;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class OpenVRListener implements VRDeviceListener {
     private static final Log logger = Logger.getLogger(OpenVRListener.class);
 
+    /** Count-down timer for selection. How long we need to press the trigger pointing at an object for the selection to go through. **/
+    private final long SELECTION_COUNTDOWN_MS = 1500;
     /** The natural camera **/
     private final NaturalCamera cam;
     /** Focus comparator **/
@@ -34,14 +32,13 @@ public class OpenVRListener implements VRDeviceListener {
     /** Aux vectors **/
     private final Vector3d p0;
     private final Vector3d p1;
-    private final Set<Integer> pressedButtons;
+    private final Map<VRDevice, BitSet> pressedButtons;
     private final FocusView focusView;
     /** Map from VR device to model object **/
     private HashMap<VRDevice, Entity> vrDeviceToModel;
-    private long lastDoublePress = 0L;
-    private boolean selecting = false;
+    /** All VR devices that are selecting right now. **/
+    private Set<VRDevice> selecting;
     private long selectingTime = 0;
-    private VRDevice selectingDevice;
     private long lastAxisMovedFrame = Long.MIN_VALUE;
 
     public OpenVRListener(NaturalCamera cam) {
@@ -49,13 +46,15 @@ public class OpenVRListener implements VRDeviceListener {
         this.comp = new ViewAngleComparator<>();
         this.p0 = new Vector3d();
         this.p1 = new Vector3d();
-        pressedButtons = new HashSet<>();
+        pressedButtons = new HashMap<>();
+        selecting = new HashSet<>();
         this.focusView = new FocusView();
     }
 
     private void lazyInit() {
-        if (vrDeviceToModel == null)
+        if (vrDeviceToModel == null) {
             vrDeviceToModel = GaiaSky.instance.getVRDeviceToModel();
+        }
     }
 
     public void connected(VRDevice device) {
@@ -71,8 +70,8 @@ public class OpenVRListener implements VRDeviceListener {
     /**
      * True if only the given button is pressed
      */
-    private boolean isPressed(int button) {
-        return pressedButtons.contains(button);
+    private boolean isPressed(VRDevice device, int button) {
+        return pressedButtons.containsKey(device) && pressedButtons.get(device).get(button);
     }
 
     public void update() {
@@ -88,12 +87,16 @@ public class OpenVRListener implements VRDeviceListener {
      * Returns true if all given buttons are pressed.
      *
      * @param buttons the buttons to check.
+     *
      * @return True if all buttons are pressed.
      */
-    private boolean arePressed(int... buttons) {
+    private boolean arePressed(VRDevice device, int... buttons) {
+        if (!pressedButtons.containsKey(device))
+            return false;
         boolean result = true;
+        var bitSet = pressedButtons.get(device);
         for (int button : buttons)
-            result = result && pressedButtons.contains(button);
+            result = result && bitSet.get(button);
         return result;
     }
 
@@ -102,12 +105,12 @@ public class OpenVRListener implements VRDeviceListener {
 
         lazyInit();
         // Add to pressed
-        pressedButtons.add(button);
-
-        // Selection countdown
-        if (button == VRControllerButtons.SteamVR_Trigger) {
-            // Start countdown
-            //startSelectionCountdown(device);
+        if (pressedButtons.containsKey(device)) {
+            pressedButtons.get(device).set(button);
+        } else {
+            BitSet bitSet = new BitSet();
+            bitSet.set(button);
+            pressedButtons.put(device, bitSet);
         }
 
         return true;
@@ -116,73 +119,68 @@ public class OpenVRListener implements VRDeviceListener {
     public boolean buttonReleased(VRDevice device, int button) {
         logger.debug("vr button released [device/code]: " + device.toString() + " / " + button);
 
-        // Removed from pressed
-        pressedButtons.remove(button);
+        lazyInit();
+        // Removed from pressed.
+        if (pressedButtons.containsKey(device)) {
+            pressedButtons.get(device).clear(button);
+        }
 
-        if (TimeUtils.millis() - lastDoublePress > 250) {
-            // Give some time to recover from double press
-            lazyInit();
-            if (button == VRControllerButtons.B) {
-                EventManager.publish(Event.SHOW_VR_UI, this);
-            } else if (button == VRControllerButtons.A) {
-                EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
-            } else if (button == VRControllerButtons.SteamVR_Touchpad) {
-                // Change mode from free to focus and vice-versa
-                CameraMode cm = cam.getMode().isFocus() ? CameraMode.FREE_MODE : CameraMode.FOCUS_MODE;
-                // Stop
-                cam.clearVelocityVR();
+        // Handle buttons.
+        if (button == VRControllerButtons.B) {
+            EventManager.publish(Event.SHOW_VR_UI, this);
+        } else if (button == VRControllerButtons.A) {
+            EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
+        } else if (button == VRControllerButtons.SteamVR_Touchpad) {
+            // Change mode from free to focus and vice-versa.
+            CameraMode cm = cam.getMode().isFocus() ? CameraMode.FREE_MODE : CameraMode.FOCUS_MODE;
+            // Stop.
+            cam.clearVelocityVR();
 
-                EventManager.publish(Event.CAMERA_MODE_CMD, this, cm);
-            }
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, cm);
         }
         return true;
     }
 
     private void startSelectionCountdown(VRDevice device) {
-        selecting = true;
+        selecting.add(device);
         selectingTime = System.currentTimeMillis();
-        selectingDevice = device;
-        EventManager.publish(Event.VR_SELECTING_STATE, this, true, 0d, selectingDevice);
+        EventManager.publish(Event.VR_SELECTING_STATE, this, true, 0d, device);
     }
 
-    final long SELECTION_COUNTDOWN_MS = 2000;
-
     private void updateSelectionCountdown() {
-        if (selecting) {
-            if (isPressed(VRControllerButtons.SteamVR_Trigger)) {
+        for (var device : selecting) {
+            if (isPressed(device, VRControllerButtons.SteamVR_Trigger)) {
                 long elapsed = System.currentTimeMillis() - selectingTime;
                 // Selection
                 double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
                 if (completion >= 1f) {
                     // Select object!
-                    select(selectingDevice);
+                    select(device);
                     // Finish
-                    EventManager.publish(Event.VR_SELECTING_STATE, this, false, completion, selectingDevice);
-                    selecting = false;
-                    selectingDevice = null;
+                    EventManager.publish(Event.VR_SELECTING_STATE, this, false, completion, device);
+                    selecting.remove(device);
                 } else {
                     // Keep on
-                    EventManager.publish(Event.VR_SELECTING_STATE, this, selecting, completion, selectingDevice);
+                    EventManager.publish(Event.VR_SELECTING_STATE, this, selecting, completion, device);
                 }
             } else {
                 // Stop selecting
-                EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d, selectingDevice);
-                selecting = false;
-                selectingDevice = null;
+                EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d, device);
+                selecting.remove(device);
             }
         }
+
     }
 
-    private void stopSelectionCountdown() {
-        if (selecting) {
+    private void stopSelectionCountdown(VRDevice device) {
+        if (selecting.contains(device)) {
             // Stop selecting
-            EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d, selectingDevice);
-            selecting = false;
-            selectingDevice = null;
+            EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d, device);
+            selecting.remove(device);
             long elapsed = System.currentTimeMillis() - selectingTime;
             double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
             if (completion >= 1f) {
-                select(selectingDevice);
+                select(device);
             }
         }
     }
@@ -198,7 +196,7 @@ public class OpenVRListener implements VRDeviceListener {
         if (sm != null && Mapper.vr.has(sm)) {
             var vr = Mapper.vr.get(sm);
             p0.set(vr.beamP0);
-            p1.set(vr.beamP1);
+            p1.set(vr.beamP2);
             Entity hit = getBestHit(p0, p1);
             if (hit != null) {
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
@@ -256,18 +254,21 @@ public class OpenVRListener implements VRDeviceListener {
 
         lazyInit();
 
+        boolean selectingDevice = selecting.contains(device);
+
         Entity sm;
         switch (axis) {
         case VRControllerAxes.Axis1:
-            // Trigger in Oculus Rift controllers
+            // Trigger in Oculus Rift controllers.
             // Selection.
-            if (!selecting && valueX > 0) {
+            if (!selectingDevice && valueX > 0) {
                 startSelectionCountdown(device);
-            } else if (selecting && valueX == 0) {
-                stopSelectionCountdown();
+            } else if (selectingDevice && valueX == 0) {
+                stopSelectionCountdown(device);
             }
             break;
         case VRControllerAxes.Axis2:
+            // Nothing for now.
             break;
         case VRControllerAxes.Axis0:
             // Joystick for forward/backward movement
@@ -275,7 +276,7 @@ public class OpenVRListener implements VRDeviceListener {
             if (sm != null && Mapper.vr.has(sm)) {
                 var vr = Mapper.vr.get(sm);
                 if (cam.getMode().isFocus()) {
-                    if (pressedButtons.contains(VRControllerButtons.Axis2)) {
+                    if (isPressed(device, VRControllerButtons.Axis2)) {
                         cam.addRotateMovement(valueX * 0.1, valueY * 0.1, false, false);
                     } else {
                         cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
