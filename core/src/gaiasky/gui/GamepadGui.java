@@ -66,7 +66,7 @@ public class GamepadGui extends AbstractGui {
     private final FocusView view;
     private final FilterView filterView;
     boolean hackProgrammaticChangeEvents = true;
-    private Table vrInfoT, searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
+    private Table infoT, searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
     private Cell<?> contentCell, infoCell;
     private OwnTextButton vrInfoButton, searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere;
@@ -161,10 +161,12 @@ public class GamepadGui extends AbstractGui {
 
         if (vr) {
             // VR INFO
-            Actor[][] vrInfoModel = null;
-            model.add(vrInfoModel);
+            model.add(null);
 
-            vrInfoT = new Table(skin);
+            infoT = new Table(skin);
+            infoT.setSize(w, h);
+
+            var vrInfoT = new Table(skin);
             vrInfoT.setSize(w, h);
 
             // Title
@@ -183,8 +185,14 @@ public class GamepadGui extends AbstractGui {
             var generic = context.getDevicesByType(VRContext.VRDeviceType.Generic);
             addDeviceTypeInfo(vrInfoT, "Other devices", generic);
 
-            tabContents.add(container(vrInfoT, w, h));
-            updatePads(vrInfoT);
+            infoT.add(vrInfoT).left().center().padRight(pad30 * 2f);
+
+            // Focus info interface
+            var focusInterface = new FocusInfoInterface(skin, vr);
+            infoT.add(focusInterface).left().center();
+
+            tabContents.add(container(infoT, w, h));
+            updatePads(infoT);
         }
 
         // SEARCH

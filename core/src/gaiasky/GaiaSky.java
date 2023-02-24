@@ -52,6 +52,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
+import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
@@ -857,6 +858,17 @@ public class GaiaSky implements ApplicationListener, IObserver {
             }
         };
         Timer.schedule(logAttributes, 5);
+
+        // In VR, scale Gaia.
+        if (vr) {
+            final Task scaleGaia = new Task() {
+                @Override
+                public void run() {
+                    scripting.setObjectSizeScaling("Gaia", Constants.DISTANCE_SCALE_FACTOR / 10.0);
+                }
+            };
+            Timer.schedule(scaleGaia, 10);
+        }
 
         // Initial report.
         scene.reportDebugObjects();
