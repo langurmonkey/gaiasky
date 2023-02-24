@@ -608,7 +608,6 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
             if (active.get()) {
-                super.buttonDown(controller, buttonCode);
                 if (currTextField == null) {
                     // Not capturing.
                     if (buttonCode == mappings.getButtonA()) {
@@ -644,7 +643,6 @@ public class GamepadConfigWindow extends GenericDialog implements IObserver {
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
             if (active.get()) {
-                super.axisMoved(controller, axisCode, value);
                 value = (float) applyZeroPoint(value);
                 if (value != 0 && currTextField != null) {
                     // Capturing.
