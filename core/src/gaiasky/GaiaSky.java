@@ -395,17 +395,20 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 doneLoading();
                 updateRenderProcess = runnableRender;
         } else {
-            // Display loading screen
+            // Display loading screen.
             if (settings.runtime.openVr) {
-                renderGui(loadingGui);
-
                 try {
                     vrContext.pollEvents();
                 } catch (Exception e) {
                     logger.error(e);
                 }
+                // Render to VR headset.
                 renderVRGui((VRGui<?>) loadingGuiVR);
+
+                // Render to screen too.
+                renderGui(loadingGui);
             } else {
+                // Render only to screen.
                 renderGui(loadingGui);
             }
         }
