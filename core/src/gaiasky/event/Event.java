@@ -489,6 +489,10 @@ public enum Event {
      **/
     GO_TO_OBJECT_CMD,
     /**
+     * Moves the camera instantly to the home object.
+     */
+    GO_HOME_INSTANT_CMD,
+    /**
      * Graphics quality updated, contains the new {@link GraphicsQuality} object.
      **/
     GRAPHICS_QUALITY_UPDATED,

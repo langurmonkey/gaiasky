@@ -52,7 +52,6 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.FocusView;
-import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.script.ScriptingServer;
 import gaiasky.util.*;
@@ -391,9 +390,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
             logger.warn(e.getLocalizedMessage());
         }
         if (finished) {
-                // Stages 1 and 2 are done, proceed.
-                doneLoading();
-                updateRenderProcess = runnableRender;
+            // Stages 1 and 2 are done, proceed.
+            doneLoading();
+            updateRenderProcess = runnableRender;
         } else {
             // Display loading screen.
             if (settings.runtime.openVr) {
@@ -768,7 +767,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events.
-        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE);
+        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.PARK_RUNNABLE, Event.PARK_CAMERA_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_ADD_OBJECT_CMD, Event.SCENE_ADD_OBJECT_NO_POST_CMD, Event.SCENE_REMOVE_OBJECT_CMD, Event.SCENE_REMOVE_OBJECT_NO_POST_CMD, Event.SCENE_RELOAD_NAMES_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.RESET_RENDERER, Event.SCENE_FORCE_UPDATE, Event.GO_HOME_INSTANT_CMD);
 
         // Re-enable input.
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -779,7 +778,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         // Resize GUIs to current size.
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
-
 
         if (settings.runtime.openVr) {
             // Build VR UI if needed.
@@ -1580,6 +1578,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             }
         }
         case SCENE_FORCE_UPDATE -> touchSceneGraph();
+        case GO_HOME_INSTANT_CMD -> goHome();
         }
 
     }

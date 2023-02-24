@@ -173,6 +173,7 @@ public class OpenVRListener implements VRDeviceListener {
             if (hit != null) {
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+                device.triggerHapticPulse(Short.MAX_VALUE);
             }
         } else {
             logger.info("Model corresponding to device not found");
@@ -228,22 +229,21 @@ public class OpenVRListener implements VRDeviceListener {
 
         boolean selectingDevice = selecting.contains(device);
 
-        Entity sm;
-        switch (axis) {
-        case AXIS_SELECTION -> {
-            // Trigger in Oculus Rift controllers.
-            // Selection.
-            if (!selectingDevice && valueX > 0) {
-                startSelectionCountdown(device);
-            } else if (selectingDevice && valueX == 0) {
-                stopSelectionCountdown(device);
+        Entity sm = vrDeviceToModel.get(device);
+        var vr = sm != null ? Mapper.vr.get(sm) : null;
+        if (vr != null && !vr.hitUI) {
+            switch (axis) {
+            case AXIS_SELECTION -> {
+                // Trigger in Oculus Rift controllers.
+                // Selection.
+                if (!selectingDevice && device.isAxisPressed(axis) && !vr.hitUI) {
+                    startSelectionCountdown(device);
+                } else if (selectingDevice && valueX == 0) {
+                    stopSelectionCountdown(device);
+                }
             }
-        }
-        case AXIS_MOVE -> {
-            // Joystick for forward/backward movement
-            sm = vrDeviceToModel.get(device);
-            if (sm != null && Mapper.vr.has(sm)) {
-                var vr = Mapper.vr.get(sm);
+            case AXIS_MOVE -> {
+                // Joystick for forward/backward movement
                 if (cam.getMode().isFocus()) {
                     if (device.isAxisPressed(AXIS_ROTATION)) {
                         cam.addRotateMovement(valueX * 0.1, valueY * 0.1, false, false);
@@ -253,10 +253,11 @@ public class OpenVRListener implements VRDeviceListener {
                 } else {
                     cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
                 }
+                lastAxisMovedFrame = GaiaSky.instance.frames;
             }
-            lastAxisMovedFrame = GaiaSky.instance.frames;
+            }
+            return true;
         }
-        }
-        return true;
+        return false;
     }
 }

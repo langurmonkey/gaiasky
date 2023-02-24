@@ -27,7 +27,7 @@ public class VRDevice implements Component, IObserver {
 
     // Color for each point.
     public float[] colorP0 = new float[] { normal.r, normal.g, normal.b, 0.8f };
-    public float[] colorP1 = new float[] { normal.r, normal.g, normal.b, 0.2f };
+    public float[] colorP1 = new float[] { normal.r, normal.g, normal.b, 0.1f };
     public float[] colorP2 = new float[] { normal.r, normal.g, normal.b, 0.0f };
     // Whether the controller hits the UI.
     public boolean hitUI = false;
@@ -73,7 +73,7 @@ public class VRDevice implements Component, IObserver {
                     colorP1[0] = normal.r;
                     colorP1[1] = normal.g;
                     colorP1[2] = normal.b;
-                    colorP1[3] = 0.2f;
+                    colorP1[3] = 0.1f;
                     // End.
                     colorP2[0] = normal.r;
                     colorP2[1] = normal.g;

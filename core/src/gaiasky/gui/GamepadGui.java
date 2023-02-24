@@ -71,9 +71,9 @@ public class GamepadGui extends AbstractGui {
     private final FilterView filterView;
     boolean hackProgrammaticChangeEvents = true;
     private Table infoT, searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
-    private Cell<?> contentCell, infoCell, topCell, bottomCell;
+    private Cell<?> contentCell, infoCell;
     private OwnTextButton vrInfoButton, searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
-    private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere;
+    private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonGoHome;
 
     private TableGuiInterface topLine;
     private OwnCheckBox cinematic;
@@ -171,6 +171,17 @@ public class GamepadGui extends AbstractGui {
         if (vr) {
             // TOP LINE (time)
             topLine = new TopInfoInterface(skin, GaiaSky.instance.scene);
+
+            // BOTTOM LINE (go home)
+            buttonGoHome = new OwnTextIconButton("", skin, "home");
+            buttonGoHome.addListener(new OwnTextTooltip(I18n.msg("context.goto", Settings.settings.scene.homeObject), skin, 10));
+            buttonGoHome.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.GO_HOME_INSTANT_CMD, buttonGoHome);
+                    return true;
+                }
+                return false;
+            });
 
             // VR INFO
             model.add(null);
@@ -1134,13 +1145,17 @@ public class GamepadGui extends AbstractGui {
         padTable.pad(pad30);
         padTable.setBackground("table-border");
         if (vr) {
-            topCell = padTable.add(topLine).top().colspan(2);
+            var topCell = padTable.add(topLine).colspan(2);
             topCell.row();
         }
         menu.pack();
         padTable.add(menu).left();
-        contentCell = padTable.add().center();
-        bottomCell = padTable.add().bottom().colspan(2);
+        contentCell = padTable.add().left();
+
+        if (vr) {
+            contentCell.row();
+            padTable.add(buttonGoHome).right().colspan(2);
+        }
 
         content.add(padTable);
 

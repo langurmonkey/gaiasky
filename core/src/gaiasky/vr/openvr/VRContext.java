@@ -673,6 +673,13 @@ public class VRContext implements Disposable {
         public static final int SteamVR_Trigger = Axis1;
     }
 
+    public static class VRControllerAxisType {
+        public static final int None = 0;
+        public static final int TrackPad = 1;
+        public static final int Joystick = 2;
+        public static final int Trigger = 3;
+    }
+
     /**
      * Represents the pose of a {@link VRDevice}, including its transform,
      * velocity and angular velocity. Also indicates whether the pose is valid
@@ -854,6 +861,8 @@ public class VRContext implements Disposable {
         public boolean isConnected() {
             return VRSystem.VRSystem_IsTrackedDeviceConnected(pose.index);
         }
+
+
 
         /**
          * @return whether the button from {@link VRControllerButtons} is

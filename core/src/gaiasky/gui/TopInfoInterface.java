@@ -112,8 +112,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TIME_CHANGE_INFO:
-        case TIME_CHANGE_CMD:
+        case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
             // Update input time
             Instant datetime = (Instant) data[0];
             GaiaSky.postRunnable(() -> {
@@ -121,21 +120,20 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
                 time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
                 pack();
             });
-
-            break;
-        case TIME_WARP_CHANGED_INFO:
+        }
+        case TIME_WARP_CHANGED_INFO -> {
             if (data.length == 1)
                 pace.setText("(" + TextUtils.getFormattedTimeWarp((double) data[0]) + ")");
-            break;
-        case TIME_STATE_CMD:
+        }
+        case TIME_STATE_CMD -> {
             Boolean t = (Boolean) data[0];
             if (!t) {
                 pace.setText("(" + I18n.msg("gui.top.time.off") + ")");
             } else {
                 pace.setText("(" + TextUtils.getFormattedTimeWarp() + ")");
             }
-            break;
-        case CAMERA_CLOSEST_INFO:
+        }
+        case CAMERA_CLOSEST_INFO -> {
             IFocus closestObject = (IFocus) data[0];
             if (closestObject != null) {
                 closest.setText(TextUtils.capString(closestObject.getClosestName(), maxNameLen));
@@ -143,8 +141,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             } else {
                 closest.setText("");
             }
-            break;
-        case CAMERA_MODE_CMD:
+        }
+        case CAMERA_MODE_CMD -> {
             CameraMode mode = (CameraMode) data[0];
             if (!mode.isFocus()) {
                 focus.setText("");
@@ -153,8 +151,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
                 focus.setText(I18n.msg("gui.top.focus", lastFocusName));
                 s1.setText("|");
             }
-            break;
-        case FOCUS_CHANGE_CMD:
+        }
+        case FOCUS_CHANGE_CMD -> {
             IFocus f = null;
             Entity e;
             if (data[0] instanceof String) {
@@ -174,9 +172,9 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
                 focus.setText(I18n.msg("gui.top.focus", lastFocusName));
                 s1.setText("|");
             }
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
     }
 

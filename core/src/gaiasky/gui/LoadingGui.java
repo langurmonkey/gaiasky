@@ -44,7 +44,6 @@ public class LoadingGui extends AbstractGui {
     private TipsGenerator tipGenerator;
     private LoadingTextGenerator loadingTextGenerator;
     private OwnLabel spin;
-    private Container tipContainer;
     private HorizontalGroup tip;
     private long lastFunnyTime;
     private long lastTipTime;
@@ -112,7 +111,7 @@ public class LoadingGui extends AbstractGui {
         tip = new HorizontalGroup();
         tip.space(pad10);
         tip.pad(10, 30, 10, 30);
-        tipContainer = new Container(tip);
+        Container<HorizontalGroup> tipContainer = new Container<>(tip);
         tipContainer.setBackground(skin.getDrawable("table-bg"));
         bottomMiddle = new Table(skin);
         bottomMiddle.setFillParent(true);
@@ -186,8 +185,8 @@ public class LoadingGui extends AbstractGui {
         if (stage != null) {
             stage.clear();
             stage.addActor(center);
-            stage.addActor(screenMode);
             if (!vr) {
+                stage.addActor(screenMode);
                 stage.addActor(bottomMiddle);
                 stage.addActor(topLeft);
             }
