@@ -30,6 +30,7 @@ public class OpenVRListener implements VRDeviceListener {
     private final static int BUTTON_LABEL = VRControllerButtons.A;
     private final static int BUTTON_CAMERA_MODE = VRControllerButtons.SteamVR_Touchpad;
     private final static int BUTTON_SELECTION = VRControllerButtons.SteamVR_Trigger;
+    private final static int BUTTON_ROTATION = VRControllerButtons.Axis2;
     private final static int AXIS_SELECTION = VRControllerAxes.Axis1;
     private final static int AXIS_ROTATION = VRControllerAxes.Axis2;
     private final static int AXIS_MOVE = VRControllerAxes.Axis0;
@@ -120,7 +121,7 @@ public class OpenVRListener implements VRDeviceListener {
 
     private void updateSelectionCountdown() {
         for (var device : selecting) {
-            if (device.isButtonPressed(BUTTON_SELECTION) || device.getAxisX(AXIS_SELECTION) != 0 || device.getAxisY(AXIS_SELECTION) != 0) {
+            if (device.isButtonPressed(BUTTON_SELECTION) || device.isAxisPressed(AXIS_SELECTION)) {
                 long elapsed = System.currentTimeMillis() - selectingTime;
                 // Selection
                 double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
@@ -244,7 +245,7 @@ public class OpenVRListener implements VRDeviceListener {
             if (sm != null && Mapper.vr.has(sm)) {
                 var vr = Mapper.vr.get(sm);
                 if (cam.getMode().isFocus()) {
-                    if (device.isButtonPressed(AXIS_ROTATION)) {
+                    if (device.isAxisPressed(AXIS_ROTATION)) {
                         cam.addRotateMovement(valueX * 0.1, valueY * 0.1, false, false);
                     } else {
                         cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);

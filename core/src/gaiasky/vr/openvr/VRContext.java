@@ -895,6 +895,10 @@ public class VRContext implements Disposable {
             return state.rAxis(axis).y();
         }
 
+        public boolean isAxisPressed(int axis) {
+            return getAxisX(axis) != 0 || getAxisY(axis) != 0;
+        }
+
         /**
          * Trigger a haptic pulse (vibrate) for the duration in microseconds.
          * Subsequent calls to this method within 5ms will be ignored.

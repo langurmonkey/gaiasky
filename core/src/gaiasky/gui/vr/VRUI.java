@@ -69,7 +69,7 @@ public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     Texture uiTexture;
     Entity entity;
     // VR UI position with respect to the user.
-    Vector3d relativePosition = new Vector3d();
+    Vector3b relativePosition = new Vector3b();
     // 5 pointers
     Vector2 pointer = new Vector2();
     boolean triggerPressed = false;
