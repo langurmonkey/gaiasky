@@ -10,7 +10,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.math.Intersectord;
+import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -135,10 +135,10 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         if (closest != null && !closest.isEmpty() && closest != spacecraft) {
             double twoRadii = closest.getRadius() + me.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(D31), newPosition.put(D32), closest.getPos().put(D33)) < twoRadii) {
+            if (!vel.isZero() && IntersectorDouble.distanceSegmentPoint(pos.put(D31), newPosition.put(D32), closest.getPos().put(D33)) < twoRadii) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(D31), newPosition.put(D32), closest.getPos().put(D31), twoRadii);
+                Array<Vector3d> intersections = IntersectorDouble.intersectRaySphere(pos.put(D31), newPosition.put(D32), closest.getPos().put(D31), twoRadii);
 
                 // Teleport outside
                 if (intersections.size >= 1) {

@@ -491,7 +491,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // aux4b <- foucs.abspos + dx
                     this.focus.getAbsolutePosition(aux4b).add(dx);
 
-                    if (vr) {
+                    if (!vr) {
                         if (!diverted) {
                             directionToTarget(dt, aux4b, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3f : 1e2f));
                         } else {
@@ -1664,7 +1664,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         boolean modeStereoVR = modeStereo && Settings.settings.program.modeStereo.isStereoVR();
         boolean modeCubemap = Settings.settings.program.modeCubemap.active;
         boolean modeReprojection = Settings.settings.postprocess.reprojection.active;
-        boolean modeVR = vr;
 
         if (modeStereoVR || modeReprojection) {
             // No pointer guides or cross-hairs
@@ -1672,7 +1671,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // Pointer guides
-        if (Settings.settings.program.pointer.guides.active && !modeStereo && !modeCubemap && !modeVR) {
+        if (Settings.settings.program.pointer.guides.active && !modeStereo && !modeCubemap && !vr) {
             int mouseX = Gdx.input.getX();
             int mouseY = rh - Gdx.input.getY();
             shapeRenderer.begin(ShapeType.Line);
@@ -1687,7 +1686,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         spriteBatch.begin();
 
-        boolean decal = modeCubemap || modeStereo || modeVR;
+        boolean decal = modeCubemap || modeStereo || vr;
         float chScale = 1f;
         if (modeCubemap) {
             chScale = 4f;
@@ -1699,19 +1698,19 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 home = new FocusView(homeEntity);
             }
             if (home != null) {
-                drawCrosshair(spriteBatch, home, decal, false, spriteHome, crosshairArrow, chScale, rw, rh, 1f, 0.7f, 0.1f, 1f);
+                drawCrossHair(spriteBatch, home, decal, false, spriteHome, crosshairArrow, chScale, rw, rh, 1f, 0.7f, 0.1f, 1f);
             }
         }
 
         // Mark closest object in BLUE
         if (Settings.settings.scene.crosshair.closest && closest != null) {
-            drawCrosshair(spriteBatch, closest, decal, false, spriteClosest, crosshairArrow, chScale, rw, rh, 0.3f, 0.5f, 1f, 1f);
+            drawCrossHair(spriteBatch, closest, decal, false, spriteClosest, crosshairArrow, chScale, rw, rh, 0.3f, 0.5f, 1f, 1f);
         }
 
         // Mark the focus in GREEN
         if (Settings.settings.scene.crosshair.focus && getMode().isFocus()) {
             // Green, focus mode
-            drawCrosshair(spriteBatch, focus, decal, true, spriteFocus, crosshairArrow, chScale, rw, rh, 0.2f, 1f, 0.4f, 1f);
+            drawCrossHair(spriteBatch, focus, decal, true, spriteFocus, crosshairArrow, chScale, rw, rh, 0.2f, 1f, 0.4f, 1f);
         }
 
         // Gravitational waves crosshair
@@ -1740,36 +1739,41 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch.end();
     }
 
-    private void drawCrosshairDecal(SpriteBatch batch, IFocus chFocus, Sprite sprite, float r, float g, float b, float a) {
+    private void drawCrossHairDecal(SpriteBatch batch, IFocus chFocus, boolean focusMode, Sprite sprite, float r, float g, float b, float a) {
         sprite.setColor(r, g, b, a);
-        Vector3b p = chFocus.getClosestAbsolutePos(aux1b).add(posinv);
+        Vector3b p;
+        if (!focusMode) {
+            p = chFocus.getClosestAbsolutePos(aux1b).add(posinv);
+        } else {
+            p = chFocus.getAbsolutePosition(aux1b).add(posinv);
+        }
         Vector3d pos = aux5;
         p.put(pos);
         DecalUtils.drawSprite(sprite, batch, (float) pos.x, (float) pos.y, (float) pos.z, 0.0008d, 1f, this, true, 0.04f, 0.04f);
     }
 
-    private void drawCrosshair(SpriteBatch batch, IFocus chFocus, boolean decal, boolean focusMode, Sprite crosshairSprite, Texture arrowTex, float crosshairScale, int rw, int rh, float r, float g, float b, float a) {
+    private void drawCrossHair(SpriteBatch batch, IFocus chFocus, boolean decal, boolean focusMode, Sprite crosshairSprite, Texture arrowTex, float crosshairScale, int rw, int rh, float r, float g, float b, float a) {
         if (chFocus != null) {
             if (decal) {
                 crosshairSprite.setScale(crosshairScale);
-                drawCrosshairDecal(batch, chFocus, crosshairSprite, r, g, b, a);
+                drawCrossHairDecal(batch, chFocus, focusMode, crosshairSprite, r, g, b, a);
             } else {
                 if (!focusMode) {
-                    drawCrosshair(chFocus.getClosestAbsolutePos(aux1b).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex, rw, rh, r, g, b, a);
+                    drawCrossHair(chFocus.getClosestAbsolutePos(aux1b).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex, rw, rh, r, g, b, a);
                 } else {
-                    drawCrosshair(chFocus.getAbsolutePosition(aux1b).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex, rw, rh, r, g, b, a);
+                    drawCrossHair(chFocus.getAbsolutePosition(aux1b).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex, rw, rh, r, g, b, a);
                 }
             }
         }
     }
 
     /**
-     * Draws a crosshair given a camera-relative position
+     * Draws a cross-hair given a camera-relative position
      *
      * @param p            The position in floating camera coordinates
      * @param distToCam    The distance to the camera
      * @param radius       Radius of object
-     * @param crosshairTex Crosshair texture
+     * @param crossHairTex Cross-hair texture
      * @param arrowTex     Arrow texture
      * @param rw           Width
      * @param rh           Height
@@ -1778,10 +1782,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param b            Blue
      * @param a            Alpha
      */
-    private void drawCrosshair(Vector3b p, double distToCam, double radius, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
+    private void drawCrossHair(Vector3b p, double distToCam, double radius, Texture crossHairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
         if (distToCam > radius * 2) {
-            float chw = crosshairTex.getWidth();
-            float chh = crosshairTex.getHeight();
+            float chw = crossHairTex.getWidth();
+            float chh = crossHairTex.getHeight();
             float chw2 = chw / 2;
             float chh2 = chh / (vr ? 1 : 2);
 
@@ -1798,7 +1802,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             spriteBatch.setColor(r, g, b, a);
 
             if (inside) {
-                spriteBatch.draw(crosshairTex, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
+                spriteBatch.draw(crossHairTex, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
             } else {
                 if (vr) {
                     float ang = firstAux ? -90f + aux2f2.angleDeg() : firstAngle;

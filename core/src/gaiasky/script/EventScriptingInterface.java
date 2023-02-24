@@ -1739,7 +1739,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     Vector3b objectPosition = focusView.getAbsolutePosition(aux3b2);
 
                     // Check intersection with object
-                    boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
+                    boolean intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
 
                     if (intersects) {
                         cameraRotate(5d, 5d);
@@ -1749,7 +1749,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         sleep(0.1f);
 
                         objectPosition = focusView.getAbsolutePosition(aux3b2);
-                        intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
+                        intersects = IntersectorDouble.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), focusView.getRadius());
                     }
 
                     cameraStop();

@@ -8,7 +8,7 @@ import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.component.*;
-import gaiasky.util.math.Intersectord;
+import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -99,7 +99,7 @@ public class TrajectoryUtils {
         Vector3d yd = y.put(D31);
         // Towards north - intersect y with plane
         Vector3d zd = D32;
-        Intersectord.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0, 0, 0), new Vector3d(0, 1, 0), zd);
+        IntersectorDouble.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0, 0, 0), new Vector3d(0, 1, 0), zd);
         zd.sub(barycenter).nor();
         //zd.set(yd).crs(0, 1, 0).nor();
 

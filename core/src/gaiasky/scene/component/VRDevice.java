@@ -18,16 +18,21 @@ public class VRDevice implements Component, IObserver {
     public Vector3d beamP0 = new Vector3d();
     public Vector3d beamP1 = new Vector3d();
     public Vector3d beamP2 = new Vector3d();
+    // Final point, always very, very far. Not used for rendering.
+    public Vector3d beamPn = new Vector3d();
 
     // Default colors for normal and select mode.
     private static final Color normal = ColorUtils.gRedC;
     private static final Color select = ColorUtils.gGreenC;
 
     // Color for each point.
-    public float[] colorP0 = new float[] { normal.r, normal.g, normal.b, 0.7f };
-    public float[] colorP1 = new float[] { normal.r, normal.g, normal.b, 0.4f };
+    public float[] colorP0 = new float[] { normal.r, normal.g, normal.b, 0.8f };
+    public float[] colorP1 = new float[] { normal.r, normal.g, normal.b, 0.2f };
     public float[] colorP2 = new float[] { normal.r, normal.g, normal.b, 0.0f };
+    // Whether the controller hits the UI.
     public boolean hitUI = false;
+    // If the UI is hit, is this controller interacting with the UI?
+    public boolean interacting = false;
 
     public VRDevice() {
         EventManager.instance.subscribe(this, Event.VR_SELECTING_STATE);
@@ -46,7 +51,7 @@ public class VRDevice implements Component, IObserver {
                     colorP0[0] = select.r;
                     colorP0[1] = select.g;
                     colorP0[2] = select.b;
-                    colorP0[3] = (float) MathUtils.clamp(completion + 0.3f, 0f, 1.0f);
+                    colorP0[3] = (float) MathUtils.clamp(completion + 0.2f, 0f, 1.0f);
                     // Middle.
                     colorP1[0] = select.r;
                     colorP1[1] = select.g;
@@ -63,12 +68,12 @@ public class VRDevice implements Component, IObserver {
                     colorP0[0] = normal.r;
                     colorP0[1] = normal.g;
                     colorP0[2] = normal.b;
-                    colorP0[3] = 0.7f;
+                    colorP0[3] = 0.8f;
                     // Middle.
                     colorP1[0] = normal.r;
                     colorP1[1] = normal.g;
                     colorP1[2] = normal.b;
-                    colorP1[3] = 0.4f;
+                    colorP1[3] = 0.2f;
                     // End.
                     colorP2[0] = normal.r;
                     colorP2[1] = normal.g;

@@ -16,7 +16,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Functions.Function2;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
-import gaiasky.util.math.Intersectord;
+import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -112,7 +112,7 @@ public class FocusHit {
                 // Diminish the size of the star
                 // when we are close by
                 double dist = posb.lend();
-                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.put(D31));
+                double distToLine = IntersectorDouble.distanceLinePoint(p0, p1, posb.put(D31));
                 double value = distToLine / dist;
 
                 if (value < 0.01) {
@@ -156,7 +156,7 @@ public class FocusHit {
                     // aux3d contains the camera position, [0,0,0]
                     aux3d.set(0, 0, 0);
 
-                    boolean intersect = Intersectord.checkIntersectRaySpehre(aux3d, aux2d, aux1d, view.getRadius());
+                    boolean intersect = IntersectorDouble.checkIntersectRaySpehre(aux3d, aux2d, aux1d, view.getRadius());
                     if (intersect) {
                         //Hit
                         hits.add(entity);
@@ -181,7 +181,7 @@ public class FocusHit {
                 // aux1d contains the position of the body in the camera ref sys
                 aux1d.set(graph.translation);
 
-                boolean intersect = Intersectord.checkIntersectRaySpehre(p0, p1, aux1d, view.getRadius());
+                boolean intersect = IntersectorDouble.checkIntersectRaySpehre(p0, p1, aux1d, view.getRadius());
                 if (intersect) {
                     //Hit
                     hits.add(entity);
@@ -296,7 +296,7 @@ public class FocusHit {
                         // when we are close by
                         double dist = posd.len();
                         double angle = set.getRadius(i) / dist / camera.getFovFactor();
-                        double distToLine = Intersectord.distanceLinePoint(p0, p1, posd.put(D31));
+                        double distToLine = IntersectorDouble.distanceLinePoint(p0, p1, posd.put(D31));
                         double value = distToLine / dist;
 
                         if (value < 0.01) {
@@ -382,7 +382,7 @@ public class FocusHit {
                 // Diminish the size of the star
                 // when we are close by
                 double dist = posb.lend();
-                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.tov3d(D32));
+                double distToLine = IntersectorDouble.distanceLinePoint(p0, p1, posb.tov3d(D32));
                 double value = distToLine / dist;
 
                 if (value < 0.01) {

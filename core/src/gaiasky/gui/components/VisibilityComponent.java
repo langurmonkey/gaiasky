@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VisibilityComponent extends GuiComponent implements IObserver {
-    protected Map<String, Button> buttonMap;
+    protected Map<String, Button> visibilityButtonMap;
     /**
      * Entities that will go in the visibility check boxes
      */
@@ -63,7 +63,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
         visibilityTable.setName("visibility table");
         visibilityTable.top().center();
-        buttonMap = new HashMap<>();
+        visibilityButtonMap = new HashMap<>();
         if (visibilityEntities != null) {
             for (int i = 0; i < visibilityEntities.length; i++) {
                 final ComponentType ct = visibilityEntities[i];
@@ -86,9 +86,9 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                         button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
                     }
 
-                    buttonMap.put(name, button);
+                    visibilityButtonMap.put(name, button);
                     if (!ct.key.equals(name))
-                        buttonMap.put(ct.key, button);
+                        visibilityButtonMap.put(ct.key, button);
 
                     button.setChecked(visible[i]);
                     button.addListener(event -> {
@@ -191,7 +191,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         pmGroup.space(space4);
 
-        pmToggleButton = buttonMap.get(ComponentType.VelocityVectors.key);
+        pmToggleButton = visibilityButtonMap.get(ComponentType.VelocityVectors.key);
         // Overwrite listeners
         pmToggleButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -244,9 +244,9 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
+        case TOGGLE_VISIBILITY_CMD -> {
             String key = (String) data[0];
-            Button b = buttonMap.get(key);
+            Button b = visibilityButtonMap.get(key);
             if (b != null && source != b) {
                 b.setProgrammaticChangeEvents(false);
                 if (data.length == 2) {
@@ -256,40 +256,39 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                 }
                 b.setProgrammaticChangeEvents(true);
             }
-            break;
-        case PM_LEN_FACTOR_CMD:
+        }
+        case PM_LEN_FACTOR_CMD -> {
             if (source != pmLenFactorSlider) {
                 sendEvents = false;
                 float value = (Float) data[0];
                 pmLenFactorSlider.setValue(value);
                 sendEvents = true;
             }
-            break;
-        case PM_NUM_FACTOR_CMD:
+        }
+        case PM_NUM_FACTOR_CMD -> {
             if (source != pmNumFactorSlider) {
                 sendEvents = false;
                 float value = (Float) data[0];
                 pmNumFactorSlider.setMappedValue(value);
                 sendEvents = true;
             }
-            break;
-        case PM_COLOR_MODE_CMD:
+        }
+        case PM_COLOR_MODE_CMD -> {
             if (source != pmColorMode) {
                 sendEvents = false;
                 pmColorMode.setSelectedIndex((Integer) data[0]);
                 sendEvents = true;
             }
-            break;
-        case PM_ARROWHEADS_CMD:
+        }
+        case PM_ARROWHEADS_CMD -> {
             if (source != pmArrowheads) {
                 sendEvents = false;
                 pmArrowheads.setChecked((boolean) data[0]);
                 sendEvents = true;
             }
-
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
 
     }

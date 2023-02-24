@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 
-public class Intersectord {
+public class IntersectorDouble {
 
     private static final Vector3d auxd1 = new Vector3d();
     private static final Vector3d auxd2 = new Vector3d();
@@ -338,5 +338,16 @@ public class Intersectord {
         double t = (planeNormal.dot(planePoint) - planeNormal.dot(linePoint)) / planeNormal.dot(lineDirection.nor());
         out.set(linePoint).add(lineDirection.nor().scl(t));
         return 0;
+    }
+
+    public static boolean intersectSegmentPlane (Vector3d start, Vector3d end, Planed plane, Vector3d intersection) {
+        Vector3d dir = auxd1.set(end).sub(start);
+        double denominator = dir.dot(plane.getNormal());
+        if (denominator == 0f) return false;
+        double t = -(start.dot(plane.getNormal()) + plane.getD()) / denominator;
+        if (t < 0 || t > 1) return false;
+
+        intersection.set(start).add(dir.scl(t));
+        return true;
     }
 }

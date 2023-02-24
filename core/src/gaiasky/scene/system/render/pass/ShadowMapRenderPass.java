@@ -18,7 +18,7 @@ import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
-import gaiasky.util.math.Intersectord;
+import gaiasky.util.math.IntersectorDouble;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -217,7 +217,7 @@ public class ShadowMapRenderPass {
                 Vector3b objPos = EntityUtils.getAbsolutePosition(candidate, aux1b);
                 Vector3b camPos = camera.getPos();
                 Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
-                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos.put(aux1d), radius);
+                boolean intersect = IntersectorDouble.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos.put(aux1d), radius);
                 if (intersect) {
                     // Use height
                     camDir.nor().scl(body.distToCamera - radius);

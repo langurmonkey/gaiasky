@@ -2371,7 +2371,7 @@ public interface IScriptingInterface {
     void parkCameraRunnable(String id, Runnable runnable);
 
     /**
-     * Removes the runnable with the given id, if any.
+     * Removes the runnable with the given id, if any. Use this method to remove previously parked scene and camera runnables.
      *
      * @param id The id of the runnable to remove.
      */
