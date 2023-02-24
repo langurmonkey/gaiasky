@@ -221,17 +221,15 @@ public class TimeComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TIME_CHANGE_INFO:
-        case TIME_CHANGE_CMD:
+        case TIME_CHANGE_INFO, TIME_CHANGE_CMD -> {
             // Update input time
             Instant datetime = (Instant) data[0];
             GaiaSky.postRunnable(() -> {
                 date.setText(dfDate.format(datetime) + " " + dfEra.format(datetime));
                 time.setText(dfTime.format(datetime) + " " + timeZone.getDisplayName(TextStyle.SHORT, I18n.locale));
             });
-            break;
-        case TIME_WARP_CHANGED_INFO:
-        case TIME_WARP_CMD:
+        }
+        case TIME_WARP_CHANGED_INFO, TIME_WARP_CMD -> {
             if (source != warp) {
                 double newWarp = (double) data[0];
                 int index = getWarpIndex(newWarp);
@@ -242,10 +240,9 @@ public class TimeComponent extends GuiComponent implements IObserver {
                     warpGuard = false;
                 }
             }
-
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
     }
 

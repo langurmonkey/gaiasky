@@ -42,6 +42,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.format.TextStyle;
 import java.util.List;
 import java.util.*;
 
@@ -67,9 +71,11 @@ public class GamepadGui extends AbstractGui {
     private final FilterView filterView;
     boolean hackProgrammaticChangeEvents = true;
     private Table infoT, searchT, camT, timeT, graphicsT, typesT, controlsT, sysT;
-    private Cell<?> contentCell, infoCell;
+    private Cell<?> contentCell, infoCell, topCell, bottomCell;
     private OwnTextButton vrInfoButton, searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere;
+
+    private TableGuiInterface topLine;
     private OwnCheckBox cinematic;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
@@ -82,6 +88,7 @@ public class GamepadGui extends AbstractGui {
     private Set<ControllerListener> backupGamepadListeners;
     private String currentInputText = "";
     private final Map<String, Button> visibilityButtonMap;
+
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
@@ -131,6 +138,8 @@ public class GamepadGui extends AbstractGui {
         EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_LOADED, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_BASE_LEVEL_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
         EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD, Event.TOGGLE_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
     }
 
     public void build() {
@@ -160,6 +169,9 @@ public class GamepadGui extends AbstractGui {
         // Create contents
 
         if (vr) {
+            // TOP LINE (time)
+            topLine = new TopInfoInterface(skin, GaiaSky.instance.scene);
+
             // VR INFO
             model.add(null);
 
@@ -171,7 +183,9 @@ public class GamepadGui extends AbstractGui {
 
             // Title
             OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "header-large");
-            vrInfoT.add(welcomeTitle).center().top().padBottom(pad40).colspan(2).row();
+            OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "header-raw");
+            vrInfoT.add(welcomeTitle).center().top().padBottom(pad20).colspan(2).row();
+            vrInfoT.add(version).center().top().padBottom(pad40).colspan(2).row();
 
             var context = GaiaSky.instance.vrContext;
 
@@ -1119,9 +1133,14 @@ public class GamepadGui extends AbstractGui {
         Table padTable = new Table(skin);
         padTable.pad(pad30);
         padTable.setBackground("table-border");
+        if (vr) {
+            topCell = padTable.add(topLine).top().colspan(2);
+            topCell.row();
+        }
         menu.pack();
         padTable.add(menu).left();
         contentCell = padTable.add().center();
+        bottomCell = padTable.add().bottom().colspan(2);
 
         content.add(padTable);
 
