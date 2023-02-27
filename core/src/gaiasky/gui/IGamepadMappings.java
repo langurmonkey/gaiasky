@@ -84,6 +84,22 @@ public interface IGamepadMappings {
     double getAxisLstickVSensitivity();
 
     /**
+     * Returns the code of the right bumper axis, used to increase the velocity. All the range
+     * of the axis is used.
+     *
+     * @return The axis code, negative if not mapped.
+     */
+    int getAxisRB();
+
+    /**
+     * Returns the code of the left bumper axis, used to increase the velocity. All the range
+     * of the axis is used.
+     *
+     * @return The axis code, negative if not mapped.
+     */
+    int getAxisLB();
+
+    /**
      * Returns the code of the right trigger axis, used to increase the velocity. All the range
      * of the axis is used. Usually mapped to a trigger button.
      *

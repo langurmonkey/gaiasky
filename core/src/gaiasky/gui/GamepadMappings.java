@@ -66,6 +66,8 @@ public class GamepadMappings extends AbstractGamepadMappings {
             AXIS_RSTICK_V_SENS = parseDouble(mappings, "1.0", "axis.yaw.sensitivity", "axis.rstick.v.sensitivity");
             AXIS_LSTICK_V = parseInt(mappings, "-1", "axis.move", "axis.lstick.v");
             AXIS_LSTICK_V_SENS = parseDouble(mappings, "1.0", "axis.move.sensitivity", "axis.lstick.v.sensitivity");
+            AXIS_RB = parseInt(mappings, "-1", "axis.rb");
+            AXIS_LB = parseInt(mappings, "-1", "axis.lb");
             AXIS_RT = parseInt(mappings, "-1", "axis.velocityup", "axis.rt");
             AXIS_RT_SENS = parseDouble(mappings, "-1", "axis.velocityup.sensitivity", "axis.rt.sensitivity");
             AXIS_LT = parseInt(mappings, "-1", "axis.velocitydown", "axis.lt");
@@ -116,7 +118,9 @@ public class GamepadMappings extends AbstractGamepadMappings {
         mappings.setProperty("axis.rstick.h.sensitivity", Double.toString(AXIS_RSTICK_H_SENS));
         mappings.setProperty("axis.rstick.v", Integer.toString(AXIS_RSTICK_V));
         mappings.setProperty("axis.rstick.v.sensitivity", Double.toString(AXIS_RSTICK_V_SENS));
-        // RT and LT
+        // Shoulder axes (RB, LB, RT, LT)
+        mappings.setProperty("axis.rb", Integer.toString(AXIS_RB));
+        mappings.setProperty("axis.lb", Integer.toString(AXIS_LB));
         mappings.setProperty("axis.rt", Integer.toString(AXIS_RT));
         mappings.setProperty("axis.rt.sensitivity", Double.toString(AXIS_RT_SENS));
         mappings.setProperty("axis.lt", Integer.toString(AXIS_LT));

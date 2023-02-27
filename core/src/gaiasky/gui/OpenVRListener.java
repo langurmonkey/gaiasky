@@ -92,11 +92,11 @@ public class OpenVRListener implements VRDeviceListener {
         lazyInit();
 
         // Handle buttons.
-        if (button == device.mappings.BUTTON_A) {
+        if (button == device.mappings.getButtonA() || button == device.mappings.getButtonY()) {
             EventManager.publish(Event.SHOW_VR_UI, this);
-        } else if (button == device.mappings.BUTTON_B) {
+        } else if (button == device.mappings.getButtonB() || button == device.mappings.getButtonX()) {
             EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
-        } else if (button == device.mappings.BUTTON_RSTICK) {
+        } else if (button == device.mappings.getButtonRstick()) {
             // Change mode from free to focus and vice-versa.
             CameraMode cm = cam.getMode().isFocus() ? CameraMode.FREE_MODE : CameraMode.FOCUS_MODE;
             // Stop.
@@ -115,7 +115,7 @@ public class OpenVRListener implements VRDeviceListener {
 
     private void updateSelectionCountdown() {
         for (var device : selecting) {
-            if (device.isButtonPressed(device.mappings.BUTTON_RT) || device.isAxisPressed(device.mappings.AXIS_RT)) {
+            if (device.isButtonPressed(device.mappings.getButtonRT()) || device.isAxisPressed(device.mappings.getAxisRT())) {
                 long elapsed = System.currentTimeMillis() - selectingTime;
                 // Selection
                 double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
@@ -225,9 +225,8 @@ public class OpenVRListener implements VRDeviceListener {
 
         Entity sm = vrDeviceToModel.get(device);
         var vr = sm != null ? Mapper.vr.get(sm) : null;
-        final int axisSelection = device.mappings.AXIS_RT;
         if (vr != null && !vr.hitUI) {
-            if (axis == device.mappings.AXIS_RT) {
+            if (axis == device.mappings.getAxisRT()) {
                 // Trigger in Oculus Rift controllers.
                 // Selection.
                 if (!selectingDevice && device.isAxisPressed(axis) && !vr.hitUI) {
@@ -235,13 +234,18 @@ public class OpenVRListener implements VRDeviceListener {
                 } else if (selectingDevice && valueX == 0) {
                     stopSelectionCountdown(device);
                 }
-            } else if (axis == device.mappings.AXIS_RSTICK_V) {
+            } else if (axis == device.mappings.getAxisRstickV() || axis == device.mappings.getAxisRstickH()) {
                 // Joystick for forward/backward movement
-                cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
-                lastAxisMovedFrame = GaiaSky.instance.frames;
-            } else if (axis == device.mappings.AXIS_RSTICK_H) {
-                // Rotation or panning
-                cam.addRotateMovement(valueX * 0.1, valueY * 0.1, false, false);
+                if (cam.getMode().isFocus()) {
+                    if (device.isAxisPressed(device.mappings.getAxisRB()) || device.isAxisPressed(device.mappings.getAxisLB()) ) {
+                        cam.addRotateMovement(valueX * 0.1, valueY * 0.1, false, false);
+                    } else {
+                        cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
+                        //cam.addRotateMovement(valueX * 0.1, 0, false, false);
+                    }
+                } else {
+                    cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
+                }
                 lastAxisMovedFrame = GaiaSky.instance.frames;
             }
             return true;

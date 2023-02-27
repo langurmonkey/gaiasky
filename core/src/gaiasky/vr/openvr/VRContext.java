@@ -390,6 +390,7 @@ public class VRContext implements Disposable {
         case VR.ETrackedDeviceClass_TrackedDeviceClass_Controller -> type = VRDeviceType.Controller;
         case VR.ETrackedDeviceClass_TrackedDeviceClass_TrackingReference -> type = VRDeviceType.BaseStation;
         case VR.ETrackedDeviceClass_TrackedDeviceClass_GenericTracker -> type = VRDeviceType.Generic;
+        case VR.ETrackedDeviceClass_TrackedDeviceClass_DisplayRedirect -> type = VRDeviceType.DisplayRedirect;
         default -> {
             return;
         }
@@ -402,6 +403,9 @@ public class VRContext implements Disposable {
             case VR.ETrackedControllerRole_TrackedControllerRole_LeftHand -> role = VRControllerRole.LeftHand;
             case VR.ETrackedControllerRole_TrackedControllerRole_RightHand -> role = VRControllerRole.RightHand;
             case VR.ETrackedControllerRole_TrackedControllerRole_Invalid -> role = VRControllerRole.Invalid;
+            case VR.ETrackedControllerRole_TrackedControllerRole_Stylus -> role = VRControllerRole.Stylus;
+            case VR.ETrackedControllerRole_TrackedControllerRole_Treadmill -> role = VRControllerRole.Treadmill;
+            case VR.ETrackedControllerRole_TrackedControllerRole_OptOut -> role = VRControllerRole.OptOut;
             }
         }
         if (role != VRControllerRole.Invalid) {
@@ -495,7 +499,12 @@ public class VRContext implements Disposable {
         /**
          * a generic VR tracking device
          **/
-        Generic
+        Generic,
+        /**
+         * Accessories that aren't necessarily tracked themselves,
+         * but may redirect video output from other tracked devices
+         */
+        DisplayRedirect,
     }
 
     /**
@@ -504,10 +513,10 @@ public class VRContext implements Disposable {
     public enum VRControllerRole {
         Invalid,
         LeftHand,
-        Max,
-        OptOut,
         RightHand,
-        Treadmill
+        OptOut,
+        Treadmill,
+        Stylus
     }
 
     public enum VRDeviceProperty {
@@ -1004,7 +1013,6 @@ public class VRContext implements Disposable {
          * Updates the axis values and returns whether the values changed.
          *
          * @param axis The axis
-         *
          * @return Whether the values of this axis changed
          */
         public boolean pollAxis(int axis) {

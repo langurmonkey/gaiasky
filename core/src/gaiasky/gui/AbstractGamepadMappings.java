@@ -30,6 +30,10 @@ public abstract class AbstractGamepadMappings implements IGamepadMappings {
     public double AXIS_RSTICK_V_SENS = 1d;
     public int AXIS_LSTICK_V = -1;
     public double AXIS_LSTICK_V_SENS = 1d;
+
+    public int AXIS_RB = -1;
+    public int AXIS_LB = -1;
+
     public int AXIS_RT = -1;
     public double AXIS_RT_SENS = 1d;
     public int AXIS_LT = -1;
@@ -100,6 +104,15 @@ public abstract class AbstractGamepadMappings implements IGamepadMappings {
     @Override
     public int getAxisLstickV() {
         return AXIS_LSTICK_V;
+    }
+
+    @Override
+    public int getAxisRB() {
+        return AXIS_RB;
+    }
+    @Override
+    public int getAxisLB() {
+        return AXIS_LB;
     }
 
     @Override
