@@ -1802,15 +1802,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getDistanceTo(String name) {
-        Entity entity = getEntity(name);
-        if (Mapper.focus.has(entity)) {
-            focusView.setEntity(entity);
-            focusView.getFocus(name);
-            if (focusView.getSet() != null) {
-                var pos = focusView.getAbsolutePosition(name, aux3b1);
-                return pos.sub(GaiaSky.instance.getICamera().getPos()).lend() * Constants.U_TO_KM;
-            } else {
-                return (focusView.getDistToCamera() - focusView.getRadius()) * Constants.U_TO_KM;
+        if (checkObjectName(name)) {
+            Entity entity = getEntity(name);
+            if (Mapper.focus.has(entity)) {
+                focusView.setEntity(entity);
+                focusView.getFocus(name);
+                if (focusView.getSet() != null) {
+                    var pos = focusView.getAbsolutePosition(name, aux3b1);
+                    return pos.sub(GaiaSky.instance.getICamera().getPos()).lend() * Constants.U_TO_KM;
+                } else {
+                    return (focusView.getDistToCamera() - focusView.getRadius()) * Constants.U_TO_KM;
+                }
             }
         }
 
@@ -1819,36 +1821,43 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] getStarParameters(String id) {
-        Entity entity = getEntity(id);
-        if (Mapper.starSet.has(entity)) {
-            var set = Mapper.starSet.get(entity);
-            // This star group contains the star
-            IParticleRecord sb = set.getCandidateBean();
-            if (sb != null) {
-                double[] rgb = sb.rgb();
-                return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
+        if (checkObjectName(id)) {
+            Entity entity = getEntity(id);
+            if (Mapper.starSet.has(entity)) {
+                var set = Mapper.starSet.get(entity);
+                // This star group contains the star
+                IParticleRecord sb = set.getCandidateBean();
+                if (sb != null) {
+                    double[] rgb = sb.rgb();
+                    return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
+                }
             }
         }
-
         return null;
     }
 
     @Override
     public double[] getObjectPosition(String name) {
-        Entity entity = getEntity(name);
-        focusView.setEntity(entity);
-        focusView.getFocus(name);
-        focusView.getAbsolutePosition(name, aux3b1);
-        return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
+        if (checkObjectName(name)) {
+            Entity entity = getEntity(name);
+            focusView.setEntity(entity);
+            focusView.getFocus(name);
+            focusView.getAbsolutePosition(name, aux3b1);
+            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
+        }
+        return null;
     }
 
     @Override
     public double[] getObjectPredictedPosition(String name) {
-        Entity entity = getEntity(name);
-        focusView.setEntity(entity);
-        focusView.getFocus(name);
-        focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
-        return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
+        if (checkObjectName(name)) {
+            Entity entity = getEntity(name);
+            focusView.setEntity(entity);
+            focusView.getFocus(name);
+            focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
+        }
+        return null;
     }
 
     @Override
@@ -2124,7 +2133,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public String getAssetsLocation() {
-        return Settings.settings.ASSETS_LOC;
+        return Settings.ASSETS_LOC;
     }
 
     @Override
