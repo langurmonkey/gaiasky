@@ -13,8 +13,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.comp.ViewAngleComparator;
 import gaiasky.util.math.Vector3d;
-import gaiasky.vr.openvr.VRContext.VRControllerAxes;
-import gaiasky.vr.openvr.VRContext.VRControllerButtons;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRDeviceListener;
 

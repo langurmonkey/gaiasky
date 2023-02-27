@@ -30,7 +30,7 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
         vr.beamP2.set(0, (float) (-70000 * Constants.KM_TO_U), (float) (-100000 * Constants.KM_TO_U));
         vr.beamPn.set(0, (float) (-7 * Constants.PC_TO_U), (float) (-10 * Constants.PC_TO_U));
         if (vr.hitUI) {
-            if(vr.interacting) {
+            if (vr.interacting) {
                 // Shorten beam.
                 aux.set(vr.beamP1).sub(vr.beamP0).nor().scl(20 * Constants.KM_TO_U);
                 vr.beamP1.set(vr.beamP0).add(aux);
@@ -47,11 +47,17 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
             }
         }
 
-        deviceTransform.set(model.model.instance.transform);
-        vr.beamP0.mul(deviceTransform);
-        vr.beamP1.mul(deviceTransform);
-        vr.beamP2.mul(deviceTransform);
-        vr.beamPn.mul(deviceTransform);
+        if (vr.device.transform != null) {
+            // Set model to device transform.
+            if (model.model != null && model.model.instance != null) {
+                model.model.instance.transform.set(vr.device.transform);
+            }
+            deviceTransform.set(vr.device.transform);
+            vr.beamP0.mul(deviceTransform);
+            vr.beamP1.mul(deviceTransform);
+            vr.beamP2.mul(deviceTransform);
+            vr.beamPn.mul(deviceTransform);
+        }
 
     }
 }

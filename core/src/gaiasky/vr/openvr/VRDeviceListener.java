@@ -5,8 +5,6 @@
 
 package gaiasky.vr.openvr;
 
-import gaiasky.vr.openvr.VRContext.VRControllerAxes;
-import gaiasky.vr.openvr.VRContext.VRControllerButtons;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 
 public interface VRDeviceListener {
@@ -17,33 +15,33 @@ public interface VRDeviceListener {
     void disconnected(VRDevice device);
 
     /**
-     * A button from {@link VRControllerButtons} was pressed on the
+     * A button was pressed on the
      * {@link VRDevice}
      * @return True if the event was handled.
      **/
     boolean buttonPressed(VRDevice device, int button);
 
     /**
-     * A button from {@link VRControllerButtons} was released on the
+     * A button was released on the
      * {@link VRDevice}
      * @return True if the event was handled.
      **/
     boolean buttonReleased(VRDevice device, int button);
 
     /**
-     * A button from {@link VRControllerButtons} was touched on the {@link VRDevice}
+     * A button was touched on the {@link VRDevice}
      * @return True if the event was handled.
      */
     boolean buttonTouched(VRDevice device, int button);
 
     /**
-     * A button from {@link VRControllerButtons} was untouched on the {@link VRDevice}
+     * A button was untouched on the {@link VRDevice}
      * @return True if the event was handled.
      */
     boolean buttonUntouched(VRDevice device, int button);
 
     /**
-     * An axis from {@link VRControllerAxes} was moved on the {@link VRDevice}
+     * An axis was moved on the {@link VRDevice}
      * @return True if the event was handled.
      */
     boolean axisMoved(VRDevice device, int axis, float valueX, float valueY);

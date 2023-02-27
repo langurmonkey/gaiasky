@@ -290,8 +290,8 @@ public class VRContext implements Disposable {
 
             if (devices[device] != null) {
                 devices[device].updateAxesAndPosition();
-                if (devices[device].modelInstance != null) {
-                    devices[device].modelInstance.transform.idt().translate(trackerSpaceOriginToWorldSpaceTranslationOffset).mul(trackerSpaceToWorldspaceRotationOffset).mul(pose.transform);
+                if (devices[device].transform != null) {
+                    devices[device].transform.idt().translate(trackerSpaceOriginToWorldSpaceTranslationOffset).mul(trackerSpaceToWorldspaceRotationOffset).mul(pose.transform);
                 }
             }
         }
@@ -406,7 +406,6 @@ public class VRContext implements Disposable {
             case VR.ETrackedControllerRole_TrackedControllerRole_Invalid -> role = VRControllerRole.Invalid;
             case VR.ETrackedControllerRole_TrackedControllerRole_Stylus -> role = VRControllerRole.Stylus;
             case VR.ETrackedControllerRole_TrackedControllerRole_Treadmill -> role = VRControllerRole.Treadmill;
-            case VR.ETrackedControllerRole_TrackedControllerRole_OptOut -> role = VRControllerRole.OptOut;
             }
         }
         if (role != VRControllerRole.Invalid) {
@@ -642,56 +641,6 @@ public class VRContext implements Disposable {
     }
 
     /**
-     * Button ids on VR controllers
-     */
-    public static class VRControllerButtons {
-        public static final int System = 0;
-        public static final int ApplicationMenu = 1;
-        public static final int Grip = 2;
-        public static final int DPad_Left = 3;
-        public static final int DPad_Up = 4;
-        public static final int DPad_Right = 5;
-        public static final int DPad_Down = 6;
-        public static final int A = 7;
-        public static final int B = 1;
-
-        public static final int ProximitySensor = 31;
-
-        public static final int Axis0 = 32;
-        public static final int Axis1 = 33;
-        public static final int Axis2 = 34;
-        public static final int Axis3 = 35;
-        public static final int Axis4 = 36;
-
-        // aliases for well known controllers
-        public static final int SteamVR_Touchpad = Axis0;
-        public static final int SteamVR_Trigger = Axis1;
-
-        public static final int Dashboard_Back = Grip;
-    }
-
-    /**
-     * Axes ids on VR controllers
-     */
-    public static class VRControllerAxes {
-        public static final int Axis0 = 0;
-        public static final int Axis1 = 1;
-        public static final int Axis2 = 2;
-        public static final int Axis3 = 3;
-        public static final int Axis4 = 4;
-
-        public static final int SteamVR_Touchpad = Axis0;
-        public static final int SteamVR_Trigger = Axis1;
-    }
-
-    public static class VRControllerAxisType {
-        public static final int None = 0;
-        public static final int TrackPad = 1;
-        public static final int Joystick = 2;
-        public static final int Trigger = 3;
-    }
-
-    /**
      * Represents the pose of a {@link VRDevice}, including its transform,
      * velocity and angular velocity. Also indicates whether the pose is valid
      * and whether the device is connected.
@@ -761,6 +710,8 @@ public class VRContext implements Disposable {
         private IntModelInstance modelInstance;
         // Mappings, in case it is a controller.
         public GamepadMappings mappings;
+        // The model transform for this device, if any.
+        public Matrix4 transform;
         private boolean initialized;
 
         VRDevice(VRDevicePose pose, VRDeviceType type, VRControllerRole role) {
@@ -769,6 +720,7 @@ public class VRContext implements Disposable {
             this.role = role;
             if (type.equals(VRDeviceType.Controller))
                 axes = new float[5][2];
+            this.transform = new Matrix4();
             this.initialized = false;
         }
 
@@ -894,7 +846,7 @@ public class VRContext implements Disposable {
         }
 
         /**
-         * @return whether the button from {@link VRControllerButtons} is
+         * @return whether the button with the given code is
          * pressed
          */
         public boolean isButtonPressed(int button) {
@@ -912,8 +864,7 @@ public class VRContext implements Disposable {
         }
 
         /**
-         * @return the x-coordinate in the range [-1, 1] of the given axis from
-         * {@link VRControllerAxes}
+         * @return the x-coordinate in the range [-1, 1] of the given axis
          */
         public float getAxisX(int axis) {
             if (axis < 0 || axis >= 5)
@@ -923,8 +874,7 @@ public class VRContext implements Disposable {
         }
 
         /**
-         * @return the y-coordinate in the range [-1, 1] of the given axis from
-         * {@link VRControllerAxes}
+         * @return the y-coordinate in the range [-1, 1] of the given axis
          */
         public float getAxisY(int axis) {
             if (axis < 0 || axis >= 5)

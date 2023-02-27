@@ -60,9 +60,6 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     public static final int WIDTH = 1920;
     public static final int HEIGHT = 1080;
 
-    /** Button that acts as left mouse button for the UI interaction. **/
-    public static final int BUTTON_LEFT_MOUSE = VRContext.VRControllerButtons.SteamVR_Trigger;
-
     Scene scene;
     Stage stage;
     FrameBuffer buffer;
@@ -468,17 +465,19 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
 
     @Override
     public boolean buttonPressed(VRContext.VRDevice device, int button) {
-        if (button == BUTTON_LEFT_MOUSE) {
-            var dev = deviceToDevice.get(device);
-            if (dev.hitUI && !dev.interacting) {
-                interactingController = dev.device;
-                dev.interacting = true;
-            }
-            if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
-                stage.touchDown((int) pointer.x, (int) (Gdx.graphics.getHeight() - pointer.y), 0, Input.Buttons.LEFT);
-                triggerPressed = true;
-                interactingController = device;
-                return true;
+        if (device.mappings != null) {
+            if (button == device.mappings.getButtonRT()) {
+                var dev = deviceToDevice.get(device);
+                if (dev.hitUI && !dev.interacting) {
+                    interactingController = dev.device;
+                    dev.interacting = true;
+                }
+                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
+                    stage.touchDown((int) pointer.x, (int) (Gdx.graphics.getHeight() - pointer.y), 0, Input.Buttons.LEFT);
+                    triggerPressed = true;
+                    interactingController = device;
+                    return true;
+                }
             }
         }
         return false;
@@ -486,16 +485,18 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
 
     @Override
     public boolean buttonReleased(VRContext.VRDevice device, int button) {
-        if (button == BUTTON_LEFT_MOUSE) {
-            var dev = deviceToDevice.get(device);
-            if (dev.hitUI && !dev.interacting) {
-                interactingController = dev.device;
-                dev.interacting = true;
-            }
-            if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
-                stage.touchUp((int) pointer.x, (int) (Gdx.graphics.getHeight() - pointer.y), 0, Input.Buttons.LEFT);
-                triggerPressed = false;
-                return true;
+        if (device.mappings != null) {
+            if (button == device.mappings.getButtonRT()) {
+                var dev = deviceToDevice.get(device);
+                if (dev.hitUI && !dev.interacting) {
+                    interactingController = dev.device;
+                    dev.interacting = true;
+                }
+                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
+                    stage.touchUp((int) pointer.x, (int) (Gdx.graphics.getHeight() - pointer.y), 0, Input.Buttons.LEFT);
+                    triggerPressed = false;
+                    return true;
+                }
             }
         }
         return false;
