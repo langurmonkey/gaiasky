@@ -750,30 +750,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean setObjectVisibility(String name, boolean visible) {
-        Entity obj = getEntity(name);
-        if (obj == null) {
-            logger.error("No object found with name '" + name + "'");
-            return false;
-        }
+        if (checkObjectName(name)) {
+            Entity obj = getEntity(name);
 
-        postRunnable(() -> EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, name, visible));
-        return true;
+            postRunnable(() -> EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, name, visible));
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean getObjectVisibility(String name) {
-        Entity obj = getEntity(name);
-        if (obj == null) {
-            logger.error("No object found with name '" + name + "'");
-            return false;
-        }
+        if (checkObjectName(name)) {
+            Entity obj = getEntity(name);
 
-        boolean visible;
-        synchronized (focusView) {
-            focusView.setEntity(obj);
-            visible = focusView.isVisible(true);
+            boolean visible;
+            synchronized (focusView) {
+                focusView.setEntity(obj);
+                visible = focusView.isVisible(true);
+            }
+            return visible;
         }
-        return visible;
+        return false;
     }
 
     @Override
@@ -805,18 +803,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean getForceDisplayLabel(String name) {
-        Entity obj = getEntity(name);
-        if (obj == null) {
-            logger.error("No object found with name '" + name + "'");
-            return false;
-        }
+        if (checkFocusName(name)) {
+            Entity obj = getEntity(name);
 
-        boolean ret;
-        synchronized (focusView) {
-            focusView.setEntity(obj);
-            ret = focusView.isForceLabel(name);
+            boolean ret;
+            synchronized (focusView) {
+                focusView.setEntity(obj);
+                ret = focusView.isForceLabel(name);
+            }
+            return ret;
         }
-        return ret;
+        return false;
     }
 
     public void setLabelSizeFactor(int factor) {
@@ -1234,8 +1231,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public FocusView getObject(String name, double timeoutSeconds) {
-        Entity object = getEntity(name, timeoutSeconds);
-        return new FocusView(object);
+        if (checkObjectName(name)) {
+            Entity object = getEntity(name, timeoutSeconds);
+            return new FocusView(object);
+        }
+        return null;
     }
 
     @Override
@@ -1245,13 +1245,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public VertsView getLineObject(String name, double timeoutSeconds) {
-        Entity object = getEntity(name, timeoutSeconds);
-        if (Mapper.verts.has(object)) {
-            return new VertsView(object);
-        } else {
-            logger.error(name + " is not a verts object.");
-            return null;
+        if (checkObjectName(name)) {
+            Entity object = getEntity(name, timeoutSeconds);
+            if (Mapper.verts.has(object)) {
+                return new VertsView(object);
+            } else {
+                logger.error(name + " is not a verts object.");
+                return null;
+            }
         }
+        return null;
     }
 
     public Entity getEntity(String name) {
@@ -1293,16 +1296,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setObjectSizeScaling(String name, double scalingFactor) {
-        Entity object = getEntity(name);
-        if (object == null) {
-            logger.error("Object '" + name + "' does not exist");
-            return;
-        }
-        if (Mapper.modelScaffolding.has(object)) {
-            var scaffolding = Mapper.modelScaffolding.get(object);
-            scaffolding.setSizeScaleFactor(scalingFactor);
-        } else {
-            logger.error("Object '" + name + "' is not a model object");
+        if (checkObjectName(name)) {
+            Entity object = getEntity(name);
+            if (Mapper.modelScaffolding.has(object)) {
+                var scaffolding = Mapper.modelScaffolding.get(object);
+                scaffolding.setSizeScaleFactor(scalingFactor);
+            } else {
+                logger.error("Object '" + name + "' is not a model object");
+            }
         }
     }
 
@@ -1313,7 +1314,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (name.contains(":")) {
             int idx = name.indexOf(":");
             className = name.substring(0, idx);
-            objectName = name.substring(idx + 1, name.length());
+            objectName = name.substring(idx + 1);
         } else {
             className = name;
             objectName = null;
@@ -1376,13 +1377,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getObjectRadius(String name) {
-        Entity object = scene.findFocus(name);
-        if (object == null)
-            return -1;
+        if (checkObjectName(name)) {
+            Entity object = scene.findFocus(name);
 
-        focusView.setEntity(object);
-        focusView.getFocus(name);
-        return focusView.getRadius() * Constants.U_TO_KM;
+            focusView.setEntity(object);
+            focusView.getFocus(name);
+            return focusView.getRadius() * Constants.U_TO_KM;
+        }
+        return -1;
     }
 
     @Override
@@ -1413,15 +1415,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private void goToObject(String name, double solidAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        if (checkString(name, "name")) {
-            if (scene.index().containsEntity(name)) {
-                Entity focus = scene.findFocus(name);
-                focusView.setEntity(focus);
-                focusView.getFocus(name);
-                goToObject(focus, solidAngle, waitTimeSeconds, stop);
-            } else {
-                logger.info("FOCUS_MODE object does not exist: " + name);
-            }
+        if (checkString(name, "name") && checkObjectName(name)) {
+            Entity focus = scene.findFocus(name);
+            focusView.setEntity(focus);
+            focusView.getFocus(name);
+            goToObject(focus, solidAngle, waitTimeSeconds, stop);
         }
     }
 
@@ -3808,13 +3806,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private boolean checkObjectName(String name) {
-        return getEntity(name) != null;
+        if (getEntity(name) == null) {
+            logger.error(name + ": object with this name does not exist");
+            return false;
+        }
+        return true;
     }
 
     private boolean checkFocusName(String name) {
         Entity entity = getFocus(name);
         if (entity == null) {
-            logger.error(name + ": entity does not exist");
+            logger.error(name + ": focus with this name does not exist");
         }
         return entity != null;
     }
