@@ -6,6 +6,7 @@
 package gaiasky.vr.openvr;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -784,8 +785,19 @@ public class VRContext implements Disposable {
 
             // Init mappings file for VR controller.
             if (type == VRDeviceType.Controller && (role == VRControllerRole.LeftHand || role == VRControllerRole.RightHand)) {
-                // Load default VR controller mappings.
-                var mappingsFile = Gdx.files.internal("mappings/Oculus_Rift_CV1.controller");
+                FileHandle mappingsFile;
+                if (Settings.settings.controls.vr.mappingsFile != null) {
+                    // Use setting.
+                    mappingsFile = Gdx.files.absolute(Settings.settings.controls.vr.mappingsFile);
+                } else {
+                    if (manufacturerName.equalsIgnoreCase("valve")) {
+                        // Valve index.
+                        mappingsFile = Gdx.files.internal("mappings/Valve_Index.controller");
+                    } else {
+                        // Default is Oculus Rift CV1 controller mappings.
+                        mappingsFile = Gdx.files.internal("mappings/Oculus_Rift_CV1.controller");
+                    }
+                }
                 mappings = new GamepadMappings(manufacturerName + " VR controller", mappingsFile.file().toPath());
             }
             this.initialized = true;

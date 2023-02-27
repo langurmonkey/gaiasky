@@ -21,7 +21,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.gui.beans.CameraComboBoxBean;
-import gaiasky.gui.vr.VRUI;
+import gaiasky.gui.vr.MainVRUI;
 import gaiasky.input.GuiGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
@@ -42,10 +42,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.format.TextStyle;
 import java.util.List;
 import java.util.*;
 
@@ -156,8 +152,8 @@ public class GamepadGui extends AbstractGui {
         tabContents.clear();
         model.clear();
 
-        float w = vr ? VRUI.WIDTH : Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
-        float h = vr ? VRUI.HEIGHT : Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
+        float w = vr ? MainVRUI.WIDTH : Math.min(Gdx.graphics.getWidth(), 1450f) - 60f;
+        float h = vr ? MainVRUI.HEIGHT : Math.min(Gdx.graphics.getHeight(), 860f) - 60f;
         // Widget width
         float ww = 400f;
         float wh = 64f;

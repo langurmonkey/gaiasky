@@ -27,6 +27,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.openvr.VRSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -1530,7 +1531,15 @@ public class Settings {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ControlsSettings {
         public GamepadSettings gamepad;
+        public VRControllerSettings vr;
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class VRControllerSettings {
+            public String mappingsFile = null;
+
+            public VRControllerSettings() {
+            }
+        }
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class GamepadSettings implements IObserver {
             /**

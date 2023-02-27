@@ -95,8 +95,6 @@ public class OpenVRListener implements VRDeviceListener {
         if (button == device.mappings.getButtonA() || button == device.mappings.getButtonY()) {
             EventManager.publish(Event.SHOW_VR_UI, this);
         } else if (button == device.mappings.getButtonB() || button == device.mappings.getButtonX()) {
-            EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
-        } else if (button == device.mappings.getButtonRstick()) {
             // Change mode from free to focus and vice-versa.
             CameraMode cm = cam.getMode().isFocus() ? CameraMode.FREE_MODE : CameraMode.FOCUS_MODE;
             // Stop.

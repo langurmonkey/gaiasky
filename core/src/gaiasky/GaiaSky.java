@@ -37,7 +37,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
 import gaiasky.gui.vr.VRGui;
-import gaiasky.gui.vr.VRUI;
+import gaiasky.gui.vr.MainVRUI;
 import gaiasky.gui.vr.WelcomeGuiVR;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -165,7 +165,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Loading texture.
      **/
     public org.lwjgl.openvr.Texture vrLoadingLeftTex, vrLoadingRightTex;
-    public VRUI vrui;
+    public MainVRUI vrui;
     /**
      * The asset manager.
      */
@@ -647,7 +647,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 // Create VRUI object.
-                vrui = new VRUI();
+                vrui = new MainVRUI();
                 vrui.initialize(assetManager, globalResources.getSpriteBatch());
                 vrContext.addListener(vrui);
 
@@ -1406,7 +1406,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
             // Also VR.
             if (settings.runtime.openVr) {
-                loadingGuiVR = new VRGui<>(LoadingGui.class, (int) (settings.graphics.backBufferResolution[0] / 4f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+                loadingGuiVR = new VRGui<>(LoadingGui.class, (int) (settings.graphics.backBufferResolution[0] / 8f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
             }
             this.updateRenderProcess = runnableLoadingGui;
@@ -1555,7 +1555,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
             }
         }
-        case HOME_CMD -> goHome();
+        case HOME_CMD, GO_HOME_INSTANT_CMD -> goHome();
         case PARK_RUNNABLE -> {
             String key = (String) data[0];
             final Runnable updateRunnable = (Runnable) data[1];
@@ -1578,7 +1578,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             }
         }
         case SCENE_FORCE_UPDATE -> touchSceneGraph();
-        case GO_HOME_INSTANT_CMD -> goHome();
         }
 
     }

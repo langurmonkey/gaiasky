@@ -55,7 +55,7 @@ import java.util.Set;
 /**
  * Creates and manages the VR UI and all its interactions with controllers.
  */
-public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
+public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
 
     public static final int WIDTH = 1920;
     public static final int HEIGHT = 1080;
@@ -83,7 +83,7 @@ public class VRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
     VRContext.VRDevice interactingController;
 
-    public VRUI() {
+    public MainVRUI() {
     }
 
     public void setScene(Scene scene) {
