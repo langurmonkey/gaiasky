@@ -72,10 +72,10 @@ public class GamepadGui extends AbstractGui {
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonGoHome;
 
     private TableGuiInterface topLine;
-    private OwnCheckBox cinematic;
+    private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
-    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel;
+    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, ambientLight;
     private OwnTextField searchField;
     private OwnLabel infoMessage, cameraModeLabel, cameraFocusLabel;
     private Actor[][] currentModel;
@@ -136,6 +136,7 @@ public class GamepadGui extends AbstractGui {
         EventManager.instance.subscribe(this, Event.CUBEMAP_CMD, Event.STEREOSCOPIC_CMD, Event.TOGGLE_VISIBILITY_CMD);
         EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD);
         EventManager.instance.subscribe(this, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
+        EventManager.instance.subscribe(this, Event.CROSSHAIR_CLOSEST_CMD, Event.CROSSHAIR_FOCUS_CMD, Event.CROSSHAIR_HOME_CMD);
     }
 
     public void build() {
@@ -318,7 +319,7 @@ public class GamepadGui extends AbstractGui {
         updatePads(searchT);
 
         // CAMERA
-        Actor[][] cameraModel = new Actor[4][7];
+        Actor[][] cameraModel = new Actor[4][10];
         model.add(cameraModel);
 
         camT = new Table(skin);
@@ -449,13 +450,58 @@ public class GamepadGui extends AbstractGui {
         camT.add(turnLabel).right().padBottom(pad20).padRight(pad20);
         camT.add(camTurnSlider).left().padBottom(pad20).row();
 
+        // Focus marker
+        OwnLabel crosshairFocusLabel = new OwnLabel(I18n.msg("gui.ui.crosshair.focus"), skin);
+        crosshairFocus = new OwnCheckBox("", skin);
+        cameraModel[0][6] = crosshairFocus;
+        crosshairFocus.setName("ch focus");
+        crosshairFocus.setChecked(Settings.settings.scene.crosshair.focus);
+        crosshairFocus.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.CROSSHAIR_FOCUS_CMD, this, crosshairFocus.isChecked());
+            }
+            return false;
+        });
+        camT.add(crosshairFocusLabel).right().padBottom(pad20).padRight(pad20);
+        camT.add(crosshairFocus).left().padBottom(pad20).row();
+
+        // Closest marker
+        OwnLabel crosshairClosestLabel = new OwnLabel(I18n.msg("gui.ui.crosshair.closest"), skin);
+        crosshairClosest = new OwnCheckBox("", skin);
+        cameraModel[0][7] = crosshairClosest;
+        crosshairClosest.setName("ch closest");
+        crosshairClosest.setChecked(Settings.settings.scene.crosshair.closest);
+        crosshairClosest.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.CROSSHAIR_CLOSEST_CMD, this, crosshairClosest.isChecked());
+            }
+            return false;
+        });
+        camT.add(crosshairClosestLabel).right().padBottom(pad20).padRight(pad20);
+        camT.add(crosshairClosest).left().padBottom(pad20).row();
+
+        // Home marker
+        OwnLabel crosshairHomeLabel = new OwnLabel(I18n.msg("gui.ui.crosshair.home"), skin);
+        crosshairHome = new OwnCheckBox("", skin);
+        cameraModel[0][8] = crosshairHome;
+        crosshairHome.setName("ch home");
+        crosshairHome.setChecked(Settings.settings.scene.crosshair.home);
+        crosshairHome.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.CROSSHAIR_HOME_CMD, this, crosshairHome.isChecked());
+            }
+            return false;
+        });
+        camT.add(crosshairHomeLabel).right().padBottom(pad20).padRight(pad20);
+        camT.add(crosshairHome).left().padBottom(pad20).row();
+
         if (!vr) {
             // Mode buttons
             Table modeButtons = new Table(skin);
 
             final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
-            cameraModel[0][6] = button3d;
+            cameraModel[0][9] = button3d;
             button3d.setChecked(Settings.settings.program.modeStereo.active);
             final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.stereomode")), hk3d, skin));
@@ -480,7 +526,7 @@ public class GamepadGui extends AbstractGui {
 
             final Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
-            cameraModel[1][6] = buttonDome;
+            cameraModel[1][9] = buttonDome;
             buttonDome.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPlanetariumOn());
             final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
             buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.msg("element.planetarium")), hkDome, skin));
@@ -506,7 +552,7 @@ public class GamepadGui extends AbstractGui {
 
             final Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
-            cameraModel[2][6] = buttonCubemap;
+            cameraModel[2][9] = buttonCubemap;
             buttonCubemap.setProgrammaticChangeEvents(false);
             buttonCubemap.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isPanoramaOn());
             final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
@@ -533,7 +579,7 @@ public class GamepadGui extends AbstractGui {
 
             final Image iconOrthosphere = new Image(skin.getDrawable("orthosphere-icon"));
             buttonOrthosphere = new OwnTextIconButton("", iconOrthosphere, skin, "toggle");
-            cameraModel[3][6] = buttonOrthosphere;
+            cameraModel[3][9] = buttonOrthosphere;
             buttonOrthosphere.setProgrammaticChangeEvents(false);
             buttonOrthosphere.setChecked(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.isOrthosphereOn());
             final String hkOrthosphere = KeyBindings.instance.getStringKeys("action.toggle/element.orthosphere");
@@ -1141,15 +1187,15 @@ public class GamepadGui extends AbstractGui {
         padTable.pad(pad30);
         padTable.setBackground("table-border");
         if (vr) {
-            var topCell = padTable.add(topLine).colspan(2);
+            var topCell = padTable.add(topLine).center().colspan(2);
             topCell.row();
         }
         menu.pack();
         padTable.add(menu).left();
-        contentCell = padTable.add().left();
+        contentCell = padTable.add().expandX().left();
+        contentCell.row();
 
         if (vr) {
-            contentCell.row();
             padTable.add(buttonGoHome).right().colspan(2);
         }
 
@@ -1175,11 +1221,11 @@ public class GamepadGui extends AbstractGui {
                 } else {
                     table.add().top().left().padRight(pad40).padBottom(pad10);
                 }
-                String text;
+                String text = device.manufacturerName != null ? device.manufacturerName + " " : "";
                 if (device.getType() == VRContext.VRDeviceType.Controller) {
-                    text = device.modelNumber;
+                    text += device.modelNumber;
                 } else {
-                    text = device.getType() + (device.getPose() != null ? " - " + device.getPose().getIndex() : "");
+                    text += device.getType() + (device.getPose() != null ? " - " + device.getPose().getIndex() : "");
                 }
                 table.add(new OwnLabel(text, skin, "big")).top().left().padBottom(pad10).row();
                 i++;
@@ -1587,6 +1633,29 @@ public class GamepadGui extends AbstractGui {
                     fovSlider.setDisabled(enable);
                 }
             }
+        }
+        case CROSSHAIR_CLOSEST_CMD -> {
+            if (source != this) {
+                crosshairClosest.setProgrammaticChangeEvents(false);
+                crosshairClosest.setChecked((Boolean) data[0]);
+                crosshairClosest.setProgrammaticChangeEvents(true);
+            }
+        }
+        case CROSSHAIR_FOCUS_CMD -> {
+            if (source != this) {
+                crosshairFocus.setProgrammaticChangeEvents(false);
+                crosshairFocus.setChecked((Boolean) data[0]);
+                crosshairFocus.setProgrammaticChangeEvents(true);
+            }
+
+        }
+        case CROSSHAIR_HOME_CMD -> {
+            if (source != this) {
+                crosshairHome.setProgrammaticChangeEvents(false);
+                crosshairHome.setChecked((Boolean) data[0]);
+                crosshairHome.setProgrammaticChangeEvents(true);
+            }
+
         }
         default -> {
         }

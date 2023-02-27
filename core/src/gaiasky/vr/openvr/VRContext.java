@@ -23,6 +23,7 @@ import java.nio.IntBuffer;
 
 import static gaiasky.util.Logger.Log;
 import static gaiasky.util.Logger.getLogger;
+import static org.lwjgl.openvr.VR.EVREventType_VREvent_ProcessConnected;
 import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
 
 /**
