@@ -316,6 +316,7 @@ public class SysUtils {
         }
     }
 
+
     public static Path getConfigDir() {
         if (isLinux()) {
             return getXdgConfigHome().resolve(GAIASKY_DIR_NAME);
@@ -334,11 +335,21 @@ public class SysUtils {
 
     private static Path getXdgDataHome() {
         String dataHome = System.getenv("XDG_DATA_HOME");
-        if (dataHome == null || dataHome.isEmpty()) {
-            return Paths.get(System.getProperty("user.home"), ".local", "share");
+        if (dataHome == null || dataHome.isBlank()) {
+            return getUserHome().resolve(".local").resolve("share");
         } else {
             return Paths.get(dataHome);
         }
+    }
+
+    private static Path getLocalAppData() {
+        String dataFolder = System.getenv("LOCALAPPDATA");
+        if (dataFolder == null || dataFolder.isBlank()) {
+            return getUserHome().resolve("AppData").resolve("Local");
+        } else {
+            return Paths.get(dataFolder);
+        }
+
     }
 
     private static Path getXdgConfigHome() {
@@ -357,6 +368,10 @@ public class SysUtils {
         } else {
             return Paths.get(cacheHome);
         }
+    }
+
+    public static Path getLocalAppDataTemp() {
+        return getLocalAppData().resolve("Temp");
     }
 
     public static double getJavaVersion() {
