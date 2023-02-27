@@ -38,7 +38,6 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  * Displays the loading screen.
  */
 public class LoadingGui extends AbstractGui {
-    private final long tipTime = 3500;
     public NotificationsInterface notificationsInterface;
     protected Table center, topLeft, bottomMiddle, screenMode;
     private TipsGenerator tipGenerator;
@@ -159,6 +158,7 @@ public class LoadingGui extends AbstractGui {
             lastFunnyTime = currTime;
             funnyTextTime = StdRandom.uniform(1500, 3000);
         }
+        long tipTime = 3500;
         if (currTime - lastTipTime > tipTime) {
             tipGenerator.newTip(tip);
             lastTipTime = currTime;

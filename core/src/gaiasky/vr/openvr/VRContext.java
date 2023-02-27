@@ -5,10 +5,12 @@
 
 package gaiasky.vr.openvr;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
+import gaiasky.gui.GamepadMappings;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnObjLoader;
 import gaiasky.util.gdx.model.IntModel;
@@ -436,7 +438,7 @@ public class VRContext implements Disposable {
             }
         }
 
-        // Load default
+        // Load default.
         if (model == null) {
             logger.info("WARN: Could not find suitable controller model, using default...");
             model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
@@ -668,7 +670,6 @@ public class VRContext implements Disposable {
         public static final int Axis3 = 3;
         public static final int Axis4 = 4;
 
-        // aliases for known controllers
         public static final int SteamVR_Touchpad = Axis0;
         public static final int SteamVR_Trigger = Axis1;
     }
@@ -748,6 +749,8 @@ public class VRContext implements Disposable {
         private VRControllerRole role;
         private long buttons = 0;
         private IntModelInstance modelInstance;
+        // Mappings, in case it is a controller.
+        public GamepadMappings mappings;
         private boolean initialized;
 
         VRDevice(VRDevicePose pose, VRDeviceType type, VRControllerRole role) {
@@ -769,6 +772,13 @@ public class VRContext implements Disposable {
             this.modelInstance = model != null ? new IntModelInstance(model) : null;
             if (model != null)
                 this.modelInstance.transform.set(pose.transform);
+
+            // Init mappings file for VR controller.
+            if (type == VRDeviceType.Controller && (role == VRControllerRole.LeftHand || role == VRControllerRole.RightHand)) {
+                // Load default VR controller mappings.
+                var mappingsFile = Gdx.files.internal("mappings/Oculus_Rift_CV1.controller");
+                mappings = new GamepadMappings(manufacturerName + " VR controller", mappingsFile.file().toPath());
+            }
             this.initialized = true;
         }
 
@@ -861,8 +871,6 @@ public class VRContext implements Disposable {
         public boolean isConnected() {
             return VRSystem.VRSystem_IsTrackedDeviceConnected(pose.index);
         }
-
-
 
         /**
          * @return whether the button from {@link VRControllerButtons} is
@@ -996,6 +1004,7 @@ public class VRContext implements Disposable {
          * Updates the axis values and returns whether the values changed.
          *
          * @param axis The axis
+         *
          * @return Whether the values of this axis changed
          */
         public boolean pollAxis(int axis) {

@@ -1548,7 +1548,7 @@ public class Settings {
             }
 
             public boolean isControllerBlacklisted(String controllerName) {
-                if (blacklist == null || blacklist.length == 0) {
+                if (blacklist == null) {
                     return false;
                 } else {
                     for (String cn : blacklist) {

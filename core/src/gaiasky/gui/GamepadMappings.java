@@ -20,13 +20,13 @@ import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 
 /**
- * Reads inputListener mappings from a file
+ * Defines the mappings of a gamepad or VR controller.
  */
 public class GamepadMappings extends AbstractGamepadMappings {
     private String controllerName;
 
     /**
-     * Create empty controller mappings
+     * Create empty controller mappings.
      */
     public GamepadMappings(String controllerName) {
         super();
