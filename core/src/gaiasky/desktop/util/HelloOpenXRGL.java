@@ -830,7 +830,7 @@ public class HelloOpenXRGL {
         XrQuaternionf orientation = pose.orientation();
         XRHelper.applyProjectionToMatrix(projectionMatrix.idt(), layerView.fov(), 0.1f, 100f, false);
         quaternion.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
-        viewMatrix.translate(pos.x(), pos.y(), pos.z()).rotate(quaternion);
+        viewMatrix.rotate(quaternion).translate(pos.x(), pos.y(), pos.z()).inv();
         //viewMatrix.translationRotateScaleInvert(
         //        pos.x(), pos.y(), pos.z(),
         //        orientation.x(), orientation.y(), orientation.z(), orientation.w(),
@@ -842,8 +842,11 @@ public class HelloOpenXRGL {
         {   // Rotating plane
             modelviewMatrix.translate(0, 0, -3).rotate((float) -glfwGetTime(), 1, 0, 0);
             glUseProgram(colorShader);
+            mvpMatrix.rewind();
             glUniformMatrix4fv(glGetUniformLocation(colorShader, "projection"), false, Matrix4Utils.put(projectionMatrix, mvpMatrix));
+            mvpMatrix.rewind();
             glUniformMatrix4fv(glGetUniformLocation(colorShader, "view"), false, Matrix4Utils.put(viewMatrix, mvpMatrix));
+            mvpMatrix.rewind();
             glUniformMatrix4fv(glGetUniformLocation(colorShader, "model"), false, Matrix4Utils.put(modelviewMatrix, mvpMatrix));
             glBindVertexArray(quadVAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -851,6 +854,7 @@ public class HelloOpenXRGL {
 
         {   // World-space cube
             modelviewMatrix.idt().scl(10);
+            mvpMatrix.rewind();
             glUniformMatrix4fv(glGetUniformLocation(colorShader, "model"), false, Matrix4Utils.put(modelviewMatrix, mvpMatrix));
             glBindVertexArray(cubeVAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBuffer);
