@@ -173,7 +173,7 @@ project(":core") {
         // ****************
         // REST SERVER DEPS
         // ****************
-        api group: "com.slf4j", name: "slf4j-nop", version: "$slf4jVersion"
+        api group: "org.slf4j", name: "slf4j-nop", version: "$slf4jVersion"
         api group: "com.sparkjava", name: "spark-core", version: "$sparkjavaVersion"
 
         // *************

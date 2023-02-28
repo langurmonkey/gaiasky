@@ -93,7 +93,7 @@ public class HiOpenXRGL {
         helloOpenXR.initializeAndBindOpenGL();
         helloOpenXR.createXRReferenceSpace();
         helloOpenXR.createXRSwapchains();
-        helloOpenXR.createOpenGLResourses();
+        helloOpenXR.createOpenGLResources();
 
         helloOpenXR.eventDataBuffer = XrEventDataBuffer.calloc()
                 .type$Default();
@@ -264,7 +264,7 @@ public class HiOpenXRGL {
             }
 
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
             window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
@@ -473,7 +473,7 @@ public class HiOpenXRGL {
         }
     }
 
-    private void createOpenGLResourses() {
+    private void createOpenGLResources() {
         swapchainFramebuffer = glGenFramebuffers();
         depthTextures = new HashMap<>(0);
         for (Swapchain swapchain : swapchains) {
@@ -554,6 +554,7 @@ public class HiOpenXRGL {
                 break;
             }
             }
+            event.close();
             event = readNextOpenXREvent();
         }
         while (event != null);
@@ -592,7 +593,7 @@ public class HiOpenXRGL {
         }
 
         switch (sessionState) {
-        case XR_SESSION_STATE_READY: {
+        case XR_SESSION_STATE_READY -> {
             assert (xrSession != null);
             try (MemoryStack stack = stackPush()) {
                 check(xrBeginSession(
@@ -606,24 +607,21 @@ public class HiOpenXRGL {
                 return false;
             }
         }
-        case XR_SESSION_STATE_STOPPING: {
+        case XR_SESSION_STATE_STOPPING -> {
             assert (xrSession != null);
             sessionRunning = false;
             check(xrEndSession(xrSession));
             return false;
         }
-        case XR_SESSION_STATE_EXITING: {
+        case XR_SESSION_STATE_EXITING, XR_SESSION_STATE_LOSS_PENDING -> {
             // Do not attempt to restart because user closed this session.
+            // Poll for a new instance.
             //*requestRestart = false;
             return true;
         }
-        case XR_SESSION_STATE_LOSS_PENDING: {
-            // Poll for a new instance.
-            //*requestRestart = true;
-            return true;
-        }
-        default:
+        default -> {
             return false;
+        }
         }
     }
 

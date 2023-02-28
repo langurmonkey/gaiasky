@@ -15,6 +15,7 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFWNativeGLX.glfwGetGLXContext;
+import static org.lwjgl.glfw.GLFWNativeGLX.glfwGetGLXFBConfig;
 import static org.lwjgl.glfw.GLFWNativeWGL.glfwGetWGLContext;
 import static org.lwjgl.glfw.GLFWNativeWayland.glfwGetWaylandDisplay;
 import static org.lwjgl.glfw.GLFWNativeWin32.glfwGetWin32Window;
@@ -168,7 +169,7 @@ public final class XRHelper {
      */
     public static Struct createGraphicsBindingOpenGL(MemoryStack stack, long window) throws IllegalStateException {
         switch (Platform.get()) {
-        case LINUX:
+        case LINUX -> {
             /*
              * NOTE: X11 is preferred over Wayland because Monado, the most promising Linux OpenXR runtime,
              * doesn't handle XrGraphicsBindingOpenGLWaylandKHR at the moment. See
@@ -185,8 +186,8 @@ public final class XRHelper {
                  * Linux X11 support will be blocked until it is merged. When it is merged, the GLFW bindings of
                  * GLFW will need to be updated as well.
                  */
-                long glxConfig = -1;
-                // long glxConfig = glfwGetGLXFBConfig();
+                //long glxConfig = -1;
+                long glxConfig = glfwGetGLXFBConfig(window);
 
                 if (glxConfig == -1) {
                     throw new IllegalStateException("Linux X11 support is not finished");
@@ -213,14 +214,15 @@ public final class XRHelper {
             } else {
                 throw new IllegalStateException("Unsupported Linux windowing system. Only X11 and Wayland are supported");
             }
-        case WINDOWS:
+        }
+        case WINDOWS -> {
             return XrGraphicsBindingOpenGLWin32KHR.malloc(stack)
                     .type$Default()
                     .next(NULL)
                     .hDC(GetDC(glfwGetWin32Window(window)))
                     .hGLRC(glfwGetWGLContext(window));
-        default:
-            throw new IllegalStateException("Unsupported operation system: " + Platform.get());
+        }
+        default -> throw new IllegalStateException("Unsupported operation system: " + Platform.get());
         }
     }
 }

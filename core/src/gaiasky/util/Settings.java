@@ -146,6 +146,10 @@ public class Settings {
         return APPLICATION_NAME + " " + settings.version.version;
     }
 
+    public static String getApplicationName(boolean vr) {
+        return APPLICATION_NAME + (vr ? " VR" : "");
+    }
+
     public enum ScreenshotMode {
         SIMPLE,
         ADVANCED
