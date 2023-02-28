@@ -122,17 +122,18 @@ project(":core") {
         api group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
         api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
         api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-windows"
+        api group: "org.joml", name: "joml", version: "1.10.5"
 
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        api group: "com.badlogicgames.gdx", name: "gdx", version: "$gdxVersion"
+        api group: "com.badlogicgames.gdx", name: "gdx-backend-lwjgl3", version: "$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
         // gdx-controllers:2.+ bases up on SDL 2.0.12
-        api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
-        api "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
+        api group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-core", version: "$gdxcontrollersVersion"
+        api group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-desktop", version: "$gdxcontrollersVersion"
 
         // Ashley
-        api "com.badlogicgames.ashley:ashley:$ashleyVersion"
+        api group: "com.badlogicgames.ashley", name: "ashley", version: "$ashleyVersion"
 
         // STIL library to load datasets
         api group: "uk.ac.starlink", name: "stil", version: "$stilVersion"
@@ -172,8 +173,8 @@ project(":core") {
         // ****************
         // REST SERVER DEPS
         // ****************
-        api "org.slf4j:slf4j-nop:$slf4jVersion"
-        api "com.sparkjava:spark-core:$sparkjavaVersion"
+        api group: "com.slf4j", name: "slf4j-nop", version: "$slf4jVersion"
+        api group: "com.sparkjava", name: "spark-core", version: "$sparkjavaVersion"
 
         // *************
         // INTERNAL DEPS
