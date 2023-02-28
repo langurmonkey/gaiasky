@@ -64,6 +64,8 @@ public abstract class AbstractGui implements IObserver, IGui {
     /** Lock for sync. **/
     protected Object lock;
 
+    protected int backBufferWidth = -1, backBufferHeight = -1;
+
     public AbstractGui(Graphics graphics, Float unitsPerPixel) {
         this.graphics = graphics;
         this.unitsPerPixel = unitsPerPixel;
@@ -168,5 +170,19 @@ public abstract class AbstractGui implements IObserver, IGui {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void setBackBufferSize(int width, int height) {
+        this.backBufferHeight = height;
+        this.backBufferWidth = width;
+    }
+
+    public int getBackBufferWidth() {
+        return backBufferWidth > 0 ? backBufferWidth : 1920;
+    }
+
+    public int getBackBufferHeight() {
+        return backBufferHeight > 0 ? backBufferHeight : 1080;
     }
 }

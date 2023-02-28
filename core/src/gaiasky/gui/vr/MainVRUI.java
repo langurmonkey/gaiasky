@@ -114,7 +114,7 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     }
 
     public void build(Skin skin) {
-        gamepadGui = new GamepadGui(skin, Gdx.graphics, 1f / Settings.settings.program.ui.scale, true);
+        gamepadGui = new GamepadGui(skin, Gdx.graphics, 1f, true);
         gamepadGui.initialize(stage);
         gamepadGui.build();
         Table content = gamepadGui.getContent();
@@ -329,6 +329,11 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     }
 
     @Override
+    public void setBackBufferSize(int width, int height) {
+
+    }
+
+    @Override
     public void dispose() {
         if (buffer != null) {
             buffer.dispose();
@@ -359,7 +364,8 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                     var body = Mapper.body.get(entity);
                     body.setColor(new float[] { 1, 1, 1, 1 });
                     body.setLabelColor(new float[] { 0, 0, 0, 0 });
-                    body.setSizeKm(100.0);
+                    body.setSize(1.0);
+                    body.sizeInUnitsFlag = true;
 
                     var affine = Mapper.affine.get(entity);
                     affine.initialize();
@@ -415,14 +421,15 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                     } else {
                         showVRUI(base);
                         // Set position and orientation
-                        // 10 meters in front of the camera, on the equatorial plane.
+                        // ~2 meters in front of the camera, on the equatorial plane.
+                        // This should NOT depend on internal units, and neither should the size!
                         ICamera camera = GaiaSky.instance.getICamera();
                         var dir = camera.getDirection().cpy();
                         dir.y = 0;
                         dir.nor();
                         var body = Mapper.body.get(entity);
-                        body.pos.set(camera.getPos().cpy().add(dir.scl(190 * Constants.KM_TO_U)));
-                        body.pos.add(0, 80.0 * Constants.KM_TO_U, 0);
+                        body.pos.set(camera.getPos().cpy().add(dir.scl(1.8)));
+                        body.pos.add(0, 1.1, 0);
 
                         // Save relative position.
                         relativePosition.set(body.pos).sub(camera.getPos());

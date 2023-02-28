@@ -9,21 +9,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.gui.IGui;
 import gaiasky.render.ComponentTypes;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 
 public class VRGui<T extends IGui> implements IGui {
 
     private T right;
     private T left;
 
-    public VRGui(Class<T> clazz, int hOffset, Skin skin, Graphics graphics, Float unitsPerPixel) {
+    public VRGui(Class<T> clazz, Skin skin, Graphics graphics, Float unitsPerPixel) {
         super();
         try {
+            int uiWidth = 2800;
+            int uiHeight = uiWidth * Settings.settings.graphics.backBufferResolution[1] / Settings.settings.graphics.backBufferResolution[0];
+            int hOffset = (int) (uiWidth / 4f);
             right = clazz.getDeclaredConstructor(Skin.class, Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             right.setVr(true);
             right.sethOffset(-hOffset);
+            right.setBackBufferSize(uiWidth, uiHeight);
             left = clazz.getDeclaredConstructor(Skin.class, Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             left.setVr(true);
             left.sethOffset(hOffset);
+            left.setBackBufferSize(uiWidth, uiHeight);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }
@@ -122,5 +128,11 @@ public class VRGui<T extends IGui> implements IGui {
     @Override
     public boolean updateUnitsPerPixel(float upp) {
         return right.updateUnitsPerPixel(upp) && left.updateUnitsPerPixel(upp);
+    }
+
+    @Override
+    public void setBackBufferSize(int width, int height) {
+        right.setBackBufferSize(width, height);
+        left.setBackBufferSize(width, height);
     }
 }

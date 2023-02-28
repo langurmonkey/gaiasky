@@ -124,7 +124,7 @@ scene:
     # Modulate the brightness of stars with this power.
     power: 0.75
     # Size scaling of stars.
-    pointSize: 8.2
+    pointSize: 9.2
     # Control the glow amount when close to stars.
     # Should be set rather low, i.e., in [0.01, 0.5].
     glowFactor: 0.06
@@ -158,9 +158,9 @@ scene:
   # Label settings
   label:
     # Label size factor
-    size: 0.65
+    size: 0.45
     # Controls the number of labels to render
-    number: 1.3
+    number: 1.8
   # Line width factor
   lineWidth: 1.0
   # Proper motion arrow settings
@@ -199,7 +199,7 @@ scene:
     # TRIANGLES is the new mode. Triangles are sent to the GPU in VBOs with VAOs. Faster on newer hardware and geometrically correct.
     # TRIANGLES_INSTANCED is a variation of TRIANGLES. Saves x4 graphics memory. Your mileage may vary with this one.
     # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes
-    pointCloud: POINTS
+    pointCloud: TRIANGLES_INSTANCED
     # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]
     line: GL_LINES
     # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO]

@@ -123,4 +123,9 @@ public interface IGui extends Disposable {
      * is the same as 1/UI_SCALE.
      */
     boolean updateUnitsPerPixel(float upp);
+
+    /**
+     * Sets the back buffer size.
+     */
+    void setBackBufferSize(int width, int height);
 }

@@ -12,18 +12,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.gui.vr.FixedScreenViewport;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
 import gaiasky.util.TipsGenerator;
@@ -66,8 +65,13 @@ public class LoadingGui extends AbstractGui {
         float pad10 = 16f;
         final Settings settings = Settings.settings;
         // User interface
-        ScreenViewport vp = new ScreenViewport();
-        vp.setUnitsPerPixel(unitsPerPixel);
+        Viewport vp;
+        if (vr) {
+            vp = new FixedScreenViewport(getBackBufferWidth(), getBackBufferHeight());
+        } else {
+            vp = new ScreenViewport();
+            ((ScreenViewport) vp).setUnitsPerPixel(unitsPerPixel);
+        }
         stage = new Stage(vp, sb);
         if (vr) {
             vp.update(settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], true);
@@ -122,21 +126,23 @@ public class LoadingGui extends AbstractGui {
         topLeft = new VersionLineTable(skin);
 
         // SCREEN MODE BUTTON - TOP RIGHT
-        screenMode = new Table(skin);
-        screenMode.setFillParent(true);
-        screenMode.top().right();
-        screenMode.pad(pad10);
-        OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
-        screenModeButton.addListener(new OwnTextTooltip(I18n.msg("gui.fullscreen"), skin, 10));
-        screenModeButton.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                settings.graphics.fullScreen.active = !settings.graphics.fullScreen.active;
-                EventManager.publish(Event.SCREEN_MODE_CMD, screenModeButton);
-                return true;
-            }
-            return false;
-        });
-        screenMode.add(screenModeButton);
+        if (!vr) {
+            screenMode = new Table(skin);
+            screenMode.setFillParent(true);
+            screenMode.top().right();
+            screenMode.pad(pad10);
+            OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
+            screenModeButton.addListener(new OwnTextTooltip(I18n.msg("gui.fullscreen"), skin, 10));
+            screenModeButton.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    settings.graphics.fullScreen.active = !settings.graphics.fullScreen.active;
+                    EventManager.publish(Event.SCREEN_MODE_CMD, screenModeButton);
+                    return true;
+                }
+                return false;
+            });
+            screenMode.add(screenModeButton);
+        }
 
         // MESSAGE INTERFACE - BOTTOM
         notificationsInterface = new NotificationsInterface(skin, lock, false, false, false);

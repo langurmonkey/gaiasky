@@ -22,8 +22,7 @@ public class WelcomeGuiVR extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        ScreenViewport vp = new ScreenViewport();
-        vp.setUnitsPerPixel(unitsPerPixel);
+        FixedScreenViewport vp = new FixedScreenViewport(getBackBufferWidth(), getBackBufferHeight());
         stage = new Stage(vp, sb);
 
         center = new Table();
