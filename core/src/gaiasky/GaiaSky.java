@@ -432,10 +432,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
     public GaiaSky(final boolean skipWelcome, final boolean vr, final boolean externalView, final boolean headless, final boolean noScriptingServer, final boolean debugMode) {
         super();
 
+        // Instance and settings.
         instance = this;
         this.settings = Settings.settings;
 
-        // Flags
+        // Set flags.
         this.skipWelcome = skipWelcome;
         this.vr = vr;
         this.externalView = externalView;
@@ -443,6 +444,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         this.noScripting = noScriptingServer;
         this.debugMode = debugMode;
 
+        // Set update-render process to initial GUI.
         this.updateRenderProcess = runnableInitialGui;
     }
 

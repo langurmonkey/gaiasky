@@ -197,15 +197,17 @@ public class GamepadGui extends AbstractGui {
 
             var context = GaiaSky.instance.vrContext;
 
-            // Devices
-            var hmds = context.getDevicesByType(VRContext.VRDeviceType.HeadMountedDisplay);
-            addDeviceTypeInfo(vrInfoT, "HMD", hmds);
-            var baseStations = context.getDevicesByType(VRContext.VRDeviceType.BaseStation);
-            addDeviceTypeInfo(vrInfoT, "Base stations", baseStations);
-            var controllers = context.getDevicesByType(VRContext.VRDeviceType.Controller);
-            addDeviceTypeInfo(vrInfoT, "Controllers", controllers);
-            var generic = context.getDevicesByType(VRContext.VRDeviceType.Generic);
-            addDeviceTypeInfo(vrInfoT, "Other devices", generic);
+            if(context != null) {
+                // Devices
+                var hmds = context.getDevicesByType(VRContext.VRDeviceType.HeadMountedDisplay);
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.hmds"), hmds);
+                var baseStations = context.getDevicesByType(VRContext.VRDeviceType.BaseStation);
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.basestations"), baseStations);
+                var controllers = context.getDevicesByType(VRContext.VRDeviceType.Controller);
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controllers"), controllers);
+                var generic = context.getDevicesByType(VRContext.VRDeviceType.Generic);
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.other"), generic);
+            }
 
             infoT.add(vrInfoT).left().center().padRight(pad30 * 2f);
 

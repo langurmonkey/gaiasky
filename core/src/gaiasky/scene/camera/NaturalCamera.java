@@ -1314,9 +1314,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 addRotateMovement((double) data[0], (double) data[1], true, true);
             }
             break;
-        case CAMERA_PAN:
-
-            break;
         case CAMERA_ROLL:
             synchronized (updateLock) {
                 addRoll((double) data[0], Settings.settings.scene.camera.cinematic);
