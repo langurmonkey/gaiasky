@@ -100,7 +100,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                             // Is star.
                             var graph = Mapper.graph.get(entity);
                             double angle = GaiaSky.instance.cameraManager.getDirection().angle(graph.translation);
-                            if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openVr || angle < angleEdgeDeg)) {
+                            if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openXr || angle < angleEdgeDeg)) {
                                 Vector3d pos3d = graph.translation.put(auxD);
 
                                 // Apply relativistic effects.

@@ -47,7 +47,7 @@ import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.vr.openvr.VRContext;
+import gaiasky.vr.openxr.OpenXRDriver;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
@@ -65,9 +65,9 @@ import static gaiasky.render.RenderGroup.*;
 public class SceneRenderer implements ISceneRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneRenderer.class);
     // Indexes
-    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENVR_IDX = 4;
-    // VRContext, may be null
-    private final VRContext vrContext;
+    private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENXR_IDX = 4;
+    // The OpenXR driver. This is null if we are not in VR.
+    private final OpenXRDriver xrDriver;
     private final GlobalResources globalResources;
     private final AtomicBoolean rendering;
     private final RenderAssets renderAssets;
@@ -83,7 +83,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
      * Alpha values for each type.
      **/
     public float[] alphas;
-    private ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
+    private final ModelEntityRenderSystem renderObject = new ModelEntityRenderSystem(this);
     /**
      * Render lists for all render groups.
      * The front render lists contain the objects which are actually rendered in the current cycle. The back
@@ -109,9 +109,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private final LightGlowPass lightGlowPass;
     private final SVTRenderPass svtPass;
 
-    public SceneRenderer(final VRContext vrContext, final GlobalResources globalResources) {
+    public SceneRenderer(final OpenXRDriver xrDriver, final GlobalResources globalResources) {
         super();
-        this.vrContext = vrContext;
+        this.xrDriver = xrDriver;
         this.globalResources = globalResources;
         this.rendering = new AtomicBoolean(false);
         this.renderAssets = new RenderAssets(globalResources);
@@ -203,7 +203,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         sgrList[SGR_STEREO_IDX] = new RenderModeStereoscopic(globalResources.getSpriteBatch());
         sgrList[SGR_FOV_IDX] = new RenderModeFov();
         sgrList[SGR_CUBEMAP_IDX] = new RenderModeCubemapProjections();
-        sgrList[SGR_OPENVR_IDX] = new RenderModeOpenVR(GaiaSky.instance.scene, vrContext, null);
+        sgrList[SGR_OPENXR_IDX] = new RenderModeOpenXR(GaiaSky.instance.scene, xrDriver, null);
         renderMode = null;
 
         /*
@@ -465,9 +465,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     private void initRenderMode(ICamera camera) {
-        if (Settings.settings.runtime.openVr) {
+        if (Settings.settings.runtime.openXr) {
             // Using Steam OpenVR renderer
-            renderMode = sgrList[SGR_OPENVR_IDX];
+            renderMode = sgrList[SGR_OPENXR_IDX];
         } else if (camera.getNCameras() > 1) {
             // FOV mode
             renderMode = sgrList[SGR_FOV_IDX];
@@ -509,7 +509,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
             // Light glow pass.
             // In stereo and cubemap modes, the glow pass is rendered in the SGR itself.
-            if (!Settings.settings.program.isStereoOrCubemap() && !Settings.settings.runtime.openVr) {
+            if (!Settings.settings.program.isStereoOrCubemap() && !Settings.settings.runtime.openXr) {
                 lightGlowPass.renderGlowPass(camera, null);
             }
 
@@ -662,19 +662,19 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             if (stereo)
                 renderMode = sgrList[SGR_STEREO_IDX];
             else {
-                if (Settings.settings.runtime.openVr)
-                    renderMode = sgrList[SGR_OPENVR_IDX];
+                if (Settings.settings.runtime.openXr)
+                    renderMode = sgrList[SGR_OPENXR_IDX];
                 else
                     renderMode = sgrList[SGR_DEFAULT_IDX];
             }
         }
         case CUBEMAP_CMD -> {
-            boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openVr;
+            boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openXr;
             if (cubemap) {
                 renderMode = sgrList[SGR_CUBEMAP_IDX];
             } else {
-                if (Settings.settings.runtime.openVr)
-                    renderMode = sgrList[SGR_OPENVR_IDX];
+                if (Settings.settings.runtime.openXr)
+                    renderMode = sgrList[SGR_OPENXR_IDX];
                 else
                     renderMode = sgrList[SGR_DEFAULT_IDX];
             }
@@ -684,8 +684,8 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             if (cm.isGaiaFov())
                 renderMode = sgrList[SGR_FOV_IDX];
             else {
-                if (Settings.settings.runtime.openVr)
-                    renderMode = sgrList[SGR_OPENVR_IDX];
+                if (Settings.settings.runtime.openXr)
+                    renderMode = sgrList[SGR_OPENXR_IDX];
                 else if (Settings.settings.program.modeStereo.active)
                     renderMode = sgrList[SGR_STEREO_IDX];
                 else if (Settings.settings.program.modeCubemap.active)
@@ -846,11 +846,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     }
 
     public IRenderMode getRenderModeOpenVR() {
-        return sgrList[SGR_OPENVR_IDX];
+        return sgrList[SGR_OPENXR_IDX];
     }
 
-    public VRContext getVrContext() {
-        return vrContext;
+    public OpenXRDriver getVrContext() {
+        return xrDriver;
     }
 
     public FrameBuffer getFrameBuffer(final int w, final int h) {

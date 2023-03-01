@@ -49,7 +49,7 @@ public class RenderModeAbstract {
         ppb.render(fb);
 
         // Render camera
-        if (!Settings.settings.runtime.openVr) {
+        if (!Settings.settings.runtime.openXr) {
             if (fb != null && postproc) {
                 fb.begin();
             }

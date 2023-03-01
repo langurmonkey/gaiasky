@@ -185,7 +185,7 @@ public class GridRecInitializer extends AbstractInitSystem {
         EventManager.instance.subscribe(new GridRecursiveRadio(entity), Event.TOGGLE_VISIBILITY_CMD);
 
         // Fade out in VR
-        if (Settings.settings.runtime.openVr) {
+        if (Settings.settings.runtime.openXr) {
             var fade = Mapper.fade.get(entity);
             fade.setFadeOut(new double[] { 5e6, 50e6 });
             fade.fadeOutMap = new Vector2d(1, 0);

@@ -378,7 +378,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void setVROffset(NaturalCamera cam) {
-        if (Settings.settings.runtime.openVr && cam.vrOffset != null) {
+        if (Settings.settings.runtime.openXr && cam.vrOffset != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);

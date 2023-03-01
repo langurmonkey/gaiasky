@@ -96,7 +96,7 @@ public class LoadingGui extends AbstractGui {
         // Title.
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(pad30 * 2f);
-        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(settings.runtime.openVr), skin, "main-title");
+        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(settings.runtime.openXr), skin, "main-title");
         OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
         version.setColor(skin.getColor("theme"));
         titleGroup.addActor(gaiaSky);
@@ -181,7 +181,7 @@ public class LoadingGui extends AbstractGui {
     }
 
     private void randomFunnyText() {
-        if (Settings.settings.runtime.openVr) {
+        if (Settings.settings.runtime.openXr) {
             spin.setText(I18n.msg("gui.loading"));
         } else {
             try {

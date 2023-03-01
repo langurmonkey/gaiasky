@@ -190,7 +190,7 @@ public class GamepadGui extends AbstractGui {
             vrInfoT.setSize(w, h);
 
             // Title
-            OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "header-large");
+            OwnLabel welcomeTitle = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "header-large");
             OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "header-raw");
             vrInfoT.add(welcomeTitle).center().top().padBottom(pad20).colspan(2).row();
             vrInfoT.add(version).center().top().padBottom(pad40).colspan(2).row();
@@ -988,7 +988,7 @@ public class GamepadGui extends AbstractGui {
                 // Read defaults from internal settings file
                 try {
                     Path confFolder = Settings.assetsPath("conf");
-                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr));
+                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openXr));
                     Yaml yaml = new Yaml();
                     Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
 

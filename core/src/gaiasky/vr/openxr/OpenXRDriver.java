@@ -16,9 +16,7 @@ import org.lwjgl.system.Struct;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.util.Map;
 
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.opengl.GL11.GL_RGB10_A2;
 import static org.lwjgl.opengl.GL11.GL_RGBA8;
 import static org.lwjgl.opengl.GL30.GL_RGBA16F;
@@ -40,27 +38,16 @@ public class OpenXRDriver implements Disposable {
     private XrSpace xrAppSpace;  //The real world space in which the program runs
     private long glColorFormat;
     private XrView.Buffer views;       //Each view reperesents an eye in the headset with views[0] being left and views[1] being right
+    private XrActionSet gameplayActionSet;
+    private XrAction actionVRUI;
     private Swapchain[] swapchains;  //One swapchain per view
     private XrViewConfigurationView.Buffer viewConfigs;
-    private int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
+    private final int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
 
     //Runtime
     XrEventDataBuffer eventDataBuffer;
     int sessionState;
     boolean sessionRunning;
-
-    //GL globals
-    Map<XrSwapchainImageOpenGLKHR, Integer> depthTextures; //Swapchain images only provide a color texture so we have to create depth textures seperatley
-
-    int swapchainFramebuffer;
-    int cubeVertexBuffer;
-    int cubeIndexBuffer;
-    int quadVertexBuffer;
-    int cubeVAO;
-    int quadVAO;
-    int screenShader;
-    int textureShader;
-    int colorShader;
 
     static class Swapchain {
         XrSwapchain handle;
@@ -69,20 +56,23 @@ public class OpenXRDriver implements Disposable {
         XrSwapchainImageOpenGLKHR.Buffer images;
     }
 
+    /**
+     * Runs the initialization sequence of OpenXR by creating an instance, a session,
+     * a reference space and initializing the swapchain.
+     */
     public void initializeOpenXR() {
         createOpenXRInstance();
-        initializeOpenXRSystem();
+        initializeXRSystem();
         initializeOpenXRSession();
         createOpenXRReferenceSpace();
         createOpenXRSwapchains();
     }
 
     /**
+     * Creates the OpenXR instance object.
      * First method to call in the OpenXR initialization sequence.
-     *
-     * @return The OpenXR instance.
      */
-    public XrInstance createOpenXRInstance() {
+    public void createOpenXRInstance() {
         try (MemoryStack stack = stackPush()) {
             IntBuffer pi = stack.mallocInt(1);
 
@@ -157,14 +147,14 @@ public class OpenXRDriver implements Disposable {
             PointerBuffer pp = stack.mallocPointer(1);
             check(xrCreateInstance(createInfo, pp));
             xrInstance = new XrInstance(pp.get(0), createInfo);
-            return xrInstance;
         }
     }
 
     /**
+     * Creates the system with which to later create a session.
      * Second method to call in the OpenXR initialization sequence.
      */
-    public void initializeOpenXRSystem() {
+    public void initializeXRSystem() {
         try (MemoryStack stack = stackPush()) {
             //Get headset
             LongBuffer pl = stack.longs(0);
@@ -187,11 +177,10 @@ public class OpenXRDriver implements Disposable {
     }
 
     /**
+     * Creates the XrSession object.
      * Third method to call in the OpenXR initialization sequence.
-     *
-     * @return The OpenXR session.
      */
-    public XrSession initializeOpenXRSession() {
+    public void initializeOpenXRSession() {
         try (MemoryStack stack = stackPush()) {
             //Initialize OpenXR's OpenGL compatability
             XrGraphicsRequirementsOpenGLKHR graphicsRequirements = XrGraphicsRequirementsOpenGLKHR.malloc(stack)
@@ -244,16 +233,14 @@ public class OpenXRDriver implements Disposable {
                 check(xrCreateDebugUtilsMessengerEXT(xrInstance, ciDebugUtils, pp));
                 xrDebugMessenger = new XrDebugUtilsMessengerEXT(pp.get(0), xrInstance);
             }
-            return xrSession;
         }
     }
 
     /**
+     * Creates an XrSpace from the previously created session.
      * Fourth method to call in the OpenXR initialization sequence.
-     *
-     * @return The OpenXR space.
      */
-    public XrSpace createOpenXRReferenceSpace() {
+    public void createOpenXRReferenceSpace() {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
 
@@ -274,16 +261,14 @@ public class OpenXRDriver implements Disposable {
             ));
 
             xrAppSpace = new XrSpace(pp.get(0), xrSession);
-            return xrAppSpace;
         }
     }
 
     /**
+     * Initializes the XR swapchains.
      * Fifth method to call in the OpenXR initialization sequence.
-     *
-     * @return The OpenXR swapchains.
      */
-    public Swapchain[] createOpenXRSwapchains() {
+    public void createOpenXRSwapchains() {
         try (MemoryStack stack = stackPush()) {
             XrSystemProperties systemProperties = XrSystemProperties.calloc(stack);
             memPutInt(systemProperties.address(), XR_TYPE_SYSTEM_PROPERTIES);
@@ -383,12 +368,34 @@ public class OpenXRDriver implements Disposable {
                     swapchains[i] = swapchainWrapper;
                 }
             }
-            return swapchains;
         }
     }
 
-    private boolean pollEvents() {
-        glfwPollEvents();
+    public void initializeActions() {
+        try (MemoryStack stack = stackPush()) {
+            // Create action set.
+            XrActionSetCreateInfo setCreateInfo = XrActionSetCreateInfo.malloc(stack)
+                    .actionSetName(stack.UTF8("gameplay"))
+                    .localizedActionSetName(stack.UTF8("gameplay"))
+                    .priority(0);
+
+            PointerBuffer pp = stack.mallocPointer(1);
+            check(xrCreateActionSet(xrInstance, setCreateInfo, pp));
+            gameplayActionSet = new XrActionSet(pp.get(0), xrInstance);
+
+            // Create action.
+            XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
+                    .actionName(stack.UTF8("vrui"))
+                    .localizedActionName(stack.UTF8("vrui"))
+                    .actionType(XR_ACTION_TYPE_POSE_INPUT);
+
+            pp = stack.mallocPointer(1);
+            check(xrCreateAction(gameplayActionSet, createInfo, pp));
+            actionVRUI = new XrAction(pp.get(0), gameplayActionSet);
+        }
+    }
+
+    public boolean pollEvents() {
         XrEventDataBaseHeader event = readNextOpenXREvent();
         if (event == null) {
             return false;

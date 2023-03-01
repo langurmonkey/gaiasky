@@ -81,6 +81,7 @@ import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
+import gaiasky.vr.openxr.OpenXRDriver;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;
@@ -149,10 +150,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
      **/
     public Graphics graphics;
     /**
-     * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
-     * present or SteamVR is not installed.
+     * The OpenXR driver set up in {@link #createVR()}, may be null if we are not in
+     * VR mode or an OpenXR runtime is not detected.
      */
-    public VRContext vrContext;
+    public OpenXRDriver xrDriver;
     /**
      * The asset manager.
      */
@@ -236,6 +237,40 @@ public class GaiaSky implements ApplicationListener, IObserver {
     /** Settings reference **/
     private Settings settings;
     /**
+<<<<<<< HEAD
+||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
+     * Displays the initial GUI
+     **/
+    private final Runnable runnableInitialGui = () -> {
+        renderGui(welcomeGui);
+        if (settings.runtime.openVr) {
+            try {
+                vrContext.pollEvents();
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
+            renderVRGui((VRGui<?>) welcomeGuiVR);
+        }
+    };
+    /**
+=======
+     * Displays the initial GUI
+     **/
+    private final Runnable runnableInitialGui = () -> {
+        renderGui(welcomeGui);
+        if (settings.runtime.openXr) {
+            try {
+                xrDriver.pollEvents();
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
+            //renderVRGui((VRGui<?>) welcomeGuiVR);
+        }
+    };
+    /**
+>>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
      * Camera recording or not?
      */
     private boolean camRecording = false;
@@ -320,7 +355,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 /* RENDER THE SCENE */
                 sceneRenderer.clearScreen();
 
-                if (settings.runtime.openVr) {
+                if (settings.runtime.openXr) {
                     sceneRenderer.render(cameraManager, t, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], tw, th, null, postProcessor.getPostProcessBean(RenderType.screen));
                 } else {
                     PostProcessBean ppb = postProcessor.getPostProcessBean(RenderType.screen);
@@ -329,7 +364,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 // Render the GUI, setting the viewport
-                if (settings.runtime.openVr) {
+                if (settings.runtime.openXr) {
                     guiRegistry.render(settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1]);
                 } else {
                     guiRegistry.render(tw, th);
@@ -347,7 +382,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (settings.graphics.fpsLimit > 0.0) {
             // If FPS limit is on, dynamic resolution is off
             sleep(settings.graphics.fpsLimit);
-        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openVr) {
+        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openXr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate
             float fps = 1f / graphics.getDeltaTime();
 
@@ -381,9 +416,43 @@ public class GaiaSky implements ApplicationListener, IObserver {
             doneLoading();
             updateRenderProcess = runnableRender;
         } else {
+<<<<<<< HEAD
             if (settings.runtime.openVr) {
                 // Render to VR.
                 renderGui(loadingGuiVR);
+||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
+            // Display loading screen.
+            if (settings.runtime.openVr) {
+                try {
+                    vrContext.pollEvents();
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+                // Render to VR headset.
+                renderVRGui((VRGui<?>) loadingGuiVR);
+
+                // Render to screen too.
+                renderGui(loadingGui);
+            } else {
+                // Render only to screen.
+                renderGui(loadingGui);
+=======
+            // Display loading screen.
+            if (settings.runtime.openXr) {
+                try {
+                    xrDriver.pollEvents();
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+                // Render to VR headset.
+                //renderVRGui((VRGui<?>) loadingGuiVR);
+
+                // Render to screen too.
+                renderGui(loadingGui);
+            } else {
+                // Render only to screen.
+                renderGui(loadingGui);
+>>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
             }
             // Render to screen.
             renderGui(loadingGui);
@@ -541,7 +610,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         guis = new ArrayList<>(3);
 
         // Scene renderer.
-        sceneRenderer = new SceneRenderer(vrContext, globalResources);
+        sceneRenderer = new SceneRenderer(xrDriver, globalResources);
         sceneRenderer.initialize(assetManager);
 
         // Screenshots and frame output manager.
@@ -566,6 +635,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         inputMultiplexer.addProcessor(welcomeGui.getGuiStage());
         Gdx.input.setInputProcessor(inputMultiplexer);
 
+<<<<<<< HEAD
         if (settings.runtime.openVr) {
             welcomeGuiVR = new StandaloneVRGui<>(vrContext, WelcomeGuiVR.class, globalResources.getSkin(), new OpenVRListener() {
                 @Override
@@ -583,14 +653,25 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     return false;
                 }
             });
+||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
+        if (settings.runtime.openVr) {
+            welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, globalResources.getSkin(), graphics, 1f);
+=======
+        if (settings.runtime.openXr) {
+            welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, globalResources.getSkin(), graphics, 1f);
+>>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
 
     }
 
     /**
-     * Attempt to create a VR context. This operation will only succeed if an HMD is connected
-     * and detected via OpenVR.
+     * Attempt to create a VR context. This operation succeeds if:
+     * <ul>
+     *     <li>Gaia Sky was launched in VR mode.</li>
+     *     <li>An HMD is connected.</li>
+     *     <li>An OpenXR runtime is running.</li>
+     * </ul>
      **/
     private VRStatus createVR() {
         if (vr) {
@@ -598,11 +679,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
             // is not installed.
             try {
                 //OpenVRQuery.queryOpenVr();
-                settings.runtime.openVr = true;
+                settings.runtime.openXr = true;
                 Constants.initialize(settings.scene.distanceScaleVr);
 
-                vrContext = new VRContext();
-                vrContext.pollEvents();
+                xrDriver = new OpenXRDriver();
+                xrDriver.initializeOpenXR();
+                xrDriver.pollEvents();
 
                 final VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
                 logger.info("Initialization of VR successful");
@@ -638,14 +720,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 return VRStatus.OK;
             } catch (Exception e) {
                 // If initializing the VRContext failed.
-                settings.runtime.openVr = false;
+                settings.runtime.openXr = false;
                 logger.error(e);
                 logger.error("Initialisation of VR context failed");
                 return VRStatus.ERROR_NO_CONTEXT;
             }
         } else {
             // Desktop mode.
-            settings.runtime.openVr = false;
+            settings.runtime.openXr = false;
             Constants.initialize(settings.scene.distanceScaleDesktop);
         }
         return VRStatus.NO_VR;
@@ -667,8 +749,22 @@ public class GaiaSky implements ApplicationListener, IObserver {
         loadingGui.dispose();
         loadingGui = null;
 
+<<<<<<< HEAD
         // Dispose loading GUI VR.
         if (settings.runtime.openVr) {
+||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
+        // Dispose vr loading GUI.
+        if (settings.runtime.openVr) {
+            welcomeGuiVR.dispose();
+            welcomeGuiVR = null;
+
+=======
+        // Dispose vr loading GUI.
+        if (settings.runtime.openXr) {
+            welcomeGuiVR.dispose();
+            welcomeGuiVR = null;
+
+>>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
             loadingGuiVR.dispose();
             loadingGuiVR = null;
         }
@@ -750,7 +846,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
 
-        if (settings.runtime.openVr) {
+        if (settings.runtime.openXr) {
             // Resize post-processors and render systems.
             postRunnable(() -> resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, false, false, false));
         }
@@ -881,7 +977,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             EventManager.publish(Event.FOCUS_CHANGE_CMD, this, homeObject, true);
             EventManager.publish(Event.GO_TO_OBJECT_CMD, this);
-            if (settings.runtime.openVr) {
+            if (settings.runtime.openXr) {
                 // Free mode by default in VR.
                 EventManager.publishDelayed(Event.CAMERA_MODE_CMD, this, 1000L, CameraMode.FREE_MODE);
             }
@@ -1233,7 +1329,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
         if (currResizeTime - lastResizeTime > 100L) {
-            resizeImmediate(resizeWidth, resizeHeight, !settings.runtime.openVr, !settings.runtime.openVr, true, true);
+            resizeImmediate(resizeWidth, resizeHeight, !settings.runtime.openXr, !settings.runtime.openXr, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
     }
@@ -1359,9 +1455,17 @@ public class GaiaSky implements ApplicationListener, IObserver {
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
             // Also VR.
+<<<<<<< HEAD
             if (settings.runtime.openVr) {
                 // Create loading GUI VR.
                 loadingGuiVR = new StandaloneVRGui<>(vrContext, LoadingGui.class, globalResources.getSkin(), null);
+||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
+            if (settings.runtime.openVr) {
+                loadingGuiVR = new VRGui<>(LoadingGui.class, globalResources.getSkin(), graphics, 1f);
+=======
+            if (settings.runtime.openXr) {
+                loadingGuiVR = new VRGui<>(LoadingGui.class, globalResources.getSkin(), graphics, 1f);
+>>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
 
                 // Dispose previous VR GUI.

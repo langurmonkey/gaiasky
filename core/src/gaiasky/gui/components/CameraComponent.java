@@ -77,7 +77,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        if (!Settings.settings.runtime.openVr) {
+        if (!Settings.settings.runtime.openXr) {
             final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             button3d.setChecked(Settings.settings.program.modeStereo.active);
@@ -320,7 +320,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         HorizontalGroup buttonGroup = null;
-        if (!Settings.settings.runtime.openVr) {
+        if (!Settings.settings.runtime.openXr) {
             buttonGroup = new HorizontalGroup();
             buttonGroup.space(pad4);
             buttonGroup.addActor(button3d);
@@ -343,7 +343,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.add(cinematic).top().left().padBottom(pad9).row();
         cameraGroup.add(focusLock).top().left().padBottom(pad9).row();
         cameraGroup.add(orientationLock).top().left().row();
-        if (!Settings.settings.runtime.openVr)
+        if (!Settings.settings.runtime.openXr)
             cameraGroup.add(group(new Label("", skin), buttonGroup, pad3)).top().center();
 
         component = cameraGroup;
@@ -428,14 +428,14 @@ public class CameraComponent extends GuiComponent implements IObserver {
             fovFlag = true;
         }
         case STEREOSCOPIC_CMD -> {
-            if (source != button3d && !Settings.settings.runtime.openVr) {
+            if (source != button3d && !Settings.settings.runtime.openXr) {
                 button3d.setProgrammaticChangeEvents(false);
                 button3d.setChecked((boolean) data[0]);
                 button3d.setProgrammaticChangeEvents(true);
             }
         }
         case CUBEMAP_CMD -> {
-            if (!Settings.settings.runtime.openVr) {
+            if (!Settings.settings.runtime.openXr) {
                 final CubemapProjection proj = (CubemapProjection) data[1];
                 final boolean enable = (boolean) data[0];
                 if (proj.isPanorama() && source != buttonCubemap) {

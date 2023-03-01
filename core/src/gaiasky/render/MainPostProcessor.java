@@ -145,7 +145,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         StarSettings ss = settings.scene.star;
         GraphicsQuality gq = settings.graphics.quality;
         boolean safeMode = settings.program.safeMode;
-        boolean vr = settings.runtime.openVr;
+        boolean vr = settings.runtime.openXr;
 
         ar = width / height;
 
@@ -216,7 +216,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setLightGlowTexture(glow);
         lightGlow.setTextureScale(getGlowTextureScale(ss.brightness, ss.glowFactor, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), settings.program.modeCubemap.active));
         lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
-        lightGlow.setBackbufferScale(settings.runtime.openVr ? (float) settings.graphics.backBufferScale : 1);
+        lightGlow.setBackbufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
@@ -808,7 +808,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case SSR_CMD:
-            boolean enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr;
+            boolean enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -819,7 +819,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case MOTION_BLUR_CMD:
-            enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr;
+            enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -836,7 +836,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             break;
         case CUBEMAP_CMD:
             boolean cubemap = (Boolean) data[0];
-            enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openVr;
+            enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openXr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];

@@ -285,7 +285,7 @@ public class ShadowMapRenderPass {
         //List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
         models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 
-        final int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openVr) ? 2 : Settings.settings.program.modeCubemap.active ? 6 : 1;
+        final int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openXr) ? 2 : Settings.settings.program.modeCubemap.active ? 6 : 1;
 
         if (shadowMapFb != null && smCombinedMap != null) {
             addCandidates(models, shadowCandidates);

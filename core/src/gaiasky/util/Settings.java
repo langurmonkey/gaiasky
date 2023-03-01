@@ -27,7 +27,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.openvr.VRSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -1209,7 +1208,7 @@ public class Settings {
             }
             case STEREO_PROFILE_CMD -> modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
             case CUBEMAP_CMD -> {
-                modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openVr;
+                modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openXr;
                 if (modeCubemap.active) {
                     modeCubemap.projection = (CubemapProjection) data[1];
 
@@ -2029,7 +2028,7 @@ public class Settings {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RuntimeSettings implements IObserver {
-        public boolean openVr = false;
+        public boolean openXr = false;
         public boolean displayGui = true;
         public boolean updatePause = false;
         public boolean timeOn = false;

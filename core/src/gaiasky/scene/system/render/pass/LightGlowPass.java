@@ -73,7 +73,7 @@ public class LightGlowPass {
             List<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
 
             // VR controllers
-            if (Settings.settings.runtime.openVr) {
+            if (Settings.settings.runtime.openXr) {
                 RenderModeOpenVR sgrVR = (RenderModeOpenVR) sceneRenderer.getRenderModeOpenVR();
                 if (sceneRenderer.getVrContext() != null) {
                     for (Entity m : sgrVR.controllerObjects) {

@@ -99,7 +99,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
 
         Vector3 vroffset = F34;
         float vrScl = 1f;
-        if (Settings.settings.runtime.openVr) {
+        if (Settings.settings.runtime.openXr) {
             vrScl = 100f;
             if (camera.getCurrent() instanceof NaturalCamera) {
                 ((NaturalCamera) camera.getCurrent()).vrOffset.put(vroffset);

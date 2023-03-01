@@ -135,7 +135,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final float buttonHeight = 40f;
 
         boolean safeMode = settings.program.safeMode;
-        boolean vr = settings.runtime.openVr;
+        boolean vr = settings.runtime.openXr;
 
         // Create the tab buttons
         Table tabsTable = new Table(skin);
@@ -712,7 +712,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentGraphicsTable.add(titleDisplay).left().padBottom(pad18).row();
         contentGraphicsTable.add(imageLevels).left().padBottom(pad34).row();
 
-        if (!settings.runtime.openVr) {
+        if (!settings.runtime.openXr) {
             // VIRTUAL TEXTURES
             Label titleSVT = new OwnLabel(I18n.msg("gui.svt"), skin, "header");
             Table svtTable = new Table();
@@ -2207,7 +2207,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         boolean restartDialog = false;
-        if (!settings.runtime.openVr) {
+        if (!settings.runtime.openXr) {
             // Point cloud renderer
             PointCloudMode newPointCloudMode = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
             restartDialog = newPointCloudMode != settings.scene.renderer.pointCloud;
@@ -2245,7 +2245,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.scene.fadeMs = MathUtils.clamp(fadeTimeField.getLongValue(settings.scene.fadeMs), Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
 
         // Dynamic resolution
-        settings.graphics.dynamicResolution = !settings.runtime.openVr && dynamicResolution.isChecked();
+        settings.graphics.dynamicResolution = !settings.runtime.openXr && dynamicResolution.isChecked();
         if (!settings.graphics.dynamicResolution) {
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
         }

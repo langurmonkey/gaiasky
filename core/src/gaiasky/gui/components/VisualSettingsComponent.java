@@ -168,7 +168,7 @@ public class VisualSettingsComponent extends GuiComponent implements IObserver {
                 // Read defaults from internal settings file
                 try {
                     Path confFolder = Settings.assetsPath("conf");
-                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr));
+                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openXr));
                     Yaml yaml = new Yaml();
                     Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
 

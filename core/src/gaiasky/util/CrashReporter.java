@@ -304,7 +304,7 @@ public class CrashReporter {
             strArray.add("## GL INFORMATION not available");
         }
 
-        if (Settings.settings != null && Settings.settings.runtime.openVr) {
+        if (Settings.settings != null && Settings.settings.runtime.openXr) {
             VRContext vrContext = GaiaSky.instance.vrContext;
             if (vrContext != null) {
                 /* VR info **/

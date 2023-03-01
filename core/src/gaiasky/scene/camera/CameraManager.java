@@ -285,7 +285,7 @@ public class CameraManager implements ICamera, IObserver {
         speed = (velocity.len() * Constants.U_TO_KM) / (dt * Nature.S_TO_H);
 
         // High speed?
-        if (speed > (Settings.settings.runtime.openVr ? 5e6 : 5e5)) {
+        if (speed > (Settings.settings.runtime.openXr ? 5e6 : 5e5)) {
             EventManager.publish(Event.CLEAR_OCTANT_QUEUE, this);
         }
 

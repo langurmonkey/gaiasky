@@ -116,7 +116,7 @@ public class AboutWindow extends GenericDialog {
         final Table contentHelp = new Table(skin);
         contentHelp.top();
 
-        OwnLabel gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
+        OwnLabel gaiasky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
 
         // User manual
         Label homepageTitle = new OwnLabel(I18n.msg("gui.help.homepage"), skin);
@@ -129,7 +129,7 @@ public class AboutWindow extends GenericDialog {
         Link docsLink = new Link(Settings.DOCUMENTATION, linkStyle, Settings.DOCUMENTATION);
 
         // Icon
-        FileHandle gsIcon = Gdx.files.internal(Settings.settings.runtime.openVr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
+        FileHandle gsIcon = Gdx.files.internal(Settings.settings.runtime.openXr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image gaiaSkyIcon = new Image(iconTex);

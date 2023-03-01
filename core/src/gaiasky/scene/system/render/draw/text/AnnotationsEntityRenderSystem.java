@@ -43,7 +43,7 @@ public class AnnotationsEntityRenderSystem {
         font.setColor(body.labelColor[0], body.labelColor[1], body.labelColor[2], body.labelColor[3] * alpha);
 
         Vector3 vrOffset = F34;
-        if (Settings.settings.runtime.openVr) {
+        if (Settings.settings.runtime.openXr) {
             if (camera.getCurrent() instanceof NaturalCamera) {
                 ((NaturalCamera) camera.getCurrent()).vrOffset.put(vrOffset);
                 vrOffset.scl((float) (1f / Constants.M_TO_U));

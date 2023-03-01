@@ -120,7 +120,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (!Settings.settings.runtime.openVr) {
+        if (!Settings.settings.runtime.openXr) {
             switch (event) {
             case CUBEMAP_CMD:
                 CubemapProjection p = (CubemapProjection) data[1];
