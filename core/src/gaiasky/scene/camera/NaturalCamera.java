@@ -1333,7 +1333,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case GO_TO_OBJECT_CMD:
-            if (this.focus != null) {
+            if (this.focus != null && this.focus.isValid()) {
                 final IFocus f = this.focus;
                 GaiaSky.postRunnable(() -> {
                     setTrackingObject(null, null);
