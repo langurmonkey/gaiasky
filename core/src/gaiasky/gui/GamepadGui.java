@@ -1373,7 +1373,6 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
-     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1402,7 +1401,6 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
-     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1433,6 +1431,9 @@ public class GamepadGui extends AbstractGui {
     }
 
     public void updateFocused(boolean force) {
+        if (vr) {
+            return;
+        }
         if ((force || content.getParent() != null) && currentModel != null && currentModel.length != 0) {
             Actor actor = currentModel[fi][fj];
             if (GuiUtils.isInputWidget(actor)) {

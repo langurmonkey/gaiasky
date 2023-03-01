@@ -304,13 +304,13 @@ public class VRContext implements Disposable {
             int button = 0;
 
             switch (event.eventType()) {
-            case VR.EVREventType_VREvent_TrackedDeviceActivated:
+            case VR.EVREventType_VREvent_TrackedDeviceActivated -> {
                 createDevice(index);
                 for (VRDeviceListener l : listeners) {
                     l.connected(devices[index]);
                 }
-                break;
-            case VR.EVREventType_VREvent_TrackedDeviceDeactivated:
+            }
+            case VR.EVREventType_VREvent_TrackedDeviceDeactivated -> {
                 index = event.trackedDeviceIndex();
                 if (devices[index] == null)
                     continue;
@@ -318,8 +318,8 @@ public class VRContext implements Disposable {
                     l.disconnected(devices[index]);
                 }
                 devices[index] = null;
-                break;
-            case VR.EVREventType_VREvent_ButtonPress:
+            }
+            case VR.EVREventType_VREvent_ButtonPress -> {
                 if (devices[index] == null)
                     continue;
                 button = event.data().controller().button();
@@ -329,8 +329,8 @@ public class VRContext implements Disposable {
                         break;
                     }
                 }
-                break;
-            case VR.EVREventType_VREvent_ButtonUnpress:
+            }
+            case VR.EVREventType_VREvent_ButtonUnpress -> {
                 if (devices[index] == null)
                     continue;
                 button = event.data().controller().button();
@@ -340,8 +340,8 @@ public class VRContext implements Disposable {
                         break;
                     }
                 }
-                break;
-            case VR.EVREventType_VREvent_ButtonTouch:
+            }
+            case VR.EVREventType_VREvent_ButtonTouch -> {
                 if (devices[index] == null)
                     continue;
                 button = event.data().controller().button();
@@ -349,8 +349,8 @@ public class VRContext implements Disposable {
                 for (VRDeviceListener l : listeners) {
                     l.buttonTouched(devices[index], button);
                 }
-                break;
-            case VR.EVREventType_VREvent_ButtonUntouch:
+            }
+            case VR.EVREventType_VREvent_ButtonUntouch -> {
                 if (devices[index] == null)
                     continue;
                 button = event.data().controller().button();
@@ -358,14 +358,14 @@ public class VRContext implements Disposable {
                 for (VRDeviceListener l : listeners) {
                     l.buttonUntouched(devices[index], button);
                 }
-                break;
-            case VR.EVREventType_VREvent_ActionBindingReloaded:
-                // Ignore
-                break;
-            default:
+            }
+            case VR.EVREventType_VREvent_ActionBindingReloaded -> logger.info(event.data().toString());
+
+            // Ignore
+            default -> {
                 for (VRDeviceListener l : listeners)
                     l.event(event.eventType());
-                break;
+            }
             }
         }
 
@@ -454,22 +454,26 @@ public class VRContext implements Disposable {
         return model;
     }
 
+    private boolean isVRController(String name, String modelNumber, VRControllerRole role) {
+        return isControllerRight(name, modelNumber, role) || isControllerLeft(name, modelNumber, role);
+    }
+
     private boolean isControllerLeft(String name, String modelNumber, VRControllerRole role) {
-        if ((role == VRControllerRole.LeftHand))
+        if (role == VRControllerRole.LeftHand)
             return true;
-        if (name != null && name.equals("renderLeftHand"))
+        if (name != null && name.equalsIgnoreCase("renderLeftHand"))
             return true;
         assert name != null;
-        return (name.contains("_left")) || (modelNumber != null && modelNumber.contains("Left"));
+        return (name.contains("left") || name.contains("Left")) || (modelNumber != null && modelNumber.contains("Left"));
     }
 
     private boolean isControllerRight(String name, String modelNumber, VRControllerRole role) {
-        if ((role == VRControllerRole.RightHand))
+        if (role == VRControllerRole.RightHand)
             return true;
-        if (name != null && name.equals("renderRightHand"))
+        if (name != null && name.equalsIgnoreCase("renderRightHand"))
             return true;
         assert name != null;
-        return (name.contains("_right")) || (modelNumber != null && modelNumber.contains("Right"));
+        return (name.contains("right") || name.contains("Right")) || (modelNumber != null && modelNumber.contains("Right"));
     }
 
     /**
@@ -737,7 +741,7 @@ public class VRContext implements Disposable {
                 this.modelInstance.transform.set(pose.transform);
 
             // Init mappings file for VR controller.
-            if (type == VRDeviceType.Controller && (role == VRControllerRole.LeftHand || role == VRControllerRole.RightHand)) {
+            if (type == VRDeviceType.Controller && isVRController(renderModelName, modelNumber, role)) {
                 FileHandle mappingsFile;
                 if (Settings.settings.controls.vr.mappingsFile != null) {
                     // Use setting.

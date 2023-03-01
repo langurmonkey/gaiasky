@@ -41,9 +41,11 @@ import gaiasky.scene.component.tag.TagNoClosest;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
+import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.*;
+import gaiasky.util.scene2d.FixedStage;
 import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRDeviceListener;
 
@@ -92,7 +94,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
         setVr(Settings.settings.runtime.openVr);
         this.batch = new SpriteBatch(20, GaiaSky.instance.getGlobalResources().getSpriteShader());
         this.shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
-        resize(WIDTH, HEIGHT);
+        //resize(WIDTH, HEIGHT);
         this.shapeRenderer.setAutoShapeType(true);
 
         // Create controllers set.
@@ -121,7 +123,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
         }
 
         Viewport vp = new FixedScreenViewport(WIDTH, HEIGHT);
-        stage = new Stage(vp, batch);
+        stage = new FixedStage(vp, batch, WIDTH, HEIGHT);
 
         gamepadGui = new GamepadGui(skin, Gdx.graphics, 1f, true);
         gamepadGui.initialize(stage);
@@ -176,7 +178,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
                     if (!vr) {
                         var cam = GaiaSky.instance.getICamera();
                         aux.set(Gdx.input.getX(), Gdx.input.getY(), 0.1f);
-                        cam.getCamera().unproject(aux);
+                        CameraUtils.unproject(cam.getCamera(), aux, WIDTH, HEIGHT);
 
                         mouseP0.set(aux).scl(3200.0);
                         mouseP1.set(cam.getDirection()).nor().scl(10.0 * Constants.KM_TO_U).add(mouseP0);
@@ -228,11 +230,11 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
             }
 
             if (device == null || (device.hitUI && device.device == interactingController)) {
-                int x = (int) (u * Gdx.graphics.getWidth());
-                int y = (int) (v * Gdx.graphics.getHeight());
+                int x = (int) (u * WIDTH);
+                int y = (int) (v * HEIGHT);
 
                 pointer.x = x;
-                pointer.y = Gdx.graphics.getHeight() - y;
+                pointer.y = HEIGHT - y;
 
                 if (triggerPressed) {
                     stage.touchDragged(x, y, 0);
@@ -323,10 +325,9 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
 
             if (isVRUIVisible() && pointer != null) {
                 shapeRenderer.begin(ShapeType.Filled);
-                var pi = pointer;
-                if (Float.isFinite(pi.x) && Float.isFinite(pi.y)) {
+                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y)) {
                     shapeRenderer.setColor(1f, 0f, 0f, 1f);
-                    shapeRenderer.circle(pi.x, pi.y, 10);
+                    shapeRenderer.circle(pointer.x, pointer.y, 10);
                 }
                 shapeRenderer.end();
             }
@@ -337,10 +338,11 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
     @Override
     public void resize(int width, int height) {
         if (shapeRenderer != null) {
-            shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+            shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, WIDTH, HEIGHT);
+            shapeRenderer.updateMatrices();
         }
         if (batch != null) {
-            batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+            batch.setProjectionMatrix(batch.getProjectionMatrix().setToOrtho2D(0, 0, WIDTH, HEIGHT));
         }
     }
 
@@ -560,7 +562,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
                     dev.interacting = true;
                 }
                 if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
-                    stage.touchDown((int) pointer.x, (int) (Gdx.graphics.getHeight() - pointer.y), 0, Input.Buttons.LEFT);
+                    stage.touchDown((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
                     triggerPressed = true;
                     interactingController = device;
                     return true;
@@ -580,7 +582,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
                     dev.interacting = true;
                 }
                 if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
-                    stage.touchUp((int) pointer.x, (int) (Gdx.graphics.getHeight() - pointer.y), 0, Input.Buttons.LEFT);
+                    stage.touchUp((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
                     triggerPressed = false;
                     return true;
                 }
@@ -628,7 +630,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (!vr) {
             if (button == Input.Buttons.LEFT && mouseHit) {
-                stage.touchDown((int) this.pointer.x, (int) (Gdx.graphics.getHeight() - this.pointer.y), 0, button);
+                stage.touchDown((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, button);
                 triggerPressed = true;
                 return true;
             }
@@ -640,7 +642,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (!vr) {
             if (button == Input.Buttons.LEFT && mouseHit) {
-                stage.touchUp((int) this.pointer.x, (int) (Gdx.graphics.getHeight() - this.pointer.y), 0, button);
+                stage.touchUp((int) this.pointer.x, (int) (HEIGHT - this.pointer.y), 0, button);
                 triggerPressed = false;
                 return true;
             }

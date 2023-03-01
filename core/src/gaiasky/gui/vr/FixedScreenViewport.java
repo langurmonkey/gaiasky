@@ -3,8 +3,12 @@ package gaiasky.gui.vr;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.util.Settings;
+import gaiasky.util.camera.CameraUtils;
 
 /**
  * A viewport which does not depend on the screen size at all. To be used in VR GUIs.
@@ -12,6 +16,7 @@ import gaiasky.util.Settings;
 public class FixedScreenViewport extends Viewport {
     private final int width;
     private final int height;
+    final Vector3 tmp = new Vector3();
 
     /** Creates a new viewport using a new {@link OrthographicCamera}. */
     public FixedScreenViewport(int width, int height) {
@@ -22,6 +27,32 @@ public class FixedScreenViewport extends Viewport {
         setCamera(camera);
         this.width = width;
         this.height = height;
+    }
+
+    public Vector2 unproject (Vector2 screenCoords) {
+        tmp.set(screenCoords.x, screenCoords.y, 1);
+        CameraUtils.unproject(getCamera(), tmp, getScreenX(), getScreenY(), getScreenWidth(), getScreenHeight(), height);
+        screenCoords.set(tmp.x, tmp.y);
+        return screenCoords;
+    }
+
+    /** Transforms the specified screen coordinate to world coordinates.
+     * @return The vector that was passed in, transformed to world coordinates.
+     * @see Camera#unproject(Vector3) */
+    public Vector3 unproject (Vector3 screenCoords) {
+        CameraUtils.unproject(getCamera(), screenCoords, getScreenX(), getScreenY(), getScreenWidth(), getScreenHeight(), height);
+        return screenCoords;
+    }
+
+    @Override
+    public Vector2 toScreenCoordinates (Vector2 worldCoords, Matrix4 transformMatrix) {
+        tmp.set(worldCoords.x, worldCoords.y, 0);
+        tmp.mul(transformMatrix);
+        getCamera().project(tmp, getScreenX(), getScreenY(), getScreenWidth(), getScreenHeight());
+        tmp.y = height - tmp.y;
+        worldCoords.x = tmp.x;
+        worldCoords.y = tmp.y;
+        return worldCoords;
     }
 
     public void update(int screenWidth, int screenHeight, boolean centerCamera) {
