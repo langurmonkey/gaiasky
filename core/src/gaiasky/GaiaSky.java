@@ -36,8 +36,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.*;
-import gaiasky.gui.vr.VRGui;
 import gaiasky.gui.vr.MainVRUI;
+import gaiasky.gui.vr.VRGui;
 import gaiasky.gui.vr.WelcomeGuiVR;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -557,6 +557,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Create vr context if possible.
         final VRStatus vrStatus = createVR();
+
         cameraManager.updateFrustumPlanes();
 
         // GUI.
@@ -592,6 +593,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, globalResources.getSkin(), graphics, 1f);
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
+
     }
 
     /**
@@ -639,17 +641,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 vrLoadingRightTex = org.lwjgl.openvr.Texture.create();
                 vrLoadingRightTex.set(vrLoadingRightFb.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Gamma);
 
-                // Sprite batch for VR - uses back buffer resolution.
-                globalResources.setSpriteBatchVR(new SpriteBatch(500, globalResources.getSpriteShader()));
-                globalResources.getSpriteBatchVR().getProjectionMatrix().setToOrtho2D(0, 0, settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1]);
-
                 // Enable visibility of 'Others' if off (for VR controllers).
                 if (!settings.scene.visibility.get(ComponentType.Others.name())) {
                     EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.others", false);
                 }
 
                 // Create VRUI object.
-                vrui = new MainVRUI();
+                vrui = new MainVRUI(globalResources.getSkin());
                 vrui.initialize(assetManager, globalResources.getSpriteBatch());
                 vrContext.addListener(vrui);
 
@@ -782,10 +780,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             gui.resize(graphics.getWidth(), graphics.getHeight());
 
         if (settings.runtime.openVr) {
-            // Build VR UI if needed.
-            vrui.setScene(scene);
-            vrui.build(globalResources.getSkin());
-
             // Resize post-processors and render systems.
             postRunnable(() -> resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, false, false, false));
         }
@@ -1270,8 +1264,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
             resizeHeight = height;
             lastResizeTime = System.currentTimeMillis();
 
-            if (renderBatch != null)
+            if (renderBatch != null) {
                 renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+            }
 
             Settings.settings.graphics.resolution[0] = width;
             Settings.settings.graphics.resolution[1] = height;
@@ -1292,7 +1287,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             final int renderHeight = (int) Math.round(height * settings.graphics.backBufferScale);
 
             // Resize global UI sprite batch
-            globalResources.getSpriteBatch().getProjectionMatrix().setToOrtho2D(0, 0, renderWidth, renderHeight);
+            globalResources.resize(renderWidth, renderHeight);
 
             if (!initialized) {
                 if (welcomeGui != null)
@@ -1308,6 +1303,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     for (IGui gui : guis) {
                         gui.resizeImmediate(width, height);
                     }
+                }
+                if (vrui != null) {
+                    vrui.resize(width, height);
                 }
 
                 sceneRenderer.resize(width, height, renderWidth, renderHeight, resizeRenderSys);

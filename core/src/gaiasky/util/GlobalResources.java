@@ -63,7 +63,6 @@ public class GlobalResources {
     private AssetManager manager;
     private ShaderProgram shapeShader;
     private ShaderProgram spriteShader;
-    private SpriteBatch spriteBatchVR;
     // Cursors
     private Cursor linkCursor;
     private Cursor resizeXCursor;
@@ -835,13 +834,6 @@ public class GlobalResources {
         return spriteBatch;
     }
 
-    public SpriteBatch getSpriteBatchVR() {
-        return spriteBatchVR;
-    }
-
-    public void setSpriteBatchVR(SpriteBatch sb) {
-        spriteBatchVR = sb;
-    }
 
     public ExtShaderProgram getExtSpriteShader() {
         return extSpriteShader;
@@ -889,5 +881,11 @@ public class GlobalResources {
 
     public void setSkin(Skin skin) {
         this.skin = skin;
+    }
+
+    public void resize(int width, int height) {
+        if(spriteBatch != null) {
+            spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        }
     }
 }

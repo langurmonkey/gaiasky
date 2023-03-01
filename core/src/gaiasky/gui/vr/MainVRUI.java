@@ -3,6 +3,7 @@ package gaiasky.gui.vr;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -19,7 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
@@ -55,23 +55,27 @@ import java.util.Set;
 /**
  * Creates and manages the VR UI and all its interactions with controllers.
  */
-public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
+public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserver, Disposable {
 
     public static final int WIDTH = 1920;
     public static final int HEIGHT = 1080;
 
     Scene scene;
     Stage stage;
+    Skin skin;
     FrameBuffer buffer;
     Texture uiTexture;
     Entity entity;
     // VR UI position with respect to the user.
     Vector3b relativePosition = new Vector3b();
     // 5 pointers
-    Vector2 pointer = new Vector2();
+    Vector2 pointer = new Vector2(Float.NaN, Float.NaN);
     boolean triggerPressed = false;
+    boolean mouseHit = false;
+    boolean vr;
 
     ShapeRenderer shapeRenderer;
+    SpriteBatch batch;
     Set<VRDevice> vrControllers;
     Map<VRContext.VRDevice, VRDevice> deviceToDevice;
 
@@ -80,19 +84,16 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
     VRContext.VRDevice interactingController;
 
-    public MainVRUI() {
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public MainVRUI(Skin skin) {
+        setSkin(skin);
     }
 
     public void initialize(AssetManager manager, SpriteBatch batch) {
-        // Create stage.
-        Viewport vp = new StretchViewport(WIDTH, HEIGHT);
-        stage = new Stage(vp, batch);
-        shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
-        shapeRenderer.setAutoShapeType(true);
+        setVr(Settings.settings.runtime.openVr);
+        this.batch = new SpriteBatch(20, GaiaSky.instance.getGlobalResources().getSpriteShader());
+        this.shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
+        resize(WIDTH, HEIGHT);
+        this.shapeRenderer.setAutoShapeType(true);
 
         // Create controllers set.
         vrControllers = new HashSet<>();
@@ -105,7 +106,7 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
         uiTexture = buffer.getColorBufferTexture();
 
         // Events.
-        EventManager.instance.subscribe(this, Event.SHOW_VR_UI, Event.VR_CONTROLLER_INFO);
+        EventManager.instance.subscribe(this, Event.SHOW_VR_UI, Event.VR_CONTROLLER_INFO, Event.SCENE_LOADED);
     }
 
     @Override
@@ -114,6 +115,14 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     }
 
     public void build(Skin skin) {
+        if (stage != null) {
+            stage.clear();
+            stage.dispose();
+        }
+
+        Viewport vp = new FixedScreenViewport(WIDTH, HEIGHT);
+        stage = new Stage(vp, batch);
+
         gamepadGui = new GamepadGui(skin, Gdx.graphics, 1f, true);
         gamepadGui.initialize(stage);
         gamepadGui.build();
@@ -121,10 +130,12 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
         content.setFillParent(true);
         content.left().top();
 
-        stage.clear();
         stage.addActor(content);
     }
 
+    Vector3 aux = new Vector3();
+    Vector3d mouseP0 = new Vector3d();
+    Vector3d mouseP1 = new Vector3d();
     Vector3d point = new Vector3d();
     Vector3d normal = new Vector3d();
     Vector3d intersection = new Vector3d();
@@ -138,7 +149,7 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
             var base = Mapper.base.get(entity);
             if (base.isVisible()) {
                 // Handle controller interaction.
-                if (!vrControllers.isEmpty()) {
+                if (!vr || !vrControllers.isEmpty()) {
                     var model = Mapper.model.get(entity);
                     transform.set(model.model.instance.transform);
                     inverse.set(transform).inv();
@@ -156,43 +167,23 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                             if (!deviceToDevice.containsKey(device.device)) {
                                 deviceToDevice.put(device.device, device);
                             }
-                            var intersects = IntersectorDouble.intersectSegmentPlane(device.beamP0, device.beamPn, plane, intersection);
-
-                            if (intersects) {
-                                // Use inverse transform to position on ZX plane.
-                                intersection.mul(inverse);
-                                double x3d = MathUtilsDouble.clamp(intersection.x, -0.28125, 0.28125);
-                                double z3d = MathUtilsDouble.clamp(intersection.z, -0.5, 0.5);
-                                double u = z3d + 0.5;
-                                double v = (x3d + 0.28125) * 1 / 0.5625;
-
-                                // Update hit.
-                                device.hitUI = u > 0 && u < 1 && v > 0 && v < 1;
-                                // Default to current.
-                                if (interactingController == null) {
-                                    interactingController = device.device;
-                                }
-                                device.interacting = device.device == interactingController;
-
-                                if (device.hitUI && device.device == interactingController) {
-                                    int x = (int) (u * Gdx.graphics.getWidth());
-                                    int y = (int) (v * Gdx.graphics.getHeight());
-
-                                    pointer.x = x;
-                                    pointer.y = Gdx.graphics.getHeight() - y;
-
-                                    if (triggerPressed) {
-                                        stage.touchDragged(x, y, 0);
-                                    } else {
-                                        stage.mouseMoved(x, y);
-                                    }
-                                    intersecting++;
-                                }
-
-                            }
+                            intersecting += processDevice(device, device.beamP0, device.beamPn);
                         } else {
                             deviceToDevice.remove(device.device);
                         }
+                    }
+                    // Process mouse input.
+                    if (!vr) {
+                        var cam = GaiaSky.instance.getICamera();
+                        aux.set(Gdx.input.getX(), Gdx.input.getY(), 0.1f);
+                        cam.getCamera().unproject(aux);
+
+                        mouseP0.set(aux).scl(3200.0);
+                        mouseP1.set(cam.getDirection()).nor().scl(10.0 * Constants.KM_TO_U).add(mouseP0);
+
+                        var nHits = processDevice(null, mouseP0, mouseP1);
+                        mouseHit = nHits > 0;
+                        intersecting += nHits;
                     }
                     if (intersecting == 0) {
                         pointer.x = Float.NaN;
@@ -203,6 +194,55 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
             }
         }
 
+    }
+
+    /**
+     * Processes the given VR controller, with the given start and end of its beam.
+     *
+     * @param device The VRDevice for this controller. If null, this is not processed as a VR device.
+     * @param beamP0 The starting point of the beam.
+     * @param beamP1 The end point of the beam.
+     *
+     * @return 1 if the intersection is successful, 0 otherwise.
+     */
+    private int processDevice(VRDevice device, Vector3d beamP0, Vector3d beamP1) {
+
+        var intersects = IntersectorDouble.intersectSegmentPlane(beamP0, beamP1, plane, intersection);
+
+        if (intersects) {
+            // Use inverse transform to position on ZX plane.
+            intersection.mul(inverse);
+            double x3d = MathUtilsDouble.clamp(intersection.x, -0.28125, 0.28125);
+            double z3d = MathUtilsDouble.clamp(intersection.z, -0.5, 0.5);
+            double u = z3d + 0.5;
+            double v = (x3d + 0.28125) * 1 / 0.5625;
+
+            // Update hit.
+            if (device != null) {
+                device.hitUI = u > 0 && u < 1 && v > 0 && v < 1;
+                // Default to current.
+                if (interactingController == null) {
+                    interactingController = device.device;
+                }
+                device.interacting = device.device == interactingController;
+            }
+
+            if (device == null || (device.hitUI && device.device == interactingController)) {
+                int x = (int) (u * Gdx.graphics.getWidth());
+                int y = (int) (v * Gdx.graphics.getHeight());
+
+                pointer.x = x;
+                pointer.y = Gdx.graphics.getHeight() - y;
+
+                if (triggerPressed) {
+                    stage.touchDragged(x, y, 0);
+                } else {
+                    stage.mouseMoved(x, y);
+                }
+                return 1;
+            }
+        }
+        return 0;
     }
 
     /**
@@ -229,6 +269,10 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     private void showVRUI(Base base) {
         if (base != null) {
             base.visible = true;
+            if (!vr) {
+                // Add processor to main input multiplexer.
+                GaiaSky.instance.inputMultiplexer.addProcessor(this);
+            }
             // Camera runnable to update the position of the VR UI if necessary.
             GaiaSky.instance.scripting().parkCameraRunnable("VRUI-pos-updater", this::updatePosition);
         }
@@ -239,6 +283,10 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
             base.visible = false;
             for (var device : vrControllers) {
                 device.hitUI = false;
+            }
+            if (!vr) {
+                // Remove processor from main input multiplexer.
+                GaiaSky.instance.inputMultiplexer.removeProcessor(this);
             }
             // Camera runnable to update the position of the VR UI if necessary.
             GaiaSky.instance.scripting().removeRunnable("VRUI-pos-updater");
@@ -251,6 +299,7 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
      * @param x      The coordinate X of the point to test.
      * @param y      The coordinate Y of the point to test.
      * @param points The points defining the polygon.
+     *
      * @return Whether the point is in the polygon.
      */
     public boolean contains(int x, int y, Vector3[] points) {
@@ -267,24 +316,32 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
 
     @Override
     public void render(int rw, int rh) {
-        buffer.begin();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        stage.draw();
+        if (stage != null) {
+            buffer.begin();
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            stage.draw();
 
-        if (isVRUIVisible() && pointer != null) {
-            shapeRenderer.begin(ShapeType.Filled);
-            var pi = pointer;
-            if (Float.isFinite(pi.x) && Float.isFinite(pi.y)) {
-                shapeRenderer.setColor(1f, 0f, 0f, 1f);
-                shapeRenderer.circle(pi.x, pi.y, 10);
+            if (isVRUIVisible() && pointer != null) {
+                shapeRenderer.begin(ShapeType.Filled);
+                var pi = pointer;
+                if (Float.isFinite(pi.x) && Float.isFinite(pi.y)) {
+                    shapeRenderer.setColor(1f, 0f, 0f, 1f);
+                    shapeRenderer.circle(pi.x, pi.y, 10);
+                }
+                shapeRenderer.end();
             }
-            shapeRenderer.end();
+            buffer.end();
         }
-        buffer.end();
     }
 
     @Override
     public void resize(int width, int height) {
+        if (shapeRenderer != null) {
+            shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        }
+        if (batch != null) {
+            batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        }
     }
 
     @Override
@@ -316,6 +373,7 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
 
     @Override
     public void setVr(boolean vr) {
+        this.vr = vr;
     }
 
     @Override
@@ -364,8 +422,12 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                     var body = Mapper.body.get(entity);
                     body.setColor(new float[] { 1, 1, 1, 1 });
                     body.setLabelColor(new float[] { 0, 0, 0, 0 });
-                    body.setSize(1.0);
-                    body.sizeInUnitsFlag = true;
+                    if (vr) {
+                        body.setSize(1.0);
+                        body.sizeInUnitsFlag = true;
+                    } else {
+                        body.setSizeKm(1.0);
+                    }
 
                     var affine = Mapper.affine.get(entity);
                     affine.initialize();
@@ -412,6 +474,9 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                     EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, true);
                 }
 
+                // Build UI.
+                build(skin);
+
                 // Position UI.
                 Runnable r = () -> {
                     var base = Mapper.base.get(entity);
@@ -428,8 +493,13 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
                         dir.y = 0;
                         dir.nor();
                         var body = Mapper.body.get(entity);
-                        body.pos.set(camera.getPos().cpy().add(dir.scl(1.8)));
-                        body.pos.add(0, 1.1, 0);
+                        if (vr) {
+                            body.pos.set(camera.getPos().cpy().add(dir.scl(1.8)));
+                            body.pos.add(0, 1.1, 0);
+                        } else {
+                            body.pos.set(camera.getPos().cpy().add(dir.scl(2.0 * Constants.KM_TO_U)));
+                            body.pos.add(0, 0, 0);
+                        }
 
                         // Save relative position.
                         relativePosition.set(body.pos).sub(camera.getPos());
@@ -457,7 +527,17 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
 
         } else if (event == Event.VR_CONTROLLER_INFO) {
             vrControllers.add((VRDevice) data[0]);
+        } else if (event == Event.SCENE_LOADED) {
+            setScene((Scene) data[0]);
         }
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
     }
 
     @Override
@@ -527,5 +607,59 @@ public class MainVRUI implements VRDeviceListener, IGui, IObserver, Disposable {
     @Override
     public void event(int code) {
 
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (!vr) {
+            if (button == Input.Buttons.LEFT && mouseHit) {
+                stage.touchDown((int) this.pointer.x, (int) (Gdx.graphics.getHeight() - this.pointer.y), 0, button);
+                triggerPressed = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (!vr) {
+            if (button == Input.Buttons.LEFT && mouseHit) {
+                stage.touchUp((int) this.pointer.x, (int) (Gdx.graphics.getHeight() - this.pointer.y), 0, button);
+                triggerPressed = false;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
     }
 }

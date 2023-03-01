@@ -1038,6 +1038,8 @@ public enum Event {
      * <li>window title [string]</li>
      * <li>frame buffer or texture object [FrameBuffer|Texture]</li>
      * <li>(optional) scale [float]</li>
+     * <li>(optional) flipX [boolean]</li>
+     * <li>(optional) flipY [boolean]</li>
      * </ol>
      */
     SHOW_TEXTURE_WINDOW_ACTION,

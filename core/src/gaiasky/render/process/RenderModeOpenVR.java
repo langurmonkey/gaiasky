@@ -68,7 +68,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
     private Environment controllersEnv;
 
     // GUI
-    private SpriteBatch sb, sbScreen;
+    private SpriteBatch sbScreen;
 
     private Vector3 auxf1;
     private Vector3d auxd1;
@@ -96,10 +96,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             auxf1 = new Vector3();
             auxd1 = new Vector3d();
             lastSize = new Vector2();
-
-            // Sprite batch
-            this.sb = spriteBatch;
-            sb.getProjectionMatrix().setToOrtho2D(0, 0, Settings.settings.graphics.backBufferResolution[0] * Settings.settings.program.ui.scale, Settings.settings.graphics.backBufferResolution[1] * Settings.settings.program.ui.scale);
 
             // Controllers
             Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);

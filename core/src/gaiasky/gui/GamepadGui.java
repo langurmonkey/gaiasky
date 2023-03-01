@@ -85,7 +85,7 @@ public class GamepadGui extends AbstractGui {
     private String currentInputText = "";
     private final Map<String, Button> visibilityButtonMap;
 
-    private int selectedTab = 0;
+    private static int selectedTab = 0;
     private int fi = 0, fj = 0;
 
     public GamepadGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final boolean vrMode) {
@@ -197,7 +197,7 @@ public class GamepadGui extends AbstractGui {
 
             var context = GaiaSky.instance.vrContext;
 
-            if(context != null) {
+            if (context != null) {
                 // Devices
                 var hmds = context.getDevicesByType(VRContext.VRDeviceType.HeadMountedDisplay);
                 addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.hmds"), hmds);
@@ -1326,12 +1326,18 @@ public class GamepadGui extends AbstractGui {
         }
     }
 
+    private ScrollPane container(Table t) {
+        return container(t, -1, -1);
+    }
+
     private ScrollPane container(Table t, float w, float h) {
         var c = new OwnScrollPane(t, skin, "minimalist-nobg");
         t.center();
         c.setFadeScrollBars(true);
         c.setForceScroll(false, false);
-        c.setSize(w, h);
+        if (w > 0 && h > 0) {
+            c.setSize(w, h);
+        }
         return c;
     }
 
@@ -1367,6 +1373,7 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1395,6 +1402,7 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1448,25 +1456,25 @@ public class GamepadGui extends AbstractGui {
     }
 
     public void up() {
-        if (selectInCol(fi, update(fj, -1, currentModel[fi].length), false)) {
+        if (currentModel != null && selectInCol(fi, update(fj, -1, currentModel[fi].length), false)) {
             updateFocused();
         }
     }
 
     public void down() {
-        if (selectInCol(fi, update(fj, 1, currentModel[fi].length), true)) {
+        if (currentModel != null && selectInCol(fi, update(fj, 1, currentModel[fi].length), true)) {
             updateFocused();
         }
     }
 
     public void left() {
-        if (selectInRow(update(fi, -1, currentModel.length), fj, false)) {
+        if (currentModel != null && selectInRow(update(fi, -1, currentModel.length), fj, false)) {
             updateFocused();
         }
     }
 
     public void right() {
-        if (selectInRow(update(fi, 1, currentModel.length), fj, true)) {
+        if (currentModel != null && selectInRow(update(fi, 1, currentModel.length), fj, true)) {
             updateFocused();
         }
     }

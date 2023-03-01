@@ -203,7 +203,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         sgrList[SGR_STEREO_IDX] = new RenderModeStereoscopic(globalResources.getSpriteBatch());
         sgrList[SGR_FOV_IDX] = new RenderModeFov();
         sgrList[SGR_CUBEMAP_IDX] = new RenderModeCubemapProjections();
-        sgrList[SGR_OPENVR_IDX] = new RenderModeOpenVR(GaiaSky.instance.scene, vrContext, globalResources.getSpriteBatchVR());
+        sgrList[SGR_OPENVR_IDX] = new RenderModeOpenVR(GaiaSky.instance.scene, vrContext, null);
         renderMode = null;
 
         /*
