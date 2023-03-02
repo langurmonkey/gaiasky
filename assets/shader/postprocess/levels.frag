@@ -140,7 +140,9 @@ void main() {
     #endif//toneMappingUncharted
 
     // Gamma correction.
-    pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));
+    if (u_gamma != 1.0) {
+        pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));
+    }
 
     // Final color
     fragColor = vec4(pixelColor, 1.0);

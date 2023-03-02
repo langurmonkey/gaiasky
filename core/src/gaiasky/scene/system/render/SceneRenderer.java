@@ -441,12 +441,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         GL30.glClampColor(GL30.GL_CLAMP_VERTEX_COLOR, GL30.GL_FALSE);
         GL30.glClampColor(GL30.GL_CLAMP_FRAGMENT_COLOR, GL30.GL_FALSE);
 
-        // Enable sRGB if needed.
-        if (Settings.settings.graphics.useSRGB && !Settings.settings.program.safeMode) {
-            Gdx.gl.glEnable(GL30.GL_FRAMEBUFFER_SRGB);
-        } else {
-            Gdx.gl.glDisable(GL30.GL_FRAMEBUFFER_SRGB);
-        }
 
         EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
 

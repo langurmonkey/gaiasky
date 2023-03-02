@@ -2,11 +2,13 @@ package gaiasky.render.process;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -38,6 +40,7 @@ import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.Space;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.openvr.*;
 
 import java.nio.FloatBuffer;
@@ -82,13 +85,22 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
         this.vrContext = vrContext;
 
         if (vrContext != null) {
+            GLFrameBuffer.FrameBufferBuilder frameBufferBuilder = new GLFrameBuffer.FrameBufferBuilder(vrContext.getWidth(), vrContext.getHeight());
+            int internalFormat = GL30.GL_RGBA8;
+            if (Settings.settings.graphics.useSRGB) {
+                internalFormat = GL30.GL_SRGB8_ALPHA8;
+            }
+            frameBufferBuilder.addColorTextureAttachment(internalFormat, GL30.GL_RGBA, GL20.GL_UNSIGNED_BYTE);
+            frameBufferBuilder.addBasicDepthRenderBuffer();
+            frameBufferBuilder.addBasicStencilRenderBuffer();
+
             // Left eye, fb and texture
-            fbLeft = new FrameBuffer(Format.RGBA8888, vrContext.getWidth(), vrContext.getHeight(), true);
+            fbLeft = frameBufferBuilder.build();
             texLeft = org.lwjgl.openvr.Texture.create();
             texLeft.set(fbLeft.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Auto);
 
             // Right eye, fb and texture
-            fbRight = new FrameBuffer(Format.RGBA8888, vrContext.getWidth(), vrContext.getHeight(), true);
+            fbRight = frameBufferBuilder.build();
             texRight = org.lwjgl.openvr.Texture.create();
             texRight.set(fbRight.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Auto);
 
@@ -145,7 +157,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.VR_DEVICE_CONNECTED, Event.VR_DEVICE_DISCONNECTED);
         }
     }
-
 
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {

@@ -644,7 +644,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         /* Gamma */
         OwnLabel gammaLabel = new OwnLabel(I18n.msg("gui.gamma"), skin, "default");
-        Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, 0.1f, false, skin);
+        Slider gamma = new OwnSliderPlus("", Constants.MIN_GAMMA, Constants.MAX_GAMMA, Constants.SLIDER_STEP_TINY, false, skin);
         gamma.setName("gamma");
         gamma.setWidth(sliderWidth);
         gamma.setValue(settings.postprocess.levels.gamma);
