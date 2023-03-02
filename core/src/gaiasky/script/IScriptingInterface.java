@@ -2510,8 +2510,8 @@ public interface IScriptingInterface {
      * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2554,8 +2554,8 @@ public interface IScriptingInterface {
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize  The size of the particles in pixels.
      * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2578,8 +2578,8 @@ public interface IScriptingInterface {
      * @param particleSize       The size of the particles in pixels.
      * @param particleSizeLimits The minimum and maximum size of the particles in pixels.
      * @param ct                 The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync               Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2598,8 +2598,8 @@ public interface IScriptingInterface {
      * @param dsName        The name of the dataset.
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2618,8 +2618,8 @@ public interface IScriptingInterface {
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2639,8 +2639,8 @@ public interface IScriptingInterface {
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2660,8 +2660,8 @@ public interface IScriptingInterface {
      * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
-     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync          Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2685,8 +2685,8 @@ public interface IScriptingInterface {
      * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the magnitudes in the light curve, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
-     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
-     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
+     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
