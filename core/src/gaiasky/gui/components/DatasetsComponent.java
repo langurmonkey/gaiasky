@@ -171,13 +171,13 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         ColorPickerAbstract cp;
         if (ci.hasParticleAttributes()) {
             ColormapPicker cmp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
-            cmp.addListener(new TextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
+            cmp.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
             cmp.setNewColorRunnable(() -> ci.setHlColor(cmp.getPickedColor()));
             cmp.setNewColormapRunnable(() -> ci.setHlColormap(cmp.getPickedCmapIndex(), cmp.getPickedCmapAttribute(), cmp.getPickedCmapMin(), cmp.getPickedCmapMax()));
             cp = cmp;
         } else {
             ColorPicker clp = new ColorPicker(ci.name, ci.hlColor, stage, skin);
-            clp.addListener(new TextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
+            clp.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.dataset.highlight.color.select"), skin));
             clp.setNewColorRunnable(() -> ci.setHlColor(clp.getPickedColor()));
             cp = clp;
         }
@@ -192,7 +192,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         } else {
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }
-        int cap = 25;
+        int cap = 20;
         String types = ci.type.toString() + " / " + ci.getCt();
         OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin);
         typesLabel.addListener(new OwnTextTooltip(types, skin));
