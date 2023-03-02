@@ -48,13 +48,8 @@ public class LoadingGui extends AbstractGui {
     private long funnyTextTime = 1400;
 
     public LoadingGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
-        this(skin, graphics, unitsPerPixel, 0, vr);
-    }
-
-    public LoadingGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Integer hoffset, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.vr = vr;
-        this.hOffset = hoffset;
         this.skin = skin;
     }
 
@@ -87,11 +82,11 @@ public class LoadingGui extends AbstractGui {
         }
         center.setFillParent(true);
         center.center();
-        if (hOffset > 0)
-            center.padLeft(hOffset);
-        else if (hOffset < 0)
-            center.padRight(-hOffset);
 
+        // Logo.
+        Image logo = new Image(new Texture(Gdx.files.internal("icon/gs_128.png")));
+
+        // Title.
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(pad30 * 2f);
         OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(settings.runtime.openVr), skin, "main-title");
@@ -100,12 +95,13 @@ public class LoadingGui extends AbstractGui {
         titleGroup.addActor(gaiaSky);
         titleGroup.addActor(version);
 
-        // Funny text
+        // Funny text.
         loadingTextGenerator = new LoadingTextGenerator();
         lastFunnyTime = 0;
         spin = new OwnLabel("0", skin, "main-title-xs");
         spin.setColor(skin.getColor("theme"));
 
+        center.add(logo).center().padBottom(pad10).row();
         center.add(titleGroup).center().padBottom(pad10 * 2f).row();
         center.add(spin).padBottom(pad30).row();
 

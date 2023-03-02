@@ -24,10 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -237,6 +234,9 @@ public class WelcomeGui extends AbstractGui {
         int numTotalCatalogsEnabled = numTotalDatasetsEnabled();
         boolean baseDataPresent = baseDataPresent();
 
+        // Logo.
+        Image logo = new Image(new Texture(Gdx.files.internal("icon/gs_128.png")));
+
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(pad32 * 2f);
@@ -362,6 +362,8 @@ public class WelcomeGui extends AbstractGui {
         });
         buttonList.add(exitButton);
 
+        // Logo
+        center.add(logo).center().padBottom(pad16).colspan(2).row();
         // Title
         center.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
 

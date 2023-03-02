@@ -1,13 +1,19 @@
 package gaiasky.gui.vr;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.gui.AbstractGui;
+import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class WelcomeGuiVR extends AbstractGui {
@@ -21,18 +27,35 @@ public class WelcomeGuiVR extends AbstractGui {
 
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
-        // User interface
         FixedScreenViewport vp = new FixedScreenViewport(getBackBufferWidth(), getBackBufferHeight());
         stage = new Stage(vp, sb);
 
         center = new Table();
         center.setFillParent(true);
         center.center();
-        if (hOffset > 0)
-            center.padLeft(hOffset);
-        else if (hOffset < 0)
-            center.padRight(-hOffset);
-        center.add(new OwnLabel("Please, check the window on your screen", skin, "main-title-s"));
+
+        String textStyle = "main-title-s";
+
+        // Logo.
+        Image logo = new Image(new Texture(Gdx.files.internal("icon/gs_128.png")));
+        center.add(logo).padBottom(20f).row();
+        // Title.
+        HorizontalGroup titleGroup = new HorizontalGroup();
+        titleGroup.space(64f);
+        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
+        OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
+        version.setColor(skin.getColor("theme"));
+        titleGroup.addActor(gaiaSky);
+        titleGroup.addActor(version);
+        center.add(titleGroup).padBottom(110f).row();
+
+        // Check window!
+        var w1 = new OwnLabel("The window on your screen allows you to\ndownload and manage datasets.", skin, textStyle);
+        w1.setAlignment(Align.center);
+        var w2 = new OwnLabel("If you already have all the datasets you need,\nplease click on 'Start Gaia Sky'", skin, textStyle);
+        w2.setAlignment(Align.center);
+        center.add(w1).padBottom(40f).row();
+        center.add(w2);
 
         rebuildGui();
     }

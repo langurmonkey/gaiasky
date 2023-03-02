@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
@@ -57,7 +56,7 @@ import java.util.Set;
 /**
  * Creates and manages the VR UI and all its interactions with controllers.
  */
-public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserver, Disposable {
+public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObserver, Disposable {
 
     public static final int WIDTH = 1920;
     public static final int HEIGHT = 1080;
@@ -66,7 +65,6 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
     Stage stage;
     Skin skin;
     FrameBuffer buffer;
-    Texture uiTexture;
     Entity entity;
     // VR UI position with respect to the user.
     Vector3b relativePosition = new Vector3b();
@@ -86,7 +84,7 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
     VRContext.VRDevice interactingController;
 
-    public MainVRUI(Skin skin) {
+    public MainVRGui(Skin skin) {
         setSkin(skin);
     }
 
@@ -105,7 +103,6 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
         var builder = new FrameBufferBuilder(WIDTH, HEIGHT);
         builder.addBasicColorTextureAttachment(Format.RGBA8888);
         buffer = builder.build();
-        uiTexture = buffer.getColorBufferTexture();
 
         // Events.
         EventManager.instance.subscribe(this, Event.SHOW_VR_UI, Event.VR_CONTROLLER_INFO, Event.SCENE_LOADED);
@@ -367,10 +364,6 @@ public class MainVRUI implements VRDeviceListener, InputProcessor, IGui, IObserv
     @Override
     public Actor findActor(String name) {
         return null;
-    }
-
-    @Override
-    public void sethOffset(int hOffset) {
     }
 
     @Override

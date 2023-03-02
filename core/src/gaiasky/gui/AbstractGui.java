@@ -51,11 +51,6 @@ public abstract class AbstractGui implements IObserver, IGui {
     protected boolean vr;
 
     /**
-     * Horizontal offset, for VR.
-     */
-    protected int hOffset;
-
-    /**
      * Units per pixel, 1/uiScale.
      * This only works with a screen viewport.
      */
@@ -144,11 +139,6 @@ public abstract class AbstractGui implements IObserver, IGui {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         // Empty by default
-    }
-
-    @Override
-    public void sethOffset(int hOffset) {
-        this.hOffset = hOffset;
     }
 
     @Override

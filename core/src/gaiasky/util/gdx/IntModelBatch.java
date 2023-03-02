@@ -50,6 +50,7 @@ public class IntModelBatch implements Disposable {
     protected final IntRenderableSorter sorter;
     private final boolean ownContext;
     protected Camera camera;
+
     /**
      * Construct a ModelBatch, using this constructor makes you responsible for calling context.begin() and context.end() yourself.
      *
@@ -116,11 +117,11 @@ public class IntModelBatch implements Disposable {
      * Construct a ModelBatch with the default implementation and the specified ubershader. See {@link DefaultIntShader} for more
      * information about using a custom ubershader. Requires OpenGL ES 2.0.
      *
-     * @param vertexShader   The vertex shader to use.
-     * @param fragmentShader The fragment shader to use.
+     * @param vertexShaderCode   The vertex shader to use.
+     * @param fragmentShaderCode The fragment shader to use.
      */
-    public IntModelBatch(final String vertexShader, final String fragmentShader) {
-        this(null, new DefaultIntShaderProvider(vertexShader, fragmentShader), null);
+    public IntModelBatch(final String vertexShaderCode, final String fragmentShaderCode) {
+        this(null, new DefaultIntShaderProvider(vertexShaderCode, fragmentShaderCode), null);
     }
 
     /** Construct a ModelBatch with the default implementation */
@@ -359,8 +360,7 @@ public class IntModelBatch implements Disposable {
      * @param environment         the {@link Environment} to use for the renderables
      * @param shader              the shader to use for the renderables
      */
-    public <T extends IntRenderableProvider> void render(final Iterable<T> renderableProviders, final Environment environment,
-            final IntShader shader) {
+    public <T extends IntRenderableProvider> void render(final Iterable<T> renderableProviders, final Environment environment, final IntShader shader) {
         for (final IntRenderableProvider renderableProvider : renderableProviders)
             render(renderableProvider, environment, shader);
     }

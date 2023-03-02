@@ -98,13 +98,6 @@ public interface IGui extends Disposable {
     Actor findActor(String name);
 
     /**
-     * Sets the horizontal offset, for VR
-     *
-     * @param hOffset The horizontal offset in pixels
-     */
-    void sethOffset(int hOffset);
-
-    /**
      * Whether this GUI is to be used in VR mode
      *
      * @param vr Vr mode is active

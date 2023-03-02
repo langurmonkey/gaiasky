@@ -36,12 +36,12 @@ public class DefaultIntShaderProvider extends BaseIntShaderProvider {
         EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
-    public DefaultIntShaderProvider(final String vertexShader, final String fragmentShader) {
-        this(new DefaultIntShader.Config(vertexShader, fragmentShader));
+    public DefaultIntShaderProvider(final String vertexShaderCode, final String fragmentShaderCode) {
+        this(new DefaultIntShader.Config(vertexShaderCode, fragmentShaderCode));
     }
 
-    public DefaultIntShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {
-        this(vertexShader.readString(), fragmentShader.readString());
+    public DefaultIntShaderProvider(final FileHandle vertexShaderFile, final FileHandle fragmentShaderFile) {
+        this(vertexShaderFile.readString(), fragmentShaderFile.readString());
     }
 
     public DefaultIntShaderProvider() {

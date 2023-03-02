@@ -31,15 +31,14 @@ public class CrashGui extends AbstractGui {
     protected CrashWindow crashWindow;
 
     public CrashGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Throwable crash) {
-        this(skin, graphics, unitsPerPixel, crash, 0, false);
+        this(skin, graphics, unitsPerPixel, crash, false);
     }
 
-    public CrashGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Throwable crash, final Integer hoffset, final Boolean vr) {
+    public CrashGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Throwable crash, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.crash = crash;
         this.vr = vr;
-        this.hOffset = hoffset;
     }
 
     @Override
