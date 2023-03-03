@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.gui.AbstractGui;
 import gaiasky.gui.VersionLineTable;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class WelcomeGuiVR extends AbstractGui {
@@ -54,11 +55,11 @@ public class WelcomeGuiVR extends AbstractGui {
         center.add(titleGroup).padBottom(110f).row();
 
         // Check window!
-        var w1 = new OwnLabel("The window on your screen allows you to\ndownload and manage datasets.", skin, textStyle);
+        var w1 = new OwnLabel(I18n.msg("gui.vr.welcome.1"), skin, textStyle);
         w1.setAlignment(Align.center);
-        var w2 = new OwnLabel("If you already have all the datasets you need,", skin, textStyle);
+        var w2 = new OwnLabel(I18n.msg("gui.vr.welcome.2"), skin, textStyle);
         w2.setAlignment(Align.center);
-        var w3 = new OwnLabel("press ANY button in your VR controller.", skin, "header-blue");
+        var w3 = new OwnLabel(I18n.msg("gui.vr.welcome.3"), skin, "header-blue");
         w3.setAlignment(Align.center);
         center.add(w1).padBottom(40f).row();
         center.add(w2).row();

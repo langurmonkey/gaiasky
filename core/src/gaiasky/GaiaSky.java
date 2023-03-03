@@ -14,7 +14,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -571,7 +570,11 @@ public class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR = new StandaloneVRGui<>(vrContext, WelcomeGuiVR.class, globalResources.getSkin(), new OpenVRListener() {
                 @Override
                 public boolean buttonReleased(VRDevice device, int button) {
-                    ((WelcomeGui) welcomeGui).startLoading();
+                    // Any of the main buttons.
+                    if (button == device.mappings.getButtonA() || button == device.mappings.getButtonB()
+                            || button == device.mappings.getButtonX() || button == device.mappings.getButtonY()) {
+                        ((WelcomeGui) welcomeGui).startLoading();
+                    }
                     return false;
                 }
             });
