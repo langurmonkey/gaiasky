@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -35,7 +34,6 @@ import gaiasky.util.RenderUtils;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
-import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.Space;
 import gaiasky.vr.openvr.VRContext.VRDevice;
@@ -74,7 +72,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
     private SpriteBatch sbScreen;
 
     private Vector3 auxf1;
-    private Vector3d auxd1;
 
     private Vector2 lastSize;
 
@@ -106,13 +103,12 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
 
             // Aux vectors
             auxf1 = new Vector3();
-            auxd1 = new Vector3d();
             lastSize = new Vector2();
 
-            // Controllers
+            // Controllers.
             Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);
 
-            // Env
+            // Controller environment.
             controllersEnv = new Environment();
             controllersEnv.set(new ColorAttribute(ColorAttribute.AmbientLight, .2f, .2f, .2f, 1f));
             DirectionalLight dlight = new DirectionalLight();
@@ -170,12 +166,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
 
             // Add controller objects to render lists.
             for (Entity controller : controllerObjects) {
-                var vr = Mapper.vr.get(controller);
                 var model = Mapper.model.get(controller);
-
-                Vector3 devicePos = vr.device.getPosition(Space.Tracker);
-                // Length from headset to controller
-                auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
                 if (model.model.instance != null) {
                     scene.extractEntity(controller);
                 }
@@ -184,7 +175,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             /* LEFT EYE */
 
             // Camera to left
-            updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, false, rc);
+            updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, rc);
 
             sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
@@ -201,7 +192,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             /* RIGHT EYE */
 
             // Camera to right
-            updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, false, rc);
+            updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, rc);
 
             sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
@@ -226,7 +217,7 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
 
     }
 
-    private void updateCamera(NaturalCamera cam, PerspectiveCamera camera, int eye, boolean updateFrustum, RenderingContext rc) {
+    private void updateCamera(NaturalCamera cam, PerspectiveCamera camera, int eye, RenderingContext rc) {
         // get the projection matrix from the HDM 
         VRSystem.VRSystem_GetProjectionMatrix(eye, camera.near, camera.far, projectionMat);
         VRContext.hmdMat4toMatrix4(projectionMat, camera.projection);
@@ -259,12 +250,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
         camera.combined.set(camera.projection);
         Matrix4.mul(camera.combined.val, invEyeSpace.val);
         Matrix4.mul(camera.combined.val, camera.view.val);
-
-        if (updateFrustum) {
-            camera.invProjectionView.set(camera.combined);
-            Matrix4.inv(camera.invProjectionView.val);
-            camera.frustum.update(camera.invProjectionView);
-        }
     }
 
     private void renderGui(IGui gui) {

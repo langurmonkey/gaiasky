@@ -336,7 +336,7 @@ public class VRContext implements Disposable {
                 button = event.data().controller().button();
                 devices[index].setButton(button, false);
                 for (VRDeviceListener l : listeners) {
-                    if (l.buttonReleased(devices[index], button)) {
+                    if (l != null && l.buttonReleased(devices[index], button)) {
                         break;
                     }
                 }
@@ -363,8 +363,11 @@ public class VRContext implements Disposable {
 
             // Ignore
             default -> {
-                for (VRDeviceListener l : listeners)
-                    l.event(event.eventType());
+                for (VRDeviceListener l : listeners) {
+                    if (l != null) {
+                        l.event(event.eventType());
+                    }
+                }
             }
             }
         }
@@ -737,8 +740,9 @@ public class VRContext implements Disposable {
             this.role = VRControllerRole.values()[controllerRole];
             IntModel model = loadRenderModel(renderModelName, modelNumber, manufacturerName, this.role);
             this.modelInstance = model != null ? new IntModelInstance(model) : null;
-            if (model != null)
-                this.modelInstance.transform.set(pose.transform);
+            if (model != null) {
+                this.modelInstance.transform = transform;
+            }
 
             // Init mappings file for VR controller.
             if (type == VRDeviceType.Controller && isVRController(renderModelName, modelNumber, role)) {

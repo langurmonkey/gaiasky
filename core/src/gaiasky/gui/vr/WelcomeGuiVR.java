@@ -11,14 +11,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.gui.AbstractGui;
+import gaiasky.gui.VersionLineTable;
 import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class WelcomeGuiVR extends AbstractGui {
 
-    private Table center;
+    private Table center, bottom;
 
     public WelcomeGuiVR(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
@@ -34,7 +34,11 @@ public class WelcomeGuiVR extends AbstractGui {
         center.setFillParent(true);
         center.center();
 
-        String textStyle = "main-title-s";
+        String textStyle = "header-raw";
+
+        // Bottom info.
+        bottom = new VersionLineTable(skin, true);
+        bottom.bottom();
 
         // Logo.
         Image logo = new Image(new Texture(Gdx.files.internal("icon/gs_128.png")));
@@ -52,10 +56,13 @@ public class WelcomeGuiVR extends AbstractGui {
         // Check window!
         var w1 = new OwnLabel("The window on your screen allows you to\ndownload and manage datasets.", skin, textStyle);
         w1.setAlignment(Align.center);
-        var w2 = new OwnLabel("If you already have all the datasets you need,\nplease click on 'Start Gaia Sky'", skin, textStyle);
+        var w2 = new OwnLabel("If you already have all the datasets you need,", skin, textStyle);
         w2.setAlignment(Align.center);
+        var w3 = new OwnLabel("press ANY button in your VR controller.", skin, "header-blue");
+        w3.setAlignment(Align.center);
         center.add(w1).padBottom(40f).row();
-        center.add(w2);
+        center.add(w2).row();
+        center.add(w3);
 
         rebuildGui();
     }
@@ -70,6 +77,7 @@ public class WelcomeGuiVR extends AbstractGui {
         if (stage != null) {
             stage.clear();
             stage.addActor(center);
+            stage.addActor(bottom);
         }
     }
 }

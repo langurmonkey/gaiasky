@@ -89,7 +89,7 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
     }
 
     public void initialize(AssetManager manager, SpriteBatch batch) {
-        setVr(Settings.settings.runtime.openVr);
+        setVR(Settings.settings.runtime.openVr);
         this.batch = new SpriteBatch(20, GaiaSky.instance.getGlobalResources().getSpriteShader());
         this.shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
         //resize(WIDTH, HEIGHT);
@@ -367,8 +367,13 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
     }
 
     @Override
-    public void setVr(boolean vr) {
+    public void setVR(boolean vr) {
         this.vr = vr;
+    }
+
+    @Override
+    public boolean isVR() {
+        return vr;
     }
 
     @Override

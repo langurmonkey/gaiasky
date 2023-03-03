@@ -102,7 +102,13 @@ public interface IGui extends Disposable {
      *
      * @param vr Vr mode is active
      */
-    void setVr(boolean vr);
+    void setVR(boolean vr);
+
+    /**
+     * Returns whether this GUI is a VR gui.
+     * @return Is this a VR gui?
+     */
+    boolean isVR();
 
     /**
      * Returns whether this GUI must be drawn or not

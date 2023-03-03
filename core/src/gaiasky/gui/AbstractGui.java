@@ -142,8 +142,13 @@ public abstract class AbstractGui implements IObserver, IGui {
     }
 
     @Override
-    public void setVr(boolean vr) {
+    public void setVR(boolean vr) {
         this.vr = vr;
+    }
+
+    @Override
+    public boolean isVR() {
+        return vr;
     }
 
     @Override

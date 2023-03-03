@@ -172,7 +172,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
     /**
      * The user interfaces
      */
-    public IGui welcomeGui, welcomeGuiVR, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui, mainVRGui;
+    public IGui welcomeGui, loadingGui, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, gamepadGui, mainVRGui;
+    public StandaloneVRGui<?> welcomeGuiVR, loadingGuiVR;
+
     /**
      * Time
      */
@@ -274,7 +276,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private final Runnable runnableInitialGui = () -> {
         if (settings.runtime.openVr) {
             // Render to VR.
-            welcomeGuiVR.update(Gdx.graphics.getDeltaTime());
             renderGui(welcomeGuiVR);
         }
         // Render to screen.
@@ -383,7 +384,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         } else {
             if (settings.runtime.openVr) {
                 // Render to VR.
-                loadingGuiVR.update(Gdx.graphics.getDeltaTime());
                 renderGui(loadingGuiVR);
             }
             // Render to screen.
@@ -568,7 +568,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (settings.runtime.openVr) {
-            welcomeGuiVR = new StandaloneVRGui<>(vrContext, WelcomeGuiVR.class, globalResources.getSkin());
+            welcomeGuiVR = new StandaloneVRGui<>(vrContext, WelcomeGuiVR.class, globalResources.getSkin(), new OpenVRListener() {
+                @Override
+                public boolean buttonReleased(VRDevice device, int button) {
+                    ((WelcomeGui) welcomeGui).startLoading();
+                    return false;
+                }
+            });
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
 
@@ -653,11 +659,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         loadingGui.dispose();
         loadingGui = null;
 
-        // Dispose vr loading GUI.
+        // Dispose loading GUI VR.
         if (settings.runtime.openVr) {
-            welcomeGuiVR.dispose();
-            welcomeGuiVR = null;
-
             loadingGuiVR.dispose();
             loadingGuiVR = null;
         }
@@ -1274,9 +1277,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
      */
     private void renderGui(final IGui gui) {
         gui.update(graphics.getDeltaTime());
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         gui.render(graphics.getWidth(), graphics.getHeight());
     }
 
@@ -1352,8 +1352,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
             // Also VR.
             if (settings.runtime.openVr) {
-                loadingGuiVR = new StandaloneVRGui<>(vrContext, LoadingGui.class, globalResources.getSkin());
+                // Create loading GUI VR.
+                loadingGuiVR = new StandaloneVRGui<>(vrContext, LoadingGui.class, globalResources.getSkin(), null);
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
+
+                // Dispose previous VR GUI.
+                welcomeGuiVR.dispose();
+                welcomeGuiVR = null;
             }
             this.updateRenderProcess = runnableLoadingGui;
 

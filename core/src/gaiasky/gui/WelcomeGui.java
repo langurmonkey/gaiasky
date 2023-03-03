@@ -11,13 +11,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -46,7 +44,6 @@ import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.gdx.loader.OwnTextureLoader;
-import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -134,7 +131,7 @@ public class WelcomeGui extends AbstractGui {
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, stage));
         } else if (Settings.settings.program.net.slave.active || GaiaSky.instance.isHeadless()) {
             // If we are a slave or running headless, data load can start
-            gaiaSky();
+            startLoading();
         } else {
             // Otherwise, check for updates, etc.
             clearGui();
@@ -154,7 +151,7 @@ public class WelcomeGui extends AbstractGui {
             DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null, (digest) -> GaiaSky.postRunnable(() -> {
                 // Data descriptor ok. Skip welcome screen only if flag and base data present
                 if (skipWelcome && baseDataPresent()) {
-                    gaiaSky();
+                    startLoading();
                 } else {
                     buildWelcomeUI();
                 }
@@ -186,7 +183,7 @@ public class WelcomeGui extends AbstractGui {
                             Gdx.app.exit();
                         } else if (ie.getKeyCode() == Input.Keys.ENTER) {
                             if (baseDataPresent()) {
-                                gaiaSky();
+                                startLoading();
                             } else {
                                 addDatasetManagerWindow(serverDatasets);
                             }
@@ -257,7 +254,7 @@ public class WelcomeGui extends AbstractGui {
         startButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Check base data is enabled
-                gaiaSky();
+                startLoading();
             }
             return true;
         });
@@ -519,7 +516,7 @@ public class WelcomeGui extends AbstractGui {
     /**
      * Starts gaia sky.
      */
-    private void gaiaSky() {
+    public void startLoading() {
         EventManager.instance.removeAllSubscriptions(this);
         removeOwnListeners();
         ensureBaseDataEnabled(serverDatasets);
@@ -803,7 +800,7 @@ public class WelcomeGui extends AbstractGui {
 
         @Override
         public boolean accept() {
-            gaiaSky();
+            startLoading();
             return true;
         }
 
@@ -884,7 +881,7 @@ public class WelcomeGui extends AbstractGui {
         public boolean buttonDown(Controller controller, int buttonCode) {
             long now = TimeUtils.millis();
             if (buttonCode == mappings.getButtonStart()) {
-                gaiaSky();
+                startLoading();
                 lastButtonPollTime = now;
             } else if (buttonCode == mappings.getButtonA()) {
                 fireChange();

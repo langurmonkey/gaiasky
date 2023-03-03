@@ -42,6 +42,10 @@ public class OpenVRListener implements VRDeviceListener {
     private long selectingTime = 0;
     private long lastAxisMovedFrame = Long.MIN_VALUE;
 
+    public OpenVRListener() {
+        this(null);
+    }
+
     public OpenVRListener(NaturalCamera cam) {
         this.cam = cam;
         this.comp = new ViewAngleComparator<>();

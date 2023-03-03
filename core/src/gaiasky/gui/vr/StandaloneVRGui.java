@@ -17,8 +17,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.gui.IGui;
+import gaiasky.gui.OpenVRListener;
 import gaiasky.render.ComponentTypes;
 import gaiasky.util.*;
 import gaiasky.util.gdx.IntModelBatch;
@@ -33,6 +35,7 @@ import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
+import gaiasky.vr.openvr.VRDeviceListener;
 import org.lwjgl.openvr.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,15 +50,16 @@ import java.util.Map;
 public class StandaloneVRGui<T extends IGui> implements IGui {
     private static final Logger.Log logger = Logger.getLogger(StandaloneVRGui.class);
 
+    OpenVRListener listener;
     int vrWidth, vrHeight;
-    int guiWidth = 1920, guiHeight = 1080;
+    int guiWidth = 2960, guiHeight = 1440;
     Skin skin;
     Class<T> guiClass;
     T gui;
     PerspectiveCamera camera;
     IntModelInstance instance;
     IntModelBatch batch;
-    Environment env;
+    Environment env, controllersEnv;
     VRContext vrContext;
     FrameBuffer fbLeft, fbRight, fbGui;
     Texture texLeft, texRight;
@@ -64,17 +68,19 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
     Matrix4 invEyeSpace = new Matrix4();
     HmdMatrix44 projectionMat = HmdMatrix44.create();
     HmdMatrix34 eyeMat = HmdMatrix34.create();
+    Array<VRContext.VRDevice> controllers;
     Vector2 lastSize = new Vector2();
     Vector3 aux = new Vector3();
 
     private boolean renderToScreen = false;
 
-    public StandaloneVRGui(VRContext vrContext, Class<T> guiClass, Skin skin) {
+    public StandaloneVRGui(VRContext vrContext, Class<T> guiClass, Skin skin, OpenVRListener listener) {
         this.vrContext = vrContext;
         this.vrWidth = vrContext.getWidth();
         this.vrHeight = vrContext.getHeight();
         this.guiClass = guiClass;
         this.skin = skin;
+        this.listener = listener;
     }
 
     @Override
@@ -82,7 +88,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         try {
             // Create GUI.
             gui = guiClass.getDeclaredConstructor(Skin.class, Graphics.class, Float.class, Boolean.class).newInstance(skin, Gdx.graphics, 1f, true);
-            gui.setVr(true);
+            gui.setVR(true);
             gui.initialize(assetManager, spriteBatch);
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             logger.error(e);
@@ -164,17 +170,29 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         texRight = org.lwjgl.openvr.Texture.create();
         texRight.set(fbRight.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Auto);
 
+        // Controller environment.
+        controllersEnv = new Environment();
+        controllersEnv.set(new ColorAttribute(ColorAttribute.AmbientLight, .2f, .2f, .2f, 1f));
+        DirectionalLight dlight = new DirectionalLight();
+        dlight.color.set(1f, 1f, 1f, 1f);
+        dlight.direction.set(0, -1, 0);
+        controllersEnv.add(dlight);
+
         // Sprite batch for rendering to screen.
         sbScreen = new SpriteBatch();
+
+        if (vrContext != null && listener != null) {
+            vrContext.addListener(listener);
+        }
 
     }
 
     private void setSurfacePosition() {
-        updateCamera(camera, VR.EVREye_Eye_Left, false, vrWidth, vrHeight);
+        updateCamera(camera, VR.EVREye_Eye_Left, vrWidth, vrHeight);
         Vector3d dir = new Vector3d();
         dir.set(camera.direction);
         float angle = (float) dir.angle(Vector3d.getUnitX());
-        if(dir.z > 0) {
+        if (dir.z > 0) {
             angle = -angle;
         }
         Vector3d pos = new Vector3d();
@@ -190,6 +208,22 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
 
     @Override
     public void update(double dt) {
+        try {
+            vrContext.pollEvents();
+        } catch (Exception e) {
+            logger.error(e);
+        }
+
+        // Initialize controllers if needed.
+        if (controllers == null) {
+            controllers = vrContext.getDevicesByType(VRContext.VRDeviceType.Controller);
+        }
+        for (var controller : controllers) {
+            if (!controller.isInitialized()) {
+                controller.initialize();
+            }
+        }
+
         gui.update(dt);
     }
 
@@ -202,27 +236,23 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         fbGui.end();
 
         if (vrContext != null) {
-            try {
-                vrContext.pollEvents();
-            } catch (Exception e) {
-                logger.error(e);
-            }
-
             // Left.
-            updateCamera(camera, VR.EVREye_Eye_Left, false, vrWidth, vrHeight);
+            updateCamera(camera, VR.EVREye_Eye_Left, vrWidth, vrHeight);
             fbLeft.begin();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
             batch.begin(camera);
             batch.render(instance, env);
+            renderControllers();
             batch.end();
             fbLeft.end();
 
             // Right.
-            updateCamera(camera, VR.EVREye_Eye_Right, false, vrWidth, vrHeight);
+            updateCamera(camera, VR.EVREye_Eye_Right, vrWidth, vrHeight);
             fbRight.begin();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
             batch.begin(camera);
             batch.render(instance, env);
+            renderControllers();
             batch.end();
             fbRight.end();
 
@@ -237,7 +267,20 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         }
     }
 
-    private void updateCamera(PerspectiveCamera camera, int eye, boolean updateFrustum, int w, int h) {
+    private void renderControllers() {
+        if (controllers != null) {
+            for (var controller : controllers) {
+                if (controller.isInitialized()) {
+                    var controllerInstance = controller.getModelInstance();
+                    if (controllerInstance != null) {
+                        batch.render(controllerInstance, controllersEnv);
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateCamera(PerspectiveCamera camera, int eye, int w, int h) {
         // get the projection matrix from the HDM
         VRSystem.VRSystem_GetProjectionMatrix(eye, camera.near, camera.far, projectionMat);
         VRContext.hmdMat4toMatrix4(projectionMat, camera.projection);
@@ -266,12 +309,6 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         camera.up.set(up);
         camera.direction.set(dir);
         camera.position.set(pos);
-
-        if (updateFrustum) {
-            camera.invProjectionView.set(camera.combined);
-            Matrix4.inv(camera.invProjectionView.val);
-            camera.frustum.update(camera.invProjectionView);
-        }
     }
 
     @Override
@@ -304,7 +341,12 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
     }
 
     @Override
-    public void setVr(boolean vr) {
+    public void setVR(boolean vr) {
+    }
+
+    @Override
+    public boolean isVR() {
+        return true;
     }
 
     @Override
@@ -323,6 +365,9 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
 
     @Override
     public void dispose() {
+        if (vrContext != null && listener != null) {
+            vrContext.removeListener(listener);
+        }
         fbLeft.dispose();
         fbRight.dispose();
         batch.dispose();

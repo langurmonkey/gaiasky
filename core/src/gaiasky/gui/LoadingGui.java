@@ -37,6 +37,7 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  * Displays the loading screen.
  */
 public class LoadingGui extends AbstractGui {
+    private static final long tipTime = 3500;
     public NotificationsInterface notificationsInterface;
     protected Table center, topLeft, bottomMiddle, screenMode;
     private TipsGenerator tipGenerator;
@@ -105,18 +106,23 @@ public class LoadingGui extends AbstractGui {
         center.add(titleGroup).center().padBottom(pad10 * 2f).row();
         center.add(spin).padBottom(pad30).row();
 
-        // Tips
-        tipGenerator = new TipsGenerator(skin);
-        tip = new HorizontalGroup();
-        tip.space(pad10);
-        tip.pad(10, 30, 10, 30);
-        Container<HorizontalGroup> tipContainer = new Container<>(tip);
-        tipContainer.setBackground(skin.getDrawable("table-bg"));
-        bottomMiddle = new Table(skin);
-        bottomMiddle.setFillParent(true);
-        bottomMiddle.center().bottom();
-        bottomMiddle.padLeft(pad30).padBottom(pad10);
-        bottomMiddle.add(tipContainer);
+        if (vr) {
+            bottomMiddle = new VersionLineTable(skin, true);
+            bottomMiddle.center().bottom();
+        } else {
+            // Tips
+            tipGenerator = new TipsGenerator(skin);
+            tip = new HorizontalGroup();
+            tip.space(pad10);
+            tip.pad(10, 30, 10, 30);
+            Container<HorizontalGroup> tipContainer = new Container<>(tip);
+            tipContainer.setBackground(skin.getDrawable("table-bg"));
+            bottomMiddle = new Table(skin);
+            bottomMiddle.setFillParent(true);
+            bottomMiddle.center().bottom();
+            bottomMiddle.padLeft(pad30).padBottom(pad10);
+            bottomMiddle.add(tipContainer);
+        }
 
         // Version and build
         topLeft = new VersionLineTable(skin);
@@ -160,10 +166,11 @@ public class LoadingGui extends AbstractGui {
             lastFunnyTime = currTime;
             funnyTextTime = StdRandom.uniform(1500, 3000);
         }
-        long tipTime = 3500;
-        if (currTime - lastTipTime > tipTime) {
-            tipGenerator.newTip(tip);
-            lastTipTime = currTime;
+        if (!vr) {
+            if (currTime - lastTipTime > tipTime) {
+                tipGenerator.newTip(tip);
+                lastTipTime = currTime;
+            }
         }
     }
 
@@ -187,9 +194,9 @@ public class LoadingGui extends AbstractGui {
         if (stage != null) {
             stage.clear();
             stage.addActor(center);
+            stage.addActor(bottomMiddle);
             if (!vr) {
                 stage.addActor(screenMode);
-                stage.addActor(bottomMiddle);
                 stage.addActor(topLeft);
             }
         }
