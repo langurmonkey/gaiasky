@@ -243,9 +243,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
      **/
     private final Runnable runnableInitialGui = () -> {
         renderGui(welcomeGui);
-        if (settings.runtime.openVr) {
+        if (settings.runtime.openXr) {
             try {
-                vrContext.pollEvents();
+                xrDriver.pollEvents();
             } catch (Exception e) {
                 logger.error(e);
             }
@@ -308,7 +308,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * Displays the initial GUI
      **/
     private final Runnable runnableInitialGui = () -> {
-        if (settings.runtime.openVr) {
+        if (settings.runtime.openXr) {
             // Render to VR.
             renderGui(welcomeGuiVR);
         }
@@ -416,43 +416,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
             doneLoading();
             updateRenderProcess = runnableRender;
         } else {
-<<<<<<< HEAD
-            if (settings.runtime.openVr) {
+            if (settings.runtime.openXr) {
                 // Render to VR.
                 renderGui(loadingGuiVR);
-||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
-            // Display loading screen.
-            if (settings.runtime.openVr) {
-                try {
-                    vrContext.pollEvents();
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-                // Render to VR headset.
-                renderVRGui((VRGui<?>) loadingGuiVR);
-
-                // Render to screen too.
-                renderGui(loadingGui);
-            } else {
-                // Render only to screen.
-                renderGui(loadingGui);
-=======
-            // Display loading screen.
-            if (settings.runtime.openXr) {
-                try {
-                    xrDriver.pollEvents();
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-                // Render to VR headset.
-                //renderVRGui((VRGui<?>) loadingGuiVR);
-
-                // Render to screen too.
-                renderGui(loadingGui);
-            } else {
-                // Render only to screen.
-                renderGui(loadingGui);
->>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
             }
             // Render to screen.
             renderGui(loadingGui);
@@ -635,8 +601,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         inputMultiplexer.addProcessor(welcomeGui.getGuiStage());
         Gdx.input.setInputProcessor(inputMultiplexer);
 
-<<<<<<< HEAD
-        if (settings.runtime.openVr) {
+        if (settings.runtime.openXr) {
             welcomeGuiVR = new StandaloneVRGui<>(vrContext, WelcomeGuiVR.class, globalResources.getSkin(), new OpenVRListener() {
                 @Override
                 public boolean buttonReleased(VRDevice device, int button) {
@@ -653,13 +618,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     return false;
                 }
             });
-||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
-        if (settings.runtime.openVr) {
-            welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, globalResources.getSkin(), graphics, 1f);
-=======
-        if (settings.runtime.openXr) {
-            welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, globalResources.getSkin(), graphics, 1f);
->>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
 
@@ -749,16 +707,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         loadingGui.dispose();
         loadingGui = null;
 
-<<<<<<< HEAD
-        // Dispose loading GUI VR.
-        if (settings.runtime.openVr) {
-||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
-        // Dispose vr loading GUI.
-        if (settings.runtime.openVr) {
-            welcomeGuiVR.dispose();
-            welcomeGuiVR = null;
-
-=======
         // Dispose vr loading GUI.
         if (settings.runtime.openXr) {
             welcomeGuiVR.dispose();
@@ -1094,8 +1042,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 bookmarksManager.persistBookmarks();
         }
 
-        if (vrContext != null)
-            vrContext.dispose();
+        if (xrDriver != null)
+            xrDriver.dispose();
 
         ScriptingServer.dispose();
 
@@ -1455,17 +1403,9 @@ public class GaiaSky implements ApplicationListener, IObserver {
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
             // Also VR.
-<<<<<<< HEAD
-            if (settings.runtime.openVr) {
+            if (settings.runtime.openXr) {
                 // Create loading GUI VR.
                 loadingGuiVR = new StandaloneVRGui<>(vrContext, LoadingGui.class, globalResources.getSkin(), null);
-||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
-            if (settings.runtime.openVr) {
-                loadingGuiVR = new VRGui<>(LoadingGui.class, globalResources.getSkin(), graphics, 1f);
-=======
-            if (settings.runtime.openXr) {
-                loadingGuiVR = new VRGui<>(LoadingGui.class, globalResources.getSkin(), graphics, 1f);
->>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
 
                 // Dispose previous VR GUI.
