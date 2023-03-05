@@ -372,6 +372,13 @@ public class OpenXRDriver implements Disposable {
     }
 
     public void initializeActions() {
+        gameplayActionSet = createActionSet(xrInstance, "gameplay");
+
+        // Create actions.
+        actionVRUI = createAction(gameplayActionSet, "vrui", XR_ACTION_TYPE_POSE_INPUT);
+    }
+
+    public XrActionSet createActionSet(XrInstance instance, String name) {
         try (MemoryStack stack = stackPush()) {
             // Create action set.
             XrActionSetCreateInfo setCreateInfo = XrActionSetCreateInfo.malloc(stack)
@@ -380,19 +387,58 @@ public class OpenXRDriver implements Disposable {
                     .priority(0);
 
             PointerBuffer pp = stack.mallocPointer(1);
-            check(xrCreateActionSet(xrInstance, setCreateInfo, pp));
-            gameplayActionSet = new XrActionSet(pp.get(0), xrInstance);
+            check(xrCreateActionSet(instance, setCreateInfo, pp));
+            return new XrActionSet(pp.get(0), instance);
+        }
+    }
 
+    /**
+     * Creates a new action.
+     * @param actionSet The action set.
+     * @param name The name of the action.
+     * @param type The actipn type.
+     */
+    public XrAction createAction(XrActionSet actionSet, String name, int type){
+        try (MemoryStack stack = stackPush()) {
             // Create action.
             XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
-                    .actionName(stack.UTF8("vrui"))
-                    .localizedActionName(stack.UTF8("vrui"))
-                    .actionType(XR_ACTION_TYPE_POSE_INPUT);
+                    .actionName(stack.UTF8(name))
+                    .localizedActionName(stack.UTF8(name))
+                    .actionType(type);
 
-            pp = stack.mallocPointer(1);
-            check(xrCreateAction(gameplayActionSet, createInfo, pp));
-            actionVRUI = new XrAction(pp.get(0), gameplayActionSet);
+            PointerBuffer pp = stack.mallocPointer(1);
+            check(xrCreateAction(actionSet, createInfo, pp));
+            return new XrAction(pp.get(0), actionSet);
         }
+    }
+
+    public XrSpace createActionSpace(XrSession session, XrAction action) {
+        try (MemoryStack stack = stackPush()) {
+            XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack)
+                    .type(XR_TYPE_ACTION_SPACE_CREATE_INFO)
+                    .poseInActionSpace(XrPosef.malloc(stack)
+                            .position$(XrVector3f.calloc(stack).set(0, 0, 0))
+                            .orientation(XrQuaternionf.malloc(stack)
+                                    .x(0)
+                                    .y(0)
+                                    .z(0)
+                                    .w(1)))
+                    .action(action);
+
+            PointerBuffer pp = stack.mallocPointer(1);
+            check(xrCreateActionSpace(session, createInfo, pp));
+            return new XrSpace(pp.get(0), session);
+        }
+    }
+
+    public void destroyActionSet(XrActionSet actionSet) {
+        xrDestroyActionSet(actionSet);
+    }
+    public void destroyAction(XrAction action) {
+        xrDestroyAction(action);
+    }
+    public void destroyActionSpace(XrSpace space) {
+        xrDestroySpace(space);
     }
 
     public boolean pollEvents() {
