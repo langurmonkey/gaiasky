@@ -36,6 +36,7 @@ import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRDeviceListener;
+import gaiasky.vr.openxr.OpenXRDriver;
 import org.lwjgl.openvr.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -60,7 +61,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
     IntModelInstance instance;
     IntModelBatch batch;
     Environment env, controllersEnv;
-    VRContext vrContext;
+    OpenXRDriver vrContext;
     FrameBuffer fbLeft, fbRight, fbGui;
     Texture texLeft, texRight;
     SpriteBatch sbScreen;
@@ -74,7 +75,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
 
     private boolean renderToScreen = false;
 
-    public StandaloneVRGui(VRContext vrContext, Class<T> guiClass, Skin skin, OpenVRListener listener) {
+    public StandaloneVRGui(OpenXRDriver vrContext, Class<T> guiClass, Skin skin, OpenVRListener listener) {
         this.vrContext = vrContext;
         this.vrWidth = vrContext.getWidth();
         this.vrHeight = vrContext.getHeight();

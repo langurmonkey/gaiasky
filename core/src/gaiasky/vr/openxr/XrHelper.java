@@ -32,9 +32,9 @@ import static org.lwjgl.system.windows.User32.GetDC;
  * A helper class with some static methods to help applications with OpenXR related tasks that are cumbersome in
  * some way.
  */
-public final class XRHelper {
+public final class XrHelper {
 
-    private XRHelper() {
+    private XrHelper() {
     }
 
     public static <T extends StructBuffer> T fill(T buffer, int offset, int value) {
@@ -82,6 +82,20 @@ public final class XRHelper {
                 XrExtensionProperties.TYPE,
                 XR_TYPE_EXTENSION_PROPERTIES
         );
+    }
+
+    /**
+     * Allocates an {@link XrActionSuggestedBinding.Buffer} onto the given stack with the given number of bindings.
+     *
+     * <p>Note: you can't use the buffer after the stack is gone!</p>
+     *
+     * @param stack       the stack to allocate the buffer on
+     * @param numBindings the number of elements the buffer should get
+     *
+     * @return the created buffer
+     */
+    public static XrActionSuggestedBinding.Buffer prepareActionSuggestedBindings(MemoryStack stack, int numBindings) {
+        return XrActionSuggestedBinding.malloc(numBindings * XrActionSuggestedBinding.SIZEOF, stack);
     }
 
     /**

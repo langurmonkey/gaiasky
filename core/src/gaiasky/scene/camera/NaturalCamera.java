@@ -1126,7 +1126,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 setMouseKbdListener(newListener);
                 addGamepadListener();
                 if (vr) {
-                    GaiaSky.instance.vrContext.addListener(openVRListener);
+                    GaiaSky.instance.xrDriver.addListener(openVRListener);
                 }
                 break;
             default:
@@ -1135,7 +1135,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 removeGamepadListener();
                 // Remove vr listener.
                 if (vr) {
-                    GaiaSky.instance.vrContext.removeListener(openVRListener);
+                    GaiaSky.instance.xrDriver.removeListener(openVRListener);
                 }
                 break;
             }

@@ -218,7 +218,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         invEyeSpace.set(eyeSpace).inv();
 
         // get the pose matrix from the HDM
-        VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
+        VRDevice hmd = xrDriver.getDeviceByType(VRDeviceType.HeadMountedDisplay);
         Vector3 up = hmd.getUp(Space.Tracker);
         Vector3 dir = hmd.getDirection(Space.Tracker);
         Vector3 pos = hmd.getPosition(Space.Tracker);

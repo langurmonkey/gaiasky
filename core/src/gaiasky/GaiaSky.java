@@ -568,7 +568,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (settings.runtime.openXr) {
-            welcomeGuiVR = new StandaloneVRGui<>(vrContext, WelcomeGuiVR.class, globalResources.getSkin(), new OpenVRListener() {
+            welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new OpenVRListener() {
                 @Override
                 public boolean buttonReleased(VRDevice device, int button) {
                     // Any of the main buttons.
@@ -610,21 +610,21 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 xrDriver.initializeOpenXR();
                 xrDriver.pollEvents();
 
-                final VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
+                final VRDevice hmd = xrDriver.getDeviceByType(VRDeviceType.HeadMountedDisplay);
                 logger.info("Initialization of VR successful");
                 if (hmd == null) {
                     logger.info("HMD device is null!");
                 } else {
-                    logger.info("HMD device is not null: " + vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).toString());
+                    logger.info("HMD device is not null: " + xrDriver.getDeviceByType(VRDeviceType.HeadMountedDisplay).toString());
                 }
 
                 vrDeviceToModel = new HashMap<>();
 
-                if (settings.graphics.resolution[0] != vrContext.getWidth()) {
-                    logger.info("Warning, resizing according to VRSystem values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + vrContext.getWidth() + "x" + vrContext.getHeight() + "]");
+                if (settings.graphics.resolution[0] != xrDriver.getWidth()) {
+                    logger.info("Warning, resizing according to VRSystem values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
                     // Do not resize the screen!
-                    settings.graphics.backBufferResolution[1] = vrContext.getHeight();
-                    settings.graphics.backBufferResolution[0] = vrContext.getWidth();
+                    settings.graphics.backBufferResolution[1] = xrDriver.getHeight();
+                    settings.graphics.backBufferResolution[0] = xrDriver.getWidth();
                 }
                 settings.graphics.vsync = false;
 
@@ -639,7 +639,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 // Create VRUI object.
                 mainVRGui = new MainVRGui(globalResources.getSkin());
                 mainVRGui.initialize(assetManager, globalResources.getSpriteBatch());
-                vrContext.addListener((MainVRGui) mainVRGui);
+                xrDriver.addListener((MainVRGui) mainVRGui);
 
                 return VRStatus.OK;
             } catch (Exception e) {
@@ -758,7 +758,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         if (settings.runtime.openXr) {
             // Resize post-processors and render systems.
-            postRunnable(() -> resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, false, false, false));
+            postRunnable(() -> resizeImmediate(xrDriver.getWidth(), xrDriver.getHeight(), true, false, false, false));
         }
 
         // Initialise frames.
@@ -1367,7 +1367,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             // Also VR.
             if (settings.runtime.openXr) {
                 // Create loading GUI VR.
-                loadingGuiVR = new StandaloneVRGui<>(vrContext, LoadingGui.class, globalResources.getSkin(), null);
+                loadingGuiVR = new StandaloneVRGui<>(xrDriver, LoadingGui.class, globalResources.getSkin(), null);
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
 
                 // Dispose previous VR GUI.

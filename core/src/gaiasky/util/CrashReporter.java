@@ -305,7 +305,7 @@ public class CrashReporter {
         }
 
         if (Settings.settings != null && Settings.settings.runtime.openXr) {
-            VRContext vrContext = GaiaSky.instance.vrContext;
+            var vrContext = GaiaSky.instance.xrDriver;
             if (vrContext != null) {
                 /* VR info **/
                 strArray.add("");

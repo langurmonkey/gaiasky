@@ -2,11 +2,15 @@ package gaiasky.vr.openxr;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.desktop.util.HiOpenXRGL.XrResultException;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.vr.openvr.VRContext.VRDevice;
+import gaiasky.vr.openvr.VRContext.VRDeviceType;
+import gaiasky.vr.openvr.VRDeviceListener;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.openxr.*;
@@ -19,6 +23,7 @@ import java.nio.LongBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_RGB10_A2;
 import static org.lwjgl.opengl.GL11.GL_RGBA8;
+import static org.lwjgl.opengl.GL21.GL_SRGB8_ALPHA8;
 import static org.lwjgl.opengl.GL30.GL_RGBA16F;
 import static org.lwjgl.openxr.EXTDebugUtils.*;
 import static org.lwjgl.openxr.KHROpenGLEnable.*;
@@ -39,7 +44,8 @@ public class OpenXRDriver implements Disposable {
     private long glColorFormat;
     private XrView.Buffer views;       //Each view reperesents an eye in the headset with views[0] being left and views[1] being right
     private XrActionSet gameplayActionSet;
-    private XrAction actionVRUI;
+    private XrAction leftPose, rightPose, leftHaptic, rightHaptic, buttonA, buttonB, buttonX, buttonY, axisThumbstickX, axisThumbstickY, axisTrigger, buttonThumbstick, buttonTrigger;
+    private XrSpace leftPoseSpace, rightPoseSpace;
     private Swapchain[] swapchains;  //One swapchain per view
     private XrViewConfigurationView.Buffer viewConfigs;
     private final int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
@@ -66,6 +72,7 @@ public class OpenXRDriver implements Disposable {
         initializeOpenXRSession();
         createOpenXRReferenceSpace();
         createOpenXRSwapchains();
+        initializeInput();
     }
 
     /**
@@ -80,7 +87,7 @@ public class OpenXRDriver implements Disposable {
             check(xrEnumerateApiLayerProperties(pi, null));
             int numLayers = pi.get(0);
 
-            XrApiLayerProperties.Buffer pLayers = XRHelper.prepareApiLayerProperties(stack, numLayers);
+            XrApiLayerProperties.Buffer pLayers = XrHelper.prepareApiLayerProperties(stack, numLayers);
             check(xrEnumerateApiLayerProperties(pi, pLayers));
             for (int index = 0; index < numLayers; index++) {
                 XrApiLayerProperties layer = pLayers.get(index);
@@ -96,7 +103,7 @@ public class OpenXRDriver implements Disposable {
             check(xrEnumerateInstanceExtensionProperties((ByteBuffer) null, pi, null));
             int numExtensions = pi.get(0);
 
-            XrExtensionProperties.Buffer properties = XRHelper.prepareExtensionProperties(stack, numExtensions);
+            XrExtensionProperties.Buffer properties = XrHelper.prepareExtensionProperties(stack, numExtensions);
 
             check(xrEnumerateInstanceExtensionProperties((ByteBuffer) null, pi, properties));
 
@@ -193,7 +200,7 @@ public class OpenXRDriver implements Disposable {
 
             //Bind the OpenGL context to the OpenXR instance and create the session
             Lwjgl3Graphics graphics = (Lwjgl3Graphics) Gdx.graphics;
-            Struct graphicsBinding = XRHelper.createGraphicsBindingOpenGL(stack, graphics.getWindow().getWindowHandle());
+            Struct graphicsBinding = XrHelper.createGraphicsBindingOpenGL(stack, graphics.getWindow().getWindowHandle());
 
             PointerBuffer pp = stack.mallocPointer(1);
 
@@ -285,7 +292,7 @@ public class OpenXRDriver implements Disposable {
             IntBuffer pi = stack.mallocInt(1);
 
             check(xrEnumerateViewConfigurationViews(xrInstance, systemID, viewConfigType, pi, null));
-            viewConfigs = XRHelper.fill(
+            viewConfigs = XrHelper.fill(
                     XrViewConfigurationView.calloc(pi.get(0)), // Don't use malloc() because that would mess up the `next` field
                     XrViewConfigurationView.TYPE,
                     XR_TYPE_VIEW_CONFIGURATION_VIEW
@@ -294,7 +301,7 @@ public class OpenXRDriver implements Disposable {
             check(xrEnumerateViewConfigurationViews(xrInstance, systemID, viewConfigType, pi, viewConfigs));
             int viewCountNumber = pi.get(0);
 
-            views = XRHelper.fill(
+            views = XrHelper.fill(
                     XrView.calloc(viewCountNumber),
                     XrView.TYPE,
                     XR_TYPE_VIEW
@@ -308,6 +315,7 @@ public class OpenXRDriver implements Disposable {
                 long[] desiredSwapchainFormats = {
                         GL_RGB10_A2,
                         GL_RGBA16F,
+                        GL_SRGB8_ALPHA8,
                         // The two below should only be used as a fallback, as they are linear color formats without enough bits for color
                         // depth, thus leading to banding.
                         GL_RGBA8,
@@ -357,7 +365,7 @@ public class OpenXRDriver implements Disposable {
                     check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi, null));
                     int imageCount = pi.get(0);
 
-                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XRHelper.fill(
+                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XrHelper.fill(
                             XrSwapchainImageOpenGLKHR.create(imageCount),
                             XrSwapchainImageOpenGLKHR.TYPE,
                             XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR
@@ -371,17 +379,130 @@ public class OpenXRDriver implements Disposable {
         }
     }
 
-    public void initializeActions() {
+    public void initializeInput() {
         gameplayActionSet = createActionSet(xrInstance, "gameplay");
 
-        // Create actions.
-        actionVRUI = createAction(gameplayActionSet, "vrui", XR_ACTION_TYPE_POSE_INPUT);
+        // Haptic.
+        leftHaptic = createAction(gameplayActionSet, "left-haptic", XR_ACTION_TYPE_VIBRATION_OUTPUT);
+        rightHaptic = createAction(gameplayActionSet, "right-haptic", XR_ACTION_TYPE_VIBRATION_OUTPUT);
+        // Poses.
+        leftPose = createAction(gameplayActionSet, "left-hand", XR_ACTION_TYPE_POSE_INPUT);
+        rightPose = createAction(gameplayActionSet, "right-hand", XR_ACTION_TYPE_POSE_INPUT);
+        leftPoseSpace = createActionSpace(xrSession, leftPose);
+        rightPoseSpace = createActionSpace(xrSession, rightPose);
+        // Buttons.
+        buttonA = createAction(gameplayActionSet, "a-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonB = createAction(gameplayActionSet, "b-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonX = createAction(gameplayActionSet, "x-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonY = createAction(gameplayActionSet, "y-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonThumbstick = createAction(gameplayActionSet, "thumbstick-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonTrigger = createAction(gameplayActionSet, "trigger-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        // Axes.
+        axisThumbstickX = createAction(gameplayActionSet, "thumbstick-x-axis", XR_ACTION_TYPE_FLOAT_INPUT);
+        axisThumbstickY = createAction(gameplayActionSet, "thumbstick-y-axis", XR_ACTION_TYPE_FLOAT_INPUT);
+        axisTrigger = createAction(gameplayActionSet, "trigger-axis", XR_ACTION_TYPE_FLOAT_INPUT);
+
+        long leftHapticPath = getPath(xrInstance, "/user/hand/left/output/haptic");
+        long rightHapticPath = getPath(xrInstance, "/user/hand/right/output/haptic");
+        long leftPosePath = getPath(xrInstance, "/user/hand/left/input/grip/pose");
+        long rightPosePath = getPath(xrInstance, "/user/hand/right/input/grip/pose");
+        long buttonARightPath = getPath(xrInstance, "/user/hand/right/input/a/click");
+        long buttonBRightPath = getPath(xrInstance, "/user/hand/right/input/b/click");
+        long buttonALeftPath = getPath(xrInstance, "/user/hand/left/input/a/click");
+        long buttonBLeftPath = getPath(xrInstance, "/user/hand/left/input/b/click");
+        long buttonXPath = getPath(xrInstance, "/user/hand/left/input/x/click");
+        long buttonYPath = getPath(xrInstance, "/user/hand/left/input/y/click");
+        long buttonThumbstickLeftPath = getPath(xrInstance, "/user/hand/left/input/thumbstick/click");
+        long buttonThumbstickRightPath = getPath(xrInstance, "/user/hand/right/input/thumbstick/click");
+        long buttonTriggerLeftPath = getPath(xrInstance, "/user/hand/left/input/trigger/click");
+        long buttonTriggerRightPath = getPath(xrInstance, "/user/hand/right/input/trigger/click");
+        long axisThumbstickXLeftPath = getPath(xrInstance, "/user/hand/left/input/thumbstick/x");
+        long axisThumbstickYLeftPath = getPath(xrInstance, "/user/hand/left/input/thumbstick/y");
+        long axisThumbstickXRightPath = getPath(xrInstance, "/user/hand/right/input/thumbstick/x");
+        long axisThumbstickYRightPath = getPath(xrInstance, "/user/hand/right/input/thumbstick/y");
+        long axisTriggerLeftPath = getPath(xrInstance, "/user/hand/left/input/trigger/value");
+        long axisTriggerRightPath = getPath(xrInstance, "/user/hand/left/input/trigger/value");
+
+        long oculusTouchPath = getPath(xrInstance, "/interaction_profiles/oculus/touch_controller");
+        long indexControllerPath = getPath(xrInstance, "/interaction_profiles/valve/index_controller");
+
+        // OCULUS TOUCH
+        try (MemoryStack stack = stackPush()) {
+            XrActionSuggestedBinding.Buffer suggestedBindings = XrHelper.prepareActionSuggestedBindings(stack, 16);
+            suggestedBindings
+                    .action(leftHaptic).binding(leftHapticPath)
+                    .action(rightHaptic).binding(rightHapticPath)
+                    .action(leftPose).binding(leftPosePath)
+                    .action(rightPose).binding(rightPosePath)
+                    .action(buttonA).binding(buttonARightPath)
+                    .action(buttonB).binding(buttonBRightPath)
+                    .action(buttonX).binding(buttonXPath)
+                    .action(buttonY).binding(buttonYPath)
+                    .action(buttonThumbstick).binding(buttonThumbstickLeftPath)
+                    .action(buttonThumbstick).binding(buttonThumbstickRightPath)
+
+                    .action(axisThumbstickX).binding(axisThumbstickXLeftPath)
+                    .action(axisThumbstickY).binding(axisThumbstickYLeftPath)
+                    .action(axisThumbstickX).binding(axisThumbstickXRightPath)
+                    .action(axisThumbstickY).binding(axisThumbstickYRightPath)
+                    .action(axisTrigger).binding(axisTriggerLeftPath)
+                    .action(axisTrigger).binding(axisTriggerRightPath);
+
+            XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack)
+                    .type(XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING)
+                    .interactionProfile(oculusTouchPath)
+                    .suggestedBindings(suggestedBindings);
+            check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
+        }
+
+        // VALVE INDEX
+        try (MemoryStack stack = stackPush()) {
+            XrActionSuggestedBinding.Buffer suggestedBindings = XrHelper.prepareActionSuggestedBindings(stack, 18);
+            suggestedBindings
+                    .action(leftHaptic).binding(leftHapticPath)
+                    .action(rightHaptic).binding(rightHapticPath)
+                    .action(leftPose).binding(leftPosePath)
+                    .action(rightPose).binding(rightPosePath)
+                    .action(buttonA).binding(buttonARightPath)
+                    .action(buttonB).binding(buttonBRightPath)
+                    .action(buttonA).binding(buttonALeftPath)
+                    .action(buttonB).binding(buttonBLeftPath)
+                    .action(buttonThumbstick).binding(buttonThumbstickLeftPath)
+                    .action(buttonThumbstick).binding(buttonThumbstickRightPath)
+                    .action(buttonTrigger).binding(buttonTriggerLeftPath)
+                    .action(buttonTrigger).binding(buttonTriggerRightPath)
+
+                    .action(axisThumbstickX).binding(axisThumbstickXLeftPath)
+                    .action(axisThumbstickY).binding(axisThumbstickYLeftPath)
+                    .action(axisThumbstickX).binding(axisThumbstickXRightPath)
+                    .action(axisThumbstickY).binding(axisThumbstickYRightPath)
+                    .action(axisTrigger).binding(axisTriggerLeftPath)
+                    .action(axisTrigger).binding(axisTriggerRightPath);
+
+            XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack)
+                    .type(XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING)
+                    .interactionProfile(indexControllerPath)
+                    .suggestedBindings(suggestedBindings);
+            check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
+        }
+
+    }
+
+    public void destroyInput() {
+        destroyActionSpace(leftPoseSpace);
+        destroyActionSpace(rightPoseSpace);
+
+        destroyAction(leftPose);
+        destroyAction(rightPose);
+
+        destroyActionSet(gameplayActionSet);
     }
 
     public XrActionSet createActionSet(XrInstance instance, String name) {
         try (MemoryStack stack = stackPush()) {
             // Create action set.
             XrActionSetCreateInfo setCreateInfo = XrActionSetCreateInfo.malloc(stack)
+                    .type$Default()
                     .actionSetName(stack.UTF8("gameplay"))
                     .localizedActionSetName(stack.UTF8("gameplay"))
                     .priority(0);
@@ -394,14 +515,16 @@ public class OpenXRDriver implements Disposable {
 
     /**
      * Creates a new action.
+     *
      * @param actionSet The action set.
-     * @param name The name of the action.
-     * @param type The actipn type.
+     * @param name      The name of the action.
+     * @param type      The actipn type.
      */
-    public XrAction createAction(XrActionSet actionSet, String name, int type){
+    public XrAction createAction(XrActionSet actionSet, String name, int type) {
         try (MemoryStack stack = stackPush()) {
             // Create action.
             XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
+                    .type$Default()
                     .actionName(stack.UTF8(name))
                     .localizedActionName(stack.UTF8(name))
                     .actionType(type);
@@ -415,7 +538,7 @@ public class OpenXRDriver implements Disposable {
     public XrSpace createActionSpace(XrSession session, XrAction action) {
         try (MemoryStack stack = stackPush()) {
             XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack)
-                    .type(XR_TYPE_ACTION_SPACE_CREATE_INFO)
+                    .type$Default()
                     .poseInActionSpace(XrPosef.malloc(stack)
                             .position$(XrVector3f.calloc(stack).set(0, 0, 0))
                             .orientation(XrQuaternionf.malloc(stack)
@@ -431,12 +554,22 @@ public class OpenXRDriver implements Disposable {
         }
     }
 
+    public long getPath(XrInstance instance, String name) {
+        try (MemoryStack stack = stackPush()) {
+            LongBuffer path = stack.longs(0);
+            check(xrStringToPath(instance, stack.UTF8(name), path));
+            return path.get();
+        }
+    }
+
     public void destroyActionSet(XrActionSet actionSet) {
         xrDestroyActionSet(actionSet);
     }
+
     public void destroyAction(XrAction action) {
         xrDestroyAction(action);
     }
+
     public void destroyActionSpace(XrSpace space) {
         xrDestroySpace(space);
     }
@@ -557,6 +690,8 @@ public class OpenXRDriver implements Disposable {
         }
         xrDestroySession(xrSession);
         xrDestroyInstance(xrInstance);
+
+        destroyInput();
     }
 
     public void check(int result) throws IllegalStateException {
@@ -574,4 +709,29 @@ public class OpenXRDriver implements Disposable {
         throw new XrResultException("XR method returned " + result);
     }
 
+    public void addListener(VRDeviceListener listener) {
+    }
+
+    public void removeListener(VRDeviceListener listener) {
+    }
+
+    public int getWidth() {
+        return swapchains[0].width;
+    }
+
+    public int getHeight() {
+        return swapchains[0].height;
+    }
+
+    public VRDevice getDeviceByType(VRDeviceType type) {
+        return null;
+    }
+
+    public Array<VRDevice> getDevicesByType(VRDeviceType type) {
+        return new Array<>();
+    }
+
+    public Array<VRDevice> getDevices() {
+        return new Array<>();
+    }
 }

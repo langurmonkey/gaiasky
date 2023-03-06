@@ -6,8 +6,8 @@ package gaiasky.desktop.util;
  */
 
 import gaiasky.vr.openxr.ShadersGL;
-import gaiasky.vr.openxr.XRHelper;
-import org.joml.*;
+import gaiasky.vr.openxr.XrHelper;
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL;
@@ -60,6 +60,10 @@ public class HiOpenXRGL {
     XrViewConfigurationView.Buffer viewConfigs;
     int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
 
+    private XrActionSet gameplayActionSet;
+    private XrAction leftPose, rightPose, leftHaptic, rightHaptic, buttonA, buttonB, buttonX, buttonY, axisThumbstickX, axisThumbstickY, axisTrigger, buttonThumbstick, buttonTrigger;
+    private XrSpace leftPoseSpace, rightPoseSpace;
+
     //Runtime
     XrEventDataBuffer eventDataBuffer;
     int sessionState;
@@ -94,6 +98,7 @@ public class HiOpenXRGL {
         helloOpenXR.createXRReferenceSpace();
         helloOpenXR.createXRSwapchains();
         helloOpenXR.createOpenGLResources();
+        helloOpenXR.initializeInput();
 
         helloOpenXR.eventDataBuffer = XrEventDataBuffer.calloc()
                 .type$Default();
@@ -111,6 +116,7 @@ public class HiOpenXRGL {
         glFinish();
 
         // Destroy OpenXR
+        helloOpenXR.destroyInput();
         helloOpenXR.eventDataBuffer.free();
         helloOpenXR.views.free();
         helloOpenXR.viewConfigs.free();
@@ -151,7 +157,7 @@ public class HiOpenXRGL {
             check(xrEnumerateApiLayerProperties(pi, null));
             int numLayers = pi.get(0);
 
-            XrApiLayerProperties.Buffer pLayers = XRHelper.prepareApiLayerProperties(stack, numLayers);
+            XrApiLayerProperties.Buffer pLayers = XrHelper.prepareApiLayerProperties(stack, numLayers);
             check(xrEnumerateApiLayerProperties(pi, pLayers));
             System.out.println(numLayers + " XR layers are available:");
             for (int index = 0; index < numLayers; index++) {
@@ -168,7 +174,7 @@ public class HiOpenXRGL {
             check(xrEnumerateInstanceExtensionProperties((ByteBuffer) null, pi, null));
             int numExtensions = pi.get(0);
 
-            XrExtensionProperties.Buffer properties = XRHelper.prepareExtensionProperties(stack, numExtensions);
+            XrExtensionProperties.Buffer properties = XrHelper.prepareExtensionProperties(stack, numExtensions);
 
             check(xrEnumerateInstanceExtensionProperties((ByteBuffer) null, pi, properties));
 
@@ -296,7 +302,7 @@ public class HiOpenXRGL {
             }
 
             //Bind the OpenGL context to the OpenXR instance and create the session
-            Struct graphicsBinding = XRHelper.createGraphicsBindingOpenGL(stack, window);
+            Struct graphicsBinding = XrHelper.createGraphicsBindingOpenGL(stack, window);
 
             PointerBuffer pp = stack.mallocPointer(1);
 
@@ -387,7 +393,7 @@ public class HiOpenXRGL {
             IntBuffer pi = stack.mallocInt(1);
 
             check(xrEnumerateViewConfigurationViews(xrInstance, systemID, viewConfigType, pi, null));
-            viewConfigs = XRHelper.fill(
+            viewConfigs = XrHelper.fill(
                     XrViewConfigurationView.calloc(pi.get(0)), // Don't use malloc() because that would mess up the `next` field
                     XrViewConfigurationView.TYPE,
                     XR_TYPE_VIEW_CONFIGURATION_VIEW
@@ -396,7 +402,7 @@ public class HiOpenXRGL {
             check(xrEnumerateViewConfigurationViews(xrInstance, systemID, viewConfigType, pi, viewConfigs));
             int viewCountNumber = pi.get(0);
 
-            views = XRHelper.fill(
+            views = XrHelper.fill(
                     XrView.calloc(viewCountNumber),
                     XrView.TYPE,
                     XR_TYPE_VIEW
@@ -410,6 +416,7 @@ public class HiOpenXRGL {
                 long[] desiredSwapchainFormats = {
                         GL_RGB10_A2,
                         GL_RGBA16F,
+                        GL_SRGB8_ALPHA8,
                         // The two below should only be used as a fallback, as they are linear color formats without enough bits for color
                         // depth, thus leading to banding.
                         GL_RGBA8,
@@ -459,7 +466,7 @@ public class HiOpenXRGL {
                     check(xrEnumerateSwapchainImages(swapchainWrapper.handle, pi, null));
                     int imageCount = pi.get(0);
 
-                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XRHelper.fill(
+                    XrSwapchainImageOpenGLKHR.Buffer swapchainImageBuffer = XrHelper.fill(
                             XrSwapchainImageOpenGLKHR.create(imageCount),
                             XrSwapchainImageOpenGLKHR.TYPE,
                             XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR
@@ -525,6 +532,206 @@ public class HiOpenXRGL {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+    }
+
+    public void initializeInput() {
+        gameplayActionSet = createActionSet(xrInstance, "gameplay");
+
+        // Haptic.
+        leftHaptic = createAction(gameplayActionSet, "left-haptic", XR_ACTION_TYPE_VIBRATION_OUTPUT);
+        rightHaptic = createAction(gameplayActionSet, "right-haptic", XR_ACTION_TYPE_VIBRATION_OUTPUT);
+        // Poses.
+        leftPose = createAction(gameplayActionSet, "left-hand", XR_ACTION_TYPE_POSE_INPUT);
+        rightPose = createAction(gameplayActionSet, "right-hand", XR_ACTION_TYPE_POSE_INPUT);
+        leftPoseSpace = createActionSpace(xrSession, leftPose);
+        rightPoseSpace = createActionSpace(xrSession, rightPose);
+        // Buttons.
+        buttonA = createAction(gameplayActionSet, "a-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonB = createAction(gameplayActionSet, "b-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonX = createAction(gameplayActionSet, "x-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonY = createAction(gameplayActionSet, "y-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonThumbstick = createAction(gameplayActionSet, "thumbstick-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        buttonTrigger = createAction(gameplayActionSet, "trigger-button", XR_ACTION_TYPE_BOOLEAN_INPUT);
+        // Axes.
+        axisThumbstickX = createAction(gameplayActionSet, "thumbstick-x-axis", XR_ACTION_TYPE_FLOAT_INPUT);
+        axisThumbstickY = createAction(gameplayActionSet, "thumbstick-y-axis", XR_ACTION_TYPE_FLOAT_INPUT);
+        axisTrigger = createAction(gameplayActionSet, "trigger-axis", XR_ACTION_TYPE_FLOAT_INPUT);
+
+        long leftHapticPath = getPath(xrInstance, "/user/hand/left/output/haptic");
+        long rightHapticPath = getPath(xrInstance, "/user/hand/right/output/haptic");
+        long leftPosePath = getPath(xrInstance, "/user/hand/left/input/grip/pose");
+        long rightPosePath = getPath(xrInstance, "/user/hand/right/input/grip/pose");
+        long buttonARightPath = getPath(xrInstance, "/user/hand/right/input/a/click");
+        long buttonBRightPath = getPath(xrInstance, "/user/hand/right/input/b/click");
+        long buttonALeftPath = getPath(xrInstance, "/user/hand/left/input/a/click");
+        long buttonBLeftPath = getPath(xrInstance, "/user/hand/left/input/b/click");
+        long buttonXPath = getPath(xrInstance, "/user/hand/left/input/x/click");
+        long buttonYPath = getPath(xrInstance, "/user/hand/left/input/y/click");
+        long buttonThumbstickLeftPath = getPath(xrInstance, "/user/hand/left/input/thumbstick/click");
+        long buttonThumbstickRightPath = getPath(xrInstance, "/user/hand/right/input/thumbstick/click");
+        long buttonTriggerLeftPath = getPath(xrInstance, "/user/hand/left/input/trigger/click");
+        long buttonTriggerRightPath = getPath(xrInstance, "/user/hand/right/input/trigger/click");
+        long axisThumbstickXLeftPath = getPath(xrInstance, "/user/hand/left/input/thumbstick/x");
+        long axisThumbstickYLeftPath = getPath(xrInstance, "/user/hand/left/input/thumbstick/y");
+        long axisThumbstickXRightPath = getPath(xrInstance, "/user/hand/right/input/thumbstick/x");
+        long axisThumbstickYRightPath = getPath(xrInstance, "/user/hand/right/input/thumbstick/y");
+        long axisTriggerLeftPath = getPath(xrInstance, "/user/hand/left/input/trigger/value");
+        long axisTriggerRightPath = getPath(xrInstance, "/user/hand/left/input/trigger/value");
+
+        long oculusTouchPath = getPath(xrInstance, "/interaction_profiles/oculus/touch_controller");
+        long indexControllerPath = getPath(xrInstance, "/interaction_profiles/valve/index_controller");
+
+        // OCULUS TOUCH
+        try (MemoryStack stack = stackPush()) {
+            XrActionSuggestedBinding.Buffer suggestedBindings = XrHelper.prepareActionSuggestedBindings(stack, 16);
+            suggestedBindings
+                    .action(leftHaptic).binding(leftHapticPath).position(1)
+                    .action(rightHaptic).binding(rightHapticPath).position(2)
+                    .action(leftPose).binding(leftPosePath).position(3)
+                    .action(rightPose).binding(rightPosePath).position(4)
+                    .action(buttonA).binding(buttonARightPath).position(5)
+                    .action(buttonB).binding(buttonBRightPath).position(6)
+                    .action(buttonA).binding(buttonXPath).position(7)
+                    .action(buttonB).binding(buttonYPath).position(8)
+                    .action(buttonThumbstick).binding(buttonThumbstickLeftPath).position(9)
+                    .action(buttonThumbstick).binding(buttonThumbstickRightPath).position(10)
+
+                    .action(axisThumbstickX).binding(axisThumbstickXLeftPath).position(11)
+                    .action(axisThumbstickY).binding(axisThumbstickYLeftPath).position(12)
+                    .action(axisThumbstickX).binding(axisThumbstickXRightPath).position(13)
+                    .action(axisThumbstickY).binding(axisThumbstickYRightPath).position(14)
+                    .action(axisTrigger).binding(axisTriggerLeftPath).position(15)
+                    .action(axisTrigger).binding(axisTriggerRightPath).position(16);
+
+            XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .interactionProfile(oculusTouchPath)
+                    .suggestedBindings(suggestedBindings);
+            check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
+        }
+
+        // VALVE INDEX
+        try (MemoryStack stack = stackPush()) {
+            XrActionSuggestedBinding.Buffer suggestedBindings = XrHelper.prepareActionSuggestedBindings(stack, 18);
+            suggestedBindings
+                    .action(leftHaptic).binding(leftHapticPath)
+                    .action(rightHaptic).binding(rightHapticPath)
+                    .action(leftPose).binding(leftPosePath)
+                    .action(rightPose).binding(rightPosePath)
+                    .action(buttonA).binding(buttonARightPath)
+                    .action(buttonB).binding(buttonBRightPath)
+                    .action(buttonA).binding(buttonALeftPath)
+                    .action(buttonB).binding(buttonBLeftPath)
+                    .action(buttonThumbstick).binding(buttonThumbstickLeftPath)
+                    .action(buttonThumbstick).binding(buttonThumbstickRightPath)
+                    .action(buttonTrigger).binding(buttonTriggerLeftPath)
+                    .action(buttonTrigger).binding(buttonTriggerRightPath)
+
+                    .action(axisThumbstickX).binding(axisThumbstickXLeftPath)
+                    .action(axisThumbstickY).binding(axisThumbstickYLeftPath)
+                    .action(axisThumbstickX).binding(axisThumbstickXRightPath)
+                    .action(axisThumbstickY).binding(axisThumbstickYRightPath)
+                    .action(axisTrigger).binding(axisTriggerLeftPath)
+                    .action(axisTrigger).binding(axisTriggerRightPath);
+            suggestedBindings.rewind();
+
+            XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .interactionProfile(indexControllerPath)
+                    .suggestedBindings(suggestedBindings);
+            check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
+        }
+
+    }
+
+    public void destroyInput() {
+        destroyActionSpace(leftPoseSpace);
+        destroyActionSpace(rightPoseSpace);
+
+        destroyAction(leftPose);
+        destroyAction(rightPose);
+
+        destroyActionSet(gameplayActionSet);
+    }
+
+    public XrActionSet createActionSet(XrInstance instance, String name) {
+        try (MemoryStack stack = stackPush()) {
+            // Create action set.
+            XrActionSetCreateInfo setCreateInfo = XrActionSetCreateInfo.malloc(stack)
+                    .type$Default()
+                    .actionSetName(stack.UTF8("gameplay"))
+                    .localizedActionSetName(stack.UTF8("gameplay"))
+                    .priority(0);
+
+            PointerBuffer pp = stack.mallocPointer(1);
+            check(xrCreateActionSet(instance, setCreateInfo, pp));
+            return new XrActionSet(pp.get(0), instance);
+        }
+    }
+
+    /**
+     * Creates a new action.
+     *
+     * @param actionSet The action set.
+     * @param name      The name of the action.
+     * @param type      The action type.
+     */
+    public XrAction createAction(XrActionSet actionSet, String name, int type) {
+        try (MemoryStack stack = stackPush()) {
+            // Create action.
+            XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .actionName(stack.UTF8(name))
+                    .localizedActionName(stack.UTF8(name))
+                    .countSubactionPaths(0)
+                    .actionType(type);
+
+            PointerBuffer pp = stack.mallocPointer(1);
+            check(xrCreateAction(actionSet, createInfo, pp));
+            return new XrAction(pp.get(0), actionSet);
+        }
+    }
+
+    public XrSpace createActionSpace(XrSession session, XrAction action) {
+        try (MemoryStack stack = stackPush()) {
+            XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack)
+                    .type$Default()
+                    .poseInActionSpace(XrPosef.malloc(stack)
+                            .position$(XrVector3f.calloc(stack).set(0, 0, 0))
+                            .orientation(XrQuaternionf.malloc(stack)
+                                    .x(0)
+                                    .y(0)
+                                    .z(0)
+                                    .w(1)))
+                    .action(action);
+
+            PointerBuffer pp = stack.mallocPointer(1);
+            check(xrCreateActionSpace(session, createInfo, pp));
+            return new XrSpace(pp.get(0), session);
+        }
+    }
+
+    public long getPath(XrInstance instance, String name) {
+        try (MemoryStack stack = stackPush()) {
+            LongBuffer path = stack.longs(0);
+            check(xrStringToPath(instance, stack.UTF8(name), path));
+            return path.get();
+        }
+    }
+
+    public void destroyActionSet(XrActionSet actionSet) {
+        xrDestroyActionSet(actionSet);
+    }
+
+    public void destroyAction(XrAction action) {
+        xrDestroyAction(action);
+    }
+
+    public void destroyActionSpace(XrSpace space) {
+        xrDestroySpace(space);
     }
 
     private boolean pollEvents() {
@@ -701,7 +908,7 @@ public class HiOpenXRGL {
         assert (viewCountOutput == viewConfigs.capacity());
         assert (viewCountOutput == swapchains.length);
 
-        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XRHelper.fill(
+        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(
                 XrCompositionLayerProjectionView.calloc(viewCountOutput, stack), // Use calloc() since malloc() messes up the `next` field
                 XrCompositionLayerProjectionView.TYPE,
                 XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW
@@ -789,7 +996,7 @@ public class HiOpenXRGL {
         XrVector3f pos = pose.position$();
         XrQuaternionf orientation = pose.orientation();
         try (MemoryStack stack = stackPush()) {
-            projectionMatrix.set(XRHelper.createProjectionMatrixBuffer(stack, layerView.fov(), 0.1f, 100f, false));
+            projectionMatrix.set(XrHelper.createProjectionMatrixBuffer(stack, layerView.fov(), 0.1f, 100f, false));
         }
         viewMatrix.translationRotateScaleInvert(
                 pos.x(), pos.y(), pos.z(),

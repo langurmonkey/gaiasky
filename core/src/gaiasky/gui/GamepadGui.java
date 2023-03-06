@@ -195,7 +195,7 @@ public class GamepadGui extends AbstractGui {
             vrInfoT.add(welcomeTitle).center().top().padBottom(pad20).colspan(2).row();
             vrInfoT.add(version).center().top().padBottom(pad40).colspan(2).row();
 
-            var context = GaiaSky.instance.vrContext;
+            var context = GaiaSky.instance.xrDriver;
 
             if (context != null) {
                 // Devices
