@@ -204,8 +204,9 @@ public class SettingsManager {
 
         // Scripts location
         String scl = settings.program.scriptsLocation;
-        scl = (scl == null || scl.isEmpty()) ? System.getProperty("user.dir") + File.separatorChar + "scripts" : scl;
-        scl = scl.replaceAll("\\\\", "/");
+        scl = (!SysUtils.isAppImage() && (scl == null || scl.isEmpty())) ? System.getProperty("user.dir") + File.separatorChar + "scripts" : scl;
+        if (scl != null)
+            scl = scl.replaceAll("\\\\", "/");
         settings.program.scriptsLocation = scl;
 
         // Back buffer resolution

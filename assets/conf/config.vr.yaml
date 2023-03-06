@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30400
+configVersion: 30401
 
 #
 # Data configuration
@@ -78,26 +78,35 @@ scene:
   # Camera configuration
   camera:
     # Camera speed limit
-    # 0 - 100 km/h
-    # 1 - 0.5c
-    # 2 - 0.8c
-    # 3 - 0.9c
-    # 4 - 0.99c
-    # 5 - 0.99999c
-    # 6 - c (3e8 m/s)
-    # 7 - 2*c
-    # 8 - 10*c
-    # 9 - 1000*c
-    # 10 - 1 AU/s
-    # 11 - 10 AU/s
-    # 12 - 1000 AU/s
-    # 13 - 10000 AU/s
-    # 14 - 1 pc/s
-    # 15 - 2 pc/s
-    # 16 - 10 pc/s
-    # 17 - 1000 pc/s
-    # 18 - No limit
-    speedLimitIndex: 18
+    # 0  - 1 km/h
+    # 1  - 10 km/h
+    # 2  - 100 km/h
+    # 3  - 1000 km/h
+    # 4  - 1 km/s
+    # 5  - 10 km/s
+    # 6  - 100 km/s
+    # 7  - 1000 km/s
+    # 8  - 0.01c
+    # 9  - 0.1c
+    # 10 - 0.5c
+    # 11 - 0.8c
+    # 12 - 0.9c
+    # 13 - 0.99c
+    # 14 - 0.99999c
+    # 15 - c (3e8 m/s)
+    # 16 - 2*c
+    # 17 - 10*c
+    # 18 - 1000*c
+    # 19 - 1 AU/s
+    # 20 - 10 AU/s
+    # 21 - 1000 AU/s
+    # 22 - 10000 AU/s
+    # 23 - 1 pc/s
+    # 24 - 2 pc/s
+    # 25 - 10 pc/s
+    # 26 - 1000 pc/s
+    # negative - No limit
+    speedLimitIndex: 27
     # Camera speed multiplier
     speed: 4.5
     # Camera turn velocity

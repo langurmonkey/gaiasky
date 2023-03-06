@@ -24,7 +24,7 @@ project.ext.assetsDir = new File(project.ext.workDir, "assets")
 project.ext.sourceSets = sourceSets
 project.ext.tmpDir = new File("/tmp/gaiasky-gradle/")
 project.ext.tmpDir.mkdirs()
-project.ext.jdkArchive = "jdk-archive.tar.gz"
+project.ext.jreArchive = "jre-archive.tar.gz"
 
 task versionFile {
     doLast {
@@ -226,13 +226,6 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
             into "$distDir/i18n"
         }
 
-        // Copy music
-        //mkdir "$distDir/music"
-        //copy {
-        //    from "../assets/music"
-        //    into "$distDir/music"
-        //}
-
         // Copy mappings
         mkdir "$distDir/mappings"
         copy {
@@ -259,6 +252,13 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
         copy {
             from "$baseDir/assets/scripts"
             into "$distDir/scripts"
+        }
+
+        // Copy startup icon
+        mkdir "$distDir/icon"
+        copy {
+            from "$baseDir/assets/icon/gs_128.png"
+            into "$distDir/icon"
         }
 
         // Copy scripts, README, LICENSE and AUTHORS
@@ -334,22 +334,22 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
     }
 }
 
-task downloadJDK(type: Download, description: "Downloads the JDK package into project.tmpDir") {
-    src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.2%2B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.2_8.tar.gz"
-    dest new File("$tmpDir", "$jdkArchive")
+task downloadJRE(type: Download, description: "Downloads the JRE package into project.tmpDir") {
+    src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.6%2B10/OpenJDK17U-jre_x64_linux_hotspot_17.0.6_10.tar.gz"
+    dest new File("$tmpDir", "$jreArchive")
     onlyIfModified true
     overwrite false
 }
-task downloadAndExtractJDK(dependsOn: downloadJDK, description: "Extracts the downloaded JRE into project.tmpDir") {
+task downloadAndExtractJRE(dependsOn: downloadJRE, description: "Extracts the downloaded JRE into project.tmpDir") {
     doLast {
-        File jdkArchivePath = new File("$tmpDir", "$jdkArchive")
+        File jreArchivePath = new File("$tmpDir", "$jreArchive")
         // Delete pre-existing jre
         project.tmpDir.eachFile(groovy.io.FileType.DIRECTORIES) { dir ->
             delete "$dir"
         }
         // Extract
         copy {
-            from tarTree(resources.gzip(jdkArchivePath))
+            from tarTree(resources.gzip(jreArchivePath))
             into project.tmpDir
         }
 
@@ -359,7 +359,7 @@ task downloadAndExtractJDK(dependsOn: downloadJDK, description: "Extracts the do
     }
 }
 
-task createAppimage(dependsOn: [createTar, downloadAndExtractJDK], description: "Creates the appimage package for Gaia Sky") {
+task createAppimage(dependsOn: [createTar, downloadAndExtractJRE], description: "Creates the appimage package for Gaia Sky") {
     doLast {
         String gsId = "gaiasky"
         String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
@@ -375,10 +375,14 @@ task createAppimage(dependsOn: [createTar, downloadAndExtractJDK], description: 
 
         // Package JRE
         println("Packaging JRE $jreDir into Appimage")
-        exec {
-            executable "$jreDir/bin/jlink"
-            args "--no-header-files", "--no-man-pages", "--compress=2", "--strip-debug", "--add-modules", "java.base,java.compiler,java.datatransfer,java.desktop,java.instrument,java.logging,java.management,java.management.rmi,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.smartcardio,java.sql,java.sql.rowset,java.transaction.xa,java.xml,java.xml.crypto,jdk.accessibility,jdk.attach,jdk.charsets,jdk.compiler,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.dynalink,jdk.editpad,jdk.httpserver,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.jartool,jdk.javadoc,jdk.jconsole,jdk.jdeps,jdk.jdi,jdk.jdwp.agent,jdk.jfr,jdk.jlink,jdk.jshell,jdk.jsobject,jdk.jstatd,jdk.localedata,jdk.management,jdk.management.agent,jdk.management.jfr,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.nio.mapmode,jdk.sctp,jdk.security.auth,jdk.security.jgss,jdk.unsupported,jdk.unsupported.desktop,jdk.xml.dom,jdk.zipfs", "--output", "$appimgDir/usr"
+        copy {
+            from "$jreDir"
+            into "$appimgDir/usr"
         }
+        //exec {
+        //    executable "$jreDir/bin/jlink"
+        //    args "--no-header-files", "--no-man-pages", "--compress=2", "--strip-debug", "--add-modules", "java.base,java.compiler,java.datatransfer,java.desktop,java.instrument,java.logging,java.management,java.management.rmi,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.smartcardio,java.sql,java.sql.rowset,java.transaction.xa,java.xml,java.xml.crypto,jdk.accessibility,jdk.attach,jdk.charsets,jdk.compiler,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.dynalink,jdk.editpad,jdk.httpserver,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.jartool,jdk.javadoc,jdk.jconsole,jdk.jdeps,jdk.jdi,jdk.jdwp.agent,jdk.jfr,jdk.jlink,jdk.jshell,jdk.jsobject,jdk.jstatd,jdk.localedata,jdk.management,jdk.management.agent,jdk.management.jfr,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.nio.mapmode,jdk.sctp,jdk.security.auth,jdk.security.jgss,jdk.unsupported,jdk.unsupported.desktop,jdk.xml.dom,jdk.zipfs", "--output", "$appimgDir/usr"
+        //}
 
         // Metadata
         File usrmeta = new File("$appimgDir", "usr/share/metainfo/")

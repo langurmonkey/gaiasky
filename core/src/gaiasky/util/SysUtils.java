@@ -316,7 +316,6 @@ public class SysUtils {
         }
     }
 
-
     public static Path getConfigDir() {
         if (isLinux()) {
             return getXdgConfigHome().resolve(GAIASKY_DIR_NAME);
@@ -424,5 +423,25 @@ public class SysUtils {
             PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
             logger.info(TextUtils.capitalise(name) + " texture written to " + file);
         }
+    }
+
+    /**
+     * Checks if the given file path belongs to an AppImage.
+     *
+     * @param path The path to check.
+     *
+     * @return Whether the path to the file belongs to an AppImage or not.
+     */
+    public static boolean isAppImagePath(String path) {
+        return path != null && path.contains("/tmp/.mount_");
+    }
+
+    /**
+     * Returns whether we are running in an AppImage.
+     * @return True if we are in an AppImage package.
+     */
+    public static boolean isAppImage() {
+        String userDir = System.getProperty("user.dir");
+        return isAppImagePath(userDir);
     }
 }
