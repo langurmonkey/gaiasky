@@ -378,7 +378,6 @@ public class OpenXRDriver implements Disposable {
             }
         }
     }
-
     public void initializeInput() {
         gameplayActionSet = createActionSet(xrInstance, "gameplay");
 
@@ -430,26 +429,27 @@ public class OpenXRDriver implements Disposable {
         try (MemoryStack stack = stackPush()) {
             XrActionSuggestedBinding.Buffer suggestedBindings = XrHelper.prepareActionSuggestedBindings(stack, 16);
             suggestedBindings
-                    .action(leftHaptic).binding(leftHapticPath)
-                    .action(rightHaptic).binding(rightHapticPath)
-                    .action(leftPose).binding(leftPosePath)
-                    .action(rightPose).binding(rightPosePath)
-                    .action(buttonA).binding(buttonARightPath)
-                    .action(buttonB).binding(buttonBRightPath)
-                    .action(buttonX).binding(buttonXPath)
-                    .action(buttonY).binding(buttonYPath)
-                    .action(buttonThumbstick).binding(buttonThumbstickLeftPath)
-                    .action(buttonThumbstick).binding(buttonThumbstickRightPath)
+                    .action(leftHaptic).binding(leftHapticPath).position(1)
+                    .action(rightHaptic).binding(rightHapticPath).position(2)
+                    .action(leftPose).binding(leftPosePath).position(3)
+                    .action(rightPose).binding(rightPosePath).position(4)
+                    .action(buttonA).binding(buttonARightPath).position(5)
+                    .action(buttonB).binding(buttonBRightPath).position(6)
+                    .action(buttonA).binding(buttonXPath).position(7)
+                    .action(buttonB).binding(buttonYPath).position(8)
+                    .action(buttonThumbstick).binding(buttonThumbstickLeftPath).position(9)
+                    .action(buttonThumbstick).binding(buttonThumbstickRightPath).position(10)
 
-                    .action(axisThumbstickX).binding(axisThumbstickXLeftPath)
-                    .action(axisThumbstickY).binding(axisThumbstickYLeftPath)
-                    .action(axisThumbstickX).binding(axisThumbstickXRightPath)
-                    .action(axisThumbstickY).binding(axisThumbstickYRightPath)
-                    .action(axisTrigger).binding(axisTriggerLeftPath)
-                    .action(axisTrigger).binding(axisTriggerRightPath);
+                    .action(axisThumbstickX).binding(axisThumbstickXLeftPath).position(11)
+                    .action(axisThumbstickY).binding(axisThumbstickYLeftPath).position(12)
+                    .action(axisThumbstickX).binding(axisThumbstickXRightPath).position(13)
+                    .action(axisThumbstickY).binding(axisThumbstickYRightPath).position(14)
+                    .action(axisTrigger).binding(axisTriggerLeftPath).position(15)
+                    .action(axisTrigger).binding(axisTriggerRightPath).position(16);
 
             XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack)
-                    .type(XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING)
+                    .type$Default()
+                    .next(NULL)
                     .interactionProfile(oculusTouchPath)
                     .suggestedBindings(suggestedBindings);
             check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
@@ -478,9 +478,11 @@ public class OpenXRDriver implements Disposable {
                     .action(axisThumbstickY).binding(axisThumbstickYRightPath)
                     .action(axisTrigger).binding(axisTriggerLeftPath)
                     .action(axisTrigger).binding(axisTriggerRightPath);
+            suggestedBindings.rewind();
 
             XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack)
-                    .type(XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING)
+                    .type$Default()
+                    .next(NULL)
                     .interactionProfile(indexControllerPath)
                     .suggestedBindings(suggestedBindings);
             check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
@@ -518,15 +520,17 @@ public class OpenXRDriver implements Disposable {
      *
      * @param actionSet The action set.
      * @param name      The name of the action.
-     * @param type      The actipn type.
+     * @param type      The action type.
      */
     public XrAction createAction(XrActionSet actionSet, String name, int type) {
         try (MemoryStack stack = stackPush()) {
             // Create action.
             XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
                     .type$Default()
+                    .next(NULL)
                     .actionName(stack.UTF8(name))
                     .localizedActionName(stack.UTF8(name))
+                    .countSubactionPaths(0)
                     .actionType(type);
 
             PointerBuffer pp = stack.mallocPointer(1);
