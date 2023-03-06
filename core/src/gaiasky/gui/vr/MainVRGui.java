@@ -89,13 +89,7 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
     }
 
     public void initialize(AssetManager manager, SpriteBatch batch) {
-<<<<<<< HEAD:core/src/gaiasky/gui/vr/MainVRGui.java
-        setVR(Settings.settings.runtime.openVr);
-||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.):core/src/gaiasky/gui/vr/MainVRUI.java
-        setVr(Settings.settings.runtime.openVr);
-=======
-        setVr(Settings.settings.runtime.openXr);
->>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.):core/src/gaiasky/gui/vr/MainVRUI.java
+        setVR(Settings.settings.runtime.openXr);
         this.batch = new SpriteBatch(20, GaiaSky.instance.getGlobalResources().getSpriteShader());
         this.shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
         //resize(WIDTH, HEIGHT);

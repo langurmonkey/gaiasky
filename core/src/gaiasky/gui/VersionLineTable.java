@@ -64,25 +64,11 @@ public class VersionLineTable extends Table {
         add(glslVersion).bottom().left().padRight(pad32);
 
         // VR
-<<<<<<< HEAD
-        if (!vr && settings.runtime.openVr) {
+        if (!vr && settings.runtime.openXr) {
             OwnLabel vrLabel = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.vr.mode")), skin, style);
             vrLabel.setColor(ColorUtils.gPinkC);
             vrLabel.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mode.tooltip"), skin));
             add(vrLabel).bottom().left().padRight(pad32);
-||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
-        if (settings.runtime.openVr) {
-            OwnLabel vr = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.vr.mode")), skin, "hud-med");
-            vr.setColor(ColorUtils.gPinkC);
-            vr.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mode.tooltip"), skin));
-            add(vr).bottom().left().padRight(pad32);
-=======
-        if (settings.runtime.openXr) {
-            OwnLabel vr = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.vr.mode")), skin, "hud-med");
-            vr.setColor(ColorUtils.gPinkC);
-            vr.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mode.tooltip"), skin));
-            add(vr).bottom().left().padRight(pad32);
->>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
         }
 
         // Master instance

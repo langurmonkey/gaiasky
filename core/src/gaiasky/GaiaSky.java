@@ -237,40 +237,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
     /** Settings reference **/
     private Settings settings;
     /**
-<<<<<<< HEAD
-||||||| parent of 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
-     * Displays the initial GUI
-     **/
-    private final Runnable runnableInitialGui = () -> {
-        renderGui(welcomeGui);
-        if (settings.runtime.openXr) {
-            try {
-                xrDriver.pollEvents();
-            } catch (Exception e) {
-                logger.error(e);
-            }
-
-            renderVRGui((VRGui<?>) welcomeGuiVR);
-        }
-    };
-    /**
-=======
-     * Displays the initial GUI
-     **/
-    private final Runnable runnableInitialGui = () -> {
-        renderGui(welcomeGui);
-        if (settings.runtime.openXr) {
-            try {
-                xrDriver.pollEvents();
-            } catch (Exception e) {
-                logger.error(e);
-            }
-
-            //renderVRGui((VRGui<?>) welcomeGuiVR);
-        }
-    };
-    /**
->>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
      * Camera recording or not?
      */
     private boolean camRecording = false;
@@ -707,12 +673,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         loadingGui.dispose();
         loadingGui = null;
 
-        // Dispose vr loading GUI.
+        // Dispose loading GUI VR.
         if (settings.runtime.openXr) {
-            welcomeGuiVR.dispose();
-            welcomeGuiVR = null;
-
->>>>>>> 7949a6093 (none: actual migration to OpenXR started. Nothing works.)
             loadingGuiVR.dispose();
             loadingGuiVR = null;
         }
