@@ -57,7 +57,7 @@ public class WelcomeGuiVR extends AbstractGui {
         // Title.
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(64f);
-        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
+        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openXr), skin, "main-title");
         OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
         version.setColor(skin.getColor("theme"));
         titleGroup.addActor(gaiaSky);
