@@ -1151,7 +1151,6 @@ public class Settings {
         public ModeStereoSettings modeStereo;
         public ModeCubemapSettings modeCubemap;
         public NetSettings net;
-        public String scriptsLocation;
         public UiSettings ui;
         public boolean exitConfirmation;
         public String locale;

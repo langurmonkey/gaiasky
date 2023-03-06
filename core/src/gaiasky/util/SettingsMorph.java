@@ -308,7 +308,6 @@ public class SettingsMorph {
         program.net.slave.roll = f32("program.net.slave.roll", p);
         program.net.slave.warpFile = str("program.net.slave.warp", p);
         program.net.slave.blendFile = str("program.net.slave.blend", p);
-        program.scriptsLocation = str("program.scriptlocation", p);
         program.ui = new UiSettings();
         program.ui.theme = str("program.ui.theme", p);
         program.ui.scale = MathUtilsDouble.lint(f32("program.ui.scale", p), Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);

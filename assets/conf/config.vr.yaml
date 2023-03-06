@@ -384,8 +384,6 @@ program:
       pitch: 0.0
       # Roll angle (rotate head cw)
       roll: 0.0
-  # Default location of script files, leave empty for default
-  scriptsLocation: null
   # User interface configuration
   ui:
     # The UI theme, in [dark-green|dark-blue|dark-orange|night-red]

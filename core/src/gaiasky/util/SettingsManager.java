@@ -202,13 +202,6 @@ public class SettingsManager {
             settings.program.ui.distanceUnits = DistanceUnits.PC;
         }
 
-        // Scripts location
-        String scl = settings.program.scriptsLocation;
-        scl = (!SysUtils.isAppImage() && (scl == null || scl.isEmpty())) ? System.getProperty("user.dir") + File.separatorChar + "scripts" : scl;
-        if (scl != null)
-            scl = scl.replaceAll("\\\\", "/");
-        settings.program.scriptsLocation = scl;
-
         // Back buffer resolution
         settings.graphics.backBufferResolution = new int[2];
         settings.graphics.backBufferResolution[0] = (int) (settings.graphics.resolution[0] * settings.graphics.backBufferScale);
