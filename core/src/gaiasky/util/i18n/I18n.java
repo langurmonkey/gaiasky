@@ -99,6 +99,18 @@ public class I18n {
         }
     }
 
+    public static synchronized boolean exists(String key) {
+        try {
+            return messages.get(key) != null;
+        } catch (MissingResourceException e) {
+            return false;
+        }
+    }
+
+    public static synchronized String get(String key) {
+        return msg(key);
+    }
+
     public static synchronized String msg(String key) {
         return get(messages, key);
     }

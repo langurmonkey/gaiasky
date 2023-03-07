@@ -602,13 +602,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
             // Initializing the VRContext may fail if no HMD is connected or SteamVR
             // is not installed.
             try {
-                //OpenVRQuery.queryOpenVr();
                 settings.runtime.openXr = true;
                 Constants.initialize(settings.scene.distanceScaleVr);
 
                 xrDriver = new OpenXRDriver();
-                xrDriver.initializeOpenXR();
-                xrDriver.pollEvents();
+                //xrDriver.initializeOpenXR();
+                //xrDriver.pollEvents();
 
                 final VRDevice hmd = xrDriver.getDeviceByType(VRDeviceType.HeadMountedDisplay);
                 logger.info("Initialization of VR successful");

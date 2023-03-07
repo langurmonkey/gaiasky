@@ -95,7 +95,7 @@ public final class XrHelper {
      * @return the created buffer
      */
     public static XrActionSuggestedBinding.Buffer prepareActionSuggestedBindings(MemoryStack stack, int numBindings) {
-        return XrActionSuggestedBinding.malloc(numBindings * XrActionSuggestedBinding.SIZEOF, stack);
+        return XrActionSuggestedBinding.malloc(numBindings, stack);
     }
 
     /**
