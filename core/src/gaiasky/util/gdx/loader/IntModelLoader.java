@@ -24,8 +24,9 @@ import gaiasky.util.gdx.model.data.IntModelData;
 import java.util.Iterator;
 
 public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters> extends AsynchronousAssetLoader<IntModel, P> {
-    protected Array<ObjectMap.Entry<String, IntModelData>> items = new Array<>();
+    protected final Array<ObjectMap.Entry<String, IntModelData>> items = new Array<>();
     protected IntModelParameters defaultParameters = new IntModelParameters();
+
     public IntModelLoader(FileHandleResolver resolver) {
         super(resolver);
     }
@@ -56,7 +57,10 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
 
     /** Directly load the model on the calling thread. The model with not be managed by an {@link AssetManager}. */
     public IntModel loadModel(final FileHandle fileHandle) {
-        return loadModel(fileHandle, new TextureProvider.FileTextureProvider(), null);
+        if (fileHandle.exists()) {
+            return loadModel(fileHandle, new TextureProvider.FileTextureProvider(), null);
+        }
+        return null;
     }
 
     @Override
@@ -73,14 +77,12 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
             items.add(item);
         }
 
-        OwnTextureLoader.OwnTextureParameter textureParameter = (parameters != null)
-                ? parameters.textureParameter
-                : defaultParameters.textureParameter;
+        OwnTextureLoader.OwnTextureParameter textureParameter = (parameters != null) ? parameters.textureParameter : defaultParameters.textureParameter;
 
         for (final ModelMaterial modelMaterial : data.materials) {
             if (modelMaterial.textures != null) {
                 for (final ModelTexture modelTexture : modelMaterial.textures)
-                    deps.add(new AssetDescriptor(modelTexture.fileName, Texture.class, textureParameter));
+                    deps.add(new AssetDescriptor<>(modelTexture.fileName, Texture.class, textureParameter));
             }
         }
         return deps;

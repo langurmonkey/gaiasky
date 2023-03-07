@@ -11,18 +11,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.gui.AbstractGui;
 import gaiasky.gui.VersionLineTable;
+import gaiasky.gui.WelcomeGui;
 import gaiasky.util.Settings;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class WelcomeGuiVR extends AbstractGui {
 
     private Table center, bottom;
+    private WelcomeGui wg;
 
     public WelcomeGuiVR(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
+        wg = (WelcomeGui) GaiaSky.instance.welcomeGui;
         this.skin = skin;
     }
 
@@ -57,13 +62,20 @@ public class WelcomeGuiVR extends AbstractGui {
         // Check window!
         var w1 = new OwnLabel(I18n.msg("gui.vr.welcome.1"), skin, textStyle);
         w1.setAlignment(Align.center);
-        var w2 = new OwnLabel(I18n.msg("gui.vr.welcome.2"), skin, textStyle);
-        w2.setAlignment(Align.center);
-        var w3 = new OwnLabel(I18n.msg("gui.vr.welcome.3"), skin, "header-blue");
-        w3.setAlignment(Align.center);
         center.add(w1).padBottom(40f).row();
-        center.add(w2).row();
-        center.add(w3);
+        if(wg.baseDataPresent()) {
+            var w2 = new OwnLabel(I18n.msg("gui.vr.welcome.2"), skin, textStyle);
+            w2.setAlignment(Align.center);
+            var w3 = new OwnLabel(I18n.msg("gui.vr.welcome.3"), skin, "header-blue");
+            w3.setAlignment(Align.center);
+            center.add(w2).row();
+            center.add(w3);
+        } else {
+            var w2 = new OwnLabel(I18n.msg("gui.welcome.start.nobasedata"), skin, textStyle);
+            w2.setColor(ColorUtils.aOrangeC);
+            w2.setAlignment(Align.center);
+            center.add(w2);
+        }
 
         rebuildGui();
     }

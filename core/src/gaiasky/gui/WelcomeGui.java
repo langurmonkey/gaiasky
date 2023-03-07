@@ -634,7 +634,7 @@ public class WelcomeGui extends AbstractGui {
      *
      * @return True if basic data is found
      */
-    private boolean baseDataPresent() {
+    public boolean baseDataPresent() {
         Array<Path> defaultDatasetFiles = new Array<>();
         fillDefaultDatasetFiles(defaultDatasetFiles);
 

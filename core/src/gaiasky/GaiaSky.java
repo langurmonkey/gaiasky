@@ -571,9 +571,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 @Override
                 public boolean buttonReleased(VRDevice device, int button) {
                     // Any of the main buttons.
-                    if (button == device.mappings.getButtonA() || button == device.mappings.getButtonB()
-                            || button == device.mappings.getButtonX() || button == device.mappings.getButtonY()) {
-                        ((WelcomeGui) welcomeGui).startLoading();
+                    if (device.mappings != null) {
+                        if (button == device.mappings.getButtonA() || button == device.mappings.getButtonB() || button == device.mappings.getButtonX() || button == device.mappings.getButtonY()) {
+                            var wg = (WelcomeGui) welcomeGui;
+                            if (wg.baseDataPresent()) {
+                                wg.startLoading();
+                                return true;
+                            }
+                        }
                     }
                     return false;
                 }

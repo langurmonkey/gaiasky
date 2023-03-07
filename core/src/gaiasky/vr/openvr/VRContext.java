@@ -434,25 +434,22 @@ public class VRContext implements Disposable {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
             } else if (isControllerRight(name, modelNumber, role)) {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-right.obj"));
-            } else {
-                logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
             }
         } else {
             // Default to HTC vive controller model.
             if (isControllerRight(name, modelNumber, role) || isControllerLeft(name, modelNumber, role)) {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
-            } else {
-                logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
             }
         }
 
         // Load default.
-        if (model == null) {
-            logger.info("WARN: Could not find suitable controller model, using default...");
+        if (isVRController(name, modelNumber, role) && model == null) {
             model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
         }
 
-        models.put(name, model);
+        if (model != null) {
+            models.put(name, model);
+        }
 
         return model;
     }
@@ -738,14 +735,17 @@ public class VRContext implements Disposable {
             manufacturerName = getStringProperty(VRDeviceProperty.ManufacturerName_String);
             int controllerRole = MathUtils.clamp(getInt32Property(VRDeviceProperty.ControllerRoleHint_Int32), 0, VRControllerRole.values().length - 1);
             this.role = VRControllerRole.values()[controllerRole];
-            IntModel model = loadRenderModel(renderModelName, modelNumber, manufacturerName, this.role);
-            this.modelInstance = model != null ? new IntModelInstance(model) : null;
-            if (model != null) {
-                this.modelInstance.transform = transform;
+            boolean isVRController = isVRController(renderModelName, modelNumber, role);
+            if (isVRController) {
+                IntModel model = loadRenderModel(renderModelName, modelNumber, manufacturerName, this.role);
+                this.modelInstance = model != null ? new IntModelInstance(model) : null;
+                if (model != null) {
+                    this.modelInstance.transform = transform;
+                }
             }
 
             // Init mappings file for VR controller.
-            if (type == VRDeviceType.Controller && isVRController(renderModelName, modelNumber, role)) {
+            if (type == VRDeviceType.Controller && isVRController) {
                 FileHandle mappingsFile;
                 if (Settings.settings.controls.vr.mappingsFile != null) {
                     // Use setting.
@@ -761,7 +761,8 @@ public class VRContext implements Disposable {
                 }
                 mappings = new GamepadMappings(manufacturerName + " VR controller", mappingsFile.file().toPath());
             }
-            this.initialized = true;
+
+            this.initialized = !isVRController || modelInstance != null;
         }
 
         /**
