@@ -35,8 +35,10 @@ import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
+import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRDeviceListener;
 import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.input.OpenXRInputListener;
 import org.lwjgl.openvr.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,12 +48,14 @@ import java.util.Map;
 
 /**
  * Manages the full rendering cycle of a VR user interface.
- * Creates a surface in front of the user (in 3D world) with the given IGui.
+ * Creates a surface in front of the user (in 3D world) with the given IGui, and
+ * takes into account the HMD position/orientation. It also renders the detected
+ * controller(s).
  */
 public class StandaloneVRGui<T extends IGui> implements IGui {
     private static final Logger.Log logger = Logger.getLogger(StandaloneVRGui.class);
 
-    OpenVRListener listener;
+    OpenXRInputListener listener;
     int vrWidth, vrHeight;
     int guiWidth = 2960, guiHeight = 1440;
     Skin skin;
@@ -61,7 +65,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
     IntModelInstance instance;
     IntModelBatch batch;
     Environment env, controllersEnv;
-    OpenXRDriver vrContext;
+    OpenXRDriver driver;
     FrameBuffer fbLeft, fbRight, fbGui;
     Texture texLeft, texRight;
     SpriteBatch sbScreen;
@@ -75,8 +79,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
 
     private boolean renderToScreen = false;
 
-    public StandaloneVRGui(OpenXRDriver vrContext, Class<T> guiClass, Skin skin, OpenVRListener listener) {
-        this.vrContext = vrContext;
+    public StandaloneVRGui(OpenXRDriver vrContext, Class<T> guiClass, Skin skin, OpenXRInputListener listener) {
+        this.driver = vrContext;
         this.vrWidth = vrContext.getWidth();
         this.vrHeight = vrContext.getHeight();
         this.guiClass = guiClass;
@@ -154,7 +158,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         batch = new IntModelBatch(new GroundShaderProvider(Gdx.files.internal("shader/normal.vertex.glsl"), Gdx.files.internal("shader/normal.fragment.glsl")));
 
         // Frame buffer builder.
-        GLFrameBuffer.FrameBufferBuilder frameBufferBuilder = new GLFrameBuffer.FrameBufferBuilder(vrContext.getWidth(), vrContext.getHeight());
+        GLFrameBuffer.FrameBufferBuilder frameBufferBuilder = new GLFrameBuffer.FrameBufferBuilder(driver.getWidth(), driver.getHeight());
         int internalFormat = org.lwjgl.opengl.GL30.GL_RGBA8;
         if (Settings.settings.graphics.useSRGB) {
             internalFormat = org.lwjgl.opengl.GL30.GL_SRGB8_ALPHA8;
@@ -182,8 +186,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         // Sprite batch for rendering to screen.
         sbScreen = new SpriteBatch();
 
-        if (vrContext != null && listener != null) {
-            vrContext.addListener(listener);
+        if (driver != null && listener != null) {
+            driver.addListener(listener);
         }
 
     }
@@ -210,14 +214,14 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
     @Override
     public void update(double dt) {
         try {
-            vrContext.pollEvents();
+            driver.pollEvents();
         } catch (Exception e) {
             logger.error(e);
         }
 
         // Initialize controllers if needed.
         if (controllers == null) {
-            controllers = vrContext.getDevicesByType(VRContext.VRDeviceType.Controller);
+            controllers = driver.getDevicesByType(VRContext.VRDeviceType.Controller);
         }
         for (var controller : controllers) {
             if (!controller.isInitialized()) {
@@ -236,7 +240,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         gui.render(rw, rh);
         fbGui.end();
 
-        if (vrContext != null) {
+        if (driver != null) {
             // Left.
             updateCamera(camera, VR.EVREye_Eye_Left, vrWidth, vrHeight);
             fbLeft.begin();
@@ -292,7 +296,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
         invEyeSpace.set(eyeSpace).inv();
 
         // get the pose matrix from the HDM
-        VRContext.VRDevice hmd = vrContext.getDeviceByType(VRContext.VRDeviceType.HeadMountedDisplay);
+        VRContext.VRDevice hmd = driver.getDeviceByType(VRContext.VRDeviceType.HeadMountedDisplay);
         Vector3 up = hmd.getUp(VRContext.Space.Tracker);
         Vector3 dir = hmd.getDirection(VRContext.Space.Tracker);
         Vector3 pos = hmd.getPosition(VRContext.Space.Tracker);
@@ -366,8 +370,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui {
 
     @Override
     public void dispose() {
-        if (vrContext != null && listener != null) {
-            vrContext.removeListener(listener);
+        if (driver != null && listener != null) {
+            driver.removeListener(listener);
         }
         fbLeft.dispose();
         fbRight.dispose();

@@ -77,12 +77,13 @@ import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.time.RealTimeClock;
 import gaiasky.util.tree.OctreeNode;
-import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
 import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.input.OpenXRInputListener;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.openxr.XrVector2f;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -568,7 +569,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (settings.runtime.openXr) {
-            welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new OpenVRListener() {
+            welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new OpenXRInputListener() {
                 @Override
                 public boolean buttonReleased(VRDevice device, int button) {
                     // Any of the main buttons.
@@ -582,6 +583,35 @@ public class GaiaSky implements ApplicationListener, IObserver {
                         }
                     }
                     return false;
+                }
+
+                @Override
+                public boolean buttonB(boolean value) {
+                    return false;
+                }
+
+                @Override
+                public boolean buttonTrigger(boolean value) {
+                    return false;
+                }
+
+                @Override
+                public boolean buttonThumbstick(boolean value) {
+                    return false;
+                }
+
+                @Override
+                public boolean thumbstick(XrVector2f value) {
+                    return false;
+                }
+
+                @Override
+                public boolean trigger(float value) {
+                    return false;
+                }
+
+                private void proceedToLoading(){
+                    ((WelcomeGui) welcomeGui).startLoading();
                 }
             });
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
