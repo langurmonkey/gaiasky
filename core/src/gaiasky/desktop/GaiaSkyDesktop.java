@@ -54,7 +54,9 @@ public class GaiaSkyDesktop implements IObserver {
     private static final String REQUIRED_JAVA_VERSION = "15";
     private static final int DEFAULT_OPENGL_MAJOR = 4;
     private static final int DEFAULT_OPENGL_MINOR = 1;
+    private static final int XR_OPENGL_MINOR = 5;
     private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
+    private static final String XR_OPENGL = DEFAULT_OPENGL_MAJOR + "." + XR_OPENGL_MINOR;
     private static final int MIN_OPENGL_MAJOR = 3;
     private static final int MIN_OPENGL_MINOR = 2;
     private static final String MIN_OPENGL = MIN_OPENGL_MAJOR + "." + MIN_OPENGL_MINOR;
@@ -448,7 +450,9 @@ public class GaiaSkyDesktop implements IObserver {
         } else {
             cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
         }
-        cfg.setOpenGLEmulation(GLEmulation.GL30, DEFAULT_OPENGL_MAJOR, DEFAULT_OPENGL_MINOR);
+        // OpenXR requires OpenGL 4.5.
+        int minor = cliArgs.vr ? XR_OPENGL_MINOR : DEFAULT_OPENGL_MINOR;
+        cfg.setOpenGLEmulation(GLEmulation.GL30, DEFAULT_OPENGL_MAJOR, minor);
         // Disable logical DPI modes (macOS, Windows).
         cfg.setHdpiMode(HdpiMode.Pixels);
         // Headless mode.

@@ -144,7 +144,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         if (xrDriver != null) {
             rc.ppb = null;
             try {
-                xrDriver.pollEvents();
+                xrDriver.pollEvents(1);
             } catch (Exception e) {
                 // Should never happen.
             }

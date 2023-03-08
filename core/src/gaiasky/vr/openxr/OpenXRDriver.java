@@ -17,13 +17,15 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Struct;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
-import static org.lwjgl.opengl.GL11.GL_RGB10_A2;
-import static org.lwjgl.opengl.GL11.GL_RGBA8;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glGetInteger;
 import static org.lwjgl.opengl.GL21.GL_SRGB8_ALPHA8;
-import static org.lwjgl.opengl.GL30.GL_RGBA16F;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.openxr.EXTDebugUtils.*;
 import static org.lwjgl.openxr.KHROpenGLEnable.*;
 import static org.lwjgl.openxr.XR10.*;
@@ -33,7 +35,10 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class OpenXRDriver implements Disposable {
     private static final Log logger = Logger.getLogger(OpenXRDriver.class);
 
-    public long systemID;
+    public static final int
+            VR_Eye_Left = 0,
+            VR_Eye_Right = 1;
+    public long systemId;
     public boolean missingXrDebug;
     public String runtimeName, runtimeVersionString;
     public long runtimeVersion;
@@ -61,10 +66,14 @@ public class OpenXRDriver implements Disposable {
     public XrViewConfigurationView.Buffer viewConfigs;
     public final int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
 
+    // The guy that renders to OpenXR currently.
+    private OpenXRRenderer currentRenderer;
+
     //Runtime
     XrEventDataBuffer eventDataBuffer;
     int sessionState;
     boolean sessionRunning;
+    public long currentFrameTime = 0L;
 
     public static class Swapchain {
         public XrSwapchain handle;
@@ -186,11 +195,11 @@ public class OpenXRDriver implements Disposable {
                     pl
             ));
 
-            systemID = pl.get(0);
-            if (systemID == 0) {
+            systemId = pl.get(0);
+            if (systemId == 0) {
                 throw new IllegalStateException("No compatible headset detected");
             }
-            logger.info("Headset found with System ID: " + systemID);
+            logger.info("Headset found with System ID: " + systemId);
         }
     }
 
@@ -207,8 +216,42 @@ public class OpenXRDriver implements Disposable {
                 .minApiVersionSupported(0)
                 .maxApiVersionSupported(0);
 
-        xrGetOpenGLGraphicsRequirementsKHR(xrInstance, systemID, graphicsRequirements);
+        xrGetOpenGLGraphicsRequirementsKHR(xrInstance, systemId, graphicsRequirements);
         return graphicsRequirements;
+    }
+
+    public void checkOpenGL() {
+        try (MemoryStack stack = stackPush()) {
+            var graphicsRequirements = getXrGraphicsRequirements(stack);
+            // Make sure GLFW is initialized.
+            if (!glfwInit()) {
+                throw new IllegalStateException("GLFW is not initialized!");
+            }
+
+            // Check if OpenGL version is supported by OpenXR runtime
+            int actualMajorVersion = glGetInteger(GL_MAJOR_VERSION);
+            int actualMinorVersion = glGetInteger(GL_MINOR_VERSION);
+
+            int minMajorVersion = XR_VERSION_MAJOR(graphicsRequirements.minApiVersionSupported());
+            int minMinorVersion = XR_VERSION_MINOR(graphicsRequirements.minApiVersionSupported());
+
+            int maxMajorVersion = XR_VERSION_MAJOR(graphicsRequirements.maxApiVersionSupported());
+            int maxMinorVersion = XR_VERSION_MINOR(graphicsRequirements.maxApiVersionSupported());
+
+            if (minMajorVersion > actualMajorVersion || (minMajorVersion == actualMajorVersion && minMinorVersion > actualMinorVersion)) {
+                throw new IllegalStateException(
+                        "The OpenXR runtime supports only OpenGL " + minMajorVersion + "." + minMinorVersion +
+                                " and later, but we got OpenGL " + actualMajorVersion + "." + actualMinorVersion
+                );
+            }
+
+            if (actualMajorVersion > maxMajorVersion || (actualMajorVersion == maxMajorVersion && actualMinorVersion > maxMinorVersion)) {
+                throw new IllegalStateException(
+                        "The OpenXR runtime supports only OpenGL " + maxMajorVersion + "." + minMajorVersion +
+                                " and earlier, but we got OpenGL " + actualMajorVersion + "." + actualMinorVersion
+                );
+            }
+        }
     }
 
     /**
@@ -218,17 +261,19 @@ public class OpenXRDriver implements Disposable {
     public void initializeOpenXRSession(long windowHandle) {
         try (MemoryStack stack = stackPush()) {
             //Bind the OpenGL context to the OpenXR instance and create the session
-            Struct graphicsBinding = XrHelper.createGraphicsBindingOpenGL(stack, windowHandle);
+            Struct graphicsBinding = XrHelper.createOpenGLBinding(stack, windowHandle);
+
+            XrSessionCreateInfo sessionCreateInfo = XrSessionCreateInfo.calloc(stack).set(
+                    XR10.XR_TYPE_SESSION_CREATE_INFO,
+                    graphicsBinding.address(),
+                    0,
+                    systemId
+            );
 
             PointerBuffer pp = stack.mallocPointer(1);
-
             check(xrCreateSession(
                     xrInstance,
-                    XrSessionCreateInfo.malloc(stack)
-                            .type$Default()
-                            .next(graphicsBinding.address())
-                            .createFlags(0)
-                            .systemId(systemID),
+                    sessionCreateInfo,
                     pp
             ));
 
@@ -297,7 +342,7 @@ public class OpenXRDriver implements Disposable {
         try (MemoryStack stack = stackPush()) {
             XrSystemProperties systemProperties = XrSystemProperties.calloc(stack);
             memPutInt(systemProperties.address(), XR_TYPE_SYSTEM_PROPERTIES);
-            check(xrGetSystemProperties(xrInstance, systemID, systemProperties));
+            check(xrGetSystemProperties(xrInstance, systemId, systemProperties));
 
             logger.info("Headset name:" + memUTF8(memAddress(systemProperties.systemName())) + " vendor:" + systemProperties.vendorId());
 
@@ -309,14 +354,14 @@ public class OpenXRDriver implements Disposable {
 
             IntBuffer pi = stack.mallocInt(1);
 
-            check(xrEnumerateViewConfigurationViews(xrInstance, systemID, viewConfigType, pi, null));
+            check(xrEnumerateViewConfigurationViews(xrInstance, systemId, viewConfigType, pi, null));
             viewConfigs = XrHelper.fill(
                     XrViewConfigurationView.calloc(pi.get(0)), // Don't use malloc() because that would mess up the `next` field
                     XrViewConfigurationView.TYPE,
                     XR_TYPE_VIEW_CONFIGURATION_VIEW
             );
 
-            check(xrEnumerateViewConfigurationViews(xrInstance, systemID, viewConfigType, pi, viewConfigs));
+            check(xrEnumerateViewConfigurationViews(xrInstance, systemId, viewConfigType, pi, viewConfigs));
             int viewCountNumber = pi.get(0);
 
             views = XrHelper.fill(
@@ -527,14 +572,225 @@ public class OpenXRDriver implements Disposable {
 
     }
 
+    private XrFrameState getFrameState(MemoryStack stack) {
+        XrFrameState frameState = XrFrameState.calloc(stack)
+                .type$Default();
+
+        check(xrWaitFrame(
+                xrSession,
+                XrFrameWaitInfo.calloc(stack)
+                        .type$Default(),
+                frameState
+        ));
+        return frameState;
+    }
+
+    /**
+     * Renders the next frame with the current renderer.
+     */
+    public void renderFrameOpenXR() {
+        try (MemoryStack stack = stackPush()) {
+            XrFrameState frameState = getFrameState(stack);
+
+            check(xrBeginFrame(
+                    xrSession,
+                    XrFrameBeginInfo.calloc(stack)
+                            .type$Default()
+            ));
+
+            XrCompositionLayerProjection layerProjection = XrCompositionLayerProjection.calloc(stack)
+                    .type$Default();
+
+            PointerBuffer layers = stack.callocPointer(1);
+            boolean didRender = false;
+
+            // Fetch time.
+            currentFrameTime = frameState.predictedDisplayTime();
+
+            if (frameState.shouldRender()) {
+                if (renderLayerOpenXR(stack, currentFrameTime, layerProjection)) {
+                    layers.put(0, layerProjection.address());
+                    didRender = true;
+                } else {
+                    System.out.println("Didn't render");
+                }
+            } else {
+                System.out.println("Shouldn't render");
+            }
+
+            check(xrEndFrame(
+                    xrSession,
+                    XrFrameEndInfo.malloc(stack)
+                            .type$Default()
+                            .next(NULL)
+                            .displayTime(frameState.predictedDisplayTime())
+                            .environmentBlendMode(XR_ENVIRONMENT_BLEND_MODE_OPAQUE)
+                            .layers(didRender ? layers : null)
+                            .layerCount(didRender ? layers.remaining() : 0)
+            ));
+        }
+    }
+
+    private boolean renderLayerOpenXR(MemoryStack stack, long predictedDisplayTime, XrCompositionLayerProjection layer) {
+        XrViewState viewState = XrViewState.calloc(stack)
+                .type$Default();
+
+        IntBuffer pi = stack.mallocInt(1);
+        check(xrLocateViews(
+                xrSession,
+                XrViewLocateInfo.malloc(stack)
+                        .type$Default()
+                        .next(NULL)
+                        .viewConfigurationType(viewConfigType)
+                        .displayTime(predictedDisplayTime)
+                        .space(xrAppSpace),
+                viewState,
+                pi,
+                views
+        ));
+
+        if ((viewState.viewStateFlags() & XR_VIEW_STATE_POSITION_VALID_BIT) == 0 ||
+                (viewState.viewStateFlags() & XR_VIEW_STATE_ORIENTATION_VALID_BIT) == 0) {
+            return false;  // There is no valid tracking poses for the views.
+        }
+
+        int viewCountOutput = pi.get(0);
+        assert (viewCountOutput == views.capacity());
+        assert (viewCountOutput == viewConfigs.capacity());
+        assert (viewCountOutput == swapchains.length);
+
+        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(
+                XrCompositionLayerProjectionView.calloc(viewCountOutput, stack), // Use calloc() since malloc() messes up the `next` field
+                XrCompositionLayerProjectionView.TYPE,
+                XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW
+        );
+
+        // Render view to the appropriate part of the swapchain image.
+        for (int viewIndex = 0; viewIndex < viewCountOutput; viewIndex++) {
+            // Each view has a separate swapchain which is acquired, rendered to, and released.
+            Swapchain viewSwapchain = swapchains[viewIndex];
+
+            check(xrAcquireSwapchainImage(
+                    viewSwapchain.handle,
+                    XrSwapchainImageAcquireInfo.calloc(stack)
+                            .type$Default(),
+                    pi
+            ));
+            int swapchainImageIndex = pi.get(0);
+
+            check(xrWaitSwapchainImage(
+                    viewSwapchain.handle,
+                    XrSwapchainImageWaitInfo.malloc(stack)
+                            .type$Default()
+                            .next(NULL)
+                            .timeout(XR_INFINITE_DURATION)
+            ));
+
+            XrCompositionLayerProjectionView projectionLayerView = projectionLayerViews.get(viewIndex)
+                    .pose(views.get(viewIndex).pose())
+                    .fov(views.get(viewIndex).fov())
+                    .subImage(si -> si
+                            .swapchain(viewSwapchain.handle)
+                            .imageRect(rect -> rect
+                                    .offset(offset -> offset
+                                            .x(0)
+                                            .y(0))
+                                    .extent(extent -> extent
+                                            .width(viewSwapchain.width)
+                                            .height(viewSwapchain.height)
+                                    )));
+
+            if (currentRenderer != null) {
+                currentRenderer.renderView(projectionLayerView, viewSwapchain.images.get(swapchainImageIndex), viewIndex);
+            }
+
+            check(xrReleaseSwapchainImage(
+                    viewSwapchain.handle,
+                    XrSwapchainImageReleaseInfo.calloc(stack)
+                            .type$Default()
+            ));
+        }
+
+        layer.space(xrAppSpace);
+        layer.views(projectionLayerViews);
+        return true;
+    }
+
+    public void getProjectionRaw(int eEye, FloatBuffer pfLeft, FloatBuffer pfRight, FloatBuffer pfTop, FloatBuffer pfBottom) throws XrResultException {
+        // This is how SteamVR seems to handle invalid eyes
+        if (eEye < 0 || eEye >= 2)
+            eEye = 0;
+
+        try (MemoryStack stack = stackPush()) {
+            XrViewState viewState = XrViewState.calloc(stack)
+                    .type$Default();
+
+            if (currentFrameTime <= 0) {
+                XrFrameState frameState = getFrameState(stack);
+                currentFrameTime = frameState.predictedDisplayTime();
+            }
+
+            IntBuffer pi = stack.mallocInt(1);
+            check(xrLocateViews(
+                    xrSession,
+                    XrViewLocateInfo.malloc(stack)
+                            .type$Default()
+                            .next(NULL)
+                            .viewConfigurationType(viewConfigType)
+                            .displayTime(currentFrameTime)
+                            .space(xrAppSpace),
+                    viewState,
+                    pi,
+                    views
+            ));
+            try (XrFovf fov = views.get(eEye).fov()) {
+
+                /**
+                 * With a straight passthrough:
+                 *
+                 * SteamVR Left:  -1.110925, 0.889498, -0.964926, 0.715264
+                 * SteamVR Right: -1.110925, 0.889498, -0.715264, 0.964926
+                 *
+                 * For the Rift S:
+                 * OpenXR Left: 1.000000, -1.150368, -0.965689, 1.035530
+                 * SteamVR Left: -1.150368, 1.000000, -0.965689, 1.035530
+                 *
+                 * Via:
+                 *   char buff[1024];
+                 *   snprintf(buff, sizeof(buff), "eye=%d %f, %f, %f, %f", eye, *pfTop, *pfBottom, *pfLeft, *pfRight);
+                 *   OOVR_LOG(buff);
+                 *
+                 * This suggests that SteamVR negates the top and left values, which obviously we need to match. OpenXR
+                 * also negates the bottom and left value. Since it appears that SteamVR flips the top and bottom angles, we
+                 * can just do that and it'll match.
+                 */
+
+                // Unfortunately this can occur on WMR, from the data not being valid very early on. See the comments in
+                // GetProjectionMatrix for a further discussion of this.
+                if (fov.angleDown() == 0.0f && fov.angleUp() == 0.0f)
+                    throw new XrResultException("Fov is 0!");
+
+                pfTop.rewind().put((float) Math.tan(fov.angleDown()));
+                pfBottom.rewind().put((float) Math.tan(fov.angleUp()));
+                pfLeft.rewind().put((float) Math.tan(fov.angleLeft()));
+                pfRight.rewind().put((float) Math.tan(fov.angleRight()));
+            }
+        }
+    }
+
     public void destroyInput() {
-        destroyActionSpace(leftPoseSpace);
-        destroyActionSpace(rightPoseSpace);
+        if (leftPoseSpace != null)
+            destroyActionSpace(leftPoseSpace);
+        if (rightPoseSpace != null)
+            destroyActionSpace(rightPoseSpace);
 
-        destroyAction(leftPose);
-        destroyAction(rightPose);
+        if (leftPose != null)
+            destroyAction(leftPose);
+        if (rightPose != null)
+            destroyAction(rightPose);
 
-        destroyActionSet(gsActionSet);
+        if (gsActionSet != null)
+            destroyActionSet(gsActionSet);
     }
 
     public XrActionSet createActionSet(XrInstance instance, String name) {
@@ -621,14 +877,12 @@ public class OpenXRDriver implements Disposable {
 
     /**
      * Polls pending events in the OpenXR system.
+     *
      * @return True if we must stop, false otherwise.
      */
-    public boolean pollEvents() {
-        // Poll input first.
-        pollInput();
-
+    public boolean pollEvents(long frameTime) {
         XrEventDataBaseHeader event = readNextOpenXREvent();
-        while(event != null) {
+        while (event != null) {
             switch (event.type()) {
             case XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING: {
                 XrEventDataInstanceLossPending instanceLossPending = XrEventDataInstanceLossPending.create(event.address());
@@ -650,10 +904,13 @@ public class OpenXRDriver implements Disposable {
             event = readNextOpenXREvent();
         }
 
+        // Poll input.
+        pollInput(frameTime);
+
         return false;
     }
 
-    private void pollInput() {
+    private void pollInput(long frameTime) {
         try (var stack = stackPush()) {
             XrActiveActionSet.Buffer sets = XrActiveActionSet.calloc(1, stack);
             sets.actionSet(gsActionSet);
@@ -662,6 +919,38 @@ public class OpenXRDriver implements Disposable {
                     .type(XR_TYPE_ACTIONS_SYNC_INFO).activeActionSets(sets);
 
             check(xrSyncActions(xrSession, syncInfo));
+
+            // Poses
+            if (frameTime > 0) {
+                XrPosef pose = XrPosef.calloc(stack);
+                XrSpaceLocation location = XrSpaceLocation.calloc(stack);
+
+                // Left hand
+                getInfo.action(leftPose);
+                check(xrGetActionStatePose(xrSession, getInfo, statePose));
+                if (statePose.isActive()) {
+                    location.set(XR_TYPE_SPACE_LOCATION, NULL, 0, pose);
+                    check(xrLocateSpace(leftPoseSpace, xrAppSpace, frameTime, location));
+                    if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0 &&
+                            (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
+                        // Ok!
+                        var pos = location.pose().position$();
+                    }
+                }
+
+                // Right hand
+                getInfo.action(rightPose);
+                check(xrGetActionStatePose(xrSession, getInfo, statePose));
+                if (statePose.isActive()) {
+                    location.set(XR_TYPE_SPACE_LOCATION, NULL, 0, pose);
+                    check(xrLocateSpace(rightPoseSpace, xrAppSpace, frameTime, location));
+                    if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0 &&
+                            (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
+                        // Ok!
+                        var pos = location.pose().position$();
+                    }
+                }
+            }
 
             // Button A
             getInfo.action(buttonA);
@@ -824,20 +1113,27 @@ public class OpenXRDriver implements Disposable {
 
     public void dispose() {
         // Destroy OpenXR
-        eventDataBuffer.free();
-        views.free();
-        viewConfigs.free();
-        for (Swapchain swapchain : swapchains) {
-            xrDestroySwapchain(swapchain.handle);
-            swapchain.images.free();
-        }
+        if (eventDataBuffer != null)
+            eventDataBuffer.free();
+        if (views != null)
+            views.free();
+        if (viewConfigs != null)
+            viewConfigs.free();
+        if (swapchains != null)
+            for (Swapchain swapchain : swapchains) {
+                xrDestroySwapchain(swapchain.handle);
+                swapchain.images.free();
+            }
 
-        xrDestroySpace(xrAppSpace);
-        if (xrDebugMessenger != null) {
+        if (xrAppSpace != null)
+            xrDestroySpace(xrAppSpace);
+        if (xrDebugMessenger != null)
             xrDestroyDebugUtilsMessengerEXT(xrDebugMessenger);
-        }
-        xrDestroySession(xrSession);
-        xrDestroyInstance(xrInstance);
+
+        if (xrSession != null)
+            xrDestroySession(xrSession);
+        if (xrInstance != null)
+            xrDestroyInstance(xrInstance);
 
         destroyInput();
     }
@@ -910,6 +1206,10 @@ public class OpenXRDriver implements Disposable {
      */
     public void removeListener(OpenXRInputListener listener) {
         this.listeners.removeValue(listener, true);
+    }
+
+    public void setRenderer(OpenXRRenderer renderer) {
+        this.currentRenderer = renderer;
     }
 
     public boolean isRunning() {

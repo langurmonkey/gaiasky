@@ -1,30 +1,23 @@
 package gaiasky.desktop.util;
 
-/*
- * Copyright LWJGL. All rights reserved.
- * License terms: https://www.lwjgl.org/license
- */
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
-import com.badlogic.gdx.files.FileHandle;
 import gaiasky.gui.ConsoleLogger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
 import gaiasky.vr.openxr.OpenXRDriver;
 import gaiasky.vr.openxr.OpenXRDriver.Swapchain;
+import gaiasky.vr.openxr.OpenXRRenderer;
 import gaiasky.vr.openxr.ShadersGL;
 import gaiasky.vr.openxr.XrHelper;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -35,19 +28,15 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.openxr.XR10.*;
+import static org.lwjgl.openxr.XR10.XR_VERSION_MAJOR;
+import static org.lwjgl.openxr.XR10.XR_VERSION_MINOR;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
- * Slightly tweaked combination of
- * https://github.com/maluoi/OpenXRSamples/blob/master/SingleFileExample
- * and
- * https://github.com/ReliaSolve/OpenXR-OpenGL-Example
- * Missing actions (xr input) and can only run on windows.
- * Requires a stereo headset and an install of the OpenXR runtime to run.
+ * Re-implementation of LWGJL3's HelloOpenXRGL, but using our driver classes.
  */
-public class HiOpenXRGL {
+public class HiOpenXRGL implements OpenXRRenderer {
 
     static OpenXRDriver driver;
 
@@ -66,6 +55,8 @@ public class HiOpenXRGL {
     int textureShader;
     int colorShader;
 
+    long frameTime;
+
     public static void main(String[] args) throws Exception {
         // Enable logging.
         Gdx.files = new Lwjgl3Files();
@@ -79,6 +70,8 @@ public class HiOpenXRGL {
         // Main classes.
         HiOpenXRGL hi = new HiOpenXRGL();
         driver = new OpenXRDriver();
+        // Set Hi as the renderer.
+        driver.setRenderer(hi);
 
         driver.createOpenXRInstance();
         driver.initializeXRSystem();
@@ -123,9 +116,9 @@ public class HiOpenXRGL {
             }
         });
 
-        while (!driver.pollEvents() && !glfwWindowShouldClose(hi.window)) {
+        while (!driver.pollEvents(hi.frameTime) && !glfwWindowShouldClose(hi.window)) {
             if (driver.isRunning()) {
-                hi.renderFrameOpenXR();
+                driver.renderFrameOpenXR();
             } else {
                 // Throttle loop since xrWaitFrame won't be called.
                 Thread.sleep(250);
@@ -251,144 +244,18 @@ public class HiOpenXRGL {
         glBindVertexArray(0);
     }
 
-    private void renderFrameOpenXR() {
-        try (MemoryStack stack = stackPush()) {
-            XrFrameState frameState = XrFrameState.calloc(stack)
-                    .type$Default();
-
-            driver.check(xrWaitFrame(
-                    driver.xrSession,
-                    XrFrameWaitInfo.calloc(stack)
-                            .type$Default(),
-                    frameState
-            ));
-
-            driver.check(xrBeginFrame(
-                    driver.xrSession,
-                    XrFrameBeginInfo.calloc(stack)
-                            .type$Default()
-            ));
-
-            XrCompositionLayerProjection layerProjection = XrCompositionLayerProjection.calloc(stack)
-                    .type$Default();
-
-            PointerBuffer layers = stack.callocPointer(1);
-            boolean didRender = false;
-
-            if (frameState.shouldRender()) {
-                if (renderLayerOpenXR(stack, frameState.predictedDisplayTime(), layerProjection)) {
-                    layers.put(0, layerProjection.address());
-                    didRender = true;
-                } else {
-                    System.out.println("Didn't render");
-                }
-            } else {
-                System.out.println("Shouldn't render");
-            }
-
-            driver.check(xrEndFrame(
-                    driver.xrSession,
-                    XrFrameEndInfo.malloc(stack)
-                            .type$Default()
-                            .next(NULL)
-                            .displayTime(frameState.predictedDisplayTime())
-                            .environmentBlendMode(XR_ENVIRONMENT_BLEND_MODE_OPAQUE)
-                            .layers(didRender ? layers : null)
-                            .layerCount(didRender ? layers.remaining() : 0)
-            ));
-        }
-    }
-
-    private boolean renderLayerOpenXR(MemoryStack stack, long predictedDisplayTime, XrCompositionLayerProjection layer) {
-        XrViewState viewState = XrViewState.calloc(stack)
-                .type$Default();
-
-        IntBuffer pi = stack.mallocInt(1);
-        driver.check(xrLocateViews(
-                driver.xrSession,
-                XrViewLocateInfo.malloc(stack)
-                        .type$Default()
-                        .next(NULL)
-                        .viewConfigurationType(driver.viewConfigType)
-                        .displayTime(predictedDisplayTime)
-                        .space(driver.xrAppSpace),
-                viewState,
-                pi,
-                driver.views
-        ));
-
-        if ((viewState.viewStateFlags() & XR_VIEW_STATE_POSITION_VALID_BIT) == 0 ||
-                (viewState.viewStateFlags() & XR_VIEW_STATE_ORIENTATION_VALID_BIT) == 0) {
-            return false;  // There is no valid tracking poses for the views.
-        }
-
-        int viewCountOutput = pi.get(0);
-        assert (viewCountOutput == driver.views.capacity());
-        assert (viewCountOutput == driver.viewConfigs.capacity());
-        assert (viewCountOutput == driver.swapchains.length);
-
-        XrCompositionLayerProjectionView.Buffer projectionLayerViews = XrHelper.fill(
-                XrCompositionLayerProjectionView.calloc(viewCountOutput, stack), // Use calloc() since malloc() messes up the `next` field
-                XrCompositionLayerProjectionView.TYPE,
-                XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW
-        );
-
-        // Render view to the appropriate part of the swapchain image.
-        for (int viewIndex = 0; viewIndex < viewCountOutput; viewIndex++) {
-            // Each view has a separate swapchain which is acquired, rendered to, and released.
-            Swapchain viewSwapchain = driver.swapchains[viewIndex];
-
-            driver.check(xrAcquireSwapchainImage(
-                    viewSwapchain.handle,
-                    XrSwapchainImageAcquireInfo.calloc(stack)
-                            .type$Default(),
-                    pi
-            ));
-            int swapchainImageIndex = pi.get(0);
-
-            driver.check(xrWaitSwapchainImage(
-                    viewSwapchain.handle,
-                    XrSwapchainImageWaitInfo.malloc(stack)
-                            .type$Default()
-                            .next(NULL)
-                            .timeout(XR_INFINITE_DURATION)
-            ));
-
-            XrCompositionLayerProjectionView projectionLayerView = projectionLayerViews.get(viewIndex)
-                    .pose(driver.views.get(viewIndex).pose())
-                    .fov(driver.views.get(viewIndex).fov())
-                    .subImage(si -> si
-                            .swapchain(viewSwapchain.handle)
-                            .imageRect(rect -> rect
-                                    .offset(offset -> offset
-                                            .x(0)
-                                            .y(0))
-                                    .extent(extent -> extent
-                                            .width(viewSwapchain.width)
-                                            .height(viewSwapchain.height)
-                                    )));
-
-            OpenGLRenderView(projectionLayerView, viewSwapchain.images.get(swapchainImageIndex), viewIndex);
-
-            driver.check(xrReleaseSwapchainImage(
-                    viewSwapchain.handle,
-                    XrSwapchainImageReleaseInfo.calloc(stack)
-                            .type$Default()
-            ));
-        }
-
-        layer.space(driver.xrAppSpace);
-        layer.views(projectionLayerViews);
-        return true;
-    }
-
     private static Matrix4f modelviewMatrix = new Matrix4f();
     private static Matrix4f projectionMatrix = new Matrix4f();
     private static Matrix4f viewMatrix = new Matrix4f();
 
     private static FloatBuffer mvpMatrix = BufferUtils.createFloatBuffer(16);
 
-    private void OpenGLRenderView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, int viewIndex) {
+    @Override
+    public void renderBefore() {
+
+    }
+
+    public void renderView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, int viewIndex) {
         glBindFramebuffer(GL_FRAMEBUFFER, swapchainFramebuffer);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
@@ -473,6 +340,11 @@ public class HiOpenXRGL {
                 glFlush();
             }
         }
+    }
+
+    @Override
+    public void renderAfter() {
+
     }
 
     private static class Geometry {

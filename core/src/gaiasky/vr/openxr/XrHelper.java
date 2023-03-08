@@ -4,14 +4,24 @@
  */
 package gaiasky.vr.openxr;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.glfw.GLFWNativeGLX;
+import org.lwjgl.glfw.GLFWNativeWGL;
+import org.lwjgl.glfw.GLFWNativeWin32;
+import org.lwjgl.glfw.GLFWNativeX11;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
 import org.lwjgl.system.Struct;
 import org.lwjgl.system.StructBuffer;
+import org.lwjgl.system.linux.X11;
 import org.lwjgl.system.linux.XVisualInfo;
+import org.lwjgl.system.windows.User32;
 
 import java.nio.FloatBuffer;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFWNativeGLX.glfwGetGLXContext;
@@ -21,9 +31,10 @@ import static org.lwjgl.glfw.GLFWNativeWayland.glfwGetWaylandDisplay;
 import static org.lwjgl.glfw.GLFWNativeWin32.glfwGetWin32Window;
 import static org.lwjgl.glfw.GLFWNativeX11.glfwGetX11Display;
 import static org.lwjgl.opengl.GLX.glXGetCurrentDrawable;
-import static org.lwjgl.opengl.GLX13.glXGetVisualFromFBConfig;
+import static org.lwjgl.opengl.GLX13.*;
 import static org.lwjgl.openxr.XR10.XR_TYPE_API_LAYER_PROPERTIES;
 import static org.lwjgl.openxr.XR10.XR_TYPE_EXTENSION_PROPERTIES;
+import static org.lwjgl.system.MemoryStack.stackInts;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memPutInt;
 import static org.lwjgl.system.windows.User32.GetDC;
@@ -181,62 +192,39 @@ public final class XrHelper {
      *
      * @throws IllegalStateException If the current platform is not supported
      */
-    public static Struct createGraphicsBindingOpenGL(MemoryStack stack, long window) throws IllegalStateException {
-        switch (Platform.get()) {
-        case LINUX -> {
-            /*
-             * NOTE: X11 is preferred over Wayland because Monado, the most promising Linux OpenXR runtime,
-             * doesn't handle XrGraphicsBindingOpenGLWaylandKHR at the moment. See
-             * https://gitlab.freedesktop.org/monado/monado/-/issues/128 for the current status on this.
-             */
-            int platform = glfwGetPlatform();
-            if (platform == GLFW_PLATFORM_X11) {
-                long display = glfwGetX11Display();
+    public static Struct createOpenGLBinding(MemoryStack stack, long window) {
+        //Bind the OpenGL context to the OpenXR instance and create the session
+        if (Platform.get() == Platform.WINDOWS) {
+            return XrGraphicsBindingOpenGLWin32KHR.calloc(stack).set(
+                    KHROpenGLEnable.XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR,
+                    NULL,
+                    User32.GetDC(GLFWNativeWin32.glfwGetWin32Window(window)),
+                    GLFWNativeWGL.glfwGetWGLContext(window)
+            );
+        } else if (Platform.get() == Platform.LINUX) {
+            long xDisplay = GLFWNativeX11.glfwGetX11Display();
 
-                /*
-                 * To continue, we need the GLXFBConfig that was used to create the GLFW window. Unfortunately,
-                 * GLFW doesn't expose this to us. I created a pull request for this:
-                 * https://github.com/glfw/glfw/pull/1925
-                 * Linux X11 support will be blocked until it is merged. When it is merged, the GLFW bindings of
-                 * GLFW will need to be updated as well.
-                 */
-                //long glxConfig = -1;
-                long glxConfig = glfwGetGLXFBConfig(window);
+            long glXContext = GLFWNativeGLX.glfwGetGLXContext(window);
+            long glXWindowHandle = GLFWNativeGLX.glfwGetGLXWindow(window);
 
-                if (glxConfig == -1) {
-                    throw new IllegalStateException("Linux X11 support is not finished");
-                }
-
-                XVisualInfo visualInfo = glXGetVisualFromFBConfig(display, glxConfig);
-                if (visualInfo == null) {
-                    throw new IllegalStateException("Failed to get visual info");
-                }
-                long visualid = visualInfo.visualid();
-                return XrGraphicsBindingOpenGLXlibKHR.malloc(stack)
-                        .type$Default()
-                        .next(NULL)
-                        .xDisplay(display)
-                        .visualid((int) visualid)
-                        .glxFBConfig(glxConfig)
-                        .glxDrawable(glXGetCurrentDrawable())
-                        .glxContext(glfwGetGLXContext(window));
-            } else if (platform == GLFW_PLATFORM_WAYLAND) {
-                return XrGraphicsBindingOpenGLWaylandKHR.malloc(stack)
-                        .type$Default()
-                        .next(NULL)
-                        .display(glfwGetWaylandDisplay());
-            } else {
-                throw new IllegalStateException("Unsupported Linux windowing system. Only X11 and Wayland are supported");
+            int fbXID = glXQueryDrawable(xDisplay, glXWindowHandle, GLX_FBCONFIG_ID);
+            PointerBuffer fbConfigBuf = glXChooseFBConfig(xDisplay, X11.XDefaultScreen(xDisplay), stackInts(GLX_FBCONFIG_ID, fbXID, 0));
+            if(fbConfigBuf == null) {
+                throw new IllegalStateException("Your framebuffer config was null, make a github issue");
             }
-        }
-        case WINDOWS -> {
-            return XrGraphicsBindingOpenGLWin32KHR.malloc(stack)
-                    .type$Default()
-                    .next(NULL)
-                    .hDC(GetDC(glfwGetWin32Window(window)))
-                    .hGLRC(glfwGetWGLContext(window));
-        }
-        default -> throw new IllegalStateException("Unsupported operation system: " + Platform.get());
+            long fbConfig = fbConfigBuf.get();
+
+            return XrGraphicsBindingOpenGLXlibKHR.calloc(stack).set(
+                    KHROpenGLEnable.XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR,
+                    NULL,
+                    xDisplay,
+                    (int) Objects.requireNonNull(glXGetVisualFromFBConfig(xDisplay, fbConfig)).visualid(),
+                    fbConfig,
+                    glXWindowHandle,
+                    glXContext
+            );
+        } else {
+            throw new IllegalStateException("macOS not supported");
         }
     }
 }

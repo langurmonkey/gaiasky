@@ -278,6 +278,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (settings.runtime.openXr) {
             // Render to VR.
             renderGui(welcomeGuiVR);
+
+            xrDriver.pollEvents(xrDriver.currentFrameTime);
+            if (xrDriver.isRunning()) {
+                // Render OpenXR frame.
+                xrDriver.renderFrameOpenXR();
+            }
         }
         // Render to screen.
         renderGui(welcomeGui);
@@ -610,6 +616,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
             });
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
+            xrDriver.setRenderer(welcomeGuiVR);
         }
 
     }
@@ -624,23 +631,21 @@ public class GaiaSky implements ApplicationListener, IObserver {
      **/
     private VRStatus createVR() {
         if (vr) {
-            // Initializing the VRContext may fail if no HMD is connected or SteamVR
-            // is not installed.
+            // Initializing the VRContext may fail if no HMD is connected or no OpenXR runtime is found.
             try {
                 settings.runtime.openXr = true;
                 Constants.initialize(settings.scene.distanceScaleVr);
 
                 xrDriver = new OpenXRDriver();
-                //xrDriver.initializeOpenXR();
-                //xrDriver.pollEvents();
+                xrDriver.createOpenXRInstance();
+                xrDriver.initializeXRSystem();
+                xrDriver.checkOpenGL();
+                xrDriver.initializeOpenXRSession(window.getWindowHandle());
+                xrDriver.createOpenXRReferenceSpace();
+                xrDriver.createOpenXRSwapchains();
+                xrDriver.initializeInput();
 
-                final VRDevice hmd = xrDriver.getDeviceByType(VRDeviceType.HeadMountedDisplay);
-                logger.info("Initialization of VR successful");
-                if (hmd == null) {
-                    logger.info("HMD device is null!");
-                } else {
-                    logger.info("HMD device is not null: " + xrDriver.getDeviceByType(VRDeviceType.HeadMountedDisplay).toString());
-                }
+                xrDriver.pollEvents(1);
 
                 vrDeviceToModel = new HashMap<>();
 
@@ -670,7 +675,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 // If initializing the VRContext failed.
                 settings.runtime.openXr = false;
                 logger.error(e);
-                logger.error("Initialisation of VR context failed");
+                logger.error("Initialization of VR context failed");
                 return VRStatus.ERROR_NO_CONTEXT;
             }
         } else {
@@ -699,6 +704,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         // Dispose loading GUI VR.
         if (settings.runtime.openXr) {
+            xrDriver.setRenderer(null);
             loadingGuiVR.dispose();
             loadingGuiVR = null;
         }
@@ -1393,6 +1399,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 // Create loading GUI VR.
                 loadingGuiVR = new StandaloneVRGui<>(xrDriver, LoadingGui.class, globalResources.getSkin(), null);
                 loadingGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
+                xrDriver.setRenderer(loadingGuiVR);
 
                 // Dispose previous VR GUI.
                 welcomeGuiVR.dispose();
