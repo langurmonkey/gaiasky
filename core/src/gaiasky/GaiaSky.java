@@ -571,23 +571,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (settings.runtime.openXr) {
             welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new OpenXRInputListener() {
                 @Override
-                public boolean buttonReleased(VRDevice device, int button) {
-                    // Any of the main buttons.
-                    if (device.mappings != null) {
-                        if (button == device.mappings.getButtonA() || button == device.mappings.getButtonB() || button == device.mappings.getButtonX() || button == device.mappings.getButtonY()) {
-                            var wg = (WelcomeGui) welcomeGui;
-                            if (wg.baseDataPresent()) {
-                                wg.startLoading();
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
+                public boolean buttonA(boolean value) {
+                    return proceedToLoading();
                 }
 
                 @Override
                 public boolean buttonB(boolean value) {
-                    return false;
+                    return proceedToLoading();
                 }
 
                 @Override
@@ -610,8 +600,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     return false;
                 }
 
-                private void proceedToLoading(){
-                    ((WelcomeGui) welcomeGui).startLoading();
+                private boolean proceedToLoading() {
+                    var wg = (WelcomeGui) welcomeGui;
+                    if (wg.baseDataPresent()) {
+                        wg.startLoading();
+                        return true;
+                    }
+                    return false;
                 }
             });
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
