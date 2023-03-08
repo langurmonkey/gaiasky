@@ -428,23 +428,23 @@ public class VRContext implements Disposable {
 
         IntModel model = null;
         OwnObjLoader ol = new OwnObjLoader();
-        if (manufacturer == null || manufacturer.equalsIgnoreCase("Oculus")) {
+        if (manufacturer != null && manufacturer.equalsIgnoreCase("Oculus")) {
             // Oculus Rift CV1.
             if (isControllerLeft(name, modelNumber, role)) {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
             } else if (isControllerRight(name, modelNumber, role)) {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-right.obj"));
             }
-        } else {
+        } else if (manufacturer != null && (manufacturer.equalsIgnoreCase("HTC") || manufacturer.equalsIgnoreCase("Vive"))){
             // Default to HTC vive controller model.
             if (isControllerRight(name, modelNumber, role) || isControllerLeft(name, modelNumber, role)) {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
             }
-        }
-
-        // Load default.
-        if (isVRController(name, modelNumber, role) && model == null) {
-            model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
+        } else {
+            // Load default.
+            if (isVRController(name, modelNumber, role)) {
+                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/generic/generic_vr_controller.obj"));
+            }
         }
 
         if (model != null) {
