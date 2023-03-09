@@ -14,6 +14,7 @@ import gaiasky.vr.openvr.VRDeviceListener;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
 import gaiasky.vr.openxr.input.actions.Action;
 import gaiasky.vr.openxr.input.actions.HapticsAction;
+import gaiasky.vr.openxr.input.actions.VRControllerDevice;
 import gaiasky.vr.openxr.input.actionsets.ActionSet;
 import gaiasky.vr.openxr.input.actionsets.GaiaSkyActionSet;
 import gaiasky.vr.openxr.input.actionsets.HandsActionSet;
@@ -750,6 +751,13 @@ public class OpenXRDriver implements Disposable {
 
     public Array<VRDevice> getDevicesByType(VRDeviceType type) {
         return new Array<>();
+    }
+
+    public Array<VRControllerDevice> getControllerDevices(){
+        Array<VRControllerDevice> controllers = new Array<>();
+        if(poses != null) {
+        }
+        return null;
     }
 
     public Array<VRDevice> getDevices() {

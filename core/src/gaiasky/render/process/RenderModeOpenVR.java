@@ -117,7 +117,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
             controllersEnv.add(dlight);
 
             // Controller objects
-            vrDeviceToModel = GaiaSky.instance.getVRDeviceToModel();
             controllerObjects = new Array<>(false, controllers.size);
             for (VRDevice controller : controllers) {
                 if (!controller.isInitialized())
@@ -278,7 +277,6 @@ public class RenderModeOpenVR extends RenderModeAbstract implements IRenderMode,
         var archetype = scene.archetypes().get("gaiasky.scenegraph.VRDeviceModel");
         var entity = archetype.createEntity();
         var vr = Mapper.vr.get(entity);
-        vr.device = device;
         var model = Mapper.model.get(entity);
         model.model = new ModelComponent();
         model.model.env = environment;

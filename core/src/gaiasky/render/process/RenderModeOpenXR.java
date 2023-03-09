@@ -39,6 +39,7 @@ import gaiasky.vr.openvr.VRContext.Space;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.input.actions.VRControllerDevice;
 import org.lwjgl.openvr.*;
 
 import java.nio.FloatBuffer;
@@ -65,7 +66,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
     Texture texLeft, texRight;
     HmdMatrix44 projectionMat = HmdMatrix44.create();
     HmdMatrix34 eyeMat = HmdMatrix34.create();
-    private Map<VRDevice, Entity> vrDeviceToModel;
+    private Map<VRControllerDevice, Entity> vrDeviceToModel;
     private Environment controllersEnv;
 
     // GUI
@@ -90,7 +91,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
             // Controllers
             //Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);
-            Array<VRDevice> controllers = new Array<>();
+            Array<VRControllerDevice> controllers = xrDriver.getControllerDevices();
 
             // Env
             controllersEnv = new Environment();
@@ -101,11 +102,10 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
             controllersEnv.add(dlight);
 
             // Controller objects
-            vrDeviceToModel = GaiaSky.instance.getVRDeviceToModel();
             controllerObjects = new Array<>(false, controllers.size);
-            for (VRDevice controller : controllers) {
+            for (VRControllerDevice controller : controllers) {
                 if (!controller.isInitialized())
-                    controller.initialize();
+                    controller.initialize(xrDriver);
                 addVRController(controller);
             }
 
@@ -134,10 +134,9 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
                 // Default
                 EventManager.publish(Event.FOV_CHANGED_CMD, this, 89f);
             }
-            EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.VR_DEVICE_CONNECTED, Event.VR_DEVICE_DISCONNECTED);
+            EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE);
         }
     }
-
 
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
@@ -154,7 +153,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
                 var vr = Mapper.vr.get(controller);
                 var model = Mapper.model.get(controller);
 
-                Vector3 devicePos = vr.device.getPosition(Space.Tracker);
+                Vector3 devicePos = vr.device.position;
                 // Length from headset to controller
                 //auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
                 if (model.model.instance != null) {
@@ -270,7 +269,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         }
     }
 
-    private Entity newVRDeviceModelEntity(VRDevice device, Environment environment) {
+    private Entity newVRDeviceModelEntity(VRControllerDevice device, Environment environment) {
         var archetype = scene.archetypes().get("gaiasky.scenegraph.VRDeviceModel");
         var entity = archetype.createEntity();
         var vr = Mapper.vr.get(entity);
@@ -285,7 +284,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         return entity;
     }
 
-    private void addVRController(VRDevice device) {
+    private void addVRController(VRControllerDevice device) {
         if (!vrDeviceToModel.containsKey(device)) {
             Entity entity = newVRDeviceModelEntity(device, controllersEnv);
             controllerObjects.add(entity);
@@ -293,7 +292,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         }
     }
 
-    private void removeVRController(VRDevice device) {
+    private void removeVRController(VRControllerDevice device) {
         if (vrDeviceToModel.containsKey(device)) {
             Entity entity = vrDeviceToModel.get(device);
             controllerObjects.removeValue(entity, true);
@@ -302,24 +301,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
     }
 
     @Override
-    public void notify(final Event event, Object source, final Object... data) {
-        switch (event) {
-        case VR_DEVICE_CONNECTED:
-            VRDevice device = (VRDevice) data[0];
-            if (device.getType() == VRDeviceType.Controller) {
-                GaiaSky.postRunnable(() -> addVRController(device));
-            }
-            break;
-        case VR_DEVICE_DISCONNECTED:
-            device = (VRDevice) data[0];
-            if (device.getType() == VRDeviceType.Controller) {
-                GaiaSky.postRunnable(() -> removeVRController(device));
-            }
-            break;
-        default:
-            break;
-        }
+    public void notify(Event event, Object source, Object... data) {
 
     }
-
 }

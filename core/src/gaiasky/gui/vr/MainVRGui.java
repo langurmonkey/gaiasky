@@ -47,6 +47,7 @@ import gaiasky.util.math.*;
 import gaiasky.util.scene2d.FixedStage;
 import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRDeviceListener;
+import gaiasky.vr.openxr.input.actions.VRControllerDevice;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,12 +78,12 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
     ShapeRenderer shapeRenderer;
     SpriteBatch batch;
     Set<VRDevice> vrControllers;
-    Map<VRContext.VRDevice, VRDevice> deviceToDevice;
+    Map<VRControllerDevice, VRDevice> deviceToDevice;
 
     GamepadGui gamepadGui;
 
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
-    VRContext.VRDevice interactingController;
+    VRControllerDevice interactingController;
 
     public MainVRGui(Skin skin) {
         setSkin(skin);
@@ -162,7 +163,7 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
                     // Check intersection with each controller.
                     int intersecting = 0;
                     for (var device : vrControllers) {
-                        if (device.device.isInitialized() && device.device.isConnected()) {
+                        if (device.device.isInitialized() && device.device.isActive()) {
                             if (!deviceToDevice.containsKey(device.device)) {
                                 deviceToDevice.put(device.device, device);
                             }
@@ -559,10 +560,10 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
                     interactingController = dev.device;
                     dev.interacting = true;
                 }
-                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
+                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) /*&& device == interactingController*/) {
                     stage.touchDown((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
                     triggerPressed = true;
-                    interactingController = device;
+                    //interactingController = device;
                     return true;
                 }
             }
@@ -579,7 +580,7 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
                     interactingController = dev.device;
                     dev.interacting = true;
                 }
-                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
+                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y)/* && device == interactingController*/) {
                     stage.touchUp((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
                     triggerPressed = false;
                     return true;

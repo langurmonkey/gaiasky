@@ -1,6 +1,8 @@
 package gaiasky.vr.openxr.input.actions;
 
+import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.XrHelper;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
@@ -14,15 +16,17 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
     private static final XrActionStateGetInfo getInfo = XrActionStateGetInfo.calloc().type(XR_TYPE_ACTION_STATE_GET_INFO);
     private static final XrActionStatePose state = XrActionStatePose.calloc().type(XR_TYPE_ACTION_STATE_POSE);
     private static final XrSpaceLocation location = XrSpaceLocation.calloc();
-    private static final XrPosef xrPose = XrPosef.calloc();
+    private static final XrPosef pose = XrPosef.calloc();
 
+    // The XR space.
     public XrSpace space;
-    public PoseBean pose;
+    // THe controller device attached to this pose.
+    public VRControllerDevice controllerDevice;
 
     public PoseAction(String name, String localizedName, boolean left) {
         super(name, localizedName, XR_ACTION_TYPE_POSE_INPUT);
-        pose = new PoseBean();
-        pose.left = left;
+        controllerDevice = new VRControllerDevice();
+        controllerDevice.left = left;
     }
 
     @Override
@@ -34,17 +38,7 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
     @Override
     public void createActionSpace(OpenXRDriver driver) {
         try (MemoryStack stack = stackPush()) {
-            XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack)
-                    .type$Default()
-                    .next(NULL)
-                    .poseInActionSpace(XrPosef.malloc(stack)
-                            .position$(XrVector3f.calloc(stack).set(0, 0, 0))
-                            .orientation(XrQuaternionf.malloc(stack)
-                                    .x(0)
-                                    .y(0)
-                                    .z(0)
-                                    .w(1)))
-                    .action(handle);
+            XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack).type$Default().next(NULL).poseInActionSpace(XrPosef.malloc(stack).position$(XrVector3f.calloc(stack).set(0, 0, 0)).orientation(XrQuaternionf.malloc(stack).x(0).y(0).z(0).w(1))).action(handle);
 
             PointerBuffer pp = stack.mallocPointer(1);
             driver.check(xrCreateActionSpace(driver.xrSession, createInfo, pp), "xrCreateActionSpace");
@@ -57,17 +51,13 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
     public void sync(OpenXRDriver driver) {
         getInfo.action(handle);
         driver.check(XR10.xrGetActionStatePose(driver.xrSession, getInfo, state), "xrGetActionStatePose");
-        pose.active = state.isActive();
-        if (pose.active) {
-            location.set(XR_TYPE_SPACE_LOCATION, NULL, 0, xrPose);
+        controllerDevice.active = state.isActive();
+        if (controllerDevice.active) {
+            location.set(XR_TYPE_SPACE_LOCATION, NULL, 0, pose);
             driver.check(xrLocateSpace(space, driver.xrAppSpace, driver.currentFrameTime, location));
-            if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0 &&
-                    (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
+            if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0 && (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
                 // Ok!
-                var pos = location.pose().position$();
-                var orientation = location.pose().orientation();
-                pose.position.set(pos.x(), pos.y(), pos.z());
-                pose.orientation.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
+                controllerDevice.setFromPose(location.pose());
             }
         }
     }

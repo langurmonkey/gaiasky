@@ -203,10 +203,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
      **/
     private Runnable updateRenderProcess;
-    /**
-     * Maps the VR devices to model objects.
-     */
-    private HashMap<VRDevice, Entity> vrDeviceToModel;
+    /** Main post processor. **/
     private IPostProcessor postProcessor;
     /**
      * The session start time, in milliseconds.
@@ -585,8 +582,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 @Override
                 public boolean showUI(boolean value) {
-                    if(value) {
-                       // return proceedToLoading();
+                    if (value) {
+                        // return proceedToLoading();
                     }
                     logger.info("Show UI " + value);
                     return false;
@@ -600,8 +597,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 @Override
                 public boolean cameraMode(boolean value) {
-                    if(value) {
-                      //  return proceedToLoading();
+                    if (value) {
+                        //  return proceedToLoading();
                     }
                     logger.info("Camera mode " + value);
                     return false;
@@ -666,8 +663,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 xrDriver.initializeInput();
 
                 xrDriver.pollEvents();
-
-                vrDeviceToModel = new HashMap<>();
 
                 if (settings.graphics.resolution[0] != xrDriver.getWidth()) {
                     logger.info("Warning, resizing according to VRSystem values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
@@ -1339,10 +1334,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
     private void renderGui(final IGui gui) {
         gui.update(graphics.getDeltaTime());
         gui.render(graphics.getWidth(), graphics.getHeight());
-    }
-
-    public HashMap<VRDevice, Entity> getVRDeviceToModel() {
-        return vrDeviceToModel;
     }
 
     public IScriptingInterface scripting() {

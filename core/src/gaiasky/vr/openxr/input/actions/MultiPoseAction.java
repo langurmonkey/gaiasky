@@ -25,15 +25,15 @@ public class MultiPoseAction extends Action implements SpaceAwareAction, InputAc
     public final int amount;
     public final List<String> subActionPathsStr;
     public XrSpace[] spaces;
-    public PoseBean[] poses;
+    public VRControllerDevice[] poses;
 
     public MultiPoseAction(String name, String localizedName, String[] subActionPathsStr) {
         super(name, localizedName, XR10.XR_ACTION_TYPE_POSE_INPUT);
         this.subActionPathsStr = Arrays.asList(subActionPathsStr);
         this.amount = subActionPathsStr.length;
-        this.poses = new PoseBean[amount];
+        this.poses = new VRControllerDevice[amount];
         for (int i = 0; i < amount; i++) {
-            this.poses[i] = new PoseBean();
+            this.poses[i] = new VRControllerDevice();
         }
     }
 

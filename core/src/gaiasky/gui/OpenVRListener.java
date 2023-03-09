@@ -57,7 +57,6 @@ public class OpenVRListener implements VRDeviceListener {
 
     private void lazyInit() {
         if (vrDeviceToModel == null) {
-            vrDeviceToModel = GaiaSky.instance.getVRDeviceToModel();
         }
     }
 

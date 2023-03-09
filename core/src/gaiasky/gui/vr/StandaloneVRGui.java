@@ -33,11 +33,11 @@ import gaiasky.util.gdx.shader.attribute.IntAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 import gaiasky.util.math.Vector3d;
-import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openxr.OpenXRDriver;
 import gaiasky.vr.openxr.OpenXRRenderer;
 import gaiasky.vr.openxr.XrHelper;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
+import gaiasky.vr.openxr.input.actions.VRControllerDevice;
 import org.joml.Matrix4f;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
@@ -72,7 +72,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     OpenXRDriver driver;
     FrameBuffer fbGui;
     SpriteBatch sbScreen;
-    Array<VRContext.VRDevice> controllers;
+    Array<VRControllerDevice> controllers;
     Vector2 lastSize = new Vector2();
     Vector3 aux = new Vector3();
 
@@ -185,19 +185,19 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     public void update(double dt) {
         // Initialize controllers if needed.
         if (controllers == null) {
-            controllers = driver.getDevicesByType(VRContext.VRDeviceType.Controller);
+            controllers = driver.getControllerDevices();
         }
         for (var controller : controllers) {
             if (!controller.isInitialized()) {
-                controller.initialize();
+                controller.initialize(driver);
             }
         }
 
         gui.update(dt);
     }
 
-
     private FrameBuffer lastFrameBuffer;
+
     @Override
     public void renderOpenXRView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, FrameBuffer frameBuffer, int viewIndex) {
         if (!positionSet) {
@@ -245,7 +245,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         if (controllers != null) {
             for (var controller : controllers) {
                 if (controller.isInitialized()) {
-                    var controllerInstance = controller.getModelInstance();
+                    var controllerInstance = controller.modelInstance;
                     if (controllerInstance != null) {
                         batch.render(controllerInstance, controllersEnv);
                     }
@@ -256,7 +256,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
 
     private final Matrix4f projectionMatrix = new Matrix4f();
     private final Matrix4f viewMatrix = new Matrix4f();
-    private final Quaternion quat = new Quaternion();
+    private final Quaternion quaternion = new Quaternion();
 
     private void updateCamera(XrCompositionLayerProjectionView layerView, PerspectiveCamera camera, int eye, int w, int h) {
         XrPosef pose = layerView.pose();
@@ -265,21 +265,17 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         try (MemoryStack stack = stackPush()) {
             projectionMatrix.set(XrHelper.createProjectionMatrixBuffer(stack, layerView.fov(), camera.near, camera.far, false));
         }
-        viewMatrix.translationRotateScaleInvert(
-                position.x(), position.y(), position.z(),
-                orientation.x(), orientation.y(), orientation.z(), orientation.w(),
-                1, 1, 1
-        );
+        viewMatrix.translationRotateScaleInvert(position.x(), position.y(), position.z(), orientation.x(), orientation.y(), orientation.z(), orientation.w(), 1, 1, 1);
 
         projectionMatrix.get(camera.projection.val);
         viewMatrix.get(camera.view.val);
         camera.combined.set(camera.projection);
         Matrix4.mul(camera.combined.val, camera.view.val);
 
-        quat.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
+        quaternion.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
         camera.position.set(position.x(), position.y(), position.z());
-        camera.direction.set(0, 0, -1).mul(quat);
-        camera.up.set(0, 1, 0).mul(quat);
+        camera.direction.set(0, 0, -1).mul(quaternion);
+        camera.up.set(0, 1, 0).mul(quaternion);
     }
 
     @Override

@@ -6,6 +6,11 @@ package gaiasky.vr.openxr;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import gaiasky.util.Settings;
+import gaiasky.util.gdx.loader.OwnObjLoader;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.vr.openvr.VRContext;
+import gaiasky.vr.openxr.input.actions.VRControllerDevice;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWNativeGLX;
 import org.lwjgl.glfw.GLFWNativeWGL;
@@ -65,15 +70,10 @@ public final class XrHelper {
      *
      * @param stack     the stack to allocate the buffer on
      * @param numLayers the number of elements the buffer should get
-     *
      * @return the created buffer
      */
     public static XrApiLayerProperties.Buffer prepareApiLayerProperties(MemoryStack stack, int numLayers) {
-        return fill(
-                XrApiLayerProperties.malloc(numLayers, stack),
-                XrApiLayerProperties.TYPE,
-                XR_TYPE_API_LAYER_PROPERTIES
-        );
+        return fill(XrApiLayerProperties.malloc(numLayers, stack), XrApiLayerProperties.TYPE, XR_TYPE_API_LAYER_PROPERTIES);
     }
 
     /**
@@ -84,15 +84,10 @@ public final class XrHelper {
      *
      * @param stack         the stack onto which to allocate the buffer
      * @param numExtensions the number of elements the buffer should get
-     *
      * @return the created buffer
      */
     public static XrExtensionProperties.Buffer prepareExtensionProperties(MemoryStack stack, int numExtensions) {
-        return fill(
-                XrExtensionProperties.malloc(numExtensions, stack),
-                XrExtensionProperties.TYPE,
-                XR_TYPE_EXTENSION_PROPERTIES
-        );
+        return fill(XrExtensionProperties.malloc(numExtensions, stack), XrExtensionProperties.TYPE, XR_TYPE_EXTENSION_PROPERTIES);
     }
 
     /**
@@ -102,7 +97,6 @@ public final class XrHelper {
      *
      * @param stack       the stack to allocate the buffer on
      * @param numBindings the number of elements the buffer should get
-     *
      * @return the created buffer
      */
     public static XrActionSuggestedBinding.Buffer prepareActionSuggestedBindings(MemoryStack stack, int numBindings) {
@@ -121,7 +115,6 @@ public final class XrHelper {
      * @param farZ       The furthest Z value that the user should see (also known as far plane)
      * @param zZeroToOne True if the z-axis of the coordinate system goes from 0 to 1 (Vulkan).
      *                   False if the z-axis of the coordinate system goes from -1 to 1 (OpenGL).
-     *
      * @return A {@link FloatBuffer} that contains the matrix data of the desired projection matrix. Use the
      * <b>set</b> method of a <b>Matrix4f</b> instance to copy the buffer values to that matrix.
      */
@@ -187,20 +180,13 @@ public final class XrHelper {
      *
      * @param stack  The stack onto which to allocate the graphics binding struct
      * @param window The GLFW window handle used to create the OpenGL context
-     *
      * @return A {@code XrGraphicsBindingOpenGL**} struct that can be used to create a session
-     *
      * @throws IllegalStateException If the current platform is not supported
      */
     public static Struct createOpenGLBinding(MemoryStack stack, long window) {
         //Bind the OpenGL context to the OpenXR instance and create the session
         if (Platform.get() == Platform.WINDOWS) {
-            return XrGraphicsBindingOpenGLWin32KHR.calloc(stack).set(
-                    KHROpenGLEnable.XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR,
-                    NULL,
-                    User32.GetDC(GLFWNativeWin32.glfwGetWin32Window(window)),
-                    GLFWNativeWGL.glfwGetWGLContext(window)
-            );
+            return XrGraphicsBindingOpenGLWin32KHR.calloc(stack).set(KHROpenGLEnable.XR_TYPE_GRAPHICS_BINDING_OPENGL_WIN32_KHR, NULL, User32.GetDC(GLFWNativeWin32.glfwGetWin32Window(window)), GLFWNativeWGL.glfwGetWGLContext(window));
         } else if (Platform.get() == Platform.LINUX) {
             long xDisplay = GLFWNativeX11.glfwGetX11Display();
 
@@ -209,22 +195,35 @@ public final class XrHelper {
 
             int fbXID = glXQueryDrawable(xDisplay, glXWindowHandle, GLX_FBCONFIG_ID);
             PointerBuffer fbConfigBuf = glXChooseFBConfig(xDisplay, X11.XDefaultScreen(xDisplay), stackInts(GLX_FBCONFIG_ID, fbXID, 0));
-            if(fbConfigBuf == null) {
+            if (fbConfigBuf == null) {
                 throw new IllegalStateException("Your framebuffer config was null, make a github issue");
             }
             long fbConfig = fbConfigBuf.get();
 
-            return XrGraphicsBindingOpenGLXlibKHR.calloc(stack).set(
-                    KHROpenGLEnable.XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR,
-                    NULL,
-                    xDisplay,
-                    (int) Objects.requireNonNull(glXGetVisualFromFBConfig(xDisplay, fbConfig)).visualid(),
-                    fbConfig,
-                    glXWindowHandle,
-                    glXContext
-            );
+            return XrGraphicsBindingOpenGLXlibKHR.calloc(stack).set(KHROpenGLEnable.XR_TYPE_GRAPHICS_BINDING_OPENGL_XLIB_KHR, NULL, xDisplay, (int) Objects.requireNonNull(glXGetVisualFromFBConfig(xDisplay, fbConfig)).visualid(), fbConfig, glXWindowHandle, glXContext);
         } else {
             throw new IllegalStateException("macOS not supported");
         }
+    }
+
+    public static IntModel loadRenderModel(OpenXRDriver driver, VRControllerDevice controllerDevice) {
+        IntModel model = null;
+        OwnObjLoader ol = new OwnObjLoader();
+        if (driver != null && driver.runtimeName.contains("oculus")) {
+            // Oculus Rift CV1.
+            if (controllerDevice.left) {
+                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
+            } else {
+                model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-right.obj"));
+            }
+        } else if (driver != null && (driver.runtimeName.contains("htc") || driver.runtimeName.contains("vive"))) {
+            // HTC vive controller model.
+            model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
+        } else {
+            // Load default.
+            model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/generic/generic_vr_controller.obj"));
+        }
+
+        return model;
     }
 }
