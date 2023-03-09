@@ -1,3 +1,40 @@
+<a name="3.4.1"></a>
+## [3.4.1](https://codeberg.org/gaiasky/gaiasky/tree/3.4.0) (2023-03-09)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.4.0...3.4.1)
+
+### Bug Fixes
+- typo in German translation file. Fixes [#706](https://codeberg.org/gaiasky/gaiasky/issues/706). 
+- remove unused configuration setting `scriptsLocation`. 
+- tooltip and layout issues in datasets component. 
+- invalid focus state in natural camera. 
+- add object name checks to most API calls. 
+- omit regular gamepad window bindings in gamepad configuration window. 
+- first loading frame produced in VR with incorrect sizing. 
+- connect visibility buttons in gamepad GUI to global visibility event, and add tooltips with name. 
+- remove IVRHeadsetView interface from OpenVR initialization so that Gaia Sky works with OpenComposite, which translates OpenVR to OpenXR. 
+- properly close file stream when done with them. 
+- prevent hang on close due to daemon thread notify() calls. 
+- incorrect filtering in slider backgrounds. 
+- incorrect filtering in UI table baground image. 
+- script with wrong loader name. Fixes [#703](https://codeberg.org/gaiasky/gaiasky/issues/703). 
+
+### Code Refactoring
+- update VR controllers in their own system. 
+- move VR UI classes to own package. 
+
+### Documentation
+- update API call fade in/out descriptions. 
+
+### Features
+- add generic VR controller. 
+- add VR controller interaction in VR welcome screen. 
+- welcome and loading VR screens are now 3D surfaces in-scene. 
+- sRGB setting enables SRGB format only in VR frame buffers. 
+- add specific mappings for Valve Index VR controllers. 
+- VR controllers use same mappings format as gamepads. 
+- use gamepad UI in VR. 
+- initial implementation of a proper in-scene VR user interface with mouse interaction. 
+
 <a name="3.4.0"></a>
 ## [3.4.0](https://codeberg.org/gaiasky/gaiasky/tree/3.3.2) (2023-02-13)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.3.2...3.4.0)

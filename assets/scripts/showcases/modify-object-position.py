@@ -47,6 +47,9 @@ gs.sleep(20.0)
 
 gs.stopSimulationTime()
 
+position = gs.getObjectPosition("Test Object")
+print("%f, %f, %f" % (position[0], position[1], position[2]))
+
 # clean up and finish
 gs.unparkRunnable("pos-updater")
 gs.removeModelObject("Test Object")
