@@ -26,7 +26,7 @@
   </description>
 
   <releases>
-    <release version="3.4.0" date="2023-02-13" urgency="high">
+    <release version="3.4.1" date="2023-03-09" urgency="high">
       <url>https://gaia.ari.uni-heidelberg.de/gaiasky/releases/3.4.0.80b36aa6a/releasenotes.txt</url>
     </release>
   </releases>
@@ -98,6 +98,14 @@
     <screenshot>
       <caption>Scripting</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20210225/00000.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Virtual Reality</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230303/00007.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Virtual Reality</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230303/00006.jpg</image>
     </screenshot>
   </screenshots>
 </component>
