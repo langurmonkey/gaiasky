@@ -17,28 +17,39 @@ public abstract class Action implements AutoCloseable {
     protected XrAction handle;
     public final String name;
     public final String localizedName;
-    public final int type;
+    public final int xrActionType;
+    protected final DeviceType deviceType;
 
-    public Action(String name, String localizedName, int type) {
+    /**
+     * Reflects the source device of this action. Either left or right.
+     */
+    public enum DeviceType {
+        Left, Right;
+
+        public boolean isLeft(){
+            return this == Left;
+        }
+
+        public boolean isRight(){
+            return this == Right;
+        }
+    }
+
+    public Action(String name, String localizedName, int type, DeviceType deviceType) {
         this.name = name;
         this.localizedName = localizedName;
-        this.type = type;
+        this.xrActionType = type;
+        this.deviceType = deviceType;
     }
 
     public void createHandle(XrActionSet actionSet, OpenXRDriver driver) {
-        handle = createAction(driver, actionSet, type);
+        handle = createAction(driver, actionSet, xrActionType);
     }
 
     protected XrAction createAction(OpenXRDriver driver, XrActionSet actionSet, int type) {
         try (MemoryStack stack = stackPush()) {
             // Create action.
-            XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
-                    .type$Default()
-                    .next(NULL)
-                    .actionName(stack.UTF8(name))
-                    .localizedActionName(stack.UTF8(localizedName))
-                    .countSubactionPaths(0)
-                    .actionType(type);
+            XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack).type$Default().next(NULL).actionName(stack.UTF8(name)).localizedActionName(stack.UTF8(localizedName)).countSubactionPaths(0).actionType(type);
 
             PointerBuffer pp = stack.mallocPointer(1);
             driver.check(xrCreateAction(actionSet, createInfo, pp));
@@ -61,4 +72,9 @@ public abstract class Action implements AutoCloseable {
     public void close() {
         destroyHandle();
     }
+
+    public DeviceType getDeviceType() {
+        return deviceType;
+    }
+
 }

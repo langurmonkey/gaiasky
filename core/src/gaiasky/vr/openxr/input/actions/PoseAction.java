@@ -1,8 +1,6 @@
 package gaiasky.vr.openxr.input.actions;
 
-import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.vr.openxr.OpenXRDriver;
-import gaiasky.vr.openxr.XrHelper;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
@@ -23,10 +21,10 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
     // THe controller device attached to this pose.
     public VRControllerDevice controllerDevice;
 
-    public PoseAction(String name, String localizedName, boolean left) {
-        super(name, localizedName, XR_ACTION_TYPE_POSE_INPUT);
+    public PoseAction(String name, String localizedName, DeviceType deviceType) {
+        super(name, localizedName, XR_ACTION_TYPE_POSE_INPUT, deviceType);
         controllerDevice = new VRControllerDevice();
-        controllerDevice.left = left;
+        controllerDevice.deviceType = deviceType;
     }
 
     @Override

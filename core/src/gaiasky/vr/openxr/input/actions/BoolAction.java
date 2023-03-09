@@ -10,8 +10,8 @@ public class BoolAction extends SingleInputAction<Boolean> {
 
     private static final XrActionStateBoolean state = XrActionStateBoolean.calloc().type(XR_TYPE_ACTION_STATE_BOOLEAN);
 
-    public BoolAction(String name, String localizedName) {
-        super(name, localizedName, XR_ACTION_TYPE_BOOLEAN_INPUT);
+    public BoolAction(String name, String localizedName, DeviceType deviceType) {
+        super(name, localizedName, XR_ACTION_TYPE_BOOLEAN_INPUT, deviceType);
         currentState = false;
     }
 

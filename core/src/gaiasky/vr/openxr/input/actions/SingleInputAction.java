@@ -19,8 +19,8 @@ public abstract class SingleInputAction<T> extends Action implements InputAction
     public long lastChangeTime;
     public boolean isActive;
 
-    public SingleInputAction(String name, String localizedName, int type) {
-        super(name, localizedName, type);
+    public SingleInputAction(String name, String localizedName, int type, DeviceType deviceType) {
+        super(name, localizedName, type, deviceType);
     }
 
 }

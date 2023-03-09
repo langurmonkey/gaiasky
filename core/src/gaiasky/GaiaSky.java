@@ -82,6 +82,7 @@ import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRStatus;
 import gaiasky.vr.openxr.OpenXRDriver;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
+import gaiasky.vr.openxr.input.actions.Action;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.openxr.XrVector2f;
 
@@ -581,7 +582,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
             welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new OpenXRInputListener() {
 
                 @Override
-                public boolean showUI(boolean value) {
+                public boolean showUI(boolean value, Action.DeviceType type) {
                     if (value) {
                         // return proceedToLoading();
                     }
@@ -590,13 +591,13 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 @Override
-                public boolean accept(boolean value) {
+                public boolean accept(boolean value, Action.DeviceType type) {
                     logger.info("Accept " + value);
                     return false;
                 }
 
                 @Override
-                public boolean cameraMode(boolean value) {
+                public boolean cameraMode(boolean value, Action.DeviceType type) {
                     if (value) {
                         //  return proceedToLoading();
                     }
@@ -605,19 +606,19 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 @Override
-                public boolean rotate(boolean value) {
+                public boolean rotate(boolean value, Action.DeviceType type) {
                     logger.info("Rotate " + value);
                     return false;
                 }
 
                 @Override
-                public boolean move(Vector2 value) {
+                public boolean move(Vector2 value, Action.DeviceType type) {
                     logger.info("Move " + value);
                     return false;
                 }
 
                 @Override
-                public boolean select(float value) {
+                public boolean select(float value, Action.DeviceType type) {
                     logger.info("Select " + value);
                     return false;
                 }

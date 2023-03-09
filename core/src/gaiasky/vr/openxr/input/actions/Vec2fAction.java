@@ -11,8 +11,8 @@ public class Vec2fAction extends SingleInputAction<Vector2> {
 
     private static final XrActionStateVector2f state = XrActionStateVector2f.calloc().type(XR_TYPE_ACTION_STATE_VECTOR2F);
 
-    public Vec2fAction(String name, String localizedName) {
-        super(name, localizedName, XR_ACTION_TYPE_VECTOR2F_INPUT);
+    public Vec2fAction(String name, String localizedName, DeviceType deviceType) {
+        super(name, localizedName, XR_ACTION_TYPE_VECTOR2F_INPUT, deviceType);
         currentState = new Vector2();
     }
 

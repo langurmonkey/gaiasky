@@ -12,9 +12,7 @@ import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRDeviceListener;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
-import gaiasky.vr.openxr.input.actions.Action;
-import gaiasky.vr.openxr.input.actions.HapticsAction;
-import gaiasky.vr.openxr.input.actions.VRControllerDevice;
+import gaiasky.vr.openxr.input.actions.*;
 import gaiasky.vr.openxr.input.actionsets.ActionSet;
 import gaiasky.vr.openxr.input.actionsets.GaiaSkyActionSet;
 import gaiasky.vr.openxr.input.actionsets.HandsActionSet;
@@ -549,26 +547,51 @@ public class OpenXRDriver implements Disposable {
                 actions.sync(this);
                 var gsActions = (GaiaSkyActionSet) actions;
                 for (var listener : listeners) {
-                    if (gsActions.showUI.isActive && gsActions.showUI.changedSinceLastSync) {
-                        listener.showUI(gsActions.showUI.currentState);
-                    }
-                    if (gsActions.accept.isActive && gsActions.accept.changedSinceLastSync) {
-                        listener.accept(gsActions.accept.currentState);
-                    }
-                    if (gsActions.cameraMode.isActive && gsActions.cameraMode.changedSinceLastSync) {
-                        listener.cameraMode(gsActions.cameraMode.currentState);
-                    }
-                    if (gsActions.select.isActive && gsActions.select.changedSinceLastSync) {
-                        listener.select(gsActions.select.currentState);
-                    }
-                    if (gsActions.move.isActive && gsActions.move.changedSinceLastSync) {
-                        listener.move(gsActions.move.currentState);
-                    }
+                    processShowUIAction(gsActions.showUiLeft, listener);
+                    processShowUIAction(gsActions.showUiRight, listener);
+
+                    processAcceptAction(gsActions.acceptLeft, listener);
+                    processAcceptAction(gsActions.acceptRight, listener);
+
+                    processCameraModeAction(gsActions.cameraModeLeft, listener);
+                    processCameraModeAction(gsActions.cameraModeRight, listener);
+
+                    processSelectAction(gsActions.selectLeft, listener);
+                    processSelectAction(gsActions.selectRight, listener);
+
+                    processMoveAction(gsActions.moveLeft, listener);
+                    processMoveAction(gsActions.moveRight, listener);
                 }
             }
             if (poses != null) {
                 poses.sync(this);
             }
+        }
+    }
+
+    private void processShowUIAction(BoolAction action, OpenXRInputListener listener) {
+        if (action.isActive && action.changedSinceLastSync) {
+            listener.showUI(action.currentState, action.getDeviceType());
+        }
+    }
+    private void processCameraModeAction(BoolAction action, OpenXRInputListener listener) {
+        if (action.isActive && action.changedSinceLastSync) {
+            listener.cameraMode(action.currentState, action.getDeviceType());
+        }
+    }
+    private void processAcceptAction(BoolAction action, OpenXRInputListener listener) {
+        if (action.isActive && action.changedSinceLastSync) {
+            listener.accept(action.currentState, action.getDeviceType());
+        }
+    }
+    private void processSelectAction(FloatAction action, OpenXRInputListener listener) {
+        if (action.isActive && action.changedSinceLastSync) {
+            listener.select(action.currentState, action.getDeviceType());
+        }
+    }
+    private void processMoveAction(Vec2fAction action, OpenXRInputListener listener) {
+        if (action.isActive && action.changedSinceLastSync) {
+            listener.move(action.currentState, action.getDeviceType());
         }
     }
 
@@ -646,9 +669,9 @@ public class OpenXRDriver implements Disposable {
             var haptics = (HandsActionSet) poses;
             HapticsAction action;
             if (left) {
-                action = haptics.leftHaptic;
+                action = haptics.hapticLeft;
             } else {
-                action = haptics.rightHaptic;
+                action = haptics.hapticRight;
             }
             if (action != null) {
                 action.sendHapticPulse(this, duration, frequency, amplitude);

@@ -13,6 +13,7 @@ import gaiasky.vr.openxr.OpenXRRenderer;
 import gaiasky.vr.openxr.ShadersGL;
 import gaiasky.vr.openxr.XrHelper;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
+import gaiasky.vr.openxr.input.actions.Action;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
@@ -84,38 +85,38 @@ public class HiOpenXRGL implements OpenXRRenderer {
 
         driver.addListener(new OpenXRInputListener() {
             @Override
-            public boolean showUI(boolean value) {
+            public boolean showUI(boolean value, Action.DeviceType type) {
                 System.out.println("Show UI");
                 return false;
             }
 
             @Override
-            public boolean accept(boolean value) {
+            public boolean accept(boolean value, Action.DeviceType type) {
                 System.out.println("Accept");
                 return false;
             }
 
             @Override
-            public boolean cameraMode(boolean value) {
+            public boolean cameraMode(boolean value, Action.DeviceType type) {
                 System.out.println("Camera mode");
                 return false;
             }
 
             @Override
-            public boolean rotate(boolean value) {
+            public boolean rotate(boolean value, Action.DeviceType type) {
                 System.out.println("Rotate");
                 return false;
             }
 
             @Override
-            public boolean move(Vector2 value) {
+            public boolean move(Vector2 value, Action.DeviceType type) {
                 System.out.println("Move");
                 return false;
             }
 
 
             @Override
-            public boolean select(float value) {
+            public boolean select(float value, Action.DeviceType type) {
                 System.out.println("Select");
                 return false;
             }

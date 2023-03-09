@@ -9,12 +9,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static gaiasky.vr.openxr.input.actions.Action.DeviceType.Left;
+import static gaiasky.vr.openxr.input.actions.Action.DeviceType.Right;
+
 public class HandsActionSet extends ActionSet {
 
-    public PoseAction leftPose = new PoseAction("left-pose", "Left grip pose", true);
-    public PoseAction rightPose = new PoseAction("right-pose", "Right grip pose", false);
-    public HapticsAction leftHaptic = new HapticsAction("haptics-left", "Haptic left");
-    public HapticsAction rightHaptic = new HapticsAction("haptics-right", "Haptic right");
+    public PoseAction poseLeft = new PoseAction("left-pose", "Left grip pose", Left);
+    public PoseAction poseRight = new PoseAction("right-pose", "Right grip pose", Right);
+    public HapticsAction hapticLeft = new HapticsAction("haptics-left", "Haptic left", Left);
+    public HapticsAction hapticRight = new HapticsAction("haptics-right", "Haptic right", Right);
 
     public HandsActionSet() {
         super("hands", "Hand poses", 0);
@@ -22,11 +25,7 @@ public class HandsActionSet extends ActionSet {
 
     @Override
     public List<Action> actions() {
-        return List.of(
-                leftPose,
-                rightPose,
-                leftHaptic,
-                rightHaptic
+        return List.of(poseLeft, poseRight, hapticLeft, hapticRight
         );
     }
 
@@ -36,20 +35,20 @@ public class HandsActionSet extends ActionSet {
         // OCULUS TOUCH
         map.computeIfAbsent("/interaction_profiles/oculus/touch_controller", aLong -> new ArrayList<>()).addAll(
                 List.of(
-                        new Pair<>(leftPose, "/user/hand/left/input/grip/pose"),
-                        new Pair<>(rightPose, "/user/hand/right/input/grip/pose"),
-                        new Pair<>(leftHaptic, "/user/hand/left/output/haptic"),
-                        new Pair<>(rightHaptic, "/user/hand/right/output/haptic")
+                        new Pair<>(poseLeft, "/user/hand/left/input/grip/pose"),
+                        new Pair<>(poseRight, "/user/hand/right/input/grip/pose"),
+                        new Pair<>(hapticLeft, "/user/hand/left/output/haptic"),
+                        new Pair<>(hapticRight, "/user/hand/right/output/haptic")
                 )
         );
 
         // VALVE INDEX
         map.computeIfAbsent("/interaction_profiles/valve/index_controller", aLong -> new ArrayList<>()).addAll(
                 List.of(
-                        new Pair<>(leftPose, "/user/hand/left/input/grip/pose"),
-                        new Pair<>(rightPose, "/user/hand/right/input/grip/pose"),
-                        new Pair<>(leftHaptic, "/user/hand/left/output/haptic"),
-                        new Pair<>(rightHaptic, "/user/hand/right/output/haptic")
+                        new Pair<>(poseLeft, "/user/hand/left/input/grip/pose"),
+                        new Pair<>(poseRight, "/user/hand/right/input/grip/pose"),
+                        new Pair<>(hapticLeft, "/user/hand/left/output/haptic"),
+                        new Pair<>(hapticRight, "/user/hand/right/output/haptic")
                 )
         );
 

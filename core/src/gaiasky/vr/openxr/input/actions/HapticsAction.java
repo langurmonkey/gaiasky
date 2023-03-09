@@ -12,8 +12,8 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class HapticsAction extends Action {
 
-    public HapticsAction(String name, String localizedName) {
-        super(name, localizedName, XR_ACTION_TYPE_VIBRATION_OUTPUT);
+    public HapticsAction(String name, String localizedName, DeviceType deviceType) {
+        super(name, localizedName, XR_ACTION_TYPE_VIBRATION_OUTPUT, deviceType);
     }
 
     public void sendHapticPulse(OpenXRDriver driver, long duration, float frequency, float amplitude) {

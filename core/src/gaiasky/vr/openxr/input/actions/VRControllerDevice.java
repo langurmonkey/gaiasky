@@ -14,7 +14,7 @@ import org.lwjgl.openxr.XrPosef;
  */
 public class VRControllerDevice {
     public boolean active = false;
-    public boolean left = false;
+    public Action.DeviceType deviceType = Action.DeviceType.Right;
     private boolean initialized = false;
     public Matrix4f transform = new Matrix4f();
     public Vector3 position = new Vector3();
