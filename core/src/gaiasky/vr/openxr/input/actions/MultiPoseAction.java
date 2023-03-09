@@ -1,82 +1,106 @@
 package gaiasky.vr.openxr.input.actions;
 
-import gaiasky.util.i18n.I18n;
 import gaiasky.vr.openxr.OpenXRDriver;
 import gaiasky.vr.openxr.OpenXRState;
-import gaiasky.vr.openxr.XrException;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openxr.*;
+import org.lwjgl.system.MemoryStack;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.lwjgl.openxr.XR10.*;
 import static org.lwjgl.system.MemoryStack.stackCallocPointer;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 
-public class MultiPoseAction extends Action implements SessionAwareAction, InputAction {
+public class MultiPoseAction extends Action implements SpaceAwareAction, InputAction {
 
-    private static final XrActionStateGetInfo getInfo = XrActionStateGetInfo.calloc().type(XR10.XR_TYPE_ACTION_STATE_GET_INFO);
-    private static final XrActionStatePose state = XrActionStatePose.calloc().type(XR10.XR_TYPE_ACTION_STATE_POSE);
+    private static final XrActionStateGetInfo getInfo = XrActionStateGetInfo.calloc().type(XR_TYPE_ACTION_STATE_GET_INFO);
+    private static final XrActionStatePose state = XrActionStatePose.calloc().type(XR_TYPE_ACTION_STATE_POSE);
+    private static final XrSpaceLocation location = XrSpaceLocation.calloc();
+    private static final XrPosef pose = XrPosef.calloc();
 
     public final int amount;
-    public final List<String> subactionPathsStr;
-    public boolean[] isActive;
+    public final List<String> subActionPathsStr;
     public XrSpace[] spaces;
+    public PoseBean[] poses;
 
-    public MultiPoseAction(String name, String[] subactionPathsStr) {
-        super(name, XR10.XR_ACTION_TYPE_POSE_INPUT);
-        this.subactionPathsStr = Arrays.asList(subactionPathsStr);
-        this.amount = subactionPathsStr.length;
-        this.isActive = new boolean[amount];
+    public MultiPoseAction(String name, String localizedName, String[] subActionPathsStr) {
+        super(name, localizedName, XR10.XR_ACTION_TYPE_POSE_INPUT);
+        this.subActionPathsStr = Arrays.asList(subActionPathsStr);
+        this.amount = subActionPathsStr.length;
+        this.poses = new PoseBean[amount];
+        for (int i = 0; i < amount; i++) {
+            this.poses[i] = new PoseBean();
+        }
     }
 
     @Override
     public void createHandle(XrActionSet actionSet, OpenXRDriver driver) {
         try (var stack = stackPush()) {
 
-            var subactionPaths = stack.callocLong(amount);
+            var subActionPaths = stack.callocLong(amount);
 
             for (int i = 0; i < amount; i++) {
-                var str = subactionPathsStr.get(i);
-                subactionPaths.put(i, driver.getPath(str));
-            }
-
-            String localizedName = "gaiasky.action." + this.name;
-            if (I18n.exists(localizedName)) {
-                localizedName = I18n.get(localizedName);
+                var str = subActionPathsStr.get(i);
+                subActionPaths.put(i, driver.getPath(str));
             }
 
             XrActionCreateInfo actionCreateInfo = XrActionCreateInfo.calloc(stack).set(
                     XR10.XR_TYPE_ACTION_CREATE_INFO,
                     NULL,
-                    memUTF8("gaiasky." + this.name),
+                    memUTF8(name),
                     type,
                     amount,
-                    subactionPaths,
+                    subActionPaths,
                     memUTF8(localizedName)
             );
             PointerBuffer pp = stackCallocPointer(1);
             driver.check(XR10.xrCreateAction(actionSet, actionCreateInfo, pp));
             handle = new XrAction(pp.get(), actionSet);
         }
+        createActionSpace(driver);
     }
 
     @Override
-    public void createHandleSession(OpenXRDriver driver) throws XrException {
+    public void createActionSpace(OpenXRDriver driver) {
+        try (MemoryStack stack = stackPush()) {
+            spaces = new XrSpace[amount];
+            for (int i = 0; i < amount; i++) {
+                XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack)
+                        .type$Default()
+                        .poseInActionSpace(XrPosef.malloc(stack)
+                                .position$(XrVector3f.calloc(stack).set(0, 0, 0))
+                                .orientation(XrQuaternionf.malloc(stack)
+                                        .x(0)
+                                        .y(0)
+                                        .z(0)
+                                        .w(1)))
+                        .action(handle)
+                        .subactionPath(driver.getPath(subActionPathsStr.get(i)));
+
+                PointerBuffer pp = stack.mallocPointer(1);
+                driver.check(xrCreateActionSpace(driver.xrSession, createInfo, pp), "xrCreateActionSpace");
+                spaces[i] = new XrSpace(pp.get(0), driver.xrSession);
+            }
+        }
+    }
+
+    public void bakActionSpace(OpenXRDriver driver) {
         try (var stack = stackPush()) {
             spaces = new XrSpace[amount];
             for (int i = 0; i < amount; i++) {
-                XrActionSpaceCreateInfo action_space_info = XrActionSpaceCreateInfo.calloc(stack).set(
+                XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.calloc(stack).set(
                         XR10.XR_TYPE_ACTION_SPACE_CREATE_INFO,
                         NULL,
                         handle,
-                        driver.getPath(subactionPathsStr.get(i)),
+                        driver.getPath(subActionPathsStr.get(i)),
                         OpenXRState.POSE_IDENTITY
                 );
                 PointerBuffer pp = stackCallocPointer(1);
-                driver.check(XR10.xrCreateActionSpace(driver.xrSession, action_space_info, pp), "xrCreateActionSpace");
+                driver.check(XR10.xrCreateActionSpace(driver.xrSession, createInfo, pp), "xrCreateActionSpace");
                 spaces[i] = new XrSpace(pp.get(0), driver.xrSession);
             }
         }
@@ -85,15 +109,27 @@ public class MultiPoseAction extends Action implements SessionAwareAction, Input
     @Override
     public void sync(OpenXRDriver driver) {
         for (int i = 0; i < amount; i++) {
-            getInfo.subactionPath(driver.getPath(subactionPathsStr.get(i)));
+            getInfo.subactionPath(driver.getPath(subActionPathsStr.get(i)));
             getInfo.action(handle);
             driver.check(XR10.xrGetActionStatePose(driver.xrSession, getInfo, state), "xrGetActionStatePose");
-            isActive[i] = state.isActive();
+            poses[i].active = state.isActive();
+            if (poses[i].active) {
+                location.set(XR_TYPE_SPACE_LOCATION, NULL, 0, pose);
+                driver.check(xrLocateSpace(spaces[i], driver.xrAppSpace, driver.currentFrameTime, location));
+                if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0 &&
+                        (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
+                    // Ok!
+                    var pos = location.pose().position$();
+                    var orientation = location.pose().orientation();
+                    poses[i].position.set(pos.x(), pos.y(), pos.z());
+                    poses[i].orientation.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
+                }
+            }
         }
     }
 
     @Override
-    public void destroyHandleSession() {
+    public void destroyActionSpace() {
         if (spaces != null) {
             for (var space : spaces) {
                 XR10.xrDestroySpace(space);

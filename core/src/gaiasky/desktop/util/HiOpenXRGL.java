@@ -2,6 +2,8 @@ package gaiasky.desktop.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Vector2;
 import gaiasky.gui.ConsoleLogger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
@@ -55,8 +57,6 @@ public class HiOpenXRGL implements OpenXRRenderer {
     int textureShader;
     int colorShader;
 
-    long frameTime;
-
     public static void main(String[] args) throws Exception {
         // Enable logging.
         Gdx.files = new Lwjgl3Files();
@@ -84,39 +84,44 @@ public class HiOpenXRGL implements OpenXRRenderer {
 
         driver.addListener(new OpenXRInputListener() {
             @Override
-            public boolean buttonA(boolean value) {
-                System.out.println("BUTTON A " + value);
+            public boolean showUI(boolean value) {
+                System.out.println("Show UI");
                 return false;
             }
 
             @Override
-            public boolean buttonB(boolean value) {
-                System.out.println("BUTTON B " + value);
+            public boolean accept(boolean value) {
+                System.out.println("Accept");
                 return false;
             }
 
             @Override
-            public boolean buttonTrigger(boolean value) {
+            public boolean cameraMode(boolean value) {
+                System.out.println("Camera mode");
                 return false;
             }
 
             @Override
-            public boolean buttonThumbstick(boolean value) {
+            public boolean rotate(boolean value) {
+                System.out.println("Rotate");
                 return false;
             }
 
             @Override
-            public boolean thumbstick(XrVector2f value) {
+            public boolean move(Vector2 value) {
+                System.out.println("Move");
                 return false;
             }
 
+
             @Override
-            public boolean trigger(float value) {
+            public boolean select(float value) {
+                System.out.println("Select");
                 return false;
             }
         });
 
-        while (!driver.pollEvents(hi.frameTime) && !glfwWindowShouldClose(hi.window)) {
+        while (!driver.pollEvents() && !glfwWindowShouldClose(hi.window)) {
             if (driver.isRunning()) {
                 driver.renderFrameOpenXR();
             } else {
@@ -250,12 +255,7 @@ public class HiOpenXRGL implements OpenXRRenderer {
 
     private static FloatBuffer mvpMatrix = BufferUtils.createFloatBuffer(16);
 
-    @Override
-    public void renderBefore() {
-
-    }
-
-    public void renderView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, int viewIndex) {
+    public void renderOpenXRView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, FrameBuffer ignored, int viewIndex) {
         glBindFramebuffer(GL_FRAMEBUFFER, swapchainFramebuffer);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
@@ -340,11 +340,6 @@ public class HiOpenXRGL implements OpenXRRenderer {
                 glFlush();
             }
         }
-    }
-
-    @Override
-    public void renderAfter() {
-
     }
 
     private static class Geometry {

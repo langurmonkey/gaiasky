@@ -1,16 +1,16 @@
 package gaiasky.vr.openxr.input;
 
-import org.lwjgl.openxr.XrVector2f;
+import com.badlogic.gdx.math.Vector2;
 
 /**
- * Listener for OpenXR events.
+ * Listener for OpenXR events in Gaia Sky.
  */
 public interface OpenXRInputListener {
 
-    boolean buttonA(boolean value);
-    boolean buttonB(boolean value);
-    boolean buttonTrigger(boolean value);
-    boolean buttonThumbstick(boolean value);
-    boolean thumbstick(XrVector2f value);
-    boolean trigger(float value);
+    boolean showUI(boolean value);
+    boolean accept(boolean value);
+    boolean cameraMode(boolean value);
+    boolean rotate(boolean value);
+    boolean move(Vector2 value);
+    boolean select(float value);
 }

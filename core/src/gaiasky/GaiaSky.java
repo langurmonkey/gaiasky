@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.*;
@@ -78,7 +79,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.time.RealTimeClock;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.vr.openvr.VRContext.VRDevice;
-import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
 import gaiasky.vr.openxr.OpenXRDriver;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
@@ -276,10 +276,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
      **/
     private final Runnable runnableInitialGui = () -> {
         if (settings.runtime.openXr) {
-            // Render to VR.
+            // Render to UI to frame buffer.
             renderGui(welcomeGuiVR);
 
-            xrDriver.pollEvents(xrDriver.currentFrameTime);
+            xrDriver.pollEvents();
             if (xrDriver.isRunning()) {
                 // Render OpenXR frame.
                 xrDriver.renderFrameOpenXR();
@@ -390,8 +390,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
             updateRenderProcess = runnableRender;
         } else {
             if (settings.runtime.openXr) {
-                // Render to VR.
+                // Render to UI to frame buffer.
                 renderGui(loadingGuiVR);
+
+                xrDriver.pollEvents();
+                if (xrDriver.isRunning()) {
+                    // Render OpenXR frame.
+                    xrDriver.renderFrameOpenXR();
+                }
             }
             // Render to screen.
             renderGui(loadingGui);
@@ -576,33 +582,46 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         if (settings.runtime.openXr) {
             welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new OpenXRInputListener() {
-                @Override
-                public boolean buttonA(boolean value) {
-                    return proceedToLoading();
-                }
 
                 @Override
-                public boolean buttonB(boolean value) {
-                    return proceedToLoading();
-                }
-
-                @Override
-                public boolean buttonTrigger(boolean value) {
+                public boolean showUI(boolean value) {
+                    if(value) {
+                       // return proceedToLoading();
+                    }
+                    logger.info("Show UI " + value);
                     return false;
                 }
 
                 @Override
-                public boolean buttonThumbstick(boolean value) {
+                public boolean accept(boolean value) {
+                    logger.info("Accept " + value);
                     return false;
                 }
 
                 @Override
-                public boolean thumbstick(XrVector2f value) {
+                public boolean cameraMode(boolean value) {
+                    if(value) {
+                      //  return proceedToLoading();
+                    }
+                    logger.info("Camera mode " + value);
                     return false;
                 }
 
                 @Override
-                public boolean trigger(float value) {
+                public boolean rotate(boolean value) {
+                    logger.info("Rotate " + value);
+                    return false;
+                }
+
+                @Override
+                public boolean move(Vector2 value) {
+                    logger.info("Move " + value);
+                    return false;
+                }
+
+                @Override
+                public boolean select(float value) {
+                    logger.info("Select " + value);
                     return false;
                 }
 
@@ -643,9 +662,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 xrDriver.initializeOpenXRSession(window.getWindowHandle());
                 xrDriver.createOpenXRReferenceSpace();
                 xrDriver.createOpenXRSwapchains();
+                xrDriver.initializeOpenGLFrameBuffers();
                 xrDriver.initializeInput();
 
-                xrDriver.pollEvents(1);
+                xrDriver.pollEvents();
 
                 vrDeviceToModel = new HashMap<>();
 

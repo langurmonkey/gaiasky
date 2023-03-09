@@ -4,9 +4,8 @@ import gaiasky.util.Logger;
 import gaiasky.vr.openxr.input.ControllerPoses;
 import gaiasky.vr.openxr.input.XrInput;
 import gaiasky.vr.openxr.input.actionsets.ActionSet;
-import gaiasky.vr.openxr.input.actionsets.GuiActionSet;
-import gaiasky.vr.openxr.input.actionsets.HandsActionSet;
 import gaiasky.vr.openxr.input.actionsets.GaiaSkyActionSet;
+import gaiasky.vr.openxr.input.actionsets.HandsActionSet;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL21;
@@ -200,19 +199,11 @@ public class OpenXRSession implements AutoCloseable {
         }
 
         try (var stack = stackPush()) {
-            GaiaSkyActionSet vcActionSet = XrInput.vanillaGameplayActionSet;
-            GuiActionSet guiActionSet = XrInput.guiActionSet;
+            GaiaSkyActionSet vcActionSet = XrInput.gaiaSkyActionSet;
             HandsActionSet handsActionSet = XrInput.handsActionSet;
             List<ActionSet> toSync = new ArrayList<>();
 
             toSync.add(handsActionSet);
-
-            if (!xrDisabled) {
-                toSync.add(vcActionSet);
-                if (guiActionSet.shouldSync()) {
-                    toSync.add(guiActionSet);
-                }
-            }
 
             XrActiveActionSet.Buffer sets = XrActiveActionSet.calloc(toSync.size(), stack);
             for (int i = 0; i < toSync.size(); i++) {
@@ -249,8 +240,7 @@ public class OpenXRSession implements AutoCloseable {
 
     @Override
     public void close() {
-        XrInput.vanillaGameplayActionSet.close();
-        XrInput.guiActionSet.close();
+        XrInput.gaiaSkyActionSet.close();
         XrInput.handsActionSet.close();
 
         if (swapchain != null) {

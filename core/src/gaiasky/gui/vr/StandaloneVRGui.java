@@ -20,7 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.IGui;
-import gaiasky.gui.OpenVRListener;
 import gaiasky.render.ComponentTypes;
 import gaiasky.util.*;
 import gaiasky.util.gdx.IntModelBatch;
@@ -35,27 +34,20 @@ import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
-import gaiasky.vr.openvr.VRContext.VRDevice;
-import gaiasky.vr.openvr.VRDeviceListener;
 import gaiasky.vr.openxr.OpenXRDriver;
-import gaiasky.vr.openxr.OpenXRDriver.XrResultException;
 import gaiasky.vr.openxr.OpenXRRenderer;
 import gaiasky.vr.openxr.XrHelper;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
 import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.openvr.*;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
 
 import java.lang.reflect.InvocationTargetException;
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 /**
@@ -78,14 +70,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     IntModelBatch batch;
     Environment env, controllersEnv;
     OpenXRDriver driver;
-    FrameBuffer fbLeft, fbRight, fbGui;
-    FrameBuffer[] viewFrameBuffers;
-    Texture texLeft, texRight;
+    FrameBuffer fbGui;
     SpriteBatch sbScreen;
-    Matrix4 eyeSpace = new Matrix4();
-    Matrix4 invEyeSpace = new Matrix4();
-    HmdMatrix44 projectionMat = HmdMatrix44.create();
-    HmdMatrix34 eyeMat = HmdMatrix34.create();
     Array<VRContext.VRDevice> controllers;
     Vector2 lastSize = new Vector2();
     Vector3 aux = new Vector3();
@@ -159,20 +145,6 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         // Model batch.
         batch = new IntModelBatch(new GroundShaderProvider(Gdx.files.internal("shader/normal.vertex.glsl"), Gdx.files.internal("shader/normal.fragment.glsl")));
 
-        // Frame buffer builder.
-        GLFrameBuffer.FrameBufferBuilder frameBufferBuilder = new GLFrameBuffer.FrameBufferBuilder(driver.getWidth(), driver.getHeight());
-        int internalFormat = org.lwjgl.opengl.GL30.GL_RGBA8;
-        if (Settings.settings.graphics.useSRGB) {
-            internalFormat = org.lwjgl.opengl.GL30.GL_SRGB8_ALPHA8;
-        }
-        frameBufferBuilder.addColorTextureAttachment(internalFormat, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE);
-        frameBufferBuilder.addBasicDepthRenderBuffer();
-
-        // Frame buffers.
-        fbLeft = frameBufferBuilder.build();
-        fbRight = frameBufferBuilder.build();
-        viewFrameBuffers = new FrameBuffer[] { fbLeft, fbRight };
-
         // Controller environment.
         controllersEnv = new Environment();
         controllersEnv.set(new ColorAttribute(ColorAttribute.AmbientLight, .2f, .2f, .2f, 1f));
@@ -224,20 +196,16 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         gui.update(dt);
     }
 
-    @Override
-    public void renderBefore() {
 
-    }
-
+    private FrameBuffer lastFrameBuffer;
     @Override
-    public void renderView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, int viewIndex) {
+    public void renderOpenXRView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, FrameBuffer frameBuffer, int viewIndex) {
         if (!positionSet) {
             setSurfacePosition(layerView);
             positionSet = true;
         }
 
-        FrameBuffer fb = viewFrameBuffers[viewIndex];
-        fb.begin();
+        frameBuffer.begin();
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
 
         XrRect2Di imageRect = layerView.subImage().imageRect();
@@ -248,15 +216,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         batch.render(instance, env);
         renderControllers();
         batch.end();
-        fb.end();
-    }
-
-    @Override
-    public void renderAfter() {
-        /* Render to screen */
-        if (renderToScreen) {
-            RenderUtils.renderKeepAspect(fbRight, sbScreen, Gdx.graphics, lastSize);
-        }
+        frameBuffer.end();
+        lastFrameBuffer = frameBuffer;
     }
 
     @Override
@@ -266,6 +227,18 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         gui.render(rw, rh);
         fbGui.end();
+
+        // OpenXR render.
+        driver.pollEvents();
+        if (driver.isRunning()) {
+            // Delegate to OpenXR driver.
+            driver.renderFrameOpenXR();
+        }
+
+        // Render to screen if necessary.
+        if (renderToScreen && lastFrameBuffer != null) {
+            RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
+        }
     }
 
     private void renderControllers() {
@@ -281,9 +254,9 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         }
     }
 
-    private Matrix4f projectionMatrix = new Matrix4f();
-    private Matrix4f viewMatrix = new Matrix4f();
-    private Quaternion quat = new Quaternion();
+    private final Matrix4f projectionMatrix = new Matrix4f();
+    private final Matrix4f viewMatrix = new Matrix4f();
+    private final Quaternion quat = new Quaternion();
 
     private void updateCamera(XrCompositionLayerProjectionView layerView, PerspectiveCamera camera, int eye, int w, int h) {
         XrPosef pose = layerView.pose();
@@ -366,8 +339,6 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         if (driver != null && listener != null) {
             driver.removeListener(listener);
         }
-        fbLeft.dispose();
-        fbRight.dispose();
         batch.dispose();
         sbScreen.dispose();
     }

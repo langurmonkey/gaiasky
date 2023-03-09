@@ -1,11 +1,12 @@
 package gaiasky.vr.openxr.input;
 
-import gaiasky.vr.openxr.*;
+import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.XrException;
+import gaiasky.vr.openxr.XrRuntimeException;
 import gaiasky.vr.openxr.input.actions.Action;
-import gaiasky.vr.openxr.input.actions.SessionAwareAction;
-import gaiasky.vr.openxr.input.actionsets.GuiActionSet;
-import gaiasky.vr.openxr.input.actionsets.HandsActionSet;
+import gaiasky.vr.openxr.input.actions.SpaceAwareAction;
 import gaiasky.vr.openxr.input.actionsets.GaiaSkyActionSet;
+import gaiasky.vr.openxr.input.actionsets.HandsActionSet;
 import org.lwjgl.openxr.XrActionSuggestedBinding;
 import org.lwjgl.openxr.XrInteractionProfileSuggestedBinding;
 import org.lwjgl.openxr.XrSessionActionSetsAttachInfo;
@@ -14,15 +15,14 @@ import oshi.util.tuples.Pair;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.lwjgl.openxr.XR10.*;
 import static org.lwjgl.system.MemoryStack.stackPointers;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.openxr.XR10.*;
 
 public final class XrInput {
     public static final HandsActionSet handsActionSet = new HandsActionSet();
-    public static final GaiaSkyActionSet vanillaGameplayActionSet = new GaiaSkyActionSet();
-    public static final GuiActionSet guiActionSet = new GuiActionSet();
+    public static final GaiaSkyActionSet gaiaSkyActionSet = new GaiaSkyActionSet();
 
     private static long lastPollTime = 0;
 
@@ -31,17 +31,14 @@ public final class XrInput {
     private XrInput() {
     }
 
-    //TODO registryify this
     public static void reinitialize(OpenXRDriver driver) throws XrException {
 
         handsActionSet.createHandle(driver);
-        vanillaGameplayActionSet.createHandle(driver);
-        guiActionSet.createHandle(driver);
+        gaiaSkyActionSet.createHandle(driver);
 
         HashMap<String, List<Pair<Action, String>>> defaultBindings = new HashMap<>();
         handsActionSet.getDefaultBindings(defaultBindings);
-        vanillaGameplayActionSet.getDefaultBindings(defaultBindings);
-        guiActionSet.getDefaultBindings(defaultBindings);
+        gaiaSkyActionSet.getDefaultBindings(defaultBindings);
 
         try (var stack = stackPush()) {
             for (var entry : defaultBindings.entrySet()) {
@@ -73,16 +70,15 @@ public final class XrInput {
             XrSessionActionSetsAttachInfo attach_info = XrSessionActionSetsAttachInfo.calloc(stack).set(
                     XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO,
                     NULL,
-                    stackPointers(vanillaGameplayActionSet.getHandle().address(),
-                            guiActionSet.getHandle().address(),
+                    stackPointers(gaiaSkyActionSet.getHandle().address(),
                             handsActionSet.getHandle().address()));
             // Attach the action set we just made to the session
             driver.check(xrAttachSessionActionSets(driver.xrSession, attach_info), "xrAttachSessionActionSets");
         }
 
         for (Action action : handsActionSet.actions()) {
-            if (action instanceof SessionAwareAction) {
-                ((SessionAwareAction) action).createHandleSession(driver);
+            if (action instanceof SpaceAwareAction) {
+                ((SpaceAwareAction) action).createActionSpace(driver);
             }
         }
     }
