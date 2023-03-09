@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class PoseBean {
     public boolean active = false;
+    public boolean left = false;
     public Vector3 position = new Vector3();
     public Quaternion orientation = new Quaternion();
 }

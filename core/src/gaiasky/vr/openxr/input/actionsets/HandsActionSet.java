@@ -11,8 +11,8 @@ import java.util.List;
 
 public class HandsActionSet extends ActionSet {
 
-    public PoseAction leftPose = new PoseAction("left-pose", "Left grip pose");
-    public PoseAction rightPose = new PoseAction("right-pose", "Right grip pose");
+    public PoseAction leftPose = new PoseAction("left-pose", "Left grip pose", true);
+    public PoseAction rightPose = new PoseAction("right-pose", "Right grip pose", false);
     public HapticsAction leftHaptic = new HapticsAction("haptics-left", "Haptic left");
     public HapticsAction rightHaptic = new HapticsAction("haptics-right", "Haptic right");
 

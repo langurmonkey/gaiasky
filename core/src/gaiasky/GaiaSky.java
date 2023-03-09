@@ -1093,9 +1093,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             postProcessor.dispose();
         }
 
-        // Dispose music manager.
-        MusicManager.dispose();
-
         // Clear temp.
         try {
             Path tmp = SysUtils.getTempDir(settings.data.location);

@@ -19,9 +19,10 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
     public XrSpace space;
     public PoseBean pose;
 
-    public PoseAction(String name, String localizedName) {
+    public PoseAction(String name, String localizedName, boolean left) {
         super(name, localizedName, XR_ACTION_TYPE_POSE_INPUT);
         pose = new PoseBean();
+        pose.left = left;
     }
 
     @Override

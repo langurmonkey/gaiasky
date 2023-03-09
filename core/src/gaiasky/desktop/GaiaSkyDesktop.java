@@ -208,9 +208,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Init cam recorder.
             CamRecorder.initialize();
 
-            // Init music manager.
-            MusicManager.initialize(Paths.get(Settings.ASSETS_LOC, "music"), SysUtils.getDefaultMusicDir());
-
             // Key mappings.
             KeyBindings.initialize();
 

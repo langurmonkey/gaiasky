@@ -176,8 +176,8 @@ public class OpenXRDriver implements Disposable {
             runtimeVersion = properties.runtimeVersion();
             runtimeVersionString = XR10.XR_VERSION_MAJOR(runtimeVersion) + "." + XR10.XR_VERSION_MINOR(runtimeVersion) + "." + XR10.XR_VERSION_PATCH(runtimeVersion);
 
-            logger.info(runtimeName);
-            logger.info(runtimeVersionString);
+            logger.info("Runtime name: " + runtimeName);
+            logger.info("Runtime version: " + runtimeVersionString);
 
             check(xrGetSystem(xrInstance, XrSystemGetInfo.malloc(stack).type$Default().next(NULL).formFactor(XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY), pl));
 
@@ -186,12 +186,6 @@ public class OpenXRDriver implements Disposable {
                 throw new IllegalStateException("No compatible headset detected");
             }
             logger.info("Headset found with System ID: " + systemId);
-        }
-    }
-
-    public XrGraphicsRequirementsOpenGLKHR getXrGraphicsRequirements() {
-        try (MemoryStack stack = stackPush()) {
-            return getXrGraphicsRequirements(stack);
         }
     }
 
@@ -285,13 +279,14 @@ public class OpenXRDriver implements Disposable {
             memPutInt(systemProperties.address(), XR_TYPE_SYSTEM_PROPERTIES);
             check(xrGetSystemProperties(xrInstance, systemId, systemProperties));
 
-            logger.info("Headset name:" + memUTF8(memAddress(systemProperties.systemName())) + " vendor:" + systemProperties.vendorId());
+            logger.info("Headset name: " + memUTF8(memAddress(systemProperties.systemName())) + ", vendor: " + systemProperties.vendorId());
+            logger.info(systemProperties.systemNameString());
 
             XrSystemTrackingProperties trackingProperties = systemProperties.trackingProperties();
-            logger.info("Headset orientationTracking:" + trackingProperties.orientationTracking() + " positionTracking:" + trackingProperties.positionTracking());
+            logger.info("Headset orientationTracking: " + trackingProperties.orientationTracking() + ", positionTracking: " + trackingProperties.positionTracking());
 
             XrSystemGraphicsProperties graphicsProperties = systemProperties.graphicsProperties();
-            logger.info("Headset MaxWidth:" + graphicsProperties.maxSwapchainImageWidth() + " MaxHeight:" + graphicsProperties.maxSwapchainImageHeight() + " MaxLayerCount:" + graphicsProperties.maxLayerCount());
+            logger.info("Headset MaxWidth: " + graphicsProperties.maxSwapchainImageWidth() + ", MaxHeight: " + graphicsProperties.maxSwapchainImageHeight() + ", MaxLayerCount: " + graphicsProperties.maxLayerCount());
 
             IntBuffer pi = stack.mallocInt(1);
 
@@ -677,6 +672,7 @@ public class OpenXRDriver implements Disposable {
         if (swapchains != null)
             for (Swapchain swapchain : swapchains) {
                 xrDestroySwapchain(swapchain.handle);
+                swapchain.images.free();
             }
 
         if (xrAppSpace != null)
