@@ -70,7 +70,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     PerspectiveCamera camera;
     IntModelInstance instance;
     IntModelBatch batch;
-    Environment env, controllersEnv;
+    Environment uiEnvironment, controllersEnvironment;
     OpenXRDriver driver;
     FrameBuffer fbGui;
     SpriteBatch sbScreen;
@@ -139,20 +139,20 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         material.set(new BlendingAttribute(true, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 1f));
         material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_BACK));
 
-        env = new Environment();
-        env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
+        uiEnvironment = new Environment();
+        uiEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
         instance = new IntModelInstance(model);
 
         // Model batch.
         batch = new IntModelBatch(new GroundShaderProvider(Gdx.files.internal("shader/normal.vertex.glsl"), Gdx.files.internal("shader/normal.fragment.glsl")));
 
         // Controller environment.
-        controllersEnv = new Environment();
-        controllersEnv.set(new ColorAttribute(ColorAttribute.AmbientLight, .2f, .2f, .2f, 1f));
+        controllersEnvironment = new Environment();
+        controllersEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1f));
         DirectionalLight dlight = new DirectionalLight();
         dlight.color.set(1f, 1f, 1f, 1f);
         dlight.direction.set(0, -1, 0);
-        controllersEnv.add(dlight);
+        controllersEnvironment.add(dlight);
 
         // Sprite batch for rendering to screen.
         sbScreen = new SpriteBatch();
@@ -216,7 +216,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         batch.begin(camera);
-        batch.render(instance, env);
+        batch.render(instance, uiEnvironment);
         renderControllers();
         batch.end();
         frameBuffer.end();
@@ -248,10 +248,10 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     private void renderControllers() {
         if (controllers != null) {
             for (var controller : controllers) {
-                if (controller.isInitialized()) {
+                if (controller.isInitialized() && controller.isActive()) {
                     var controllerInstance = controller.modelInstance;
                     if (controllerInstance != null) {
-                        batch.render(controllerInstance, controllersEnv);
+                        batch.render(controllerInstance, controllersEnvironment);
                     }
                 }
             }

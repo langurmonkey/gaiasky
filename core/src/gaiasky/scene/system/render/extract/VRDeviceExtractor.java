@@ -18,10 +18,13 @@ public class VRDeviceExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
         if (this.mustRender(base)) {
-            var render = Mapper.render.get(entity);
-            addToRender(render, RenderGroup.MODEL_PIX);
-            if (Mapper.line.has(entity)) {
-                addToRender(render, RenderGroup.LINE_LATE);
+            var vr = Mapper.vr.get(entity);
+            if(vr.device != null && vr.device.isActive()) {
+                var render = Mapper.render.get(entity);
+                addToRender(render, RenderGroup.MODEL_PIX);
+                if (Mapper.line.has(entity)) {
+                    addToRender(render, RenderGroup.LINE_LATE);
+                }
             }
         }
     }

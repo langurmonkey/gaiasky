@@ -16,7 +16,6 @@ public class VRControllerDevice {
     public boolean active = false;
     public Action.DeviceType deviceType = Action.DeviceType.Right;
     private boolean initialized = false;
-    public Matrix4f transform = new Matrix4f();
     public Vector3 position = new Vector3();
     public Quaternion orientation = new Quaternion();
     public IntModelInstance modelInstance;
@@ -40,9 +39,13 @@ public class VRControllerDevice {
         var ori = pose.orientation();
         position.set(pos.x(), pos.y(), pos.z());
         orientation.set(ori.x(), ori.y(), ori.z(), ori.w());
-        transform.translationRotateScaleInvert(position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w, 1, 1, 1);
-        // Set model instance transform.
-        transform.get(modelInstance.transform.val);
+        // The last bit (rotate 40 degrees around x) is due to this:
+        // Our controller models are positioned in local space for OpenVR poses.
+        // In OpenXR we have two poses: grip and aim. We use aim, which is
+        // located at the pointy end of the controller, but its orientation must be rotated a bit to match
+        // that of OpenVR.
+        // More info: https://registry.khronos.org/OpenXR/specs/1.0/html/xrspec.html#semantic-path-standard-pose-identifiers
+        modelInstance.transform.idt().translate(position).rotate(orientation).rotate(1, 0, 0, 40);
     }
 
     public IntModelInstance getModelInstance() {

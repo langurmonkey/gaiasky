@@ -54,7 +54,7 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
         controllerDevice.active = state.isActive();
         if (controllerDevice.active && driver.currentFrameTime > 0) {
             location.set(XR_TYPE_SPACE_LOCATION, NULL, 0, pose);
-            driver.check(xrLocateSpace(space, driver.xrAppSpace, driver.currentFrameTime, location));
+            driver.checkNoException(xrLocateSpace(space, driver.xrAppSpace, driver.currentFrameTime, location));
             if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0
                     && (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
                 // Ok!

@@ -1,15 +1,15 @@
 package gaiasky.vr.openxr;
 
-import org.lwjgl.system.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.system.MemoryStack;
 
-import java.nio.*;
+import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
 
-public final class ShadersGL {
-
+public class ShadersGL {
     public static final String texVertShader = "#version 330 core\n" +
             "layout (location = 0) in vec3 aPos;\n" +
             "layout (location = 1) in vec2 aTexCoord;\n" +
@@ -76,52 +76,47 @@ public final class ShadersGL {
             "   FragColor = vec4(Color, 1.0f);\n" +
             "}";
 
-
-    private ShadersGL() {
-    }
-
     public static int createShaderProgram(String vertexShaderGlsl, String fragmentShaderGlsl) {
-        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, vertexShaderGlsl);
-        glCompileShader(vertexShader);
+        int vertexShader = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
+        GL20.glShaderSource(vertexShader, vertexShaderGlsl);
+        GL20.glCompileShader(vertexShader);
         checkShader(vertexShader);
 
-        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, fragmentShaderGlsl);
-        glCompileShader(fragmentShader);
+        int fragmentShader = GL20.glCreateShader(GL20.GL_FRAGMENT_SHADER);
+        GL20.glShaderSource(fragmentShader, fragmentShaderGlsl);
+        GL20.glCompileShader(fragmentShader);
         checkShader(fragmentShader);
 
         int program = glCreateProgram();
-
-        glAttachShader(program, vertexShader);
-        glAttachShader(program, fragmentShader);
-        glLinkProgram(program);
+        GL20.glAttachShader(program, vertexShader);
+        GL20.glAttachShader(program, fragmentShader);
+        GL20.glLinkProgram(program);
         checkProgram(program);
 
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
+        GL20.glDeleteShader(vertexShader);
+        GL20.glDeleteShader(fragmentShader);
         return program;
     }
 
-    static void checkShader(int shader) {
+    public static void checkShader(int shader) {
         try (MemoryStack stack = stackPush()) {
-            IntBuffer pi = stack.mallocInt(1);
-            glGetShaderiv(shader, GL_COMPILE_STATUS, pi);
-            if (pi.get(0) == GL_FALSE) {
-                throw new IllegalStateException("Compile shader failed: " + glGetShaderInfoLog(shader, 4096));
+            IntBuffer r = stack.mallocInt(1);
+            GL20.glGetShaderiv(shader, GL_COMPILE_STATUS, r);
+            if (r.get(0) == GL11.GL_FALSE) {
+                String msg = GL20.glGetShaderInfoLog(shader, 4096);
+                throw new IllegalStateException("Compile shader failed: " + msg);
             }
         }
     }
 
-    static void checkProgram(int program) {
+    public static void checkProgram(int program) {
         try (MemoryStack stack = stackPush()) {
-            IntBuffer pi = stack.mallocInt(1);
-            glGetProgramiv(program, GL_LINK_STATUS, pi);
-            if (pi.get(0) == GL_FALSE) {
-                throw new IllegalStateException("Link program failed: " + glGetProgramInfoLog(program, 4096));
+            IntBuffer r = stack.mallocInt(1);
+            GL20.glGetProgramiv(program, GL_LINK_STATUS, r);
+            if (r.get(0) == GL11.GL_FALSE) {
+                String msg = GL20.glGetProgramInfoLog(program, 4096);
+                throw new IllegalStateException("Link program failed: " + msg);
             }
         }
     }
-
 }

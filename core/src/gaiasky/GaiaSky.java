@@ -581,43 +581,37 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 @Override
                 public boolean showUI(boolean value, Action.DeviceType type) {
-                    if (value) {
-                        // return proceedToLoading();
-                    }
-                    logger.info("Show UI " + value);
                     return false;
                 }
 
                 @Override
                 public boolean accept(boolean value, Action.DeviceType type) {
-                    logger.info("Accept " + value);
+                    if (value) {
+                        return proceedToLoading();
+                    }
                     return false;
                 }
 
                 @Override
                 public boolean cameraMode(boolean value, Action.DeviceType type) {
                     if (value) {
-                        //  return proceedToLoading();
+                         return proceedToLoading();
                     }
-                    logger.info("Camera mode " + value);
                     return false;
                 }
 
                 @Override
                 public boolean rotate(boolean value, Action.DeviceType type) {
-                    logger.info("Rotate " + value);
                     return false;
                 }
 
                 @Override
                 public boolean move(Vector2 value, Action.DeviceType type) {
-                    logger.info("Move " + value);
                     return false;
                 }
 
                 @Override
                 public boolean select(float value, Action.DeviceType type) {
-                    logger.info("Select " + value);
                     return false;
                 }
 

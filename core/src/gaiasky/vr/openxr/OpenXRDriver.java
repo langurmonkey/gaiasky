@@ -13,9 +13,7 @@ import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRDeviceListener;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
 import gaiasky.vr.openxr.input.actions.*;
-import gaiasky.vr.openxr.input.actionsets.ActionSet;
 import gaiasky.vr.openxr.input.actionsets.GaiaSkyActionSet;
-import gaiasky.vr.openxr.input.actionsets.HandsActionSet;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.openxr.*;
@@ -56,7 +54,7 @@ public class OpenXRDriver implements Disposable {
     private long glColorFormat;
     // Each view represents an eye in the headset with views[0] being left and views[1] being right.
     public XrView.Buffer views;
-    private ActionSet actions, poses;
+    private GaiaSkyActionSet actions;
 
     private final Array<OpenXRInputListener> listeners;
     // One swapchain per view
@@ -303,10 +301,14 @@ public class OpenXRDriver implements Disposable {
                 LongBuffer swapchainFormats = stack.mallocLong(pi.get(0));
                 check(xrEnumerateSwapchainFormats(xrSession, pi, swapchainFormats));
 
-                long[] desiredSwapchainFormats = { GL_RGB10_A2, GL_RGBA16F, GL_SRGB8_ALPHA8,
+                long[] desiredSwapchainFormats = {
+                        GL_SRGB8_ALPHA8,
+                        GL_RGB10_A2,
+                        GL_RGBA16F,
                         // The two below should only be used as a fallback, as they are linear color formats without enough bits for color
                         // depth, thus leading to banding.
-                        GL_RGBA8, GL31.GL_RGBA8_SNORM };
+                        GL_RGBA8,
+                        GL31.GL_RGBA8_SNORM };
 
                 out:
                 for (long glFormatIter : desiredSwapchainFormats) {
@@ -374,11 +376,7 @@ public class OpenXRDriver implements Disposable {
         actions = new GaiaSkyActionSet();
         actions.createHandle(this);
 
-        poses = new HandsActionSet();
-        poses.createHandle(this);
-
         HashMap<String, List<Pair<Action, String>>> bindingsMap = new HashMap<>();
-        poses.getDefaultBindings(bindingsMap);
         actions.getDefaultBindings(bindingsMap);
 
         try (MemoryStack stack = stackPush()) {
@@ -395,11 +393,11 @@ public class OpenXRDriver implements Disposable {
                 check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
             }
 
-            // Attach sets to session.
+            // Attach action set to session.
             XrSessionActionSetsAttachInfo attachInfo = XrSessionActionSetsAttachInfo.calloc(stack).set(
                     XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO,
                     NULL,
-                    stackPointers(actions.getHandle(), poses.getHandle()));
+                    stackPointers(actions.getHandle()));
             check(xrAttachSessionActionSets(xrSession, attachInfo));
         }
     }
@@ -535,22 +533,18 @@ public class OpenXRDriver implements Disposable {
     private void pollInput() {
         // Ensure frame time is valid.
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Sync sets.
-            XrActiveActionSet.Buffer sets = XrActiveActionSet.calloc(2, stack);
-            sets.get(0).actionSet(poses.getHandle());
-            sets.get(1).actionSet(actions.getHandle());
+            // Sync action set.
+            XrActiveActionSet.Buffer sets = XrActiveActionSet.calloc(1, stack);
+            sets.actionSet(actions.getHandle());
 
             XrActionsSyncInfo syncInfo = XrActionsSyncInfo.calloc(stack)
-                    .type(XR_TYPE_ACTIONS_SYNC_INFO)
-                    .activeActionSets(sets);
+                    .type(XR_TYPE_ACTIONS_SYNC_INFO).activeActionSets(sets);
 
             check(xrSyncActions(xrSession, syncInfo));
-
-            if (poses != null) {
-                poses.sync(this);
-            }
             if (actions != null) {
                 actions.sync(this);
+
+                // Check input.
                 var gsActions = (GaiaSkyActionSet) actions;
                 for (var listener : listeners) {
                     processShowUIAction(gsActions.showUiLeft, listener);
@@ -672,13 +666,12 @@ public class OpenXRDriver implements Disposable {
      * @param amplitude The amplitude in [0,1].
      */
     private void sendHapticPulse(boolean left, long duration, float frequency, float amplitude) {
-        if (poses != null) {
-            var haptics = (HandsActionSet) poses;
+        if (actions != null) {
             HapticsAction action;
             if (left) {
-                action = haptics.hapticLeft;
+                action = actions.hapticLeft;
             } else {
-                action = haptics.hapticRight;
+                action = actions.hapticRight;
             }
             if (action != null) {
                 action.sendHapticPulse(this, duration, frequency, amplitude);
@@ -737,8 +730,6 @@ public class OpenXRDriver implements Disposable {
     public void disposeInput() {
         if (actions != null)
             actions.close();
-        if (poses != null)
-            poses.close();
     }
 
     public void check(int result) throws IllegalStateException {
@@ -761,6 +752,29 @@ public class OpenXRDriver implements Disposable {
         }
 
         throw new XrResultException("XR method returned " + result);
+    }
+
+    public void checkNoException(int result) {
+        checkNoException(result, null);
+    }
+
+    public void checkNoException(int result, String method) {
+        if (XR_SUCCEEDED(result))
+            return;
+
+        if (xrInstance != null) {
+            ByteBuffer str = stackCalloc(XR10.XR_MAX_RESULT_STRING_SIZE);
+            if (xrResultToString(xrInstance, result, str) >= 0) {
+                if (method == null) {
+                    logger.error(memUTF8(str, memLengthNT1(str)));
+                    return;
+                } else {
+                    logger.error(method + " : " + memUTF8(str, memLengthNT1(str)));
+                    return;
+                }
+            }
+        }
+        logger.error("XR method returned " + result);
     }
 
     public static class XrResultException extends RuntimeException {
@@ -794,9 +808,9 @@ public class OpenXRDriver implements Disposable {
 
     public Array<VRControllerDevice> getControllerDevices() {
         Array<VRControllerDevice> controllers = new Array<>();
-        if (poses != null) {
-            var actions = poses.actions();
-            for (var action : actions) {
+        if (actions != null) {
+            var actionList = actions.actions();
+            for (var action : actionList) {
                 if (action instanceof PoseAction) {
                     var poseAction = (PoseAction) action;
                     if (poseAction.controllerDevice != null) {

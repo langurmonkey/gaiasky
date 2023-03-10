@@ -1,9 +1,6 @@
 package gaiasky.vr.openxr.input.actionsets;
 
-import gaiasky.util.i18n.I18n;
 import gaiasky.vr.openxr.OpenXRDriver;
-import gaiasky.vr.openxr.OpenXRSession;
-import gaiasky.vr.openxr.XrException;
 import gaiasky.vr.openxr.input.actions.Action;
 import gaiasky.vr.openxr.input.actions.InputAction;
 import org.lwjgl.PointerBuffer;
