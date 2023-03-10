@@ -35,7 +35,6 @@ import gaiasky.util.Settings.ControlsSettings.GamepadSettings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.*;
-import gaiasky.vr.openvr.VRContext;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -195,18 +194,16 @@ public class GamepadGui extends AbstractGui {
             vrInfoT.add(welcomeTitle).center().top().padBottom(pad20).colspan(2).row();
             vrInfoT.add(version).center().top().padBottom(pad40).colspan(2).row();
 
-            var context = GaiaSky.instance.xrDriver;
+            var driver = GaiaSky.instance.xrDriver;
 
-            if (context != null) {
+            if (driver != null) {
                 // Devices
-                var hmds = context.getDevicesByType(VRContext.VRDeviceType.HeadMountedDisplay);
-                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.hmds"), hmds);
-                var baseStations = context.getDevicesByType(VRContext.VRDeviceType.BaseStation);
-                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.basestations"), baseStations);
-                var controllers = context.getDevicesByType(VRContext.VRDeviceType.Controller);
-                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controllers"), controllers);
-                var generic = context.getDevicesByType(VRContext.VRDeviceType.Generic);
-                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.other"), generic);
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.runtime.name"), driver.runtimeName);
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.runtime.version"), driver.runtimeVersionString);
+                var left = driver.getControllerDevices().get(0);
+                var right = driver.getControllerDevices().get(1);
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controllers"), "Left, connected: " + left.isActive());
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controllers"), "Right, connected: " + right.isActive());
             }
 
             infoT.add(vrInfoT).left().center().padRight(pad30 * 2f);
@@ -1214,27 +1211,9 @@ public class GamepadGui extends AbstractGui {
             scene = GaiaSky.instance.scene;
     }
 
-    private void addDeviceTypeInfo(Table table, String name, Array<VRContext.VRDevice> devices) {
-        if (devices != null && !devices.isEmpty()) {
-            int i = 0;
-            for (var device : devices) {
-                if (i == 0) {
-                    table.add(new OwnLabel(name, skin, "header")).top().left().padRight(pad40).padBottom(pad10);
-                } else {
-                    table.add().top().left().padRight(pad40).padBottom(pad10);
-                }
-                String text = device.manufacturerName != null ? device.manufacturerName + " " : "";
-                if (device.getType() == VRContext.VRDeviceType.Controller) {
-                    text += device.modelNumber;
-                } else {
-                    text += device.getType() + (device.getPose() != null ? " - " + device.getPose().getIndex() : "");
-                }
-                table.add(new OwnLabel(text, skin, "big")).top().left().padBottom(pad10).row();
-                i++;
-            }
-
-        }
-
+    private void addDeviceTypeInfo(Table table, String name, String text) {
+        table.add(new OwnLabel(name, skin, "header")).top().left().padRight(pad40).padBottom(pad10);
+        table.add(new OwnLabel(text, skin, "big")).top().left().padBottom(pad10).row();
     }
 
     private void addTextKey(String text, Actor[][] m, int i, int j, boolean nl) {
@@ -1373,6 +1352,7 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1401,6 +1381,7 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {

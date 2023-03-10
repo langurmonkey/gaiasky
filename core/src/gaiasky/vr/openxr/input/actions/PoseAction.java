@@ -1,6 +1,7 @@
 package gaiasky.vr.openxr.input.actions;
 
-import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.input.XrControllerDevice;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
@@ -18,17 +19,13 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
 
     // The XR space.
     public XrSpace space;
-    // THe controller device attached to this pose.
-    public VRControllerDevice controllerDevice;
 
-    public PoseAction(String name, String localizedName, DeviceType deviceType) {
-        super(name, localizedName, XR_ACTION_TYPE_POSE_INPUT, deviceType);
-        controllerDevice = new VRControllerDevice();
-        controllerDevice.deviceType = deviceType;
+    public PoseAction(String name, String localizedName, XrControllerDevice device) {
+        super(name, localizedName, XR_ACTION_TYPE_POSE_INPUT, device);
     }
 
     @Override
-    public void createActionSpace(OpenXRDriver driver) {
+    public void createActionSpace(XrDriver driver) {
         try (MemoryStack stack = stackPush()) {
             XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack)
                     .type$Default()
@@ -48,7 +45,7 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
     }
 
     @Override
-    public void sync(OpenXRDriver driver) {
+    public void sync(XrDriver driver) {
         getInfo.action(handle);
         driver.check(XR10.xrGetActionStatePose(driver.xrSession, getInfo, state), "xrGetActionStatePose");
         controllerDevice.active = state.isActive();

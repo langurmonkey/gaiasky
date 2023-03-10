@@ -8,11 +8,9 @@ import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.vr.openvr.VRContext.VRDevice;
-import gaiasky.vr.openvr.VRContext.VRDeviceType;
-import gaiasky.vr.openvr.VRDeviceListener;
-import gaiasky.vr.openxr.input.OpenXRInputListener;
-import gaiasky.vr.openxr.input.actions.*;
+import gaiasky.vr.openxr.input.XrControllerDevice;
+import gaiasky.vr.openxr.input.XrInputListener;
+import gaiasky.vr.openxr.input.actions.Action;
 import gaiasky.vr.openxr.input.actionsets.GaiaSkyActionSet;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.GL31;
@@ -38,8 +36,8 @@ import static org.lwjgl.openxr.XR10.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class OpenXRDriver implements Disposable {
-    private static final Log logger = Logger.getLogger(OpenXRDriver.class);
+public class XrDriver implements Disposable {
+    private static final Log logger = Logger.getLogger(XrDriver.class);
 
     public static final int VR_Eye_Left = 0, VR_Eye_Right = 1;
     public long systemId;
@@ -54,9 +52,12 @@ public class OpenXRDriver implements Disposable {
     private long glColorFormat;
     // Each view represents an eye in the headset with views[0] being left and views[1] being right.
     public XrView.Buffer views;
+
+    private XrControllerDevice deviceLeft, deviceRight;
+    private Array<XrControllerDevice> devices;
     private GaiaSkyActionSet actions;
 
-    private final Array<OpenXRInputListener> listeners;
+    private final Array<XrInputListener> listeners;
     // One swapchain per view
     public Swapchain[] swapchains;
     public XrViewConfigurationView.Buffer viewConfigs;
@@ -64,7 +65,7 @@ public class OpenXRDriver implements Disposable {
     private FrameBuffer[] viewFrameBuffers;
 
     // The guy that renders to OpenXR currently.
-    private final AtomicReference<OpenXRRenderer> currentRenderer;
+    private final AtomicReference<XrRenderer> currentRenderer;
 
     //Runtime
     XrEventDataBuffer eventDataBuffer;
@@ -79,7 +80,7 @@ public class OpenXRDriver implements Disposable {
         public XrSwapchainImageOpenGLKHR.Buffer images;
     }
 
-    public OpenXRDriver() {
+    public XrDriver() {
         listeners = new Array<>();
         currentRenderer = new AtomicReference<>();
     }
@@ -370,10 +371,16 @@ public class OpenXRDriver implements Disposable {
     }
 
     public void initializeInput() {
+        // Devices.
+        deviceLeft = new XrControllerDevice(XrControllerDevice.DeviceType.Left);
+        deviceRight = new XrControllerDevice(XrControllerDevice.DeviceType.Right);
+        devices = new Array<>();
+        devices.add(deviceLeft, deviceRight);
+
         // Event buffer.
         eventDataBuffer = XrEventDataBuffer.calloc().type$Default();
 
-        actions = new GaiaSkyActionSet();
+        actions = new GaiaSkyActionSet(deviceLeft, deviceRight);
         actions.createHandle(this);
 
         HashMap<String, List<Pair<Action, String>>> bindingsMap = new HashMap<>();
@@ -547,52 +554,9 @@ public class OpenXRDriver implements Disposable {
                 // Check input.
                 var gsActions = (GaiaSkyActionSet) actions;
                 for (var listener : listeners) {
-                    processShowUIAction(gsActions.showUiLeft, listener);
-                    processShowUIAction(gsActions.showUiRight, listener);
-
-                    processAcceptAction(gsActions.acceptLeft, listener);
-                    processAcceptAction(gsActions.acceptRight, listener);
-
-                    processCameraModeAction(gsActions.cameraModeLeft, listener);
-                    processCameraModeAction(gsActions.cameraModeRight, listener);
-
-                    processSelectAction(gsActions.selectLeft, listener);
-                    processSelectAction(gsActions.selectRight, listener);
-
-                    processMoveAction(gsActions.moveLeft, listener);
-                    processMoveAction(gsActions.moveRight, listener);
+                    gsActions.processListener(listener);
                 }
             }
-        }
-    }
-
-    private void processShowUIAction(BoolAction action, OpenXRInputListener listener) {
-        if (action.isActive && action.changedSinceLastSync) {
-            listener.showUI(action.currentState, action.getDeviceType());
-        }
-    }
-
-    private void processCameraModeAction(BoolAction action, OpenXRInputListener listener) {
-        if (action.isActive && action.changedSinceLastSync) {
-            listener.cameraMode(action.currentState, action.getDeviceType());
-        }
-    }
-
-    private void processAcceptAction(BoolAction action, OpenXRInputListener listener) {
-        if (action.isActive && action.changedSinceLastSync) {
-            listener.accept(action.currentState, action.getDeviceType());
-        }
-    }
-
-    private void processSelectAction(FloatAction action, OpenXRInputListener listener) {
-        if (action.isActive && action.changedSinceLastSync) {
-            listener.select(action.currentState, action.getDeviceType());
-        }
-    }
-
-    private void processMoveAction(Vec2fAction action, OpenXRInputListener listener) {
-        if (action.isActive && action.changedSinceLastSync) {
-            listener.move(action.currentState, action.getDeviceType());
         }
     }
 
@@ -655,28 +619,6 @@ public class OpenXRDriver implements Disposable {
             return null;
         }
         throw new IllegalStateException(String.format("[XrResult failure %d in xrPollEvent]", result));
-    }
-
-    /**
-     * Sends a haptic pulse with the given action, duration, frequency and amplitude.
-     *
-     * @param left      True to use the left controller, false for the right one.
-     * @param duration  The duration in nanoseconds.
-     * @param frequency The frequency in Hz.
-     * @param amplitude The amplitude in [0,1].
-     */
-    private void sendHapticPulse(boolean left, long duration, float frequency, float amplitude) {
-        if (actions != null) {
-            HapticsAction action;
-            if (left) {
-                action = actions.hapticLeft;
-            } else {
-                action = actions.hapticRight;
-            }
-            if (action != null) {
-                action.sendHapticPulse(this, duration, frequency, amplitude);
-            }
-        }
     }
 
     public void dispose() {
@@ -784,12 +726,6 @@ public class OpenXRDriver implements Disposable {
 
     }
 
-    public void addListener(VRDeviceListener listener) {
-    }
-
-    public void removeListener(VRDeviceListener listener) {
-    }
-
     public int getWidth() {
         return swapchains[0].width;
     }
@@ -798,52 +734,32 @@ public class OpenXRDriver implements Disposable {
         return swapchains[0].height;
     }
 
-    public VRDevice getDeviceByType(VRDeviceType type) {
-        return null;
-    }
-
-    public Array<VRDevice> getDevicesByType(VRDeviceType type) {
-        return new Array<>();
-    }
-
-    public Array<VRControllerDevice> getControllerDevices() {
-        Array<VRControllerDevice> controllers = new Array<>();
-        if (actions != null) {
-            var actionList = actions.actions();
-            for (var action : actionList) {
-                if (action instanceof PoseAction) {
-                    var poseAction = (PoseAction) action;
-                    if (poseAction.controllerDevice != null) {
-                        controllers.add(poseAction.controllerDevice);
-                    }
-                }
-            }
-        }
-        return controllers;
-    }
-
-    public Array<VRDevice> getDevices() {
-        return new Array<>();
+    public Array<XrControllerDevice> getControllerDevices() {
+        return devices;
     }
 
     /**
-     * Adds a {@link OpenXRInputListener} to receive events
+     * Adds a {@link XrInputListener} to receive events
      */
-    public void addListener(OpenXRInputListener listener) {
+    public void addListener(XrInputListener listener) {
         if (!this.listeners.contains(listener, true)) {
             this.listeners.add(listener);
         }
     }
 
     /**
-     * Removes a {@link OpenXRInputListener}
+     * Removes a {@link XrInputListener}
      */
-    public void removeListener(OpenXRInputListener listener) {
+    public void removeListener(XrInputListener listener) {
         this.listeners.removeValue(listener, true);
     }
 
-    public void setRenderer(OpenXRRenderer renderer) {
+    public void setRenderer(XrRenderer renderer) {
         this.currentRenderer.set(renderer);
+    }
+
+    public boolean hasRenderer() {
+        return this.currentRenderer.get() != null;
     }
 
     public boolean isRunning() {

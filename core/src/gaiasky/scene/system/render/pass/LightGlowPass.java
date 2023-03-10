@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.api.IRenderable;
-import gaiasky.render.process.RenderModeOpenVR;
+import gaiasky.render.process.RenderModeOpenXR;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.LightPositionUpdater;
 import gaiasky.scene.Mapper;
@@ -74,7 +74,7 @@ public class LightGlowPass {
 
             // VR controllers
             if (Settings.settings.runtime.openXr) {
-                RenderModeOpenVR sgrVR = (RenderModeOpenVR) sceneRenderer.getRenderModeOpenVR();
+                RenderModeOpenXR sgrVR = (RenderModeOpenXR) sceneRenderer.getRenderModeOpenXR();
                 if (sceneRenderer.getVrContext() != null) {
                     for (Entity m : sgrVR.controllerObjects) {
                         var render = Mapper.render.get(m);

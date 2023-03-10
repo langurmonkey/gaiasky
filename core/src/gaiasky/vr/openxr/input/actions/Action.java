@@ -1,6 +1,8 @@
 package gaiasky.vr.openxr.input.actions;
 
-import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.input.XrControllerDevice;
+import gaiasky.vr.openxr.input.XrControllerDevice.DeviceType;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openxr.XrAction;
 import org.lwjgl.openxr.XrActionCreateInfo;
@@ -18,39 +20,24 @@ public abstract class Action implements AutoCloseable {
     public final String name;
     public final String localizedName;
     public final int xrActionType;
-    protected final DeviceType deviceType;
+    // The controller device attached to this pose.
+    protected final XrControllerDevice controllerDevice;
 
-    /**
-     * Reflects the source device of this action. Either left or right.
-     */
-    public enum DeviceType {
-        Left,
-        Right;
-
-        public boolean isLeft() {
-            return this == Left;
-        }
-
-        public boolean isRight() {
-            return this == Right;
-        }
-    }
-
-    public Action(String name, String localizedName, int type, DeviceType deviceType) {
+    public Action(String name, String localizedName, int type, XrControllerDevice device) {
         this.name = name;
         this.localizedName = localizedName;
         this.xrActionType = type;
-        this.deviceType = deviceType;
+        this.controllerDevice = device;
     }
 
-    public void createHandle(XrActionSet actionSet, OpenXRDriver driver) {
+    public void createHandle(XrActionSet actionSet, XrDriver driver) {
         handle = createAction(driver, actionSet, xrActionType);
         if (this instanceof SpaceAwareAction) {
             ((SpaceAwareAction) this).createActionSpace(driver);
         }
     }
 
-    protected XrAction createAction(OpenXRDriver driver, XrActionSet actionSet, int type) {
+    protected XrAction createAction(XrDriver driver, XrActionSet actionSet, int type) {
         try (MemoryStack stack = stackPush()) {
             // Create action.
             XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
@@ -83,8 +70,12 @@ public abstract class Action implements AutoCloseable {
         destroyHandle();
     }
 
+    public XrControllerDevice getControllerDevice() {
+        return controllerDevice;
+    }
+
     public DeviceType getDeviceType() {
-        return deviceType;
+        return controllerDevice.deviceType;
     }
 
 }

@@ -78,9 +78,10 @@ import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.time.RealTimeClock;
 import gaiasky.util.tree.OctreeNode;
-import gaiasky.vr.openvr.VRStatus;
-import gaiasky.vr.openxr.OpenXRDriver;
-import gaiasky.vr.openxr.input.OpenXRInputListener;
+import gaiasky.vr.openxr.XrLoadStatus;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.input.XrControllerDevice;
+import gaiasky.vr.openxr.input.XrInputListener;
 import gaiasky.vr.openxr.input.actions.Action;
 import org.lwjgl.opengl.GL30;
 
@@ -153,7 +154,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
      * The OpenXR driver set up in {@link #createVR()}, may be null if we are not in
      * VR mode or an OpenXR runtime is not detected.
      */
-    public OpenXRDriver xrDriver;
+    public XrDriver xrDriver;
     /**
      * The asset manager.
      */
@@ -274,12 +275,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
         if (settings.runtime.openXr) {
             // Render to UI to frame buffer.
             renderGui(welcomeGuiVR);
-
-            xrDriver.pollEvents();
-            if (xrDriver.isRunning()) {
-                // Render OpenXR frame.
-                xrDriver.renderFrameOpenXR();
-            }
         }
         // Render to screen.
         renderGui(welcomeGui);
@@ -388,12 +383,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
             if (settings.runtime.openXr) {
                 // Render to UI to frame buffer.
                 renderGui(loadingGuiVR);
-
-                xrDriver.pollEvents();
-                if (xrDriver.isRunning()) {
-                    // Render OpenXR frame.
-                    xrDriver.renderFrameOpenXR();
-                }
             }
             // Render to screen.
             renderGui(loadingGui);
@@ -543,7 +532,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
         AssetBean.setAssetManager(assetManager);
 
         // Create vr context if possible.
-        final VRStatus vrStatus = createVR();
+        final XrLoadStatus vrStatus = createVR();
 
         cameraManager.updateFrustumPlanes();
 
@@ -577,15 +566,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         if (settings.runtime.openXr) {
-            welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new OpenXRInputListener() {
+            welcomeGuiVR = new StandaloneVRGui<>(xrDriver, WelcomeGuiVR.class, globalResources.getSkin(), new XrInputListener() {
 
                 @Override
-                public boolean showUI(boolean value, Action.DeviceType type) {
+                public boolean showUI(boolean value, XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean accept(boolean value, Action.DeviceType type) {
+                public boolean accept(boolean value, XrControllerDevice device) {
                     if (value) {
                         return proceedToLoading();
                     }
@@ -593,7 +582,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 @Override
-                public boolean cameraMode(boolean value, Action.DeviceType type) {
+                public boolean cameraMode(boolean value, XrControllerDevice device) {
                     if (value) {
                          return proceedToLoading();
                     }
@@ -601,17 +590,17 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 }
 
                 @Override
-                public boolean rotate(boolean value, Action.DeviceType type) {
+                public boolean rotate(boolean value, XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean move(Vector2 value, Action.DeviceType type) {
+                public boolean move(Vector2 value, XrControllerDevice device) {
                     return false;
                 }
 
                 @Override
-                public boolean select(float value, Action.DeviceType type) {
+                public boolean select(float value, XrControllerDevice device) {
                     return false;
                 }
 
@@ -638,14 +627,14 @@ public class GaiaSky implements ApplicationListener, IObserver {
      *     <li>An OpenXR runtime is running.</li>
      * </ul>
      **/
-    private VRStatus createVR() {
+    private XrLoadStatus createVR() {
         if (vr) {
             // Initializing the VRContext may fail if no HMD is connected or no OpenXR runtime is found.
             try {
                 settings.runtime.openXr = true;
                 Constants.initialize(settings.scene.distanceScaleVr);
 
-                xrDriver = new OpenXRDriver();
+                xrDriver = new XrDriver();
                 xrDriver.createOpenXRInstance();
                 xrDriver.initializeXRSystem();
                 xrDriver.checkOpenGL();
@@ -679,20 +668,20 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 mainVRGui.initialize(assetManager, globalResources.getSpriteBatch());
                 xrDriver.addListener((MainVRGui) mainVRGui);
 
-                return VRStatus.OK;
+                return XrLoadStatus.OK;
             } catch (Exception e) {
                 // If initializing the VRContext failed.
                 settings.runtime.openXr = false;
                 logger.error(e);
                 logger.error("Initialization of VR context failed");
-                return VRStatus.ERROR_NO_CONTEXT;
+                return XrLoadStatus.ERROR_NO_CONTEXT;
             }
         } else {
             // Desktop mode.
             settings.runtime.openXr = false;
             Constants.initialize(settings.scene.distanceScaleDesktop);
         }
-        return VRStatus.NO_VR;
+        return XrLoadStatus.NO_VR;
     }
 
     /**

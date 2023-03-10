@@ -1,7 +1,7 @@
 package gaiasky.vr.openxr.input.actions;
 
-import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.XrDriver;
 
 public interface InputAction {
-    void sync(OpenXRDriver driver);
+    void sync(XrDriver driver);
 }

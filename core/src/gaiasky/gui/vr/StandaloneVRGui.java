@@ -35,11 +35,12 @@ import gaiasky.util.gdx.shader.attribute.IntAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 import gaiasky.util.math.Vector3d;
-import gaiasky.vr.openxr.OpenXRDriver;
-import gaiasky.vr.openxr.OpenXRRenderer;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.XrRenderer;
 import gaiasky.vr.openxr.XrHelper;
-import gaiasky.vr.openxr.input.OpenXRInputListener;
-import gaiasky.vr.openxr.input.actions.VRControllerDevice;
+import gaiasky.vr.openxr.XrViewManager;
+import gaiasky.vr.openxr.input.XrInputListener;
+import gaiasky.vr.openxr.input.XrControllerDevice;
 import org.joml.Matrix4f;
 import org.lwjgl.openxr.*;
 import org.lwjgl.system.MemoryStack;
@@ -58,11 +59,10 @@ import static org.lwjgl.system.MemoryStack.stackPush;
  * takes into account the HMD position/orientation. It also renders the detected
  * controller(s).
  */
-public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
+public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
     private static final Logger.Log logger = Logger.getLogger(StandaloneVRGui.class);
 
-    OpenXRInputListener listener;
-    int vrWidth, vrHeight;
+    final int vrWidth, vrHeight;
     int guiWidth = 2960, guiHeight = 1440;
     Skin skin;
     Class<T> guiClass;
@@ -71,22 +71,26 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     IntModelInstance instance;
     IntModelBatch batch;
     Environment uiEnvironment, controllersEnvironment;
-    OpenXRDriver driver;
+    final XrDriver driver;
+    final XrInputListener listener;
+    final XrViewManager viewManager;
+    private FrameBuffer lastFrameBuffer;
     FrameBuffer fbGui;
     SpriteBatch sbScreen;
-    Array<VRControllerDevice> controllers;
+    Array<XrControllerDevice> controllers;
     Vector2 lastSize = new Vector2();
 
     private boolean positionSet = false;
     private boolean renderToScreen = false;
 
-    public StandaloneVRGui(OpenXRDriver vrContext, Class<T> guiClass, Skin skin, OpenXRInputListener listener) {
-        this.driver = vrContext;
-        this.vrWidth = vrContext.getWidth();
-        this.vrHeight = vrContext.getHeight();
+    public StandaloneVRGui(XrDriver xrDriver, Class<T> guiClass, Skin skin, XrInputListener listener) {
+        this.driver = xrDriver;
+        this.vrWidth = xrDriver.getWidth();
+        this.vrHeight = xrDriver.getHeight();
         this.guiClass = guiClass;
         this.skin = skin;
         this.listener = listener;
+        this.viewManager = new XrViewManager();
     }
 
     @Override
@@ -149,10 +153,10 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         // Controller environment.
         controllersEnvironment = new Environment();
         controllersEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1f));
-        DirectionalLight dlight = new DirectionalLight();
-        dlight.color.set(1f, 1f, 1f, 1f);
-        dlight.direction.set(0, -1, 0);
-        controllersEnvironment.add(dlight);
+        DirectionalLight directionalLight = new DirectionalLight();
+        directionalLight.color.set(1f, 1f, 1f, 1f);
+        directionalLight.direction.set(0f, -0.3f, -4.0f);
+        controllersEnvironment.add(directionalLight);
 
         // Sprite batch for rendering to screen.
         sbScreen = new SpriteBatch();
@@ -164,7 +168,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     }
 
     private void setSurfacePosition(XrCompositionLayerProjectionView view) {
-        updateCamera(view, camera, OpenXRDriver.VR_Eye_Left, vrWidth, vrHeight);
+        viewManager.updateCamera(view, camera);
         Vector3d dir = new Vector3d();
         dir.set(camera.direction);
         float angle = (float) dir.angle(Vector3d.getUnitX());
@@ -199,7 +203,27 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         gui.update(dt);
     }
 
-    private FrameBuffer lastFrameBuffer;
+    @Override
+    public void render(int rw, int rh) {
+        // OpenXR render.
+        if (!driver.pollEvents()) {
+            // First render GUI to frame buffer.
+            fbGui.begin();
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            gui.render(rw, rh);
+            fbGui.end();
+
+            if (driver.isRunning() && driver.hasRenderer()) {
+                // Delegate to OpenXR driver.
+                driver.renderFrameOpenXR();
+            }
+
+            // Render to screen if necessary.
+            if (renderToScreen && lastFrameBuffer != null) {
+                RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
+            }
+        }
+    }
 
     @Override
     public void renderOpenXRView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, FrameBuffer frameBuffer, int viewIndex) {
@@ -211,8 +235,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         frameBuffer.begin();
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
 
-        XrRect2Di imageRect = layerView.subImage().imageRect();
-        updateCamera(layerView, camera, viewIndex, imageRect.extent().width(), imageRect.extent().height());
+        viewManager.updateCamera(layerView, camera);
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         batch.begin(camera);
@@ -223,27 +246,6 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         lastFrameBuffer = frameBuffer;
     }
 
-    @Override
-    public void render(int rw, int rh) {
-        // OpenXR render.
-        if (!driver.pollEvents()) {
-            // First render GUI to frame buffer.
-            fbGui.begin();
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-            gui.render(rw, rh);
-            fbGui.end();
-
-            if (driver.isRunning()) {
-                // Delegate to OpenXR driver.
-                driver.renderFrameOpenXR();
-            }
-
-            // Render to screen if necessary.
-            if (renderToScreen && lastFrameBuffer != null) {
-                RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
-            }
-        }
-    }
 
     private void renderControllers() {
         if (controllers != null) {
@@ -258,29 +260,6 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         }
     }
 
-    private final Matrix4f projectionMatrix = new Matrix4f();
-    private final Matrix4f viewMatrix = new Matrix4f();
-    private final Quaternion quaternion = new Quaternion();
-
-    private void updateCamera(XrCompositionLayerProjectionView layerView, PerspectiveCamera camera, int eye, int w, int h) {
-        XrPosef pose = layerView.pose();
-        XrVector3f position = pose.position$();
-        XrQuaternionf orientation = pose.orientation();
-        try (MemoryStack stack = stackPush()) {
-            projectionMatrix.set(XrHelper.createProjectionMatrixBuffer(stack, layerView.fov(), camera.near, camera.far, false));
-        }
-        viewMatrix.translationRotateScaleInvert(position.x(), position.y(), position.z(), orientation.x(), orientation.y(), orientation.z(), orientation.w(), 1, 1, 1);
-
-        projectionMatrix.get(camera.projection.val);
-        viewMatrix.get(camera.view.val);
-        camera.combined.set(camera.projection);
-        Matrix4.mul(camera.combined.val, camera.view.val);
-
-        quaternion.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
-        camera.position.set(position.x(), position.y(), position.z());
-        camera.direction.set(0, 0, -1).mul(quaternion);
-        camera.up.set(0, 1, 0).mul(quaternion);
-    }
 
     @Override
     public void resize(int width, int height) {

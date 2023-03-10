@@ -1,7 +1,7 @@
 package gaiasky.vr.openxr.input.actions;
 
-import gaiasky.vr.openxr.OpenXRDriver;
-import org.lwjgl.openxr.XrActionSet;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.input.XrControllerDevice;
 import org.lwjgl.openxr.XrHapticActionInfo;
 import org.lwjgl.openxr.XrHapticBaseHeader;
 import org.lwjgl.openxr.XrHapticVibration;
@@ -12,11 +12,11 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class HapticsAction extends Action {
 
-    public HapticsAction(String name, String localizedName, DeviceType deviceType) {
-        super(name, localizedName, XR_ACTION_TYPE_VIBRATION_OUTPUT, deviceType);
+    public HapticsAction(String name, String localizedName, XrControllerDevice device) {
+        super(name, localizedName, XR_ACTION_TYPE_VIBRATION_OUTPUT, device);
     }
 
-    public void sendHapticPulse(OpenXRDriver driver, long duration, float frequency, float amplitude) {
+    public void sendHapticPulse(XrDriver driver, long duration, float frequency, float amplitude) {
         try (var stack = stackPush()) {
             // Haptic feedback.
             XrHapticActionInfo info = XrHapticActionInfo.calloc(stack)

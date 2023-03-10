@@ -1,6 +1,6 @@
 package gaiasky.vr.openxr.input.actionsets;
 
-import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.input.actions.Action;
 import gaiasky.vr.openxr.input.actions.InputAction;
 import org.lwjgl.PointerBuffer;
@@ -20,7 +20,7 @@ import static org.lwjgl.system.MemoryUtil.memUTF8;
 public abstract class ActionSet implements AutoCloseable {
 
 
-    protected OpenXRDriver driver;
+    protected XrDriver driver;
     public final String name;
     public final String localizedName;
     private XrActionSet handle;
@@ -40,8 +40,7 @@ public abstract class ActionSet implements AutoCloseable {
 
     public abstract void getDefaultBindings(HashMap<String, List<Pair<Action, String>>> map);
 
-    public void sync(OpenXRDriver driver) {
-
+    public void sync(XrDriver driver) {
         for (var action : actions()) {
             if (action instanceof InputAction) {
                 ((InputAction) action).sync(driver);
@@ -49,7 +48,7 @@ public abstract class ActionSet implements AutoCloseable {
         }
     }
 
-    public final void createHandle(OpenXRDriver driver) {
+    public final void createHandle(XrDriver driver) {
         try (var stack = stackPush()) {
             // Create action set.
             XrActionSetCreateInfo setCreateInfo = XrActionSetCreateInfo.malloc(stack)
@@ -73,7 +72,7 @@ public abstract class ActionSet implements AutoCloseable {
      * @param driver The driver.
      * @param stack The memory stack.
      */
-    public void attachToSession(OpenXRDriver driver, MemoryStack stack) {
+    public void attachToSession(XrDriver driver, MemoryStack stack) {
         XrSessionActionSetsAttachInfo attachInfo = XrSessionActionSetsAttachInfo.calloc(stack).set(
                 XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO,
                 NULL,

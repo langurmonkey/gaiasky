@@ -48,7 +48,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
-import gaiasky.vr.openvr.VRStatus;
+import gaiasky.vr.openxr.XrLoadStatus;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -64,7 +64,7 @@ import java.util.Set;
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
 
-    private final VRStatus vrStatus;
+    private final XrLoadStatus vrStatus;
     private final boolean skipWelcome;
     private final WelcomeGuiGamepadListener gamepadListener;
     protected DatasetManagerWindow ddw;
@@ -86,7 +86,7 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final boolean skipWelcome, final VRStatus vrStatus) {
+    public WelcomeGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final boolean skipWelcome, final XrLoadStatus vrStatus) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.lock = new Object();
@@ -125,9 +125,9 @@ public class WelcomeGui extends AbstractGui {
 
     private void continueWelcomeGui() {
         if (vrStatus.vrInitFailed()) {
-            if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))
+            if (vrStatus.equals(XrLoadStatus.ERROR_NO_CONTEXT))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, stage));
-            else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
+            else if (vrStatus.equals(XrLoadStatus.ERROR_RENDERMODEL))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, stage));
         } else if (Settings.settings.program.net.slave.active || GaiaSky.instance.isHeadless()) {
             // If we are a slave or running headless, data load can start

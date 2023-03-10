@@ -3,9 +3,9 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.vr.openvr;
+package gaiasky.vr.openxr;
 
-public enum VRStatus {
+public enum XrLoadStatus {
     OK,
     ERROR_NO_CONTEXT,
     ERROR_RENDERMODEL,

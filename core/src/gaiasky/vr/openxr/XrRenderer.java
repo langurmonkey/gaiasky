@@ -7,7 +7,7 @@ import org.lwjgl.openxr.XrSwapchainImageOpenGLKHR;
 /**
  * To be implemented by all actors that render to OpenXR.
  */
-public interface OpenXRRenderer {
+public interface XrRenderer {
 
     /**
      * Executed for each eye every cycle.

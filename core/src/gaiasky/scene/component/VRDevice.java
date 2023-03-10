@@ -8,12 +8,11 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Vector3d;
-import gaiasky.vr.openvr.VRContext;
-import gaiasky.vr.openxr.input.actions.VRControllerDevice;
+import gaiasky.vr.openxr.input.XrControllerDevice;
 
 public class VRDevice implements Component, IObserver {
 
-    public VRControllerDevice device;
+    public XrControllerDevice device;
 
     // Points in the beam.
     public Vector3d beamP0 = new Vector3d();
@@ -43,7 +42,7 @@ public class VRDevice implements Component, IObserver {
     public void notify(Event event, Object source, Object... data) {
         // Update colors!
         if (event == Event.VR_SELECTING_STATE) {
-            var dev = (VRControllerDevice) data[2];
+            var dev = (XrControllerDevice) data[2];
             if (dev != null && dev == this.device) {
                 var selecting = (Boolean) data[0];
                 var completion = (Double) data[1];

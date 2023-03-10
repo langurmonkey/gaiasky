@@ -18,11 +18,11 @@ import com.badlogic.gdx.math.Vector2;
 public class RenderUtils {
 
     /**
-     * Assumes the aspect ratio is fine
+     * Assumes the aspect ratio is fine.
      *
-     * @param fb The frame buffer to render
-     * @param sb The sprite batch to use
-     * @param g  The graphics instance
+     * @param fb The frame buffer to render.
+     * @param sb The sprite batch to use.
+     * @param g  The graphics instance.
      */
     public static void renderBackbuffer(FrameBuffer fb, SpriteBatch sb, Graphics g) {
         Texture tex = fb.getColorBufferTexture();
@@ -32,26 +32,37 @@ public class RenderUtils {
     }
 
     /**
-     * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio
+     * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio.
      *
-     * @param fb The frame buffer to render
-     * @param sb The sprite batch to use
-     * @param g  The graphics instance
+     * @param fb The frame buffer to render.
+     * @param sb The sprite batch to use.
+     * @param g  The graphics instance.
      */
     public static void renderKeepAspect(FrameBuffer fb, SpriteBatch sb, Graphics g) {
         renderKeepAspect(fb, sb, g, null);
     }
 
     /**
-     * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio
+     * Renders the given frame buffer to screen with a fill scaling, maintaining the aspect ratio.
      *
-     * @param fb       The frame buffer to render
-     * @param sb       The sprite batch to use
-     * @param g        The graphics instance
-     * @param lastSize The previous size, for recomputing the sprite batch transform
+     * @param fb       The frame buffer to render.
+     * @param sb       The sprite batch to use.
+     * @param g        The graphics instance.
+     * @param lastSize The previous size, for recomputing the sprite batch transform.
      */
     public static void renderKeepAspect(FrameBuffer fb, SpriteBatch sb, Graphics g, Vector2 lastSize) {
-        Texture tex = fb.getColorBufferTexture();
+        renderKeepAspect(fb.getColorBufferTexture(), sb, g, lastSize);
+    }
+
+    /**
+     * Renders the given texture to screen with a fill scaling, maintaining the aspect ratio.
+     *
+     * @param tex      The texture to render.
+     * @param sb       The sprite batch to use.
+     * @param g        The graphics instance.
+     * @param lastSize The previous size, for recomputing the sprite batch transform.
+     */
+    public static void renderKeepAspect(Texture tex, SpriteBatch sb, Graphics g, Vector2 lastSize) {
         float tw = tex.getWidth();
         float th = tex.getHeight();
         float tar = tw / th;

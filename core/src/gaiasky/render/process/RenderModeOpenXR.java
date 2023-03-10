@@ -2,22 +2,13 @@ package gaiasky.render.process;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.BufferUtils;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
-import gaiasky.gui.IGui;
-import gaiasky.render.RenderingContext;
 import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.ISceneRenderer;
@@ -26,232 +17,140 @@ import gaiasky.scene.Scene;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.ModelComponent;
-import gaiasky.util.Constants;
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
 import gaiasky.util.RenderUtils;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
-import gaiasky.util.math.Vector3d;
-import gaiasky.vr.openvr.VRContext;
-import gaiasky.vr.openvr.VRContext.Space;
-import gaiasky.vr.openvr.VRContext.VRDevice;
-import gaiasky.vr.openvr.VRContext.VRDeviceType;
-import gaiasky.vr.openxr.OpenXRDriver;
-import gaiasky.vr.openxr.input.actions.VRControllerDevice;
-import org.lwjgl.openvr.*;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.XrRenderer;
+import gaiasky.vr.openxr.XrViewManager;
+import gaiasky.vr.openxr.input.XrControllerDevice;
+import org.lwjgl.openxr.XrCompositionLayerProjectionView;
+import org.lwjgl.openxr.XrSwapchainImageOpenGLKHR;
 
-import java.nio.FloatBuffer;
+import java.util.HashMap;
 import java.util.Map;
 
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL30.*;
+
 /**
- * Renders to OpenVR. Renders basically two scenes, one for each eye, using the
- * OpenVR context.
+ * Renders to OpenXR using the {@link XrDriver}.
  */
-public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode, IObserver {
-    private static final Log logger = Logger.getLogger(RenderModeOpenXR.class);
-    public final Matrix4 eyeSpace = new Matrix4();
-    public final Matrix4 invEyeSpace = new Matrix4();
+public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode, XrRenderer {
     private final Scene scene;
-    private final OpenXRDriver xrDriver;
+    private final XrDriver driver;
+    private final XrViewManager viewManager;
+
     public Array<Entity> controllerObjects;
-    /**
-     * Frame buffers for each eye
-     **/
-    FrameBuffer fbLeft, fbRight;
-    /**
-     * Textures
-     **/
-    Texture texLeft, texRight;
-    HmdMatrix44 projectionMat = HmdMatrix44.create();
-    HmdMatrix34 eyeMat = HmdMatrix34.create();
-    private Map<VRControllerDevice, Entity> vrDeviceToModel;
-    private Environment controllersEnv;
+    private final Map<XrControllerDevice, Entity> vrDeviceToModel;
+    private Environment controllersEnvironment;
+    private FrameBuffer lastFrameBuffer;
 
     // GUI
     private SpriteBatch sbScreen;
 
-    private Vector3 auxf1;
-    private Vector3d auxd1;
-
     private Vector2 lastSize;
 
-    public RenderModeOpenXR(final Scene scene, final OpenXRDriver xrDriver, final SpriteBatch spriteBatch) {
+    public RenderModeOpenXR(final Scene scene, final XrDriver xrDriver, final SpriteBatch ignored) {
         super();
         this.scene = scene;
-        this.xrDriver = xrDriver;
+        this.driver = xrDriver;
+        this.viewManager = new XrViewManager();
+        this.vrDeviceToModel = new HashMap<>();
 
         if (xrDriver != null) {
-
             // Aux vectors
-            auxf1 = new Vector3();
-            auxd1 = new Vector3d();
             lastSize = new Vector2();
 
             // Controllers
-            //Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);
-            Array<VRControllerDevice> controllers = xrDriver.getControllerDevices();
+            Array<XrControllerDevice> controllers = xrDriver.getControllerDevices();
 
             // Env
-            controllersEnv = new Environment();
-            controllersEnv.set(new ColorAttribute(ColorAttribute.AmbientLight, .2f, .2f, .2f, 1f));
-            DirectionalLight dlight = new DirectionalLight();
-            dlight.color.set(1f, 1f, 1f, 1f);
-            dlight.direction.set(0, -1, 0);
-            controllersEnv.add(dlight);
+            controllersEnvironment = new Environment();
+            controllersEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, .2f, .2f, .2f, 1f));
+            DirectionalLight directionalLight = new DirectionalLight();
+            directionalLight.color.set(1f, 1f, 1f, 1f);
+            directionalLight.direction.set(0f, -0.3f, -4.0f);
+            controllersEnvironment.add(directionalLight);
 
             // Controller objects
             controllerObjects = new Array<>(false, controllers.size);
-            for (VRControllerDevice controller : controllers) {
+            for (XrControllerDevice controller : controllers) {
                 if (!controller.isInitialized())
                     controller.initialize(xrDriver);
                 addVRController(controller);
             }
 
-            // Screen
+            // Screen.
             sbScreen = new SpriteBatch();
 
-            FloatBuffer fovt = BufferUtils.newFloatBuffer(1);
-            FloatBuffer fovb = BufferUtils.newFloatBuffer(1);
-            FloatBuffer fovr = BufferUtils.newFloatBuffer(1);
-            FloatBuffer fovl = BufferUtils.newFloatBuffer(1);
-            VRSystem.VRSystem_GetProjectionRaw(VR.EVREye_Eye_Left, fovl, fovr, fovt, fovb);
+            // Set renderer.
+            this.driver.setRenderer(this);
 
-            try {
-                double fovT = Math.toDegrees(Math.atan(fovt.get()));
-                double fovB = Math.toDegrees(Math.atan(fovb.get()));
-                float fov = (float) (fovB - fovT);
-                if (fov > 50) {
-                    logger.info("Setting fov to HMD value: " + fov);
-                    EventManager.publish(Event.FOV_CHANGED_CMD, this, fov);
-                } else {
-                    // Default
-                    logger.info("Setting fov to default value: " + 89f);
-                    EventManager.publish(Event.FOV_CHANGED_CMD, this, 89f);
-                }
-            } catch (Exception e) {
-                // Default
-                EventManager.publish(Event.FOV_CHANGED_CMD, this, 89f);
-            }
-            EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE);
         }
     }
 
+    private ISceneRenderer sgr;
+    private ICamera camera;
+    private PostProcessBean ppb;
+    private int rw, rh;
+    private double t;
+
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        if (xrDriver != null) {
+        if (driver != null && !driver.pollEvents()) {
             rc.ppb = null;
-            try {
-                xrDriver.pollEvents();
-            } catch (Exception e) {
-                // Should never happen.
-            }
 
             // Add controller objects to render lists.
             for (Entity controller : controllerObjects) {
-                var vr = Mapper.vr.get(controller);
                 var model = Mapper.model.get(controller);
 
-                Vector3 devicePos = vr.device.position;
-                // Length from headset to controller
-                //auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
                 if (model.model.instance != null) {
                     scene.extractEntity(controller);
                 }
             }
 
-            /* LEFT EYE */
+            // Instruct driver to render frames.
+            if (driver.isRunning() && driver.hasRenderer()) {
+                this.sgr = sgr;
+                this.camera = camera;
+                this.ppb = ppb;
+                this.rw = rw;
+                this.rh = rh;
+                this.t = t;
+                driver.renderFrameOpenXR();
 
-            // Camera to left
-            updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, false, rc);
-
-            sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
-
-            boolean postProcess = postProcessCapture(ppb, fbLeft, rw, rh);
-
-            // Render scene
-            sgr.renderScene(camera, t, rc);
-            // Camera
-            camera.render(rw, rh);
-
-            sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postProcessRender(ppb, fbLeft, postProcess, camera, rw, rh);
-
-            /* RIGHT EYE */
-
-            // Camera to right
-            updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, false, rc);
-
-            sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
-
-            postProcess = postProcessCapture(ppb, fbRight, rw, rh);
-
-            // Render scene
-            sgr.renderScene(camera, t, rc);
-            // Camera
-            camera.render(rw, rh);
-
-            sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postProcessRender(ppb, fbRight, postProcess, camera, rw, rh);
-
-            /* SUBMIT TO VR COMPOSITOR */
-            VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, texLeft, null, VR.EVRSubmitFlags_Submit_Default);
-            VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, texRight, null, VR.EVRSubmitFlags_Submit_Default);
-
-            /* Render to screen */
-            RenderUtils.renderKeepAspect(fbLeft, sbScreen, Gdx.graphics, lastSize);
-
+                /* Render to screen */
+                if (lastFrameBuffer != null) {
+                    RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
+                }
+            }
         }
 
     }
 
-    private void updateCamera(NaturalCamera cam, PerspectiveCamera camera, int eye, boolean updateFrustum, RenderingContext rc) {
-        // get the projection matrix from the HDM 
-        VRSystem.VRSystem_GetProjectionMatrix(eye, camera.near, camera.far, projectionMat);
-        VRContext.hmdMat4toMatrix4(projectionMat, camera.projection);
+    @Override
+    public void renderOpenXRView(XrCompositionLayerProjectionView layerView, XrSwapchainImageOpenGLKHR swapchainImage, FrameBuffer frameBuffer, int viewIndex) {
+        rc.ppb = null;
+        sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
-        // get the eye space matrix from the HDM
-        VRSystem.VRSystem_GetEyeToHeadTransform(eye, eyeMat);
-        VRContext.hmdMat34ToMatrix4(eyeMat, eyeSpace);
-        invEyeSpace.set(eyeSpace).inv();
+        viewManager.updateCamera(layerView, camera.getCamera(), (NaturalCamera) camera.getCurrent(), rc);
 
-        // get the pose matrix from the HDM
-        VRDevice hmd = xrDriver.getDeviceByType(VRDeviceType.HeadMountedDisplay);
-        Vector3 up = hmd.getUp(Space.Tracker);
-        Vector3 dir = hmd.getDirection(Space.Tracker);
-        Vector3 pos = hmd.getPosition(Space.Tracker);
+        boolean postProcess = postProcessCapture(ppb, frameBuffer, rw, rh);
 
-        // Update main camera
-        if (cam != null) {
-            cam.vrOffset.set(pos).scl(Constants.M_TO_U);
-            cam.direction.set(dir);
-            cam.up.set(up);
-            rc.vrOffset = cam.vrOffset;
-        }
+        // Render scene
+        sgr.renderScene(camera, t, rc);
+        // Camera
+        camera.render(rw, rh);
 
-        // Update Eye camera
-        camera.viewportWidth = rc.w();
-        camera.viewportHeight = rc.h();
-        camera.view.idt();
-        camera.view.setToLookAt(pos, auxf1.set(pos).add(dir), up);
+        sendOrientationUpdate(camera.getCamera(), rw, rh);
 
-        camera.combined.set(camera.projection);
-        Matrix4.mul(camera.combined.val, invEyeSpace.val);
-        Matrix4.mul(camera.combined.val, camera.view.val);
+        frameBuffer.begin();
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
+        frameBuffer.end();
+        postProcessRender(ppb, frameBuffer, postProcess, camera, rw, rh);
 
-        if (updateFrustum) {
-            camera.invProjectionView.set(camera.combined);
-            Matrix4.inv(camera.invProjectionView.val);
-            camera.frustum.update(camera.invProjectionView);
-        }
-    }
-
-    private void renderGui(IGui gui) {
-        gui.update(Gdx.graphics.getDeltaTime());
-        int width = Settings.settings.graphics.backBufferResolution[0];
-        int height = Settings.settings.graphics.backBufferResolution[1];
-        gui.render(width, height);
+        lastFrameBuffer = frameBuffer;
     }
 
     public void resize(int rw, int rh, int tw, int th) {
@@ -259,17 +158,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
             lastSize.set(-1, -1);
     }
 
-    public void dispose() {
-        if (fbLeft != null)
-            fbLeft.dispose();
-        if (fbRight != null)
-            fbRight.dispose();
-        if (xrDriver != null) {
-            xrDriver.dispose();
-        }
-    }
-
-    private Entity newVRDeviceModelEntity(VRControllerDevice device, Environment environment) {
+    private Entity newVRDeviceModelEntity(XrControllerDevice device, Environment environment) {
         var archetype = scene.archetypes().get("gaiasky.scenegraph.VRDeviceModel");
         var entity = archetype.createEntity();
         var vr = Mapper.vr.get(entity);
@@ -284,15 +173,15 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         return entity;
     }
 
-    private void addVRController(VRControllerDevice device) {
+    private void addVRController(XrControllerDevice device) {
         if (!vrDeviceToModel.containsKey(device)) {
-            Entity entity = newVRDeviceModelEntity(device, controllersEnv);
+            Entity entity = newVRDeviceModelEntity(device, controllersEnvironment);
             controllerObjects.add(entity);
             vrDeviceToModel.put(device, entity);
         }
     }
 
-    private void removeVRController(VRControllerDevice device) {
+    private void removeVRController(XrControllerDevice device) {
         if (vrDeviceToModel.containsKey(device)) {
             Entity entity = vrDeviceToModel.get(device);
             controllerObjects.removeValue(entity, true);
@@ -300,8 +189,12 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         }
     }
 
+    public Map<XrControllerDevice, Entity> getXRControllerToModel() {
+        return vrDeviceToModel;
+    }
+
     @Override
-    public void notify(Event event, Object source, Object... data) {
+    public void dispose() {
 
     }
 }

@@ -16,8 +16,6 @@ import gaiasky.event.EventManager;
 import gaiasky.gui.MessageBean;
 import gaiasky.gui.NotificationsInterface;
 import gaiasky.util.Logger.Log;
-import gaiasky.vr.openvr.VRContext;
-import gaiasky.vr.openvr.VRContext.VRDevice;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -305,21 +303,14 @@ public class CrashReporter {
         }
 
         if (Settings.settings != null && Settings.settings.runtime.openXr) {
-            var vrContext = GaiaSky.instance.xrDriver;
-            if (vrContext != null) {
+            var driver = GaiaSky.instance.xrDriver;
+            if (driver != null) {
                 /* VR info **/
                 strArray.add("");
                 strArray.add("## VR INFORMATION");
-                strArray.add("VR resolution: " + vrContext.getWidth() + "x" + vrContext.getHeight());
-                Array<VRDevice> devices = vrContext.getDevices();
-                for (VRDevice device : devices) {
-                    strArray.add("Device: " + device.renderModelName);
-                    strArray.add("    Model number: " + device.modelNumber);
-                    strArray.add("    Manufacturer: " + device.manufacturerName);
-                    strArray.add("    Role: " + device.getControllerRole());
-                    strArray.add("    Type: " + device.getType());
-                    strArray.add("    Index: " + (device.getPose() != null ? device.getPose().getIndex() : "null"));
-                }
+                strArray.add("VR resolution: " + driver.getWidth() + "x" + driver.getHeight());
+                strArray.add("OpenXR runtime name: " + driver.runtimeName);
+                strArray.add("OpenXR runtime version: " + driver.runtimeVersionString);
             }
         }
     }

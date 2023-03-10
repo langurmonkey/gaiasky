@@ -4,13 +4,10 @@
  */
 package gaiasky.vr.openxr;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnObjLoader;
 import gaiasky.util.gdx.model.IntModel;
-import gaiasky.vr.openvr.VRContext;
-import gaiasky.vr.openxr.input.actions.VRControllerDevice;
+import gaiasky.vr.openxr.input.XrControllerDevice;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWNativeGLX;
 import org.lwjgl.glfw.GLFWNativeWGL;
@@ -22,27 +19,17 @@ import org.lwjgl.system.Platform;
 import org.lwjgl.system.Struct;
 import org.lwjgl.system.StructBuffer;
 import org.lwjgl.system.linux.X11;
-import org.lwjgl.system.linux.XVisualInfo;
 import org.lwjgl.system.windows.User32;
 
 import java.nio.FloatBuffer;
 import java.util.Objects;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFWNativeGLX.glfwGetGLXContext;
-import static org.lwjgl.glfw.GLFWNativeGLX.glfwGetGLXFBConfig;
-import static org.lwjgl.glfw.GLFWNativeWGL.glfwGetWGLContext;
-import static org.lwjgl.glfw.GLFWNativeWayland.glfwGetWaylandDisplay;
-import static org.lwjgl.glfw.GLFWNativeWin32.glfwGetWin32Window;
-import static org.lwjgl.glfw.GLFWNativeX11.glfwGetX11Display;
-import static org.lwjgl.opengl.GLX.glXGetCurrentDrawable;
 import static org.lwjgl.opengl.GLX13.*;
 import static org.lwjgl.openxr.XR10.XR_TYPE_API_LAYER_PROPERTIES;
 import static org.lwjgl.openxr.XR10.XR_TYPE_EXTENSION_PROPERTIES;
 import static org.lwjgl.system.MemoryStack.stackInts;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memPutInt;
-import static org.lwjgl.system.windows.User32.GetDC;
 
 /**
  * A helper class with some static methods to help applications with OpenXR related tasks that are cumbersome in
@@ -206,7 +193,7 @@ public final class XrHelper {
         }
     }
 
-    public static IntModel loadRenderModel(OpenXRDriver driver, VRControllerDevice controllerDevice) {
+    public static IntModel loadRenderModel(XrDriver driver, XrControllerDevice controllerDevice) {
         IntModel model = null;
         OwnObjLoader ol = new OwnObjLoader();
         if (driver != null && driver.runtimeName.contains("oculus")) {

@@ -5,6 +5,7 @@
 
 package gaiasky.scene.system.render;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
@@ -47,7 +48,8 @@ import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.math.MathUtilsDouble;
-import gaiasky.vr.openxr.OpenXRDriver;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.input.XrControllerDevice;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL40;
 
@@ -67,7 +69,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     // Indexes
     private final int SGR_DEFAULT_IDX = 0, SGR_STEREO_IDX = 1, SGR_FOV_IDX = 2, SGR_CUBEMAP_IDX = 3, SGR_OPENXR_IDX = 4;
     // The OpenXR driver. This is null if we are not in VR.
-    private final OpenXRDriver xrDriver;
+    private final XrDriver xrDriver;
     private final GlobalResources globalResources;
     private final AtomicBoolean rendering;
     private final RenderAssets renderAssets;
@@ -109,7 +111,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
     private final LightGlowPass lightGlowPass;
     private final SVTRenderPass svtPass;
 
-    public SceneRenderer(final OpenXRDriver xrDriver, final GlobalResources globalResources) {
+    public SceneRenderer(final XrDriver xrDriver, final GlobalResources globalResources) {
         super();
         this.xrDriver = xrDriver;
         this.globalResources = globalResources;
@@ -349,7 +351,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         // MODEL CLOUDS
         AbstractRenderSystem modelCloudProc = new ModelRenderer(this, MODEL_CLOUD, alphas, renderAssets.mbCloud);
 
-
         // MODEL PER-PIXEL-LIGHTING WITH TRANSPARENCIES
         AbstractRenderSystem modelPerPixelLightingTransp = new ModelRenderer(this, MODEL_PIX_TRANSPARENT, alphas, renderAssets.mbPixelLighting);
 
@@ -441,7 +442,6 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         GL30.glClampColor(GL30.GL_CLAMP_VERTEX_COLOR, GL30.GL_FALSE);
         GL30.glClampColor(GL30.GL_CLAMP_FRAGMENT_COLOR, GL30.GL_FALSE);
 
-
         EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_GLOW_CMD);
 
         // Set clear color, depth and stencil.
@@ -508,7 +508,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
             }
 
             // Light glow pass.
-            // In stereo and cubemap modes, the glow pass is rendered in the SGR itself.
+            // In stereo/cubemap and VR modes, the glow pass is rendered in the SGR itself.
             if (!Settings.settings.program.isStereoOrCubemap() && !Settings.settings.runtime.openXr) {
                 lightGlowPass.renderGlowPass(camera, null);
             }
@@ -845,11 +845,11 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         }
     }
 
-    public IRenderMode getRenderModeOpenVR() {
-        return sgrList[SGR_OPENXR_IDX];
+    public RenderModeOpenXR getRenderModeOpenXR() {
+        return (RenderModeOpenXR) sgrList[SGR_OPENXR_IDX];
     }
 
-    public OpenXRDriver getVrContext() {
+    public XrDriver getVrContext() {
         return xrDriver;
     }
 
@@ -868,5 +868,9 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
 
     public ModelEntityRenderSystem getModelRenderSystem() {
         return renderObject;
+    }
+
+    public Map<XrControllerDevice, Entity> getXRControllerToModel() {
+        return getRenderModeOpenXR().getXRControllerToModel();
     }
 }

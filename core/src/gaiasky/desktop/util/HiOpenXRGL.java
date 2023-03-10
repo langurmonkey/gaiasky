@@ -7,12 +7,13 @@ import com.badlogic.gdx.math.Vector2;
 import gaiasky.gui.ConsoleLogger;
 import gaiasky.util.SettingsManager;
 import gaiasky.util.i18n.I18n;
-import gaiasky.vr.openxr.OpenXRDriver;
-import gaiasky.vr.openxr.OpenXRDriver.Swapchain;
-import gaiasky.vr.openxr.OpenXRRenderer;
+import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.XrDriver.Swapchain;
+import gaiasky.vr.openxr.XrRenderer;
 import gaiasky.vr.openxr.ShadersGL;
 import gaiasky.vr.openxr.XrHelper;
-import gaiasky.vr.openxr.input.OpenXRInputListener;
+import gaiasky.vr.openxr.input.XrControllerDevice;
+import gaiasky.vr.openxr.input.XrInputListener;
 import gaiasky.vr.openxr.input.actions.Action;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
@@ -39,9 +40,9 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 /**
  * Re-implementation of LWGJL3's HelloOpenXRGL, but using our driver classes.
  */
-public class HiOpenXRGL implements OpenXRRenderer {
+public class HiOpenXRGL implements XrRenderer {
 
-    static OpenXRDriver driver;
+    static XrDriver driver;
 
     long window;
 
@@ -70,7 +71,7 @@ public class HiOpenXRGL implements OpenXRRenderer {
 
         // Main classes.
         HiOpenXRGL hi = new HiOpenXRGL();
-        driver = new OpenXRDriver();
+        driver = new XrDriver();
         // Set Hi as the renderer.
         driver.setRenderer(hi);
 
@@ -83,40 +84,40 @@ public class HiOpenXRGL implements OpenXRRenderer {
         hi.createOpenGLResources();
         driver.initializeInput();
 
-        driver.addListener(new OpenXRInputListener() {
+        driver.addListener(new XrInputListener() {
             @Override
-            public boolean showUI(boolean value, Action.DeviceType type) {
+            public boolean showUI(boolean value, XrControllerDevice device) {
                 System.out.println("Show UI");
                 return false;
             }
 
             @Override
-            public boolean accept(boolean value, Action.DeviceType type) {
+            public boolean accept(boolean value, XrControllerDevice device) {
                 System.out.println("Accept");
                 return false;
             }
 
             @Override
-            public boolean cameraMode(boolean value, Action.DeviceType type) {
+            public boolean cameraMode(boolean value, XrControllerDevice device) {
                 System.out.println("Camera mode");
                 return false;
             }
 
             @Override
-            public boolean rotate(boolean value, Action.DeviceType type) {
+            public boolean rotate(boolean value, XrControllerDevice device) {
                 System.out.println("Rotate");
                 return false;
             }
 
             @Override
-            public boolean move(Vector2 value, Action.DeviceType type) {
+            public boolean move(Vector2 value, XrControllerDevice device) {
                 System.out.println("Move");
                 return false;
             }
 
 
             @Override
-            public boolean select(float value, Action.DeviceType type) {
+            public boolean select(float value, XrControllerDevice device) {
                 System.out.println("Select");
                 return false;
             }

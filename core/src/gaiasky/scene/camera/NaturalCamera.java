@@ -29,7 +29,7 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.gui.ControllerConnectionListener;
-import gaiasky.gui.OpenVRListener;
+import gaiasky.gui.OpenXRListener;
 import gaiasky.input.AbstractMouseKbdListener;
 import gaiasky.input.GameMouseKbdListener;
 import gaiasky.input.MainGamepadListener;
@@ -231,7 +231,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * VR listener
      **/
-    private OpenVRListener openVRListener;
+    private OpenXRListener openXRListener;
 
     private double DIST_A;
     private double DIST_B;
@@ -322,7 +322,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         ControllerConnectionListener controllerConnectionListener = new ControllerConnectionListener();
         Controllers.addListener(controllerConnectionListener);
         if (vr) {
-            openVRListener = new OpenVRListener(this);
+            openXRListener = new OpenXRListener(GaiaSky.instance.xrDriver, this);
         }
 
         // Shape renderer (pointer guide lines)
@@ -415,7 +415,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         currentMouseKbdListener.update();
         gamepadListener.update();
         if (vr) {
-            openVRListener.update();
+            openXRListener.update();
         }
 
         // Next focus and closest positions
@@ -1126,7 +1126,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 setMouseKbdListener(newListener);
                 addGamepadListener();
                 if (vr) {
-                    GaiaSky.instance.xrDriver.addListener(openVRListener);
+                    GaiaSky.instance.xrDriver.addListener(openXRListener);
                 }
                 break;
             default:
@@ -1135,7 +1135,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 removeGamepadListener();
                 // Remove vr listener.
                 if (vr) {
-                    GaiaSky.instance.xrDriver.removeListener(openVRListener);
+                    GaiaSky.instance.xrDriver.removeListener(openXRListener);
                 }
                 break;
             }
@@ -1170,6 +1170,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * The speed scaling function.
      *
      * @param min The minimum speed.
+     *
      * @return The speed scaling.
      */
     public double speedScaling(double min) {

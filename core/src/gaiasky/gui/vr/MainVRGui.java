@@ -45,9 +45,8 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.*;
 import gaiasky.util.scene2d.FixedStage;
-import gaiasky.vr.openvr.VRContext;
-import gaiasky.vr.openvr.VRDeviceListener;
-import gaiasky.vr.openxr.input.actions.VRControllerDevice;
+import gaiasky.vr.openxr.input.XrControllerDevice;
+import gaiasky.vr.openxr.input.XrInputListener;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,7 +56,7 @@ import java.util.Set;
 /**
  * Creates and manages the VR UI and all its interactions with controllers.
  */
-public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObserver, Disposable {
+public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserver, Disposable {
 
     public static final int WIDTH = 1920;
     public static final int HEIGHT = 1080;
@@ -74,16 +73,17 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
     boolean triggerPressed = false;
     boolean mouseHit = false;
     boolean vr;
+    boolean visible = false;
 
     ShapeRenderer shapeRenderer;
     SpriteBatch batch;
     Set<VRDevice> vrControllers;
-    Map<VRControllerDevice, VRDevice> deviceToDevice;
+    Map<XrControllerDevice, VRDevice> deviceToDevice;
 
     GamepadGui gamepadGui;
 
     /** Saves the controller that last interacted with the UI, so that we can only get its input. **/
-    VRControllerDevice interactingController;
+    XrControllerDevice interactingController;
 
     public MainVRGui(Skin skin) {
         setSkin(skin);
@@ -93,7 +93,6 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
         setVR(Settings.settings.runtime.openXr);
         this.batch = new SpriteBatch(20, GaiaSky.instance.getGlobalResources().getSpriteShader());
         this.shapeRenderer = new ShapeRenderer(100, GaiaSky.instance.getGlobalResources().getShapeShader());
-        //resize(WIDTH, HEIGHT);
         this.shapeRenderer.setAutoShapeType(true);
 
         // Create controllers set.
@@ -269,6 +268,7 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
     private void showVRUI(Base base) {
         if (base != null) {
             base.visible = true;
+            visible = true;
             if (!vr) {
                 // Add processor to main input multiplexer.
                 GaiaSky.instance.inputMultiplexer.addProcessor(this);
@@ -281,6 +281,7 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
     private void hideVRUI(Base base) {
         if (base != null) {
             base.visible = false;
+            visible = false;
             for (var device : vrControllers) {
                 device.hitUI = false;
             }
@@ -495,8 +496,8 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
                         dir.nor();
                         var body = Mapper.body.get(entity);
                         if (vr) {
-                            body.pos.set(camera.getPos().cpy().add(dir.scl(1.8)));
-                            body.pos.add(0, 1.1, 0);
+                            body.pos.set(camera.getPos().cpy().add(dir.scl(1.3)));
+                            body.pos.add(0, 0.0, 0);
                         } else {
                             body.pos.set(camera.getPos().cpy().add(dir.scl(2.0 * Constants.KM_TO_U)));
                             body.pos.add(0, 0, 0);
@@ -539,75 +540,6 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
 
     public void setSkin(Skin skin) {
         this.skin = skin;
-    }
-
-    @Override
-    public void connected(VRContext.VRDevice device) {
-
-    }
-
-    @Override
-    public void disconnected(VRContext.VRDevice device) {
-
-    }
-
-    @Override
-    public boolean buttonPressed(VRContext.VRDevice device, int button) {
-        if (device.mappings != null) {
-            if (button == device.mappings.getButtonRT()) {
-                var dev = deviceToDevice.get(device);
-                if (dev.hitUI && !dev.interacting) {
-                    interactingController = dev.device;
-                    dev.interacting = true;
-                }
-                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) /*&& device == interactingController*/) {
-                    stage.touchDown((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
-                    triggerPressed = true;
-                    //interactingController = device;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean buttonReleased(VRContext.VRDevice device, int button) {
-        if (device.mappings != null) {
-            if (button == device.mappings.getButtonRT()) {
-                var dev = deviceToDevice.get(device);
-                if (dev.hitUI && !dev.interacting) {
-                    interactingController = dev.device;
-                    dev.interacting = true;
-                }
-                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y)/* && device == interactingController*/) {
-                    stage.touchUp((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
-                    triggerPressed = false;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean buttonTouched(VRContext.VRDevice device, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean buttonUntouched(VRContext.VRDevice device, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean axisMoved(VRContext.VRDevice device, int axis, float valueX, float valueY) {
-        return false;
-    }
-
-    @Override
-    public void event(int code) {
-
     }
 
     @Override
@@ -661,6 +593,65 @@ public class MainVRGui implements VRDeviceListener, InputProcessor, IGui, IObser
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
+    @Override
+    public boolean showUI(boolean value, XrControllerDevice device) {
+        return false;
+    }
+
+    @Override
+    public boolean accept(boolean value, XrControllerDevice device) {
+        return false;
+    }
+
+    @Override
+    public boolean cameraMode(boolean value, XrControllerDevice device) {
+        return false;
+    }
+
+    @Override
+    public boolean rotate(boolean value, XrControllerDevice device) {
+        return false;
+    }
+
+    @Override
+    public boolean move(Vector2 value, XrControllerDevice device) {
+        return false;
+    }
+
+    @Override
+    public boolean select(float value, XrControllerDevice device) {
+        if (visible) {
+            if (value > 0) {
+                // Pressed.
+                var dev = deviceToDevice.get(device);
+                if (dev.hitUI && !dev.interacting) {
+                    interactingController = dev.device;
+                    dev.interacting = true;
+                }
+                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) /*&& device == interactingController*/) {
+                    stage.touchDown((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
+                    triggerPressed = true;
+                    interactingController = device;
+                    return true;
+                }
+            } else {
+                // Released.
+                var dev = deviceToDevice.get(device);
+                if (dev.hitUI && !dev.interacting) {
+                    interactingController = dev.device;
+                    dev.interacting = true;
+                }
+                if (Float.isFinite(pointer.x) && Float.isFinite(pointer.y) && device == interactingController) {
+                    stage.touchUp((int) pointer.x, (int) (HEIGHT - pointer.y), 0, Input.Buttons.LEFT);
+                    triggerPressed = false;
+                    return true;
+                }
+
+            }
+        }
         return false;
     }
 }
