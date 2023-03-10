@@ -24,13 +24,14 @@ public abstract class Action implements AutoCloseable {
      * Reflects the source device of this action. Either left or right.
      */
     public enum DeviceType {
-        Left, Right;
+        Left,
+        Right;
 
-        public boolean isLeft(){
+        public boolean isLeft() {
             return this == Left;
         }
 
-        public boolean isRight(){
+        public boolean isRight() {
             return this == Right;
         }
     }
@@ -44,12 +45,21 @@ public abstract class Action implements AutoCloseable {
 
     public void createHandle(XrActionSet actionSet, OpenXRDriver driver) {
         handle = createAction(driver, actionSet, xrActionType);
+        if (this instanceof SpaceAwareAction) {
+            ((SpaceAwareAction) this).createActionSpace(driver);
+        }
     }
 
     protected XrAction createAction(OpenXRDriver driver, XrActionSet actionSet, int type) {
         try (MemoryStack stack = stackPush()) {
             // Create action.
-            XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack).type$Default().next(NULL).actionName(stack.UTF8(name)).localizedActionName(stack.UTF8(localizedName)).countSubactionPaths(0).actionType(type);
+            XrActionCreateInfo createInfo = XrActionCreateInfo.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .actionName(stack.UTF8(name))
+                    .localizedActionName(stack.UTF8(localizedName))
+                    .countSubactionPaths(0)
+                    .actionType(type);
 
             PointerBuffer pp = stack.mallocPointer(1);
             driver.check(xrCreateAction(actionSet, createInfo, pp));

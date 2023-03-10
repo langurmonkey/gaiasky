@@ -72,7 +72,7 @@ public class OpenXRDriver implements Disposable {
     XrEventDataBuffer eventDataBuffer;
     int sessionState;
     boolean sessionRunning, disposing = false;
-    public long currentFrameTime = 1L;
+    public long currentFrameTime = 0L;
 
     public static class Swapchain {
         public XrSwapchain handle;
@@ -359,9 +359,10 @@ public class OpenXRDriver implements Disposable {
         frameBufferBuilder.addColorTextureAttachment(internalFormat, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE);
         frameBufferBuilder.addBasicDepthRenderBuffer();
 
-        // Frame buffers.
-        viewFrameBuffers = new FrameBuffer[swapchains.length];
-        for (int view = 0; view < swapchains.length; view++) {
+        // Create actual frame buffers.
+        int count = swapchains.length;
+        viewFrameBuffers = new FrameBuffer[count];
+        for (int view = 0; view < count; view++) {
             viewFrameBuffers[view] = frameBufferBuilder.build();
         }
     }
@@ -532,17 +533,22 @@ public class OpenXRDriver implements Disposable {
     }
 
     private void pollInput() {
-        // Sync sets.
+        // Ensure frame time is valid.
         try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Sync sets.
             XrActiveActionSet.Buffer sets = XrActiveActionSet.calloc(2, stack);
-            sets.get(0).actionSet(actions.getHandle());
-            sets.get(1).actionSet(poses.getHandle());
+            sets.get(0).actionSet(poses.getHandle());
+            sets.get(1).actionSet(actions.getHandle());
 
             XrActionsSyncInfo syncInfo = XrActionsSyncInfo.calloc(stack)
-                    .type(XR_TYPE_ACTIONS_SYNC_INFO).activeActionSets(sets);
+                    .type(XR_TYPE_ACTIONS_SYNC_INFO)
+                    .activeActionSets(sets);
 
             check(xrSyncActions(xrSession, syncInfo));
 
+            if (poses != null) {
+                poses.sync(this);
+            }
             if (actions != null) {
                 actions.sync(this);
                 var gsActions = (GaiaSkyActionSet) actions;
@@ -563,9 +569,6 @@ public class OpenXRDriver implements Disposable {
                     processMoveAction(gsActions.moveRight, listener);
                 }
             }
-            if (poses != null) {
-                poses.sync(this);
-            }
         }
     }
 
@@ -574,21 +577,25 @@ public class OpenXRDriver implements Disposable {
             listener.showUI(action.currentState, action.getDeviceType());
         }
     }
+
     private void processCameraModeAction(BoolAction action, OpenXRInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.cameraMode(action.currentState, action.getDeviceType());
         }
     }
+
     private void processAcceptAction(BoolAction action, OpenXRInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.accept(action.currentState, action.getDeviceType());
         }
     }
+
     private void processSelectAction(FloatAction action, OpenXRInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.select(action.currentState, action.getDeviceType());
         }
     }
+
     private void processMoveAction(Vec2fAction action, OpenXRInputListener listener) {
         if (action.isActive && action.changedSinceLastSync) {
             listener.move(action.currentState, action.getDeviceType());
@@ -680,9 +687,11 @@ public class OpenXRDriver implements Disposable {
     }
 
     public void dispose() {
+        logger.info("Disposing OpenXR context.");
         disposing = true;
         sessionRunning = false;
 
+        logger.info(" - OpenXR input.");
         // Input stack.
         disposeInput();
 
@@ -693,24 +702,31 @@ public class OpenXRDriver implements Disposable {
             views.free();
         if (viewConfigs != null)
             viewConfigs.free();
+
+        logger.info(" - OpenXR swapchains.");
         if (swapchains != null)
             for (Swapchain swapchain : swapchains) {
                 xrDestroySwapchain(swapchain.handle);
                 swapchain.images.free();
             }
 
+        logger.info(" - OpenXR appSpace.");
         if (xrAppSpace != null)
             xrDestroySpace(xrAppSpace);
+        logger.info(" - OpenXR debugMessenger.");
         if (xrDebugMessenger != null)
             xrDestroyDebugUtilsMessengerEXT(xrDebugMessenger);
 
+        logger.info(" - OpenXR session.");
         if (xrSession != null)
             xrDestroySession(xrSession);
 
+        logger.info(" - OpenXR instance.");
         if (xrInstance != null)
             xrDestroyInstance(xrInstance);
 
         // Frame buffers.
+        logger.info(" - OpenGL frame buffers.");
         if (viewFrameBuffers != null) {
             for (var frameBuffer : viewFrameBuffers) {
                 frameBuffer.dispose();
@@ -776,11 +792,20 @@ public class OpenXRDriver implements Disposable {
         return new Array<>();
     }
 
-    public Array<VRControllerDevice> getControllerDevices(){
+    public Array<VRControllerDevice> getControllerDevices() {
         Array<VRControllerDevice> controllers = new Array<>();
-        if(poses != null) {
+        if (poses != null) {
+            var actions = poses.actions();
+            for (var action : actions) {
+                if (action instanceof PoseAction) {
+                    var poseAction = (PoseAction) action;
+                    if (poseAction.controllerDevice != null) {
+                        controllers.add(poseAction.controllerDevice);
+                    }
+                }
+            }
         }
-        return null;
+        return controllers;
     }
 
     public Array<VRDevice> getDevices() {

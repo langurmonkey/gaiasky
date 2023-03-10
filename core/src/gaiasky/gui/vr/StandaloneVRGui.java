@@ -14,14 +14,16 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.gui.IGui;
 import gaiasky.render.ComponentTypes;
-import gaiasky.util.*;
+import gaiasky.util.Bits;
+import gaiasky.util.Logger;
+import gaiasky.util.ModelCache;
+import gaiasky.util.RenderUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
@@ -74,7 +76,6 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
     SpriteBatch sbScreen;
     Array<VRControllerDevice> controllers;
     Vector2 lastSize = new Vector2();
-    Vector3 aux = new Vector3();
 
     private boolean positionSet = false;
     private boolean renderToScreen = false;
@@ -187,9 +188,11 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
         if (controllers == null) {
             controllers = driver.getControllerDevices();
         }
-        for (var controller : controllers) {
-            if (!controller.isInitialized()) {
-                controller.initialize(driver);
+        if (controllers != null) {
+            for (var controller : controllers) {
+                if (!controller.isInitialized()) {
+                    controller.initialize(driver);
+                }
             }
         }
 
@@ -222,22 +225,23 @@ public class StandaloneVRGui<T extends IGui> implements IGui, OpenXRRenderer {
 
     @Override
     public void render(int rw, int rh) {
-        // Render GUI to frame buffer.
-        fbGui.begin();
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        gui.render(rw, rh);
-        fbGui.end();
-
         // OpenXR render.
-        driver.pollEvents();
-        if (driver.isRunning()) {
-            // Delegate to OpenXR driver.
-            driver.renderFrameOpenXR();
-        }
+        if (!driver.pollEvents()) {
+            // First render GUI to frame buffer.
+            fbGui.begin();
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            gui.render(rw, rh);
+            fbGui.end();
 
-        // Render to screen if necessary.
-        if (renderToScreen && lastFrameBuffer != null) {
-            RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
+            if (driver.isRunning()) {
+                // Delegate to OpenXR driver.
+                driver.renderFrameOpenXR();
+            }
+
+            // Render to screen if necessary.
+            if (renderToScreen && lastFrameBuffer != null) {
+                RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
+            }
         }
     }
 

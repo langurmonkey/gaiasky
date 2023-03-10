@@ -25,7 +25,11 @@ public class HandsActionSet extends ActionSet {
 
     @Override
     public List<Action> actions() {
-        return List.of(poseLeft, poseRight, hapticLeft, hapticRight
+        return List.of(
+                poseLeft,
+                poseRight,
+                hapticLeft,
+                hapticRight
         );
     }
 

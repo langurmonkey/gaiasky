@@ -78,13 +78,11 @@ import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.time.RealTimeClock;
 import gaiasky.util.tree.OctreeNode;
-import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRStatus;
 import gaiasky.vr.openxr.OpenXRDriver;
 import gaiasky.vr.openxr.input.OpenXRInputListener;
 import gaiasky.vr.openxr.input.actions.Action;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.openxr.XrVector2f;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -665,6 +663,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
                 xrDriver.pollEvents();
 
+
                 if (settings.graphics.resolution[0] != xrDriver.getWidth()) {
                     logger.info("Warning, resizing according to VRSystem values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
                     // Do not resize the screen!
@@ -1050,9 +1049,6 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 bookmarksManager.persistBookmarks();
         }
 
-        if (xrDriver != null)
-            xrDriver.dispose();
-
         ScriptingServer.dispose();
 
         // Flush frames.
@@ -1097,6 +1093,10 @@ public class GaiaSky implements ApplicationListener, IObserver {
         } catch (Exception e) {
             logger.error(e, "Error deleting tmp directory");
         }
+
+        // OpenXR context.
+        if (xrDriver != null)
+            xrDriver.dispose();
     }
 
     public void resetDynamicResolution() {

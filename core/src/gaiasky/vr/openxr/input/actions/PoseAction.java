@@ -28,15 +28,17 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
     }
 
     @Override
-    public void createHandle(XrActionSet actionSet, OpenXRDriver driver) {
-        super.createHandle(actionSet, driver);
-        createActionSpace(driver);
-    }
-
-    @Override
     public void createActionSpace(OpenXRDriver driver) {
         try (MemoryStack stack = stackPush()) {
-            XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack).type$Default().next(NULL).poseInActionSpace(XrPosef.malloc(stack).position$(XrVector3f.calloc(stack).set(0, 0, 0)).orientation(XrQuaternionf.malloc(stack).x(0).y(0).z(0).w(1))).action(handle);
+            XrActionSpaceCreateInfo createInfo = XrActionSpaceCreateInfo.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .poseInActionSpace(XrPosef.malloc(stack)
+                            .position$(XrVector3f.calloc(stack)
+                                    .set(0, 0, 0))
+                            .orientation(XrQuaternionf.malloc(stack)
+                                    .x(0).y(0).z(0).w(1)))
+                    .action(handle);
 
             PointerBuffer pp = stack.mallocPointer(1);
             driver.check(xrCreateActionSpace(driver.xrSession, createInfo, pp), "xrCreateActionSpace");
@@ -50,10 +52,11 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
         getInfo.action(handle);
         driver.check(XR10.xrGetActionStatePose(driver.xrSession, getInfo, state), "xrGetActionStatePose");
         controllerDevice.active = state.isActive();
-        if (controllerDevice.active) {
+        if (controllerDevice.active && driver.currentFrameTime > 0) {
             location.set(XR_TYPE_SPACE_LOCATION, NULL, 0, pose);
             driver.check(xrLocateSpace(space, driver.xrAppSpace, driver.currentFrameTime, location));
-            if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0 && (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
+            if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0
+                    && (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
                 // Ok!
                 controllerDevice.setFromPose(location.pose());
             }

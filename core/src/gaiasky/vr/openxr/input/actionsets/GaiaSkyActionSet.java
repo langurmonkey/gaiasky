@@ -61,39 +61,39 @@ public class GaiaSkyActionSet extends ActionSet {
         // Oculus touch.
         map.computeIfAbsent("/interaction_profiles/oculus/touch_controller", aLong -> new ArrayList<>()).addAll(
                 List.of(
-                        new Pair<>(showUiLeft, "/user/hand/right/input/a/click"),
-                        new Pair<>(showUiRight, "/user/hand/left/input/x/click"),
+                        new Pair<>(showUiLeft, "/user/hand/left/input/x/click"),
+                        new Pair<>(showUiRight, "/user/hand/right/input/a/click"),
 
-                        new Pair<>(acceptLeft, "/user/hand/right/input/a/click"),
-                        new Pair<>(acceptRight, "/user/hand/left/input/x/click"),
+                        new Pair<>(acceptLeft, "/user/hand/left/input/x/click"),
+                        new Pair<>(acceptRight, "/user/hand/right/input/a/click"),
 
-                        new Pair<>(cameraModeLeft, "/user/hand/right/input/b/click"),
-                        new Pair<>(cameraModeRight, "/user/hand/left/input/y/click"),
+                        new Pair<>(cameraModeLeft, "/user/hand/left/input/y/click"),
+                        new Pair<>(cameraModeRight, "/user/hand/right/input/b/click"),
 
-                        new Pair<>(selectLeft, "/user/hand/right/input/trigger/value"),
-                        new Pair<>(selectRight, "/user/hand/left/input/trigger/value"),
+                        new Pair<>(selectLeft, "/user/hand/left/input/trigger/value"),
+                        new Pair<>(selectRight, "/user/hand/right/input/trigger/value"),
 
-                        new Pair<>(moveLeft, "/user/hand/right/input/thumbstick"),
-                        new Pair<>(moveRight, "/user/hand/left/input/thumbstick")
+                        new Pair<>(moveLeft, "/user/hand/left/input/thumbstick"),
+                        new Pair<>(moveRight, "/user/hand/right/input/thumbstick")
                 ));
 
         // Valve index
         map.computeIfAbsent("/interaction_profiles/valve/index_controller", aLong -> new ArrayList<>()).addAll(
                 List.of(
-                        new Pair<>(showUiLeft, "/user/hand/right/input/b/click"),
-                        new Pair<>(showUiRight, "/user/hand/left/input/b/click"),
+                        new Pair<>(showUiLeft, "/user/hand/left/input/b/click"),
+                        new Pair<>(showUiRight, "/user/hand/right/input/b/click"),
 
-                        new Pair<>(acceptLeft, "/user/hand/right/input/b/click"),
-                        new Pair<>(acceptRight, "/user/hand/left/input/b/click"),
+                        new Pair<>(acceptLeft, "/user/hand/left/input/b/click"),
+                        new Pair<>(acceptRight, "/user/hand/right/input/b/click"),
 
-                        new Pair<>(cameraModeLeft, "/user/hand/right/input/a/click"),
-                        new Pair<>(cameraModeRight, "/user/hand/left/input/a/click"),
+                        new Pair<>(cameraModeLeft, "/user/hand/left/input/a/click"),
+                        new Pair<>(cameraModeRight, "/user/hand/right/input/a/click"),
 
-                        new Pair<>(selectLeft, "/user/hand/right/input/trigger/value"),
-                        new Pair<>(selectRight, "/user/hand/left/input/trigger/value"),
+                        new Pair<>(selectLeft, "/user/hand/left/input/trigger/value"),
+                        new Pair<>(selectRight, "/user/hand/right/input/trigger/value"),
 
-                        new Pair<>(moveLeft, "/user/hand/right/input/thumbstick"),
-                        new Pair<>(moveRight, "/user/hand/left/input/thumbstick")
+                        new Pair<>(moveLeft, "/user/hand/left/input/thumbstick"),
+                        new Pair<>(moveRight, "/user/hand/right/input/thumbstick")
                 )
         );
     }
