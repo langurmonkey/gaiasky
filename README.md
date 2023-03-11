@@ -41,7 +41,7 @@ This file contains the following sections:
 
 | Component             | Minimum requirement                                                            |
 |-----------------------|--------------------------------------------------------------------------------|
-| **Operating system**  | Linux / Windows 7+ / macOS, 64-bit                                             |
+| **Operating system**  | Linux / Windows 7+ / macOS, x86-64 (ARM CPUs are unsupported)                  |
 | **CPU**               | Intel Core i5 3rd Generation or similar. 4 core or higher recommended          |
 | **GPU**               | Support for OpenGL `3.2` (`4.x` recommended) and GLSL `3.3`,  1 GB RAM         |
 | **Memory**            | 2-6 GB RAM depending on catalog                                                |
