@@ -112,12 +112,6 @@ project(":core") {
         // REGULAR DEPS
         // ************
 
-        // OpenVR
-        api group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
-        api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
-        api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
-        api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-macos"
-
         // OpenXR
         api group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
         api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
