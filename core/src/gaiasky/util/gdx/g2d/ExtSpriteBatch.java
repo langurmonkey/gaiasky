@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.Gdx;
@@ -26,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.util.gdx.graphics.TextureView;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.mesh.IntMesh.VertexDataType;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -416,6 +401,61 @@ public class ExtSpriteBatch implements ExtBatch {
         vertices[idx + 18] = u2;
         vertices[idx + 19] = v;
         this.idx = idx + 20;
+    }
+    public void draw(TextureView textureView, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
+            int srcHeight, boolean flipX, boolean flipY) {
+        if (!drawing)
+            throw new IllegalStateException("SpriteBatch.begin must be called before draw.");
+
+        float[] vertices = this.vertices;
+
+        float u = srcX * invTexWidth;
+        float v = (srcY + srcHeight) * invTexHeight;
+        float u2 = (srcX + srcWidth) * invTexWidth;
+        float v2 = srcY * invTexHeight;
+        final float fx2 = x + width;
+        final float fy2 = y + height;
+
+        if (flipX) {
+            float tmp = u;
+            u = u2;
+            u2 = tmp;
+        }
+
+        if (flipY) {
+            float tmp = v;
+            v = v2;
+            v2 = tmp;
+        }
+
+        float color = this.colorPacked;
+        int idx = this.idx;
+        vertices[idx] = x;
+        vertices[idx + 1] = y;
+        vertices[idx + 2] = color;
+        vertices[idx + 3] = u;
+        vertices[idx + 4] = v;
+
+        vertices[idx + 5] = x;
+        vertices[idx + 6] = fy2;
+        vertices[idx + 7] = color;
+        vertices[idx + 8] = u;
+        vertices[idx + 9] = v2;
+
+        vertices[idx + 10] = fx2;
+        vertices[idx + 11] = fy2;
+        vertices[idx + 12] = color;
+        vertices[idx + 13] = u2;
+        vertices[idx + 14] = v2;
+
+        vertices[idx + 15] = fx2;
+        vertices[idx + 16] = y;
+        vertices[idx + 17] = color;
+        vertices[idx + 18] = u2;
+        vertices[idx + 19] = v;
+        this.idx = idx + 20;
+
+        flush(textureView);
     }
 
     public void draw(Texture texture, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
@@ -961,6 +1001,35 @@ public class ExtSpriteBatch implements ExtBatch {
         int count = spritesInBatch * 6;
 
         lastTexture.bind();
+        IntMesh mesh = this.mesh;
+        mesh.setVertices(vertices, 0, idx);
+        mesh.getIndicesBuffer().position(0);
+        mesh.getIndicesBuffer().limit(count);
+
+        if (blendingDisabled) {
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+        } else {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            if (blendSrcFunc != -1)
+                Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+        }
+
+        mesh.render(customShader != null ? customShader : shader, GL20.GL_TRIANGLES, 0, count);
+
+        idx = 0;
+    }
+    public void flush(TextureView texture) {
+        if (idx == 0)
+            return;
+
+        renderCalls++;
+        totalRenderCalls++;
+        int spritesInBatch = idx / 20;
+        if (spritesInBatch > maxSpritesInBatch)
+            maxSpritesInBatch = spritesInBatch;
+        int count = spritesInBatch * 6;
+
+        texture.bind();
         IntMesh mesh = this.mesh;
         mesh.setVertices(vertices, 0, idx);
         mesh.getIndicesBuffer().position(0);

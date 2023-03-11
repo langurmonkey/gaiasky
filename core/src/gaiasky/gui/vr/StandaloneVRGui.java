@@ -11,8 +11,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,6 +23,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.ModelCache;
 import gaiasky.util.RenderUtils;
 import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.graphics.TextureView;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Environment;
@@ -37,13 +37,10 @@ import gaiasky.util.gdx.shader.provider.GroundShaderProvider;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.XrRenderer;
-import gaiasky.vr.openxr.XrHelper;
 import gaiasky.vr.openxr.XrViewManager;
 import gaiasky.vr.openxr.input.XrInputListener;
 import gaiasky.vr.openxr.input.XrControllerDevice;
-import org.joml.Matrix4f;
 import org.lwjgl.openxr.*;
-import org.lwjgl.system.MemoryStack;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -51,7 +48,6 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.system.MemoryStack.stackPush;
 
 /**
  * Manages the full rendering cycle of a VR user interface.
@@ -74,9 +70,9 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
     final XrDriver driver;
     final XrInputListener listener;
     final XrViewManager viewManager;
-    private FrameBuffer lastFrameBuffer;
+    private TextureView textureView;
     FrameBuffer fbGui;
-    SpriteBatch sbScreen;
+    ExtSpriteBatch sbScreen;
     Array<XrControllerDevice> controllers;
     Vector2 lastSize = new Vector2();
 
@@ -91,6 +87,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         this.skin = skin;
         this.listener = listener;
         this.viewManager = new XrViewManager();
+        this.textureView = new TextureView(GL20.GL_TEXTURE_2D, 0, vrWidth, vrHeight);
     }
 
     @Override
@@ -159,7 +156,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         controllersEnvironment.add(directionalLight);
 
         // Sprite batch for rendering to screen.
-        sbScreen = new SpriteBatch();
+        sbScreen = new ExtSpriteBatch();
 
         if (driver != null && listener != null) {
             driver.addListener(listener);
@@ -219,8 +216,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
             }
 
             // Render to screen if necessary.
-            if (renderToScreen && lastFrameBuffer != null) {
-                RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
+            if (renderToScreen && textureView != null) {
+                RenderUtils.renderKeepAspect(textureView, sbScreen, Gdx.graphics, lastSize);
             }
         }
     }
@@ -243,7 +240,8 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         renderControllers();
         batch.end();
         frameBuffer.end();
-        lastFrameBuffer = frameBuffer;
+        // Set to texture view for rendering to screen.
+        textureView.setTexture(swapchainImage.image(), frameBuffer.getWidth(), frameBuffer.getHeight());
     }
 
 
