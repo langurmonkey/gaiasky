@@ -449,10 +449,7 @@ public class WelcomeGui extends AbstractGui {
         stage.addActor(bottomRight);
         stage.addActor(popupInterface);
 
-        if (!baseDataPresent) {
-            // Open dataset manager if base data is not there
-            addDatasetManagerWindow(serverDatasets);
-        } else {
+        if (baseDataPresent) {
             // Check if there is an update for the base data, and show a notice if so
             if (serverDatasets != null && serverDatasets.updatesAvailable) {
                 DatasetDesc baseData = serverDatasets.findDataset(Constants.DEFAULT_DATASET_KEY);
@@ -553,9 +550,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numTotalDatasetsEnabled() {
-        return this.localDatasets != null ? (int) this.localDatasets.datasets.stream()
-                .filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr))
-                .count() : 0;
+        return this.localDatasets != null ? (int) this.localDatasets.datasets.stream().filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr)).count() : 0;
     }
 
     private int numCatalogsAvailable() {
