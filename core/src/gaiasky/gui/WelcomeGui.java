@@ -214,11 +214,18 @@ public class WelcomeGui extends AbstractGui {
 
         float pad16 = 16f;
         float pad18 = 18f;
-        float pad32 = 32f;
         float pad28 = 28f;
+        float pad32 = 32f;
 
         float bw = 540f;
         float bh = 110f;
+
+        Table centerContent = new Table(skin);
+        centerContent.center();
+        centerContent.setBackground("table-bg");
+        centerContent.pad(pad32);
+        centerContent.padLeft(pad32 * 5f);
+        centerContent.padRight(pad32 * 5f);
 
         Set<String> removed = removeNonExistent();
         if (removed.size() > 0) {
@@ -360,22 +367,25 @@ public class WelcomeGui extends AbstractGui {
         buttonList.add(exitButton);
 
         // Logo
-        center.add(logo).center().padBottom(pad16).colspan(2).row();
+        centerContent.add(logo).center().padBottom(pad16).colspan(2).row();
         // Title
-        center.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
+        centerContent.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
 
         // Start button
-        center.add(startButton).right().top().padBottom(pad18 * 10f).padRight(pad28 * 2f);
-        center.add(startGroup).top().left().padBottom(pad18 * 10f).row();
+        centerContent.add(startButton).right().top().padBottom(pad18 * 10f).padRight(pad28 * 2f);
+        centerContent.add(startGroup).top().left().padBottom(pad18 * 10f).row();
 
         // Dataset manager
-        center.add(datasetManagerButton).right().top().padBottom(pad32).padRight(pad28 * 2f);
-        center.add(datasetManagerInfo).left().top().padBottom(pad32).row();
+        centerContent.add(datasetManagerButton).right().top().padBottom(pad32).padRight(pad28 * 2f);
+        centerContent.add(datasetManagerInfo).left().top().padBottom(pad32).row();
 
-        center.add(selectionInfo).colspan(2).center().top().padBottom(pad32 * 4f).row();
+        centerContent.add(selectionInfo).colspan(2).center().top().padBottom(pad32 * 4f).row();
 
         // Quit
-        center.add(exitButton).center().top().colspan(2);
+        centerContent.add(exitButton).center().top().colspan(2);
+
+        // Add to center
+        center.add(centerContent).center();
 
         // Version line table
         Table topLeft = new VersionLineTable(skin);
