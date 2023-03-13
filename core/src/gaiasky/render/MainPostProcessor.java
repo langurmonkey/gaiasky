@@ -123,10 +123,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         int[] screenshot, frame;
         screenshot = getSize(RenderType.screenshot);
         frame = getSize(RenderType.frame);
-        if (Settings.settings.screenshot.isAdvancedMode())
-            pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, screenshot[0], screenshot[1], screenshot[0], screenshot[1], manager);
-        if (Settings.settings.frame.isAdvancedMode())
-            pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, frame[0], frame[1], frame[0], frame[1], manager);
+        // Screenshots.
+        pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, screenshot[0], screenshot[1], screenshot[0], screenshot[1], manager);
+        // Frame output mode.
+        pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, frame[0], frame[1], frame[0], frame[1], manager);
     }
 
     private int[] getSize(RenderType type) {
@@ -1047,9 +1047,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public boolean isLightScatterEnabled() {
-        return pps != null && pps[RenderType.screen.index] != null
-                && pps[RenderType.screen.index].get(LightGlow.class) != null
-                && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
+        return pps != null && pps[RenderType.screen.index] != null && pps[RenderType.screen.index].get(LightGlow.class) != null && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {
