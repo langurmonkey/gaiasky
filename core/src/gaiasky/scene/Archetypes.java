@@ -150,7 +150,7 @@ public class Archetypes {
             addArchetype(modelName("FadeNode"), modelName("SceneGraphNode"), Fade.class, Label.class);
 
             // GenericCatalog
-            addArchetype(modelName("GenericCatalog"), modelName("FadeNode"), DatasetDescription.class, Highlight.class);
+            addArchetype(modelName("GenericCatalog"), modelName("FadeNode"), DatasetDescription.class, Highlight.class, RefSysTransform.class);
 
             // MeshObject
             addArchetype(modelName("MeshObject"), modelName("FadeNode"), Mesh.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);

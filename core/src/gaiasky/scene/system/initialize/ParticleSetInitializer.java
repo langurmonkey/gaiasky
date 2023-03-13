@@ -51,6 +51,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         var particleSet = Mapper.particleSet.get(entity);
         var starSet = Mapper.starSet.get(entity);
         var focus = Mapper.focus.get(entity);
+        var transform = Mapper.transform.get(entity);
 
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateParticleSet;
@@ -59,10 +60,10 @@ public class ParticleSetInitializer extends AbstractInitSystem {
         // Initialize particle set
         if (starSet == null) {
             initializeCommon(base, particleSet);
-            initializeParticleSet(entity, particleSet);
+            initializeParticleSet(entity, particleSet, transform);
         } else {
             initializeCommon(base, starSet);
-            initializeStarSet(entity, starSet);
+            initializeStarSet(entity, starSet, transform);
         }
     }
 
@@ -103,10 +104,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
     /**
      * Initializes a particle set. It loads the data from the provider
      *
-     * @param entity The entity.
-     * @param set    The particle set.
+     * @param entity    The entity.
+     * @param set       The particle set.
+     * @param transform The transform.
      */
-    private void initializeParticleSet(Entity entity, ParticleSet set) {
+    private void initializeParticleSet(Entity entity, ParticleSet set, RefSysTransform transform) {
         set.isStars = false;
         boolean initializeData = set.pointData == null;
 
@@ -116,6 +118,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 Class<?> clazz = Class.forName(set.provider);
                 IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor().newInstance();
                 provider.setProviderParams(set.providerParams);
+                provider.setTransformMatrix(transform.matrix);
 
                 set.setData(provider.loadData(set.datafile, set.factor));
             } catch (Exception e) {
@@ -142,10 +145,11 @@ public class ParticleSetInitializer extends AbstractInitSystem {
      * Initializes a star set. Loads the data from the provider and computes mean and
      * label positions.
      *
-     * @param entity The entity.
-     * @param set    The star set.
+     * @param entity    The entity.
+     * @param set       The star set.
+     * @param transform The transform.
      */
-    public void initializeStarSet(Entity entity, StarSet set) {
+    public void initializeStarSet(Entity entity, StarSet set, RefSysTransform transform) {
         set.isStars = true;
         boolean initializeData = set.pointData == null;
 
@@ -155,6 +159,7 @@ public class ParticleSetInitializer extends AbstractInitSystem {
                 Class<?> clazz = Class.forName(set.provider);
                 IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
                 provider.setProviderParams(set.providerParams);
+                provider.setTransformMatrix(transform.matrix);
 
                 // Set data, generate index
                 List<IParticleRecord> l = provider.loadData(set.datafile, set.factor);

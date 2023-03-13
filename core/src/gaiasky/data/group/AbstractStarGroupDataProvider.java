@@ -14,6 +14,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.io.ByteBufferInputStream;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 
@@ -42,6 +43,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
+    protected Matrix4d transform;
     protected Set<Long> mustLoadIds = null;
     protected List<AdditionalCols> additional;
     /**
@@ -567,6 +569,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     @Override
     public void setProviderParams(Map<String, Object> params) {
         this.params = params;
+    }
+
+    @Override
+    public void setTransformMatrix(Matrix4d transform) {
+        this.transform = transform;
     }
 
     /**

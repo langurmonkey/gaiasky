@@ -6,6 +6,7 @@
 package gaiasky.data.group;
 
 import gaiasky.scene.api.IParticleRecord;
+import gaiasky.util.math.Matrix4d;
 
 import java.io.InputStream;
 import java.util.List;
@@ -76,4 +77,10 @@ public interface IParticleGroupDataProvider {
      * @param params The parameters map.
      */
     void setProviderParams(Map<String, Object> params);
+
+    /**
+     * Sets a transform matrix to apply to all data points.
+     * @param matrix The transform matrix.
+     */
+    void setTransformMatrix(Matrix4d matrix);
 }

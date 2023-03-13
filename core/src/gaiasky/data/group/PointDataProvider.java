@@ -11,6 +11,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;
+import gaiasky.util.math.Matrix4d;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +27,8 @@ import java.util.zip.GZIPInputStream;
  */
 public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
+
+    private Matrix4d transform;
 
     public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1d);
@@ -96,6 +99,11 @@ public class PointDataProvider implements IParticleGroupDataProvider {
 
     @Override
     public void setProviderParams(Map<String, Object> params) {
+    }
+
+    @Override
+    public void setTransformMatrix(Matrix4d matrix) {
+        this.transform = matrix;
     }
 
     @Override

@@ -112,7 +112,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
-     *
      * @return Pair of <UCD,Double>
      */
     private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs, Object[] row) {
@@ -144,7 +143,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
-     *
      * @return Pair of <UCD,double[]>
      */
     private Pair<UCD, double[]> getDoubleArrayUcd(Array<UCD> UCDs, Object[] row) {
@@ -170,7 +168,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The set of UCD objects
      * @param row  The row
-     *
      * @return A pair with the UCD and the string
      */
     private Pair<UCD, String> getStringUcd(Array<UCD> UCDs, Object[] row) {
@@ -215,7 +212,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the current number of loaded objects and the
      *                       second holds the total number of objects to load.
      * @param postCallback   A function that runs after the data has been loaded.
-     *
      * @return The list of particle records.
      */
     public List<IParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
@@ -292,6 +288,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
 
                             p.realPosition.scl(Constants.PC_TO_U);
+                            // Transform if necessary
+                            if (transform != null) {
+                                p.realPosition.mul(transform);
+                            }
+
                             // Find out RA/DEC/Dist
                             Vector3d sph = new Vector3d();
                             Coordinates.cartesianToSpherical(p.realPosition, sph);
@@ -713,7 +714,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * Works out the size from the absolute magnitude.
      *
      * @param absMag The absolute magnitude
-     *
      * @return The pseudo-size of this star
      */
     private double absoluteMagnitudeToPseudoSize(final double absMag) {
