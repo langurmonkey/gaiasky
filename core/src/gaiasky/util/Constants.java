@@ -147,6 +147,8 @@ public class Constants {
     public final static float MAX_ELEVATION_MULT = 15f;
     public final static float MIN_TESS_QUALITY = 1f;
     public final static float MAX_TESS_QUALITY = 10f;
+    public final static float MIN_SCREENSHOT_QUALITY = 1f;
+    public final static float MAX_SCREENSHOT_QUALITY = 100f;
     public final static float MIN_PARTICLE_SIZE = 0.5f;
     public final static float MAX_PARTICLE_SIZE = 50f;
     public final static float MIN_COLOR_NOISE = 0.0f;

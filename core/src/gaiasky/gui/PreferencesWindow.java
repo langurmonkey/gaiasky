@@ -67,7 +67,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final boolean welcomeScreen;
     private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameOutputMode, nShadows, distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin;
@@ -75,7 +75,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, unsharpMask, svtCacheSize;
+    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize;
     private OwnTextButton screenshotsLocation, frameOutputLocation;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
@@ -1369,6 +1369,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotMode.setSelected(screenshotModes[settings.screenshot.mode.ordinal()]);
         screenshotMode.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.screenshotmode"), skin));
 
+        // Quality
+        OwnLabel ssQualityLabel = new OwnLabel(I18n.msg("gui.screenshots.quality"), skin);
+        screenshotQuality = new OwnSliderPlus("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY, Constants.SLIDER_STEP, skin);
+        screenshotQuality.setName("screenshot quality");
+        screenshotQuality.setWidth(sliderWidth);
+        screenshotQuality.setValue(settings.screenshot.quality  * 100f);
+
+        // Format
+        OwnLabel ssFormatLabel = new OwnLabel(I18n.msg("gui.screenshots.format"), skin);
+        ComboBoxBean[] screenshotFormats = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.format.png"), 0), new ComboBoxBean(I18n.msg("gui.screenshots.format.jpg"), 1) };
+        screenshotFormat = new OwnSelectBox<>(skin);
+        screenshotFormat.setItems(screenshotFormats);
+        screenshotFormat.setWidth(selectWidth);
+        screenshotFormat.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                enableComponents(screenshotFormat.getSelected().value == 1, screenshotQuality, ssQualityLabel);
+                return true;
+            }
+            return false;
+        });
+        screenshotFormat.setSelected(screenshotFormats[settings.screenshot.format.ordinal()]);
+        enableComponents(screenshotFormat.getSelected().value == 1, screenshotQuality, ssQualityLabel);
+
         OwnImageButton screenshotsModeTooltip = new OwnImageButton(skin, "tooltip");
         screenshotsModeTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.tooltip.screenshotmode"), skin));
 
@@ -1378,7 +1401,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ssModeGroup.addActor(screenshotsModeTooltip);
 
         // LABELS
-        labels.addAll(screenshotsLocationLabel, ssModeLabel, screenshotsSizeLabel);
+        labels.addAll(screenshotsLocationLabel, ssModeLabel, screenshotsSizeLabel, ssFormatLabel, ssQualityLabel);
 
         // Add to table
         screenshots.add(screenshotsInfo).colspan(2).left().padBottom(pad10).row();
@@ -1388,6 +1411,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshots.add(ssModeGroup).left().expandX().padBottom(pad10).row();
         screenshots.add(screenshotsSizeLabel).left().padRight(pad34).padBottom(pad10);
         screenshots.add(ssSizeGroup).left().expandX().padBottom(pad10).row();
+        screenshots.add(ssFormatLabel).left().padRight(pad34).padBottom(pad10);
+        screenshots.add(screenshotFormat).left().expandX().padBottom(pad10).row();
+        screenshots.add(ssQualityLabel).left().padRight(pad34).padBottom(pad10);
+        screenshots.add(screenshotQuality).left().expandX().padBottom(pad10).row();
 
         // Add to content
         contentScreenshots.add(titleScreenshots).left().padBottom(pad18).row();
@@ -1464,6 +1491,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         foSizeGroup.addActor(xFrameLabel);
         foSizeGroup.addActor(foHeightField);
 
+        // Quality
+        OwnLabel foQualityLabel = new OwnLabel(I18n.msg("gui.screenshots.quality"), skin);
+        frameQuality = new OwnSliderPlus("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY, Constants.SLIDER_STEP, skin);
+        frameQuality.setName("frame quality");
+        frameQuality.setWidth(sliderWidth);
+        frameQuality.setValue(settings.frame.quality  * 100f);
+
+        // Format
+        OwnLabel foFormatLabel = new OwnLabel(I18n.msg("gui.screenshots.format"), skin);
+        ComboBoxBean[] frameFormats = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.format.png"), 0), new ComboBoxBean(I18n.msg("gui.screenshots.format.jpg"), 1) };
+        frameOutputFormat = new OwnSelectBox<>(skin);
+        frameOutputFormat.setItems(screenshotFormats);
+        frameOutputFormat.setWidth(selectWidth);
+        frameOutputFormat.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                enableComponents(frameOutputFormat.getSelected().value == 1, frameQuality, foQualityLabel);
+                return true;
+            }
+            return false;
+        });
+        frameOutputFormat.setSelected(screenshotFormats[settings.frame.format.ordinal()]);
+        enableComponents(frameOutputFormat.getSelected().value == 1, frameQuality, foQualityLabel);
+
         // Mode
         OwnLabel fomodeLabel = new OwnLabel(I18n.msg("gui.screenshots.mode"), skin);
         ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(I18n.msg("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.msg("gui.screenshots.mode.redraw"), 1) };
@@ -1523,6 +1573,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameOutput.add(foModeGroup).left().expandX().padBottom(pad10).row();
         frameOutput.add(frameoutputSizeLabel).left().padRight(pad34).padBottom(pad10);
         frameOutput.add(foSizeGroup).left().expandX().padBottom(pad10).row();
+        frameOutput.add(foFormatLabel).left().padRight(pad34).padBottom(pad10);
+        frameOutput.add(frameOutputFormat).left().expandX().padBottom(pad10).row();
+        frameOutput.add(foQualityLabel).left().padRight(pad34).padBottom(pad10);
+        frameOutput.add(frameQuality).left().expandX().padBottom(pad10).row();
         frameOutput.add(counterLabel).left().padRight(pad34).padBottom(pad10);
         frameOutput.add(counterGroup).left().expandX().padBottom(pad10).row();
         frameOutput.add().padRight(pad34);
@@ -2289,6 +2343,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.screenshot.resolution[1] = ssh;
         if (ssUpdate)
             EventManager.publish(Event.SCREENSHOT_SIZE_UPDATE, this, settings.screenshot.resolution[0], settings.screenshot.resolution[1]);
+        // Format
+        settings.screenshot.format = ImageFormat.values()[screenshotFormat.getSelected().value];
+        // Quality
+        settings.screenshot.quality = screenshotQuality.getValue() / 100f;
 
         // Frame output
         File foFile = new File(frameOutputLocation.getText().toString());
@@ -2308,6 +2366,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.frame.targetFps = Parser.parseDouble(frameOutputFps.getText());
         if (frameOutputUpdate)
             EventManager.publish(Event.FRAME_SIZE_UPDATE, this, settings.frame.resolution[0], settings.frame.resolution[1]);
+        // Format
+        settings.frame.format = ImageFormat.values()[frameOutputFormat.getSelected().value];
+        // Quality
+        settings.frame.quality = frameQuality.getValue() / 100f;
 
         // Camera recording
         EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camRecFps.getText()));
