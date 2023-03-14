@@ -3,6 +3,7 @@ package gaiasky.gui.vr;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -47,7 +48,11 @@ public class WelcomeGuiVR extends AbstractGui {
         bottom.bottom();
 
         // Logo.
-        Image logo = new Image(new Texture(Gdx.files.internal("icon/gs_128.png")));
+        FileHandle gsIcon = Gdx.files.internal("icon/gs_icon.png");
+        Texture iconTex = new Texture(gsIcon);
+        iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        Image logo = new Image(iconTex);
+        logo.setOrigin(Align.center);
         center.add(logo).padBottom(20f).row();
         // Title.
         HorizontalGroup titleGroup = new HorizontalGroup();

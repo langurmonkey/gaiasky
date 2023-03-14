@@ -254,13 +254,6 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
             into "$distDir/scripts"
         }
 
-        // Copy startup icon
-        mkdir "$distDir/icon"
-        copy {
-            from "$baseDir/assets/icon/gs_128.png"
-            into "$distDir/icon"
-        }
-
         // Copy scripts, README, LICENSE and AUTHORS
         copy {
             from "exe"

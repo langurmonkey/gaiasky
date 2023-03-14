@@ -239,7 +239,11 @@ public class WelcomeGui extends AbstractGui {
         boolean baseDataPresent = baseDataPresent();
 
         // Logo.
-        Image logo = new Image(new Texture(Gdx.files.internal("icon/gs_128.png")));
+        FileHandle gsIcon = Gdx.files.internal("icon/gs_icon.png");
+        Texture iconTex = new Texture(gsIcon);
+        iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        Image logo = new Image(iconTex);
+        logo.setOrigin(Align.center);
 
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();

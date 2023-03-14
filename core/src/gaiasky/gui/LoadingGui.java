@@ -8,6 +8,7 @@ package gaiasky.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -85,7 +87,11 @@ public class LoadingGui extends AbstractGui {
         center.center();
 
         // Logo.
-        Image logo = new Image(new Texture(Gdx.files.internal("icon/gs_128.png")));
+        FileHandle gsIcon = Gdx.files.internal("icon/gs_icon.png");
+        Texture iconTex = new Texture(gsIcon);
+        iconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        Image logo = new Image(iconTex);
+        logo.setOrigin(Align.center);
 
         // Title.
         HorizontalGroup titleGroup = new HorizontalGroup();
