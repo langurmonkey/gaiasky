@@ -122,7 +122,56 @@ public class GaiaSkyActionSet extends ActionSet {
 
                         new Pair<>(deviceLeft.move, "/user/hand/left/input/thumbstick"),
                         new Pair<>(deviceRight.move, "/user/hand/right/input/thumbstick")
-                )
-        );
+                ));
+
+        // HTC vive controller
+        map.computeIfAbsent("/interaction_profiles/htc/vive_controller", aLong -> new ArrayList<>()).addAll(
+                List.of(
+                        new Pair<>(deviceLeft.pose, "/user/hand/left/input/aim/pose"),
+                        new Pair<>(deviceRight.pose, "/user/hand/right/input/aim/pose"),
+
+                        new Pair<>(deviceLeft.haptics, "/user/hand/left/output/haptic"),
+                        new Pair<>(deviceRight.haptics, "/user/hand/right/output/haptic"),
+
+                        new Pair<>(deviceLeft.showUi, "/user/hand/left/input/menu/click"),
+                        new Pair<>(deviceRight.showUi, "/user/hand/right/input/menu/click"),
+
+                        new Pair<>(deviceLeft.accept, "/user/hand/left/input/menu/click"),
+                        new Pair<>(deviceRight.accept, "/user/hand/right/input/menu/click"),
+
+                        new Pair<>(deviceLeft.cameraMode, "/user/hand/left/input/trackpad/click"),
+                        new Pair<>(deviceRight.cameraMode, "/user/hand/right/input/trackpad/click"),
+
+                        new Pair<>(deviceLeft.select, "/user/hand/left/input/trigger/value"),
+                        new Pair<>(deviceRight.select, "/user/hand/right/input/trigger/value"),
+
+                        new Pair<>(deviceLeft.move, "/user/hand/left/input/trackpad"),
+                        new Pair<>(deviceRight.move, "/user/hand/right/input/trackpad")
+                ));
+
+        // Microsoft motion controller
+        map.computeIfAbsent("/interaction_profiles/microsoft/motion_controller", aLong -> new ArrayList<>()).addAll(
+                List.of(
+                        new Pair<>(deviceLeft.pose, "/user/hand/left/input/aim/pose"),
+                        new Pair<>(deviceRight.pose, "/user/hand/right/input/aim/pose"),
+
+                        new Pair<>(deviceLeft.haptics, "/user/hand/left/output/haptic"),
+                        new Pair<>(deviceRight.haptics, "/user/hand/right/output/haptic"),
+
+                        new Pair<>(deviceLeft.showUi, "/user/hand/left/input/trackpad/click"),
+                        new Pair<>(deviceRight.showUi, "/user/hand/right/input/trackpad/click"),
+
+                        new Pair<>(deviceLeft.accept, "/user/hand/left/input/trackpad/click"),
+                        new Pair<>(deviceRight.accept, "/user/hand/right/input/trackpad/click"),
+
+                        new Pair<>(deviceLeft.cameraMode, "/user/hand/left/input/thumbstick/click"),
+                        new Pair<>(deviceRight.cameraMode, "/user/hand/right/input/thumbstick/click"),
+
+                        new Pair<>(deviceLeft.select, "/user/hand/left/input/trigger/value"),
+                        new Pair<>(deviceRight.select, "/user/hand/right/input/trigger/value"),
+
+                        new Pair<>(deviceLeft.move, "/user/hand/left/input/thumbstick"),
+                        new Pair<>(deviceRight.move, "/user/hand/right/input/thumbstick")
+                ));
     }
 }
