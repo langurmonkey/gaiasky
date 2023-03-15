@@ -66,12 +66,13 @@ public class LabelEntityRenderSystem {
 
     public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         var body = view.body;
+        var sa = Mapper.sa.get(view.getEntity());
 
         Vector3d pos = D31;
         view.textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", (float) body.solidAngle);
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thLabel", 1f);
+        shader.setUniformf("u_thLabel", (float) sa.thresholdLabel);
 
         render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.base.forceLabel);
     }

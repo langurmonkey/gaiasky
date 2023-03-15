@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -64,14 +65,15 @@ public class ShapeInitializer extends AbstractInitSystem {
             focus.hitRayConsumer = FocusHit::addHitRayModel;
             focus.activeFunction = FocusActive::isFocusActiveTrue;
             entity.add(focus);
-
-            // Solid angle.
-            var sa = Mapper.sa.get(entity);
-            double thPoint = sa.thresholdPoint;
-            sa.thresholdNone = thPoint / 1e6;
-            sa.thresholdPoint = thPoint / 3e4;
-            sa.thresholdQuad = thPoint / 2.0;
         }
+
+        // Solid angle.
+        var sa = Mapper.sa.get(entity);
+        double baseThreshold = Math.toRadians(2.0);
+        sa.thresholdNone = 0.0;
+        sa.thresholdPoint = baseThreshold / 10.0;
+        sa.thresholdQuad = baseThreshold;
+        sa.thresholdLabel = Math.toRadians(0.2);
 
         initModel(entity);
     }

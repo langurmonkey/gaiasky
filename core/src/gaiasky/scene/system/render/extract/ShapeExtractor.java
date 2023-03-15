@@ -16,7 +16,7 @@ public class ShapeExtractor extends AbstractExtractSystem {
         if (mustRender(base)) {
             var render = Mapper.render.get(entity);
             var renderType = Mapper.renderType.get(entity);
-            addToRender(render, renderType.renderGroup != null ? renderType.renderGroup : RenderGroup.MODEL_BG);
+            addToRender(render, renderType.renderGroup != null ? renderType.renderGroup : RenderGroup.MODEL_VERT_ADDITIVE);
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }

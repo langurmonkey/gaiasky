@@ -10,7 +10,7 @@ public class Shape implements Component {
 
     public boolean focusable = false;
 
-    public void setFosucable(Boolean focusable) {
+    public void setFocusable(Boolean focusable) {
         this.focusable = focusable;
     }
 
