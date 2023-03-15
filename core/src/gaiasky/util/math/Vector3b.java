@@ -473,11 +473,11 @@ public class Vector3b implements Serializable {
         return this;
     }
 
-    public double lend() {
+    public double lenDouble() {
         return len(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
 
-    public float lenf() {
+    public float lenFloat() {
         return this.len().floatValue();
     }
 
@@ -503,11 +503,11 @@ public class Vector3b implements Serializable {
         return x.equals(vec.x) && y.equals(vec.y) && z.equals(vec.z);
     }
 
-    public double dstd(final Vector3b vec) {
+    public double dstDouble(final Vector3b vec) {
         return dst(vec).doubleValue();
     }
 
-    public double dstd(final Vector3b vec, final Vector3b aux) {
+    public double dstDouble(final Vector3b vec, final Vector3b aux) {
         return dst(vec, aux).doubleValue();
     }
 
@@ -549,7 +549,7 @@ public class Vector3b implements Serializable {
         return aux.set(this).sub(vec).len();
     }
 
-    public double dstd(double x, double y, double z) {
+    public double dstDouble(double x, double y, double z) {
         return dst(x, y, z).doubleValue();
     }
 
@@ -886,22 +886,22 @@ public class Vector3b implements Serializable {
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3b v) {
-        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3d v) {
-        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lenDouble() * v.len()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3b v) {
-        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dotd(v) / (this.lenDouble() * v.lenDouble()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3d v) {
-        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.lenDouble() * v.len()), -1d, 1d));
     }
 
     @Override

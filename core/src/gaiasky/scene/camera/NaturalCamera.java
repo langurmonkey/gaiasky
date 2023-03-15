@@ -422,7 +422,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         computeNextPositions(time);
 
         // The whole update thread must lock the value of direction and up
-        distance = pos.lend();
+        distance = pos.lenDouble();
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
         double speedScaling = m.isGame() ? speedScaling(1e-5) : speedScaling();
         double speedScalingCapped = Math.max(10d * Constants.M_TO_U, speedScaling);
@@ -507,7 +507,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     focusDirection.set(aux4b).sub(pos).nor();
                     focus = focusBak;
 
-                    double dist = aux4b.dstd(pos);
+                    double dist = aux4b.dstDouble(pos);
                     if (dist < focus.getRadius()) {
                         // aux2 <- focus-cam with a length of radius
                         aux2b.set(pos).sub(aux4b).nor().scl(focus.getRadius());
@@ -528,7 +528,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     appMagEarth = computeFocusApparentMagnitudeEarth();
                 }
 
-                EventManager.publish(Event.FOCUS_INFO_UPDATED, this, focus.getDistToCamera() - focus.getRadius(), focus.getSolidAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius(), appMagCamera, appMagEarth);
+                EventManager.publish(Event.FOCUS_INFO_UPDATED, this, focus.getDistToCamera() - focus.getRadius(), focus.getSolidAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lenDouble() - focus.getRadius(), appMagCamera, appMagEarth);
             } else {
                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
             }
@@ -538,7 +538,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 if (gravity && (closestBody.getEntity() != null) && closestBody.isPlanet() && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                     // Add gravity to force, pulling to the closest body
                     final Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
-                    final double dist = camObj.lend();
+                    final double dist = camObj.lenDouble();
                     // Gravity acts only at twice the radius, in planets
                     if (dist < closestBody.getRadius() * 2d) {
                         force.add(camObj.nor().scl(0.002d));
@@ -881,7 +881,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             vel.add(aux1);
         }
 
-        double forceLen = force.lend();
+        double forceLen = force.lenDouble();
         double velocity = vel.len();
 
         // Half a second after we have stopped zooming, real friction kicks in
@@ -953,7 +953,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             closestBody.getPredictedPosition(aux5b, GaiaSky.instance.time, this, false);
 
             double elevation = closestBody.getElevationAt(pos, aux5b) + closestBody.getHeightScale() / Math.max(4.0, 20.0 - Settings.settings.scene.renderer.elevation.multiplier);
-            double newDist = aux5b.scl(-1).add(pos).lend();
+            double newDist = aux5b.scl(-1).add(pos).lenDouble();
             if (newDist < elevation) {
                 aux5b.nor().scl(elevation - newDist);
                 pos.add(aux5b);
@@ -1570,11 +1570,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Checks the position of the camera does not collide with the focus object.
      */
-    public void checkFocus() {
+    private void checkFocus() {
         if (focus.isValid() && !Mapper.hip.has(focus.getEntity()) && focus.getSet() == null) {
             // Move camera if too close to focus.
             this.focus.getAbsolutePosition(aux1b);
-            if (pos.dstd(aux1b, aux2b) < this.focus.getRadius()) {
+            if (pos.dstDouble(aux1b, aux2b) < this.focus.getRadius()) {
                 // Position camera near focus.
                 stopTotalMovement();
 
@@ -1586,7 +1586,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 direction.set(0d, 0d, 1d);
             }
         } else if (!focus.isValid() && closest != null && closest.isValid()) {
-            // Use closest object.
+            // Use closest object as focus.
             focus.setEntity(((FocusView) closest).getEntity());
             checkFocus();
         }
@@ -1610,9 +1610,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // r: dist to star [au]
             // D: dist to Earth [au]
             // g: term for phase effects (~0)
-            double distCamAu = pos.put(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
+            double distCamAu = pos.put(aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() * Constants.U_TO_AU;
             IFocus starAncestor = focus.getFirstStarAncestor();
-            double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
+            double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() : focus.getAbsolutePosition(aux5b).lenDouble()) * Constants.U_TO_AU;
             return 5d * Math.log10(distStarAu * distCamAu) + focus.getAbsmag();
         } else {
             // m - M = 5 * log10(d) - 5
@@ -1640,9 +1640,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // r: dist from object to star [AU]
             // D: dist from object to Earth [AU]
             // g: term for phase effects (~0)
-            double distEarthAu = EntityUtils.getAbsolutePosition(earth, aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
+            double distEarthAu = EntityUtils.getAbsolutePosition(earth, aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() * Constants.U_TO_AU;
             IFocus starAncestor = focus.getFirstStarAncestor(focusView);
-            double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
+            double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() : focus.getAbsolutePosition(aux5b).lenDouble()) * Constants.U_TO_AU;
             return 5d * Math.log10(distStarAu * distEarthAu) + focus.getAbsmag();
         } else {
             return Double.NaN;

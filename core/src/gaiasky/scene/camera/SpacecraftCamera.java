@@ -204,7 +204,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         updateHard(dt);
 
         /* POST */
-        distance = pos.lend();
+        distance = pos.lenDouble();
 
         // Update camera
         updatePerspectiveCamera();

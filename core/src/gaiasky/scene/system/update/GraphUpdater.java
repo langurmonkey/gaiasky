@@ -155,7 +155,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
             }
 
             // Update supporting attributes
-            body.distToCamera = graph.translation.lend();
+            body.distToCamera = graph.translation.lenDouble();
             if (Mapper.extra.has(entity)) {
                 // Particles have a special algorithm for the solid angles.
                 body.solidAngle = (Mapper.extra.get(entity).radius / body.distToCamera);

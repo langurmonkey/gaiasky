@@ -106,11 +106,11 @@ public class Proximity {
     }
 
     /**
-     * Updates the list of proximal objects with the given {@link NearbyRecord}
+     * Updates the list of proximal objects with the given {@link NearbyRecord}.
      *
-     * @param object The record to use for updating
+     * @param object The record to use for updating.
      *
-     * @return Whether this proximity array was modified
+     * @return Whether this proximity array was modified.
      */
     public boolean update(NearbyRecord object) {
         int i = 0;
@@ -131,12 +131,12 @@ public class Proximity {
     }
 
     /**
-     * Updates the list of proximal objects with the given {@link IFocus}
+     * Updates the list of proximal objects with the given {@link IFocus}.
      *
-     * @param object The record to use for updating
-     * @param camera The camera
+     * @param object The record to use for updating.
+     * @param camera The camera.
      *
-     * @return Whether this proximity array was modified
+     * @return Whether this proximity array was modified.
      */
     public boolean update(IFocus object, ICamera camera) {
         int i = 0;
@@ -229,7 +229,7 @@ public class Proximity {
         return c;
     }
 
-    public class NearbyRecord implements IFocus {
+    public static class NearbyRecord implements IFocus {
         public double distToCamera, size, radius;
         public Vector3d pos, pm, absolutePos;
         public float[] col;
@@ -268,7 +268,7 @@ public class Proximity {
 
         @Override
         public boolean isValid() {
-            return true;
+            return false;
         }
 
         @Override

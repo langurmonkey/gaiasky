@@ -24,7 +24,7 @@ public class AxesUpdater extends AbstractUpdateSystem {
 
         var camera = GaiaSky.instance.getICamera();
 
-        body.distToCamera = (float) camera.getPos().lend();
+        body.distToCamera = (float) camera.getPos().lenDouble();
         body.size = (float) (LINE_SIZE_RAD * body.distToCamera) * camera.getFovFactor();
 
         axis.o.set(camera.getInversePos());

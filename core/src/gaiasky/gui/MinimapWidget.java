@@ -98,7 +98,7 @@ public class MinimapWidget implements Disposable {
 
     public void update() {
         ICamera cam = GaiaSky.instance.cameraManager;
-        double distSun = cam.getPos().lend();
+        double distSun = cam.getPos().lenDouble();
         for (IMinimapScale mms : scales) {
             if (mms.isActive(cam.getPos().tov3d(aux3d), distSun)) {
                 mms.update();

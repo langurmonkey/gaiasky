@@ -152,7 +152,7 @@ public class GridRecUpdater extends AbstractUpdateSystem {
 
     private double getDistanceToOrigin(ICamera camera) {
         if (Settings.settings.program.recursiveGrid.origin.isRefSys() || !camera.hasFocus()) {
-            return camera.getPos().lend();
+            return camera.getPos().lenDouble();
         } else {
             IFocus focus = camera.getFocus();
             return focus.getDistToCamera();

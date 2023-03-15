@@ -90,9 +90,9 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
             if (!Float.isFinite(mag.absMag)) {
                 double distPc;
                 if (coordinates.coordinates != null) {
-                    distPc = coordinates.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31).lend() * Constants.U_TO_PC;
+                    distPc = coordinates.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31).lenDouble() * Constants.U_TO_PC;
                 } else {
-                    distPc = EntityUtils.getAbsolutePosition(entity, B31).lend() * Constants.U_TO_PC;
+                    distPc = EntityUtils.getAbsolutePosition(entity, B31).lenDouble() * Constants.U_TO_PC;
                 }
                 mag.absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, mag.appMag);
             }

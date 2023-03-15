@@ -1807,7 +1807,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 focusView.getFocus(name);
                 if (focusView.getSet() != null) {
                     var pos = focusView.getAbsolutePosition(name, aux3b1);
-                    return pos.sub(GaiaSky.instance.getICamera().getPos()).lend() * Constants.U_TO_KM;
+                    return pos.sub(GaiaSky.instance.getICamera().getPos()).lenDouble() * Constants.U_TO_KM;
                 } else {
                     return (focusView.getDistToCamera() - focusView.getRadius()) * Constants.U_TO_KM;
                 }
@@ -2393,7 +2393,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         Vector3b in = aux3b1.set(x, y, z);
         Vector3d out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
-        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lend() };
+        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lenDouble() };
     }
 
     public double[] internalCartesianToEquatorial(int x, int y, int z) {

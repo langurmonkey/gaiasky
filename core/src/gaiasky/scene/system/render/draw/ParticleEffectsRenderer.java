@@ -119,7 +119,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
              * Empirical fit to determine where the particle effects start to break down wrt distance to sol (since they are positioned globally)
              * <a href="https://mycurvefit.com/share/7b20c3bf-267d-4a8a-9498-844832d6509b">See curve and fit</a>
              */
-            double distToSol = cam.getFocus().getAbsolutePosition(aux1b).lend() * Constants.U_TO_KM;
+            double distToSol = cam.getFocus().getAbsolutePosition(aux1b).lenDouble() * Constants.U_TO_KM;
             double focusDistKm = cam.getFocus().getDistToCamera() * Constants.U_TO_KM;
             double cutDistKm = 11714150000000000d + (1900.228d - 11714150000000000d) / (1d + Math.pow(distToSol / 93302269999999990000d, 1.541734d));
             if (focusDistKm < cutDistKm) {

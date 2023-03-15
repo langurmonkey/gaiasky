@@ -52,7 +52,7 @@ public class PerimeterUpdater extends AbstractUpdateSystem {
             base.opacity = (float) MathUtilsDouble.lint(parentBody.solidAngleApparent, angleLow, angleHigh, 0, 1);
             base.opacity *= base.getVisibilityOpacityFactor();
 
-            body.distToCamera = (float) graph.translation.lend();
+            body.distToCamera = (float) graph.translation.lenDouble();
             body.solidAngle = (float) FastMath.atan(body.size / body.distToCamera);
             body.solidAngleApparent = body.solidAngle / camera.getFovFactor();
         } else {

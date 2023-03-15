@@ -933,7 +933,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3b v) {
-        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.lend()), -1d, 1d));
+        return MathUtilsDouble.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.lenDouble()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/

@@ -111,7 +111,7 @@ public class FocusHit {
                 // The star is in front of us
                 // Diminish the size of the star
                 // when we are close by
-                double dist = posb.lend();
+                double dist = posb.lenDouble();
                 double distToLine = IntersectorDouble.distanceLinePoint(p0, p1, posb.put(D31));
                 double value = distToLine / dist;
 
@@ -381,7 +381,7 @@ public class FocusHit {
                 // The star is in front of us
                 // Diminish the size of the star
                 // when we are close by
-                double dist = posb.lend();
+                double dist = posb.lenDouble();
                 double distToLine = IntersectorDouble.distanceLinePoint(p0, p1, posb.tov3d(D32));
                 double value = distToLine / dist;
 

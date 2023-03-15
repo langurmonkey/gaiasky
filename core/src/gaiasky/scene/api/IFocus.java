@@ -27,6 +27,13 @@ public interface IFocus {
      */
     boolean isEmpty();
 
+    /**
+     * Whether this contains a valid focus object. This returns
+     * true in the case of focus views, and only when the focus
+     * view is correctly set up and initialized with a valid
+     * entity.
+     * @return Whether this focus is valid or not.
+     */
     boolean isValid();
 
     /**

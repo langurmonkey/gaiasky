@@ -146,7 +146,7 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
                 }
 
                 spacecraft.stopAllMovement();
-            } else if (posb.dstd(closest.getPos()) < twoRadii) {
+            } else if (posb.dstDouble(closest.getPos()) < twoRadii) {
                 posb.set(B31.set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos(), B32)));
             } else {
                 posb.set(newPosition);

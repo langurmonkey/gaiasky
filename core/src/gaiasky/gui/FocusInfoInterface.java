@@ -616,7 +616,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y, s.program.ui.distanceUnits);
             Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z, s.program.ui.distanceUnits);
             camVel.setText(sf.format((double) data[1]) + " " + I18n.msg("gui.unit.kmh"));
-            Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lend(), s.program.ui.distanceUnits);
+            Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lenDouble(), s.program.ui.distanceUnits);
             camDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
         }
         case CAMERA_TRACKING_OBJECT_UPDATE -> {
