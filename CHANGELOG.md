@@ -1,3 +1,23 @@
+<a name="3.4.2"></a>
+## [3.4.2](https://codeberg.org/gaiasky/gaiasky/tree/3.4.1) (2023-03-15)
+[Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.4.1...3.4.2)
+
+### Bug Fixes
+- labels in shape objects not showing up, focusable shape objects not working.
+- unchecked cast in focus check method.
+- welcome screen Gaia Sky icon causing problems with macOS package.
+- initialize screenshots and frame output post processor even if not initially active.
+
+### Documentation
+- add note concerning support for Apple M1/2 ARM.
+
+### Features
+- add support for reference system transformations to STIL data provider.
+- add image format and quality to preferences dialog for screenshots and frame output system.
+- add dark background to content frame in welcome screen.
+- do not force-show dataset manager when no base data is found.
+
+
 <a name="3.4.1"></a>
 ## [3.4.1](https://codeberg.org/gaiasky/gaiasky/tree/3.4.0) (2023-03-09)
 [Full changelog](https://codeberg.org/gaiasky/gaiasky/compare/3.4.0...3.4.1)
