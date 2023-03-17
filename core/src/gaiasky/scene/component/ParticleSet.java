@@ -51,6 +51,11 @@ public class ParticleSet implements Component, IDisposable {
      * Noise factor for the color in [0,1]
      */
     public float colorNoise = 0;
+
+    /**
+     * Fixed angular size for all particles in this set, in radians. Negative to disable.
+     */
+    public double fixedAngularSize = -1;
     /**
      * Particle size limits. Applies to legacy point render (using GL_POINTS).
      */
@@ -212,7 +217,6 @@ public class ParticleSet implements Component, IDisposable {
      * and computes the geometric center of this group
      *
      * @param pointData The data
-     *
      * @return An map{string,int} mapping names to indices
      */
     public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
@@ -280,6 +284,27 @@ public class ParticleSet implements Component, IDisposable {
         this.colorNoise = colorNoise.floatValue();
     }
 
+    /**
+     * Set fixed angular size, in radians.
+     */
+    public void setFixedAngularSize(Double fixedAngularSize) {
+        setFixedAngularSizeRad(fixedAngularSize);
+    }
+
+    /**
+     * Set fixed angular size, in radians.
+     */
+    public void setFixedAngularSizeRad(Double fixedAngularSizeRad) {
+        this.fixedAngularSize = fixedAngularSizeRad;
+    }
+
+    /**
+     * Set fixed angular size, in degrees.
+     */
+    public void setFixedAngularSizeDeg(Double fixedAngularSizeDeg) {
+        setFixedAngularSizeRad(Math.toRadians(fixedAngularSizeDeg));
+    }
+
     public void setParticleSizeLimits(double[] sizeLimits) {
         if (sizeLimits[0] > sizeLimits[1])
             sizeLimits[0] = sizeLimits[1];
@@ -317,7 +342,6 @@ public class ParticleSet implements Component, IDisposable {
      * Returns the size of the particle at index i
      *
      * @param i The index
-     *
      * @return The size
      */
     public double getSize(int i) {
@@ -395,7 +419,6 @@ public class ParticleSet implements Component, IDisposable {
      * Checks whether the particle with the given index is visible
      *
      * @param index The index of the particle
-     *
      * @return The visibility of the particle
      */
     public boolean isVisible(int index) {
@@ -457,7 +480,6 @@ public class ParticleSet implements Component, IDisposable {
      *                    reference system instead of the camera reference system.
      * @param destination The destination factor
      * @param deltaYears  The delta years
-     *
      * @return The vector for chaining
      */
     public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {

@@ -187,6 +187,9 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
                 triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * sizeFactor;
                 shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
+                // Fixed size
+                shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
+
                 // Days since epoch
                 // Emulate double with floats, for compatibility
                 double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);

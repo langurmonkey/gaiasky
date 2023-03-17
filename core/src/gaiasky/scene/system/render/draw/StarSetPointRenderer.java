@@ -221,6 +221,9 @@ public class StarSetPointRenderer extends ImmediateModeRenderSystem implements I
                         alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * sizeFactor) / camera.getFovFactor();
                         shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
+                        // Fixed size
+                        shaderProgram.setUniformf("u_fixedAngularSize", (float) (set.fixedAngularSize));
+
                         // Days since epoch
                         // Emulate double with floats, for compatibility
                         double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), set.epochJd);

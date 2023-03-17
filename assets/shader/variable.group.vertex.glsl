@@ -25,6 +25,8 @@ uniform float u_vrScale;
 // z - star brightness
 // w - rc primitive scale factor
 uniform vec4 u_alphaSizeBrRc;
+// Fixed angular size
+uniform float u_fixedAngularSize;
 
 // INPUT
 layout (location=0) in vec3 a_position;
@@ -138,14 +140,25 @@ void main() {
         }
     }
 
-    float solidAngle = atan((size * u_alphaSizeBrRc.z) / dist);
-    float opacity = lint(solidAngle, u_thAnglePoint.x, u_thAnglePoint.y, u_opacityLimits.x, u_opacityLimits.y);
+    float solidAngle;
+    float opacity;
+    float pointSize;
+    if (u_fixedAngularSize <= 0) {
+        solidAngle = atan((size * u_alphaSizeBrRc.z) / dist);
+        opacity = lint(solidAngle, u_thAnglePoint.x, u_thAnglePoint.y, u_opacityLimits.x, u_opacityLimits.y);
+        pointSize = max(3.3 * u_alphaSizeBrRc.w, pow(solidAngle * .5e8, u_brightnessPower) * u_alphaSizeBrRc.y * cubemapFactor);
+    } else {
+        solidAngle = u_fixedAngularSize;
+        opacity = clamp(size / 100.0, 0.0, 1.0);
+        pointSize = 0.2e4 * solidAngle * u_alphaSizeBrRc.y * cubemapFactor;
+    }
+
     float boundaryFade = smoothstep(l0, l1, dist);
     v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeBrRc.x * boundaryFade, 0.0, 1.0));
 
     vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = max(3.3 * u_alphaSizeBrRc.w, pow(solidAngle * .5e8, u_brightnessPower) * u_alphaSizeBrRc.y * cubemapFactor);
+    gl_PointSize = pointSize;
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);

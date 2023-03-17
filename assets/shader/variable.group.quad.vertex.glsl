@@ -23,6 +23,8 @@ uniform vec3 u_alphaSizeBr;
 // Brightness power
 uniform float u_brightnessPower;
 uniform vec2 u_opacityLimits;
+// Fixed angular size
+uniform float u_fixedAngularSize;
 
 // INPUT
 // Regular attributes
@@ -133,12 +135,22 @@ void main() {
         }
     }
 
-    float solidAngle = atan(size / dist);
-    float opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
+    float solidAngle;
+    float opacity;
+    float quadSize;
+    if (u_fixedAngularSize <= 0) {
+        solidAngle = atan(size / dist);
+        opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
+        quadSize = clamp(size * pow(solidAngle * 5e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.003 * dist, 0.5 * dist);
+    } else {
+        solidAngle = u_fixedAngularSize;
+        opacity = clamp(size / 100.0, 0.0, 1.0);
+        quadSize = (tan(solidAngle) * dist) * u_alphaSizeBr.y * 0.25e-5;
+    }
+
     float boundaryFade = smoothstep(l0, l1, dist);
     v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
 
-    float quadSize = clamp(size * pow(solidAngle * 5e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.002 * dist, 0.5 * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
