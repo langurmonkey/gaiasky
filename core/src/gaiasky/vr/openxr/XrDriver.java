@@ -564,12 +564,22 @@ public class XrDriver implements Disposable {
         }
     }
 
+    private boolean lastPollResult = false;
+
+    public boolean getLastPollEventsResult() {
+        return lastPollResult;
+    }
+
     /**
      * Polls pending events in the OpenXR system.
      *
      * @return True if we must stop, false otherwise.
      */
     public boolean pollEvents() {
+        return (lastPollResult = pollEventsInternal());
+    }
+
+    private boolean pollEventsInternal() {
         if (!disposing) {
             XrEventDataBaseHeader event = readNextOpenXREvent();
             while (event != null) {

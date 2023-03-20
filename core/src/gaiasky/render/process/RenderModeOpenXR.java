@@ -2,7 +2,6 @@ package gaiasky.render.process;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
@@ -18,12 +17,15 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.util.RenderUtils;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.graphics.TextureView;
 import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.XrRenderer;
 import gaiasky.vr.openxr.XrViewManager;
 import gaiasky.vr.openxr.input.XrControllerDevice;
+import org.lwjgl.opengl.GL40;
 import org.lwjgl.openxr.XrCompositionLayerProjectionView;
 import org.lwjgl.openxr.XrSwapchainImageOpenGLKHR;
 
@@ -44,14 +46,14 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
     public Array<Entity> controllerObjects;
     private final Map<XrControllerDevice, Entity> vrDeviceToModel;
     private Environment controllersEnvironment;
-    private FrameBuffer lastFrameBuffer;
+    private TextureView textureView;
 
     // GUI
-    private SpriteBatch sbScreen;
+    private ExtSpriteBatch sbScreen;
 
     private Vector2 lastSize;
 
-    public RenderModeOpenXR(final Scene scene, final XrDriver xrDriver, final SpriteBatch ignored) {
+    public RenderModeOpenXR(final Scene scene, final XrDriver xrDriver, final ExtSpriteBatch spriteBatch) {
         super();
         this.scene = scene;
         this.driver = xrDriver;
@@ -59,6 +61,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         this.vrDeviceToModel = new HashMap<>();
 
         if (xrDriver != null) {
+            this.textureView = new TextureView(0, xrDriver.getWidth(), xrDriver.getHeight());
             // Aux vectors
             lastSize = new Vector2();
 
@@ -82,7 +85,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
             }
 
             // Screen.
-            sbScreen = new SpriteBatch();
+            sbScreen = spriteBatch;
 
             // Set renderer.
             this.driver.setRenderer(this);
@@ -98,7 +101,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        if (driver != null && !driver.pollEvents()) {
+        if (driver != null && !driver.getLastPollEventsResult()) {
             rc.ppb = null;
 
             // Add controller objects to render lists.
@@ -120,10 +123,6 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
                 this.t = t;
                 driver.renderFrameOpenXR();
 
-                /* Render to screen */
-                if (lastFrameBuffer != null) {
-                    RenderUtils.renderKeepAspect(lastFrameBuffer, sbScreen, Gdx.graphics, lastSize);
-                }
             }
         }
 
@@ -134,28 +133,36 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
         rc.ppb = null;
         sgr.getLightGlowPass().renderGlowPass(camera, sgr.getGlowFrameBuffer());
 
+        // Update camera.
         viewManager.updateCamera(layerView, camera.getCamera(), (NaturalCamera) camera.getCurrent(), rc);
-
         boolean postProcess = postProcessCapture(ppb, frameBuffer, rw, rh);
 
-        // Render scene
+        // Render scene.
         sgr.renderScene(camera, t, rc);
-        // Camera
-        camera.render(rw, rh);
 
+        // Render camera.
+        camera.render(rw, rh);
         sendOrientationUpdate(camera.getCamera(), rw, rh);
 
+        // To swap-chain texture.
         frameBuffer.begin();
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, swapchainImage.image(), 0);
         frameBuffer.end();
         postProcessRender(ppb, frameBuffer, postProcess, camera, rw, rh);
 
-        lastFrameBuffer = frameBuffer;
+        /* Render to screen */
+        if (viewIndex == 0) {
+            textureView.setTexture(swapchainImage.image(), driver.getWidth(), driver.getHeight());
+            Gdx.gl.glEnable(GL40.GL_FRAMEBUFFER_SRGB);
+            RenderUtils.renderKeepAspect(textureView, sbScreen, Gdx.graphics, lastSize);
+            Gdx.gl.glDisable(GL40.GL_FRAMEBUFFER_SRGB);
+        }
     }
 
     public void resize(int rw, int rh, int tw, int th) {
-        if (lastSize != null)
+        if (lastSize != null) {
             lastSize.set(-1, -1);
+        }
     }
 
     private Entity newVRDeviceModelEntity(XrControllerDevice device, Environment environment) {

@@ -292,11 +292,15 @@ public class GaiaSky implements ApplicationListener, IObserver {
             synchronized (frameMonitor) {
                 frameMonitor.notify();
             }
+            // Poll OpenXR.
+            if (settings.runtime.openXr) {
+               xrDriver.pollEvents();
+            }
+
             /*
              * UPDATE SCENE
              */
             update(graphics.getDeltaTime());
-
 
             /*
              * FRAME OUTPUT

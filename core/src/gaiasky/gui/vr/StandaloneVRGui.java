@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.gui.IGui;
 import gaiasky.render.ComponentTypes;
 import gaiasky.util.Bits;
@@ -40,6 +41,7 @@ import gaiasky.vr.openxr.XrRenderer;
 import gaiasky.vr.openxr.XrViewManager;
 import gaiasky.vr.openxr.input.XrInputListener;
 import gaiasky.vr.openxr.input.XrControllerDevice;
+import org.lwjgl.opengl.GL40;
 import org.lwjgl.openxr.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -87,7 +89,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         this.skin = skin;
         this.listener = listener;
         this.viewManager = new XrViewManager();
-        this.textureView = new TextureView(GL20.GL_TEXTURE_2D, 0, vrWidth, vrHeight);
+        this.textureView = new TextureView(0, vrWidth, vrHeight);
     }
 
     @Override
@@ -156,7 +158,7 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         controllersEnvironment.add(directionalLight);
 
         // Sprite batch for rendering to screen.
-        sbScreen = new ExtSpriteBatch();
+        sbScreen = new ExtSpriteBatch(5);;
 
         if (driver != null && listener != null) {
             driver.addListener(listener);
@@ -215,10 +217,6 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
                 driver.renderFrameOpenXR();
             }
 
-            // Render to screen if necessary.
-            if (renderToScreen && textureView != null) {
-                RenderUtils.renderKeepAspect(textureView, sbScreen, Gdx.graphics, lastSize);
-            }
         }
     }
 
@@ -240,8 +238,15 @@ public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
         renderControllers();
         batch.end();
         frameBuffer.end();
-        // Set to texture view for rendering to screen.
-        textureView.setTexture(swapchainImage.image(), frameBuffer.getWidth(), frameBuffer.getHeight());
+
+        // Render to screen if necessary.
+        if (viewIndex == 0 && renderToScreen) {
+            // Set to texture view for rendering to screen.
+            textureView.setTexture(swapchainImage.image(), driver.getWidth(), driver.getHeight());
+            Gdx.gl.glEnable(GL40.GL_FRAMEBUFFER_SRGB);
+            RenderUtils.renderKeepAspect(textureView, sbScreen, Gdx.graphics, lastSize);
+            Gdx.gl.glDisable(GL40.GL_FRAMEBUFFER_SRGB);
+        }
     }
 
 

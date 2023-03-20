@@ -43,6 +43,7 @@ public class ExtSpriteBatch implements ExtBatch {
     public int maxSpritesInBatch = 0;
     int idx = 0;
     Texture lastTexture = null;
+    TextureView lastTextureView = null;
     float invTexWidth = 0, invTexHeight = 0;
     boolean drawing = false;
     float colorPacked = Color.WHITE_FLOAT_BITS;
@@ -174,9 +175,16 @@ public class ExtSpriteBatch implements ExtBatch {
     public void end() {
         if (!drawing)
             throw new IllegalStateException("SpriteBatch.begin must be called before end.");
-        if (idx > 0)
-            flush();
+        if (idx > 0) {
+            if (lastTexture != null) {
+                flush();
+            }
+            if (lastTextureView != null) {
+                flushView();
+            }
+        }
         lastTexture = null;
+        lastTextureView = null;
         drawing = false;
 
         GL20 gl = Gdx.gl;
@@ -402,12 +410,18 @@ public class ExtSpriteBatch implements ExtBatch {
         vertices[idx + 19] = v;
         this.idx = idx + 20;
     }
+
     public void draw(TextureView textureView, float x, float y, float width, float height, int srcX, int srcY, int srcWidth,
             int srcHeight, boolean flipX, boolean flipY) {
         if (!drawing)
             throw new IllegalStateException("SpriteBatch.begin must be called before draw.");
 
         float[] vertices = this.vertices;
+
+        if (textureView != lastTextureView)
+            switchTexture(textureView);
+        else if (idx == vertices.length) //
+            flushView();
 
         float u = srcX * invTexWidth;
         float v = (srcY + srcHeight) * invTexHeight;
@@ -454,8 +468,6 @@ public class ExtSpriteBatch implements ExtBatch {
         vertices[idx + 18] = u2;
         vertices[idx + 19] = v;
         this.idx = idx + 20;
-
-        flush(textureView);
     }
 
     public void draw(Texture texture, float x, float y, int srcX, int srcY, int srcWidth, int srcHeight) {
@@ -1018,7 +1030,8 @@ public class ExtSpriteBatch implements ExtBatch {
 
         idx = 0;
     }
-    public void flush(TextureView texture) {
+
+    public void flushView() {
         if (idx == 0)
             return;
 
@@ -1029,7 +1042,7 @@ public class ExtSpriteBatch implements ExtBatch {
             maxSpritesInBatch = spritesInBatch;
         int count = spritesInBatch * 6;
 
-        texture.bind();
+        lastTextureView.bind();
         IntMesh mesh = this.mesh;
         mesh.setVertices(vertices, 0, idx);
         mesh.getIndicesBuffer().position(0);
@@ -1139,6 +1152,13 @@ public class ExtSpriteBatch implements ExtBatch {
         lastTexture = texture;
         invTexWidth = 1.0f / texture.getWidth();
         invTexHeight = 1.0f / texture.getHeight();
+    }
+
+    protected void switchTexture(TextureView textureView) {
+        flush();
+        lastTextureView = textureView;
+        invTexWidth = 1.0f / textureView.getWidth();
+        invTexHeight = 1.0f / textureView.getHeight();
     }
 
     public ExtShaderProgram getShader() {

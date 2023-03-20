@@ -1,5 +1,6 @@
 package gaiasky.util.gdx.graphics;
 
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GLTexture;
 
 /**
@@ -7,8 +8,13 @@ import com.badlogic.gdx.graphics.GLTexture;
  */
 public class TextureView extends GLTexture {
     private int width, height;
-    public  TextureView (int glTarget, int glHandle, int width, int height) {
-        super(glTarget, glHandle);
+
+    public TextureView() {
+        super(GL20.GL_TEXTURE_2D, 0);
+    }
+
+    public TextureView(int glHandle, int width, int height) {
+        super(GL20.GL_TEXTURE_2D, glHandle);
         this.width = width;
         this.height = height;
     }
