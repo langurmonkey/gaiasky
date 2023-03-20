@@ -196,7 +196,7 @@ public final class XrHelper {
     public static IntModel loadRenderModel(XrDriver driver, XrControllerDevice controllerDevice) {
         IntModel model = null;
         OwnObjLoader ol = new OwnObjLoader();
-        if (driver != null && (driver.runtimeName.contains("oculus") || driver.runtimeName.contains("oculus") )) {
+        if (driver != null && (driver.runtimeName.contains("oculus") || driver.runtimeName.contains("Oculus") )) {
             // Oculus Rift CV1.
             if (controllerDevice.deviceType.isLeft()) {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
