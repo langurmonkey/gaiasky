@@ -185,7 +185,10 @@ public class XrDriver implements Disposable {
             logger.info("Runtime name: " + runtimeName);
             logger.info("Runtime version: " + runtimeVersionString);
 
-            check(xrGetSystem(xrInstance, XrSystemGetInfo.malloc(stack).type$Default().next(NULL).formFactor(XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY), pl));
+            check(xrGetSystem(xrInstance, XrSystemGetInfo.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .formFactor(XR_FORM_FACTOR_HEAD_MOUNTED_DISPLAY), pl));
 
             systemId = pl.get(0);
             if (systemId == 0) {
@@ -196,7 +199,11 @@ public class XrDriver implements Disposable {
     }
 
     public XrGraphicsRequirementsOpenGLKHR getXrGraphicsRequirements(MemoryStack stack) {
-        XrGraphicsRequirementsOpenGLKHR graphicsRequirements = XrGraphicsRequirementsOpenGLKHR.malloc(stack).type$Default().next(NULL).minApiVersionSupported(0).maxApiVersionSupported(0);
+        XrGraphicsRequirementsOpenGLKHR graphicsRequirements = XrGraphicsRequirementsOpenGLKHR.malloc(stack)
+                .type$Default()
+                .next(NULL)
+                .minApiVersionSupported(0)
+                .maxApiVersionSupported(0);
 
         xrGetOpenGLGraphicsRequirementsKHR(xrInstance, systemId, graphicsRequirements);
         return graphicsRequirements;
@@ -221,11 +228,15 @@ public class XrDriver implements Disposable {
             int maxMinorVersion = XR_VERSION_MINOR(graphicsRequirements.maxApiVersionSupported());
 
             if (minMajorVersion > actualMajorVersion || (minMajorVersion == actualMajorVersion && minMinorVersion > actualMinorVersion)) {
-                throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + minMajorVersion + "." + minMinorVersion + " and later, but we got OpenGL " + actualMajorVersion + "." + actualMinorVersion);
+                throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + minMajorVersion + "." + minMinorVersion
+                        + " and later, but we got OpenGL "
+                        + actualMajorVersion + "." + actualMinorVersion);
             }
 
             if (actualMajorVersion > maxMajorVersion || (actualMajorVersion == maxMajorVersion && actualMinorVersion > maxMinorVersion)) {
-                throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + maxMajorVersion + "." + minMajorVersion + " and earlier, but we got OpenGL " + actualMajorVersion + "." + actualMinorVersion);
+                throw new IllegalStateException("The OpenXR runtime supports only OpenGL " + maxMajorVersion + "." + minMajorVersion
+                        + " and earlier, but we got OpenGL "
+                        + actualMajorVersion + "." + actualMinorVersion);
             }
         }
     }
@@ -239,7 +250,11 @@ public class XrDriver implements Disposable {
             //Bind the OpenGL context to the OpenXR instance and create the session
             Struct graphicsBinding = XrHelper.createOpenGLBinding(stack, windowHandle);
 
-            XrSessionCreateInfo sessionCreateInfo = XrSessionCreateInfo.calloc(stack).set(XR10.XR_TYPE_SESSION_CREATE_INFO, graphicsBinding.address(), 0, systemId);
+            XrSessionCreateInfo sessionCreateInfo = XrSessionCreateInfo.calloc(stack)
+                    .set(XR10.XR_TYPE_SESSION_CREATE_INFO,
+                            graphicsBinding.address(),
+                            0,
+                            systemId);
 
             PointerBuffer pp = stack.mallocPointer(1);
             check(xrCreateSession(xrInstance, sessionCreateInfo, pp));
@@ -247,12 +262,21 @@ public class XrDriver implements Disposable {
             xrSession = new XrSession(pp.get(0), xrInstance);
 
             if (!missingXrDebug) {
-                XrDebugUtilsMessengerCreateInfoEXT ciDebugUtils = XrDebugUtilsMessengerCreateInfoEXT.calloc(stack).type$Default().messageSeverities(XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT).messageTypes(
-                        XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT | XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT).userCallback((messageSeverity, messageTypes, pCallbackData, userData) -> {
-                    XrDebugUtilsMessengerCallbackDataEXT callbackData = XrDebugUtilsMessengerCallbackDataEXT.create(pCallbackData);
-                    logger.info("XR Debug Utils: " + callbackData.messageString());
-                    return 0;
-                });
+                XrDebugUtilsMessengerCreateInfoEXT ciDebugUtils = XrDebugUtilsMessengerCreateInfoEXT.calloc(stack)
+                        .type$Default()
+                        .messageSeverities(XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+                                | XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                                | XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+                        .messageTypes(
+                                XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+                                        | XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+                                        | XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+                                        | XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT)
+                        .userCallback((messageSeverity, messageTypes, pCallbackData, userData) -> {
+                            XrDebugUtilsMessengerCallbackDataEXT callbackData = XrDebugUtilsMessengerCallbackDataEXT.create(pCallbackData);
+                            logger.info("XR Debug Utils: " + callbackData.messageString());
+                            return 0;
+                        });
 
                 logger.info("Enabling OpenXR debug utils");
                 check(xrCreateDebugUtilsMessengerEXT(xrInstance, ciDebugUtils, pp));
@@ -269,7 +293,17 @@ public class XrDriver implements Disposable {
         try (MemoryStack stack = stackPush()) {
             PointerBuffer pp = stack.mallocPointer(1);
 
-            check(xrCreateReferenceSpace(xrSession, XrReferenceSpaceCreateInfo.malloc(stack).type$Default().next(NULL).referenceSpaceType(XR_REFERENCE_SPACE_TYPE_LOCAL).poseInReferenceSpace(XrPosef.malloc(stack).orientation(XrQuaternionf.malloc(stack).x(0).y(0).z(0).w(1)).position$(XrVector3f.calloc(stack))), pp));
+            check(xrCreateReferenceSpace(xrSession, XrReferenceSpaceCreateInfo.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .referenceSpaceType(XR_REFERENCE_SPACE_TYPE_LOCAL)
+                    .poseInReferenceSpace(XrPosef.malloc(stack)
+                            .orientation(XrQuaternionf.malloc(stack)
+                                    .x(0)
+                                    .y(0)
+                                    .z(0)
+                                    .w(1))
+                            .position$(XrVector3f.calloc(stack))), pp));
 
             xrAppSpace = new XrSpace(pp.get(0), xrSession);
         }
@@ -285,14 +319,18 @@ public class XrDriver implements Disposable {
             memPutInt(systemProperties.address(), XR_TYPE_SYSTEM_PROPERTIES);
             check(xrGetSystemProperties(xrInstance, systemId, systemProperties));
 
-            logger.info("Headset name: " + memUTF8(memAddress(systemProperties.systemName())) + ", vendor: " + systemProperties.vendorId());
+            logger.info("Headset name: " + memUTF8(memAddress(systemProperties.systemName()))
+                    + ", vendor: " + systemProperties.vendorId());
             logger.info(systemProperties.systemNameString());
 
             XrSystemTrackingProperties trackingProperties = systemProperties.trackingProperties();
-            logger.info("Headset orientationTracking: " + trackingProperties.orientationTracking() + ", positionTracking: " + trackingProperties.positionTracking());
+            logger.info("Headset orientationTracking: " + trackingProperties.orientationTracking()
+                    + ", positionTracking: " + trackingProperties.positionTracking());
 
             XrSystemGraphicsProperties graphicsProperties = systemProperties.graphicsProperties();
-            logger.info("Headset MaxWidth: " + graphicsProperties.maxSwapchainImageWidth() + ", MaxHeight: " + graphicsProperties.maxSwapchainImageHeight() + ", MaxLayerCount: " + graphicsProperties.maxLayerCount());
+            logger.info("Headset MaxWidth: " + graphicsProperties.maxSwapchainImageWidth()
+                    + ", MaxHeight: " + graphicsProperties.maxSwapchainImageHeight()
+                    + ", MaxLayerCount: " + graphicsProperties.maxLayerCount());
 
             IntBuffer pi = stack.mallocInt(1);
 
@@ -339,7 +377,17 @@ public class XrDriver implements Disposable {
 
                     Swapchain swapchainWrapper = new Swapchain();
 
-                    XrSwapchainCreateInfo swapchainCreateInfo = XrSwapchainCreateInfo.malloc(stack).type$Default().next(NULL).createFlags(0).usageFlags(XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT).format(glColorFormat).sampleCount(viewConfig.recommendedSwapchainSampleCount()).width(viewConfig.recommendedImageRectWidth()).height(viewConfig.recommendedImageRectHeight()).faceCount(1).arraySize(1).mipCount(1);
+                    XrSwapchainCreateInfo swapchainCreateInfo = XrSwapchainCreateInfo.malloc(stack)
+                            .type$Default()
+                            .next(NULL)
+                            .createFlags(0)
+                            .usageFlags(XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT)
+                            .format(glColorFormat).sampleCount(viewConfig.recommendedSwapchainSampleCount())
+                            .width(viewConfig.recommendedImageRectWidth())
+                            .height(viewConfig.recommendedImageRectHeight())
+                            .faceCount(1)
+                            .arraySize(1)
+                            .mipCount(1);
 
                     PointerBuffer pp = stack.mallocPointer(1);
                     check(xrCreateSwapchain(xrSession, swapchainCreateInfo, pp));
@@ -401,10 +449,16 @@ public class XrDriver implements Disposable {
                 XrActionSuggestedBinding.Buffer bindingsBuffer = XrActionSuggestedBinding.calloc(bindings.size(), stack);
                 int l = 0;
                 for (var binding : bindings) {
-                    bindingsBuffer.get(l++).set(binding.getA().getHandle(), getPath(binding.getB()));
+                    bindingsBuffer.get(l++).set(
+                            binding.getA().getHandle(),
+                            getPath(binding.getB()));
                 }
 
-                XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack).type$Default().next(NULL).interactionProfile(getPath(device)).suggestedBindings(bindingsBuffer);
+                XrInteractionProfileSuggestedBinding suggestedBinding = XrInteractionProfileSuggestedBinding.malloc(stack)
+                        .type$Default()
+                        .next(NULL)
+                        .interactionProfile(getPath(device))
+                        .suggestedBindings(bindingsBuffer);
                 check(xrSuggestInteractionProfileBindings(xrInstance, suggestedBinding));
             }
 
@@ -418,9 +472,11 @@ public class XrDriver implements Disposable {
     }
 
     private XrFrameState getFrameState(MemoryStack stack) {
-        XrFrameState frameState = XrFrameState.calloc(stack).type$Default();
+        XrFrameState frameState = XrFrameState.calloc(stack)
+                .type$Default();
 
-        check(xrWaitFrame(xrSession, XrFrameWaitInfo.calloc(stack).type$Default(), frameState));
+        check(xrWaitFrame(xrSession, XrFrameWaitInfo.calloc(stack)
+                .type$Default(), frameState));
         return frameState;
     }
 
@@ -428,33 +484,33 @@ public class XrDriver implements Disposable {
      * Renders the next frame with the current renderer.
      */
     public void renderFrameOpenXR() {
-        if (currentRenderer != null) {
-            try (MemoryStack stack = stackPush()) {
-                XrFrameState frameState = getFrameState(stack);
+        try (MemoryStack stack = stackPush()) {
+            XrFrameState frameState = getFrameState(stack);
 
-                check(xrBeginFrame(xrSession, XrFrameBeginInfo.calloc(stack).type$Default()));
+            check(xrBeginFrame(xrSession, XrFrameBeginInfo.calloc(stack).type$Default()));
 
-                XrCompositionLayerProjection layerProjection = XrCompositionLayerProjection.calloc(stack).type$Default();
+            XrCompositionLayerProjection layerProjection = XrCompositionLayerProjection.calloc(stack).type$Default();
 
-                PointerBuffer layers = stack.callocPointer(1);
-                boolean didRender = false;
+            PointerBuffer layers = stack.callocPointer(1);
+            boolean didRender = false;
 
-                // Fetch time.
-                currentFrameTime = frameState.predictedDisplayTime();
+            // Fetch time.
+            currentFrameTime = frameState.predictedDisplayTime();
 
-                if (frameState.shouldRender()) {
-                    if (renderLayerOpenXR(stack, currentFrameTime, layerProjection)) {
-                        layers.put(0, layerProjection.address());
-                        didRender = true;
-                    } else {
-                        System.out.println("Didn't render");
-                    }
-                } else {
-                    System.out.println("Shouldn't render");
+            if (frameState.shouldRender()) {
+                if (renderLayerOpenXR(stack, currentFrameTime, layerProjection)) {
+                    layers.put(0, layerProjection.address());
+                    didRender = true;
                 }
-
-                check(xrEndFrame(xrSession, XrFrameEndInfo.malloc(stack).type$Default().next(NULL).displayTime(frameState.predictedDisplayTime()).environmentBlendMode(XR_ENVIRONMENT_BLEND_MODE_OPAQUE).layers(didRender ? layers : null).layerCount(didRender ? layers.remaining() : 0)));
             }
+
+            check(xrEndFrame(xrSession, XrFrameEndInfo.malloc(stack)
+                    .type$Default()
+                    .next(NULL)
+                    .displayTime(frameState.predictedDisplayTime())
+                    .environmentBlendMode(XR_ENVIRONMENT_BLEND_MODE_OPAQUE)
+                    .layers(didRender ? layers : null)
+                    .layerCount(didRender ? layers.remaining() : 0)));
         }
     }
 

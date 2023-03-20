@@ -19,9 +19,24 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
 
     // The XR space.
     public XrSpace space;
+    public final PoseType poseType;
 
-    public PoseAction(String name, String localizedName, XrControllerDevice device) {
+    public enum PoseType {
+        AIM,
+        GRIP;
+
+        public boolean isGrip() {
+            return this == GRIP;
+        }
+
+        public boolean isAim() {
+            return this == AIM;
+        }
+    }
+
+    public PoseAction(String name, String localizedName, PoseType poseType, XrControllerDevice device) {
         super(name, localizedName, XR_ACTION_TYPE_POSE_INPUT, device);
+        this.poseType = poseType;
     }
 
     @Override
@@ -55,7 +70,11 @@ public class PoseAction extends Action implements SpaceAwareAction, InputAction 
             if ((location.locationFlags() & XR_SPACE_LOCATION_POSITION_VALID_BIT) != 0
                     && (location.locationFlags() & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT) != 0) {
                 // Ok!
-                controllerDevice.setFromPose(location.pose());
+                if (poseType.isGrip()) {
+                    controllerDevice.setGripPose(location.pose());
+                } else {
+                    controllerDevice.setAim(location.pose());
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package gaiasky.vr.openxr.input;
 
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.gdx.model.IntModelInstance;
@@ -36,13 +37,16 @@ public class XrControllerDevice {
 
     public Vector3 position = new Vector3();
     public Quaternion orientation = new Quaternion();
+    // The model instance.
     public IntModelInstance modelInstance;
+    public Matrix4 aimTransform;
 
     // Actions
     public BoolAction showUi, accept, cameraMode;
     public FloatAction select;
     public Vec2fAction move;
-    public PoseAction pose;
+    public PoseAction gripPose;
+    public PoseAction aimPose;
     public HapticsAction haptics;
 
     public XrControllerDevice(DeviceType type) {
@@ -52,6 +56,7 @@ public class XrControllerDevice {
     public void initialize(XrDriver driver) {
         var model = XrHelper.loadRenderModel(driver, this);
         modelInstance = new IntModelInstance(model);
+        aimTransform = new Matrix4();
         initialized = true;
     }
 
@@ -77,18 +82,21 @@ public class XrControllerDevice {
         }
     }
 
-    public void setFromPose(XrPosef pose) {
+    public void setGripPose(XrPosef grip) {
+        setFromXrPose(grip, modelInstance.transform);
+    }
+
+    public void setAim(XrPosef aim) {
+        setFromXrPose(aim, aimTransform);
+        aimTransform.rotate(1, 0, 0, 20);
+    }
+
+    private void setFromXrPose(XrPosef pose, Matrix4 transform) {
         var pos = pose.position$();
         var ori = pose.orientation();
         position.set(pos.x(), pos.y(), pos.z());
         orientation.set(ori.x(), ori.y(), ori.z(), ori.w());
-        // The last bit (rotate 40 degrees around x) is due to this:
-        // Our controller models are positioned in local space for OpenVR poses.
-        // In OpenXR we have two poses: grip and aim. We use aim, which is
-        // located at the pointy end of the controller, but its orientation must be rotated a bit to match
-        // that of OpenVR.
-        // More info: https://registry.khronos.org/OpenXR/specs/1.0/html/xrspec.html#semantic-path-standard-pose-identifiers
-        modelInstance.transform.idt().translate(position).rotate(orientation).rotate(1, 0, 0, 40);
+        transform.idt().translate(position).rotate(orientation);
     }
 
     public IntModelInstance getModelInstance() {

@@ -50,10 +50,7 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
 
         if (vr.device.isActive()) {
             // Set model to device transform.
-            if (model.model != null && model.model.instance != null) {
-                //model.model.instance.transform.set(vr.device.transform);
-            }
-            deviceTransform.set(model.model.instance.transform);
+            deviceTransform.set(vr.device.aimTransform);
             vr.beamP0.mul(deviceTransform);
             vr.beamP1.mul(deviceTransform);
             vr.beamP2.mul(deviceTransform);

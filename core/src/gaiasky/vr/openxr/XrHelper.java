@@ -196,14 +196,14 @@ public final class XrHelper {
     public static IntModel loadRenderModel(XrDriver driver, XrControllerDevice controllerDevice) {
         IntModel model = null;
         OwnObjLoader ol = new OwnObjLoader();
-        if (driver != null && driver.runtimeName.contains("oculus")) {
+        if (driver != null && (driver.runtimeName.contains("oculus") || driver.runtimeName.contains("oculus") )) {
             // Oculus Rift CV1.
             if (controllerDevice.deviceType.isLeft()) {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-left.obj"));
             } else {
                 model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/oculus/oculus-right.obj"));
             }
-        } else if (driver != null && (driver.runtimeName.contains("htc") || driver.runtimeName.contains("vive"))) {
+        } else if (driver != null && (driver.runtimeName.contains("HTC") ||driver.runtimeName.contains("htc") || driver.runtimeName.contains("vive")|| driver.runtimeName.contains("Vive"))) {
             // HTC vive controller model.
             model = ol.loadModel(Settings.settings.data.dataFileHandle("$data/default-data/models/controllers/vive/vr_controller_vive.obj"));
         } else {
