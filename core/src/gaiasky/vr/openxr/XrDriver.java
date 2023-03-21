@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.i18n.I18n;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
 import gaiasky.vr.openxr.input.actions.Action;
@@ -39,10 +40,10 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class XrDriver implements Disposable {
     private static final Log logger = Logger.getLogger(XrDriver.class);
 
-    public static final int VR_Eye_Left = 0, VR_Eye_Right = 1;
     public long systemId;
     public boolean missingXrDebug;
     public String runtimeName, runtimeVersionString;
+    public String hmdName, systemString;
     public long runtimeVersion;
     public XrInstance xrInstance;
     public XrSession xrSession;
@@ -53,12 +54,12 @@ public class XrDriver implements Disposable {
     // Each view represents an eye in the headset with views[0] being left and views[1] being right.
     public XrView.Buffer views;
 
-    private XrControllerDevice deviceLeft, deviceRight;
+    // Contains the VR controllers, left (0) and right (1).
     private Array<XrControllerDevice> devices;
     private GaiaSkyActionSet actions;
 
     private final Array<XrInputListener> listeners;
-    // One swapchain per view
+    // One swap-chain per view.
     public Swapchain[] swapchains;
     public XrViewConfigurationView.Buffer viewConfigs;
     public final int viewConfigType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
@@ -103,12 +104,12 @@ public class XrDriver implements Disposable {
                 XrApiLayerProperties layer = pLayers.get(index);
 
                 String layerName = layer.layerNameString();
-                logger.info("OpenXR layer available: " + layerName);
+                logger.info(I18n.msg("vr.init.layer", layerName));
                 if (layerName.equals("XR_APILAYER_LUNARG_core_validation")) {
                     hasCoreValidationLayer = true;
                 }
             }
-            logger.info(numLayers + " XR layers are available:");
+            logger.info(I18n.msg("vr.init.layers", numLayers));
 
             check(xrEnumerateInstanceExtensionProperties((ByteBuffer) null, pi, null));
             int numExtensions = pi.get(0);
@@ -125,7 +126,7 @@ public class XrDriver implements Disposable {
                 XrExtensionProperties prop = properties.get(i);
 
                 String extensionName = prop.extensionNameString();
-                logger.info("OpenXR extension loaded: " + extensionName);
+                logger.info(I18n.msg("vr.init.extension", extensionName));
                 if (extensionName.equals(XR_KHR_OPENGL_ENABLE_EXTENSION_NAME)) {
                     missingOpenGL = false;
                     extensions.put(prop.extensionName());
@@ -136,7 +137,7 @@ public class XrDriver implements Disposable {
                 }
             }
             extensions.flip();
-            logger.info("OpenXR loaded with " + numExtensions + " extensions");
+            logger.info(I18n.msg("vr.init.extensions", numExtensions));
 
             if (missingOpenGL) {
                 throw new IllegalStateException("OpenXR library does not provide required extension: " + XR_KHR_OPENGL_ENABLE_EXTENSION_NAME);
@@ -146,7 +147,7 @@ public class XrDriver implements Disposable {
             if (hasCoreValidationLayer) {
                 wantedLayers = stack.callocPointer(1);
                 wantedLayers.put(0, stack.UTF8("XR_APILAYER_LUNARG_core_validation"));
-                logger.info("Enabling XR core validation");
+                logger.info(I18n.msg("vr.enable.validation"));
             } else {
                 wantedLayers = null;
             }
@@ -182,8 +183,8 @@ public class XrDriver implements Disposable {
             runtimeVersion = properties.runtimeVersion();
             runtimeVersionString = XR10.XR_VERSION_MAJOR(runtimeVersion) + "." + XR10.XR_VERSION_MINOR(runtimeVersion) + "." + XR10.XR_VERSION_PATCH(runtimeVersion);
 
-            logger.info("Runtime name: " + runtimeName);
-            logger.info("Runtime version: " + runtimeVersionString);
+            logger.info(I18n.msg("vr.runtime.name", runtimeName));
+            logger.info(I18n.msg("vr.runtime.version", runtimeVersionString));
 
             check(xrGetSystem(xrInstance, XrSystemGetInfo.malloc(stack)
                     .type$Default()
@@ -194,7 +195,7 @@ public class XrDriver implements Disposable {
             if (systemId == 0) {
                 throw new IllegalStateException("No compatible headset detected");
             }
-            logger.info("Headset found with System ID: " + systemId);
+            logger.info(I18n.msg("vr.system", systemId));
         }
     }
 
@@ -274,11 +275,11 @@ public class XrDriver implements Disposable {
                                         | XR_DEBUG_UTILS_MESSAGE_TYPE_CONFORMANCE_BIT_EXT)
                         .userCallback((messageSeverity, messageTypes, pCallbackData, userData) -> {
                             XrDebugUtilsMessengerCallbackDataEXT callbackData = XrDebugUtilsMessengerCallbackDataEXT.create(pCallbackData);
-                            logger.info("XR Debug Utils: " + callbackData.messageString());
+                            logger.info(I18n.msg("vr.debug.utils", callbackData.messageString()));
                             return 0;
                         });
 
-                logger.info("Enabling OpenXR debug utils");
+                logger.info(I18n.msg("vr.enable.debug"));
                 check(xrCreateDebugUtilsMessengerEXT(xrInstance, ciDebugUtils, pp));
                 xrDebugMessenger = new XrDebugUtilsMessengerEXT(pp.get(0), xrInstance);
             }
@@ -319,18 +320,20 @@ public class XrDriver implements Disposable {
             memPutInt(systemProperties.address(), XR_TYPE_SYSTEM_PROPERTIES);
             check(xrGetSystemProperties(xrInstance, systemId, systemProperties));
 
-            logger.info("Headset name: " + memUTF8(memAddress(systemProperties.systemName()))
-                    + ", vendor: " + systemProperties.vendorId());
-            logger.info(systemProperties.systemNameString());
+            hmdName = memUTF8(memAddress(systemProperties.systemName()));
+            systemString = systemProperties.systemNameString();
+            logger.info(I18n.msg("vr.name", hmdName));
+            logger.info(I18n.msg("vr.vendor", systemProperties.vendorId()));
+            logger.info(I18n.msg("vr.system.string", systemString));
 
             XrSystemTrackingProperties trackingProperties = systemProperties.trackingProperties();
-            logger.info("Headset orientationTracking: " + trackingProperties.orientationTracking()
-                    + ", positionTracking: " + trackingProperties.positionTracking());
+            logger.info(I18n.msg("vr.orientation", trackingProperties.orientationTracking()));
+            logger.info(I18n.msg("vr.position", trackingProperties.positionTracking()));
 
             XrSystemGraphicsProperties graphicsProperties = systemProperties.graphicsProperties();
-            logger.info("Headset MaxWidth: " + graphicsProperties.maxSwapchainImageWidth()
-                    + ", MaxHeight: " + graphicsProperties.maxSwapchainImageHeight()
-                    + ", MaxLayerCount: " + graphicsProperties.maxLayerCount());
+            logger.info(I18n.msg("vr.width", graphicsProperties.maxSwapchainImageWidth()));
+            logger.info(I18n.msg("vr.height", graphicsProperties.maxSwapchainImageHeight()));
+            logger.info(I18n.msg("vr.layer", graphicsProperties.maxLayerCount()));
 
             IntBuffer pi = stack.mallocInt(1);
 
@@ -428,8 +431,8 @@ public class XrDriver implements Disposable {
 
     public void initializeInput() {
         // Devices.
-        deviceLeft = new XrControllerDevice(XrControllerDevice.DeviceType.Left);
-        deviceRight = new XrControllerDevice(XrControllerDevice.DeviceType.Right);
+        XrControllerDevice deviceLeft = new XrControllerDevice(XrControllerDevice.DeviceType.Left);
+        XrControllerDevice deviceRight = new XrControllerDevice(XrControllerDevice.DeviceType.Right);
         devices = new Array<>();
         devices.add(deviceLeft, deviceRight);
 
@@ -660,14 +663,7 @@ public class XrDriver implements Disposable {
             check(xrEndSession(xrSession));
             return false;
         }
-        case XR_SESSION_STATE_EXITING -> {
-            // Do not attempt to restart because user closed this session.
-            //*requestRestart = false;
-            return true;
-        }
-        case XR_SESSION_STATE_LOSS_PENDING -> {
-            // Poll for a new instance.
-            //*requestRestart = true;
+        case XR_SESSION_STATE_EXITING, XR_SESSION_STATE_LOSS_PENDING -> {
             return true;
         }
         default -> {
@@ -783,11 +779,10 @@ public class XrDriver implements Disposable {
             if (xrResultToString(xrInstance, result, str) >= 0) {
                 if (method == null) {
                     logger.error(memUTF8(str, memLengthNT1(str)));
-                    return;
                 } else {
                     logger.error(method + " : " + memUTF8(str, memLengthNT1(str)));
-                    return;
                 }
+                return;
             }
         }
         logger.error("XR method returned " + result);

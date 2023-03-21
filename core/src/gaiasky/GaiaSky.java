@@ -652,7 +652,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
 
                 if (settings.graphics.resolution[0] != xrDriver.getWidth()) {
-                    logger.info("Warning, resizing according to VRSystem values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
+                    logger.info("Resizing to XR system values:  [" + settings.graphics.resolution[0] + "x" + settings.graphics.resolution[1] + "] -> [" + xrDriver.getWidth() + "x" + xrDriver.getHeight() + "]");
                     // Do not resize the screen!
                     settings.graphics.backBufferResolution[1] = xrDriver.getHeight();
                     settings.graphics.backBufferResolution[0] = xrDriver.getWidth();
@@ -677,7 +677,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 // If initializing the VRContext failed.
                 settings.runtime.openXr = false;
                 logger.error(e);
-                logger.error("Initialization of VR context failed");
+                logger.error(I18n.msg("vr.init.fail"));
                 return XrLoadStatus.ERROR_NO_CONTEXT;
             }
         } else {

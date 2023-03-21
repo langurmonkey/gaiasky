@@ -198,12 +198,13 @@ public class GamepadGui extends AbstractGui {
 
             if (driver != null) {
                 // Devices
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.system"), driver.systemString);
                 addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.runtime.name"), driver.runtimeName);
                 addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.runtime.version"), driver.runtimeVersionString);
                 var left = driver.getControllerDevices().get(0);
                 var right = driver.getControllerDevices().get(1);
-                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controllers"), "Left, connected: " + left.isActive());
-                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controllers"), "Right, connected: " + right.isActive());
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controller.left"), I18n.msg("gui.vr.controller.active", left.isActive()));
+                addDeviceTypeInfo(vrInfoT, I18n.msg("gui.vr.controller.right"), I18n.msg("gui.vr.controller.active", right.isActive()));
             }
 
             infoT.add(vrInfoT).left().center().padRight(pad30 * 2f);
