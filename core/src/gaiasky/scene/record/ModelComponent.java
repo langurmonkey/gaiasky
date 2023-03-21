@@ -40,16 +40,16 @@ import java.util.Objects;
 
 public class ModelComponent extends NamedComponent implements Disposable, IObserver, IUpdatable<ModelComponent> {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
-    private static final ColorAttribute ambient;
+    private static final ColorAttribute globalAmbient;
 
     static {
-        ambient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
+        globalAmbient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
         // Ambient light watcher.
         var observer = new Observer() {
             @Override
             public void notify(Event event, Object source, Object... data) {
                 if (event == Event.AMBIENT_LIGHT_CMD) {
-                    ModelComponent.setAmbientLight((float) data[0]);
+                    ModelComponent.setGlobalAmbientLight((float) data[0]);
                 }
             }
         };
@@ -79,7 +79,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     /**
      * Ambient light level for static light objects
      **/
-    private float staticLightLevel = 0.6f;
+    private final float[] ambientColor = new float[] { -1f, -1f, -1f, -1f };
     private boolean modelInitialised, modelLoading;
     private boolean useColor = true;
     /** The blend mode **/
@@ -95,21 +95,13 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public ModelComponent(Boolean initEnvironment) {
     }
 
-    public static void toggleAmbientLight(boolean on) {
-        if (on) {
-            ambient.color.set(.7f, .7f, .7f, 1f);
-        } else {
-            ambient.color.set((float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
-        }
-    }
-
     /**
      * Sets the ambient light
      *
      * @param level Ambient light level between 0 and 1
      */
-    public static void setAmbientLight(float level) {
-        ambient.color.set(level, level, level, 1f);
+    public static void setGlobalAmbientLight(float level) {
+        globalAmbient.color.set(level, level, level, 1f);
     }
 
     /**
@@ -165,18 +157,23 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void initializeEnvironment() {
         env = new Environment();
-        if (staticLight) {
-            // If lazy texture init, we turn off the lights until the texture is loaded
-            ColorAttribute staticAmbientLight = new ColorAttribute(ColorAttribute.AmbientLight, staticLightLevel, staticLightLevel, staticLightLevel, 1f);
+        if (staticLight || (ambientColor[0] >= 0 && ambientColor[1] >= 0 && ambientColor[2] >= 0 && ambientColor[3] >= 0)) {
+            // If lazy texture init, we turn off the lights until the texture is loaded.
+            ColorAttribute staticAmbientLight = new ColorAttribute(ColorAttribute.AmbientLight, ambientColor[0], ambientColor[1], ambientColor[2], ambientColor[3]);
             env.set(staticAmbientLight);
         } else {
-            env.set(ambient);
-            // Directional lights
+            // Use global ambient.
+            env.set(globalAmbient);
+        }
+
+        if (!staticLight) {
+            // Directional lights.
             for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
                 DirectionalLight dLight = new DirectionalLight();
                 dLight.color.set(0f, 0f, 0f, 1f);
                 env.add(dLight);
             }
+
         }
     }
 
@@ -188,7 +185,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         this.manager = manager;
         this.cc = cc;
         IntModel model;
-
 
         // CREATE MAIN MODEL INSTANCE
         if (!mesh || !Settings.settings.scene.initialization.lazyMesh) {
@@ -730,11 +726,42 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void setStaticLight(Boolean staticLight) {
         this.staticLight = staticLight;
+        if (staticLight) {
+            // Default static light value.
+            setStaticLight(0.6);
+        }
     }
 
     public void setStaticLight(Double lightLevel) {
         this.staticLight = true;
-        this.staticLightLevel = lightLevel.floatValue();
+        this.ambientColor[0] = lightLevel.floatValue();
+        this.ambientColor[1] = lightLevel.floatValue();
+        this.ambientColor[2] = lightLevel.floatValue();
+        this.ambientColor[3] = 1f;
+    }
+
+    public void setAmbientColor(double[] color) {
+        this.ambientColor[0] = (float) color[0];
+        this.ambientColor[1] = (float) color[1];
+        this.ambientColor[2] = (float) color[2];
+        if (color.length > 3) {
+            this.ambientColor[3] = (float) color[3];
+        } else {
+            this.ambientColor[3] = 1;
+        }
+    }
+
+    public void setAmbientLevel(Double level) {
+        setAmbientColor(level);
+    }
+
+    public void setAmbientColor(Double level) {
+        if (level >= 0) {
+            this.ambientColor[0] = level.floatValue();
+            this.ambientColor[1] = level.floatValue();
+            this.ambientColor[2] = level.floatValue();
+            this.ambientColor[3] = 1f;
+        }
     }
 
     public void setPrimitiveType(int primitiveType) {
@@ -775,8 +802,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     @Override
     public void updateWith(ModelComponent object) {
-        if(object.mtc != null) {
-            if(this.mtc == null) {
+        if (object.mtc != null) {
+            if (this.mtc == null) {
                 setMaterial(object.mtc);
             } else {
                 this.mtc.updateWith(object.mtc);

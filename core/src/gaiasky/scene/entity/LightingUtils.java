@@ -27,24 +27,29 @@ public class LightingUtils {
                 IFocus lightSource = camera.getCloseLightSource(i);
                 if (lightSource != null) {
                     if (lightSource instanceof Proximity.NearbyRecord) {
-                        graph.translation.put(model.model.directional(i).direction);
-                        Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
-                        if (nr.isStar() || nr.isStarGroup()) {
-                            float[] col = nr.getColor();
-                            double closestDist = nr.getClosestDistToCamera();
-                            // Dim light with distance.
-                            float colFactor = (float) Math.pow(MathUtilsDouble.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
-                            model.model.directional(i).direction.sub(nr.pos.put(F31.get()));
-                            model.model.directional(i).color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
-                        } else {
-                            Vector3b campos = camera.getPos();
-                            model.model.directional(i).direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
-                            model.model.directional(i).color.set(1f, 1f, 1f, 1f);
+                        var directional = model.model.directional(i);
+                        if(directional != null) {
+                            graph.translation.put(directional.direction);
+                            Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
+                            if (nr.isStar() || nr.isStarGroup()) {
+                                float[] col = nr.getColor();
+                                double closestDist = nr.getClosestDistToCamera();
+                                // Dim light with distance.
+                                float colFactor = (float) Math.pow(MathUtilsDouble.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
+                                directional.direction.sub(nr.pos.put(F31.get()));
+                                directional.color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
+                            } else {
+                                Vector3b campos = camera.getPos();
+                                directional.direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
+                                directional.color.set(1f, 1f, 1f, 1f);
+                            }
                         }
                     }
                 } else {
                     // Disable light
-                    model.model.directional(i).color.set(0f, 0f, 0f, 0f);
+                    if(model.model.directional(i) != null) {
+                        model.model.directional(i).color.set(0f, 0f, 0f, 0f);
+                    }
                 }
             }
         }
