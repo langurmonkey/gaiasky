@@ -25,6 +25,7 @@ public class TrajectoryUtils {
     public static OrbitRefresher orbitRefresher;
     private Vector3b B31, B32;
     private Vector3d D31, D32, D33;
+
     public TrajectoryUtils() {
         B31 = new Vector3b();
         B32 = new Vector3b();
@@ -55,7 +56,6 @@ public class TrajectoryUtils {
                 // body instanceof Planet
                 && Mapper.atmosphere.has(trajectory.body)
                 && trajectory.oc.period > 0;
-        trajectory.orbitTrail = trajectory.orbitTrail | trajectory.mustRefresh | (trajectory.providerClass != null && trajectory.providerClass.equals(OrbitalParametersProvider.class));
     }
 
     public void updateSize(Body body, Trajectory trajectory, Verts verts) {

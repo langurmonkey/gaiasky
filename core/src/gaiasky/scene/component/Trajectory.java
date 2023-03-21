@@ -48,7 +48,7 @@ public class Trajectory implements Component {
      * Whether to show the orbit as a trail or not.
      * A trail fades the orbit line as it gets further away from the object.
      */
-    public boolean orbitTrail;
+    public boolean orbitTrail = true;
     /**
      * The bottom mapping position for the trail. The orbit trail assigns
      * an opacity value to each point of the orbit, where 1 is the location of
@@ -120,7 +120,7 @@ public class Trajectory implements Component {
     }
 
     public void setTrailMap(Double trailMap) {
-        this.trailMap = MathUtils.clamp(trailMap.floatValue(), 0f, 1f);
+        this.trailMap = MathUtils.clamp(trailMap.floatValue(), 0f, 1.0f);
     }
 
     public void setOrbittrail(Boolean trail) {
