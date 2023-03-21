@@ -15,6 +15,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Body;
 import gaiasky.scene.component.Constel;
 import gaiasky.scene.component.StarSet;
+import gaiasky.scene.component.Trajectory;
 import gaiasky.scene.system.render.draw.LinePrimitiveRenderer;
 import gaiasky.scene.view.LineView;
 import gaiasky.util.Constants;
@@ -245,6 +246,14 @@ public class LineEntityRenderSystem {
         out.set(posBean.getPosition()).sub(camPos).add(vel);
     }
 
+    private float getCurrentAlpha(float topAlpha, Trajectory trajectory) {
+        float alpha = topAlpha;
+        if (trajectory.trailMap > 0) {
+            alpha = (1f / (1f - trajectory.trailMap)) * (alpha - trajectory.trailMap);
+        }
+        return MathUtils.clamp(alpha, 0f, 1f);
+    }
+
     public void renderTrajectory(Entity entity, LinePrimitiveRenderer renderer, ICamera camera, float alpha) {
         var trajectory = Mapper.trajectory.get(entity);
         if (!trajectory.onlyBody) {
@@ -270,7 +279,6 @@ public class LineEntityRenderSystem {
             int stIdx = 0;
             int nPoints = verts.pointCloudData.getNumPoints();
 
-            boolean reverse = GaiaSky.instance.time.getWarpFactor() < 0;
             boolean hasTime = verts.pointCloudData.hasTime();
 
             Vector3d bodyPos = D31.setZero();
@@ -289,10 +297,8 @@ public class LineEntityRenderSystem {
                     bodyPos.mul(localTransformD);
                 }
 
-                if (!reverse) {
-                    topAlpha = bottomAlpha;
-                    dAlpha = -dAlpha;
-                }
+                topAlpha = bottomAlpha;
+                dAlpha = -dAlpha;
             }
 
             lineView.setEntity(entity);
@@ -316,7 +322,7 @@ public class LineEntityRenderSystem {
             } else if (oc != null && oc.period > 0) {
                 // Periodic orbits.
                 int i = wrap(stIdx + 2, nPoints);
-                float cAlpha;
+                float p0Alpha;
                 while (n < nPoints - last) {
                     // i minus one
                     int im = wrap(i - 1, nPoints);
@@ -332,19 +338,15 @@ public class LineEntityRenderSystem {
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
 
-                    cAlpha = MathUtils.clamp(topAlpha, 0f, 1f);
-                    if (trajectory.trailMap > 0) {
-                        cAlpha = (1f / (1f - trajectory.trailMap)) * (cAlpha - trajectory.trailMap);
-                    }
+                    p0Alpha = getCurrentAlpha(topAlpha, trajectory);
+                    float p1Alpha = getCurrentAlpha(topAlpha - dAlpha, trajectory);
 
                     // Only render visible chunks.
-                    if (cAlpha > 0.001) {
-                        if (orbitTrail && !reverse && n == nPoints - 2) {
-                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3] * baseOpacity);
-                        } else if (orbitTrail && reverse && n == 0) {
-                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3] * baseOpacity);
+                    if (p0Alpha > 0.0 || p1Alpha > 0.0) {
+                        if (orbitTrail && n == nPoints - 2) {
+                            renderer.addLine(lineView, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], p1Alpha * cc[3] * baseOpacity, cc[0], cc[1], cc[2], p0Alpha * cc[3] * baseOpacity);
                         }
-                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3] * baseOpacity);
+                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], p0Alpha * cc[3] * baseOpacity, cc[0], cc[1], cc[2], p1Alpha * cc[3] * baseOpacity);
                     }
 
                     topAlpha -= dAlpha;
@@ -356,11 +358,8 @@ public class LineEntityRenderSystem {
 
             } else if (hasTime) {
                 // Non-periodic orbits with trail and times.
-                dAlpha = 1 / (float) stIdx * (1 - trajectory.trailMap);
-                if (!reverse) {
-                    dAlpha = -dAlpha;
-                }
-                float cAlpha;
+                dAlpha = -1 / (float) stIdx * (1 - trajectory.trailMap);
+                float p0Alpha;
                 for (int i = 1; i < stIdx; i++) {
                     pointCloudData.loadPoint(prev, i - 1);
                     pointCloudData.loadPoint(curr, i);
@@ -371,13 +370,11 @@ public class LineEntityRenderSystem {
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
 
-                    cAlpha = MathUtils.clamp(topAlpha, 0f, 1f);
-                    if (trajectory.trailMap > 0) {
-                        cAlpha = (1f / (1f - trajectory.trailMap)) * (cAlpha - trajectory.trailMap);
-                    }
+                    p0Alpha = getCurrentAlpha(topAlpha, trajectory);
+                    float p1Alpha = getCurrentAlpha(topAlpha - dAlpha, trajectory);
 
-                    if (cAlpha > 0.0) {
-                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], baseOpacity * cAlpha * cc[3]);
+                    if (p0Alpha > 0.0 || p1Alpha > 0.0) {
+                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], baseOpacity * p0Alpha * cc[3], cc[0], cc[1], cc[2], baseOpacity * p1Alpha * cc[3]);
                     }
                     topAlpha -= dAlpha;
                 }
@@ -386,7 +383,7 @@ public class LineEntityRenderSystem {
             } else {
                 // Non-periodic orbits with trail and no time.
                 dAlpha = 1 / ((nPoints - 1) * (1 - trajectory.trailMap));
-                float cAlpha;
+                float p0Alpha;
                 for (int i = nPoints - 1; i > 0; i--) {
                     pointCloudData.loadPoint(prev, i - 1);
                     pointCloudData.loadPoint(curr, i);
@@ -397,10 +394,11 @@ public class LineEntityRenderSystem {
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
 
-                    cAlpha = MathUtils.clamp(topAlpha, 0f, 1f);
+                    p0Alpha = MathUtils.clamp(topAlpha, 0f, 1f);
+                    float p1Alpha = MathUtils.clamp(topAlpha - dAlpha, 0f, 1f);
 
-                    if (cAlpha > 0.001) {
-                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3] * cAlpha * baseOpacity);
+                    if (p0Alpha > 0.001) {
+                        renderer.addLine(lineView, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3] * p0Alpha * baseOpacity, cc[0], cc[1], cc[2], alpha * cc[3] * p1Alpha * baseOpacity);
                     }
                     topAlpha -= dAlpha;
                 }
