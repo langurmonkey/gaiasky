@@ -67,7 +67,19 @@ public class Trajectory implements Component {
      * Point size
      **/
     public float pointSize = 1f;
+
+    /**
+     * Orbits with a body fade out as the camera get closer to the body.
+     * This is the far distance, in body radius units, where the orbit starts the fade (mapped to 1).
+     * This attribute only has effect if this trajectory has a body.
+     **/
     public float distUp = 200;
+
+    /**
+     * Orbits with a body fade out as the camera get closer to the body.
+     * This is the near distance, in body radius units, where the orbit ends the fade (mapped to 0).
+     * This attribute only has effect if this trajectory has a body.
+     **/
     public float distDown = 20;
 
     /**

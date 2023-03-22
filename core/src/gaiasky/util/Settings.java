@@ -1034,7 +1034,7 @@ public class Settings {
             public ElevationSettings elevation;
             public VirtualTextureSettings virtualTextures;
             @JsonIgnore
-            public double orbitSolidAngleThreshold = Math.toRadians(0);
+            public double orbitSolidAngleThreshold = Math.toRadians(1.5);
 
             public RendererSettings() {
                 EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD, Event.SVT_CACHE_SIZE_CMD);

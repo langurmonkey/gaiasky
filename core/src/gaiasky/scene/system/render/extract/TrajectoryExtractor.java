@@ -53,7 +53,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                 boolean added = false;
                 float angleLimit = (float) Settings.settings.scene.renderer.orbitSolidAngleThreshold * camera.getFovFactor();
                 if (body.solidAngle > angleLimit) {
-
+                    // Fade the orbit using its solid angle and the threshold in the settings.
                     if (body.solidAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
                         trajectory.alpha = MathUtilsDouble.lint(body.solidAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, body.color[3]);
                     } else {
@@ -68,8 +68,9 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                         added = true;
                     } else {
                         var bodyBody = Mapper.body.get(trajectory.body);
+                        // For orbits with a body objects, we fade it out as we move closer to the body, using the distUp and distDown, which are in
+                        // body radius units.
                         if (bodyBody.distToCamera > trajectory.distDown) {
-                            // Body, disappear slowly.
                             if (bodyBody.distToCamera < trajectory.distUp)
                                 trajectory.alpha *= MathUtilsDouble.lint(bodyBody.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
                             addToRender(render, rg);
