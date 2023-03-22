@@ -65,7 +65,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
                 if (params[1] instanceof Entity) {
                     var trajectory = Mapper.trajectory.get(entity);
                     var orbitObject = (Entity) params[1];
-                    trajectory.setBody(orbitObject, EntityUtils.getRadius(orbitObject));
+                    trajectory.setBody(orbitObject, EntityUtils.getRadius(orbitObject), trajectory.distDown, trajectory.distUp);
                 }
             }
         }

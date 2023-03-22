@@ -67,7 +67,20 @@ public class Trajectory implements Component {
      * Point size
      **/
     public float pointSize = 1f;
-    public float distUp, distDown;
+
+    /**
+     * Orbits with a body fade out as the camera get closer to the body.
+     * This is the far distance, in body radius units, where the orbit starts the fade (mapped to 1).
+     * This attribute only has effect if this trajectory has a body.
+     **/
+    public float distUp = 200;
+
+    /**
+     * Orbits with a body fade out as the camera get closer to the body.
+     * This is the near distance, in body radius units, where the orbit ends the fade (mapped to 0).
+     * This attribute only has effect if this trajectory has a body.
+     **/
+    public float distDown = 20;
 
     /**
      * Sets the orientation model as a string.
@@ -131,10 +144,22 @@ public class Trajectory implements Component {
         this.numSamples = Math.toIntExact(numSamples);
     }
 
+    public void setFadeDistanceUp(Double distUp) {
+        this.distUp = distUp.floatValue();
+    }
+
+    public void setFadeDistanceDown(Double distDown) {
+        this.distDown = distDown.floatValue();
+    }
+
     public void setBody(Entity entity, double radius) {
+        setBody(entity, radius, 20, 200);
+    }
+
+    public void setBody(Entity entity, double radius, float distDown, float distUp) {
         this.body = entity;
-        this.distUp = (float) Math.max(radius * 200, 500 * Constants.KM_TO_U);
-        this.distDown = (float) Math.max(radius * 20, 50 * Constants.KM_TO_U);
+        this.distUp = (float) Math.max(radius * distUp, 500 * Constants.KM_TO_U);
+        this.distDown = (float) Math.max(radius * distDown, 50 * Constants.KM_TO_U);
     }
 
     public enum OrbitOrientationModel {
