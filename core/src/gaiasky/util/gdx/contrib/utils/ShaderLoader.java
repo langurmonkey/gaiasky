@@ -37,8 +37,8 @@ public final class ShaderLoader {
         log += "...";
         logger.debug("Compiling " + log);
 
-        String vpSrc = loadShaderCode(vertexFileName, "vert", "vertex", "vert.glsl");
-        String fpSrc = loadShaderCode(fragmentFileName, "frag", "fragment", "frag.glsl");
+        String vpSrc = loadShaderCode(vertexFileName, "vert", "vertex", "vert.glsl", "glsl");
+        String fpSrc = loadShaderCode(fragmentFileName, "frag", "fragment", "frag.glsl", "glsl");
 
         // Resolve includes
         vpSrc = ShaderTemplatingLoader.resolveIncludes(vpSrc);

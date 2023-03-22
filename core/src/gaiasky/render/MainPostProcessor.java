@@ -27,6 +27,7 @@ import gaiasky.scene.camera.CameraManager;
 import gaiasky.scene.record.MaterialComponent;
 import gaiasky.scene.record.ModelComponent;
 import gaiasky.scene.view.BaseView;
+import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
@@ -56,15 +57,16 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
     /**
      * Contains a map by name with
-     * [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
+     * [0:shader{string}, 1:enabled {bool}, 2:entity{Entity}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
      */
     private final Map<String, Object[]> raymarchingDef;
     /** Aspect ratio cache. **/
     float ar;
     Entity blurObject;
     BaseView blurObjectView;
+    FocusView focusView;
     boolean blurObjectAdded = false;
-    Vector3b auxb, prevCampos;
+    Vector3b auxb1, auxb2, prevCampos;
     Vector3 auxf;
     Matrix4 prevViewProj;
     Matrix4 projection, combined, view;
@@ -81,9 +83,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ShaderLoader.BasePath = "shader/postprocess/";
 
         this.scene = scene;
-        this.auxb = new Vector3b();
+        this.auxb1 = new Vector3b();
+        this.auxb2 = new Vector3b();
         this.auxf = new Vector3();
         this.prevCampos = new Vector3b();
+        this.focusView = new FocusView();
         this.prevViewProj = new Matrix4();
         this.view = new Matrix4();
         this.projection = new Matrix4();
@@ -152,12 +156,29 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
+        // LIGHT GLOW
+        LightGlowSettings glowSettings = Settings.settings.postprocess.lightGlow;
+        Texture glow = manager.get(starTextureName);
+        glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        LightGlow lightGlow = new LightGlow(5, 5);
+        lightGlow.setLightGlowTexture(glow);
+        lightGlow.setTextureScale(getGlowTextureScale(ss.brightness, ss.glowFactor, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), settings.program.modeCubemap.active));
+        lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
+        lightGlow.setBackbufferScale(settings.runtime.openVr ? (float) settings.graphics.backBufferScale : 1);
+        lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
+        ppb.set(lightGlow);
+        updateGlow(ppb, gq);
+
         // RAY MARCHING SHADERS
         raymarchingDef.forEach((key, list) -> {
             Raymarching rm = new Raymarching((String) list[0], width, height);
             // Fixed uniforms
             float zFar = (float) GaiaSky.instance.getCameraManager().current.getFar();
             float k = Constants.getCameraK();
+            var entity = (Entity) list[2];
+            var body = Mapper.body.get(entity);
+            // We normalize the size.
+            rm.setSize(body.size * 0.1f);
             rm.setZfarK(zFar, k);
             if (list.length > 3 && list[3] != null) {
                 // Additional
@@ -207,19 +228,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             blurObjectView = new BaseView(blurObject);
             blurObjectAdded = true;
         }
-
-        // LIGHT GLOW
-        LightGlowSettings glowSettings = Settings.settings.postprocess.lightGlow;
-        Texture glow = manager.get(starTextureName);
-        glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        LightGlow lightGlow = new LightGlow(5, 5);
-        lightGlow.setLightGlowTexture(glow);
-        lightGlow.setTextureScale(getGlowTextureScale(ss.brightness, ss.glowFactor, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), settings.program.modeCubemap.active));
-        lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
-        lightGlow.setBackbufferScale(settings.runtime.openVr ? (float) settings.graphics.backBufferScale : 1);
-        lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
-        ppb.set(lightGlow);
-        updateGlow(ppb, gq);
 
         /*
          TODO
@@ -519,14 +527,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         case RAYMARCHING_CMD:
             String name = (String) data[0];
             boolean status = (Boolean) data[1];
-            Vector3b position = (Vector3b) data[2];
+            Entity entity = (Entity) data[2];
             if (data.length > 3) {
-                // Add effect description for later initialization
+                // Add effect description for later initialization.
                 String shader = (String) data[3];
                 float[] additional = data[4] != null ? (float[]) data[4] : null;
-                Object[] l = new Object[] { shader, false, position, additional };
+                Object[] l = new Object[] { shader, false, entity, additional };
                 addRayMarchingDef(name, l);
-                logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + position + "]");
+                logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + entity + "]");
             } else {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -740,8 +748,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     if (rms != null)
                         rms.forEach((key, rmEffect) -> {
                             if (rmEffect.isEnabled()) {
-                                Vector3b pos = (Vector3b) raymarchingDef.get(key)[2];
-                                Vector3 camPos = auxb.set(campos).sub(pos).put(auxf);
+                                var rmEntity = (Entity) raymarchingDef.get(key)[2];
+                                focusView.setScene(scene);
+                                focusView.setEntity(rmEntity);
+                                focusView.getPredictedPosition(auxb2, GaiaSky.instance.time, GaiaSky.instance.getICamera(), true);
+                                var camPos = auxb1.set(campos).sub(auxb2).put(auxf);
                                 Raymarching raymarching = (Raymarching) rmEffect;
                                 raymarching.setTime(secs);
                                 raymarching.setPos(camPos);
