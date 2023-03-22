@@ -1469,6 +1469,7 @@ public class Settings {
         public static class UiSettings {
             public String theme;
             public float scale;
+            public long animationMs = 600;
             public boolean modeChangeInfo;
             public DistanceUnits distanceUnits;
 
@@ -1487,6 +1488,11 @@ public class Settings {
             @JsonIgnore
             public boolean isHiDPITheme() {
                 return scale > 1.5;
+            }
+
+            @JsonIgnore
+            public float getAnimationSeconds() {
+                return animationMs / 1000f;
             }
 
             @JsonProperty("distanceUnits")

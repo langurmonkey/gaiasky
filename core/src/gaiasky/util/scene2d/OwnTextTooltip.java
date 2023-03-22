@@ -82,11 +82,15 @@ public class OwnTextTooltip extends Tooltip<Label> {
     public void setStyle(TextTooltipStyle style) {
         if (style == null)
             throw new NullPointerException("style cannot be null");
-        if (!(style instanceof TextTooltipStyle))
-            throw new IllegalArgumentException("style must be a TextTooltipStyle.");
         getContainer().getActor().setStyle(style.label);
         getContainer().setBackground(style.background);
         getContainer().maxWidth(style.wrapWidth);
+    }
+
+    public void setText(String newText) {
+        if(label != null) {
+            label.setText(newText);
+        }
     }
 
 }

@@ -8,6 +8,7 @@ package gaiasky.gui;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -334,17 +335,35 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         // MINIMIZE/MAXIMIZE
         Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
+        var toggleSizeTooltip = new OwnTextTooltip(I18n.msg("gui.minimize.pane"), skin);
+        toggleSize.addListener(toggleSizeTooltip);
         toggleSize.setColor(ColorUtils.gYellowC);
         toggleSize.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 if (maximized) {
+                    // Minimize.
                     maximized = false;
-                    contentCell.setActor(null);
-                    toggleSize.setText("(+)");
+                    content.addAction(Actions.sequence(
+                            Actions.alpha(1f),
+                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.run(() -> {
+                                contentCell.setActor(null);
+                                toggleSize.setText("(+)");
+                                toggleSizeTooltip.setText(I18n.msg("gui.maximize.pane"));
+                            })
+                    ));
                 } else {
+                    // Maximize.
                     maximized = true;
                     contentCell.setActor(content);
-                    toggleSize.setText("(-)");
+                    content.addAction(Actions.sequence(
+                            Actions.alpha(0f),
+                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.run(() -> {
+                                toggleSize.setText("(-)");
+                                toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
+                            })
+                    ));
                 }
                 pack();
             }

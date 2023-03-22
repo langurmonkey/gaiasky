@@ -16,6 +16,7 @@ public class RaymarchingUpdater extends AbstractUpdateSystem {
         updateEntity(entity, deltaTime);
     }
 
+    private final double solidAngleThreshold = Math.toRadians(0.001);
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
         var rm = Mapper.raymarching.get(entity);
@@ -25,16 +26,16 @@ public class RaymarchingUpdater extends AbstractUpdateSystem {
             var body = Mapper.body.get(entity);
 
             // Check enable/disable
-            if (body.solidAngleApparent > Math.toRadians(0.001)) {
+            if (body.solidAngleApparent > solidAngleThreshold) {
                 if (!rm.isOn) {
                     // Turn on
-                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), true, body.pos);
+                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), true, entity);
                     rm.isOn = true;
                 }
             } else {
                 if (rm.isOn) {
                     // Turn off
-                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, body.pos);
+                    EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity);
                     rm.isOn = false;
                 }
             }

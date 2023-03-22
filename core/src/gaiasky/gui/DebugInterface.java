@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -92,18 +93,36 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         /* MINIMIZE/MAXIMIZE */
         extra = new Table(skin);
 
-        Link toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
+        var toggleSize = new Link(maximized ? "(-)" : "(+)", skin, null);
         toggleSize.setColor(ColorUtils.gYellowC);
+        var toggleSizeTooltip = new OwnTextTooltip(I18n.msg("gui.maximize.pane"), skin);
+        toggleSize.addListener(toggleSizeTooltip);
         toggleSize.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 if (maximized) {
+                    // Minimize.
                     maximized = false;
-                    extraCell.setActor(null);
-                    toggleSize.setText("(+)");
+                    extra.addAction(Actions.sequence(
+                            Actions.alpha(1f),
+                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.run(() -> {
+                                extraCell.setActor(null);
+                                toggleSize.setText("(+)");
+                                toggleSizeTooltip.setText(I18n.msg("gui.maximize.pane"));
+                            })
+                    ));
                 } else {
+                    // Maximize.
                     maximized = true;
                     extraCell.setActor(extra);
-                    toggleSize.setText("(-)");
+                    extra.addAction(Actions.sequence(
+                            Actions.alpha(0f),
+                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.run(() -> {
+                                toggleSize.setText("(-)");
+                                toggleSizeTooltip.setText(I18n.msg("gui.minimize.pane"));
+                            })
+                    ));
                 }
                 pack();
             }
@@ -400,14 +419,28 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
             }
             case SHOW_DEBUG_CMD -> {
-                boolean shw;
+                boolean showDebugInfo;
                 if (data.length >= 1) {
-                    shw = (boolean) data[0];
+                    showDebugInfo = (boolean) data[0];
                 } else {
-                    shw = !this.isVisible();
+                    showDebugInfo = !this.isVisible();
                 }
-                Settings.settings.program.debugInfo = shw;
-                this.setVisible(Settings.settings.program.debugInfo);
+                Settings.settings.program.debugInfo = showDebugInfo;
+                if (showDebugInfo) {
+                    // Display.
+                    this.addAction(Actions.sequence(
+                            Actions.visible(true),
+                            Actions.alpha(0f),
+                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())
+                    ));
+                } else {
+                    // Hide.
+                    this.addAction(Actions.sequence(
+                            Actions.alpha(1f),
+                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.visible(false)
+                    ));
+                }
             }
             default -> {
             }

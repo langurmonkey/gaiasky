@@ -203,7 +203,7 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
-            shaderProgram.setUniformf("u_coordEnabled", vertsView.getPointCloud().hasTime() ? 1f : -1f);
+            shaderProgram.setUniformf("u_coordEnabled", (trajectory == null || trajectory.orbitTrail) && vertsView.getPointCloud().hasTime() ? 1f : -1f);
             shaderProgram.setUniformf("u_trailMap", trajectory != null ? trajectory.trailMap : 0.0f);
             shaderProgram.setUniformf("u_coordPos", trajectory != null ? (float) trajectory.coord : 1f);
             shaderProgram.setUniformf("u_period", trajectory != null && trajectory.oc != null ? (float) trajectory.oc.period : 0f);

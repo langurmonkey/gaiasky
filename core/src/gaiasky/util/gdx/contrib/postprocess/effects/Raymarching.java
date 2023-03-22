@@ -63,6 +63,10 @@ public final class Raymarching extends PostProcessorEffect {
         filter.setTime(seconds);
     }
 
+    public void setSize(float size) {
+        filter.setSize(size);
+    }
+
     public void setZfarK(float zfar, float k) {
         filter.setZfarK(zfar, k);
     }

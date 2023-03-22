@@ -103,9 +103,8 @@ public class CamRecorder implements IObserver {
                                 direction.set(dir);
                                 up.set(upp);
                                 break;
-                            } else {
-                                // Skip comment, next line
                             }
+
                         } else {
                             // Finish off
                             is.close();
@@ -138,7 +137,7 @@ public class CamRecorder implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case RECORD_CAMERA_CMD:
+        case RECORD_CAMERA_CMD -> {
             // Start recording
             RecorderState m;
             if (data[0] != null) {
@@ -152,7 +151,6 @@ public class CamRecorder implements IObserver {
                 m = (mode == RecorderState.RECORDING) ? RecorderState.IDLE : RecorderState.RECORDING;
 
             }
-
             if (m == RecorderState.RECORDING) {
                 String filename;
                 if (data.length > 1 && data[1] != null && !((String) data[1]).isBlank()) {
@@ -191,7 +189,7 @@ public class CamRecorder implements IObserver {
                 time = 0;
                 mode = RecorderState.RECORDING;
 
-            } else if (m == RecorderState.IDLE) {
+            } else {
                 // Flush and close
                 if (mode == RecorderState.IDLE) {
                     // No recording to cancel
@@ -211,8 +209,8 @@ public class CamRecorder implements IObserver {
                 f = null;
                 mode = RecorderState.IDLE;
             }
-            break;
-        case PLAY_CAMERA_CMD:
+        }
+        case PLAY_CAMERA_CMD -> {
             // Start playing
             if (is != null) {
                 logger.warn("Hey, we are already playing another movie!");
@@ -227,7 +225,6 @@ public class CamRecorder implements IObserver {
             } else {
                 file = (Path) f;
             }
-
             try {
                 is = new BufferedReader(new InputStreamReader(Files.newInputStream(file)));
 
@@ -246,17 +243,16 @@ public class CamRecorder implements IObserver {
             } catch (Exception e) {
                 logger.error(e);
             }
-
-            break;
-        case UPDATE_CAM_RECORDER:
+        }
+        case UPDATE_CAM_RECORDER -> {
             // Update with current position
             ITimeFrameProvider dt = (ITimeFrameProvider) data[0];
             Vector3b pos = (Vector3b) data[1];
             Vector3d dir = (Vector3d) data[2];
             Vector3d up = (Vector3d) data[3];
             update(dt, pos, dir, up);
-            break;
-        case STOP_CAMERA_PLAY:
+        }
+        case STOP_CAMERA_PLAY -> {
             // Stop playing
             mode = RecorderState.IDLE;
             // Stop camera
@@ -270,9 +266,9 @@ public class CamRecorder implements IObserver {
 
             // Stop frame output if it is on!
             EventManager.publish(Event.FRAME_OUTPUT_CMD, this, false);
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
 
     }

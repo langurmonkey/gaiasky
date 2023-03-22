@@ -88,7 +88,7 @@ public abstract class AbstractGamepadListener implements ControllerListener, IIn
     }
 
     public boolean isKeyPressed(Controller controller, int buttonCode) {
-        return controller != null ? controller.getButton(buttonCode) : false;
+        return controller != null && controller.getButton(buttonCode);
     }
 
     /**

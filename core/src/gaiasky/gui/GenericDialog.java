@@ -448,7 +448,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * default fadeIn action
      */
     public GenericDialog show(Stage stage) {
-        show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.6f, Interpolation.fade)));
+        show(stage, Actions.sequence(
+                Actions.alpha(0f),
+                Actions.fadeIn(0.6f, Interpolation.fade)));
         if (lastPosX >= 0 && lastPosY >= 0) {
             setPosition(Math.round(lastPosX), Math.round(lastPosY));
         } else {
@@ -466,7 +468,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * {@link #pack() Packs} the dialog and adds it to the stage at the specified position
      */
     public GenericDialog show(Stage stage, float x, float y) {
-        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(0.6f, Interpolation.fade)));
+        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds(), Interpolation.fade)));
         setPosition(Math.round(x), Math.round(y));
         setKeyboardFocus();
         return this;
@@ -523,7 +525,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * then removes it from the stage.
      */
     public void hide() {
-        hide(Actions.fadeOut(0.6f, Interpolation.fade));
+        hide(Actions.sequence(
+                Actions.alpha(1f),
+                Actions.fadeOut(0.6f)));
     }
 
     /**

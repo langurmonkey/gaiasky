@@ -418,6 +418,16 @@ public class GaiaSkyContextMenu extends ContextMenu {
         if (nItems > 0) {
             addSeparator();
         }
+        // Preferences
+        MenuItem preferences = new MenuItem(I18n.msg("gui.preferences"), skin, skin.getDrawable("prefs-icon"));
+        preferences.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_PREFERENCES_ACTION, preferences);
+                return true;
+            }
+            return false;
+        });
+        addItem(preferences);
         // Quit
         MenuItem quit = new MenuItem(I18n.msg("context.quit"), skin, skin.getDrawable("quit-icon"));
         quit.addListener((event) -> {

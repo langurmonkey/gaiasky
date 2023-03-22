@@ -50,13 +50,11 @@ public class RaymarchingInitializer extends AbstractInitSystem {
     @Override
     public void setUpEntity(Entity entity) {
         var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
         var raymarching = Mapper.raymarching.get(entity);
-        var coord = Mapper.coordinates.get(entity);
 
         if (raymarching != null) {
             if (raymarching.raymarchingShader != null && !raymarching.raymarchingShader.isBlank() && !Settings.settings.program.safeMode)
-                EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, coord.coordinates.getEquatorialCartesianCoordinates(Instant.now(), body.pos), raymarching.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
+                EventManager.publish(Event.RAYMARCHING_CMD, this, base.getName(), false, entity, raymarching.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
             else
                 raymarching.raymarchingShader = null;
         }

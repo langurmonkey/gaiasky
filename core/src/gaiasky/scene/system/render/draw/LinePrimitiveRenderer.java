@@ -165,8 +165,16 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
         addLinePostproc(x0, y0, z0, x1, y1, z1, col.r, col.g, col.b, col.a);
     }
 
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, Color col0, Color col1) {
+        addLinePostproc(x0, y0, z0, x1, y1, z1, col0.r, col0.g, col0.b, col0.a, col1.r, col1.g, col1.b, col1.a);
+    }
+
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
         addLinePostproc(x0, y0, z0, x1, y1, z1, r, g, b, a);
+    }
+
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, double r0, double g0, double b0, double a0, double r1, double g1, double b1, double a1) {
+        addLinePostproc(x0, y0, z0, x1, y1, z1, r0, g0, b0, a0, r1, g1, b1, a1);
     }
 
     public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r, double g, double b, double a) {
@@ -179,6 +187,19 @@ public class LinePrimitiveRenderer extends LineRenderSystem {
         color(r, g, b, a);
         vertex((float) x0, (float) y0, (float) z0);
         color(r, g, b, a);
+        vertex((float) x1, (float) y1, (float) z1);
+    }
+
+    public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r0, double g0, double b0, double a0, double r1, double g1, double b1, double a1) {
+        // Check if 3 more indices fit
+        if (curr.numVertices + 2 >= curr.capacity) {
+            // Create new mesh data
+            initVertices(meshIdx++);
+        }
+
+        color(r0, g0, b0, a0);
+        vertex((float) x0, (float) y0, (float) z0);
+        color(r1, g1, b1, a1);
         vertex((float) x1, (float) y1, (float) z1);
     }
 

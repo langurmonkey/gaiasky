@@ -45,15 +45,13 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     Vector3d line, camdir0, camdir1, camdir15, point, vec;
     private MeshDataExt currExt;
     private Array<double[]> provisionalLines;
-    private Array<Line> provLines;
     private boolean two = false;
 
     public LineQuadstripRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
-        doublePool = new DoubleArrayPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 14);
+        doublePool = new DoubleArrayPool(INI_DPOOL_SIZE, MAX_DPOOL_SIZE, 12);
         provisionalLines = new Array<>();
-        provLines = new Array<>();
-        sorter = new LineArraySorter(12);
+        sorter = new LineArraySorter(11);
         line = new Vector3d();
         camdir0 = new Vector3d();
         camdir1 = new Vector3d();
@@ -130,19 +128,41 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
 
     @Override
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, Color c) {
-        addLine(lr, x0, y0, z0, x1, y1, z1, c.r, c.g, c.b, c.a);
+        addLine(lr, x0, y0, z0, x1, y1, z1, c.toFloatBits());
+    }
+
+    @Override
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, Color c0, Color c1) {
+        addLine(lr, x0, y0, z0, x1, y1, z1, c0.toFloatBits(), c1.toFloatBits());
+    }
+
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float c) {
+        addLineInternal(x0, y0, z0, x1, y1, z1, c, c, lr.getLineWidth() * baseWidthAngleTan * Settings.settings.scene.lineWidth);
+    }
+
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float c0, float c1) {
+        addLineInternal(x0, y0, z0, x1, y1, z1, c0, c1, lr.getLineWidth() * baseWidthAngleTan * Settings.settings.scene.lineWidth);
     }
 
     @Override
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
-        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * baseWidthAngleTan * Settings.settings.scene.lineWidth);
+        addLineInternal(x0, y0, z0, x1, y1, z1, Color.toFloatBits(r, g, b, a), Color.toFloatBits(r, g, b, a), lr.getLineWidth() * baseWidthAngleTan * Settings.settings.scene.lineWidth);
     }
 
-    private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {
-        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, widthAngleTan, true);
+    @Override
+    public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r0, float g0, float b0, float a0, float r1, float g1, float b1, float a1) {
+        addLineInternal(x0, y0, z0, x1, y1, z1, Color.toFloatBits(r0, g0, b0, a0), Color.toFloatBits(r1, g1, b1, a1), lr.getLineWidth() * baseWidthAngleTan * Settings.settings.scene.lineWidth);
     }
 
-    private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan, boolean rec) {
+    private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float c0, float c1, double widthAngleTan) {
+        addLineInternal(x0, y0, z0, x1, y1, z1, c0, c1, widthAngleTan, true);
+    }
+
+    Color col0 = new Color();
+    Color col1 = new Color();
+    Color col15 = new Color();
+
+    private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float c0, float c1, double widthAngleTan, boolean rec) {
         double distToSegment = MathUtilsDouble.distancePointSegment(x0, y0, z0, x1, y1, z1, 0, 0, 0);
 
         double dist0 = FastMath.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
@@ -151,17 +171,23 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
         Vector3d p15 = auxd;
 
         if (rec && distToSegment < dist0 && distToSegment < dist1) {
-            // Projection falls in line, split line
-            p15 = MathUtilsDouble.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0, p15);
+            // Projection falls in line, split line.
+            MathUtilsDouble.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0, p15);
             double px = p15.x;
             double py = p15.y;
             double pz = p15.z;
 
-            addLineInternal(x0, y0, z0, px, py, pz, r, g, b, a, widthAngleTan, true);
-            addLineInternal(px, py, pz, x1, y1, z1, r, g, b, a, widthAngleTan, true);
+            // Mean color.
+            Color.abgr8888ToColor(col0, c0);
+            Color.abgr8888ToColor(col1, c1);
+            col15.set((col0.r + col1.r) / 2f, (col0.g + col1.g) / 2f, (col0.b + col1.b) / 2f, (col0.a + col1.a) / 2f);
+            float c15 = col15.toFloatBits();
+
+            addLineInternal(x0, y0, z0, px, py, pz, c0, c15, widthAngleTan, true);
+            addLineInternal(px, py, pz, x1, y1, z1, c15, c1, widthAngleTan, true);
         } else {
             // Add line to list
-            // x0 y0 z0 x1 y1 z1 r g b a dist0 dist1 distMean
+            // x0 y0 z0 x1 y1 z1 r0 g0 b0 a0 r1 g1 b1 a1 dist0 dist1 distMean
             double[] l = doublePool.obtain();
             l[0] = x0;
             l[1] = y0;
@@ -169,66 +195,17 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
             l[3] = x1;
             l[4] = y1;
             l[5] = z1;
-            l[6] = r;
-            l[7] = g;
-            l[8] = b;
-            l[9] = a;
-            l[10] = dist0;
-            l[11] = dist1;
-            l[12] = (dist0 + dist1) / 2d;
-            l[13] = widthAngleTan;
+            l[6] = c0;
+            l[7] = c1;
+            l[8] = dist0;
+            l[9] = dist1;
+            l[10] = widthAngleTan;
+            l[11] = (dist0 + dist1) / 2.0;
             provisionalLines.add(l);
         }
     }
 
-    public void addLinePostproc(Line l) {
-        int nPoints = l.points.length;
-        // Check if nPoints more indices fit
-        if (currExt.numVertices + nPoints * 2 - 2 > curr.capacity) {
-            initVertices(meshIdx++);
-        }
-
-        for (int i = 1; i < nPoints; i++) {
-            if (i == 1) {
-                // Line from 0 to 1
-                line.set(l.points[1][0] - l.points[0][0], l.points[1][1] - l.points[0][1], l.points[1][2] - l.points[0][2]);
-            } else if (i == nPoints - 1) {
-                // Line from npoints-1 to npoints
-                line.set(l.points[nPoints - 1][0] - l.points[nPoints - 2][0], l.points[nPoints - 1][1] - l.points[nPoints - 2][1], l.points[nPoints - 1][2] - l.points[nPoints - 2][2]);
-            } else {
-                // Line from i-1 to i+1
-                line.set(l.points[i + 1][0] - l.points[i - 1][0], l.points[i + 1][1] - l.points[i - 1][1], l.points[i + 1][2] - l.points[i - 1][2]);
-            }
-            camdir0.set(l.points[i]);
-            camdir0.crs(line);
-            camdir0.setLength(l.widthAngleTan * l.dists[i] * camera.getFovFactor());
-
-            // P1
-            point.set(l.points[i]).add(camdir0);
-            color(l.r, l.g, l.b, l.a);
-            uv(i / (nPoints - 1), 0);
-            vertex((float) point.x, (float) point.y, (float) point.z);
-
-            // P2
-            point.set(l.points[i]).sub(camdir0);
-            color(l.r, l.g, l.b, l.a);
-            uv(i / (nPoints - 1), 1);
-            vertex((float) point.x, (float) point.y, (float) point.z);
-
-            // Indices
-            if (i > 1) {
-                index((currExt.numVertices - 4));
-                index((currExt.numVertices - 2));
-                index((currExt.numVertices - 3));
-
-                index((currExt.numVertices - 2));
-                index((currExt.numVertices - 1));
-                index((currExt.numVertices - 3));
-            }
-        }
-    }
-
-    public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, double r, double g, double b, double a, double dist0, double dist1, double widthTan) {
+    public void addLinePostproc(double x0, double y0, double z0, double x1, double y1, double z1, float c0, float c1, double dist0, double dist1, double widthTan) {
 
         // Check if 4 more indices fit
         if (currExt.numVertices + 4 >= curr.capacity) {
@@ -252,26 +229,26 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
         camdir0.setLength(width0);
         // P1
         point.set(x0, y0, z0).add(camdir0);
-        color(r, g, b, a);
+        color(c0);
         uv(0, 0);
         vertex((float) point.x, (float) point.y, (float) point.z);
 
         // P2
         point.set(x0, y0, z0).sub(camdir0);
-        color(r, g, b, a);
+        color(c0);
         uv(0, 1);
         vertex((float) point.x, (float) point.y, (float) point.z);
 
         camdir1.setLength(width1);
         // P3
         point.set(x1, y1, z1).add(camdir1);
-        color(r, g, b, a);
+        color(c1);
         uv(1, 0);
         vertex((float) point.x, (float) point.y, (float) point.z);
 
         // P4
         point.set(x1, y1, z1).sub(camdir1);
-        color(r, g, b, a);
+        color(c1);
         uv(1, 1);
         vertex((float) point.x, (float) point.y, (float) point.z);
 
@@ -295,7 +272,7 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
 
-        // Reset
+        // Reset.
         meshIdx = 1;
         currExt = (MeshDataExt) meshes.get(0);
         curr = currExt;
@@ -306,13 +283,10 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
             view.render(this, camera, getAlpha(render));
         });
 
-        // Sort phase
-        provisionalLines.sort(sorter);
+        // Sort phase.
+        //provisionalLines.sort(sorter);
         for (double[] l : provisionalLines)
-            addLinePostproc(l[0], l[1], l[2], l[3], l[4], l[5], l[6], l[7], l[8], l[9], l[10], l[11], l[13]);
-
-        for (Line l : provLines)
-            addLinePostproc(l);
+            addLinePostproc(l[0], l[1], l[2], l[3], l[4], l[5], (float) l[6], (float) l[7], l[8], l[9], l[10]);
 
         ExtShaderProgram shaderProgram = getShaderProgram();
 
@@ -339,20 +313,17 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
             doublePool.free(provisionalLines.get(i));
 
         provisionalLines.clear();
-        provLines.clear();
     }
 
     public void dispose() {
         super.dispose();
         currExt = null;
         provisionalLines.clear();
-        provLines.clear();
         provisionalLines = null;
-        provLines = null;
 
     }
 
-    private class MeshDataExt extends MeshData {
+    private static class MeshDataExt extends MeshData {
         int uvOffset;
         int indexIdx;
         int maxIndices;
@@ -364,17 +335,10 @@ public class LineQuadstripRenderer extends LinePrimitiveRenderer {
         }
     }
 
-    private class Line {
-        public float r, g, b, a;
-        public double widthAngleTan;
-        public double[][] points;
-        public double[] dists;
-    }
-
     /**
      * Pools arrays of double-precision floating point numbers.
      */
-    protected class DoubleArrayPool extends Pool<double[]> {
+    protected static class DoubleArrayPool extends Pool<double[]> {
 
         private final int poolSize;
 

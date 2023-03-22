@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -594,13 +595,22 @@ public class FullGui extends AbstractGui {
             interfaces.add(minimapInterface);
         }
         if (show) {
-            // Add to ui
+            // Add to ui.
             if (!minimapInterface.hasParent() || minimapInterface.getParent() != ui.getRoot()) {
                 ui.addActor(minimapInterface);
+                minimapInterface.addAction(
+                        Actions.sequence(
+                                Actions.alpha(0f),
+                                Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())));
+
             }
         } else {
-            // Remove from ui
-            minimapInterface.remove();
+            // Remove from ui.
+            minimapInterface.addAction(
+                    Actions.sequence(
+                            Actions.alpha(1f),
+                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.run(() -> minimapInterface.remove())));
         }
     }
 

@@ -390,6 +390,8 @@ program:
     theme: dark-green
     # The UI scale factor
     scale: 1.5
+    # UI animation time in milliseconds
+    animationMs: 600
     # Preferred distance units [PC|LY]
     distanceUnits: PC
     # Show mode change pop-up dialogs (panorama, planetarium, stereoscopic, and game modes)

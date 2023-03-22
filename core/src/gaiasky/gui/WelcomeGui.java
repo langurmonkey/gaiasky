@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -67,7 +68,7 @@ public class WelcomeGui extends AbstractGui {
     private final XrLoadStatus vrStatus;
     private final boolean skipWelcome;
     private final WelcomeGuiGamepadListener gamepadListener;
-    protected DatasetManagerWindow ddw;
+    protected DatasetManagerWindow datasetManager;
     private AboutWindow aboutWindow;
     private PreferencesWindow preferencesWindow;
     private FileHandle dataDescriptor;
@@ -669,26 +670,32 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void addDatasetManagerWindow(DataDescriptor dd) {
-        if (ddw == null) {
-            ddw = new DatasetManagerWindow(stage, skin, dd);
-            ddw.setAcceptRunnable(() -> {
-                Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-                savePreferences();
-                reloadView();
+        if (datasetManager == null) {
+            datasetManager = new DatasetManagerWindow(stage, skin, dd);
+            datasetManager.setAcceptRunnable(() -> {
+                if (datasetManager != null) {
+                    // Run with slight delay to wait for hide animation.
+                    datasetManager.addAction(
+                            Actions.delay(0.4f, Actions.run(() -> {
+                                Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
+                                savePreferences();
+                                reloadView();
+                            })));
+                }
             });
         } else {
-            ddw.refresh();
+            datasetManager.refresh();
         }
-        ddw.show(stage);
+        datasetManager.show(stage);
     }
 
     public void clearGui() {
         if (stage != null) {
             stage.clear();
         }
-        if (ddw != null) {
-            ddw.remove();
-            ddw = null;
+        if (datasetManager != null) {
+            datasetManager.remove();
+            datasetManager = null;
         }
         if (preferencesWindow != null) {
             preferencesWindow.remove();

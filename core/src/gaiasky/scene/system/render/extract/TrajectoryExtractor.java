@@ -46,7 +46,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
             var render = Mapper.render.get(entity);
 
             if (!trajectory.onlyBody) {
-                // If there is overflow, return
+                // If there is overflow, return.
                 if (trajectory.body != null && EntityUtils.isCoordinatesTimeOverflow(trajectory.body))
                     return;
 
@@ -63,13 +63,13 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                     RenderGroup rg = Settings.settings.scene.renderer.isQuadLineRenderer() ? RenderGroup.LINE : RenderGroup.LINE_GPU;
 
                     if (trajectory.body == null) {
-                        // There is no body, always render
+                        // There is no body, always render.
                         addToRender(render, rg);
                         added = true;
                     } else {
                         var bodyBody = Mapper.body.get(trajectory.body);
                         if (bodyBody.distToCamera > trajectory.distDown) {
-                            // Body, disappear slowly
+                            // Body, disappear slowly.
                             if (bodyBody.distToCamera < trajectory.distUp)
                                 trajectory.alpha *= MathUtilsDouble.lint(bodyBody.distToCamera, trajectory.distDown / camera.getFovFactor(), trajectory.distUp / camera.getFovFactor(), 0, 1);
                             addToRender(render, rg);
@@ -83,7 +83,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
                     utils.refreshOrbit(trajectory, verts, false);
                 }
             }
-            // Orbital elements renderer
+            // Orbital element renderer.
             if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && renderer.isOn(ComponentType.Asteroids)) {
                 addToRender(render, RenderGroup.ORBITAL_ELEMENTS_PARTICLE);
             }
