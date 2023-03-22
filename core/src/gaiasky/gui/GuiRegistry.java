@@ -727,7 +727,7 @@ public class GuiRegistry implements IObserver {
             IGui gui = guis.get(i);
             if (gui instanceof GamepadGui) {
                 GamepadGui gamepadGui = (GamepadGui) gui;
-                return gamepadGui.removeControllerGui();
+                return gamepadGui.removeGamepadGui();
             }
         }
         return false;

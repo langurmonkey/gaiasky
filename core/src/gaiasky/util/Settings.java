@@ -27,7 +27,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.openvr.VRSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -1466,6 +1465,7 @@ public class Settings {
         public static class UiSettings {
             public String theme;
             public float scale;
+            public long animationMs = 600;
             public boolean modeChangeInfo;
             public DistanceUnits distanceUnits;
 
@@ -1484,6 +1484,11 @@ public class Settings {
             @JsonIgnore
             public boolean isHiDPITheme() {
                 return scale > 1.5;
+            }
+
+            @JsonIgnore
+            public float getAnimationSeconds() {
+                return animationMs / 1000f;
             }
 
             @JsonProperty("distanceUnits")

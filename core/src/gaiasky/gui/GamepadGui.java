@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
@@ -328,9 +329,9 @@ public class GamepadGui extends AbstractGui {
         camT.setSize(w, h);
         CameraManager cm = GaiaSky.instance.getCameraManager();
 
+        final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
         if (!vr) {
             // Camera mode
-            final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
             final int cameraModes = CameraMode.values().length;
             final CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
             for (int i = 0; i < cameraModes; i++) {
@@ -390,7 +391,6 @@ public class GamepadGui extends AbstractGui {
             camT.add(fovSlider).left().padBottom(pad20).row();
         } else {
             // In VR, we show the mode and the current focus, if any.
-            final Label modeLabel = new Label(I18n.msg("gui.camera.mode"), skin, "header-raw");
             cameraModeLabel = new OwnLabel("-", skin, "header");
             camT.add(modeLabel).right().padBottom(pad20).padRight(pad20);
             camT.add(cameraModeLabel).left().padBottom(pad20).row();
@@ -1326,10 +1326,6 @@ public class GamepadGui extends AbstractGui {
         }
     }
 
-    private ScrollPane container(Table t) {
-        return container(t, -1, -1);
-    }
-
     private ScrollPane container(Table t, float w, float h) {
         var c = new OwnScrollPane(t, skin, "minimalist-nobg");
         t.center();
@@ -1373,6 +1369,7 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1401,6 +1398,7 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1513,9 +1511,9 @@ public class GamepadGui extends AbstractGui {
         case SCENE_LOADED -> this.scene = (Scene) data[0];
         case SHOW_CONTROLLER_GUI_ACTION -> {
             if (content.isVisible() && content.hasParent()) {
-                removeControllerGui();
+                removeGamepadGui();
             } else {
-                addControllerGui();
+                addGamepadGui();
             }
         }
         case TOGGLE_VISIBILITY_CMD -> {
@@ -1673,30 +1671,41 @@ public class GamepadGui extends AbstractGui {
         }
     }
 
-    public boolean removeControllerGui() {
+    public boolean removeGamepadGui() {
         // Hide and remove
         if (content.isVisible() && content.hasParent()) {
             searchField.setText("");
-            content.setVisible(false);
-            content.remove();
-            content.clear();
-            stage.setKeyboardFocus(null);
+            content.addAction(
+                    Actions.sequence(
+                            Actions.alpha(1f),
+                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.visible(false),
+                            Actions.run(() -> {
+                                content.remove();
+                                content.clear();
+                                stage.setKeyboardFocus(null);
+                                removeGamepadListener();
+                            })));
 
-            removeGamepadListener();
             return true;
         }
         return false;
     }
 
-    public void addControllerGui() {
+    public void addGamepadGui() {
         // Add and show
         if (!content.isVisible() || !content.hasParent()) {
             rebuildGui();
             stage.addActor(content);
-            content.setVisible(true);
-            updateFocused();
-
-            addGamepadListener();
+            content.addAction(
+                    Actions.sequence(
+                            Actions.visible(true),
+                            Actions.alpha(0f),
+                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.run(() -> {
+                                updateFocused();
+                                addGamepadListener();
+                            })));
 
             // Close all open windows.
             EventManager.publish(Event.CLOSE_ALL_GUI_WINDOWS_CMD, this);

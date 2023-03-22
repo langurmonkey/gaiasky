@@ -28,21 +28,27 @@ import java.time.temporal.ChronoField;
 /**
  * A dialog to pick a date.
  */
-public class DateDialog extends CollapsibleWindow {
-    private final OwnWindow me;
-    private final Stage stage;
+public class DateDialog extends GenericDialog {
 
-    private final OwnTextField day, year, hour, min, sec;
-    private final SelectBox<String> month;
+    private OwnTextField day, year, hour, min, sec;
+    private SelectBox<String> month;
     private final Color defaultColor;
     private final ZoneId timeZone;
 
     public DateDialog(Stage stage, Skin skin) {
-        super(I18n.msg("gui.pickdate"), skin);
-        this.me = this;
-        this.stage = stage;
+        super(I18n.msg("gui.pickdate"), skin, stage);
         this.timeZone = Settings.settings.program.timeZone.getTimeZone();
 
+        setAcceptText(I18n.msg("gui.ok"));
+        setCancelText(I18n.msg("gui.cancel"));
+
+        buildSuper();
+
+        defaultColor = day.getColor().cpy();
+    }
+
+    @Override
+    protected void build() {
         float inputWidth = 96f;
         float pad = 8f;
 
@@ -56,8 +62,8 @@ public class DateDialog extends CollapsibleWindow {
             return false;
         });
         setNow.setSize(388f, 28f);
-        add(setNow).center().colspan(2).padTop(pad).padBottom(pad * 3f);
-        row();
+        content.add(setNow).center().colspan(2).padTop(pad).padBottom(pad * 3f);
+        content.row();
 
         // DAY GROUP
         HorizontalGroup dayGroup = new HorizontalGroup();
@@ -100,9 +106,9 @@ public class DateDialog extends CollapsibleWindow {
         dayGroup.addActor(new OwnLabel("/", skin));
         dayGroup.addActor(year);
 
-        add(new OwnLabel(I18n.msg("gui.time.date") + " (" + I18n.msg("gui.time.date.format") + "):", skin)).pad(pad, pad, 0, pad * 2).right();
-        add(dayGroup).pad(pad, 0, 0, pad);
-        row();
+        content.add(new OwnLabel(I18n.msg("gui.time.date") + " (" + I18n.msg("gui.time.date.format") + "):", skin)).pad(pad, pad, 0, pad * 2).right();
+        content.add(dayGroup).pad(pad, 0, 0, pad);
+        content.row();
 
         // HOUR GROUP
         HorizontalGroup hourGroup = new HorizontalGroup();
@@ -155,63 +161,32 @@ public class DateDialog extends CollapsibleWindow {
         hourGroup.addActor(new OwnLabel(":", skin));
         hourGroup.addActor(sec);
 
-        add(new OwnLabel(I18n.msg("gui.time.time") + " (" + I18n.msg("gui.time.time.format") + "):", skin)).pad(pad, pad, 0, pad * 2).right();
-        add(hourGroup).pad(pad, 0, pad, pad);
-        row();
+        content.add(new OwnLabel(I18n.msg("gui.time.time") + " (" + I18n.msg("gui.time.time.format") + "):", skin)).pad(pad, pad, 0, pad * 2).right();
+        content.add(hourGroup).pad(pad, 0, pad, pad);
+    }
 
-        // BUTTONS
-        HorizontalGroup buttonGroup = new HorizontalGroup();
-        buttonGroup.pad(pad);
-        buttonGroup.space(pad);
-        TextButton ok = new OwnTextButton(I18n.msg("gui.ok"), skin, "default");
-        ok.addListener(event -> {
-            if (event instanceof ChangeEvent) {
+    @Override
+    protected boolean accept() {
+        boolean cool = checkField(day, 1, 31);
+        cool = checkField(year, -100000, 100000) && cool;
+        cool = checkField(hour, 0, 23) && cool;
+        cool = checkField(min, 0, 59) && cool;
+        cool = checkField(sec, 0, 59) && cool;
 
-                boolean cool = checkField(day, 1, 31);
-                cool = checkField(year, -100000, 100000) && cool;
-                cool = checkField(hour, 0, 23) && cool;
-                cool = checkField(min, 0, 59) && cool;
-                cool = checkField(sec, 0, 59) && cool;
+        if (cool) {
+            // Set the date
+            LocalDateTime date = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()), Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
 
-                if (cool) {
-                    // Set the date
-                    LocalDateTime date = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()), Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
+            // Send time change command
+            ZoneOffset offset = LocalDateTime.now().atZone(timeZone).getOffset();
+            EventManager.publish(Event.TIME_CHANGE_CMD, this, date.toInstant(offset));
+        }
+        return true;
+    }
 
-                    // Send time change command
-                    ZoneOffset offset = LocalDateTime.now().atZone(timeZone).getOffset();
-                    EventManager.publish(Event.TIME_CHANGE_CMD, ok, date.toInstant(offset));
+    @Override
+    protected void cancel() {
 
-                    me.remove();
-                }
-
-                return true;
-            }
-
-            return false;
-        });
-        TextButton cancel = new OwnTextButton(I18n.msg("gui.cancel"), skin, "default");
-        cancel.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                me.remove();
-                return true;
-            }
-
-            return false;
-        });
-        buttonGroup.addActor(ok);
-        ok.setSize(112f, 32f);
-        buttonGroup.addActor(cancel);
-        cancel.setSize(112f, 32f);
-        buttonGroup.align(Align.right).space(10);
-
-        add(buttonGroup).colspan(2).pad(pad).bottom().right();
-        getTitleTable().align(Align.left);
-
-        pack();
-
-        defaultColor = day.getColor().cpy();
-
-        this.setPosition(Math.round(stage.getWidth() / 2f - this.getWidth() / 2f), Math.round(stage.getHeight() / 2f - this.getHeight() / 2f));
     }
 
     /**
@@ -258,9 +233,8 @@ public class DateDialog extends CollapsibleWindow {
         this.sec.setText(String.valueOf(sec));
     }
 
-    public void display() {
-        if (!stage.getActors().contains(me, true))
-            stage.addActor(me);
-    }
+    @Override
+    public void dispose() {
 
+    }
 }

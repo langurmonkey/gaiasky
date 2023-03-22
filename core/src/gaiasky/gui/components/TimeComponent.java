@@ -80,7 +80,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
                     dateDialog = new DateDialog(stage, skin);
                 }
                 dateDialog.updateTime(GaiaSky.instance.time.getTime(), timeZone);
-                dateDialog.display();
+                dateDialog.show(stage);
             }
             return false;
         });
