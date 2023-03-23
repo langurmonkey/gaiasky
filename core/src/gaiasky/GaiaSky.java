@@ -611,7 +611,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     var wg = (WelcomeGui) welcomeGui;
                     if (wg.baseDataPresent()) {
                         // Send haptic pulse.
-                        device.sendHapticPulse(xrDriver, 300_000_000L, 150, 1);
+                        device.sendHapticPulse(xrDriver, 200_000_000L, 150, 1);
                         // Start loading.
                         wg.startLoading();
                         return true;

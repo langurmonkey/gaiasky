@@ -117,14 +117,15 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     public void build(Skin skin) {
         if (stage != null) {
             stage.clear();
-            stage.dispose();
+        } else {
+            Viewport vp = new FixedScreenViewport(WIDTH, HEIGHT);
+            stage = new FixedStage(vp, batch, WIDTH, HEIGHT);
         }
 
-        Viewport vp = new FixedScreenViewport(WIDTH, HEIGHT);
-        stage = new FixedStage(vp, batch, WIDTH, HEIGHT);
-
-        gamepadGui = new GamepadGui(skin, Gdx.graphics, 1f, true);
-        gamepadGui.initialize(stage);
+        if (gamepadGui == null) {
+            gamepadGui = new GamepadGui(skin, Gdx.graphics, 1f, true);
+            gamepadGui.initialize(stage);
+        }
         gamepadGui.build();
         Table content = gamepadGui.getContent();
         content.setFillParent(true);
@@ -268,11 +269,15 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
     private void showVRUI(Base base) {
         if (base != null) {
+            gamepadGui.programmaticUpdate();
             gamepadGui.getContent().getColor().a = 0;
             base.visible = true;
             visible = true;
             gamepadGui.getContent().addAction(
-                    Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())
+                    Actions.sequence(
+                            Actions.visible(true),
+                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())
+                    )
             );
             if (!vr) {
                 // Add processor to main input multiplexer.
@@ -285,23 +290,25 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
     private void hideVRUI(Base base) {
         if (base != null) {
-            gamepadGui.getContent().addAction(Actions.sequence(
-                    Actions.alpha(1f),
-                    Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
-                    Actions.run(() -> {
-                        base.visible = false;
-                        visible = false;
-                    })
-            ));
-            for (var device : vrControllers) {
-                device.hitUI = false;
-            }
+            gamepadGui.getContent().getColor().a = 1;
+            gamepadGui.getContent().addAction(
+                    Actions.sequence(
+                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                            Actions.run(() -> {
+                                base.visible = false;
+                                visible = false;
+                                for (var device : vrControllers) {
+                                    device.hitUI = false;
+                                }
+                                // Camera runnable to update the position of the VR UI if necessary.
+                                GaiaSky.instance.scripting().removeRunnable("VRUI-pos-updater");
+                            }),
+                            Actions.visible(false)
+                    ));
             if (!vr) {
                 // Remove processor from main input multiplexer.
                 GaiaSky.instance.inputMultiplexer.removeProcessor(this);
             }
-            // Camera runnable to update the position of the VR UI if necessary.
-            GaiaSky.instance.scripting().removeRunnable("VRUI-pos-updater");
         }
     }
 
@@ -487,9 +494,6 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                     EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, true);
                 }
 
-                // Build UI.
-                build(skin);
-
                 // Position UI.
                 Runnable r = () -> {
                     var base = Mapper.base.get(entity);
@@ -497,6 +501,8 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                     if (base.isVisible()) {
                         hideVRUI(base);
                     } else {
+                        // Build UI.
+                        build(skin);
                         showVRUI(base);
                         // Set position and orientation
                         // ~2 meters in front of the camera, on the equatorial plane.

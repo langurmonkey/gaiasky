@@ -21,6 +21,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
@@ -726,6 +727,14 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
         }
 
+    }
+
+    public void programmaticUpdate() {
+        ICamera camera = GaiaSky.instance.getICamera();
+        notify(Event.CAMERA_MODE_CMD, this, camera.getMode());
+        if (camera.getMode().isFocus()) {
+            notify(Event.FOCUS_CHANGED, this, camera.getFocus());
+        }
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

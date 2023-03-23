@@ -135,7 +135,7 @@ public class OpenXRListener implements XrInputListener, IObserver {
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
                 // Trigger haptic pulse on the device.
-                device.sendHapticPulse(driver, 300_000_000L, 150, 1);
+                device.sendHapticPulse(driver, 200_000_000L, 150, 1);
             }
         } else {
             logger.info("Model corresponding to device not found");

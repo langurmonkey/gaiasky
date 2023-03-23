@@ -15,6 +15,7 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
+import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
@@ -175,6 +176,14 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         }
         default -> {
         }
+        }
+    }
+
+    public void programmaticUpdate() {
+        ICamera camera = GaiaSky.instance.getICamera();
+        notify(Event.CAMERA_MODE_CMD, this, camera.getMode());
+        if (camera.getMode().isFocus()) {
+            notify(Event.FOCUS_CHANGE_CMD, this, camera.getFocus());
         }
     }
 

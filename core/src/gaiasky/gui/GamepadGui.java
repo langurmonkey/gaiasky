@@ -71,7 +71,8 @@ public class GamepadGui extends AbstractGui {
     private OwnTextButton vrInfoButton, searchButton, cameraButton, timeButton, graphicsButton, typesButton, controlsButton, systemButton;
     private OwnTextIconButton button3d, buttonDome, buttonCubemap, buttonOrthosphere, buttonGoHome;
 
-    private TableGuiInterface topLine;
+    private TopInfoInterface topLine;
+    private FocusInfoInterface focusInterface;
     private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
@@ -95,6 +96,7 @@ public class GamepadGui extends AbstractGui {
         this.vr = vrMode;
         model = new ArrayList<>();
         content = new Table(skin);
+        content.setVisible(false);
         menu = new Table(skin);
         tabButtons = new ArrayList<>();
         tabContents = new ArrayList<>();
@@ -211,7 +213,7 @@ public class GamepadGui extends AbstractGui {
             infoT.add(vrInfoT).left().center().padRight(pad30 * 2f);
 
             // Focus info interface
-            var focusInterface = new FocusInfoInterface(skin, vr);
+            focusInterface = new FocusInfoInterface(skin, vr);
             infoT.add(focusInterface).left().center();
 
             tabContents.add(container(infoT, w, h));
@@ -1294,7 +1296,6 @@ public class GamepadGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        rebuildGui();
         stage.setKeyboardFocus(null);
     }
 
@@ -1676,11 +1677,12 @@ public class GamepadGui extends AbstractGui {
         // Add and show
         if (!content.isVisible() || !content.hasParent()) {
             rebuildGui();
+            programmaticUpdate();
             stage.addActor(content);
             content.addAction(
                     Actions.sequence(
-                            Actions.visible(true),
                             Actions.alpha(0f),
+                            Actions.visible(true),
                             Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
                             Actions.run(() -> {
                                 updateFocused();
@@ -1689,6 +1691,15 @@ public class GamepadGui extends AbstractGui {
 
             // Close all open windows.
             EventManager.publish(Event.CLOSE_ALL_GUI_WINDOWS_CMD, this);
+        }
+    }
+
+    public void programmaticUpdate() {
+        if (topLine != null) {
+            topLine.programmaticUpdate();
+        }
+        if (focusInterface != null) {
+            focusInterface.programmaticUpdate();
         }
     }
 
@@ -1839,6 +1850,14 @@ public class GamepadGui extends AbstractGui {
         @Override
         public void rightStickHorizontal(float value) {
             super.rightStickHorizontal(gui.getFocusedActor(), value);
+        }
+    }
+
+    @Override
+    public void resizeImmediate(final int width, final int height) {
+        stage.getViewport().update(width, height, true);
+        if (content.isVisible() && content.hasParent()) {
+            rebuildGui();
         }
     }
 
