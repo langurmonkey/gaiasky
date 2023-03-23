@@ -99,7 +99,7 @@ You can also download the **data packs manually** [here](https://gaia.ari.uni-he
 
 ##  4. Gaia Sky VR
 
-Gaia Sky supports rendering to a VR headset using SteamVR and the OpenVR API. This mode is currently in **alpha** stage, meaning that it is incomplete and may break for some configurations.
+Gaia Sky supports rendering to a VR headset using the OpenXR API. This mode is currently in **beta** stage, meaning that it works rather well, but you may encounter hiccups here and there.
 
 Run Gaia Sky in VR using the `-vr` flag from the CLI, or, on Windows, run the `gaiaskyvr.exe` file.
 
