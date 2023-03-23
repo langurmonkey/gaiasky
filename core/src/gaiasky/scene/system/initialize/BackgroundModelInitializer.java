@@ -14,6 +14,8 @@ import gaiasky.scene.component.Body;
 import gaiasky.scene.component.GraphNode;
 import gaiasky.scene.component.Model;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
+import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.coord.Coordinates;
@@ -110,6 +112,7 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
     private void setUpUVGrid(Entity entity, Body body) {
         var grid = Mapper.grid.get(entity);
         var transform = Mapper.transform.get(entity);
+        var label = Mapper.label.get(entity);
 
         // Initialize transform
         grid.annotTransform.scl(body.size);
@@ -125,5 +128,13 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
                 Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transform.transformName + "()");
             }
         }
+
+        // Label for VR
+        label.label = true;
+        label.textScale = 0.2f;
+        label.labelMax = (float) (.5e-3 / Constants.DISTANCE_SCALE_FACTOR);
+        label.labelFactor = 1;
+        label.renderConsumer = LabelEntityRenderSystem::renderGridAnnotations;
+        label.renderFunction = LabelView::renderTextGridRec;
     }
 }

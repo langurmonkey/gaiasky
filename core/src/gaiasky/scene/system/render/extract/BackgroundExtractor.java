@@ -2,8 +2,10 @@ package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
+import gaiasky.util.Settings;
 
 /**
  * Extracts background model object and UV grid data to feed to the render stage.
@@ -27,7 +29,7 @@ public class BackgroundExtractor extends AbstractExtractSystem {
             if (Mapper.grid.has(entity)) {
                 // UV grid
                 addToRender(render, RenderGroup.MODEL_VERT_GRID);
-                addToRender(render, RenderGroup.FONT_ANNOTATION);
+                addToRender(render, RenderGroup.FONT_LABEL);
             } else {
                 // Regular background model (skybox)
                 var label = Mapper.label.get(entity);

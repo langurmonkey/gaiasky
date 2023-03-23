@@ -696,7 +696,6 @@ public class XrDriver implements Disposable {
         disposing = true;
         sessionRunning = false;
 
-        logger.info(" - OpenXR input.");
         // Input stack.
         disposeInput();
 
@@ -708,30 +707,24 @@ public class XrDriver implements Disposable {
         if (viewConfigs != null)
             viewConfigs.free();
 
-        logger.info(" - OpenXR swapchains.");
         if (swapchains != null)
             for (Swapchain swapchain : swapchains) {
                 xrDestroySwapchain(swapchain.handle);
                 swapchain.images.free();
             }
 
-        logger.info(" - OpenXR appSpace.");
         if (xrAppSpace != null)
             xrDestroySpace(xrAppSpace);
-        logger.info(" - OpenXR debugMessenger.");
         if (xrDebugMessenger != null)
             xrDestroyDebugUtilsMessengerEXT(xrDebugMessenger);
 
-        logger.info(" - OpenXR session.");
         if (xrSession != null)
             xrDestroySession(xrSession);
 
-        logger.info(" - OpenXR instance.");
         if (xrInstance != null)
             xrDestroyInstance(xrInstance);
 
         // Frame buffers.
-        logger.info(" - OpenGL frame buffers.");
         if (viewFrameBuffers != null) {
             for (var frameBuffer : viewFrameBuffers) {
                 frameBuffer.dispose();

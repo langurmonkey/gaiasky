@@ -34,6 +34,7 @@ import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.component.tag.TagNoClosest;

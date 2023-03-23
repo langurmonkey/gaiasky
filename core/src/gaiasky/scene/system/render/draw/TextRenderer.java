@@ -13,7 +13,6 @@ import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
-import gaiasky.scene.system.render.draw.text.AnnotationsEntityRenderSystem;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
@@ -28,7 +27,6 @@ import java.util.List;
 public class TextRenderer extends FontRenderSystem {
 
     private final ExtSpriteBatch batch;
-    private final AnnotationsEntityRenderSystem girdRenderer;
     private final LabelView view;
     public BitmapFont fontDistanceField, font2d, fontTitles;
 
@@ -36,7 +34,6 @@ public class TextRenderer extends FontRenderSystem {
         super(sceneRenderer, rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
 
-        this.girdRenderer = new AnnotationsEntityRenderSystem();
         this.view = new LabelView();
     }
 
@@ -57,14 +54,7 @@ public class TextRenderer extends FontRenderSystem {
 
         int size = renderables.size();
         ExtShaderProgram program = programs[0];
-        if (program == null) {
-            for (IRenderable renderable : renderables) {
-                Render render = (Render) renderable;
-                girdRenderer.render(render, batch, camera, font2d, getAlpha(render.entity));
-            }
-        } else {
-            renderFont3D(renderables, program, camera, alphas[ComponentType.Labels.ordinal()]);
-        }
+        renderFont3D(renderables, program, camera, alphas[ComponentType.Labels.ordinal()]);
         batch.end();
     }
 

@@ -20,6 +20,7 @@ import gaiasky.util.*;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.camera.rec.Keyframe;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -342,6 +343,77 @@ public class LabelEntityRenderSystem {
             float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
             textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
             render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, star.names()[0], starPosition, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), radius, forceLabel);
+        }
+    }
+
+    private static final int divisionsU = 36;
+    private static final int divisionsV = 18;
+
+    public void renderGridAnnotations(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        var entity = view.getEntity();
+        var grid = Mapper.grid.get(entity);
+
+        // Horizon
+        float stepAngle = 360f / divisionsU;
+
+        float distToCamera = 10f;
+        float textSize = Settings.settings.runtime.openXr ? 5f : 0.5e-3f;
+
+        for (int angle = 0; angle < 360; angle += stepAngle) {
+            F31.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0f, distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
+            effectsPos(F31, camera);
+            if (F31.dot(camera.getCamera().direction.nor()) > 0) {
+                D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
+                render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angle(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
+            }
+
+        }
+        // North-south line
+        stepAngle = 180f / divisionsV;
+        for (int angle = -90; angle <= 90; angle += stepAngle) {
+            if (angle != 0) {
+                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
+                effectsPos(F31, camera);
+                if (F31.dot(camera.getCamera().direction.nor()) > 0) {
+                    D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
+                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
+                }
+                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(-angle), -distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
+                effectsPos(F31, camera);
+                if (F31.dot(camera.getCamera().direction.nor()) > 0) {
+                    D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
+                    render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
+                }
+            }
+        }
+    }
+
+    private String angle(int angle) {
+        return angle + "°";
+    }
+
+    private String angleSign(int angle) {
+        return (angle >= 0 ? "+" : "-") + Math.abs(angle) + "°";
+    }
+
+    private void effectsPos(Vector3 auxf, ICamera camera) {
+        relativisticPos(auxf, camera);
+        gravwavePos(auxf);
+    }
+
+    private void relativisticPos(Vector3 auxf, ICamera camera) {
+        if (Settings.settings.runtime.relativisticAberration) {
+            D31.set(auxf);
+            GlobalResources.applyRelativisticAberration(D31, camera);
+            D31.put(auxf);
+        }
+    }
+
+    private void gravwavePos(Vector3 auxf) {
+        if (Settings.settings.runtime.gravitationalWaves) {
+            D31.set(auxf);
+            RelativisticEffectsManager.getInstance().gravitationalWavePos(D31);
+            D31.put(auxf);
         }
     }
 
