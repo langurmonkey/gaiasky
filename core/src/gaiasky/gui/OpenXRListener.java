@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.NaturalCamera;
@@ -23,7 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class OpenXRListener implements XrInputListener {
+public class OpenXRListener implements XrInputListener, IObserver {
     private static final Log logger = Logger.getLogger(OpenXRListener.class);
 
     /** Count-down timer for selection. How long we need to press the trigger pointing at an object for the selection to go through. **/
@@ -32,7 +33,7 @@ public class OpenXRListener implements XrInputListener {
     /** The natural camera. **/
     private final NaturalCamera cam;
     /** The OpenXR driver. **/
-    private final XrDriver driver;
+    private XrDriver driver;
     /** Focus comparator **/
     private final Comparator<Entity> comp;
     /** Aux vectors **/
@@ -46,18 +47,15 @@ public class OpenXRListener implements XrInputListener {
     private long selectingTime = 0;
     private long lastAxisMovedFrame = Long.MIN_VALUE;
 
-    public OpenXRListener(XrDriver driver) {
-        this(driver, null);
-    }
-
-    public OpenXRListener(XrDriver driver, NaturalCamera cam) {
+    public OpenXRListener(NaturalCamera cam) {
         this.cam = cam;
-        this.driver = driver;
         this.comp = new ViewAngleComparator<>();
         this.p0 = new Vector3d();
         this.p1 = new Vector3d();
         selecting = new HashSet<>();
         this.focusView = new FocusView();
+
+        EventManager.instance.subscribe(this, Event.VR_DRIVER_LOADED);
     }
 
     private void lazyInit() {
@@ -137,7 +135,7 @@ public class OpenXRListener implements XrInputListener {
                 EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
                 EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
                 // Trigger haptic pulse on the device.
-                device.sendHapticPulse(driver, 200, 150, 1);
+                device.sendHapticPulse(driver, 300_000_000L, 150, 1);
             }
         } else {
             logger.info("Model corresponding to device not found");
@@ -211,10 +209,12 @@ public class OpenXRListener implements XrInputListener {
         lazyInit();
         Entity sm = xrControllerToModel.get(device);
         var vr = sm != null ? Mapper.vr.get(sm) : null;
-        if (cam.getMode().isFocus()) {
-            cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
-        } else {
-            cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
+        if (vr != null) {
+            if (cam.getMode().isFocus()) {
+                cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
+            } else {
+                cam.setVelocityVR(vr.beamP0, vr.beamP1, valueX, valueY);
+            }
         }
         lastAxisMovedFrame = GaiaSky.instance.frames;
         return false;
@@ -233,5 +233,12 @@ public class OpenXRListener implements XrInputListener {
             stopSelectionCountdown(device);
         }
         return false;
+    }
+
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.VR_DRIVER_LOADED) {
+            this.driver = (XrDriver) data[0];
+        }
     }
 }

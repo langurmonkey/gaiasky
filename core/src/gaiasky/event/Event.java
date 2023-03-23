@@ -1020,6 +1020,8 @@ public enum Event {
     SHOW_VR_UI,
     /** Broadcasts a new VR controller which has just been initialized. **/
     VR_CONTROLLER_INFO,
+    /** Broadcasts the newly created OpenXR driver. **/
+    VR_DRIVER_LOADED,
 
     /** Shows the slave configuration window **/
     SHOW_SLAVE_CONFIG_ACTION,

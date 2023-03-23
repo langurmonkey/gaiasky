@@ -17,7 +17,7 @@ public class HapticsAction extends Action {
     }
 
     public void sendHapticPulse(XrDriver driver, long duration, float frequency, float amplitude) {
-        if(driver != null) {
+        if (driver != null) {
             try (var stack = stackPush()) {
                 // Haptic feedback.
                 XrHapticActionInfo info = XrHapticActionInfo.calloc(stack)

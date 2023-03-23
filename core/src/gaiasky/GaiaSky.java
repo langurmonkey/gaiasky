@@ -78,11 +78,10 @@ import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.time.RealTimeClock;
 import gaiasky.util.tree.OctreeNode;
-import gaiasky.vr.openxr.XrLoadStatus;
 import gaiasky.vr.openxr.XrDriver;
+import gaiasky.vr.openxr.XrLoadStatus;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
-import gaiasky.vr.openxr.input.actions.Action;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;
@@ -580,7 +579,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 @Override
                 public boolean accept(boolean value, XrControllerDevice device) {
                     if (value) {
-                        return proceedToLoading();
+                        return proceedToLoading(device);
                     }
                     return false;
                 }
@@ -588,7 +587,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 @Override
                 public boolean cameraMode(boolean value, XrControllerDevice device) {
                     if (value) {
-                         return proceedToLoading();
+                         return proceedToLoading(device);
                     }
                     return false;
                 }
@@ -608,9 +607,12 @@ public class GaiaSky implements ApplicationListener, IObserver {
                     return false;
                 }
 
-                private boolean proceedToLoading() {
+                private boolean proceedToLoading(XrControllerDevice device) {
                     var wg = (WelcomeGui) welcomeGui;
                     if (wg.baseDataPresent()) {
+                        // Send haptic pulse.
+                        device.sendHapticPulse(xrDriver, 300_000_000L, 150, 1);
+                        // Start loading.
                         wg.startLoading();
                         return true;
                     }
@@ -671,6 +673,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
                 mainVRGui = new MainVRGui(globalResources.getSkin());
                 mainVRGui.initialize(assetManager, globalResources.getSpriteBatch());
                 xrDriver.addListener((MainVRGui) mainVRGui);
+
+                EventManager.publish(Event.VR_DRIVER_LOADED, this, xrDriver);
 
                 return XrLoadStatus.OK;
             } catch (Exception e) {

@@ -322,7 +322,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         ControllerConnectionListener controllerConnectionListener = new ControllerConnectionListener();
         Controllers.addListener(controllerConnectionListener);
         if (vr) {
-            openXRListener = new OpenXRListener(GaiaSky.instance.xrDriver, this);
+            openXRListener = new OpenXRListener(this);
         }
 
         // Shape renderer (pointer guide lines)
