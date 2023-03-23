@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
@@ -34,7 +35,6 @@ import gaiasky.scene.Archetype;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.scene.component.Base;
 import gaiasky.scene.component.VRDevice;
 import gaiasky.scene.component.tag.TagNoClosest;
@@ -268,8 +268,12 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
     private void showVRUI(Base base) {
         if (base != null) {
+            gamepadGui.getContent().getColor().a = 0;
             base.visible = true;
             visible = true;
+            gamepadGui.getContent().addAction(
+                    Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds())
+            );
             if (!vr) {
                 // Add processor to main input multiplexer.
                 GaiaSky.instance.inputMultiplexer.addProcessor(this);
@@ -281,8 +285,14 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
 
     private void hideVRUI(Base base) {
         if (base != null) {
-            base.visible = false;
-            visible = false;
+            gamepadGui.getContent().addAction(Actions.sequence(
+                    Actions.alpha(1f),
+                    Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
+                    Actions.run(() -> {
+                        base.visible = false;
+                        visible = false;
+                    })
+            ));
             for (var device : vrControllers) {
                 device.hitUI = false;
             }
