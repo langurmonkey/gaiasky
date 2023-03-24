@@ -275,7 +275,7 @@ public class JsonLoader extends AbstractSceneLoader {
         processJson(json, (valueClass, value, attribute) -> {
             try {
                 // We can't update the name!
-                if(update && attribute.name.equalsIgnoreCase("name")){
+                if (update && attribute.name.equalsIgnoreCase("name")) {
                     return true;
                 }
                 String key = findAttribute(attribute.name, className);
@@ -285,7 +285,7 @@ public class JsonLoader extends AbstractSceneLoader {
 
                     if (comp != null) {
                         if (update) {
-                            if(!update(attribute, comp, value, valueClass, componentClass)) {
+                            if (!update(attribute, comp, value, valueClass, componentClass)) {
                                 logger.error("Update operation failed (unsupported?) for attribute: " + attribute.name);
                             }
                         } else {
@@ -330,6 +330,7 @@ public class JsonLoader extends AbstractSceneLoader {
      *
      * @param json  The {@link JsonValue} for the object to convert.
      * @param clazz The class of the object.
+     *
      * @return The java object of the given class.
      */
     private Object convertJsonToObject(JsonValue json, Class<?> clazz) throws ReflectionException {
@@ -416,6 +417,7 @@ public class JsonLoader extends AbstractSceneLoader {
      * @param parameterType  The parameter class type.
      * @param source         The class of the source object.
      * @param printException Whether to print an exception if no method is found.
+     *
      * @return The method, if found. Null otherwise.
      */
     private Method searchMethod(String methodName, Class<?> parameterType, Class<?> source, boolean printException) {
@@ -444,6 +446,32 @@ public class JsonLoader extends AbstractSceneLoader {
         case doubleValue -> value = val.asDouble();
         case booleanValue -> value = val.asBoolean();
         case longValue -> value = val.asLong();
+        case array -> {
+            try {
+                value = val.asDoubleArray();
+            } catch (IllegalStateException e1) {
+                try {
+                    value = val.asFloatArray();
+                } catch (IllegalStateException e2) {
+                    try {
+                        value = val.asLongArray();
+                    } catch (IllegalStateException e3) {
+                        try {
+                            value = val.asIntArray();
+                        } catch (IllegalStateException e4) {
+                            try {
+                                value = val.asStringArray();
+                            } catch (IllegalStateException e5) {
+                                try {
+                                    value = val.asCharArray();
+                                } catch (IllegalStateException ignored) {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         default -> {
         }
         }
@@ -475,12 +503,15 @@ public class JsonLoader extends AbstractSceneLoader {
     public Pair<Object, Class> toMultidimDoubleArray(JsonValue attribute) {
         final int dim = depth(attribute) - 1;
         switch (dim) {
-        case 1:
+        case 1 -> {
             return to1DoubleArray(attribute);
-        case 2:
+        }
+        case 2 -> {
             return to2DoubleArray(attribute);
-        case 3:
+        }
+        case 3 -> {
             return to3DoubleArray(attribute);
+        }
         }
         logger.error("Double arrays of dimension " + dim + " not supported: attribute \"" + attribute.name + "\"");
         return null;

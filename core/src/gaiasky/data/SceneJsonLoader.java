@@ -59,6 +59,7 @@ public class SceneJsonLoader {
     }
 
     public synchronized static Array<Entity> loadJsonFile(FileHandle jsonFile, Scene scene) throws ReflectionException, FileNotFoundException {
+        JsonLoader jsonLoader = new JsonLoader();
         Array<Entity> loadedEntities = new Array<>();
         JsonReader jsonReader = new JsonReader();
         JsonValue model = jsonReader.parse(jsonFile.read());
@@ -101,6 +102,11 @@ public class SceneJsonLoader {
                         loader.setDescription(desc);
                     if (params.size() > 0)
                         loader.setParams(params);
+
+                    if (child.has("params")) {
+                        var parameterMap = jsonLoader.convertJsonToMap(child.get("params"));
+                        loader.setParams(parameterMap);
+                    }
 
                     // Init loader.
                     loader.initialize(files, datasetDirectory, scene);

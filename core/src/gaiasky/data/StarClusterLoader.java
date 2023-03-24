@@ -37,6 +37,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,20 @@ public class StarClusterLoader extends AbstractSceneLoader {
     private Archetype archetype;
     private int numLoaded = 0;
 
+    private float[] clusterColor = new float[] { 0.93f, 0.93f, 0.3f, 1f };
+
     private Array<Entity> clusters;
+
+    public void setColor(double[] clusterColor) {
+        this.clusterColor[0] = (float) clusterColor[0];
+        this.clusterColor[1] = (float) clusterColor[1];
+        this.clusterColor[2] = (float) clusterColor[2];
+        if (clusterColor.length > 3) {
+            this.clusterColor[3] = (float) clusterColor[3];
+        } else {
+            this.clusterColor[3] = 1;
+        }
+    }
 
     @Override
     public Array<Entity> loadData() {
@@ -117,7 +131,13 @@ public class StarClusterLoader extends AbstractSceneLoader {
 
     @Override
     public void setParams(Map<String, Object> params) {
-
+        if (params.containsKey("color")) {
+            var col = params.get("color");
+            if (col.getClass().isArray()) {
+                double[] color = (double[]) col;
+                setColor(color);
+            }
+        }
     }
 
     /**
@@ -230,8 +250,8 @@ public class StarClusterLoader extends AbstractSceneLoader {
         var body = Mapper.body.get(entity);
         body.pos = pos;
         body.posSph = new Vector2d(posSph.x, posSph.y);
-        body.setColor(new float[] { 0.93f, 0.93f, 0.3f, 1f });
-        body.setLabelColor(new float[] { 0.93f, 0.93f, 0.3f, 1f });
+        body.setColor(Arrays.copyOf(clusterColor, clusterColor.length));
+        body.setLabelColor(Arrays.copyOf(clusterColor, clusterColor.length));
 
         var pm = Mapper.pm.get(entity);
         pm.pm = pmv.put(new Vector3());
