@@ -76,6 +76,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -3211,6 +3212,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                     var graph = Mapper.graph.get(entity);
                     graph.setParent(Scene.ROOT_NAME);
+                    AtomicInteger numLoaded = new AtomicInteger(-5);
 
                     postRunnable(() -> {
                         // Load data
@@ -3219,34 +3221,42 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         scl.setParentName(dsName);
                         scl.loadData();
                         Array<Entity> clusters = scl.getClusters();
+                        numLoaded.set(clusters.size);
 
-                        // Initialize
-                        scene.initializeEntity(entity);
-                        for (Entity cluster : clusters) {
-                            scene.initializeEntity(cluster);
-                            var cBody = Mapper.body.get(cluster);
-                            cBody.setColor(datasetOptions.particleColor);
-                            cBody.setLabelColor(datasetOptions.labelColor);
+                        if (!clusters.isEmpty()) {
+                            // Initialize.
+                            scene.initializeEntity(entity);
+                            for (Entity cluster : clusters) {
+                                scene.initializeEntity(cluster);
+                                var cBody = Mapper.body.get(cluster);
+                                cBody.setColor(datasetOptions.particleColor);
+                                cBody.setLabelColor(datasetOptions.labelColor);
+                            }
+
+                            // Insert
+                            scene.insert(entity, true);
+                            for (Entity cluster : clusters) {
+                                scene.insert(cluster, true);
+                            }
+
+                            // Finalize
+                            scene.setUpEntity(entity);
+                            for (Entity cluster : clusters) {
+                                scene.setUpEntity(cluster);
+                            }
+
+                            String typeStr = I18n.msg("gui.dsload.clusters.name");
+                            logger.info(I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
                         }
-
-                        // Insert
-                        scene.insert(entity, true);
-                        for (Entity cluster : clusters) {
-                            scene.insert(cluster, true);
-                        }
-
-                        // Finalize
-                        scene.setUpEntity(entity);
-                        for (Entity cluster : clusters) {
-                            scene.setUpEntity(cluster);
-                        }
-
-                        String typeStr = I18n.msg("gui.dsload.clusters.name");
-                        logger.info(I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.msg("notif.catalog.loaded", graph.children.size, typeStr));
                     });
                     // Sync waiting until the node is in the scene graph
                     while (sync && graph.parent == null) {
+                        int loaded = numLoaded.get();
+                        if (loaded == 0) {
+                            // Stop waiting, no objects loaded.
+                            break;
+                        }
                         sleepFrames(1);
                     }
                 }
