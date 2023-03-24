@@ -48,7 +48,7 @@ import java.util.Map;
  * <ul>
  * <li>name: {@link UCDParser#idcolnames}, separate multiple names with '|'</li>
  * <li>ra[deg]: {@link UCDParser#racolnames}</li>
- * <li>dist[pc]: {@link UCDParser#distcolnames}</li>
+ * <li>dist|distance[pc]: {@link UCDParser#distcolnames}</li>
  * <li>pmra[mas/yr]: {@link UCDParser#pmracolnames}</li>
  * <li>pmde[mas/yr]: {@link UCDParser#pmdeccolnames}</li>
  * <li>rv[km/s]: {@link UCDParser#radvelcolnames}</li>
@@ -139,7 +139,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
         Map<ClusterProperties, Integer> indices = parseHeader(table);
 
         if (!checkIndices(indices)) {
-            logger.error("At least 'ra', 'dec', 'pllx'|'dist', 'radius' and 'name' are needed, please check your columns!");
+            logger.error("At least 'ra', 'dec', 'pllx'|'parallax', 'dist'|'distance', 'radius' and 'name' are needed, please check your columns!");
             return;
         }
         RowSequence rs = table.getRowSequence();
@@ -189,34 +189,34 @@ public class StarClusterLoader extends AbstractSceneLoader {
             String[] tokens = line.split(",");
             String[] names = parseName(tokens[indices.get(ClusterProperties.NAME)]);
             double ra = getDouble(tokens, ClusterProperties.RA, indices);
-            double rarad = Math.toRadians(ra);
+            double raRad = Math.toRadians(ra);
             double dec = getDouble(tokens, ClusterProperties.DEC, indices);
-            double decrad = Math.toRadians(dec);
-            double distpc = 0;
+            double decRad = Math.toRadians(dec);
+            double distPc = 0;
             if (indices.containsKey(ClusterProperties.DIST)) {
-                distpc = getDouble(tokens, ClusterProperties.DIST, indices);
+                distPc = getDouble(tokens, ClusterProperties.DIST, indices);
             } else if (indices.containsKey(ClusterProperties.PLLX)) {
-                distpc = 1000d / getDouble(tokens, ClusterProperties.PLLX, indices);
+                distPc = 1000d / getDouble(tokens, ClusterProperties.PLLX, indices);
             }
-            double dist = distpc * Constants.PC_TO_U;
-            double mualphastar = getDouble(tokens, ClusterProperties.PMRA, indices);
-            double mudelta = getDouble(tokens, ClusterProperties.PMDE, indices);
-            double radvel = getDouble(tokens, ClusterProperties.RV, indices);
-            double radius = getDouble(tokens, ClusterProperties.RADIUS, indices);
-            int nstars = getInteger(tokens, ClusterProperties.NSTARS, indices);
+            double distInternal = distPc * Constants.PC_TO_U;
+            double muAlphaStar = getDouble(tokens, ClusterProperties.PMRA, indices);
+            double muDelta = getDouble(tokens, ClusterProperties.PMDE, indices);
+            double radVel = getDouble(tokens, ClusterProperties.RV, indices);
+            double radiusDeg = getDouble(tokens, ClusterProperties.RADIUS, indices);
+            int nStars = getInteger(tokens, ClusterProperties.NSTARS, indices);
 
-            addCluster(names, ra, rarad, dec, decrad, dist, distpc, mualphastar, mudelta, radvel, radius, nstars, list);
+            addCluster(names, ra, raRad, dec, decRad, distInternal, distPc, muAlphaStar, muDelta, radVel, radiusDeg, nStars, list);
         }
 
     }
 
-    private void addCluster(String[] names, double ra, double rarad, double dec, double decrad, double dist, double distpc, double mualphastar, double mudelta, double radvel, double radius, int nstars, Array<Entity> list) {
-        Vector3b pos = Coordinates.sphericalToCartesian(rarad, decrad, new Apfloat(dist, Constants.PREC), new Vector3b());
+    private void addCluster(String[] names, double ra, double raRad, double dec, double decRad, double dist, double distPc, double muAlphaStar, double muDelta, double radVel, double radiusDeg, int nStars, Array<Entity> list) {
+        Vector3b pos = Coordinates.sphericalToCartesian(raRad, decRad, new Apfloat(dist, Constants.PREC), new Vector3b());
 
-        Vector3d pmv = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc, new Vector3d());
+        Vector3d pmv = AstroUtils.properMotionsToCartesian(muAlphaStar, muDelta, radVel, Math.toRadians(ra), Math.toRadians(dec), distPc, new Vector3d());
 
         Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
-        Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);
+        Vector3 pmSph = new Vector3((float) (muAlphaStar), (float) (muDelta), (float) radVel);
 
         // Create cluster archetype
         Entity entity = archetype.createEntity();
@@ -239,8 +239,8 @@ public class StarClusterLoader extends AbstractSceneLoader {
         pm.hasPm = true;
 
         var cluster = Mapper.cluster.get(entity);
-        cluster.raddeg = radius;
-        cluster.numStars = nstars;
+        cluster.radiusDeg = radiusDeg;
+        cluster.numStars = nStars;
         cluster.dist = posSph.z;
 
         list.add(entity);

@@ -18,7 +18,7 @@ public class Cluster implements Component, ICopy {
     public double dist;
 
     // Radius of this cluster in degrees
-    public double raddeg;
+    public double radiusDeg;
 
     // Number of stars of this cluster
     public int numStars;
@@ -35,7 +35,7 @@ public class Cluster implements Component, ICopy {
     public IntModel model;
     public Matrix4 modelTransform;
 
-    public void setNstars(Integer numStars) {
+    public void setNumStars(Integer numStars) {
         this.numStars = numStars;
     }
 
@@ -43,7 +43,7 @@ public class Cluster implements Component, ICopy {
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());
         copy.dist = dist;
-        copy.raddeg = raddeg;
+        copy.radiusDeg = radiusDeg;
         copy.numStars = numStars;
         copy.modelTransform = new Matrix4(modelTransform);
         return copy;

@@ -1498,24 +1498,28 @@ public class GamepadGui extends AbstractGui {
             }
         }
         case TOGGLE_VISIBILITY_CMD -> {
-            String key = (String) data[0];
-            Button b = visibilityButtonMap.get(key);
-            if (b != null && source != b) {
-                b.setProgrammaticChangeEvents(false);
-                if (data.length == 2) {
-                    b.setChecked((Boolean) data[1]);
-                } else {
-                    b.setChecked(!b.isChecked());
+            if (visibilityButtonMap != null) {
+                String key = (String) data[0];
+                Button b = visibilityButtonMap.get(key);
+                if (b != null && source != b) {
+                    b.setProgrammaticChangeEvents(false);
+                    if (data.length == 2) {
+                        b.setChecked((Boolean) data[1]);
+                    } else {
+                        b.setChecked(!b.isChecked());
+                    }
+                    b.setProgrammaticChangeEvents(true);
                 }
-                b.setProgrammaticChangeEvents(true);
             }
         }
         case TIME_STATE_CMD -> {
-            boolean on = (Boolean) data[0];
-            timeStartStop.setProgrammaticChangeEvents(false);
-            timeStartStop.setChecked(on);
-            timeStartStop.setText(on ? "Stop time" : "Start time");
-            timeStartStop.setProgrammaticChangeEvents(true);
+            if (timeStartStop != null) {
+                boolean on = (Boolean) data[0];
+                timeStartStop.setProgrammaticChangeEvents(false);
+                timeStartStop.setChecked(on);
+                timeStartStop.setText(on ? "Stop time" : "Start time");
+                timeStartStop.setProgrammaticChangeEvents(true);
+            }
         }
         case CAMERA_MODE_CMD -> {
             if (cameraMode != null && source != cameraMode && !vr) {
@@ -1606,17 +1610,17 @@ public class GamepadGui extends AbstractGui {
             if (!vr) {
                 final CubemapProjection proj = (CubemapProjection) data[1];
                 final boolean enable = (boolean) data[0];
-                if (proj.isPanorama() && source != buttonCubemap) {
+                if (proj.isPanorama() && source != buttonCubemap && buttonCubemap != null) {
                     buttonCubemap.setProgrammaticChangeEvents(false);
                     buttonCubemap.setChecked(enable);
                     buttonCubemap.setProgrammaticChangeEvents(true);
                     fovSlider.setDisabled(enable);
-                } else if (proj.isPlanetarium() && source != buttonDome) {
+                } else if (proj.isPlanetarium() && source != buttonDome && buttonDome != null) {
                     buttonDome.setProgrammaticChangeEvents(false);
                     buttonDome.setChecked(enable);
                     buttonDome.setProgrammaticChangeEvents(true);
                     fovSlider.setDisabled(enable);
-                } else if (proj.isOrthosphere() && source != buttonOrthosphere) {
+                } else if (proj.isOrthosphere() && source != buttonOrthosphere && buttonOrthosphere != null) {
                     buttonOrthosphere.setProgrammaticChangeEvents(false);
                     buttonOrthosphere.setChecked(enable);
                     buttonOrthosphere.setProgrammaticChangeEvents(true);
