@@ -52,6 +52,7 @@ import java.util.*;
 public class GamepadGui extends AbstractGui {
     private static final Logger.Log logger = Logger.getLogger(GamepadGui.class.getSimpleName());
 
+    private boolean initialized = false;
     private final Table content, menu;
     // Contains a matrix (column major) of actors for each tab
     private final List<Actor[][]> model;
@@ -1212,6 +1213,8 @@ public class GamepadGui extends AbstractGui {
 
         if (scene == null)
             scene = GaiaSky.instance.scene;
+
+        initialized = true;
     }
 
     private void addDeviceTypeInfo(Table table, String name, String text) {
@@ -1350,7 +1353,6 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
-     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1379,7 +1381,6 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
-     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1487,172 +1488,173 @@ public class GamepadGui extends AbstractGui {
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        // Empty by default
-        switch (event) {
-        case SCENE_LOADED -> this.scene = (Scene) data[0];
-        case SHOW_CONTROLLER_GUI_ACTION -> {
-            if (content.isVisible() && content.hasParent()) {
-                removeGamepadGui();
-            } else {
-                addGamepadGui();
-            }
-        }
-        case TOGGLE_VISIBILITY_CMD -> {
-            if (visibilityButtonMap != null) {
-                String key = (String) data[0];
-                Button b = visibilityButtonMap.get(key);
-                if (b != null && source != b) {
-                    b.setProgrammaticChangeEvents(false);
-                    if (data.length == 2) {
-                        b.setChecked((Boolean) data[1]);
-                    } else {
-                        b.setChecked(!b.isChecked());
-                    }
-                    b.setProgrammaticChangeEvents(true);
-                }
-            }
-        }
-        case TIME_STATE_CMD -> {
-            if (timeStartStop != null) {
-                boolean on = (Boolean) data[0];
-                timeStartStop.setProgrammaticChangeEvents(false);
-                timeStartStop.setChecked(on);
-                timeStartStop.setText(on ? "Stop time" : "Start time");
-                timeStartStop.setProgrammaticChangeEvents(true);
-            }
-        }
-        case CAMERA_MODE_CMD -> {
-            if (cameraMode != null && source != cameraMode && !vr) {
-                // Update camera mode selection
-                final var mode = (CameraMode) data[0];
-                var cModes = cameraMode.getItems();
-                CameraComboBoxBean selected = null;
-                for (var cameraModeBean : cModes) {
-                    if (cameraModeBean.mode == mode) {
-                        selected = cameraModeBean;
-                        break;
-                    }
-                }
-                if (selected != null) {
-                    cameraMode.getSelection().setProgrammaticChangeEvents(false);
-                    cameraMode.setSelected(selected);
-                    cameraMode.getSelection().setProgrammaticChangeEvents(true);
-                }
-            } else if (cameraModeLabel != null) {
-                final var mode = (CameraMode) data[0];
-                cameraModeLabel.setText(mode.toStringI18n());
-                if (mode != CameraMode.FOCUS_MODE && cameraFocusLabel != null) {
-                    cameraFocusLabel.setText("-");
-                }
-            }
-        }
-        case FOCUS_CHANGE_CMD -> {
-            if (cameraFocusLabel != null) {
-                String focusName;
-                if (data[0] instanceof String) {
-                    focusName = (String) data[0];
+        if (initialized) {
+            switch (event) {
+            case SCENE_LOADED -> this.scene = (Scene) data[0];
+            case SHOW_CONTROLLER_GUI_ACTION -> {
+                if (content.isVisible() && content.hasParent()) {
+                    removeGamepadGui();
                 } else {
-                    var entity = (Entity) data[0];
-                    view.setEntity(entity);
-                    focusName = view.getLocalizedName();
-                }
-                cameraFocusLabel.setText(focusName);
-            }
-        }
-        case STAR_POINT_SIZE_CMD -> {
-            if (source != pointSize) {
-                hackProgrammaticChangeEvents = false;
-                float newSize = (float) data[0];
-                pointSize.setMappedValue(newSize);
-                hackProgrammaticChangeEvents = true;
-            }
-        }
-        case STAR_BRIGHTNESS_CMD -> {
-            if (source != starBrightness) {
-                Float brightness = (Float) data[0];
-                hackProgrammaticChangeEvents = false;
-                starBrightness.setMappedValue(brightness);
-                hackProgrammaticChangeEvents = true;
-            }
-        }
-        case STAR_BRIGHTNESS_POW_CMD -> {
-            if (source != magnitudeMultiplier) {
-                Float pow = (Float) data[0];
-                hackProgrammaticChangeEvents = false;
-                magnitudeMultiplier.setMappedValue(pow);
-                hackProgrammaticChangeEvents = true;
-            }
-        }
-        case STAR_GLOW_FACTOR_CMD -> {
-            if (source != starGlowFactor) {
-                Float glowFactor = (Float) data[0];
-                hackProgrammaticChangeEvents = false;
-                starGlowFactor.setMappedValue(glowFactor);
-                hackProgrammaticChangeEvents = true;
-            }
-        }
-        case STAR_BASE_LEVEL_CMD -> {
-            if (source != starBaseLevel) {
-                Float baseLevel = (Float) data[0];
-                hackProgrammaticChangeEvents = false;
-                starBaseLevel.setMappedValue(baseLevel);
-                hackProgrammaticChangeEvents = true;
-            }
-        }
-        case STEREOSCOPIC_CMD -> {
-            if (button3d != null && source != button3d && !vr) {
-                button3d.setProgrammaticChangeEvents(false);
-                button3d.setChecked((boolean) data[0]);
-                button3d.setProgrammaticChangeEvents(true);
-            }
-        }
-        case CUBEMAP_CMD -> {
-            if (!vr) {
-                final CubemapProjection proj = (CubemapProjection) data[1];
-                final boolean enable = (boolean) data[0];
-                if (proj.isPanorama() && source != buttonCubemap && buttonCubemap != null) {
-                    buttonCubemap.setProgrammaticChangeEvents(false);
-                    buttonCubemap.setChecked(enable);
-                    buttonCubemap.setProgrammaticChangeEvents(true);
-                    fovSlider.setDisabled(enable);
-                } else if (proj.isPlanetarium() && source != buttonDome && buttonDome != null) {
-                    buttonDome.setProgrammaticChangeEvents(false);
-                    buttonDome.setChecked(enable);
-                    buttonDome.setProgrammaticChangeEvents(true);
-                    fovSlider.setDisabled(enable);
-                } else if (proj.isOrthosphere() && source != buttonOrthosphere && buttonOrthosphere != null) {
-                    buttonOrthosphere.setProgrammaticChangeEvents(false);
-                    buttonOrthosphere.setChecked(enable);
-                    buttonOrthosphere.setProgrammaticChangeEvents(true);
-                    fovSlider.setDisabled(enable);
+                    addGamepadGui();
                 }
             }
-        }
-        case CROSSHAIR_CLOSEST_CMD -> {
-            if (source != this) {
-                crosshairClosest.setProgrammaticChangeEvents(false);
-                crosshairClosest.setChecked((Boolean) data[0]);
-                crosshairClosest.setProgrammaticChangeEvents(true);
+            case TOGGLE_VISIBILITY_CMD -> {
+                if (visibilityButtonMap != null) {
+                    String key = (String) data[0];
+                    Button b = visibilityButtonMap.get(key);
+                    if (b != null && source != b) {
+                        b.setProgrammaticChangeEvents(false);
+                        if (data.length == 2) {
+                            b.setChecked((Boolean) data[1]);
+                        } else {
+                            b.setChecked(!b.isChecked());
+                        }
+                        b.setProgrammaticChangeEvents(true);
+                    }
+                }
             }
-        }
-        case CROSSHAIR_FOCUS_CMD -> {
-            if (source != this) {
-                crosshairFocus.setProgrammaticChangeEvents(false);
-                crosshairFocus.setChecked((Boolean) data[0]);
-                crosshairFocus.setProgrammaticChangeEvents(true);
+            case TIME_STATE_CMD -> {
+                if (timeStartStop != null) {
+                    boolean on = (Boolean) data[0];
+                    timeStartStop.setProgrammaticChangeEvents(false);
+                    timeStartStop.setChecked(on);
+                    timeStartStop.setText(on ? "Stop time" : "Start time");
+                    timeStartStop.setProgrammaticChangeEvents(true);
+                }
             }
+            case CAMERA_MODE_CMD -> {
+                if (cameraMode != null && source != cameraMode && !vr) {
+                    // Update camera mode selection
+                    final var mode = (CameraMode) data[0];
+                    var cModes = cameraMode.getItems();
+                    CameraComboBoxBean selected = null;
+                    for (var cameraModeBean : cModes) {
+                        if (cameraModeBean.mode == mode) {
+                            selected = cameraModeBean;
+                            break;
+                        }
+                    }
+                    if (selected != null) {
+                        cameraMode.getSelection().setProgrammaticChangeEvents(false);
+                        cameraMode.setSelected(selected);
+                        cameraMode.getSelection().setProgrammaticChangeEvents(true);
+                    }
+                } else if (cameraModeLabel != null) {
+                    final var mode = (CameraMode) data[0];
+                    cameraModeLabel.setText(mode.toStringI18n());
+                    if (mode != CameraMode.FOCUS_MODE && cameraFocusLabel != null) {
+                        cameraFocusLabel.setText("-");
+                    }
+                }
+            }
+            case FOCUS_CHANGE_CMD -> {
+                if (cameraFocusLabel != null) {
+                    String focusName;
+                    if (data[0] instanceof String) {
+                        focusName = (String) data[0];
+                    } else {
+                        var entity = (Entity) data[0];
+                        view.setEntity(entity);
+                        focusName = view.getLocalizedName();
+                    }
+                    cameraFocusLabel.setText(focusName);
+                }
+            }
+            case STAR_POINT_SIZE_CMD -> {
+                if (source != pointSize) {
+                    hackProgrammaticChangeEvents = false;
+                    float newSize = (float) data[0];
+                    pointSize.setMappedValue(newSize);
+                    hackProgrammaticChangeEvents = true;
+                }
+            }
+            case STAR_BRIGHTNESS_CMD -> {
+                if (source != starBrightness) {
+                    Float brightness = (Float) data[0];
+                    hackProgrammaticChangeEvents = false;
+                    starBrightness.setMappedValue(brightness);
+                    hackProgrammaticChangeEvents = true;
+                }
+            }
+            case STAR_BRIGHTNESS_POW_CMD -> {
+                if (source != magnitudeMultiplier) {
+                    Float pow = (Float) data[0];
+                    hackProgrammaticChangeEvents = false;
+                    magnitudeMultiplier.setMappedValue(pow);
+                    hackProgrammaticChangeEvents = true;
+                }
+            }
+            case STAR_GLOW_FACTOR_CMD -> {
+                if (source != starGlowFactor) {
+                    Float glowFactor = (Float) data[0];
+                    hackProgrammaticChangeEvents = false;
+                    starGlowFactor.setMappedValue(glowFactor);
+                    hackProgrammaticChangeEvents = true;
+                }
+            }
+            case STAR_BASE_LEVEL_CMD -> {
+                if (source != starBaseLevel && starBaseLevel != null) {
+                    Float baseLevel = (Float) data[0];
+                    hackProgrammaticChangeEvents = false;
+                    starBaseLevel.setMappedValue(baseLevel);
+                    hackProgrammaticChangeEvents = true;
+                }
+            }
+            case STEREOSCOPIC_CMD -> {
+                if (button3d != null && source != button3d && !vr) {
+                    button3d.setProgrammaticChangeEvents(false);
+                    button3d.setChecked((boolean) data[0]);
+                    button3d.setProgrammaticChangeEvents(true);
+                }
+            }
+            case CUBEMAP_CMD -> {
+                if (!vr) {
+                    final CubemapProjection proj = (CubemapProjection) data[1];
+                    final boolean enable = (boolean) data[0];
+                    if (proj.isPanorama() && source != buttonCubemap && buttonCubemap != null) {
+                        buttonCubemap.setProgrammaticChangeEvents(false);
+                        buttonCubemap.setChecked(enable);
+                        buttonCubemap.setProgrammaticChangeEvents(true);
+                        fovSlider.setDisabled(enable);
+                    } else if (proj.isPlanetarium() && source != buttonDome && buttonDome != null) {
+                        buttonDome.setProgrammaticChangeEvents(false);
+                        buttonDome.setChecked(enable);
+                        buttonDome.setProgrammaticChangeEvents(true);
+                        fovSlider.setDisabled(enable);
+                    } else if (proj.isOrthosphere() && source != buttonOrthosphere && buttonOrthosphere != null) {
+                        buttonOrthosphere.setProgrammaticChangeEvents(false);
+                        buttonOrthosphere.setChecked(enable);
+                        buttonOrthosphere.setProgrammaticChangeEvents(true);
+                        fovSlider.setDisabled(enable);
+                    }
+                }
+            }
+            case CROSSHAIR_CLOSEST_CMD -> {
+                if (source != this && crosshairClosest != null) {
+                    crosshairClosest.setProgrammaticChangeEvents(false);
+                    crosshairClosest.setChecked((Boolean) data[0]);
+                    crosshairClosest.setProgrammaticChangeEvents(true);
+                }
+            }
+            case CROSSHAIR_FOCUS_CMD -> {
+                if (source != this && crosshairFocus != null) {
+                    crosshairFocus.setProgrammaticChangeEvents(false);
+                    crosshairFocus.setChecked((Boolean) data[0]);
+                    crosshairFocus.setProgrammaticChangeEvents(true);
+                }
 
-        }
-        case CROSSHAIR_HOME_CMD -> {
-            if (source != this) {
-                crosshairHome.setProgrammaticChangeEvents(false);
-                crosshairHome.setChecked((Boolean) data[0]);
-                crosshairHome.setProgrammaticChangeEvents(true);
             }
+            case CROSSHAIR_HOME_CMD -> {
+                if (source != this && crosshairHome != null) {
+                    crosshairHome.setProgrammaticChangeEvents(false);
+                    crosshairHome.setChecked((Boolean) data[0]);
+                    crosshairHome.setProgrammaticChangeEvents(true);
+                }
 
-        }
-        default -> {
-        }
+            }
+            default -> {
+            }
+            }
         }
     }
 
@@ -1660,17 +1662,12 @@ public class GamepadGui extends AbstractGui {
         // Hide and remove
         if (content.isVisible() && content.hasParent()) {
             searchField.setText("");
-            content.addAction(
-                    Actions.sequence(
-                            Actions.alpha(1f),
-                            Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()),
-                            Actions.visible(false),
-                            Actions.run(() -> {
-                                content.remove();
-                                content.clear();
-                                stage.setKeyboardFocus(null);
-                                removeGamepadListener();
-                            })));
+            content.addAction(Actions.sequence(Actions.alpha(1f), Actions.fadeOut(Settings.settings.program.ui.getAnimationSeconds()), Actions.visible(false), Actions.run(() -> {
+                content.remove();
+                content.clear();
+                stage.setKeyboardFocus(null);
+                removeGamepadListener();
+            })));
 
             return true;
         }
@@ -1683,15 +1680,10 @@ public class GamepadGui extends AbstractGui {
             rebuildGui();
             programmaticUpdate();
             stage.addActor(content);
-            content.addAction(
-                    Actions.sequence(
-                            Actions.alpha(0f),
-                            Actions.visible(true),
-                            Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()),
-                            Actions.run(() -> {
-                                updateFocused();
-                                addGamepadListener();
-                            })));
+            content.addAction(Actions.sequence(Actions.alpha(0f), Actions.visible(true), Actions.fadeIn(Settings.settings.program.ui.getAnimationSeconds()), Actions.run(() -> {
+                updateFocused();
+                addGamepadListener();
+            })));
 
             // Close all open windows.
             EventManager.publish(Event.CLOSE_ALL_GUI_WINDOWS_CMD, this);
