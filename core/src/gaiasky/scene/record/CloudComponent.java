@@ -223,6 +223,7 @@ public class CloudComponent extends NamedComponent implements IObserver, IMateri
     }
 
     private void addSVTAttributes(Material material, VirtualTextureComponent svt, int id) {
+        svt.doneLoading(null);
         // Set ID.
         svt.id = id;
         // Set attributes.
