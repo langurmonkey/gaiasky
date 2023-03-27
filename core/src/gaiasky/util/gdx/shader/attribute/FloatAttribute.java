@@ -38,6 +38,9 @@ public class FloatAttribute extends Attribute {
     public static final String HeightScaleAlias = "heightScale";
     public static final int HeightScale = register(HeightScaleAlias);
 
+    public static final String ElevationMultiplierAlias = "elevationMultiplier";
+    public static final int ElevationMultiplier = register(ElevationMultiplierAlias);
+
     public static final String HeightNoiseSizeAlias = "noiseSize";
     public static final int HeightNoiseSize = register(HeightNoiseSizeAlias);
 

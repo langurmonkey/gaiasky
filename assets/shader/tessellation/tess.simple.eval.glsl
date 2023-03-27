@@ -44,6 +44,7 @@ uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
+uniform float u_elevationMultiplier;
 uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 
@@ -67,7 +68,7 @@ void main(void){
 
     // Use height texture to move vertex along normal
     float h = fetchHeight(o_texCoords).r;
-    vec3 dh = o_normal * h * u_heightScale;
+    vec3 dh = o_normal * h * u_heightScale * u_elevationMultiplier;
     pos += vec4(dh, 0.0);
 
 

@@ -82,6 +82,7 @@ uniform sampler2D u_svtCacheTexture;
 uniform mat4 u_projViewTrans;
 
 uniform float u_heightScale;
+uniform float u_elevationMultiplier;
 uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
 uniform float u_vrScale;
@@ -144,10 +145,8 @@ out float o_fragHeight;
 #elif defined(heightCubemapFlag) || defined(heightTextureFlag) || defined(svtIndirectionHeightTextureFlag)
     // maps the height scale in internal units to a normal strength
     float computeNormalStrength(float heightScale){
-        // to [0,100] km
-        vec2 heightSpanKm = vec2(0.0, 80.0);
-        vec2 span = vec2(0.2, 1.0);
-        heightScale *= u_vrScale * 1e6;
+        vec2 heightSpanKm = vec2(0.0, u_heightScale);
+        vec2 span = vec2(0.1, 1.0);
         heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
         // normalize to [0,1]
         heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
@@ -156,7 +155,7 @@ out float o_fragHeight;
     // Use height texture for normals
     vec3 calcNormal(vec2 p, vec2 dp){
         vec4 h;
-        vec2 size = vec2(computeNormalStrength(u_heightScale), 0.0);
+        vec2 size = vec2(computeNormalStrength(u_heightScale * u_elevationMultiplier), 0.0);
         if (dp.x < 0.0){
             // Generated height using perlin noise
             dp = vec2(3e-4);
@@ -192,7 +191,7 @@ void main(void){
 
     // Use height texture to move vertex along normal
     float h = fetchHeight(o_data.texCoords).r;
-    o_fragHeight = h * u_heightScale;
+    o_fragHeight = h * u_heightScale * u_elevationMultiplier;
     vec3 dh = o_data.normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 

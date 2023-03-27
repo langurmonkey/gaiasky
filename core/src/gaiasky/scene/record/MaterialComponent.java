@@ -454,7 +454,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         if (heightTex != null && material != null) {
             heightSize.set(heightTex.getWidth(), heightTex.getHeight());
             material.set(new TextureAttribute(TextureAttribute.Height, heightTex));
-            material.set(new FloatAttribute(FloatAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
+            material.set(new FloatAttribute(FloatAttribute.HeightScale, heightScale));
+            material.set(new FloatAttribute(FloatAttribute.ElevationMultiplier, (float) Settings.settings.scene.renderer.elevation.multiplier));
             material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
             material.set(new FloatAttribute(FloatAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
         }
@@ -694,6 +695,7 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         heightData = null;
         material.remove(TextureAttribute.Height);
         material.remove(FloatAttribute.HeightScale);
+        material.remove(FloatAttribute.ElevationMultiplier);
         material.remove(Vector2Attribute.HeightSize);
         material.remove(FloatAttribute.HeightNoiseSize);
         material.remove(FloatAttribute.TessQuality);
@@ -1065,7 +1067,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
         case ELEVATION_MULTIPLIER_CMD -> {
             if (this.hasHeight() && this.material != null) {
                 float newMultiplier = (Float) data[0];
-                GaiaSky.postRunnable(() -> this.material.set(new FloatAttribute(FloatAttribute.HeightScale, heightScale * newMultiplier)));
+                GaiaSky.postRunnable(() -> {
+                    this.material.set(new FloatAttribute(FloatAttribute.ElevationMultiplier, newMultiplier));
+                });
             }
         }
         case TESSELLATION_QUALITY_CMD -> {

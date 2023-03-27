@@ -119,8 +119,6 @@ public class TessellationShaderProgram extends ExtShaderProgram {
 
     /**
      * Invalidates all shaders so the next time they are used new handles are generated
-     *
-     * @param app
      */
     public static void invalidateAllShaderPrograms(Application app) {
         if (Gdx.gl == null)
@@ -159,11 +157,6 @@ public class TessellationShaderProgram extends ExtShaderProgram {
 
     /**
      * Loads and compiles the shaders, creates a new program and links the shaders.
-     *
-     * @param vShader
-     * @param tcShader
-     * @param teShader
-     * @param fShader
      */
     private void compileShaders(String vShader, String tcShader, String teShader, String fShader) {
         vertexShaderHandle = loadShader(GL30.GL_VERTEX_SHADER, vShader);

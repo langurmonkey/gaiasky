@@ -71,6 +71,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_normalTexture;
     public final int u_heightTexture;
     public final int u_heightScale;
+    public final int u_elevationMultiplier;
     public final int u_heightNoiseSize;
     public final int u_heightSize;
     public final int u_tessQuality;
@@ -235,6 +236,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
         u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
         u_heightScale = register(Inputs.heightScale, Setters.heightScale);
+        u_elevationMultiplier = register(Inputs.elevationMultiplier, Setters.elevationMultiplier);
         u_heightNoiseSize = register(Inputs.heightNoiseSize, Setters.heightNoiseSize);
         u_heightSize = register(Inputs.heightSize, Setters.heightSize);
         u_tessQuality = register(Inputs.tessQuality, Setters.tessQuality);
@@ -760,6 +762,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
         public final static Uniform heightScale = new Uniform("u_heightScale", FloatAttribute.HeightScale);
+        public final static Uniform elevationMultiplier = new Uniform("u_elevationMultiplier", FloatAttribute.ElevationMultiplier);
         public final static Uniform heightNoiseSize = new Uniform("u_heightNoiseSize", FloatAttribute.HeightNoiseSize);
         public final static Uniform heightSize = new Uniform("u_heightSize", Vector2Attribute.HeightSize);
         public final static Uniform tessQuality = new Uniform("u_tessQuality", FloatAttribute.TessQuality);
@@ -976,6 +979,13 @@ public class DefaultIntShader extends BaseIntShader {
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(FloatAttribute.HeightScale))
                     shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.HeightScale)))).value);
+            }
+        };
+        public final static Setter elevationMultiplier = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(FloatAttribute.ElevationMultiplier))
+                    shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.ElevationMultiplier)))).value);
             }
         };
         public final static Setter heightNoiseSize = new LocalSetter() {
