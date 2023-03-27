@@ -25,8 +25,11 @@ public class MeshUpdater extends AbstractUpdateSystem {
         // Update light with global position
         var mc = model.model;
         if (mc != null) {
-            mc.directional(0).direction.set(1f, 0f, 0f);
-            mc.directional(0).color.set(1f, 1f, 1f, 1f);
+            var directional = mc.directional(0);
+            if (directional != null) {
+                directional.direction.set(1f, 0f, 0f);
+                directional.color.set(1f, 1f, 1f, 1f);
+            }
 
             var body = Mapper.body.get(entity);
             var graph = Mapper.graph.get(entity);

@@ -228,7 +228,7 @@ scene:
       # Elevation type [TESSELLATION|PARALLAX_MAPPING|NONE]
       type: NONE
       # Elevation multiplier, in [0.0, 10.0]
-      multiplier: 2.5
+      multiplier: 0.85
       # Tessellation quality, in [1.0, 7.0]
       quality: 4.0
     # Sparse Virtual Texture global settings

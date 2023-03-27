@@ -401,8 +401,8 @@ public class GuiRegistry implements IObserver {
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().matches("^catalog-[\\w-]+.json$"));
-                fc.setAcceptedFiles("*.vot, *.csv, *.fits, catalog-*.json");
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().equalsIgnoreCase("dataset.json"));
+                fc.setAcceptedFiles("*.vot, *.csv, *.fits, dataset.json");
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.exists(result) && Files.exists(result)) {
