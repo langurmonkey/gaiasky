@@ -6,7 +6,7 @@
 
 // Parameters:
 //   s_vert_pos (vec4) - vertex position
-//   s_obj_pos (vec3) - object position
+//   s_obj_pos (vec3) - object position wrt camera
 //   s_proj_view (mat4) - camera view-projection matrix
 //   s_size (float) - scaling size
 // Returns:

@@ -25,6 +25,11 @@ vec4 draw() {
 void main() {
     fragColor = draw();
 
+    // Add outline
+    //if (v_texCoords.x > 0.99 || v_texCoords.x < 0.01 || v_texCoords.y > 0.99 || v_texCoords.y < 0.01) {
+    //    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    //}
+
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 

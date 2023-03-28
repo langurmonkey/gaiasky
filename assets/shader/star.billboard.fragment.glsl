@@ -53,7 +53,7 @@ float light(float distance_center, float decay) {
 }
 
 
-float average(vec4 color){
+float average(vec4 color) {
     return (color.r + color.g + color.b) / 3.0;
 }
 
@@ -104,6 +104,12 @@ vec4 draw() {
 
 void main() {
     fragColor = draw();
+
+    // Add outline
+    //if (v_uv.x > 0.99 || v_uv.x < 0.01 || v_uv.y > 0.99 || v_uv.y < 0.01) {
+    //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    //}
+
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 

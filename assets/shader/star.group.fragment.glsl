@@ -33,7 +33,7 @@ void main() {
     float profile = starTexture(uv);
     float alpha = v_col.a * profile;
 
-    if(alpha <= 0.0){
+    if (alpha <= 0.0){
         discard;
     }
 
@@ -42,6 +42,11 @@ void main() {
     // Final color
     fragColor = alpha * (v_col + core * 2.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    // Add outline
+    //if (uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
+    //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    //}
 
     #ifdef ssrFlag
     ssrBuffers();

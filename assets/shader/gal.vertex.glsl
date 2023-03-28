@@ -9,7 +9,6 @@ uniform mat4 u_projView;
 uniform vec4 u_color;
 uniform vec3 u_pos;
 uniform float u_size;
-uniform vec3 u_camUp;
 // Distance in u to the star
 uniform float u_distance;
 uniform float u_apparent_angle;
@@ -59,7 +58,6 @@ void main() {
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
     vec3 s_obj_pos = pos;
-    vec3 s_cam_up = u_camUp;
     mat4 s_proj_view = u_projView;
     float s_size = size;
     #include shader/snip_billboard.glsl

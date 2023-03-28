@@ -31,7 +31,7 @@ void main() {
     float profile = starTexture(uv);
     float alpha = v_col.a * profile;
 
-    if(alpha <= 0.0){
+    if (alpha <= 0.0) {
         discard;
     }
 

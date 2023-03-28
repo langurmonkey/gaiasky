@@ -31,7 +31,7 @@ float programmatic(float dist) {
 void main() {
     vec2 uv = v_uv;
     float dist = distance(vec2(0.5), uv) * 2.0;
-    if(dist > 1.0) {
+    if (dist > 1.0) {
         discard;
     }
 
