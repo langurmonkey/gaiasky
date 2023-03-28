@@ -36,19 +36,27 @@
   <launchable type="desktop-id">de.uni_heidelberg.zah.GaiaSky.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <caption>View from the Gaia spacecraft</caption>
+      <caption>Gaia Sky</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00011.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Rendering of Earth's surface, clouds and atmosphere</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00001.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>View of the Gaia spacecraft</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20220303/00000.jpg</image>
     </screenshot>
     <screenshot>
       <caption>Earthrise</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00002.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00009.jpg</image>
     </screenshot>
     <screenshot>
-      <caption>Earth surface</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00003.jpg</image>
+      <caption>Atmospheric scattering of Earth</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00004.jpg</image>
     </screenshot>
     <screenshot>
-      <caption>Black hole</caption>
+      <caption>Black hole with accretion disk</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00014.jpg</image>
     </screenshot>
     <screenshot>
@@ -57,31 +65,39 @@
     </screenshot>
     <screenshot>
       <caption>The inner Solar System</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00006.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00006.jpg</image>
     </screenshot>
     <screenshot>
       <caption>Spacecraft in planetarium mode</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00011.jpg</image>
     </screenshot>
     <screenshot>
-      <caption>Europa and Saturn</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00007.jpg</image>
+      <caption>Io and Saturn</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00008.jpg</image>
     </screenshot>
     <screenshot>
       <caption>Phobos and Mars</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00008.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00005.jpg</image>
     </screenshot>
     <screenshot>
       <caption>Saturn and its moons</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00009.jpg</image>
     </screenshot>
     <screenshot>
-      <caption>Isosurface maps</caption>
+      <caption>Iso-surface maps</caption>
       <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00010.jpg</image>
     </screenshot>
     <screenshot>
-      <caption>The outer Solar System</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00013.jpg</image>
+      <caption>Earth and Moon</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00002.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>A black hole orbiting a star</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00007.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>ESA's Euclid spacecraft</caption>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20230327/00010.jpg</image>
     </screenshot>
     <screenshot>
       <caption>The Milky Way</caption>
