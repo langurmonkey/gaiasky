@@ -347,17 +347,20 @@ public class LabelEntityRenderSystem {
     }
 
     private static final int divisionsU = 36;
-    private static final int divisionsV = 18;
 
     public void renderGridAnnotations(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         var entity = view.getEntity();
         var grid = Mapper.grid.get(entity);
 
         // Horizon
-        float stepAngle = 360f / divisionsU;
+        final float stepAngle = 360f / divisionsU;
 
         float distToCamera = 10f;
         float textSize = Settings.settings.runtime.openXr ? 5f : 0.5e-3f;
+
+        shader.setUniformf("u_viewAngle", 1f);
+        shader.setUniformf("u_viewAnglePow", 1f);
+        shader.setUniformf("u_thLabel", 0f);
 
         for (int angle = 0; angle < 360; angle += stepAngle) {
             F31.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0f, distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
@@ -369,7 +372,6 @@ public class LabelEntityRenderSystem {
 
         }
         // North-south line
-        stepAngle = 180f / divisionsV;
         for (int angle = -90; angle <= 90; angle += stepAngle) {
             if (angle != 0) {
                 F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
