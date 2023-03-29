@@ -1372,7 +1372,7 @@ return true;</property>
       <exclude>
         <entry location="gaiasky.6.gz" />
         <entry location="gs_icon.svg" />
-        <entry location="gaiasky.appdata.xml" />
+        <entry location="de.uni_heidelberg.zah.GaiaSky.metainfo.xml" />
         <entry location="gaiasky-appimage.desktop" />
         <entry location="AppRun" />
         <entry location="gs_icon.png" />

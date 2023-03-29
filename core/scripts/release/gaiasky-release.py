@@ -106,7 +106,7 @@ if __name__ == '__main__':
     # Make sure the version is set wherever it needs to be set
     print("Before running this script:")
     print()
-    print("- Bump up the version number in core/exe/gaiasky.appdata.xml")
+    print("- Bump up the version number in core/exe/de.uni_heidelberg.zah.GaiaSky.metainfo.xml")
     print("- Make sure that $GS/releasenotes.txt exists and is ready, otherwise we will auto-generate it!")
     print()
     input("Press any key to continue, or C-c to quit...")

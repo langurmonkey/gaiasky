@@ -313,7 +313,7 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
                 include(name: "$distName/**")
                 exclude(name: "$distName/AppRun")
                 exclude(name: "$distName/gaiasky-appimage.desktop")
-                exclude(name: "$distName/gaiasky.appdata.xml")
+                exclude(name: "$distName/de.uni_heidelberg.zah.GaiaSky.metainfo.xml")
             }
             tarfileset(dir: "$releasesDir", filemode: '755') {
                 include(name: "$distName/gaiasky")
