@@ -68,8 +68,6 @@ void main() {
     pos.x = ds_add(ds_set(pos.x), pmx).x;
     pos.y = ds_add(ds_set(pos.y), pmy).x;
     pos.z = ds_add(ds_set(pos.z), pmz).x;
-    // Pm for use downstream
-    vec3 pm = vec3(pmx.x, pmy.x, pmz.x);
 
     // Distance to star
     float dist = length(pos);
