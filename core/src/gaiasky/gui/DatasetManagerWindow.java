@@ -943,17 +943,17 @@ public class DatasetManagerWindow extends GenericDialog {
                         logger.error("SHA256 check failed: " + name);
                         errorMsg = "(SHA256 check failed)";
                         errors++;
-                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, 10f);
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, -1f);
                     }
                 } catch (Exception e) {
                     logger.info("Error checking SHA256: " + name);
                     errorMsg = "(SHA256 check failed)";
                     errors++;
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, -1f);
                 }
             } else {
                 logger.info("No digest found for dataset: " + name);
-                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "No digest found for dataset: " + name, 10f);
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "No digest found for dataset: " + name, -1f);
             }
 
             if (errors == 0) {
@@ -984,7 +984,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         successRunnable.run();
                     }
                     resetSelectedDataset();
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.finished", name), 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.finished", name), -1f);
                     Timer.schedule(new Timer.Task() {
                         @Override
                         public void run() {
@@ -997,7 +997,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     setStatusError(dataset, errorMessage);
                     currentDownloads.remove(dataset.key);
                     resetSelectedDataset();
-                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), -1f);
                     Timer.schedule(new Timer.Task() {
                         @Override
                         public void run() {
@@ -1015,7 +1015,7 @@ public class DatasetManagerWindow extends GenericDialog {
             setStatusError(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
-            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), 10f);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.download.failed", name), -1f);
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {

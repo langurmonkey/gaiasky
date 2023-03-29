@@ -2,17 +2,19 @@ package gaiasky.gui;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.util.scene2d.OwnButton;
-import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.i18n.I18n;
+import gaiasky.util.scene2d.*;
 
 public class PopupNotificationsInterface extends TableGuiInterface implements IObserver {
     protected final Table me;
@@ -50,8 +52,7 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
         Table t = new Table(skin);
         t.pad(pad5, pad15, pad5, pad15);
         OwnLabel label = new OwnLabel(message, skin, "big", 60);
-
-        // Add to table
+        // Add to table.
         t.add(label).left().padRight(pad5);
 
         OwnButton notification = new OwnButton(t, skin, "dataset", true);
@@ -62,19 +63,34 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
         notification.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                // Close notification
+                // Close notification.
                 removeNotification(notification);
             }
         });
 
-        // Add to stack
+        if (seconds <= 0) {
+            // Add close button.
+            Button close = new OwnImageButton(skin, "clear");
+            close.setName("quit");
+            close.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    // Close notification.
+                    removeNotification(notification);
+                }
+                return false;
+            });
+            // Add to table.
+            t.add(close).right().top().padLeft(pad15);
+        }
+
+        // Add to stack.
         stack.addActor(notification);
         notification.setColor(notification.getColor().r, notification.getColor().g, notification.getColor().b, 0f);
         notification.addAction(Actions.fadeIn(0.5f));
         stack.pack();
 
+        // Timer to remove notification.
         if (seconds > 0) {
-            // Timer to clear
             Task closeTask = new Task() {
                 @Override
                 public void run() {
