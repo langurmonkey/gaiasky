@@ -47,8 +47,6 @@ public class MetadataBinaryIO {
     /**
      * Reads the metadata into an octree node
      *
-     * @param in
-     *
      * @return The octree node
      */
     public OctreeNode readMetadata(InputStream in) {
@@ -238,9 +236,6 @@ public class MetadataBinaryIO {
     /**
      * Writes the metadata of the given octree node and its descendants to the
      * given output stream in binary.
-     *
-     * @param root
-     * @param out
      */
     public void writeMetadata(OctreeNode root, OutputStream out) {
         List<OctreeNode> nodes = new ArrayList<>();

@@ -409,15 +409,13 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case TIME_STATE_CMD:
+        case TIME_STATE_CMD -> {
             if (source != playStop) {
                 playStop.setCheckedNoFire((Boolean) data[0]);
             }
-            break;
-        case GUI_SCROLL_POSITION_CMD:
-            this.windowScroll.setScrollY((float) data[0]);
-            break;
-        case GUI_FOLD_CMD:
+        }
+        case GUI_SCROLL_POSITION_CMD -> this.windowScroll.setScrollY((float) data[0]);
+        case GUI_FOLD_CMD -> {
             boolean collapse;
             if (data.length >= 1) {
                 collapse = (boolean) data[0];
@@ -430,60 +428,55 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             } else {
                 expand();
             }
-            break;
-        case GUI_MOVE_CMD:
+        }
+        case GUI_MOVE_CMD -> {
             float x = (float) data[0];
             float y = (float) data[1];
             float width = Gdx.graphics.getWidth();
             float height = Gdx.graphics.getHeight();
             float windowWidth = getWidth();
             float windowHeight = getHeight();
-
             x = MathUtilsDouble.clamp(x * width, 0, width - windowWidth);
             y = MathUtilsDouble.clamp(y * height - windowHeight, 0, height - windowHeight);
-
             setPosition(Math.round(x), Math.round(y));
-
-            break;
-        case RECALCULATE_CONTROLS_WINDOW_SIZE:
-            recalculateSize();
-            break;
-        case EXPAND_PANE_CMD:
-            String paneName = (String) data[0];
-            CollapsiblePane pane = panes.get(paneName);
-            pane.expandPane();
-            break;
-        case COLLAPSE_PANE_CMD:
-            paneName = (String) data[0];
-            pane = panes.get(paneName);
-            pane.collapsePane();
-            break;
-        case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
-            paneName = (String) data[0];
-            pane = panes.get(paneName);
-            pane.togglePane();
-            break;
-        case SHOW_MINIMAP_ACTION:
+        }
+        case RECALCULATE_CONTROLS_WINDOW_SIZE -> recalculateSize();
+        case EXPAND_PANE_CMD -> {
+            String paneName1 = (String) data[0];
+            CollapsiblePane pane1 = panes.get(paneName1);
+            pane1.expandPane();
+        }
+        case COLLAPSE_PANE_CMD -> {
+            String paneName2 = (String) data[0];
+            CollapsiblePane pane2 = panes.get(paneName2);
+            pane2.collapsePane();
+        }
+        case TOGGLE_EXPANDCOLLAPSE_PANE_CMD -> {
+            String paneName3 = (String) data[0];
+            CollapsiblePane pane3 = panes.get(paneName3);
+            pane3.togglePane();
+        }
+        case SHOW_MINIMAP_ACTION -> {
             boolean show = (Boolean) data[0];
             if (source != map) {
                 map.setProgrammaticChangeEvents(false);
                 map.setChecked(show);
                 map.setProgrammaticChangeEvents(true);
             }
-            break;
-        case TOGGLE_MINIMAP:
+        }
+        case TOGGLE_MINIMAP -> {
             map.setProgrammaticChangeEvents(false);
             map.setChecked(!map.isChecked());
             map.setProgrammaticChangeEvents(true);
-            break;
-        case RECORD_CAMERA_CMD:
+        }
+        case RECORD_CAMERA_CMD -> {
             boolean state = (Boolean) data[0];
             if (source != recCamera) {
                 recCamera.setCheckedNoFire(state);
             }
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
 
     }
