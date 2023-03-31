@@ -563,6 +563,8 @@ postprocess:
     type: NONE
     # When type=exposure, set the exposure here, in [0,n]
     exposure: 0.0
+  # Upscale filter to use when the back-buffer size is smaller than the screen: [NEAREST|LINEAR|XBRZ]
+  upscaleFilter: LINEAR
 
 #
 # Spacecraft configuration
