@@ -117,7 +117,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         // First init spacecraft if needed
         if (isSpacecraft) {
-            initializeSpacecraft(entity, base, body, graph, model, scaffolding, engine);
+            initializeSpacecraft(entity, base, body, graph, model, scaffolding, engine, label);
         }
 
         // Initialize model body
@@ -200,7 +200,8 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    private void initializeSpacecraft(Entity entity, Base base, Body body, GraphNode graph, Model model, ModelScaffolding scaffolding, MotorEngine engine) {
+    private void initializeSpacecraft(Entity entity, Base base, Body body, GraphNode graph, Model model, ModelScaffolding scaffolding, MotorEngine engine, Label label) {
+
         // Model renderer.
         model.renderConsumer = ModelEntityRenderSystem::renderSpacecraft;
 
@@ -248,7 +249,10 @@ public class ModelInitializer extends AbstractInitSystem {
         var coord = Mapper.coordinates.get(entity);
         coord.coordinates = scc;
 
-        var label = Mapper.label.get(entity);
+        // No label.
+        label.label = false;
+        label.labelMax = 0;
+        label.renderConsumer = null;
         label.labelFactor = 0;
     }
 

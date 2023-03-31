@@ -43,25 +43,25 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     private final SpacecraftMouseKbdListener spacecraftMouseKbdListener;
     private final Vector3d aux1, aux2;
     private final Vector3b aux1b;
-    private final Vector3b todesired;
+    private final Vector3b toDesired;
     private final Vector3b desired;
-    private final Vector3d scthrust;
+    private final Vector3d scThrust;
 
     /*
      * Controller listener
      **/
     //private SpacecraftControllerListener controllerListener;
-    private final Vector3d scforce;
-    private final Vector3d scaccel;
-    private final Vector3d scvel;
-    private final Vector3d scdir;
-    private final Vector3d scup;
-    private final Pair<Vector3d, Vector3d> dirup;
+    private final Vector3d scForce;
+    private final Vector3d scAccel;
+    private final Vector3d scVel;
+    private final Vector3d scDir;
+    private final Vector3d scUp;
+    private final Pair<Vector3d, Vector3d> dirUp;
     /**
      * Direction and up vectors.
      **/
     public Vector3d direction, up;
-    public Vector3b relpos;
+    public Vector3b relPos;
     private Entity sc;
     private SpacecraftView view;
     /**
@@ -82,21 +82,21 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // Vectors
         direction = new Vector3d(1, 0, 0);
         up = new Vector3d(0, 1, 0);
-        relpos = new Vector3b();
-        todesired = new Vector3b();
+        relPos = new Vector3b();
+        toDesired = new Vector3b();
         desired = new Vector3b();
         aux1 = new Vector3d();
         aux2 = new Vector3d();
         aux1b = new Vector3b();
-        scthrust = new Vector3d();
-        scforce = new Vector3d();
-        scaccel = new Vector3d();
-        scvel = new Vector3d();
+        scThrust = new Vector3d();
+        scForce = new Vector3d();
+        scAccel = new Vector3d();
+        scVel = new Vector3d();
         scpos = new Vector3b();
-        scdir = new Vector3d();
-        scup = new Vector3d();
+        scDir = new Vector3d();
+        scUp = new Vector3d();
 
-        dirup = new Pair<>(scdir, scup);
+        dirUp = new Pair<>(scDir, scUp);
 
         view = new SpacecraftView();
         secondClosest = new FocusView();
@@ -107,12 +107,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
 
-        // init cameras vector
+        // Init cameras vector.
         cameras = new PerspectiveCamera[] { camera, camLeft, camRight };
 
-        // init gui camera
         /*
-         * Camera to render the attitude indicator system
+         * Camera to render the attitude indicator system.
          **/
         PerspectiveCamera guiCam = new PerspectiveCamera(30, 300, 300);
         guiCam.near = (float) CAM_NEAR;
@@ -190,15 +189,15 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // We use the simulation time for the integration
         //double sdt = time.getDt() * Constants.H_TO_S;
 
-        scthrust.set(view.thrust());
-        scforce.set(view.force());
-        scaccel.set(view.accel());
-        scvel.set(view.vel());
+        scThrust.set(view.thrust());
+        scForce.set(view.force());
+        scAccel.set(view.accel());
+        scVel.set(view.vel());
         scpos.set(view.pos());
-        scpos = ((SpacecraftCoordinates) view.getCoordinates()).computePosition(dt, secondClosest, view.currentEnginePower(), scthrust, view.direction(), scforce, scaccel, scvel, scpos);
-        scdir.set(view.direction());
-        scup.set(view.up());
-        view.computeDirectionUp(dt, dirup);
+        scpos = ((SpacecraftCoordinates) view.getCoordinates()).computePosition(dt, secondClosest, view.currentEnginePower(), scThrust, view.direction(), scForce, scAccel, scVel, scpos);
+        scDir.set(view.direction());
+        scUp.set(view.up());
+        view.computeDirectionUp(dt, dirUp);
 
         /* ACTUAL UPDATE */
         updateHard(dt);
@@ -210,25 +209,25 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         updatePerspectiveCamera();
 
         // Broadcast nearest info
-        String clname = null;
-        double cldist = -1d;
+        String closestName = null;
+        double closestDistance = -1d;
         if (closestStar != null) {
             double closestStarDist = closestStar.getClosestDistToCamera();
             String closestStarName = closestStar.getClosestName();
             if (secondClosest != null) {
                 if (secondClosest.getDistToCamera() < closestStarDist) {
-                    clname = secondClosest.getName();
-                    cldist = secondClosest.getDistToCamera();
+                    closestName = secondClosest.getName();
+                    closestDistance = secondClosest.getDistToCamera();
                 } else {
-                    clname = closestStarName;
-                    cldist = closestStarDist;
+                    closestName = closestStarName;
+                    closestDistance = closestStarDist;
                 }
             } else {
-                clname = closestStarName;
-                cldist = closestStarDist;
+                closestName = closestStarName;
+                closestDistance = closestStarDist;
             }
         }
-        EventManager.publish(Event.SPACECRAFT_NEAREST_INFO, this, clname, cldist);
+        EventManager.publish(Event.SPACECRAFT_NEAREST_INFO, this, closestName, closestDistance);
 
     }
 
@@ -239,25 +238,25 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         if (sc != null) {
             // POSITION
             double tDistOverFov = targetDistance / fovFactor;
-            desired.set(scdir).nor().scl(-tDistOverFov);
-            aux1b.set(scup).nor().scl(tDistOverFov * 0.125d);
+            desired.set(scDir).nor().scl(-tDistOverFov);
+            aux1b.set(scUp).nor().scl(tDistOverFov * 0.125d);
             desired.add(aux1b);
-            todesired.set(desired).sub(relpos);
-            todesired.scl(dt * view.getResponsiveness()).scl(3e-6d);
-            relpos.add(todesired);
-            pos.set(scpos).add(relpos);
+            toDesired.set(desired).sub(relPos);
+            toDesired.scl(dt * view.getResponsiveness()).scl(1e-6d);
+            relPos.add(toDesired);
+            pos.set(scpos).add(relPos);
 
             // DIRECTION
-            aux1.set(scup).nor().scl(targetDistance);
-            aux2.set(scdir).nor().scl(tDistOverFov * 50d).add(aux1);
+            aux1.set(scUp).nor().scl(targetDistance);
+            aux2.set(scDir).nor().scl(tDistOverFov * 50d).add(aux1);
             aux1b.set(scpos).add(aux2).sub(pos).nor();
             aux1b.put(direction);
 
             // UP
-            desired.set(scup);
-            todesired.set(desired).sub(up);
-            todesired.scl(dt * view.getResponsiveness()).scl(1e-8d);
-            up.add(todesired).nor();
+            desired.set(scUp);
+            toDesired.set(desired).sub(up);
+            toDesired.scl(dt * view.getResponsiveness()).scl(1e-8d);
+            up.add(toDesired).nor();
         }
     }
 
@@ -356,25 +355,19 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case SPACECRAFT_LOADED:
+        case SPACECRAFT_LOADED -> {
             sc = (Entity) data[0];
             view.setEntity(sc);
             updateTargetDistance();
-            break;
-        case SPACECRAFT_MACHINE_SELECTION_INFO:
-            updateTargetDistance();
-            break;
-        default:
-            break;
+        }
+        case SPACECRAFT_MACHINE_SELECTION_INFO -> updateTargetDistance();
+        default -> {
+        }
         }
     }
 
     private void updateTargetDistance() {
         this.targetDistance = view.size() * 3.5;
-    }
-
-    @Override
-    public void render(int rw, int rh) {
     }
 
     @Override
@@ -410,12 +403,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public Vector3d getVelocity() {
-        return scvel;
+        return scVel;
     }
 
     @Override
     public double speedScaling() {
-        return Math.max(0.001, scvel.len());
+        return Math.max(0.001, scVel.len());
     }
 
 }
