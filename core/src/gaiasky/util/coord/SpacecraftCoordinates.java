@@ -6,6 +6,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.ISpacecraft;
+import gaiasky.scene.view.FocusView;
+import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -132,7 +134,10 @@ public class SpacecraftCoordinates implements IBodyCoordinates {
         Vector3b pos = posb.put(B34);
         // Check collision!
         IFocus me = GaiaSky.instance.getICamera().getClosestBody();
-        if (closest != null && !closest.isEmpty() && closest != spacecraft) {
+        if (closest != null && !closest.isEmpty()
+                && (closest instanceof FocusView && spacecraft instanceof SpacecraftView &&
+                ((FocusView) closest).getEntity() != ((SpacecraftView) spacecraft).getEntity())) {
+
             double twoRadii = closest.getRadius() + me.getRadius();
             // d1 is the new distance to the centre of the object
             if (!vel.isZero() && IntersectorDouble.distanceSegmentPoint(pos.put(D31), newPosition.put(D32), closest.getPos().put(D33)) < twoRadii) {
