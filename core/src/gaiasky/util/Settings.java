@@ -4,6 +4,8 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
@@ -349,6 +351,19 @@ public class Settings {
                 return 40;
             }
             return 20;
+        }
+    }
+
+    public enum UpscaleFilter {
+        NEAREST(TextureFilter.Nearest, TextureFilter.Nearest),
+        LINEAR(TextureFilter.Linear, TextureFilter.Linear),
+        XBRZ(TextureFilter.Nearest, TextureFilter.Nearest);
+
+        public TextureFilter minification, magnification;
+
+        UpscaleFilter(TextureFilter min, TextureFilter mag) {
+           this.minification = min;
+           this.magnification = mag;
         }
     }
 
@@ -1900,15 +1915,23 @@ public class Settings {
         public SSRSettings ssr;
         public MotionBlurSettings motionBlur;
         public ReprojectionSettings reprojection;
+        public UpscaleFilter upscaleFilter = UpscaleFilter.NEAREST;
 
         public PostprocessSettings() {
-            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);
+            EventManager.instance.subscribe(this,
+                    Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD,
+                    Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
+                    Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD,
+                    Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
             antialias = Antialias.valueOf(antialiasString.toUpperCase());
         }
 
+        public void setUpscaleFilter(final String upscaleFilterString) {
+            upscaleFilter = UpscaleFilter.valueOf(upscaleFilterString.toUpperCase());
+        }
         public Antialias getAntialias(int code) {
             return switch (code) {
                 case -1 -> Antialias.FXAA;
@@ -1946,6 +1969,7 @@ public class Settings {
                 toneMapping.type = newTM;
             }
             case EXPOSURE_CMD -> toneMapping.exposure = MathUtilsDouble.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+            case UPSCALE_FILTER_CMD -> upscaleFilter = (UpscaleFilter) data[0];
             default -> {
             }
             }

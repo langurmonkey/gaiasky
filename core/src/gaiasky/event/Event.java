@@ -1485,6 +1485,9 @@ public enum Event {
     SVT_MATERIAL_INFO,
 
     /** Set cache size **/
-    SVT_CACHE_SIZE_CMD;
+    SVT_CACHE_SIZE_CMD,
+
+    /** Set the new upscale filter. Contains the new {@link UpscaleFilter} object. **/
+    UPSCALE_FILTER_CMD;
 
 }

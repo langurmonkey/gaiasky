@@ -20,12 +20,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.api.IPostProcessor.RenderType;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.gdx.contrib.utils.ItemsManager;
@@ -54,9 +57,9 @@ public final class PostProcessor implements Disposable {
     private final Array<PostProcessorEffect> enabledEffects = new Array<>(5);
     private TextureWrap compositeWrapU;
     private TextureWrap compositeWrapV;
+    private TextureFilter compositeMinFilter, compositeMagFilter;
     private int clearBits = GL20.GL_COLOR_BUFFER_BIT;
     private float clearDepth = 1f;
-    private boolean hasViewport = false;
     private boolean enabled;
     private boolean capturing;
     private boolean hasCaptured;
@@ -93,6 +96,10 @@ public final class PostProcessor implements Disposable {
 
         composite = newPingPongBuffer(fboWidth, fboHeight, pixmapFormat, useDepth, hasVelocity, hasNormal, hasReflectionMask, preventFloatBuffer);
         setBufferTextureWrap(u, v);
+        if (rt == RenderType.screen) {
+            Settings.UpscaleFilter upscaleFilter = Settings.settings.postprocess.upscaleFilter;
+            setBufferTextureFilter(upscaleFilter.minification, upscaleFilter.magnification);
+        }
 
         pipelineState = new PipelineState();
 
@@ -159,8 +166,7 @@ public final class PostProcessor implements Disposable {
      * restoreViewport static method.
      */
     public void setViewport(Rectangle viewport) {
-        hasViewport = (this.viewport != null);
-        if (hasViewport && viewport != null) {
+        if (viewport != null) {
             this.viewport.set(viewport);
         }
     }
@@ -262,6 +268,13 @@ public final class PostProcessor implements Disposable {
         clearDepth = depth;
     }
 
+    public void setBufferTextureFilter(TextureFilter minFilter, TextureFilter magFilter) {
+        compositeMinFilter = minFilter;
+        compositeMagFilter = magFilter;
+        composite.texture1.setFilter(minFilter, magFilter);
+        composite.texture2.setFilter(minFilter, magFilter);
+    }
+
     public void setBufferTextureWrap(TextureWrap u, TextureWrap v) {
         compositeWrapU = u;
         compositeWrapV = v;
@@ -354,8 +367,12 @@ public final class PostProcessor implements Disposable {
 
     /** Regenerates and/or rebinds owned resources when needed, eg. when the OpenGL context is lost. */
     public void rebind() {
+        // Wrap.
         composite.texture1.setWrap(compositeWrapU, compositeWrapV);
         composite.texture2.setWrap(compositeWrapU, compositeWrapV);
+        // Filter.
+        composite.texture1.setFilter(compositeMinFilter, compositeMagFilter);
+        composite.texture2.setFilter(compositeMinFilter, compositeMagFilter);
 
         for (int i = 0; i < buffers.size; i++) {
             buffers.get(i).rebind();
@@ -434,8 +451,8 @@ public final class PostProcessor implements Disposable {
     }
 
     /** Restores the previously set viewport if one was specified earlier and the destination buffer is the screen */
-    protected void restoreViewport(FrameBuffer dest) {
-        if (hasViewport && dest == null) {
+    void restoreViewport(FrameBuffer dest) {
+        if (dest == null) {
             Gdx.gl.glViewport((int) viewport.x, (int) viewport.y, (int) viewport.width, (int) viewport.height);
         }
     }

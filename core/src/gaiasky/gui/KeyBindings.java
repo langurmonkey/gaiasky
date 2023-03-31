@@ -10,9 +10,11 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.MainPostProcessor;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.UpscaleFilter;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
@@ -44,6 +46,7 @@ public class KeyBindings {
     private final Map<String, ProgramAction> actions;
     private final Map<TreeSet<Integer>, ProgramAction> mappings;
     private final Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
+
     /**
      * Creates a key mappings instance.
      */
@@ -432,6 +435,14 @@ public class KeyBindings {
 
         // Controller GUI
         addAction(new ProgramAction("action.controller.gui.in", () -> EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this)));
+
+        // Debug upscale filter
+        addAction(new ProgramAction("action.upscale", () -> {
+            var filter = Settings.settings.postprocess.upscaleFilter;
+            var newFilter = UpscaleFilter.values()[(filter.ordinal() + 1) % UpscaleFilter.values().length];
+            EventManager.publish(Event.UPSCALE_FILTER_CMD, this, newFilter);
+            logger.info("Upscaling filter: " + newFilter);
+        }));
     }
 
     private void initMappings() {

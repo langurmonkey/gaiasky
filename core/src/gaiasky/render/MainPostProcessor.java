@@ -46,7 +46,6 @@ import gaiasky.util.math.Vector3b;
 
 import java.nio.file.Path;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,7 +119,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED, Event.INDEXOFREFRACTION_CMD);
+        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED, Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -246,7 +245,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             };
             Timer.schedule(enableLG, 5);
         }
-
         // LENS FLARE
         LensFlareSettings lensSettings = settings.postprocess.lensFlare;
         Texture lensColor = manager.get(lensColorName);
@@ -328,6 +326,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             geometryWarp.setEnabled(true);
             ppb.set(geometryWarp);
 
+        }
+
+        // UPSCALE (only screen, last effect in chain!)
+        if (rt == RenderType.screen) {
+            XBRZ upscaleFilter = new XBRZ();
+            ppb.set(upscaleFilter);
+            updateUpscaleFilter(settings.postprocess.upscaleFilter, settings.graphics.backBufferScale, upscaleFilter, ppb);
         }
 
         return ppb;
@@ -520,14 +525,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     @Override
     public void notify(Event event, Object source, final Object... data) {
         switch (event) {
-        case SCENE_LOADED:
+        case SCENE_LOADED -> {
             this.scene = (Scene) data[0];
             initializeOffscreenPostProcessors();
-            break;
-        case RAYMARCHING_CMD:
-            String name = (String) data[0];
-            boolean status = (Boolean) data[1];
-            Entity entity = (Entity) data[2];
+        }
+        case RAYMARCHING_CMD -> {
+            var name = (String) data[0];
+            var status = (Boolean) data[1];
+            var entity = (Entity) data[2];
             if (data.length > 3) {
                 // Add effect description for later initialization.
                 String shader = (String) data[3];
@@ -547,10 +552,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            break;
-        case RAYMARCHING_ADDITIONAL_CMD:
-            name = (String) data[0];
-            float[] additional = (float[]) data[1];
+        }
+        case RAYMARCHING_ADDITIONAL_CMD -> {
+            var name = (String) data[0];
+            var additional = (float[]) data[1];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -563,9 +568,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            break;
-        case STAR_BRIGHTNESS_CMD:
-            float brightness = (Float) data[0];
+        }
+        case STAR_BRIGHTNESS_CMD -> {
+            var brightness = (Float) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -578,9 +583,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-            break;
-        case STAR_GLOW_FACTOR_CMD:
-            float glowFactor = (Float) data[0];
+        }
+        case STAR_GLOW_FACTOR_CMD -> {
+            var glowFactor = (Float) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -592,9 +597,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-            break;
-        case STAR_POINT_SIZE_CMD:
-            float size = (Float) data[0];
+        }
+        case STAR_POINT_SIZE_CMD -> {
+            var size = (Float) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -607,13 +612,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-            break;
-        case LIGHT_POS_2D_UPDATE:
-            Integer nLights = (Integer) data[0];
-            float[] lightPos = (float[]) data[1];
-            float[] angles = (float[]) data[2];
-            float[] colors = (float[]) data[3];
-            Texture prePass = (Texture) data[4];
+        }
+        case LIGHT_POS_2D_UPDATE -> {
+            var nLights = (Integer) data[0];
+            var lightPos = (float[]) data[1];
+            var angles = (float[]) data[2];
+            var colors = (float[]) data[3];
+            var prePass = (Texture) data[4];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -627,21 +632,21 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            break;
-        case LIGHT_GLOW_CMD:
-            boolean active = (Boolean) data[0];
+        }
+        case LIGHT_GLOW_CMD -> {
+            var lightGlowActive = (Boolean) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                     if (lightglow != null) {
-                        lightglow.setEnabled(active);
+                        lightglow.setEnabled(lightGlowActive);
                     }
                 }
             }
-            break;
-        case FOV_CHANGE_NOTIFICATION:
-            float newFov = (Float) data[0];
+        }
+        case FOV_CHANGE_NOTIFICATION -> {
+            var newFov = (Float) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -657,11 +662,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-            break;
-        case SCREENSHOT_SIZE_UPDATE:
+        }
+        case SCREENSHOT_SIZE_UPDATE -> {
             if (pps != null && Settings.settings.screenshot.isAdvancedMode()) {
-                int newWidth = (Integer) data[0];
-                int newHeight = (Integer) data[1];
+                var newWidth = (Integer) data[0];
+                var newHeight = (Integer) data[1];
                 if (pps[RenderType.screenshot.index] != null) {
                     if (changed(pps[RenderType.screenshot.index].pp, newWidth, newHeight)) {
                         GaiaSky.postRunnable(() -> replace(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight));
@@ -670,11 +675,11 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight, manager);
                 }
             }
-            break;
-        case FRAME_SIZE_UPDATE:
+        }
+        case FRAME_SIZE_UPDATE -> {
             if (pps != null && Settings.settings.frame.isAdvancedMode()) {
-                int newWidth = (Integer) data[0];
-                int newHeight = (Integer) data[1];
+                var newWidth = (Integer) data[0];
+                var newHeight = (Integer) data[1];
                 if (pps[RenderType.frame.index] != null) {
                     if (changed(pps[RenderType.frame.index].pp, newWidth, newHeight)) {
                         GaiaSky.postRunnable(() -> {
@@ -687,37 +692,33 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     });
                 }
             }
-            break;
-        case BLOOM_CMD:
-            GaiaSky.postRunnable(() -> {
-                float intensity = (float) data[0];
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        Bloom bloom = (Bloom) ppb.get(Bloom.class);
-                        bloom.setBloomIntesnity(intensity);
-                        bloom.setEnabled(intensity > 0);
-                    }
+        }
+        case BLOOM_CMD -> GaiaSky.postRunnable(() -> {
+            var intensity = (float) data[0];
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    Bloom bloom = (Bloom) ppb.get(Bloom.class);
+                    bloom.setBloomIntesnity(intensity);
+                    bloom.setEnabled(intensity > 0);
                 }
-            });
-            break;
-        case UNSHARP_MASK_CMD:
-            GaiaSky.postRunnable(() -> {
-                float sharpenFactor = (float) data[0];
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        UnsharpMask unsharp = (UnsharpMask) ppb.get(UnsharpMask.class);
-                        unsharp.setSharpenFactor(sharpenFactor);
-                        unsharp.setEnabled(sharpenFactor > 0);
-                    }
+            }
+        });
+        case UNSHARP_MASK_CMD -> GaiaSky.postRunnable(() -> {
+            var sharpenFactor = (float) data[0];
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    UnsharpMask unsharp = (UnsharpMask) ppb.get(UnsharpMask.class);
+                    unsharp.setSharpenFactor(sharpenFactor);
+                    unsharp.setEnabled(sharpenFactor > 0);
                 }
-            });
-            break;
-        case LENS_FLARE_CMD:
-            active = (Boolean) data[0];
-            int numGhosts = active ? Settings.settings.postprocess.lensFlare.numGhosts : 0;
-            float intensity = active ? Settings.settings.postprocess.lensFlare.intensity : 0;
+            }
+        });
+        case LENS_FLARE_CMD -> {
+            var lensFlareActive = (Boolean) data[0];
+            var numGhosts = lensFlareActive ? Settings.settings.postprocess.lensFlare.numGhosts : 0;
+            var intensity = lensFlareActive ? Settings.settings.postprocess.lensFlare.intensity : 0;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -726,13 +727,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     lensFlare.setFlareIntesity(intensity);
                 }
             }
-            break;
-        case CAMERA_MOTION_UPDATE:
-            PerspectiveCamera cam = (PerspectiveCamera) data[3];
-            Vector3b campos = (Vector3b) data[0];
-            ZonedDateTime zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
+        }
+        case CAMERA_MOTION_UPDATE -> {
+            var camera = (PerspectiveCamera) data[3];
+            var campos = (Vector3b) data[0];
+            var zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
             float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
-            float cameraOffset = (cam.direction.x + cam.direction.y + cam.direction.z);
+            float cameraOffset = (camera.direction.x + camera.direction.y + camera.direction.z);
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -761,16 +762,16 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             // Update previous projectionView matrix
-            prevViewProj = cam.combined;
-            break;
-        case CAMERA_ORIENTATION_UPDATE:
-            cam = (PerspectiveCamera) data[0];
-            int w = (Integer) data[1];
-            int h = (Integer) data[2];
-            CameraManager.getFrustumCornersEye(cam, frustumCorners);
-            view.set(cam.view);
-            projection.set(cam.projection);
-            combined.set(cam.combined);
+            prevViewProj = camera.combined;
+        }
+        case CAMERA_ORIENTATION_UPDATE -> {
+            var camera = (PerspectiveCamera) data[0];
+            var w = (Integer) data[1];
+            var h = (Integer) data[2];
+            CameraManager.getFrustumCornersEye(camera, frustumCorners);
+            view.set(camera.view);
+            projection.set(camera.projection);
+            combined.set(camera.combined);
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -799,10 +800,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         });
                 }
             }
-            break;
-        case REPROJECTION_CMD:
-            active = (Boolean) data[0];
-            ReprojectionMode mode = (ReprojectionMode) data[1];
+        }
+        case REPROJECTION_CMD -> {
+            var active = (Boolean) data[0];
+            var mode = (ReprojectionMode) data[1];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -817,9 +818,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            break;
-        case SSR_CMD:
-            boolean enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
+        }
+        case SSR_CMD -> {
+            var enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -828,9 +829,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         ssr.setEnabled(enabled);
                 }
             }
-            break;
-        case MOTION_BLUR_CMD:
-            enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
+        }
+        case MOTION_BLUR_CMD -> {
+            var enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openXr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -844,10 +845,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             } else if (blurObject != null) {
                 blurObjectView.setVisible(true);
             }
-            break;
-        case CUBEMAP_CMD:
-            boolean cubemap = (Boolean) data[0];
-            enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openXr;
+        }
+        case CUBEMAP_CMD -> {
+            var cubemap = (Boolean) data[0];
+            var enabled = !cubemap && Settings.settings.postprocess.motionBlur.active && !Settings.settings.runtime.openXr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -859,14 +860,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             }
-            break;
-        case STEREOSCOPIC_CMD:
-            updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);
-            break;
-        case STEREO_PROFILE_CMD:
-            updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
-            break;
-        case ANTIALIASING_CMD:
+        }
+        case STEREOSCOPIC_CMD -> updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);
+        case STEREO_PROFILE_CMD -> updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
+        case ANTIALIASING_CMD -> {
             final Antialias antiAliasingValue = (Antialias) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
@@ -892,9 +889,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-            break;
-        case BRIGHTNESS_CMD:
-            float br = (Float) data[0];
+        }
+        case BRIGHTNESS_CMD -> {
+            var br = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -903,9 +900,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         levels.setBrightness(br);
                 }
             }
-            break;
-        case CONTRAST_CMD:
-            float cn = (Float) data[0];
+        }
+        case CONTRAST_CMD -> {
+            var cn = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -914,9 +911,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         levels.setContrast(cn);
                 }
             }
-            break;
-        case HUE_CMD:
-            float hue = (Float) data[0];
+        }
+        case HUE_CMD -> {
+            var hue = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -925,9 +922,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         levels.setHue(hue);
                 }
             }
-            break;
-        case SATURATION_CMD:
-            float sat = (Float) data[0];
+        }
+        case SATURATION_CMD -> {
+            var sat = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -936,9 +933,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         levels.setSaturation(sat);
                 }
             }
-            break;
-        case GAMMA_CMD:
-            float gamma = (Float) data[0];
+        }
+        case GAMMA_CMD -> {
+            var gamma = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -947,8 +944,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         levels.setGamma(gamma);
                 }
             }
-            break;
-        case TONEMAPPING_TYPE_CMD:
+        }
+        case TONEMAPPING_TYPE_CMD -> {
             ToneMapping tm;
             if (data[0] instanceof String) {
                 tm = ToneMapping.valueOf((String) data[0]);
@@ -961,30 +958,18 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     Levels levels = (Levels) ppb.get(Levels.class);
                     if (levels != null)
                         switch (tm) {
-                        case AUTO:
-                            levels.enableToneMappingAuto();
-                            break;
-                        case EXPOSURE:
-                            levels.enableToneMappingExposure();
-                            break;
-                        case ACES:
-                            levels.enableToneMappingACES();
-                            break;
-                        case UNCHARTED:
-                            levels.enableToneMappingUncharted();
-                            break;
-                        case FILMIC:
-                            levels.enableToneMappingFilmic();
-                            break;
-                        case NONE:
-                            levels.disableToneMapping();
-                            break;
+                        case AUTO -> levels.enableToneMappingAuto();
+                        case EXPOSURE -> levels.enableToneMappingExposure();
+                        case ACES -> levels.enableToneMappingACES();
+                        case UNCHARTED -> levels.enableToneMappingUncharted();
+                        case FILMIC -> levels.enableToneMappingFilmic();
+                        case NONE -> levels.disableToneMapping();
                         }
                 }
             }
-            break;
-        case EXPOSURE_CMD:
-            float exposure = (Float) data[0];
+        }
+        case EXPOSURE_CMD -> {
+            var exposure = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -993,9 +978,9 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         levels.setExposure(exposure);
                 }
             }
-            break;
-        case FPS_INFO:
-            Float fps = (Float) data[0];
+        }
+        case FPS_INFO -> {
+            var fps = (Float) data[0];
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -1004,10 +989,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         cameraMotionBlur.setVelocityScale(fps / 60f);
                 }
             }
-            break;
-        case GRAPHICS_QUALITY_UPDATED:
+        }
+        case GRAPHICS_QUALITY_UPDATED -> {
             // Update graphics quality
-            GraphicsQuality gq = (GraphicsQuality) data[0];
+            var gq = (GraphicsQuality) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -1016,21 +1001,24 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     }
                 }
             });
-            break;
-        case BILLBOARD_TEXTURE_IDX_CMD:
-            GaiaSky.postRunnable(() -> {
-                Texture starTex = new Texture(Settings.settings.data.dataFileHandle(Settings.settings.scene.star.getStarTexture()), true);
-                starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        ((LightGlow) ppb.get(LightGlow.class)).setLightGlowTexture(starTex);
-                    }
+        }
+        case BILLBOARD_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> {
+            var starTex = new Texture(Settings.settings.data.dataFileHandle(Settings.settings.scene.star.getStarTexture()), true);
+            starTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    ((LightGlow) ppb.get(LightGlow.class)).setLightGlowTexture(starTex);
                 }
-            });
-            break;
-        default:
-            break;
+            }
+        });
+        case BACKBUFFER_SCALE_CMD -> updateUpscaleFilters(Settings.settings.postprocess.upscaleFilter, (Float) data[0]);
+        case UPSCALE_FILTER_CMD -> {
+            var upscaleFilter = (UpscaleFilter) data[0];
+            updateUpscaleFilters(upscaleFilter, (float) Settings.settings.graphics.backBufferScale);
+        }
+        default -> {
+        }
         }
     }
 
@@ -1075,6 +1063,31 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 ((LightGlow) ppb.get(LightGlow.class)).setViewportSize(size[0] / (viewportHalved ? 2 : 1), size[1]);
             }
         }
+    }
+
+    private void updateUpscaleFilters(UpscaleFilter upscaleFilter, double backBufferScale) {
+        if (pps[RenderType.screen.index] != null) {
+            PostProcessBean ppb = pps[RenderType.screen.index];
+
+            XBRZ filter = (XBRZ) ppb.get(XBRZ.class);
+            updateUpscaleFilter(upscaleFilter, backBufferScale, filter, ppb);
+        }
+    }
+
+
+    private void updateUpscaleFilter(UpscaleFilter upscaleFilter, double backBufferScale, XBRZ filter, PostProcessBean ppb) {
+        // Actual filter.
+        boolean enabled = backBufferScale < 1 && upscaleFilter.equals(UpscaleFilter.XBRZ);
+        filter.setEnabled(enabled);
+        if (enabled) {
+            int w = ppb.pp.getCombinedBuffer().width;
+            int h = ppb.pp.getCombinedBuffer().height;
+            filter.setInputSize(w, h);
+            filter.setOutputSize((int) (w / backBufferScale), (int) (h / backBufferScale));
+        }
+
+        // Texture filter.
+        ppb.pp.setBufferTextureFilter(upscaleFilter.minification, upscaleFilter.magnification);
     }
 
 }
