@@ -13,7 +13,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
 
 import java.util.List;
 
@@ -2132,7 +2132,7 @@ public interface IScriptingInterface {
      *     <li>"orthosphere_crosseye" - same as orthosphere, but duplicated to produce a stereoscopic cross-eye image (side by side). </li>
      *     <li>"azimuthal_equidistant" - azimuthal equidistant projection, used in Planetarium mode.</li>
      * </ul>
-     * See {@link CubemapProjections} for possible
+     * See {@link CubmeapProjectionEffect} for possible
      * values.
      *
      * @param projection The projection, in ["equirectangular"|"cylindrical"|"hammer"|"orthographic"|"orthosphere"|"orthosphere_crossye"|"azimuthal_equidistant"].

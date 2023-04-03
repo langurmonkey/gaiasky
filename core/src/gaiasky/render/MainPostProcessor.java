@@ -41,6 +41,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.*;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
+import gaiasky.util.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 

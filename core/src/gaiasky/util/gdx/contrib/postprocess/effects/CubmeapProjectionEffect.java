@@ -15,10 +15,10 @@ import java.util.function.Function;
 /**
  * Fisheye effect
  */
-public final class CubemapProjections extends PostProcessorEffect {
+public final class CubmeapProjectionEffect extends PostProcessorEffect {
     private final CubemapProjectionsFilter filter;
 
-    public CubemapProjections(float w, float h) {
+    public CubmeapProjectionEffect(float w, float h) {
         filter = new CubemapProjectionsFilter(w, h);
     }
 
@@ -85,10 +85,27 @@ public final class CubemapProjections extends PostProcessorEffect {
         ORTHOGRAPHIC,
         ORTHOSPHERE,
         ORTHOSPHERE_CROSSEYE,
-        AZIMUTHAL_EQUIDISTANT;
+        AZIMUTHAL_EQUIDISTANT,
+        SPHERICAL_MIRROR;
 
         public boolean isPlanetarium() {
+            return isAzimuthalEquidistant() || isSphericalMirror();
+        }
+
+        public boolean isDomeMaster() {
+            return isAzimuthalEquidistant();
+        }
+
+        public boolean isFisheye() {
+            return isAzimuthalEquidistant();
+        }
+
+        public boolean isAzimuthalEquidistant() {
             return this.equals(AZIMUTHAL_EQUIDISTANT);
+        }
+
+        public boolean isSphericalMirror() {
+            return this.equals(SPHERICAL_MIRROR);
         }
 
         public boolean isOrthosphere() {
@@ -97,6 +114,10 @@ public final class CubemapProjections extends PostProcessorEffect {
 
         public boolean isPanorama() {
             return !isPlanetarium() && !isOrthosphere();
+        }
+
+        public CubemapProjection getNextPlanetariumProjection() {
+            return getNext(CubemapProjection::isPlanetarium);
         }
 
         public CubemapProjection getNextPanoramaProjection() {

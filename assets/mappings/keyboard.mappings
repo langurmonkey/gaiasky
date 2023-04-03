@@ -1,4 +1,4 @@
-#v30300
+#v30500
 # This file contains the key mappings for Gaia Sky.
 
 # Each line contains an action=keys pair, where action is the
@@ -69,6 +69,7 @@ action.toggle/element.orthosphere.profile   = CTRL_L SHIFT_L J
 action.toggle/element.stereomode            = CTRL_L S
 action.switchstereoprofile                  = CTRL_L SHIFT_L S
 action.toggle/element.planetarium           = CTRL_L P
+action.toggle/element.planetarium.projection= CTRL_L SHIFT_L P
 action.toggle/element.cleanmode             = CTRL_L U
 action.toggle/gui.mousecapture              = CTRL_L SHIFT_L L
 

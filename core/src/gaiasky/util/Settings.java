@@ -4,7 +4,6 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,7 +23,7 @@ import gaiasky.input.AbstractGamepadListener;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.camera.rec.CameraKeyframeManager;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.update.VersionChecker;
@@ -1177,7 +1176,7 @@ public class Settings {
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
 
         public ProgramSettings() {
-            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
         }
 
         @JsonIgnore
@@ -1241,9 +1240,14 @@ public class Settings {
                         }
                     } else if (modeCubemap.projection.isPlanetarium()) {
                         String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
+                        String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium.projection");
                         mpi.title = I18n.msg("gui.planetarium.title");
                         mpi.header = I18n.msg("gui.planetarium.notice.header");
                         mpi.addMapping(I18n.msg("gui.planetarium.notice.back"), keysStr);
+                        mpi.addMapping(I18n.msg("gui.360.notice.projection"), keysStrProj);
+                        if (settings.scene.renderer.pointCloud.isPoints()) {
+                            mpi.warn = I18n.msg("gui.360.notice.renderer");
+                        }
                     } else if (modeCubemap.projection.isOrthosphere()) {
                         String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere");
                         String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.toggle/element.orthosphere.profile");
@@ -1258,7 +1262,7 @@ public class Settings {
                     EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                 }
             }
-            case CUBEMAP_PROJECTION_CMD -> {
+            case CUBEMAP_PROJECTION_CMD, PLANETARIUM_PROJECTION_CMD -> {
                 modeCubemap.projection = (CubemapProjection) data[0];
                 logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
             }

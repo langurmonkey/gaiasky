@@ -65,7 +65,6 @@ public class PFMReader {
             return new PFMData(data, width, height);
         } catch (Exception e) {
             throw new GdxRuntimeException("Couldn't read PFM file '" + file + "'", e);
-        } finally {
         }
     }
 

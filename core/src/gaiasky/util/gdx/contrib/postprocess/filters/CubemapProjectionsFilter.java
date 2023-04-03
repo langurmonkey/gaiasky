@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**

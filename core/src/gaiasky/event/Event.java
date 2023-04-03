@@ -9,6 +9,7 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.api.IStarFocus;
 import gaiasky.scene.api.IVisibilitySwitch;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 
 import static gaiasky.util.Settings.*;
 
@@ -732,6 +733,10 @@ public enum Event {
      * Sets the planetarium angle [deg], an angle from the zenith to put the focus on in planetarium mode.
      */
     PLANETARIUM_ANGLE_CMD,
+    /**
+     * Sets the planetarium projection. Contains the {@link CubemapProjection} object, which needs to evaluate isPlanetarium() to true.
+     */
+    PLANETARIUM_PROJECTION_CMD,
     /**
      * Issues the play command. Contains the path to the file to play.
      **/

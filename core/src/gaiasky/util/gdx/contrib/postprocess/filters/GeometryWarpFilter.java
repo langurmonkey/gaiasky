@@ -5,10 +5,13 @@
 
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenMesh;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
+import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
 
 /**
  * This filter implements the geometry warp and blending defined in the MPCDI format.
@@ -16,6 +19,7 @@ import gaiasky.util.gdx.loader.PFMData;
 public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
     private final FullscreenMesh mesh;
     private Texture blendTexture;
+    private Vector2 viewport;
     private int blend;
 
     public GeometryWarpFilter(PFMData warpData) {
@@ -32,12 +36,24 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         setBlendTexture(blend);
     }
 
+    public GeometryWarpFilter(WarpMesh warpMesh, int rw, int rh) {
+        super(ShaderLoader.fromFile("screenspace-alpha", "geometrywarp-alpha"));
+        this.mesh = new FullscreenMesh(warpMesh);
+        this.viewport = new Vector2(rw, rh);
+        rebind();
+    }
+
     public void setBlendTexture(Texture tex) {
         this.blendTexture = tex;
         setParam(Param.Blend, u_texture1);
 
         this.blend = tex == null ? 0 : 1;
         setParam(Param.BlendState, this.blend);
+    }
+
+    public void setViewportSize(int width, int height) {
+        this.viewport.set(width, height);
+        setParam(Param.Viewport, viewport);
     }
 
     @Override
@@ -51,6 +67,7 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
     public void rebind() {
         setParams(Param.Texture0, u_texture0);
         setParams(Param.Blend, u_texture1);
+        setParams(Param.Viewport, viewport);
         setParams(Param.BlendState, blend);
 
         endParams();
@@ -69,6 +86,7 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         // @formatter:off
         Texture0("u_texture0", 0),
         Blend("u_texture1", 0),
+        Viewport("u_viewport", 2),
         BlendState("u_blend", 0);
         // @formatter:on
 

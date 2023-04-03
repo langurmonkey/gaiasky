@@ -63,7 +63,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
     private Archetype archetype;
     private int numLoaded = 0;
 
-    private float[] clusterColor = new float[] { 0.93f, 0.93f, 0.3f, 1f };
+    private final float[] clusterColor = new float[] { 0.93f, 0.93f, 0.3f, 1f };
 
     private Array<Entity> clusters;
 

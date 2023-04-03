@@ -10,12 +10,11 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.render.MainPostProcessor;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.UpscaleFilter;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.parse.Parser;
 
@@ -323,6 +322,14 @@ public class KeyBindings {
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
         }, noPanorama, noOrthosphere));
 
+        // toggle planetarium projection
+        addAction(new ProgramAction("action.toggle/element.planetarium.projection", () -> {
+            if (Settings.settings.program.modeCubemap.isPlanetariumOn()) {
+                int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPlanetariumProjection().ordinal();
+                EventManager.publish(Event.PLANETARIUM_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
+            }
+        }, noPanorama, noOrthosphere));
+
         // toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPanoramaOn();
@@ -335,7 +342,7 @@ public class KeyBindings {
                 int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
                 EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newProjectionIndex]);
             }
-        }));
+        }, noPlanetarium, noOrthosphere));
 
         // toggle orthosphere mode
         addAction(new ProgramAction("action.toggle/element.orthosphere", () -> {

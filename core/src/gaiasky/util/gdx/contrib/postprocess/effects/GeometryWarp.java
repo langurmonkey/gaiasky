@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2012 tsagrista
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -22,9 +6,11 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.GeometryWarpFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.gdx.loader.PFMData;
+import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
 
 /**
- * Implements geometry warp and blending from MPCDI
+ * Implements geometry warp and blending from MPCDI (using PFM and texture data) or
+ * using the warp mesh format by Paul Bourke.
  */
 public final class GeometryWarp extends PostProcessorEffect {
     private GeometryWarpFilter warpFilter;
@@ -35,6 +21,14 @@ public final class GeometryWarp extends PostProcessorEffect {
 
     public GeometryWarp(PFMData data, Texture blend) {
         warpFilter = new GeometryWarpFilter(data, blend);
+    }
+
+    public GeometryWarp(WarpMesh data, int rw, int rh) {
+        warpFilter = new GeometryWarpFilter(data, rw, rh);
+    }
+
+    public void setViewportSize(int width, int height) {
+        warpFilter.setViewportSize(width, height);
     }
 
     public void setBlendTexture(Texture tex) {

@@ -55,8 +55,8 @@ import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.*;
 import gaiasky.util.screenshot.ImageRenderer;
@@ -2520,7 +2520,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCubemapMode(boolean state, String projection) {
         if (checkStringEnum(projection, CubemapProjection.class, "projection")) {
-            CubemapProjections.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
+            CubmeapProjectionEffect.CubemapProjection newProj = CubemapProjection.valueOf(projection.toUpperCase());
             postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
         }
     }

@@ -18,7 +18,7 @@ void main() {
     // Warp is done by vertex mesh
     col = texture(u_texture0, v_texCoords);
 
-    if(u_blend == 1){
+    if (u_blend == 1){
         // Blend
         vec4 blend = texture(u_texture1, vec2(v_texCoords.x, 1.0 - v_texCoords.y));
         col *= blend.r * blend.a;

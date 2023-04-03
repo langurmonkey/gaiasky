@@ -44,7 +44,7 @@ import gaiasky.scene.record.RotationComponent;
 import gaiasky.scene.view.FocusView;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsDouble;
