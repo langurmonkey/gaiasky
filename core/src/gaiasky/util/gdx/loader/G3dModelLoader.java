@@ -16,10 +16,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import gaiasky.util.gdx.model.data.IntModelData;
-import gaiasky.util.gdx.model.data.IntModelMesh;
-import gaiasky.util.gdx.model.data.IntModelMeshPart;
-import gaiasky.util.gdx.model.data.IntModelNode;
+import gaiasky.util.gdx.model.data.*;
 
 public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParameters> {
     public static final short VERSION_HI = 0;
@@ -158,7 +155,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
         } else {
             model.materials.ensureCapacity(materials.size);
             for (JsonValue material = materials.child; material != null; material = material.next) {
-                ModelMaterial jsonMaterial = new ModelMaterial();
+                OwnModelMaterial jsonMaterial = new OwnModelMaterial();
 
                 String id = material.getString("id", null);
                 if (id == null)
@@ -191,7 +188,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                 JsonValue textures = material.get("textures");
                 if (textures != null) {
                     for (JsonValue texture = textures.child; texture != null; texture = texture.next) {
-                        ModelTexture jsonTexture = new ModelTexture();
+                        OwnModelTexture jsonTexture = new OwnModelTexture();
 
                         String textureId = texture.getString("id", null);
                         if (textureId == null)
@@ -214,7 +211,7 @@ public class G3dModelLoader extends IntModelLoader<IntModelLoader.IntModelParame
                         jsonTexture.usage = parseTextureUsage(textureType);
 
                         if (jsonMaterial.textures == null)
-                            jsonMaterial.textures = new Array<ModelTexture>();
+                            jsonMaterial.textures = new Array<>();
                         jsonMaterial.textures.add(jsonTexture);
                     }
                 }

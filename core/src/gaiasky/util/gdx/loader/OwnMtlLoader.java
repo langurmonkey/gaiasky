@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.gdx.model.data.OwnModelMaterial;
+import gaiasky.util.gdx.model.data.OwnModelTexture;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +24,7 @@ import java.io.InputStreamReader;
 public class OwnMtlLoader {
     private static final Log logger = Logger.getLogger(OwnMtlLoader.class);
 
-    public Array<ModelMaterial> materials = new Array<>();
+    public Array<OwnModelMaterial> materials = new Array<>();
 
     /**
      * loads .mtl file
@@ -44,7 +46,7 @@ public class OwnMtlLoader {
         String texRoughnessFilename = null;
         String texMetallicFilename = null;
 
-        if (file == null || file.exists() == false) {
+        if (file == null || !file.exists()) {
             logger.error("ERROR: Material file not found: " + file.name());
             return;
         }
@@ -64,16 +66,15 @@ public class OwnMtlLoader {
                     continue;
                 else {
                     final String key = tokens[0].toLowerCase();
-                    if (key.equals("newmtl")) {
+                    switch (key) {
+                    case "newmtl" -> {
                         addCurrentMat(curMatName, difcolor, speccolor, emicolor, metcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texMetallicFilename, materials);
-
                         if (tokens.length > 1) {
                             curMatName = tokens[1];
                             curMatName = curMatName.replace('.', '_');
                         } else {
                             curMatName = "default";
                         }
-
                         difcolor = Color.WHITE;
                         speccolor = Color.WHITE;
                         emicolor = Color.WHITE;
@@ -85,15 +86,16 @@ public class OwnMtlLoader {
                         texMetallicFilename = null;
                         opacity = 1.f;
                         shininess = 0.f;
-                    } else if (key.equals("kd") || key.equals("ks") || key.equals("ke") || key.equals("kr") || key.equals("km")) // diffuse, specular, emissive, metallic
-                    {
+                    }
+                    case "kd", "ks", "ke", "kr", "km" -> {
+                        // diffuse, specular, emissive, metallic
+
                         float r = Float.parseFloat(tokens[1]);
                         float g = Float.parseFloat(tokens[2]);
                         float b = Float.parseFloat(tokens[3]);
                         float a = 1;
                         if (tokens.length > 4)
                             a = Float.parseFloat(tokens[4]);
-
                         if (tokens[0].equalsIgnoreCase("kd")) {
                             difcolor = new Color();
                             difcolor.set(r, g, b, a);
@@ -107,23 +109,17 @@ public class OwnMtlLoader {
                             metcolor = new Color();
                             metcolor.set(r, g, b, a);
                         }
-                    } else if (key.equals("tr") || key.equals("d")) {
-                        opacity = Float.parseFloat(tokens[1]);
-                    } else if (key.equals("ns")) {
+                    }
+                    case "tr", "d" -> opacity = Float.parseFloat(tokens[1]);
+                    case "ns" ->
                         // Shininess, normalize in [0,1]
-                        shininess = MathUtils.clamp(Float.parseFloat(tokens[1]), 0, 300) / 300;
-                    } else if (key.equals("map_kd")) {
-                        texDiffuseFilename = file.parent().child(tokens[1]).path();
-                    } else if (key.equals("map_ke")) {
-                        texEmissiveFilename = file.parent().child(tokens[1]).path();
-                    } else if (key.equals("map_kn") || key.equals("map_bump")) {
-                        texNormalFilename = file.parent().child(tokens[1]).path();
-                    } else if (key.equals("map_ks")) {
-                        texSpecularFilename = file.parent().child(tokens[1]).path();
-                    } else if (key.equals("map_kr") || key.equals("map_km")) {
-                        texMetallicFilename = file.parent().child(tokens[1]).path();
-                    } else if (key.equals("map_ns")) {
-                        texRoughnessFilename = file.parent().child(tokens[1]).path();
+                            shininess = MathUtils.clamp(Float.parseFloat(tokens[1]), 0, 300) / 300;
+                    case "map_kd" -> texDiffuseFilename = file.parent().child(tokens[1]).path();
+                    case "map_ke" -> texEmissiveFilename = file.parent().child(tokens[1]).path();
+                    case "map_kn", "map_bump", "norm" -> texNormalFilename = file.parent().child(tokens[1]).path();
+                    case "map_ks" -> texSpecularFilename = file.parent().child(tokens[1]).path();
+                    case "map_kr", "map_km", "map_pm" -> texMetallicFilename = file.parent().child(tokens[1]).path();
+                    case "map_pr", "map_ns" -> texRoughnessFilename = file.parent().child(tokens[1]).path();
                     }
                 }
             }
@@ -138,61 +134,61 @@ public class OwnMtlLoader {
         return;
     }
 
-    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texSpecularFilename, String texRoughnessFilename, String texMetallicFilename, Array<ModelMaterial> materials) {
-        ModelMaterial mat = new ModelMaterial();
+    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color metcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texSpecularFilename, String texRoughnessFilename, String texMetallicFilename, Array<OwnModelMaterial> materials) {
+        OwnModelMaterial mat = new OwnModelMaterial();
         mat.id = curMatName;
         mat.diffuse = new Color(difcolor);
         if (!ColorUtils.isZero(speccolor))
             mat.specular = new Color(speccolor);
         if (!ColorUtils.isZero(emicolor))
             mat.emissive = new Color(emicolor);
-        if (!ColorUtils.isZero(reflcolor))
-            mat.reflection = new Color(reflcolor);
+        if (!ColorUtils.isZero(metcolor))
+            mat.reflection = new Color(metcolor);
         mat.opacity = opacity;
         mat.shininess = shininess;
         if (texDiffuseFilename != null) {
-            ModelTexture tex = new ModelTexture();
-            tex.usage = ModelTexture.USAGE_DIFFUSE;
+            OwnModelTexture tex = new OwnModelTexture();
+            tex.usage = OwnModelTexture.USAGE_DIFFUSE;
             tex.fileName = texDiffuseFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         if (texEmissiveFilename != null) {
-            ModelTexture tex = new ModelTexture();
-            tex.usage = ModelTexture.USAGE_EMISSIVE;
+            OwnModelTexture tex = new OwnModelTexture();
+            tex.usage = OwnModelTexture.USAGE_EMISSIVE;
             tex.fileName = texEmissiveFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         if (texNormalFilename != null) {
-            ModelTexture tex = new ModelTexture();
-            tex.usage = ModelTexture.USAGE_NORMAL;
+            OwnModelTexture tex = new OwnModelTexture();
+            tex.usage = OwnModelTexture.USAGE_NORMAL;
             tex.fileName = texNormalFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         if (texSpecularFilename != null) {
-            ModelTexture tex = new ModelTexture();
-            tex.usage = ModelTexture.USAGE_SPECULAR;
+            OwnModelTexture tex = new OwnModelTexture();
+            tex.usage = OwnModelTexture.USAGE_SPECULAR;
             tex.fileName = texSpecularFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         if (texRoughnessFilename != null) {
-            ModelTexture tex = new ModelTexture();
-            tex.usage = ModelTexture.USAGE_SHININESS;
+            OwnModelTexture tex = new OwnModelTexture();
+            tex.usage = OwnModelTexture.USAGE_ROUGHNESS;
             tex.fileName = texRoughnessFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
         if (texMetallicFilename != null) {
-            ModelTexture tex = new ModelTexture();
-            tex.usage = ModelTexture.USAGE_REFLECTION;
+            OwnModelTexture tex = new OwnModelTexture();
+            tex.usage = OwnModelTexture.USAGE_METALLIC;
             tex.fileName = texMetallicFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
@@ -201,11 +197,11 @@ public class OwnMtlLoader {
         materials.add(mat);
     }
 
-    public ModelMaterial getMaterial(final String name) {
-        for (final ModelMaterial m : materials)
+    public OwnModelMaterial getMaterial(final String name) {
+        for (final OwnModelMaterial m : materials)
             if (m.id.equals(name))
                 return m;
-        ModelMaterial mat = new ModelMaterial();
+        OwnModelMaterial mat = new OwnModelMaterial();
         mat.id = name;
         mat.diffuse = new Color(Color.WHITE);
         materials.add(mat);

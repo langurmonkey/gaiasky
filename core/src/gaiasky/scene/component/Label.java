@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public class Label implements Component {
 
-    public float labelFactor;
+    public float labelFactor = 0;
     public float labelMax;
     /** Scale parameter for distance field fonts. **/
     public float textScale = -1;

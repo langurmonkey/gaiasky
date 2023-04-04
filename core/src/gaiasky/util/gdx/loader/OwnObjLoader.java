@@ -23,10 +23,7 @@ import com.badlogic.gdx.utils.IntArray;
 import gaiasky.util.gdx.loader.is.InputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
 import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.gdx.model.data.IntModelData;
-import gaiasky.util.gdx.model.data.IntModelMesh;
-import gaiasky.util.gdx.model.data.IntModelMeshPart;
-import gaiasky.util.gdx.model.data.IntModelNode;
+import gaiasky.util.gdx.model.data.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -240,7 +237,7 @@ public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameter
             mesh.parts = new IntModelMeshPart[] { part };
             data.nodes.add(node);
             data.meshes.add(mesh);
-            ModelMaterial mm = mtl.getMaterial(group.materialName);
+            OwnModelMaterial mm = mtl.getMaterial(group.materialName);
             data.materials.add(mm);
         }
 

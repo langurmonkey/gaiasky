@@ -112,7 +112,7 @@ public class ModelInitializer extends AbstractInitSystem {
             body.size = (float) (body.size * Constants.KM_TO_U);
         } else {
             // The rest of the bodies use the flags.
-            body.size = (float) ((body.size * (body.sizeIsRadiusFlag ? 2.0 : 1.0)) * (body.sizeInUnitsFlag ?  1.0 : Constants.KM_TO_U));
+            body.size = (float) ((body.size * (body.sizeIsRadiusFlag ? 2.0 : 1.0)) * (body.sizeInUnitsFlag ? 1.0 : Constants.KM_TO_U));
         }
 
         // First init spacecraft if needed
@@ -282,7 +282,9 @@ public class ModelInitializer extends AbstractInitSystem {
         sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
 
         label.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
-        label.labelFactor = 1;
+        if (label.labelFactor == 0) {
+            label.labelFactor = 1;
+        }
 
         if (isRandomizeModel(scaffolding)) {
             // Ignore current model component (if any) and create a random one

@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.data.IntModelData;
+import gaiasky.util.gdx.model.data.OwnModelMaterial;
 
 import java.util.Iterator;
 
@@ -79,7 +80,7 @@ public abstract class IntModelLoader<P extends IntModelLoader.IntModelParameters
 
         OwnTextureLoader.OwnTextureParameter textureParameter = (parameters != null) ? parameters.textureParameter : defaultParameters.textureParameter;
 
-        for (final ModelMaterial modelMaterial : data.materials) {
+        for (final OwnModelMaterial modelMaterial : data.materials) {
             if (modelMaterial.textures != null) {
                 for (final ModelTexture modelTexture : modelMaterial.textures)
                     deps.add(new AssetDescriptor<>(modelTexture.fileName, Texture.class, textureParameter));

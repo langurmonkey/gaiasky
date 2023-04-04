@@ -41,10 +41,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.gdx.loader.IntModelLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
-import gaiasky.util.gdx.model.data.IntModelData;
-import gaiasky.util.gdx.model.data.IntModelMesh;
-import gaiasky.util.gdx.model.data.IntModelMeshPart;
-import gaiasky.util.gdx.model.data.IntModelNode;
+import gaiasky.util.gdx.model.data.*;
 import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
@@ -276,13 +273,13 @@ public class IntModel implements Disposable {
             part.update();
     }
 
-    protected void loadMaterials(Iterable<ModelMaterial> modelMaterials, TextureProvider textureProvider) {
-        for (ModelMaterial mtl : modelMaterials) {
+    protected void loadMaterials(Iterable<OwnModelMaterial> modelMaterials, TextureProvider textureProvider) {
+        for (OwnModelMaterial mtl : modelMaterials) {
             this.materials.add(convertMaterial(mtl, textureProvider));
         }
     }
 
-    protected Material convertMaterial(ModelMaterial mtl, TextureProvider textureProvider) {
+    protected Material convertMaterial(OwnModelMaterial mtl, TextureProvider textureProvider) {
         Material result = new Material();
         result.id = mtl.id;
         if (mtl.ambient != null)
