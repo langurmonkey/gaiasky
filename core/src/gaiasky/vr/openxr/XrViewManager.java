@@ -6,13 +6,14 @@ import com.badlogic.gdx.math.Quaternion;
 import gaiasky.render.RenderingContext;
 import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Constants;
-import org.joml.Matrix4f;
+import gaiasky.util.math.Matrix4Utils;
 import org.lwjgl.openxr.XrCompositionLayerProjectionView;
 import org.lwjgl.openxr.XrPosef;
 import org.lwjgl.openxr.XrQuaternionf;
 import org.lwjgl.openxr.XrVector3f;
 import org.lwjgl.system.MemoryStack;
 
+import static com.badlogic.gdx.math.Matrix4.M00;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 /**
@@ -20,9 +21,8 @@ import static org.lwjgl.system.MemoryStack.stackPush;
  */
 public class XrViewManager {
 
-    private final Matrix4f projectionMatrix = new Matrix4f();
-    private final Matrix4f viewMatrix = new Matrix4f();
     private final Quaternion quaternion = new Quaternion();
+    private final Matrix4 mat = new Matrix4();
 
     public void updateCamera(XrCompositionLayerProjectionView layerView, PerspectiveCamera camera) {
         updateCamera(layerView, camera, null, null);
@@ -33,16 +33,16 @@ public class XrViewManager {
         XrVector3f position = pose.position$();
         XrQuaternionf orientation = pose.orientation();
         try (MemoryStack stack = stackPush()) {
-            projectionMatrix.set(XrHelper.createProjectionMatrixBuffer(stack, layerView.fov(), camera.near, camera.far, false));
+            // Set camera projection.
+            Matrix4Utils.put(camera.projection, XrHelper.createProjectionMatrixBuffer(stack, layerView.fov(), camera.near, camera.far, false));
         }
-        viewMatrix.translationRotateScaleInvert(position.x(), position.y(), position.z(), orientation.x(), orientation.y(), orientation.z(), orientation.w(), 1, 1, 1);
+        quaternion.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
+        // Set camera view.
+        camera.view.idt().translate(position.x(), position.y(), position.z()).rotate(quaternion).inv();
 
-        projectionMatrix.get(camera.projection.val);
-        viewMatrix.get(camera.view.val);
         camera.combined.set(camera.projection);
         Matrix4.mul(camera.combined.val, camera.view.val);
 
-        quaternion.set(orientation.x(), orientation.y(), orientation.z(), orientation.w());
         camera.position.set(position.x(), position.y(), position.z());
         camera.direction.set(0, 0, -1).mul(quaternion);
         camera.up.set(0, 1, 0).mul(quaternion);

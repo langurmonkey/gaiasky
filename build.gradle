@@ -116,8 +116,8 @@ project(":core") {
         api group: "org.lwjgl", name: "lwjgl-openxr", version: "$lwjglVersion"
         api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-linux"
         api "org.lwjgl:lwjgl-openxr:$lwjglVersion:natives-windows"
-        api group: "org.joml", name: "joml", version: "1.10.5"
 
+        // LWJGL3
         api group: "com.badlogicgames.gdx", name: "gdx", version: "$gdxVersion"
         api group: "com.badlogicgames.gdx", name: "gdx-backend-lwjgl3", version: "$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
