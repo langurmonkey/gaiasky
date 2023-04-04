@@ -15,6 +15,8 @@ import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
@@ -22,6 +24,8 @@ import gaiasky.util.gdx.contrib.postprocess.effects.GeometryWarp;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.loader.WarpMeshReader;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 /**
@@ -30,17 +34,18 @@ import java.util.Set;
  * and applies a cube map projection (spherical, cylindrical, hammer, azimuthal equidistant)
  */
 public class RenderModeCubemapProjections extends RenderModeCubemap implements IRenderMode, IObserver {
+    private static final Log logger = Logger.getLogger(RenderModeCubemapProjections.class);
 
     private final CubmeapProjectionEffect cubemapProjection;
-    private final GeometryWarp geometryWarp;
+    private GeometryWarp geometryWarp;
     private final Copy copy;
 
     public RenderModeCubemapProjections() {
         super();
 
         // Geometry warp, if needed.
-        var warp = WarpMeshReader.readWarpMeshAscii(Gdx.files.absolute("/home/tsagrista/Documents/spherical-mirror/standard_16x9.data"));
-        geometryWarp = new GeometryWarp(warp, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        var cubemapSettings = Settings.settings.program.modeCubemap;
+        initializeGeometryWarp(cubemapSettings.planetarium.sphericalMirrorWarp);
 
         // Cubemap projection.
         cubemapProjection = new CubmeapProjectionEffect(0, 0);
@@ -50,7 +55,9 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         setCelestialSphereIndexOfRefraction(Settings.settings.program.modeCubemap.celestialSphereIndexOfRefraction);
         copy = new Copy();
 
-        EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD, Event.CUBEMAP_CMD, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.INDEXOFREFRACTION_CMD);
+        EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD,
+                Event.CUBEMAP_CMD, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.INDEXOFREFRACTION_CMD,
+                Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD);
     }
 
     private void setProjection(CubemapProjection projection) {
@@ -101,7 +108,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
         // This renders the cubemap to [x|y|z][pos|neg]fb
         super.renderCubemapSides(sgr, camera, t, rw, rh, ppb);
 
-        if (cubemapProjection.getProjection().isSphericalMirror()) {
+        if (cubemapProjection.getProjection().isSphericalMirror() && geometryWarp != null) {
             // Spherical mirror, we need two buffers.
             FrameBuffer middleBuffer = getFrameBuffer(rw, rh, 1);
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
@@ -130,7 +137,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
 
     @Override
     public void resize(int rw, int rh, int tw, int th) {
-        if(geometryWarp != null) {
+        if (geometryWarp != null) {
             geometryWarp.setViewportSize(rw, rh);
         }
     }
@@ -173,9 +180,19 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
             }
             case PLANETARIUM_ANGLE_CMD -> setPlanetariumAngle((float) data[0]);
             case INDEXOFREFRACTION_CMD -> GaiaSky.postRunnable(() -> setCelestialSphereIndexOfRefraction((float) data[0]));
+            case PLANETARIUM_GEOMETRYWARP_FILE_CMD -> GaiaSky.postRunnable(() -> initializeGeometryWarp((Path) data[0]));
+
             default -> {
             }
             }
+        }
+    }
+
+    private void initializeGeometryWarp(Path file) {
+        if (file != null && Files.exists(file)) {
+            var warp = WarpMeshReader.readWarpMeshAscii(Gdx.files.absolute(file.toString()));
+            geometryWarp = new GeometryWarp(warp, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            logger.info("Spherical mirror geometry warp initialized with: " + file.toString());
         }
     }
 }

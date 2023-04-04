@@ -32,6 +32,7 @@ import org.lwjgl.opengl.GL30;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -361,8 +362,8 @@ public class Settings {
         public TextureFilter minification, magnification;
 
         UpscaleFilter(TextureFilter min, TextureFilter mag) {
-           this.minification = min;
-           this.magnification = mag;
+            this.minification = min;
+            this.magnification = mag;
         }
     }
 
@@ -1176,7 +1177,10 @@ public class Settings {
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
 
         public ProgramSettings() {
-            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD,
+                    Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION,
+                    Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
+                    Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
         }
 
         @JsonIgnore
@@ -1262,9 +1266,18 @@ public class Settings {
                     EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                 }
             }
-            case CUBEMAP_PROJECTION_CMD, PLANETARIUM_PROJECTION_CMD -> {
+            case CUBEMAP_PROJECTION_CMD -> {
                 modeCubemap.projection = (CubemapProjection) data[0];
                 logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
+            }
+            case PLANETARIUM_PROJECTION_CMD -> {
+                modeCubemap.projection = (CubemapProjection) data[0];
+                if (modeCubemap.projection.isSphericalMirror() && modeCubemap.planetarium.sphericalMirrorWarp == null) {
+                    modeCubemap.projection = CubemapProjection.AZIMUTHAL_EQUIDISTANT;
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.planetarium.sphericalmirror.nowarpfile"), 10f);
+                } else {
+                    logger.info(I18n.msg("gui.360.projection", modeCubemap.projection.toString()));
+                }
             }
             case INDEXOFREFRACTION_CMD -> modeCubemap.celestialSphereIndexOfRefraction = (float) data[0];
             case CUBEMAP_RESOLUTION_CMD -> modeCubemap.faceResolution = (int) data[0];
@@ -1272,6 +1285,7 @@ public class Settings {
             case TOGGLE_MINIMAP -> minimap.active = !minimap.active;
             case PLANETARIUM_APERTURE_CMD -> modeCubemap.planetarium.aperture = (float) data[0];
             case PLANETARIUM_ANGLE_CMD -> modeCubemap.planetarium.angle = (float) data[0];
+            case PLANETARIUM_GEOMETRYWARP_FILE_CMD -> modeCubemap.planetarium.sphericalMirrorWarp = (Path) data[0];
             case POINTER_GUIDES_CMD -> {
                 if (data.length > 0 && data[0] != null) {
                     pointer.guides.active = (boolean) data[0];
@@ -1417,6 +1431,26 @@ public class Settings {
             public static class PlanetariumSettings {
                 public float aperture;
                 public float angle;
+                public Path sphericalMirrorWarp;
+
+                public void setSphericalMirrorWarp(String file) {
+                    if (file != null) {
+                        try {
+                            sphericalMirrorWarp = Path.of(file);
+                        } catch (InvalidPathException e) {
+                            logger.error("Invalid spherical mirror mesh warp file path: " + file);
+                            logger.error(e);
+                        }
+                    }
+                }
+
+                public String getSphericalMirrorWarp() {
+                    if (sphericalMirrorWarp != null) {
+                        return sphericalMirrorWarp.toString();
+                    } else {
+                        return null;
+                    }
+                }
             }
         }
 
@@ -1567,6 +1601,7 @@ public class Settings {
             public VRControllerSettings() {
             }
         }
+
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class GamepadSettings implements IObserver {
             /**
@@ -1936,6 +1971,7 @@ public class Settings {
         public void setUpscaleFilter(final String upscaleFilterString) {
             upscaleFilter = UpscaleFilter.valueOf(upscaleFilterString.toUpperCase());
         }
+
         public Antialias getAntialias(int code) {
             return switch (code) {
                 case -1 -> Antialias.FXAA;

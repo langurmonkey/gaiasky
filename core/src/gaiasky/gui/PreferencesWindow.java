@@ -32,6 +32,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.*;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.util.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.MathUtilsDouble;
 import gaiasky.util.parse.Parser;
@@ -76,7 +77,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize;
-    private OwnTextButton screenshotsLocation, frameOutputLocation;
+    private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
+    private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
     private ColorPicker pointerGuidesColor;
     private OwnLabel tessQualityLabel;
@@ -1313,7 +1315,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Save location
         OwnLabel screenshotsLocationLabel = new OwnLabel(I18n.msg("gui.screenshots.save"), skin);
-        screenshotsLocation = new OwnTextButton(settings.screenshot.location, skin);
+        screenshotsLocation = new OwnTextButton(TextUtils.capString(settings.screenshot.location, 45), skin);
+        screenshotsLocation.addListener(new OwnTextTooltip(settings.screenshot.location, skin));
+        screenshotsPath = Path.of(settings.screenshot.location);
         screenshotsLocation.pad(pad10);
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -1323,7 +1327,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
-                        screenshotsLocation.setText(result.toString());
+                        screenshotsLocation.setText(TextUtils.capString(result.toString(), 45));
+                        screenshotsPath = result;
+                        screenshotsLocation.addListener(new OwnTextTooltip(result.toString(), skin));
                     }
                     return true;
                 });
@@ -1374,7 +1380,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotQuality = new OwnSliderPlus("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY, Constants.SLIDER_STEP, skin);
         screenshotQuality.setName("screenshot quality");
         screenshotQuality.setWidth(sliderWidth);
-        screenshotQuality.setValue(settings.screenshot.quality  * 100f);
+        screenshotQuality.setValue(settings.screenshot.quality * 100f);
 
         // Format
         OwnLabel ssFormatLabel = new OwnLabel(I18n.msg("gui.screenshots.format"), skin);
@@ -1443,7 +1449,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Save location
         OwnLabel frameOutputLocationLabel = new OwnLabel(I18n.msg("gui.frameoutput.location"), skin);
-        frameOutputLocation = new OwnTextButton(settings.frame.location, skin);
+        frameOutputLocation = new OwnTextButton(TextUtils.capString(settings.frame.location, 45), skin);
+        frameOutputLocation.addListener(new OwnTextTooltip(settings.frame.location, skin));
+        frameOutputPath = Path.of(settings.frame.location);
         frameOutputLocation.pad(pad10);
         frameOutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -1453,7 +1461,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
-                        frameOutputLocation.setText(result.toString());
+                        frameOutputLocation.setText(TextUtils.capString(result.toString(), 45));
+                        frameOutputPath = result;
+                        frameOutputLocation.addListener(new OwnTextTooltip(result.toString(), skin));
                     }
                     return true;
                 });
@@ -1496,7 +1506,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameQuality = new OwnSliderPlus("", Constants.MIN_SCREENSHOT_QUALITY, Constants.MAX_SCREENSHOT_QUALITY, Constants.SLIDER_STEP, skin);
         frameQuality.setName("frame quality");
         frameQuality.setWidth(sliderWidth);
-        frameQuality.setValue(settings.frame.quality  * 100f);
+        frameQuality.setValue(settings.frame.quality * 100f);
 
         // Format
         OwnLabel foFormatLabel = new OwnLabel(I18n.msg("gui.screenshots.format"), skin);
@@ -1701,17 +1711,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentPlanetarium.setWidth(contentWidth);
         contentPlanetarium.align(Align.top | Align.left);
 
-        // CUBEMAP
+        // Planetarium title
         OwnLabel titlePlanetarium = new OwnLabel(I18n.msg("gui.planetarium"), skin, "header");
         Table planetarium = new Table(skin);
 
         // Aperture
-        Label apertureLabel = new OwnLabel(I18n.msg("gui.planetarium.aperture"), skin);
+        OwnLabel apertureLabel = new OwnLabel(I18n.msg("gui.planetarium.aperture"), skin);
         plAperture = new OwnTextField(Float.toString(settings.program.modeCubemap.planetarium.aperture), skin, new FloatValidator(30, 360));
         plAperture.setWidth(inputWidth);
 
         // Skew angle
-        Label plAngleLabel = new OwnLabel(I18n.msg("gui.planetarium.angle"), skin);
+        OwnLabel plAngleLabel = new OwnLabel(I18n.msg("gui.planetarium.angle"), skin);
         plAngle = new OwnTextField(Float.toString(settings.program.modeCubemap.planetarium.angle), skin, new FloatValidator(-180, 180));
         plAngle.setWidth(inputWidth);
 
@@ -1739,7 +1749,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // LABELS
-        labels.add(plResolutionLabel);
+        labels.add(plResolutionLabel, plAngleLabel, plResolutionLabel);
 
         // Add to table
         planetarium.add(apertureLabel).left().padRight(pad34).padBottom(pad18 * 3f);
@@ -1750,9 +1760,61 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         planetarium.add(plResolutionLabel).left().padRight(pad34).padBottom(pad10);
         planetarium.add(plResolution).left().expandX().padBottom(pad10).row();
 
+        // Spherical mirror
+        OwnLabel titleSphericalMirror = new OwnLabel(I18n.msg("gui.planetarium.sphericalmirror"), skin, "header");
+        Table sphericalMirror = new Table(skin);
+
+        // Warp file
+        OwnLabel warpFileLabel = new OwnLabel(I18n.msg("gui.planetarium.sphericalmirror.warpfile"), skin);
+        var currentMeshWarp = settings.program.modeCubemap.planetarium.sphericalMirrorWarp;
+        var meshWarpText = currentMeshWarp != null ? currentMeshWarp.getFileName().toString() : I18n.msg("gui.planetarium.sphericalmirror.warpfile.select");
+        var meshWarpPath = currentMeshWarp != null ? currentMeshWarp.getParent() : SysUtils.getUserHome();
+        meshWarpFileLocation = new OwnTextButton(TextUtils.capString(meshWarpText, 45), skin);
+        meshWarpFileLocation.addListener(new OwnTextTooltip(currentMeshWarp != null ? currentMeshWarp.toString() : I18n.msg("gui.planetarium.sphericalmirror.warpfile.select"), skin));
+        meshWarpFilePath = settings.program.modeCubemap.planetarium.sphericalMirrorWarp;
+        meshWarpFileLocation.pad(pad10);
+        meshWarpFileLocation.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                FileChooser fc = new FileChooser(I18n.msg("gui.planetarium.sphericalmirror.warpfile"), skin, stage, meshWarpPath, FileChooser.FileChooserTarget.FILES);
+                fc.setShowHidden(settings.program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> settings.program.fileChooser.showHidden = showHidden);
+                fc.setFileFilter(pathname -> Files.exists(pathname) && Files.isRegularFile(pathname));
+                fc.setAcceptedFiles("*.*");
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (WarpMeshReader.isValidWarpMeshAscii(result)) {
+                            // do stuff with result
+                            meshWarpFileLocation.setText(TextUtils.capString(result.getFileName().toString(), 45));
+                            meshWarpFilePath = result;
+                            meshWarpFileLocation.addListener(new OwnTextTooltip(result.toString(), skin));
+                        } else {
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.msg("gui.planetarium.sphericalmirror.warpfile.invalid", result.toString()));
+                        }
+                    }
+                    return true;
+                });
+                fc.show(stage);
+
+                return true;
+            }
+            return false;
+        });
+        OwnImageButton meshWarpTooltip = new OwnImageButton(skin, "tooltip");
+        meshWarpTooltip.addListener(new OwnTextTooltip(I18n.msg("gui.planetarium.sphericalmirror.warpfile.tooltip"), skin));
+
+        // LABELS
+        labels.add(warpFileLabel);
+
+        // Add to table
+        sphericalMirror.add(warpFileLabel).left().padRight(pad34).padBottom(pad18 * 3f);
+        sphericalMirror.add(meshWarpFileLocation).left().expandX().padBottom(pad18 * 3f).padRight(pad18);
+        sphericalMirror.add(meshWarpTooltip).left().padBottom(pad18 * 3f);
+
         // Add to content
         contentPlanetarium.add(titlePlanetarium).left().padBottom(pad18).row();
-        contentPlanetarium.add(planetarium).left();
+        contentPlanetarium.add(planetarium).left().padBottom(pad34).row();
+        contentPlanetarium.add(titleSphericalMirror).left().padBottom(pad18).row();
+        contentPlanetarium.add(sphericalMirror).left();
 
 
         /*
@@ -2331,7 +2393,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // Screenshots
-        File ssFile = new File(screenshotsLocation.getText().toString());
+        File ssFile = screenshotsPath.toFile();
         if (ssFile.exists() && ssFile.isDirectory())
             settings.screenshot.location = ssFile.getAbsolutePath();
         ScreenshotMode prev = settings.screenshot.mode;
@@ -2349,7 +2411,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.screenshot.quality = screenshotQuality.getValue() / 100f;
 
         // Frame output
-        File foFile = new File(frameOutputLocation.getText().toString());
+        File foFile = frameOutputPath.toFile();
         if (foFile.exists() && foFile.isDirectory())
             settings.frame.location = foFile.getAbsolutePath();
         String text = frameOutputPrefix.getText();
@@ -2390,6 +2452,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float pa = Float.parseFloat(plAngle.getText());
         if (pa != settings.program.modeCubemap.planetarium.angle) {
             EventManager.publish(Event.PLANETARIUM_ANGLE_CMD, this, pa);
+        }
+
+        // Spherical mirror projection warp mesh file
+        if (settings.program.modeCubemap.planetarium.sphericalMirrorWarp != meshWarpFilePath) {
+            EventManager.publish(Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, this, meshWarpFilePath);
         }
 
         // Index of refraction

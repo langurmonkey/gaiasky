@@ -738,6 +738,10 @@ public enum Event {
      */
     PLANETARIUM_PROJECTION_CMD,
     /**
+     * A new geometry warp file has been selected. Contains the path to the file.
+     */
+    PLANETARIUM_GEOMETRYWARP_FILE_CMD,
+    /**
      * Issues the play command. Contains the path to the file to play.
      **/
     PLAY_CAMERA_CMD,

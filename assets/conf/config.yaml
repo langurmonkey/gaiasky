@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30401
+configVersion: 30500
 
 #
 # Data configuration
@@ -352,6 +352,9 @@ program:
       aperture: 180.0
       # Devaition angle of the focus mode from the zenith, in degrees
       angle: 50.0
+      # Warp mesh file for the spherical mirror projection
+      # See http://paulbourke.net/dataformats/meshwarp
+      sphericalMirrorWarp: null
   # Gaia Sky instance connection (master-slave)
   net:
     # Enable the REST API on this TCP port (negative to disable)

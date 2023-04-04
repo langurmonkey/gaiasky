@@ -442,19 +442,19 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         }
         case RECALCULATE_CONTROLS_WINDOW_SIZE -> recalculateSize();
         case EXPAND_PANE_CMD -> {
-            String paneName1 = (String) data[0];
-            CollapsiblePane pane1 = panes.get(paneName1);
-            pane1.expandPane();
+            String name = (String) data[0];
+            CollapsiblePane pane = panes.get(name);
+            pane.expandPane();
         }
         case COLLAPSE_PANE_CMD -> {
-            String paneName2 = (String) data[0];
-            CollapsiblePane pane2 = panes.get(paneName2);
-            pane2.collapsePane();
+            String name = (String) data[0];
+            CollapsiblePane pane = panes.get(name);
+            pane.collapsePane();
         }
         case TOGGLE_EXPANDCOLLAPSE_PANE_CMD -> {
-            String paneName3 = (String) data[0];
-            CollapsiblePane pane3 = panes.get(paneName3);
-            pane3.togglePane();
+            String name = (String) data[0];
+            CollapsiblePane pane = panes.get(name);
+            pane.togglePane();
         }
         case SHOW_MINIMAP_ACTION -> {
             boolean show = (Boolean) data[0];
