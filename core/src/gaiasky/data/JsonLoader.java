@@ -36,7 +36,7 @@ public class JsonLoader extends AbstractSceneLoader {
     // Old components package. This was moved during the ECS refactor.
     private static final String COMPONENTS_PACKAGE = "gaiasky.scene.record.";
     // Params to skip in the normal processing.
-    private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
+    private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "archetype", "comment", "comments");
 
     private static final Map<String, String> REPLACE = new HashMap<>();
 
@@ -92,22 +92,22 @@ public class JsonLoader extends AbstractSceneLoader {
                 int loaded = 0;
                 while (child != null) {
                     processed++;
-                    String className = child.getString("impl");
-                    className = className.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                    String archetypeName = child.has("archetype") ? child.getString("archetype") : child.getString("impl");
+                    archetypeName = archetypeName.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
-                    if (!scene.archetypes().contains(className)) {
+                    if (!scene.archetypes().contains(archetypeName)) {
                         // Do not know what to do
-                        if (!loggedArchetypes.contains(className)) {
-                            logger.warn("Skipping " + TextUtils.classSimpleName(className) + ": no suitable archetype found.");
-                            loggedArchetypes.add(className);
+                        if (!loggedArchetypes.contains(archetypeName)) {
+                            logger.warn("Skipping " + TextUtils.classSimpleName(archetypeName) + ": no suitable archetype found.");
+                            loggedArchetypes.add(archetypeName);
                         }
                     } else {
                         loaded++;
                         // Create entity and fill it up
-                        var archetype = scene.archetypes().get(className);
+                        var archetype = scene.archetypes().get(archetypeName);
                         var entity = archetype.createEntity();
                         try {
-                            fillEntity(child, entity, TextUtils.classSimpleName(className), false);
+                            fillEntity(child, entity, TextUtils.classSimpleName(archetypeName), false);
                             // Add to return list.
                             loadedEntities.add(entity);
                             // Add to index for possible later updates.

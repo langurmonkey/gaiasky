@@ -3,12 +3,14 @@
     "name" : "Test Object",
     "color" : [0.8, 0.4, 0.3, 1.0],
     "sizeKm" : 20000.0,
-    "ct" : "Others",
+    "componentType" : "Others",
 
     "parent" : "Universe", 
-    "impl" : "gaiasky.scenegraph.ShapeObject",
+    "archetype" : "ShapeObject",
     "renderGroup" : "MODEL_PIX",
     
+    "rotate": [0.0, 1.0, 0.0, 45.0],
+    "scale": [1.0, 1.0, 1.3],
 
     "model"			: {
       "args" : [true],
@@ -17,7 +19,7 @@
       "type" : "sphere",
       "primitiveType": "triangles",
       "params" : {
-        "quality" : 20,
+        "quality" : 40,
         "diameter" : 1.0,
         "flip" : false
       }

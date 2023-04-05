@@ -193,10 +193,18 @@ public class Base implements Component, ICopy {
         return ct != null && this.ct.isEnabled(ct);
     }
 
+    public void setComponentType(String ct) {
+        setCt(ct);
+    }
+
     public void setCt(String ct) {
         this.ct = new ComponentTypes();
         if (!ct.isEmpty())
             this.ct.set(ComponentType.valueOf(ct).ordinal());
+    }
+
+    public void setComponentType(String[] cts) {
+        setCt(cts);
     }
 
     public void setCt(String[] cts) {

@@ -83,6 +83,24 @@ public class Archetypes {
         return null;
     }
 
+    /**
+     * Generates a list of archetype names from the given class names. Each
+     * archetype is submitted twice, with and without the (legacy) package name.
+     *
+     * @param classNames The class names.
+     *
+     * @return A list of archetype names.
+     */
+    private String[] modelNames(String... classNames) {
+        String[] result = new String[classNames.length * 2];
+        int i = 0;
+        for (String name : classNames) {
+            result[i++] = name;
+            result[i++] = modelName(name);
+        }
+        return result;
+    }
+
     private String modelName(String className) {
         return "gaiasky.scenegraph." + className;
     }
@@ -92,128 +110,128 @@ public class Archetypes {
             this.archetypes = new HashMap<>();
 
             // SceneGraphNode
-            addArchetype(modelName("SceneGraphNode"), Base.class, Body.class, GraphNode.class, Octant.class, Render.class);
+            addArchetype(modelNames("SceneGraphNode"), Base.class, Body.class, GraphNode.class, Octant.class, Render.class);
 
             // Universe
             addArchetype(Scene.ROOT_NAME, Base.class, Body.class, GraphNode.class, GraphRoot.class);
 
             // Celestial
-            addArchetype(modelName("CelestialBody"), modelName("SceneGraphNode"), Celestial.class, Magnitude.class,
+            addArchetype(modelNames("CelestialBody"), "SceneGraphNode", Celestial.class, Magnitude.class,
                     Coordinates.class, Rotation.class, Label.class, SolidAngle.class, Focus.class, Billboard.class);
 
             // ModelBody
-            addArchetype(modelName("ModelBody"), modelName("CelestialBody"), Model.class, RenderType.class, ModelScaffolding.class, AffineTransformations.class);
+            addArchetype(modelNames("ModelBody"), "CelestialBody", Model.class, RenderType.class, ModelScaffolding.class, AffineTransformations.class);
 
             // Planet
-            addArchetype(modelName("Planet"), modelName("ModelBody"), Atmosphere.class, Cloud.class);
+            addArchetype(modelNames("Planet"), "ModelBody", Atmosphere.class, Cloud.class);
 
             // Particle
-            addArchetype(modelName("Particle"), modelName("CelestialBody"), ProperMotion.class, RenderType.class, ParticleExtra.class);
+            addArchetype(modelNames("Particle"), "CelestialBody", ProperMotion.class, RenderType.class, ParticleExtra.class);
 
             // Star
-            addArchetype(modelName("Star"), modelName("Particle"), Hip.class, Distance.class, Model.class, ModelScaffolding.class);
+            addArchetype(modelNames("Star"), "Particle", Hip.class, Distance.class, Model.class, ModelScaffolding.class);
 
             // Satellite
-            addArchetype(modelName("Satellite"), modelName("ModelBody"), ParentOrientation.class);
+            addArchetype(modelNames("Satellite"), "ModelBody", ParentOrientation.class);
 
             // HeliotropicSatellite
-            addArchetype(modelName("HeliotropicSatellite"), modelName("Satellite"), Attitude.class, TagHeliotropic.class);
+            addArchetype(modelNames("HeliotropicSatellite"), "Satellite", Attitude.class, TagHeliotropic.class);
 
             // GenericSpacecraft
-            addArchetype(modelName("GenericSpacecraft"), modelName("Satellite"), RenderFlags.class);
+            addArchetype(modelNames("GenericSpacecraft"), "Satellite", RenderFlags.class);
 
             // Spacecraft
-            addArchetype(modelName("Spacecraft"), modelName("GenericSpacecraft"), MotorEngine.class);
+            addArchetype(modelNames("Spacecraft"), "GenericSpacecraft", MotorEngine.class);
 
             // StarCluster
-            addArchetype(modelName("StarCluster"), modelName("SceneGraphNode"), Model.class, Cluster.class, ProperMotion.class, Label.class, Focus.class, Billboard.class);
+            addArchetype(modelNames("StarCluster"), "SceneGraphNode", Model.class, Cluster.class, ProperMotion.class, Label.class, Focus.class, Billboard.class);
 
             // Billboard
-            addArchetype(modelName("Billboard"), modelName("ModelBody"), TagQuaternionOrientation.class, Fade.class);
+            addArchetype(modelNames("Billboard"), "ModelBody", TagQuaternionOrientation.class, Fade.class);
 
             // BillboardGalaxy
-            addArchetype(modelName("BillboardGalaxy"), modelName("Billboard"), TagBillboardGalaxy.class);
+            addArchetype(modelNames("BillboardGalaxy"), "Billboard", TagBillboardGalaxy.class);
 
             // VertsObject
-            addArchetype(modelName("VertsObject"), modelName("SceneGraphNode"), Verts.class);
+            addArchetype(modelNames("VertsObject"), "SceneGraphNode", Verts.class);
 
             // Polyline
-            addArchetype(modelName("Polyline"), modelName("VertsObject"), Arrow.class, Line.class);
+            addArchetype(modelNames("Polyline"), "VertsObject", Arrow.class, Line.class);
 
             // Orbit
-            addArchetype(modelName("Orbit"), modelName("Polyline"), Trajectory.class, RefSysTransform.class);
+            addArchetype(modelNames("Orbit"), "Polyline", Trajectory.class, RefSysTransform.class);
 
             // HeliotropicOrbit
-            addArchetype(modelName("HeliotropicOrbit"), modelName("Orbit"), TagHeliotropic.class);
+            addArchetype(modelNames("HeliotropicOrbit"), "Orbit", TagHeliotropic.class);
 
             // FadeNode
-            addArchetype(modelName("FadeNode"), modelName("SceneGraphNode"), Fade.class, Label.class);
+            addArchetype(modelNames("FadeNode"), "SceneGraphNode", Fade.class, Label.class);
 
             // GenericCatalog
-            addArchetype(modelName("GenericCatalog"), modelName("FadeNode"), DatasetDescription.class, Highlight.class, RefSysTransform.class);
+            addArchetype(modelNames("GenericCatalog"), "FadeNode", DatasetDescription.class, Highlight.class, RefSysTransform.class);
 
             // MeshObject
-            addArchetype(modelName("MeshObject"), modelName("FadeNode"), Mesh.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
+            addArchetype(modelNames("MeshObject"), "FadeNode", Mesh.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
 
             // BackgroundModel
-            addArchetype(modelName("BackgroundModel"), modelName("FadeNode"), TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
+            addArchetype(modelNames("BackgroundModel"), "FadeNode", TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
 
             // SphericalGrid
-            addArchetype(modelName("SphericalGrid"), modelName("BackgroundModel"), GridUV.class);
+            addArchetype(modelNames("SphericalGrid"), "BackgroundModel", GridUV.class);
 
             // RecursiveGrid
-            addArchetype(modelName("RecursiveGrid"), modelName("SceneGraphNode"), GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Line.class, RenderType.class);
+            addArchetype(modelNames("RecursiveGrid"), "SceneGraphNode", GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Line.class, RenderType.class);
 
             // BillboardGroup
-            addArchetype(modelName("BillboardGroup"), modelName("SceneGraphNode"), BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
+            addArchetype(modelNames("BillboardGroup"), "SceneGraphNode", BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
 
             // Text2D
-            addArchetype(modelName("Text2D"), modelName("SceneGraphNode"), Fade.class, Title.class, Label.class);
+            addArchetype(modelNames("Text2D"), "SceneGraphNode", Fade.class, Title.class, Label.class);
 
             // Axes
-            addArchetype(modelName("Axes"), modelName("SceneGraphNode"), Axis.class, RefSysTransform.class, Line.class);
+            addArchetype(modelNames("Axes"), "SceneGraphNode", Axis.class, RefSysTransform.class, Line.class);
 
             // Loc
-            addArchetype(modelName("Loc"), modelName("SceneGraphNode"), LocationMark.class, Label.class);
+            addArchetype(modelNames("Loc"), "SceneGraphNode", LocationMark.class, Label.class);
 
             // Area
-            addArchetype(modelName("Area"), modelName("SceneGraphNode"), Perimeter.class, Line.class, TagNoProcessGraph.class);
+            addArchetype(modelNames("Area"), "SceneGraphNode", Perimeter.class, Line.class, TagNoProcessGraph.class);
 
             // ParticleGroup
-            addArchetype(modelName("ParticleGroup"), modelName("GenericCatalog"), ParticleSet.class, TagNoProcessChildren.class, Focus.class);
+            addArchetype(modelNames("ParticleGroup"), "GenericCatalog", ParticleSet.class, TagNoProcessChildren.class, Focus.class);
 
             // StarGroup
-            addArchetype(modelName("StarGroup"), modelName("GenericCatalog"), StarSet.class, Model.class, Label.class, Line.class, Focus.class, Billboard.class);
+            addArchetype(modelNames("StarGroup"), "GenericCatalog", StarSet.class, Model.class, Label.class, Line.class, Focus.class, Billboard.class);
 
             // Constellation
-            addArchetype(modelName("Constellation"), modelName("SceneGraphNode"), Constel.class, Line.class, Label.class, TagNoProcessGraph.class);
+            addArchetype(modelNames("Constellation"), "SceneGraphNode", Constel.class, Line.class, Label.class, TagNoProcessGraph.class);
 
             // ConstellationBoundaries
-            addArchetype(modelName("ConstellationBoundaries"), modelName("SceneGraphNode"), Boundaries.class, Line.class);
+            addArchetype(modelNames("ConstellationBoundaries"), "SceneGraphNode", Boundaries.class, Line.class);
 
             // CosmicRuler
-            addArchetype(modelName("CosmicRuler"), modelName("SceneGraphNode"), Ruler.class, Line.class, Label.class);
+            addArchetype(modelNames("CosmicRuler"), "SceneGraphNode", Ruler.class, Line.class, Label.class);
 
             // OrbitalElementsGroup
-            addArchetype(modelName("OrbitalElementsGroup"), modelName("GenericCatalog"), OrbitElementsSet.class, TagNoProcessChildren.class);
+            addArchetype(modelNames("OrbitalElementsGroup"), "GenericCatalog", OrbitElementsSet.class, TagNoProcessChildren.class);
 
             // Invisible
-            addArchetype(modelName("Invisible"), modelName("CelestialBody"), Raymarching.class, TagInvisible.class);
+            addArchetype(modelNames("Invisible"), "CelestialBody", Raymarching.class, TagInvisible.class);
 
             // OctreeWrapper
-            addArchetype(modelName("octreewrapper.OctreeWrapper"), modelName("SceneGraphNode"), Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
+            addArchetype(modelNames("octreewrapper.OctreeWrapper"), "SceneGraphNode", Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
 
             // Model - a generic model
-            addArchetype(modelName("Model"), modelName("SceneGraphNode"), Model.class, RenderType.class, Coordinates.class, SolidAngle.class, RefSysTransform.class, AffineTransformations.class);
+            addArchetype(modelNames("Model"), "SceneGraphNode", Model.class, RenderType.class, Coordinates.class, SolidAngle.class, RefSysTransform.class, AffineTransformations.class);
 
             // ShapeObject
-            addArchetype(modelName("ShapeObject"), modelName("Model"), Shape.class, Label.class, Line.class);
+            addArchetype(modelNames("ShapeObject"), "Model", Shape.class, Label.class, Line.class);
 
             // KeyframesPathObject
-            addArchetype(modelName("KeyframesPathObject"), modelName("VertsObject"), Keyframes.class, Label.class);
+            addArchetype(modelNames("KeyframesPathObject"), "VertsObject", Keyframes.class, Label.class);
 
             // VRDeviceModel
-            addArchetype(modelName("VRDeviceModel"), modelName("SceneGraphNode"), VRDevice.class, Model.class, Line.class, TagNoClosest.class);
+            addArchetype(modelNames("VRDeviceModel"), "SceneGraphNode", VRDevice.class, Model.class, Line.class, TagNoClosest.class);
 
             return archetypes;
         } else {
@@ -231,7 +249,21 @@ public class Archetypes {
     }
 
     @SafeVarargs
+    private void addArchetype(String[] archetypeNames, String parentArchetypeName, Class<? extends Component>... classes) {
+        for (String archetypeName : archetypeNames) {
+            addArchetype(archetypeName, parentArchetypeName, classes);
+        }
+    }
+
+    @SafeVarargs
     private void addArchetype(String archetypeName, Class<? extends Component>... classes) {
         addArchetype(archetypeName, null, classes);
+    }
+
+    @SafeVarargs
+    private void addArchetype(String[] archetypeNames, Class<? extends Component>... classes) {
+        for (String archetypeName : archetypeNames) {
+            addArchetype(archetypeName, classes);
+        }
     }
 }
