@@ -8,7 +8,9 @@ import gaiasky.scene.component.tag.*;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Logger.LoggerLevel;
+import gaiasky.util.math.Matrix4d;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -237,6 +239,10 @@ public class Archetypes {
             // VRDeviceModel
             addArchetype(modelNames("VRDeviceModel"), "SceneGraphNode", VRDevice.class, Model.class, Line.class, TagNoClosest.class);
 
+            Matrix4d m = new Matrix4d();
+            m.idt().scale(1, 0.5, 0.2).rotate(0, 1, 0, 40);
+            System.out.println(Arrays.toString(m.val));
+
             return archetypes;
         } else {
             throw new RuntimeException("Can't create archetypes: the engine is null!");
@@ -253,18 +259,20 @@ public class Archetypes {
 
         if (Logger.level == LoggerLevel.DEBUG && !archetypeName.startsWith("gaiasky")) {
             StringBuilder sb = new StringBuilder();
-            sb.append(archetypeName);
+            sb.append("\"**").append(archetypeName).append("**\", ");
             if (parentArchetypeName != null) {
-                sb.append(" [").append(parentArchetypeName).append("]: ");
+                sb.append("\"").append(parentArchetypeName).append("\", ");
             } else {
-                sb.append(":  ");
+                sb.append("\"\", ");
             }
             int n = classes.length;
             int i = 0;
+            sb.append("\"");
             for (var c : classes) {
                 sb.append(c.getSimpleName()).append(i < n - 1 ? ", " : "");
                 i++;
             }
+            sb.append("\"");
             logger.debug(sb.toString());
         }
     }

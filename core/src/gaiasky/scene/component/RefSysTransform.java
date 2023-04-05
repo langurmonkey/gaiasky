@@ -55,6 +55,11 @@ public class RefSysTransform implements Component {
         }
     }
 
+    public void setTransformMatrix(double[] matrixValues) {
+        this.matrix = new Matrix4d(matrixValues);
+        this.matrixf = this.matrix.putIn(new Matrix4());
+    }
+
     /**
      * Constructs the transformation matrix from a double array containing
      * the values in a column-major order (first the four values of the first
@@ -62,6 +67,6 @@ public class RefSysTransform implements Component {
      * must have at least 16 elements; the first 16 will be copied.
      **/
     public void setTransformValues(double[] transformValues) {
-        this.matrix = new Matrix4d(transformValues);
+        setTransformMatrix(transformValues);
     }
 }

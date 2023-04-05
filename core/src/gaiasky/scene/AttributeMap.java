@@ -88,7 +88,7 @@ public class AttributeMap {
         putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "pointcolor", "pointsize", "trail", "orbittrail", "orbitTrail", "trailMap", "newmethod", "newMethod", "onlybody", "onlyBody", "numSamples", "fadeDistanceUp", "fadeDistanceDown");
 
         // RefSysTransform
-        putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues");
+        putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues", "transformMatrix");
 
         // AffineTransformations
         putAll(AffineTransformations.class, "transformations", "scale", "rotate", "translate", "translatePc");
