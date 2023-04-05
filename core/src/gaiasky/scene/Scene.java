@@ -526,10 +526,22 @@ public class Scene {
      * @param removeFromIndex Whether to remove it from the index too.
      */
     public void remove(Entity entity, boolean removeFromIndex) {
-        if (entity != null && Mapper.graph.has(entity) && Mapper.graph.get(entity).parent != null) {
+
+        if (entity != null && Mapper.graph.has(entity)) {
             var graph = Mapper.graph.get(entity);
-            var parentGraph = Mapper.graph.get(graph.parent);
-            parentGraph.removeChild(entity, true);
+
+            // Remove all children recursively.
+            if (graph.children != null) {
+                for (var child : graph.children) {
+                    remove(child, true);
+                }
+            }
+
+            // Remove from parent.
+            if (graph.parent != null) {
+                var parentGraph = Mapper.graph.get(graph.parent);
+                parentGraph.removeChild(entity, true);
+            }
         } else {
             throw new RuntimeException("Given node is null");
         }
