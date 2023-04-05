@@ -19,6 +19,8 @@ public abstract class ModelCreator {
     public String name;
     public List<Vector3> vertices;
     public List<Vector3> normals;
+    public List<Vector3> binormals;
+    public List<Vector3> tangents;
     public List<Vector2> uv;
     public List<IFace> faces;
     protected int index;
@@ -27,6 +29,8 @@ public abstract class ModelCreator {
     public ModelCreator() {
         this.vertices = new ArrayList<>();
         this.normals = new ArrayList<>();
+        this.binormals = new ArrayList<>();
+        this.tangents = new ArrayList<>();
         this.uv = new ArrayList<>();
         this.faces = new ArrayList<>();
         this.index = 1;
@@ -117,8 +121,12 @@ public abstract class ModelCreator {
         int[] v();
 
         int[] n();
+        int[] b();
+        int[] t();
 
         void setNormals(int... n);
+        void setBinormals(int... n);
+        void setTangents(int... n);
     }
 
     /**
@@ -130,6 +138,10 @@ public abstract class ModelCreator {
 
         /** This stores the indices for the normals **/
         public int[] n;
+        /** This stores the indices for the tangents **/
+        public int[] t;
+        /** This stores the indices for the binormals **/
+        public int[] b;
 
         /**
          * Constructs a face with the indices of the vertices.
@@ -148,6 +160,22 @@ public abstract class ModelCreator {
         public void setNormals(int... n) {
             this.n = n;
         }
+        /**
+         * Sets the binormal indices.
+         *
+         * @param n Indices of the binormals.
+         */
+        public void setBinormals(int... n) {
+            this.b = n;
+        }
+        /**
+         * Sets the tangent indices.
+         *
+         * @param n Indices of the tangents.
+         */
+        public void setTangents(int... n) {
+            this.t = n;
+        }
 
         @Override
         public int[] v() {
@@ -157,6 +185,16 @@ public abstract class ModelCreator {
         @Override
         public int[] n() {
             return n;
+        }
+
+        @Override
+        public int[] t() {
+            return t;
+        }
+
+        @Override
+        public int[] b() {
+            return b;
         }
     }
 }

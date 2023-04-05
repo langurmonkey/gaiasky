@@ -1151,7 +1151,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
             int[] tri = new int[3];
             for (int i = 0; i < 3; i++) {
-                VertexInfo v = vertTmp1.set(isc.vertices.get(face.v()[i] - 1), isc.normals.get(face.n()[i] - 1), null, isc.uv.get(face.v()[i] - 1));
+                VertexInfo v = vertTmp1.set(isc.vertices.get(face.v()[i] - 1), isc.normals.get(face.n()[i] - 1), isc.tangents.get(face.t()[i] - 1), isc.binormals.get(face.b()[i] - 1), null, isc.uv.get(face.v()[i] - 1));
                 int idx = vertex(v);
                 tri[i] = idx;
             }

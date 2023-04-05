@@ -25,6 +25,8 @@ public class IcoSphereCreator extends ModelCreator {
 
     private Map<Long, Integer> middlePointIndexCache;
 
+    Vector3 aux1 = new Vector3(), aux2 = new Vector3();
+
     public IcoSphereCreator() {
         super();
         this.name = "Icosphere";
@@ -56,7 +58,7 @@ public class IcoSphereCreator extends ModelCreator {
      * @param p      The point.
      * @param radius The radius.
      *
-     * @return
+     * @return Vertex index.
      */
     protected int vertex(Vector3 p, float radius) {
         p.nor();
@@ -64,6 +66,24 @@ public class IcoSphereCreator extends ModelCreator {
         addUV(p);
         // Vertex is p times the radius
         vertices.add(p.scl(radius));
+
+        // Normal.
+        var normal = p.cpy().nor();
+        normals.add(normal);
+
+        // Tangent.
+        aux1.set(normal).crs(Vector3.Z);
+        aux2.set(normal).crs(Vector3.Y);
+        var tangent = aux2;
+        if (aux1.len() > aux2.len()) {
+            tangent = aux1;
+        }
+        tangent = tangent.cpy().nor();
+        tangents.add(tangent);
+
+        // Binormal.
+        var binormal = aux1.set(normal).crs(tangent).cpy().nor();
+        binormals.add(binormal);
 
         return index++;
     }
@@ -92,27 +112,9 @@ public class IcoSphereCreator extends ModelCreator {
 
     private void addNormals() {
         for (IFace face : faces) {
-            // Calculate normals
-            if (hardEdges) {
-                // Calculate face normal, shared amongst all vertices
-                Vector3 a = vertices.get(face.v()[1] - 1).cpy().sub(vertices.get(face.v()[0] - 1));
-                Vector3 b = vertices.get(face.v()[2] - 1).cpy().sub(vertices.get(face.v()[1] - 1));
-                normals.add(a.crs(b).nor());
-
-                // Add index to face
-                int idx = normals.size();
-                face.setNormals(idx, idx, idx);
-
-            } else {
-                // Just add the vertex normal
-                normals.add(vertices.get(face.v()[0] - 1).cpy().nor());
-                normals.add(vertices.get(face.v()[1] - 1).cpy().nor());
-                normals.add(vertices.get(face.v()[2] - 1).cpy().nor());
-
-                // Add indeces to face
-                int idx = normals.size();
-                face.setNormals(idx - 2, idx - 1, idx);
-            }
+            face.setNormals(face.v()[0], face.v()[1], face.v()[2]);
+            face.setBinormals(face.v()[0], face.v()[1], face.v()[2]);
+            face.setTangents(face.v()[0], face.v()[1], face.v()[2]);
         }
     }
 
@@ -120,8 +122,8 @@ public class IcoSphereCreator extends ModelCreator {
     private int getMiddlePoint(int p1, int p2, float radius) {
         // first check if we have it already
         boolean firstIsSmaller = p1 < p2;
-        Long smallerIndex = (long) (firstIsSmaller ? p1 : p2);
-        Long greaterIndex = (long) (firstIsSmaller ? p2 : p1);
+        long smallerIndex = firstIsSmaller ? p1 : p2;
+        long greaterIndex = firstIsSmaller ? p2 : p1;
         Long key = (smallerIndex << 32) + greaterIndex;
 
         if (this.middlePointIndexCache.containsKey(key)) {
