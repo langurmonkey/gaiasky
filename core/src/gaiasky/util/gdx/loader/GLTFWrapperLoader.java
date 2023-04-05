@@ -24,7 +24,7 @@ import net.mgsx.gltf.loaders.shared.texture.ImageResolver;
 import net.mgsx.gltf.loaders.shared.texture.TextureResolver;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
-public class GLTFLoader  extends AsynchronousAssetLoader<SceneAsset, SceneAssetLoaderParameters> {
+public class GLTFWrapperLoader extends AsynchronousAssetLoader<SceneAsset, SceneAssetLoaderParameters> {
 
     private class ManagedTextureResolver extends TextureResolver {
 
@@ -115,11 +115,11 @@ public class GLTFLoader  extends AsynchronousAssetLoader<SceneAsset, SceneAssetL
     private SeparatedDataFileResolver dataFileResolver;
     private ManagedTextureResolver textureResolver;
 
-    public GLTFLoader() {
+    public GLTFWrapperLoader() {
         this(new InternalFileHandleResolver());
     }
 
-    public GLTFLoader(FileHandleResolver resolver) {
+    public GLTFWrapperLoader(FileHandleResolver resolver) {
         super(resolver);
     }
 
