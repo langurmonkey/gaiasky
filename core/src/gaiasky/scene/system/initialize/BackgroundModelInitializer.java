@@ -49,7 +49,9 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
         model.model.env.set(new ColorAttribute(ColorAttribute.AmbientLight, body.color[0], body.color[1], body.color[2], 1));
 
         // Render type
-        renderType.renderGroup = RenderGroup.SKYBOX;
+        if (renderType.renderGroup == null) {
+            renderType.renderGroup = RenderGroup.SKYBOX;
+        }
     }
 
     @Override

@@ -199,7 +199,7 @@ public class OctreeLoader extends AbstractSceneLoader implements IObserver, IOct
              * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default
              * parallel, so we never use OctreeWrapperConcurrent
              */
-            Archetype archetype = scene.archetypes().get("gaiasky.scenegraph.octreewrapper.OctreeWrapper");
+            Archetype archetype = scene.archetypes().get("OctreeWrapper");
             Entity entity = archetype.createEntity();
 
             // Catalog info

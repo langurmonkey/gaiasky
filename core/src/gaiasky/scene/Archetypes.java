@@ -5,6 +5,9 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.*;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
+import gaiasky.util.Logger.LoggerLevel;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,6 +17,7 @@ import java.util.Map;
  * A container for data and logic concerning {@link Archetype}s.
  */
 public class Archetypes {
+    private static final Log logger = Logger.getLogger(Archetypes.class);
 
     /** Archetypes map, links old scene graph model objects to artemis archetypes. **/
     protected Map<String, Archetype> archetypes;
@@ -219,7 +223,7 @@ public class Archetypes {
             addArchetype(modelNames("Invisible"), "CelestialBody", Raymarching.class, TagInvisible.class);
 
             // OctreeWrapper
-            addArchetype(modelNames("octreewrapper.OctreeWrapper"), "SceneGraphNode", Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
+            addArchetype(modelNames("OctreeWrapper", "octreewrapper.OctreeWrapper"), "SceneGraphNode", Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
 
             // Model - a generic model
             addArchetype(modelNames("Model"), "SceneGraphNode", Model.class, RenderType.class, Coordinates.class, SolidAngle.class, RefSysTransform.class, AffineTransformations.class);
@@ -246,6 +250,23 @@ public class Archetypes {
             parent = this.archetypes.get(parentArchetypeName);
         }
         this.archetypes.put(archetypeName, new Archetype(engine, parent, archetypeName, classes));
+
+        if (Logger.level == LoggerLevel.DEBUG && !archetypeName.startsWith("gaiasky")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(archetypeName);
+            if (parentArchetypeName != null) {
+                sb.append(" [").append(parentArchetypeName).append("]: ");
+            } else {
+                sb.append(":  ");
+            }
+            int n = classes.length;
+            int i = 0;
+            for (var c : classes) {
+                sb.append(c.getSimpleName()).append(i < n - 1 ? ", " : "");
+                i++;
+            }
+            logger.debug(sb.toString());
+        }
     }
 
     @SafeVarargs

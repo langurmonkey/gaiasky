@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component;
 import gaiasky.render.RenderGroup;
 
 public class RenderType implements Component {
-    public RenderGroup renderGroup;
+    public RenderGroup renderGroup = null;
 
     public void setRenderGroup(String rg) {
         this.renderGroup = RenderGroup.valueOf(rg);

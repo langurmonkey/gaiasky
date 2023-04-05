@@ -33,6 +33,7 @@ allprojects {
         jacksonVersion = "2.13.2"
         joiseVersion = "1.+"
         ashleyVersion = "+"
+        gltfVersion = "-SNAPSHOT"
         jpegxlVersion = "+"
     }
 
@@ -121,6 +122,9 @@ project(":core") {
         api group: "com.badlogicgames.gdx", name: "gdx", version: "$gdxVersion"
         api group: "com.badlogicgames.gdx", name: "gdx-backend-lwjgl3", version: "$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+        // GLTF-gdx
+        api group: "com.github.mgsx-dev.gdx-gltf", name: "gltf", version: "$gltfVersion"
 
         // gdx-controllers:2.+ bases up on SDL 2.0.12
         api group: "com.badlogicgames.gdx-controllers", name: "gdx-controllers-core", version: "$gdxcontrollersVersion"

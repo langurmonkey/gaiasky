@@ -82,6 +82,9 @@ import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.XrLoadStatus;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
+import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
+import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;
@@ -511,6 +514,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(IntModel.class, ".obj.gz", new OwnObjLoader(new GzipInputStreamProvider(), internalResolver));
         assetManager.setLoader(IntModel.class, ".g3dj", new G3dModelLoader(new JsonReader(), internalResolver));
         assetManager.setLoader(IntModel.class, ".g3db", new G3dModelLoader(new UBJsonReader(), internalResolver));
+        assetManager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader());
+        assetManager.setLoader(SceneAsset.class, ".glb", new GLBAssetLoader());
         assetManager.setLoader(GaiaSkyAssets.class, new GaiaSkyLoader(internalResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
 
