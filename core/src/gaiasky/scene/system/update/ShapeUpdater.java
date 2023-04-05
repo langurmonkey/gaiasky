@@ -31,6 +31,7 @@ public class ShapeUpdater extends AbstractUpdateSystem {
         var model = Mapper.model.get(entity);
         var coord = Mapper.coordinates.get(entity);
         var transform = Mapper.transform.get(entity);
+        var affine = Mapper.affine.get(entity);
 
         if (!model.model.isStaticLight()) {
             // Update light with global position
@@ -49,8 +50,13 @@ public class ShapeUpdater extends AbstractUpdateSystem {
         graph.translation.add(body.pos);
 
         graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);
+        // Apply reference system transform.
         if (transform.matrixf != null) {
             graph.localTransform.mul(transform.matrixf);
+        }
+        // Apply affine transformations.
+        if (affine.transformations != null && !affine.transformations.isEmpty()) {
+            affine.apply(graph.localTransform);
         }
 
     }
