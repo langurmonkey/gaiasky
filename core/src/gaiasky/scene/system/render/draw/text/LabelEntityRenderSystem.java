@@ -31,6 +31,8 @@ import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 
+import static gaiasky.scene.Mapper.base;
+
 /**
  * Contains the logic to render labels for specific objects.
  */
@@ -67,13 +69,14 @@ public class LabelEntityRenderSystem {
 
     public void renderShape(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         var body = view.body;
+        var base = view.base;
         var sa = Mapper.sa.get(view.getEntity());
 
         Vector3d pos = D31;
         view.textPosition(camera, pos);
-        shader.setUniformf("u_viewAngle", (float) body.solidAngle);
+        shader.setUniformf("u_viewAngle", base.forceLabel ? 2f : (float) body.solidAngle);
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thLabel", (float) sa.thresholdLabel);
+        shader.setUniformf("u_thLabel", base.forceLabel ? 1f : (float) sa.thresholdLabel);
 
         render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, view.text(), pos, body.distToCamera, view.textScale() * camera.getFovFactor(), view.textSize() * camera.getFovFactor(), view.getRadius(), view.base.forceLabel);
     }
@@ -81,7 +84,7 @@ public class LabelEntityRenderSystem {
     public void renderTitle(LabelView view, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         var title = view.getComponent(Title.class);
 
-        shader.setUniformf("u_viewAngle", (float) view.body.solidAngleApparent);
+        shader.setUniformf("u_viewAngle", view.base.forceLabel ? 2f : (float) view.body.solidAngleApparent);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 1f);
 

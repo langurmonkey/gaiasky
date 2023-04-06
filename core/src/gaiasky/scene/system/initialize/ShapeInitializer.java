@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
-import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
@@ -29,7 +28,9 @@ public class ShapeInitializer extends AbstractInitSystem {
         var base = Mapper.base.get(entity);
         var modelComp = Mapper.model.get(entity);
         var mc = modelComp.model;
-        mc.initialize(base.getLocalizedName());
+        if (mc != null) {
+            mc.initialize(base.getLocalizedName());
+        }
     }
 
     @Override
@@ -87,28 +88,30 @@ public class ShapeInitializer extends AbstractInitSystem {
         modelComp.renderConsumer = ModelEntityRenderSystem::renderShape;
         var mc = modelComp.model;
         graph.localTransform = new Matrix4();
-        mc.doneLoading(AssetBean.manager(), graph.localTransform, body.color);
+        if (mc != null) {
+            mc.doneLoading(AssetBean.manager(), graph.localTransform, body.color);
 
-        if (mc.isStaticLight()) {
-            DirectionalLight dLight = new DirectionalLight();
-            dLight.set(1, 1, 1, 1, 1, 1);
-            mc.env = new Environment();
-            mc.env.add(dLight);
-            mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+            if (mc.isStaticLight()) {
+                DirectionalLight dLight = new DirectionalLight();
+                dLight.set(1, 1, 1, 1, 1, 1);
+                mc.env = new Environment();
+                mc.env.add(dLight);
+                mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+            }
+
+            // Relativistic effects
+            if (Settings.settings.runtime.relativisticAberration)
+                mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
+            // Gravitational waves
+            if (Settings.settings.runtime.gravitationalWaves)
+                mc.rec.setUpGravitationalWavesMaterial(mc.instance.materials);
+
+            // Model size. Used to compute an accurate solid angle.
+            ModelInitializer.initializeModelSize(modelComp);
         }
-
-        // Relativistic effects
-        if (Settings.settings.runtime.relativisticAberration)
-            mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
-        // Gravitational waves
-        if (Settings.settings.runtime.gravitationalWaves)
-            mc.rec.setUpGravitationalWavesMaterial(mc.instance.materials);
 
         if (rt.renderGroup == null) {
             rt.renderGroup = RenderGroup.MODEL_BG;
         }
-
-        // Model size. Used to compute an accurate solid angle.
-        ModelInitializer.initializeModelSize(modelComp);
     }
 }

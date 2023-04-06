@@ -43,7 +43,7 @@ public class AttributeMap {
 
     public Map<String, Class<? extends Component>> initialize() {
         // Base
-        putAll(Base.class, "id", "name", "names", "altName", "altname", "opacity", "ct", "componentType");
+        putAll(Base.class, "id", "name", "names", "altName", "altname", "opacity", "ct", "componentType", "forceLabel");
 
         // Body
         putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm", "radiusPc", "diameter", "diameterKm", "color", "labelcolor", "labelColor");

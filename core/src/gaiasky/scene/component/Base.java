@@ -181,6 +181,10 @@ public class Base implements Component, ICopy {
         }
     }
 
+    public void setForceLabel(Boolean force) {
+        this.forceLabel = force;
+    }
+
     public void setAltname(String altname) {
         setAltName(altname);
     }

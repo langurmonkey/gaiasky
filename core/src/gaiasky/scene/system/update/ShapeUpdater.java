@@ -33,7 +33,7 @@ public class ShapeUpdater extends AbstractUpdateSystem {
         var transform = Mapper.transform.get(entity);
         var affine = Mapper.affine.get(entity);
 
-        if (!model.model.isStaticLight()) {
+        if (model.model != null && !model.model.isStaticLight()) {
             // Update light with global position
             LightingUtils.updateLights(model, body, graph, GaiaSky.instance.cameraManager);
         }
