@@ -276,53 +276,53 @@ public class KeyBindings {
         // Toggle recgrid
         addAction(new ProgramAction("action.toggle/element.recursivegrid", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.recursivegrid")));
 
-        // toggle meshes
+        // Toggle meshes
         addAction(new ProgramAction("action.toggle/element.meshes", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.meshes")));
 
-        // toggle clusters
+        // Toggle clusters
         addAction(new ProgramAction("action.toggle/element.clusters", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.clusters")));
 
-        // divide speed
+        // Divide time warp
         addAction(new ProgramAction("action.dividetime", () -> EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this)));
 
-        // double speed
+        // Double time warp
         addAction(new ProgramAction("action.doubletime", () -> EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this)));
 
-        // toggle time
+        // Toggle time
         addAction(new ProgramAction("action.pauseresume", () -> {
             // Game mode has space bound to 'up'
             if (!GaiaSky.instance.cameraManager.mode.isGame())
                 EventManager.publish(Event.TIME_STATE_CMD, this, !Settings.settings.runtime.timeOn);
         }));
 
-        // increase field of view
+        // Increase field of view
         addAction(new ProgramAction("action.incfov", () -> EventManager.publish(Event.FOV_CHANGED_CMD, this, Settings.settings.scene.camera.fov + 1f), noSlaveProj));
 
-        // decrease field of view
+        // Decrease field of view
         addAction(new ProgramAction("action.decfov", () -> EventManager.publish(Event.FOV_CHANGED_CMD, this, Settings.settings.scene.camera.fov - 1f), noSlaveProj));
 
-        // fullscreen
+        // Fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {
             Settings.settings.graphics.fullScreen.active = !Settings.settings.graphics.fullScreen.active;
             EventManager.publish(Event.SCREEN_MODE_CMD, this);
         }));
 
-        // take screenshot
+        // Take screenshot
         addAction(new ProgramAction("action.screenshot", () -> EventManager.publish(Event.SCREENSHOT_CMD, this, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1], Settings.settings.screenshot.location)));
 
-        // toggle frame output
+        // Toggle frame output
         addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.publish(Event.FRAME_OUTPUT_CMD, this, !Settings.settings.frame.active)));
 
-        // toggle UI collapse/expand
+        // Toggle UI collapse/expand
         addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.publish(Event.GUI_FOLD_CMD, this), fullGuiCondition, noCleanMode));
 
-        // toggle planetarium mode
+        // Toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPlanetariumOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.AZIMUTHAL_EQUIDISTANT);
         }, noPanorama, noOrthosphere));
 
-        // toggle planetarium projection
+        // Toggle planetarium projection
         addAction(new ProgramAction("action.toggle/element.planetarium.projection", () -> {
             if (Settings.settings.program.modeCubemap.isPlanetariumOn()) {
                 int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPlanetariumProjection().ordinal();
@@ -330,13 +330,13 @@ public class KeyBindings {
             }
         }, noPanorama, noOrthosphere));
 
-        // toggle cubemap mode
+        // Toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isPanoramaOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.EQUIRECTANGULAR);
         }, noPlanetarium, noOrthosphere));
 
-        // toggle cubemap projection
+        // Toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
             if (Settings.settings.program.modeCubemap.isPanoramaOn()) {
                 int newProjectionIndex = Settings.settings.program.modeCubemap.projection.getNextPanoramaProjection().ordinal();
@@ -344,13 +344,13 @@ public class KeyBindings {
             }
         }, noPlanetarium, noOrthosphere));
 
-        // toggle orthosphere mode
+        // Toggle orthosphere mode
         addAction(new ProgramAction("action.toggle/element.orthosphere", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active || !Settings.settings.program.modeCubemap.isOrthosphereOn();
             EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.ORTHOSPHERE);
         }, noPlanetarium, noPanorama));
 
-        // toggle orthosphere profile
+        // Toggle orthosphere profile
         addAction(new ProgramAction("action.toggle/element.orthosphere.profile", () -> {
             if (Settings.settings.program.modeCubemap.isOrthosphereOn()) {
                 int newProfileIndex = Settings.settings.program.modeCubemap.projection.getNextOrthosphereProfile().ordinal();
@@ -358,38 +358,38 @@ public class KeyBindings {
             }
         }));
 
-        // increase star point size by 0.5
+        // Increase star point size by 0.5
         addAction(new ProgramAction("action.starpointsize.inc", () -> EventManager.publish(Event.STAR_POINT_SIZE_INCREASE_CMD, this)));
 
-        // decrease star point size by 0.5
+        // Decrease star point size by 0.5
         addAction(new ProgramAction("action.starpointsize.dec", () -> EventManager.publish(Event.STAR_POINT_SIZE_DECREASE_CMD, this)));
 
-        // reset star point size
+        // Reset star point size
         addAction(new ProgramAction("action.starpointsize.reset", () -> EventManager.publish(Event.STAR_POINT_SIZE_RESET_CMD, this)));
 
-        // new keyframe
+        // New keyframe
         addAction(new ProgramAction("action.keyframe", () -> EventManager.publish(Event.KEYFRAME_ADD, this)));
 
-        // toggle debug information
+        // Toggle debug information
         addAction(new ProgramAction("action.toggle/element.debugmode", () -> EventManager.publish(Event.SHOW_DEBUG_CMD, this), noCleanMode));
 
-        // search dialog
+        // Search dialog
         final Runnable runnableSearch = () -> EventManager.publish(Event.SHOW_SEARCH_ACTION, this);
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
-        // search dialog
+        // Search dialog
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
-        // search dialog
+        // Search dialog
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
-        // toggle particle fade
+        // Toggle particle fade
         addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.msg("element.octreeparticlefade"), !Settings.settings.scene.octree.fade)));
 
-        // toggle stereoscopic mode
+        // Toggle stereoscopic mode
         addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active)));
 
-        // switch stereoscopic profile
+        // Switch stereoscopic profile
         addAction(new ProgramAction("action.switchstereoprofile", () -> {
             int newidx = Settings.settings.program.modeStereo.profile.ordinal();
             newidx = (newidx + 1) % values().length;
@@ -449,6 +449,10 @@ public class KeyBindings {
 
         // Toggle cinematic camera behaviour
         addAction(new ProgramAction("action.toggle/camera.cinematic", () -> EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, !Settings.settings.scene.camera.cinematic)));
+
+        // Empty action, press to speed up camera
+        addAction(new ProgramAction("action.camera.speedup", () -> {
+        }));
 
         // Controller GUI
         addAction(new ProgramAction("action.controller.gui.in", () -> EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this)));

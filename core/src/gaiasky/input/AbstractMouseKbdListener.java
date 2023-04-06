@@ -12,6 +12,7 @@ import gaiasky.gui.IInputListener;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -68,6 +69,13 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
      * @return True if all are pressed
      */
     public boolean allPressed(int... keys) {
+        for (int k : keys) {
+            if (!isKeyPressed(k))
+                return false;
+        }
+        return true;
+    }
+    public boolean allPressed(Collection<Integer> keys) {
         for (int k : keys) {
             if (!isKeyPressed(k))
                 return false;

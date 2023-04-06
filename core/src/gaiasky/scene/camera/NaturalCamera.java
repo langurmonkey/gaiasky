@@ -196,6 +196,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private double velocityGamepad = 0;
     private double gamepadMultiplier = 1;
+    /** Factor applied to all velocities. **/
+    private double movementMultiplier = 1;
+    /** Factor applied to speed only. **/
+    private double speedMultiplier = 1;
     /**
      * VR velocity vectors
      **/
@@ -865,7 +869,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Updates the position of this entity using the current force
      */
-    protected void updatePosition(double dt, double multiplier, double transUnits) {
+    protected void updatePosition(double dt, double multiplier, double speedScaling) {
         boolean cinematic = Settings.settings.scene.camera.cinematic;
         // Calculate velocity if coming from gamepad
         if (velocityGamepad != 0) {
@@ -886,7 +890,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         // Half a second after we have stopped zooming, real friction kicks in
         if (fullStop) {
-            double counterAmount = lastFwdAmount < 0 && cinematic ? Math.min(transUnits, 200) : 2;
+            double counterAmount = lastFwdAmount < 0 && cinematic ? Math.min(speedScaling, 200) : 2;
             if (getMode().isFocus() && lastFwdAmount > 0) {
                 double factor = cinematic ? 100 : 1;
                 counterAmount *= factor / ((focus.getDistToCamera() - focus.getRadius()) / focus.getRadius());
@@ -902,7 +906,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         force.add(friction);
 
-        if (lastFwdTime > (cinematic ? 250f : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop || lastFwdAmount > 0 && transUnits == 0) {
+        if (lastFwdTime > (cinematic ? 250f : currentMouseKbdListener.getResponseTime()) && velocityGamepad == 0 && velocityVRX == 0 && velocityVRY == 0 && fullStop || lastFwdAmount > 0 && speedScaling == 0) {
             stopForwardMovement();
         }
 
@@ -911,7 +915,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         applyForce(force);
 
         if (!(force.isZero() && velocity == 0 && accel.isZero())) {
-            vel.add(accel.scl(dt));
+            vel.add(accel.scl(dt)).scl(speedMultiplier);
 
             // Clamp to top speed
             if (Settings.settings.scene.camera.speedLimit > 0 && vel.len() > Settings.settings.scene.camera.speedLimit) {
@@ -932,7 +936,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 vel.set(focusDirection).nor().scl(sign * velocity);
             }
 
-            vel.clamp(0, multiplier);
+            vel.clamp(0, multiplier * speedMultiplier);
             // Aux1 is the step to take
             aux1b.set(vel).scl(dt);
             // Aux2 contains the new position
@@ -970,11 +974,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (updatePosition(pitch, dt)) {
             // Pitch
             aux1.set(direction).crs(up).nor();
-            rotate(aux1, pitch.z * rotateSpeed);
+            rotate(aux1, pitch.z * rotateSpeed * movementMultiplier);
         }
         if (updatePosition(yaw, dt)) {
             // Yaw
-            rotate(up, -yaw.z * rotateSpeed);
+            rotate(up, -yaw.z * rotateSpeed * movementMultiplier);
         }
 
         defaultState(pitch, !Settings.settings.scene.camera.cinematic && !gamepadInput);
@@ -984,7 +988,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void updateRoll(double dt, double rotateSpeed) {
         if (updatePosition(roll, dt)) {
             // Roll
-            rotate(direction, -roll.z * rotateSpeed);
+            rotate(direction, -roll.z * rotateSpeed * movementMultiplier);
         }
         defaultState(roll, !Settings.settings.scene.camera.cinematic && !gamepadInput);
     }
@@ -998,11 +1002,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (updatePosition(vertical, dt)) {
             // Pitch
             aux1.set(direction).crs(up).nor();
-            rotateAround(rotationCenter, aux1, vertical.z * Settings.settings.scene.camera.rotate);
+            rotateAround(rotationCenter, aux1, vertical.z * Settings.settings.scene.camera.rotate * movementMultiplier);
         }
         if (updatePosition(horizontal, dt)) {
             // Yaw
-            rotateAround(rotationCenter, up, -horizontal.z * Settings.settings.scene.camera.rotate);
+            rotateAround(rotationCenter, up, -horizontal.z * Settings.settings.scene.camera.rotate * movementMultiplier);
         }
 
         defaultState(vertical, !Settings.settings.scene.camera.cinematic && !gamepadInput);
@@ -1022,8 +1026,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void updateLateral(double dt, double translateUnits) {
         // Pan with hor
         aux1.set(direction).crs(up).nor();
-        aux1.scl(horizontal.y * gamepadMultiplier * translateUnits);
-        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * translateUnits);
+        aux1.scl(horizontal.y * gamepadMultiplier * translateUnits * movementMultiplier);
+        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * translateUnits * movementMultiplier);
         aux1.add(aux2);
         if (Settings.settings.scene.camera.speedLimit > 0 && aux1.len() > Settings.settings.scene.camera.speedLimit) {
             aux1.clamp(0, Settings.settings.scene.camera.speedLimit);
@@ -1063,7 +1067,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double desiredDirectionAngle = desired.angle(direction);
         if (desiredDirectionAngle > Math.min(0.3, 0.3 * fovFactor)) {
             // Add desired to direction with given turn velocity (v*dt)
-            desired.scl(turnVelocity * dt);
+            desired.scl(turnVelocity * dt * movementMultiplier);
             direction.add(desired).nor();
 
             // Update up so that it is always perpendicular
@@ -1897,6 +1901,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public void setDiverted(boolean diverted) {
         this.diverted = diverted;
+    }
+
+    public void setCameraMultipliers(double movementMultiplier, double speedMultiplier) {
+        this.movementMultiplier = movementMultiplier;
+        this.speedMultiplier = speedMultiplier;
     }
 
     public AbstractMouseKbdListener getCurrentMouseKbdListener() {

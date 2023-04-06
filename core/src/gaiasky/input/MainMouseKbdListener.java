@@ -18,6 +18,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.gui.KeyBindings;
 import gaiasky.scene.Scene;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.NaturalCamera;
@@ -69,6 +70,8 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
     public boolean alwaysScroll = true;
     /** The weight for each scrolled amount. */
     public float scrollFactor = -0.1f;
+    /** Current movement multiplier state. **/
+    private boolean movementMultiplierState = false;
     /** The key for rolling the camera **/
     public int rollKey = Keys.SHIFT_LEFT;
     /** The current (first) button being pressed. */
@@ -110,6 +113,7 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         this.currentDrag = new Vector2();
         this.lastDrag = new Vector2();
     }
+
     public MainMouseKbdListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
         EventManager.instance.subscribe(this, Event.TOUCH_DOWN, Event.TOUCH_UP, Event.TOUCH_DRAGGED, Event.SCROLLED, Event.KEY_DOWN, Event.KEY_UP, Event.SCENE_LOADED);
@@ -402,6 +406,22 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
             }
             result = true;
         }
+        var bindings = KeyBindings.instance;
+        var keys = bindings.getKeys("action.camera.speedup");
+        if (allPressed(keys)) {
+            if (!movementMultiplierState) {
+                // Activate.
+                movementMultiplierState = true;
+                camera.setCameraMultipliers(6, 5);
+            }
+        } else {
+            if (movementMultiplierState) {
+                // Deactivate.
+                movementMultiplierState = false;
+                camera.setCameraMultipliers(1, 1);
+
+            }
+        }
         return result;
     }
 
@@ -431,26 +451,6 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
         }
 
         @Override
-        public boolean tap(float x, float y, int count, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean longPress(float x, float y) {
-            return false;
-        }
-
-        @Override
-        public boolean fling(float velocityX, float velocityY, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean pan(float x, float y, float deltaX, float deltaY) {
-            return false;
-        }
-
-        @Override
         public boolean zoom(float initialDistance, float distance) {
             if (inputListener.isActive()) {
                 float newZoom = distance - initialDistance;
@@ -459,11 +459,6 @@ public class MainMouseKbdListener extends AbstractMouseKbdListener implements IO
                 float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
                 return inputListener.zoom(amount / (Math.min(w, h)));
             }
-            return false;
-        }
-
-        @Override
-        public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
             return false;
         }
     }
