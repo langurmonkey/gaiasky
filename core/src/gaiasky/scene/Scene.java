@@ -526,6 +526,18 @@ public class Scene {
      * @param removeFromIndex Whether to remove it from the index too.
      */
     public void remove(Entity entity, boolean removeFromIndex) {
+        remove(entity, true, removeFromIndex);
+    }
+
+    /**
+     * Removes the given entity from the scene.
+     *
+     * @param entity          The entity.
+     * @param topLevelElement Whether to remove the entity from its parent and update the scene graph counts.
+     *                        The top-level entity should set this to true.
+     * @param removeFromIndex Whether to remove it from the index too.
+     */
+    private void remove(Entity entity, boolean topLevelElement, boolean removeFromIndex) {
 
         if (entity != null && Mapper.graph.has(entity)) {
             var graph = Mapper.graph.get(entity);
@@ -533,12 +545,14 @@ public class Scene {
             // Remove all children recursively.
             if (graph.children != null) {
                 for (var child : graph.children) {
-                    remove(child, true);
+                    remove(child, false, true);
                 }
+                // Clear children.
+                graph.children.clear();
             }
 
             // Remove from parent.
-            if (graph.parent != null) {
+            if (graph.parent != null && topLevelElement) {
                 var parentGraph = Mapper.graph.get(graph.parent);
                 parentGraph.removeChild(entity, true);
             }
@@ -567,7 +581,9 @@ public class Scene {
         engine.removeEntity(entity);
 
         // Report update to number of objects.
-        reportDebugObjects();
+        if (topLevelElement) {
+            reportDebugObjects();
+        }
     }
 
     /**

@@ -357,45 +357,42 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
         switch (event) {
-        case CATALOG_ADD:
+        case CATALOG_ADD -> {
             removeNoDatasets();
             addCatalogInfo((CatalogInfo) data[0]);
-            break;
-        case CATALOG_REMOVE:
-            String ciName = (String) data[0];
-            if (groupMap.containsKey(ciName)) {
-                groupMap.get(ciName).remove();
-                groupMap.remove(ciName);
-                imageMap.remove(ciName);
-                colorMap.remove(ciName);
+        }
+        case CATALOG_REMOVE -> {
+            String datasetName = (String) data[0];
+            if (groupMap.containsKey(datasetName)) {
+                groupMap.get(datasetName).remove();
+                groupMap.remove(datasetName);
+                imageMap.remove(datasetName);
+                colorMap.remove(datasetName);
                 EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
             }
             addNoDatasets();
-            break;
-        case CATALOG_VISIBLE:
-            boolean ui = source == this;
-            if (!ui) {
-                ciName = (String) data[0];
+        }
+        case CATALOG_VISIBLE -> {
+            if (source != this) {
+                String datasetName = (String) data[0];
                 boolean visible = (Boolean) data[1];
-                OwnImageButton eye = imageMap.get(ciName)[0];
+                OwnImageButton eye = imageMap.get(datasetName)[0];
                 eye.setCheckedNoFire(!visible);
             }
-            break;
-        case PER_OBJECT_VISIBILITY_CMD:
-            ui = source == this;
-            if (!ui) {
+        }
+        case PER_OBJECT_VISIBILITY_CMD -> {
+            if (source != this) {
                 FocusView obj = (FocusView) data[0];
-                String name = (String) data[1];
+                String datasetName = (String) data[1];
                 boolean checked = (Boolean) data[2];
                 if (Mapper.mesh.has(obj.getEntity())) {
-                    OwnImageButton eye = imageMap.get(name)[0];
+                    OwnImageButton eye = imageMap.get(datasetName)[0];
                     eye.setCheckedNoFire(!checked);
                 }
             }
-            break;
-        case CATALOG_HIGHLIGHT:
-            ui = source == this;
-            if (!ui) {
+        }
+        case CATALOG_HIGHLIGHT -> {
+            if (source != this) {
                 CatalogInfo ci = (CatalogInfo) data[0];
                 float[] col = ci.hlColor;
                 if (colorMap.containsKey(ci.name) && col != null) {
@@ -408,23 +405,22 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                     hig.setCheckedNoFire(hl);
                 }
             }
-            break;
-        case CATALOG_POINT_SIZE_SCALING_CMD:
-            ui = source == this;
-            if (!ui) {
-                ciName = (String) data[0];
+        }
+        case CATALOG_POINT_SIZE_SCALING_CMD -> {
+            if (source != this) {
+                String datasetName = (String) data[0];
                 double val = (Double) data[1];
-                if (scalingMap.containsKey(ciName)) {
-                    OwnSliderPlus slider = scalingMap.get(ciName);
+                if (scalingMap.containsKey(datasetName)) {
+                    OwnSliderPlus slider = scalingMap.get(datasetName);
                     slider.setProgrammaticChangeEvents(false);
                     slider.setMappedValue(val);
                     slider.setProgrammaticChangeEvents(true);
                 }
 
             }
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
 
     }
