@@ -238,10 +238,6 @@ public class Archetypes {
             // VRDeviceModel
             addArchetype(modelNames("VRDeviceModel"), "SceneGraphNode", VRDevice.class, Model.class, Line.class, TagNoClosest.class);
 
-            Matrix4d m = new Matrix4d();
-            m.idt().scale(1, 0.5, 0.2).rotate(0, 1, 0, 40);
-            System.out.println(Arrays.toString(m.val));
-
             return archetypes;
         } else {
             throw new RuntimeException("Can't create archetypes: the engine is null!");
