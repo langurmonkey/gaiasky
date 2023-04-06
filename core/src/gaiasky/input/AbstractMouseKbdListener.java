@@ -69,13 +69,22 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
      * @return True if all are pressed
      */
     public boolean allPressed(int... keys) {
+        if (keys == null) {
+            return false;
+        }
+        
         for (int k : keys) {
             if (!isKeyPressed(k))
                 return false;
         }
         return true;
     }
+
     public boolean allPressed(Collection<Integer> keys) {
+        if (keys == null) {
+            return false;
+        }
+
         for (int k : keys) {
             if (!isKeyPressed(k))
                 return false;
