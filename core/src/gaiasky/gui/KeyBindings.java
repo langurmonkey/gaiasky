@@ -440,6 +440,16 @@ public class KeyBindings {
             addAction(new ProgramAction("camera.full/camera." + mode.toString(), () -> EventManager.publish(Event.CAMERA_MODE_CMD, this, mode)));
         }
 
+        // Toggle camera mode
+        addAction(new ProgramAction("action.toggle/camera.mode", () -> {
+            CameraMode oldMode = GaiaSky.instance.getCameraManager().getMode();
+            CameraMode newMode = CameraMode.values()[(oldMode.ordinal() + 1) % CameraMode.values().length];
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, newMode);
+        }));
+
+        // Toggle cinematic camera behaviour
+        addAction(new ProgramAction("action.toggle/camera.cinematic", () -> EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, !Settings.settings.scene.camera.cinematic)));
+
         // Controller GUI
         addAction(new ProgramAction("action.controller.gui.in", () -> EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this)));
 

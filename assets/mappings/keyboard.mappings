@@ -93,6 +93,10 @@ camera.full/camera.GAIA_FOV1_MODE           = NUMPAD_4
 camera.full/camera.GAIA_FOV2_MODE           = NUMPAD_5
 camera.full/camera.GAIA_FOVS_MODE           = NUMPAD_6
 
+# Cinematic camera
+action.toggle/camera.mode                   = CTRL_L M
+action.toggle/camera.cinematic              = CTRL_L C
+
 # Debug info
 action.toggle/element.debugmode             = CTRL_L D
 
