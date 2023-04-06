@@ -17,6 +17,7 @@
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.Color;
+import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 
 public class ColorAttribute extends Attribute {
     public final static String DiffuseAlias = "diffuseColor";
@@ -37,6 +38,32 @@ public class ColorAttribute extends Attribute {
 
     public ColorAttribute(final int index) {
         super(index);
+    }
+
+    public ColorAttribute(com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute other) {
+        super(convertType(other.type));
+        color.set(other.color);
+    }
+
+    private static int convertType(long oldType) {
+        if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.Ambient) {
+            return Ambient;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.Fog) {
+            return Fog;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.Diffuse) {
+            return Diffuse;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.Emissive) {
+            return Emissive;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.AmbientLight) {
+            return AmbientLight;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.Reflection) {
+            return Metallic;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.Specular) {
+            return Specular;
+        } else if(oldType == PBRColorAttribute.BaseColorFactor){
+            return Diffuse;
+        }
+        return -1;
     }
 
     public ColorAttribute(final int index, final Color color) {

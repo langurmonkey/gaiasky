@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
+import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
 
 public class TextureAttribute extends Attribute {
     public final static String DiffuseAlias = "diffuseTexture";
@@ -74,6 +75,49 @@ public class TextureAttribute extends Attribute {
     public TextureAttribute(final int index) {
         super(index);
         textureDescription = new TextureDescriptor<>();
+    }
+
+    public TextureAttribute(com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute other) {
+        super(convertType(other.type));
+        textureDescription = other.textureDescription;
+        offsetU = other.offsetU;
+        offsetV = other.offsetV;
+        scaleU = other.scaleU;
+        scaleV = other.scaleV;
+        uvIndex = other.uvIndex;
+    }
+
+    protected static int convertType(long oldType) {
+        if (oldType == PBRTextureAttribute.BaseColorTexture) {
+            return Diffuse;
+        } else if (oldType == PBRTextureAttribute.EmissiveTexture) {
+            return Emissive;
+        } else if (oldType == PBRTextureAttribute.NormalTexture) {
+            return Normal;
+        } else if (oldType == PBRTextureAttribute.SpecularFactorTexture) {
+            return Specular;
+        } else if (oldType == PBRTextureAttribute.SpecularColorTexture) {
+            return Specular;
+        } else if (oldType == PBRTextureAttribute.MetallicRoughnessTexture) {
+            return Roughness;
+        } else if (oldType == PBRTextureAttribute.OcclusionTexture) {
+            return AO;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Bump) {
+            return Bump;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Ambient) {
+            return Ambient;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Diffuse) {
+            return Diffuse;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Normal) {
+            return Normal;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Emissive) {
+            return Emissive;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Reflection) {
+            return Metallic;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Specular) {
+            return Specular;
+        }
+        return -1;
     }
 
     public <T extends Texture> TextureAttribute(final int index, final TextureDescriptor<T> textureDescription) {

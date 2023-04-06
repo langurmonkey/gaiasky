@@ -18,6 +18,7 @@ package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.gdx.shader.attribute.Attribute;
+import gaiasky.util.gdx.shader.attribute.AttributeConverter;
 import gaiasky.util.gdx.shader.attribute.Attributes;
 
 public class Material extends Attributes {
@@ -27,6 +28,16 @@ public class Material extends Attributes {
     /** Create an empty material */
     public Material() {
         this("mtl" + (++counter));
+    }
+
+    public Material(com.badlogic.gdx.graphics.g3d.Material other) {
+        this.id = other.id;
+        for (com.badlogic.gdx.graphics.g3d.Attribute at : other) {
+            var attribute = AttributeConverter.convert(at);
+            if (attribute != null) {
+                set(attribute);
+            }
+        }
     }
 
     /** Create an empty material */

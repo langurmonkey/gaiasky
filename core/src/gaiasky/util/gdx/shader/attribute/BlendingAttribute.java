@@ -38,7 +38,15 @@ public class BlendingAttribute extends Attribute {
     /** The opacity used as source alpha value, ranging from 0 (fully transparent) to 1 (fully opaque), (default: 1). */
     public float opacity;
     public BlendingAttribute() {
-        this(null);
+        this((BlendingAttribute) null);
+    }
+
+    public BlendingAttribute(com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute other) {
+        super(Type);
+        this.blended = other.blended;
+        this.sourceFunction = other.sourceFunction;
+        this.destFunction = other.destFunction;
+        this.opacity = other.opacity;
     }
 
     public BlendingAttribute(final boolean blended, final int sourceFunc, final int destFunc, final float opacity) {

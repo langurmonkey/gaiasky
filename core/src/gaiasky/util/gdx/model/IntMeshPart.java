@@ -23,6 +23,7 @@ package gaiasky.util.gdx.model;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -88,6 +89,17 @@ public class IntMeshPart {
 
     /** Construct a new MeshPart, with null values. The MeshPart is unusable until you set all members. **/
     public IntMeshPart() {
+    }
+
+    public IntMeshPart(MeshPart other) {
+        this.primitiveType = other.primitiveType;
+        this.center.set(other.center);
+        this.halfExtents.set(other.halfExtents);
+        this.id = other.id;
+        this.offset = other.offset;
+        this.size = other.size;
+        this.mesh = new IntMesh(other.mesh);
+        this.radius = other.radius;
     }
 
     /**

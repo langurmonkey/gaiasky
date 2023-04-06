@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.model.Animation;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.model.Node;
@@ -94,6 +95,33 @@ public class IntModel implements Disposable {
      */
     public IntModel(IntModelData modelData) {
         this(modelData, new FileTextureProvider());
+    }
+
+    /**
+     * Constructs a new IntModel based on the given {@link com.badlogic.gdx.graphics.g3d.Model}.
+     *
+     * @param other The other model.
+     */
+    public IntModel(Model other) {
+        // Add Nodes.
+        if (other.nodes != null) {
+            for (var node : other.nodes) {
+                nodes.add(new IntNode(node));
+            }
+
+            for (var node : nodes) {
+                for (var part : node.parts) {
+                    if (part.meshPart != null) {
+                        meshParts.add(part.meshPart);
+                        meshes.add(part.meshPart.mesh);
+                    }
+                    if (part.material != null) {
+                        materials.add(part.material);
+                    }
+                }
+            }
+        }
+
     }
 
     /**

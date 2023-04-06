@@ -29,8 +29,19 @@ public abstract class Attribute implements Comparable<Attribute> {
         this.typeBit = index;
     }
 
+    protected Attribute(long oldType) {
+        this(getIndex(oldType));
+    }
+
+    protected static int getIndex(long oldType) {
+        int idx = -1;
+        while (oldType != 0 && ++idx < 63 && (((oldType >> idx) & 1) == 0))
+            ;
+        return idx;
+    }
+
     /** @return The ID of the specified attribute type, or zero if not available */
-    public final static Bits getAttributeType(final String alias) {
+    public static Bits getAttributeType(final String alias) {
         for (int i = 0; i < types.size; i++) {
             if (types.get(i).compareTo(alias) == 0) {
                 Bits b = Bits.empty();
@@ -42,18 +53,18 @@ public abstract class Attribute implements Comparable<Attribute> {
     }
 
     /** @return The alias of the specified attribute type, or null if not available. */
-    public final static String getAttributeAlias(final Bits type) {
+    public static String getAttributeAlias(final Bits type) {
         int idx = type.nextSetBit(0);
         return (idx >= 0 && idx < types.size) ? types.get(idx) : null;
     }
 
     /** @return The index of the specified attribute type, or -1 if not available. */
-    public final static int getAttributeIndex(final Bits type) {
+    public static int getAttributeIndex(final Bits type) {
         return type.nextSetBit(0);
     }
 
     /** @return The index of the specified attribute alias, or -1 if not available. */
-    public final static int getAttributeIndex(final String alias) {
+    public static int getAttributeIndex(final String alias) {
         for (int i = 0; i < types.size; i++) {
             if (types.get(i).compareTo(alias) == 0) {
                 return i;
@@ -70,7 +81,7 @@ public abstract class Attribute implements Comparable<Attribute> {
      *
      * @return the index of the newly registered type, or the index of the existing type if the alias was already registered.
      */
-    protected final static int register(final String alias) {
+    protected static int register(final String alias) {
         int result = getAttributeIndex(alias);
         if (result >= 0)
             return result;

@@ -68,6 +68,20 @@ public class FloatAttribute extends Attribute {
         super(index);
     }
 
+    public FloatAttribute(com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute other) {
+        super(convertType(other.type));
+        this.value = other.value;
+    }
+
+    protected static int convertType(long oldType) {
+        if (oldType == com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute.AlphaTest) {
+            return AlphaTest;
+        } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute.Shininess) {
+            return Shininess;
+        }
+        return -1;
+    }
+
     public FloatAttribute(int index, float value) {
         super(index);
         this.value = value;

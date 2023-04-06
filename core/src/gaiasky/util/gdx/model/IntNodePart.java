@@ -21,6 +21,7 @@
 
 package gaiasky.util.gdx.model;
 
+import com.badlogic.gdx.graphics.g3d.model.NodePart;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ArrayMap;
 import gaiasky.util.gdx.IntRenderable;
@@ -55,6 +56,12 @@ public class IntNodePart {
      * the newly created part can be used.
      */
     public IntNodePart() {
+    }
+
+    public IntNodePart(final NodePart other) {
+        this(new IntMeshPart(other.meshPart), new Material(other.material));
+        bones = other.bones;
+        enabled = other.enabled;
     }
 
     /**

@@ -18,6 +18,8 @@ package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import gaiasky.util.gdx.OwnCubemap;
+import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
+import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 
 public class CubemapAttribute extends Attribute {
     public final static String ReflectionCubemapAlias = "reflectionCubemap";
@@ -49,6 +51,25 @@ public class CubemapAttribute extends Attribute {
     public CubemapAttribute(final int index) {
         super(index);
         textureDescription = new TextureDescriptor<>();
+    }
+
+    public CubemapAttribute(com.badlogic.gdx.graphics.g3d.attributes.CubemapAttribute other) {
+        super(convertType(other.type));
+        textureDescription = new TextureDescriptor<>();
+        if (other.textureDescription.texture != null) {
+            textureDescription.texture = new OwnCubemap(other.textureDescription.texture.getCubemapData(),
+                    other.textureDescription.texture.getMinFilter(),
+                    other.textureDescription.texture.getMagFilter());
+        }
+    }
+
+    private static int convertType(long oldType) {
+        if (oldType == com.badlogic.gdx.graphics.g3d.attributes.CubemapAttribute.EnvironmentMap) {
+            return ReflectionCubemap;
+        } else if (oldType == PBRCubemapAttribute.DiffuseEnv) {
+            return ReflectionCubemap;
+        }
+        return -1;
     }
 
     public <T extends OwnCubemap> CubemapAttribute(final int index, final TextureDescriptor<T> textureDescription) {

@@ -27,6 +27,11 @@ public class DirectionalLightsAttribute extends Attribute {
         lights.addAll(copyFrom.lights);
     }
 
+    public DirectionalLightsAttribute(com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute other) {
+        this();
+        lights.addAll(other.lights);
+    }
+
     @Override
     public DirectionalLightsAttribute copy() {
         return new DirectionalLightsAttribute(this);

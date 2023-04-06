@@ -69,6 +69,10 @@ public class DepthTestAttribute extends Attribute {
         this(rhs.index, rhs.depthFunc, rhs.depthRangeNear, rhs.depthRangeFar, rhs.depthMask);
     }
 
+    public DepthTestAttribute(final com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute other) {
+        this(Type, other.depthFunc, other.depthRangeNear, other.depthRangeFar, other.depthMask);
+    }
+
     @Override
     public Attribute copy() {
         return new DepthTestAttribute(this);

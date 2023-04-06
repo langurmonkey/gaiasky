@@ -25,6 +25,11 @@ public class IntAttribute extends Attribute {
         super(index);
     }
 
+    public IntAttribute(com.badlogic.gdx.graphics.g3d.attributes.IntAttribute other) {
+        super(CullFace);
+        this.value = other.value;
+    }
+
     public IntAttribute(int index, int value) {
         super(index);
         this.value = value;

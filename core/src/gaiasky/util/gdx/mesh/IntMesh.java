@@ -24,6 +24,7 @@ package gaiasky.util.gdx.mesh;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -79,6 +80,33 @@ public class IntMesh implements Disposable {
     final boolean isInstanced;
     private final Vector3 tmpV = new Vector3();
     boolean autoBind = true;
+
+    /**
+     * Creates a new IntMesh from the given mesh.
+     *
+     * @param other The mesh to copy.
+     */
+    public IntMesh(Mesh other) {
+        short[] otherIndices = new short[other.getNumIndices()];
+        float[] otherVertices = new float[other.getNumVertices()];
+        other.getIndices(otherIndices);
+        other.getVertices(otherVertices);
+
+        int[] myIndices = new int[otherIndices.length];
+        for (int i = 0; i < otherIndices.length; i++) {
+            myIndices[i] = otherIndices[i];
+        }
+
+        vertices = new VertexBufferObjectWithVAO(true, otherVertices.length, other.getVertexAttributes());
+        indices = new IntIndexBufferObjectSubData(true, otherIndices.length);
+        isVertexArray = false;
+        isInstanced = false;
+
+        indices.setIndices(myIndices, 0, myIndices.length);
+        vertices.setVertices(otherVertices, 0, otherVertices.length);
+
+        addManagedMesh(Gdx.app, this);
+    }
 
     /**
      * Creates a new Mesh with the given attributes.
@@ -176,31 +204,30 @@ public class IntMesh implements Disposable {
      */
     public IntMesh(VertexDataType type, boolean isStatic, int maxVertices, int maxIndices, VertexAttributes attributes) {
         switch (type) {
-        case VertexBufferObject:
+        case VertexBufferObject -> {
             vertices = new VertexBufferObject(isStatic, maxVertices, attributes);
             indices = new IntIndexBufferObject(isStatic, maxIndices);
             isVertexArray = false;
             isInstanced = false;
-            break;
-        case VertexBufferObjectSubData:
+        }
+        case VertexBufferObjectSubData -> {
             vertices = new VertexBufferObjectSubData(isStatic, maxVertices, attributes);
             indices = new IntIndexBufferObjectSubData(isStatic, maxIndices);
             isVertexArray = false;
             isInstanced = false;
-            break;
-        case VertexBufferObjectWithVAO:
+        }
+        case VertexBufferObjectWithVAO -> {
             vertices = new VertexBufferObjectWithVAO(isStatic, maxVertices, attributes);
             indices = new IntIndexBufferObjectSubData(isStatic, maxIndices);
             isVertexArray = false;
             isInstanced = false;
-            break;
-        case VertexArray:
-        default:
+        }
+        default -> {
             vertices = new VertexArray(maxVertices, attributes);
             indices = new IntIndexArray(maxIndices);
             isVertexArray = true;
             isInstanced = false;
-            break;
+        }
         }
 
         addManagedMesh(Gdx.app, this);
@@ -209,7 +236,7 @@ public class IntMesh implements Disposable {
     private static void addManagedMesh(Application app, IntMesh mesh) {
         Array<IntMesh> managedResources = meshes.get(app);
         if (managedResources == null)
-            managedResources = new Array<IntMesh>();
+            managedResources = new Array<>();
         managedResources.add(mesh);
         meshes.put(app, managedResources);
     }
@@ -217,7 +244,7 @@ public class IntMesh implements Disposable {
     /**
      * Invalidates all meshes so the next time they are rendered new VBO handles are generated.
      *
-     * @param app
+     * @param app The application
      */
     public static void invalidateAllMeshes(Application app) {
         Array<IntMesh> meshesArray = meshes.get(app);
@@ -268,22 +295,22 @@ public class IntMesh implements Disposable {
 
         int idx = offset + (start * vertexSize);
         switch (dimensions) {
-        case 1:
+        case 1 -> {
             for (int i = 0; i < count; i++) {
                 tmp.set(vertices[idx], 0, 0).mul(matrix);
                 vertices[idx] = tmp.x;
                 idx += vertexSize;
             }
-            break;
-        case 2:
+        }
+        case 2 -> {
             for (int i = 0; i < count; i++) {
                 tmp.set(vertices[idx], vertices[idx + 1], 0).mul(matrix);
                 vertices[idx] = tmp.x;
                 vertices[idx + 1] = tmp.y;
                 idx += vertexSize;
             }
-            break;
-        case 3:
+        }
+        case 3 -> {
             for (int i = 0; i < count; i++) {
                 tmp.set(vertices[idx], vertices[idx + 1], vertices[idx + 2]).mul(matrix);
                 vertices[idx] = tmp.x;
@@ -291,7 +318,7 @@ public class IntMesh implements Disposable {
                 vertices[idx + 2] = tmp.z;
                 idx += vertexSize;
             }
-            break;
+        }
         }
     }
 
