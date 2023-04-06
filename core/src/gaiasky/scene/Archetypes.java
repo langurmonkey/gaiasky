@@ -7,7 +7,6 @@ import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.*;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.math.Matrix4d;
 
 import java.util.Arrays;
@@ -257,23 +256,29 @@ public class Archetypes {
         }
         this.archetypes.put(archetypeName, new Archetype(engine, parent, archetypeName, classes));
 
-        if (Logger.level == LoggerLevel.DEBUG && !archetypeName.startsWith("gaiasky")) {
+        // Log.
+        // Print archetypes list.
+        final boolean printRSTArchetypes = false;
+        if (printRSTArchetypes && !archetypeName.startsWith("gaiasky")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("\"**").append(archetypeName).append("**\", ");
+
+            sb.append("* - **").append(archetypeName).append("**\n");
             if (parentArchetypeName != null) {
-                sb.append("\"").append(parentArchetypeName).append("\", ");
+                sb.append("  - ").append(parentArchetypeName).append("\n");
             } else {
-                sb.append("\"\", ");
+                sb.append("  - \n");
             }
-            int n = classes.length;
             int i = 0;
-            sb.append("\"");
             for (var c : classes) {
-                sb.append(c.getSimpleName()).append(i < n - 1 ? ", " : "");
+                if(i == 0) {
+                    sb.append("  - | ");
+                } else {
+                    sb.append("    | ");
+                }
+                sb.append(c.getSimpleName()).append("\n");
                 i++;
             }
-            sb.append("\"");
-            logger.debug(sb.toString());
+            System.out.print(sb);
         }
     }
 

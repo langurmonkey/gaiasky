@@ -45,6 +45,14 @@ public class AffineTransformations implements Component {
         setTranslate(iu);
     }
 
+    public void setTranslateKm(double[] translation) {
+        double[] iu = new double[3];
+        iu[0] = translation[0] * Constants.KM_TO_U;
+        iu[1] = translation[1] * Constants.KM_TO_U;
+        iu[2] = translation[2] * Constants.KM_TO_U;
+        setTranslate(iu);
+    }
+
     public void setQuaternion(double[] axis, double angle) {
         initialize();
         QuaternionTransform qt = new QuaternionTransform();
@@ -64,6 +72,13 @@ public class AffineTransformations implements Component {
         initialize();
         ScaleTransform st = new ScaleTransform();
         st.setScale(sc);
+        this.transformations.add(st);
+    }
+
+    public void setScale(Double sc) {
+        initialize();
+        ScaleTransform st = new ScaleTransform();
+        st.setScale(new double[] { sc, sc, sc });
         this.transformations.add(st);
     }
 
