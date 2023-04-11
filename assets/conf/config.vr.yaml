@@ -147,13 +147,13 @@ scene:
     opacity: [ 0.0, 1.0 ]
     # Star groups
     group:
-      # Enable or disable the star billboards when stars are close
+      # Enable or disable the star billboards when stars are close.
       billboard: true
-      # Maximum number of star billboards per group
+      # Maximum number of star billboards per group.
       numBillboard: 30
-      # Maximum number of labels per star group
+      # Maximum number of labels per star group.
       numLabel: 50
-      # Maximum number of velocity vectors per star group
+      # Maximum number of velocity vectors per star group.
       numVelocityVector: 500
     # Star threshold values
     threshold:
@@ -168,26 +168,27 @@ scene:
   label:
     # Label size factor
     size: 0.45
-    # Controls the number of labels to render
+    # Controls the number of labels to render. The threshold solid angle is divided by this number, effectively
+    # lowering it (when number > 1) or raising it (when label < 0).
     number: 1.8
-  # Line width factor
+  # Line width factor.
   lineWidth: 1.0
-  # Proper motion arrow settings
+  # Proper motion arrow settings.
   properMotion:
-    # Length factor of proper motion vectors [500.0 - 50000.0]
+    # Length factor of proper motion vectors [500.0 - 50000.0].
     length: 25000.0
-    # Scale factor of proper motion vectors [1.0 - 10.0]
+    # Scale factor of proper motion vectors [1.0 - 10.0].
     number: 5.0
-    # Color mode for velocity vectors
+    # Color mode for velocity vectors.
     # 0 - direction
     # 1 - length (speed)
     # 2 - has radial velocity
     # 3 - redshift
     # 4 - single color
     colorMode: 0
-    # Whether to show arrowheads or not
+    # Whether to show arrowheads or not.
     arrowHeads: true
-  # Octree settings
+  # Octree settings.
   octree:
     # In the case of multifile LOD datasets (such as DR2+), this setting contains
     # the maximum number of stars loaded at a time. If the number of loaded stars
@@ -200,58 +201,58 @@ scene:
     # - radius/distance above which we start painting stars in octant with fade in. Angle in radians.
     # - radius/distance below which we paint stars in octant with fade out. Above this angle, inner stars are painted with full brightness. Angle in radians.
     threshold: [ 1.4, 1.8 ]
-    # If on, particles fade in and out between levels of detail
+    # If on, particles fade in and out between levels of detail.
     fade: true
-  # Renderer settings
+  # Renderer settings.
   renderer:
-    # Point cloud mode, one of [TRIANGLES|TRIANGLES_INSTANCED|POINTS]
+    # Point cloud mode, one of [TRIANGLES|TRIANGLES_INSTANCED|POINTS].
     # TRIANGLES is the new mode. Triangles are sent to the GPU in VBOs with VAOs. Faster on newer hardware and geometrically correct.
     # TRIANGLES_INSTANCED is a variation of TRIANGLES. Saves x4 graphics memory. Your mileage may vary with this one.
-    # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes
+    # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes.
     pointCloud: TRIANGLES_INSTANCED
-    # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]
+    # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP].
     line: GL_LINES
-    # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO]
+    # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO].
     orbit: LINE_MODE_SETTING
-    # Ambient light value
+    # Ambient light value.
     ambient: 0.0
-    # Shadow settings
+    # Shadow settings.
     shadow:
-      # Enable shadows
+      # Enable shadows.
       active: true
-      # Shadow map resolution
+      # Shadow map resolution.
       resolution: 1024
-      # Maximum number of shadows
+      # Maximum number of shadows.
       number: 4
-    # Elevation representation settings
+    # Elevation representation settings.
     elevation:
-      # Elevation type [TESSELLATION|PARALLAX_MAPPING|NONE]
+      # Elevation type [TESSELLATION|PARALLAX_MAPPING|NONE].
       type: NONE
-      # Elevation multiplier, in [0.0, 10.0]
+      # Elevation multiplier, in [0.0, 10.0].
       multiplier: 0.85
-      # Tessellation quality, in [1.0, 7.0]
+      # Tessellation quality, in [1.0, 7.0].
       quality: 4.0
-    # Sparse Virtual Texture global settings
+    # Sparse Virtual Texture global settings.
     virtualTextures:
-      # Cache size, in tiles per side
+      # Cache size, in tiles per side.
       cacheSize: 6
-      # The detection buffer reduction factor
+      # The detection buffer reduction factor.
       detectionBufferFactor: 8.0
-  # Crosshair settings
+  # Crosshair settings.
   crosshair:
-    # Show crosshair on focus object
+    # Show crosshair on focus object.
     focus: true
-    # Show crosshair on closest object
+    # Show crosshair on closest object.
     closest: true
-    # Show crosshair on home object
+    # Show crosshair on home object.
     home: true
-  # Initialization configuration
+  # Initialization configuration.
   initialization:
-    # Lazy initialization of textures
+    # Lazy initialization of textures.
     lazyTexture: false
-    # Lazy initialization of meshes
+    # Lazy initialization of meshes.
     lazyMesh: true
-  # Visibility of components
+  # Visibility of components.
   visibility:
     Stars: true
     Planets: true
@@ -284,142 +285,142 @@ scene:
     Others: true
 
 #
-# Program configuration
+# Program configuration.
 #
 program:
-  # The default time zone to use. One of [UTC|SYSTEM_DEFAULT]
+  # The default time zone to use. One of [UTC|SYSTEM_DEFAULT].
   timeZone: UTC
   # Enable safe mode, which disables advanced graphics features.
-  # For instance, it disables float buffers and creates no velocity buffer (no motion blur)
+  # For instance, it disables float buffers and creates no velocity buffer (no motion blur).
   safeMode: false
-  # Print debug information to the terminal
+  # Print debug information to the terminal.
   debugInfo: false
-  # Offline mode: never attempt any connection - disables updates and dataset downloads
+  # Offline mode: never attempt any connection - disables updates and dataset downloads.
   offlineMode: false
-  # Save all procedurally-generated textures to the data folder
+  # Save all procedurally-generated textures to the data folder.
   # WARN: watch your disk space!
   saveProceduralTextures: false
-  # Minimap settings
+  # Minimap settings.
   minimap:
-    # Display the minimap
+    # Display the minimap.
     active: false
-    # Minimap side size in [150,350]
+    # Minimap side size in [150,350].
     size: 200.0
-    # Put minimap in a window
+    # Put minimap in a window.
     inWindow: false
-  # File chooser dialog configuration
+  # File chooser dialog configuration.
   fileChooser:
-    # Last location
+    # Last location.
     lastLocation: null
-    # Show hidden files
+    # Show hidden files.
     showHidden: false
-  # Pointer configuration
+  # Pointer configuration.
   pointer:
-    # Display the coordinates of the pointer projected on the sides of the window
+    # Display the coordinates of the pointer projected on the sides of the window.
     coordinates: true
-    # Pointer guides configuration
+    # Pointer guides configuration.
     guides:
-      # Display pointer guides
+      # Display pointer guides.
       active: false
-      # Color of pointer guides in RGBA
+      # Color of pointer guides in RGBA.
       color: [ 1.0, 1.0, 1.0, 0.3 ]
-      # Width of pointer guide lines
+      # Width of pointer guide lines.
       width: 1.5
-  # Recursive grid configuration
+  # Recursive grid configuration.
   recursiveGrid:
-    # Origin of the recursive grid in [FOCUS|REFSYS]
+    # Origin of the recursive grid in [FOCUS|REFSYS].
     origin: REFSYS
-    # If origin is refsys, this option adds projection lines to the current focus
+    # If origin is refsys, this option adds projection lines to the current focus.
     projectionLines: true
-  # Stereoscopic mode (3D)
+  # Stereoscopic mode (3D).
   modeStereo:
-    # Start in 3D mode
+    # Start in 3D mode.
     active: false
-    # The stereoscopic profile, one of [VR_HEADSET|HORIZONTAL_3DTV|VERTICAL_3DTV|CROSSEYE|PARALLEL_VIEW|ANAGLYPH]
+    # The stereoscopic profile, one of [VR_HEADSET|HORIZONTAL_3DTV|VERTICAL_3DTV|CROSSEYE|PARALLEL_VIEW|ANAGLYPH].
     profile: CROSSEYE
   # Cubemap mode
   modeCubemap:
-    # Start in cubemap mode
+    # Start in cubemap mode.
     active: false
-    # Projection to use for the cubemap mode, in [EQUIRECTANGULAR|CYLINDRICAL|HAMMER|AZIMUTHAL_EQUIDISTANT]
-    # Set to 'fisheye' for planetarium mode
+    # Projection to use for the cubemap mode, in [EQUIRECTANGULAR|CYLINDRICAL|HAMMER|AZIMUTHAL_EQUIDISTANT].
+    # Set to 'fisheye' for planetarium mode.
     projection: EQUIRECTANGULAR
-    # The resolution at which to render each side of the cubemap
+    # The resolution at which to render each side of the cubemap.
     faceResolution: 1500
-    # Planetarium mode configuration
+    # Planetarium mode configuration.
     planetarium:
-      # Aperture angle, in degrees
+      # Aperture angle, in degrees.
       aperture: 180.0
-      # Devaition angle of the focus mode from the zenith, in degrees
+      # Devaition angle of the focus mode from the zenith, in degrees.
       angle: 50.0
-      # Warp mesh file for the spherical mirror projection
+      # Warp mesh file for the spherical mirror projection.
       # See http://paulbourke.net/dataformats/meshwarp
       sphericalMirrorWarp: null
-  # Gaia Sky instance connection (master-slave)
+  # Gaia Sky instance connection (master-slave).
   net:
-    # Enable the REST API on this TCP port (negative to disable)
+    # Enable the REST API on this TCP port (negative to disable).
     restPort: -1
-    # Master configuration
+    # Master configuration.
     master:
-      # Is master instance
+      # Is master instance.
       # This means that the status is sent over the network to the slaves
-      # Incompatible with slave>is
+      # Incompatible with slave>is.
       active: false
-      # List of URLs of the slave instances
+      # List of URLs of the slave instances.
       # Example: [http://localhost:13900/api/, http://localhost:13901/api]
       slaves: [ ]
-    # Slave configuration
+    # Slave configuration.
     slave:
       # In a client-server configuration, this makes this instance act as a slave
       # which receives input events over the network
-      # Incompatible with master>is
+      # Incompatible with master>is.
       active: false
-      # Location of the .mpcdi configuration file for this instance
-      # Only needed if program.net.slave is true
+      # Location of the .mpcdi configuration file for this instance.
+      # Only needed if program.net.slave is true.
       configFile: null
-      # Warp pfm file
+      # Warp pfm file.
       warpFile: null
-      # Blend png file
+      # Blend png file.
       blendFile: null
-      # Yaw angle (turn head right)
+      # Yaw angle (turn head right).
       yaw: 0.0
-      # Pitch angle (turn head up)
+      # Pitch angle (turn head up).
       pitch: 0.0
-      # Roll angle (rotate head cw)
+      # Roll angle (rotate head cw).
       roll: 0.0
-  # User interface configuration
+  # User interface configuration.
   ui:
-    # The UI theme, in [dark-green|dark-blue|dark-orange|night-red]
+    # The UI theme, in [dark-green|dark-blue|dark-orange|night-red].
     theme: dark-green
-    # The UI scale factor
+    # The UI scale factor.
     scale: 1.5
-    # UI animation time in milliseconds
+    # UI animation time in milliseconds.
     animationMs: 600
-    # Preferred distance units [PC|LY]
+    # Preferred distance units [PC|LY].
     distanceUnits: PC
-    # Show mode change pop-up dialogs (panorama, planetarium, stereoscopic, and game modes)
+    # Show mode change pop-up dialogs (panorama, planetarium, stereoscopic, and game modes).
     modeChangeInfo: true
-  # Ask for confirmation on exit
+  # Ask for confirmation on exit.
   exitConfirmation: true
   # Set to 'default' to use the system default locale, set to
   # language tag (see java.util.Locale#forLanguageTag(), java 7+) to change
-  # the locale (en_GB, en_US, es_ES, de_DE, fr, etc.)
-  # Leave null to use default locale
+  # the locale (en_GB, en_US, es_ES, de_DE, fr, etc.).
+  # Leave null to use default locale.
   locale: null
-  # Update configuration
+  # Update configuration.
   update:
-    # Last update check date
+    # Last update check date.
     lastCheck: null
-    # Server version of the last check
+    # Server version of the last check.
     lastVersion: null
-  # Pointers to some resources
+  # Pointers to some resources.
   url:
-    # URL to check for new versions
+    # URL to check for new versions.
     versionCheck: https://codeberg.org/api/v1/repos/gaiasky/gaiasky/tags
-    # Data repository location
+    # Data repository location.
     dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
-    # Data descriptor file location
-    # This can also point to a local repository description file (use file://)
+    # Data descriptor file location.
+    # This can also point to a local repository description file (use file://).
     dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030301.json.gz
 
 #
