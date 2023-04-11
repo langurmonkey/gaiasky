@@ -31,6 +31,8 @@ public class ParticleSet implements Component, IDisposable {
      * List that contains the point data. It contains only [x y z]
      */
     public List<IParticleRecord> pointData;
+    /** This flag enables muting particle rendering. **/
+    public boolean renderParticles = true;
     /** Flag indicating whether the particle set holds stars or particles. **/
     public boolean isStars;
     /**
@@ -313,6 +315,10 @@ public class ParticleSet implements Component, IDisposable {
 
     public void setParticlesizelimits(double[] sizeLimits) {
         setParticleSizeLimits(sizeLimits);
+    }
+
+    public void setRenderParticles(Boolean renderParticles) {
+        this.renderParticles = renderParticles;
     }
 
     public IParticleRecord get(int index) {

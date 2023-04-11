@@ -146,14 +146,14 @@ public class AttributeMap {
                 "provider:ParticleGroup", "position:ParticleGroup", "datafile",
                 "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits",
                 "particleSizeLimits", "colorMin", "colorMax", "fixedAngularSize", "fixedAngularSizeDeg",
-                "fixedAngularSizeRad");
+                "fixedAngularSizeRad", "renderParticles");
 
         // StarSet
         putAll(StarSet.class,
                 "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup",
                 "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup",
                 "epoch:StarGroup", "variabilityEpoch:StarGroup", "fixedAngularSize:StarGroup", "fixedAngularSizeDeg:StarGroup",
-                "fixedAngularSizeRad:StarGroup");
+                "fixedAngularSizeRad:StarGroup", "renderParticles:StarGroup");
 
         // Attitude
         putAll(Attitude.class,

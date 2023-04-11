@@ -36,14 +36,16 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
 
     /** For star sets. **/
     private void addToRenderLists(Render render, StarSet starSet) {
-        if (starSet.variableStars) {
-            addToRender(render, RenderGroup.VARIABLE_GROUP);
-        } else {
-            addToRender(render, RenderGroup.STAR_GROUP);
-        }
-        addToRender(render, RenderGroup.MODEL_VERT_STAR);
-        if (Settings.settings.scene.star.group.billboard) {
-            addToRender(render, RenderGroup.BILLBOARD_STAR);
+        if (starSet.renderParticles) {
+            if (starSet.variableStars) {
+                addToRender(render, RenderGroup.VARIABLE_GROUP);
+            } else {
+                addToRender(render, RenderGroup.STAR_GROUP);
+            }
+            addToRender(render, RenderGroup.MODEL_VERT_STAR);
+            if (Settings.settings.scene.star.group.billboard) {
+                addToRender(render, RenderGroup.BILLBOARD_STAR);
+            }
         }
         if (renderer.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
             addToRender(render, RenderGroup.LINE);
@@ -53,7 +55,9 @@ public class ParticleSetExtractor extends AbstractExtractSystem {
 
     /** For particle sets. **/
     private void addToRenderLists(Render render) {
-        addToRender(render, RenderGroup.PARTICLE_GROUP);
+        if (Mapper.particleSet.get(render.entity).renderParticles) {
+            addToRender(render, RenderGroup.PARTICLE_GROUP);
+        }
         addToRender(render, RenderGroup.FONT_LABEL);
     }
 }
