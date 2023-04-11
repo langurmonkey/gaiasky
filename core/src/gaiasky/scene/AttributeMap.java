@@ -43,10 +43,15 @@ public class AttributeMap {
 
     public Map<String, Class<? extends Component>> initialize() {
         // Base
-        putAll(Base.class, "id", "name", "names", "altName", "altname", "opacity", "ct", "componentType", "forceLabel");
+        putAll(Base.class,
+                "id", "name", "names", "altName", "altname", "opacity",
+                "ct", "componentType", "forceLabel");
 
         // Body
-        putAll(Body.class, "position", "positionKm", "positionPc", "pos", "posKm", "posPc", "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm", "radiusPc", "diameter", "diameterKm", "color", "labelcolor", "labelColor");
+        putAll(Body.class,
+                "position", "positionKm", "positionPc", "pos", "posKm", "posPc",
+                "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm",
+                "radiusPc", "diameter", "diameterKm", "color", "labelcolor", "labelColor");
 
         // GraphNode
         putAll(GraphNode.class, "parent");
@@ -67,7 +72,9 @@ public class AttributeMap {
         putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
 
         // ModelScaffolding
-        putAll(ModelScaffolding.class, "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier", "locVaMultiplier", "locthoverfactor", "locThresholdLabel", "shadowvalues");
+        putAll(ModelScaffolding.class,
+                "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier",
+                "locVaMultiplier", "locthoverfactor", "locThresholdLabel", "shadowvalues");
 
         // Model
         putAll(Model.class, "model");
@@ -85,22 +92,33 @@ public class AttributeMap {
         putAll(MotorEngine.class, "machines");
 
         // Trajectory
-        putAll(Trajectory.class, "provider", "orbit", "model:Orbit", "pointcolor", "pointsize", "trail", "orbittrail", "orbitTrail", "trailMap", "newmethod", "newMethod", "onlybody", "onlyBody", "numSamples", "fadeDistanceUp", "fadeDistanceDown");
+        putAll(Trajectory.class,
+                "provider", "orbit", "model:Orbit", "pointcolor",
+                "pointsize", "trail", "orbittrail", "orbitTrail", "trailMap", "newmethod",
+                "newMethod", "onlybody", "onlyBody", "numSamples", "fadeDistanceUp",
+                "fadeDistanceDown");
 
         // RefSysTransform
-        putAll(RefSysTransform.class, "transformName", "transformFunction", "transformValues", "transformMatrix");
+        putAll(RefSysTransform.class,
+                "transformName", "transformFunction", "transformValues", "transformMatrix");
 
         // AffineTransformations
-        putAll(AffineTransformations.class, "transformations", "scale", "rotate", "translate", "translatePc", "translateKm");
+        putAll(AffineTransformations.class,
+                "transformations", "scale", "rotate", "translate", "translatePc", "translateKm");
 
         // Fade
-        putAll(Fade.class, "fadein", "fadeIn", "fadeInMap", "fadeout", "fadeOut", "fadeOutMap", "fade", "fadepc", "fadePc", "positionobjectname", "fadeObjectName", "fadePosition");
+        putAll(Fade.class,
+                "fadein", "fadeIn", "fadeInMap", "fadeout", "fadeOut", "fadeOutMap",
+                "fade", "fadepc", "fadePc", "positionobjectname", "fadeObjectName", "fadePosition");
 
         // DatasetDescription
-        putAll(DatasetDescription.class, "catalogInfo", "cataloginfo", "description:MeshObject");
+        putAll(DatasetDescription.class,
+                "catalogInfo", "cataloginfo", "description:MeshObject");
 
         // Label
-        putAll(Label.class, "label", "label2d", "labelposition", "labelPosition", "labelFactor", "labelMax", "textScale");
+        putAll(Label.class,
+                "label", "label2d", "labelposition", "labelPosition",
+                "labelPositionKm", "labelPositionPc", "labelFactor", "labelMax", "textScale");
 
         // RenderType
         putAll(RenderType.class, "rendergroup", "renderGroup", "billboardRenderGroup:Particle");
@@ -124,13 +142,22 @@ public class AttributeMap {
         putAll(Boundaries.class, "boundaries", "boundariesEquatorial");
 
         // ParticleSet
-        putAll(ParticleSet.class, "provider:ParticleGroup", "position:ParticleGroup", "datafile", "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits", "particleSizeLimits", "colorMin", "colorMax", "fixedAngularSize", "fixedAngularSizeDeg", "fixedAngularSizeRad");
+        putAll(ParticleSet.class,
+                "provider:ParticleGroup", "position:ParticleGroup", "datafile",
+                "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits",
+                "particleSizeLimits", "colorMin", "colorMax", "fixedAngularSize", "fixedAngularSizeDeg",
+                "fixedAngularSizeRad");
 
         // StarSet
-        putAll(StarSet.class, "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup", "epoch:StarGroup", "variabilityEpoch:StarGroup", "fixedAngularSize:StarGroup", "fixedAngularSizeDeg:StarGroup", "fixedAngularSizeRad:StarGroup");
+        putAll(StarSet.class,
+                "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup",
+                "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup",
+                "epoch:StarGroup", "variabilityEpoch:StarGroup", "fixedAngularSize:StarGroup", "fixedAngularSizeDeg:StarGroup",
+                "fixedAngularSizeRad:StarGroup");
 
         // Attitude
-        putAll(Attitude.class, "provider:HeliotropicSatellite", "attitudeLocation");
+        putAll(Attitude.class,
+                "provider:HeliotropicSatellite", "attitudeLocation");
 
         // ParticleExtra
         putAll(ParticleExtra.class, "primitiveRenderScale");

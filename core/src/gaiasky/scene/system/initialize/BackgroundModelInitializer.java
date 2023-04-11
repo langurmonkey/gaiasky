@@ -78,11 +78,6 @@ public class BackgroundModelInitializer extends AbstractInitSystem {
         model.model.doneLoading(AssetBean.manager(), graph.localTransform, body.color);
         // Disable depth writes, enable reads
         model.model.setDepthTest(GL20.GL_LEQUAL, false);
-
-        // Label pos 3D
-        if (label.label && label.labelPosition != null && !label.label2d) {
-            label.labelPosition.scl(Constants.PC_TO_U);
-        }
     }
 
     private void updateLocalTransform(Entity entity, Body body, GraphNode graph) {

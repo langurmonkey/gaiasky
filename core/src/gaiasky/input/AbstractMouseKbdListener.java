@@ -72,7 +72,7 @@ public abstract class AbstractMouseKbdListener extends GestureDetector implement
         if (keys == null) {
             return false;
         }
-        
+
         for (int k : keys) {
             if (!isKeyPressed(k))
                 return false;
