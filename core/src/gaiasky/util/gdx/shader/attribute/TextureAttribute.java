@@ -42,6 +42,8 @@ public class TextureAttribute extends Attribute {
     public final static int AO = register(AOAlias);
     public final static String RoughnessAlias = "roughnessTexture";
     public final static int Roughness = register(RoughnessAlias);
+    public final static String OcclusionMetallicRoughnessAlias = "occlusionMetallicRoughnessTexture";
+    public final static int OcclusionMetallicRoughness = register(OcclusionMetallicRoughnessAlias);
     public final static String HeightAlias = "heightTexture";
     public final static int Height = register(HeightAlias);
     public final static String SvtCacheAlias = "svtCacheTexture";
@@ -99,7 +101,7 @@ public class TextureAttribute extends Attribute {
         } else if (oldType == PBRTextureAttribute.SpecularColorTexture) {
             return Specular;
         } else if (oldType == PBRTextureAttribute.MetallicRoughnessTexture) {
-            return Roughness;
+            return OcclusionMetallicRoughness;
         } else if (oldType == PBRTextureAttribute.OcclusionTexture) {
             return AO;
         } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute.Bump) {

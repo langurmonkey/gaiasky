@@ -7,11 +7,11 @@ package gaiasky.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMDataLoader.PFMDataParameter;
 import gaiasky.util.i18n.I18n;
@@ -313,7 +313,7 @@ public class SlaveManager {
             manager.load(pfm.toString(), PFMData.class, param);
         }
         if (blend != null && Files.exists(blend)) {
-            TextureParameter param = new TextureParameter();
+            OwnTextureParameter param = new OwnTextureParameter();
             param.magFilter = Texture.TextureFilter.Linear;
             param.format = Pixmap.Format.RGBA8888;
             manager.load(blend.toString(), Texture.class, param);

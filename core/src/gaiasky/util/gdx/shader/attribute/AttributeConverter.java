@@ -1,5 +1,7 @@
 package gaiasky.util.gdx.shader.attribute;
 
+import net.mgsx.gltf.scene3d.attributes.PBRFloatAttribute;
+
 public class AttributeConverter {
 
     public static Attribute convert(com.badlogic.gdx.graphics.g3d.Attribute attrib) {
@@ -19,6 +21,14 @@ public class AttributeConverter {
                 return attribute;
             }
         } else if (attrib instanceof com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute) {
+            if (attrib instanceof PBRFloatAttribute) {
+                var pbrAttribute = (PBRFloatAttribute) attrib;
+                if (pbrAttribute.type == PBRFloatAttribute.Metallic) {
+                    return new ColorAttribute(ColorAttribute.Metallic, pbrAttribute.value);
+                } else if (pbrAttribute.type == PBRFloatAttribute.Roughness) {
+                    return new ColorAttribute(ColorAttribute.Roughness, pbrAttribute.value);
+                }
+            }
             var attribute = new FloatAttribute((com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute) attrib);
             if (attribute.index >= 0) {
                 return attribute;

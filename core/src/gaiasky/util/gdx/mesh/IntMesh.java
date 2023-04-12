@@ -88,7 +88,7 @@ public class IntMesh implements Disposable {
      */
     public IntMesh(Mesh other) {
         short[] otherIndices = new short[other.getNumIndices()];
-        float[] otherVertices = new float[other.getNumVertices()];
+        float[] otherVertices = new float[other.getNumVertices() * other.getVertexSize() / 4];
         other.getIndices(otherIndices);
         other.getVertices(otherVertices);
 
@@ -97,7 +97,7 @@ public class IntMesh implements Disposable {
             myIndices[i] = otherIndices[i];
         }
 
-        vertices = new VertexBufferObjectWithVAO(true, otherVertices.length, other.getVertexAttributes());
+        vertices = makeVertexBuffer(true, otherVertices.length, other.getVertexAttributes());
         indices = new IntIndexBufferObjectSubData(true, otherIndices.length);
         isVertexArray = false;
         isInstanced = false;

@@ -252,7 +252,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     }
 
     public void initMaterial(AssetManager manager, IntModelInstance instance, float[] diffuseCol, boolean culling) {
-        initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, diffuseCol, culling);
+        if (instance != null) {
+            initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, diffuseCol, culling);
+        }
     }
 
     public void initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {

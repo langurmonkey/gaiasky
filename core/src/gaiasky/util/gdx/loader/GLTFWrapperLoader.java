@@ -23,7 +23,7 @@ public class GLTFWrapperLoader extends AsynchronousAssetLoader<IntModel, GLTFLoa
 
     public GLTFWrapperLoader(FileHandleResolver resolver) {
         super(resolver);
-        gltfAssetLoader = new GLTFAssetLoader();
+        gltfAssetLoader = new GLTFAssetLoader(resolver);
     }
 
     @Override
@@ -36,9 +36,12 @@ public class GLTFWrapperLoader extends AsynchronousAssetLoader<IntModel, GLTFLoa
         SceneAsset scene = gltfAssetLoader.loadSync(manager, fileName, file, convertParameters(parameter));
 
         // Convert to IntModel.
-        Model model = scene.scene.model;
-
-        return new IntModel(model);
+        if (scene != null && scene.scene != null && scene.scene.model != null) {
+            Model model = scene.scene.model;
+            return new IntModel(model);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -47,6 +50,9 @@ public class GLTFWrapperLoader extends AsynchronousAssetLoader<IntModel, GLTFLoa
     }
 
     public SceneAssetLoaderParameters convertParameters(GLTFLoaderParameters parameter) {
+        if (parameter == null) {
+            return null;
+        }
         var result = new SceneAssetLoaderParameters();
         result.withData = parameter.withData;
         return result;

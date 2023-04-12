@@ -74,6 +74,7 @@ public class IntNode {
     public IntNode(Node other, IntNode parent) {
         id = other.id;
         translation.set(other.translation);
+        rotation.set(other.rotation);
         scale.set(other.scale);
         localTransform.set(other.localTransform);
         globalTransform.set(other.globalTransform);

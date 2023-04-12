@@ -77,12 +77,20 @@ uniform sampler2D u_metallicTexture;
 uniform samplerCube u_metallicCubemap;
 #endif
 
+#ifdef roughnessColorFlag
+uniform vec4 u_roughnessColor;
+#endif
+
 #ifdef roughnessTextureFlag
 uniform sampler2D u_roughnessTexture;
 #endif
 
 #ifdef roughnessCubemapFlag
 uniform samplerCube u_roughnessCubemap;
+#endif
+
+#ifdef occlusionMetallicRoughnessTextureFlag
+uniform sampler2D u_occlusionMetallicRoughnessTexture;
 #endif
 
 #ifdef heightTextureFlag
@@ -217,9 +225,7 @@ float getShadow(vec3 shadowMapUv) {
 #endif // diffuse
 
 // COLOR EMISSIVE
-#if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) + u_emissiveColor
-#elif defined(emissiveTextureFlag)
+#if defined(emissiveTextureFlag)
     #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
 #elif defined(emissiveColorFlag)
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
@@ -266,17 +272,27 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
 #elif defined(metallicTextureFlag)
     #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
+#elif defined(occlusionMetallicRoughnessTextureFlag) && defined(metallicColorFlag)
+    #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b) * u_metallicColor.rgb
+#elif defined(occlusionMetallicRoughnessTextureFlag)
+    #define fetchColorMetallic(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).b)
 #elif defined(metallicColorFlag)
     #define fetchColorMetallic(texCoord) u_metallicColor
 #endif // metallic
 
 // COLOR ROUGHNESS
 #if defined(svtIndirectionRoughnessTextureFlag)
-    #define fetchColorRoughness(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionRoughnessTexture, texCoord))
+    #define fetchColorRoughness(texCoord) texture(u_svtCacheTexture, svtTexCoords(u_svtIndirectionRoughnessTexture, texCoord)).rgb
 #elif defined(roughnessCubemapFlag)
-    #define fetchColorRoughness(texCoord) texture(u_roughnessCubemap, UVtoXYZ(texCoord))
+    #define fetchColorRoughness(texCoord) texture(u_roughnessCubemap, UVtoXYZ(texCoord)).rgb
 #elif defined(roughnessTextureFlag)
-    #define fetchColorRoughness(texCoord) texture(u_roughnessTexture, texCoord)
+    #define fetchColorRoughness(texCoord) texture(u_roughnessTexture, texCoord).rgb
+#elif defined(occlusionMetallicRoughnessTextureFlag) && defined(roughnessColorFlag)
+    #define fetchColorRoughness(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).g) * u_roughnessColor.rgb
+#elif defined(occlusionMetallicRoughnessTextureFlag)
+    #define fetchColorRoughness(texCoord) vec3(texture(u_occlusionMetallicRoughnessTexture, texCoord).g)
+#elif defined(roughnessColorFlag)
+    #define fetchColorRoughness(texCoord) u_roughnessColor.rgb;
 #endif // roughness
 
 // HEIGHT
@@ -502,14 +518,15 @@ void main() {
 
     #ifdef metallicFlag
         float roughness = 0.0;
-        #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag)
-            roughness = fetchColorRoughness(texCoords).x;
+        #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag) || defined(svtIndirectionRoughnessTextureFlag) || defined(roughnessColorFlag) || defined(occlusionMetallicRoughnessTextureFlag)
+            vec3 roughness3 = fetchColorRoughness(texCoords);
+            roughness = roughness3.r;
         #elif defined(shininessFlag)
             roughness = 1.0 - u_shininess;
         #endif // roughness, shininessFlag
 
         #ifdef reflectionCubemapFlag
-            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 7.0).rgb;
+            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 6.0).rgb;
         #endif // reflectionCubemapFlag
 
         vec3 metallicColor = fetchColorMetallic(texCoords).rgb;

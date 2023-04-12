@@ -514,8 +514,8 @@ public class GaiaSky implements ApplicationListener, IObserver {
         assetManager.setLoader(IntModel.class, ".obj.gz", new OwnObjLoader(new GzipInputStreamProvider(), internalResolver));
         assetManager.setLoader(IntModel.class, ".g3dj", new G3dModelLoader(new JsonReader(), internalResolver));
         assetManager.setLoader(IntModel.class, ".g3db", new G3dModelLoader(new UBJsonReader(), internalResolver));
-        assetManager.setLoader(IntModel.class, ".gltf", new GLTFWrapperLoader(internalResolver));
-        assetManager.setLoader(IntModel.class, ".glb", new GLBWrapperLoader(internalResolver));
+        assetManager.setLoader(IntModel.class, ".gltf", new GLTFWrapperLoader(dataResolver));
+        assetManager.setLoader(IntModel.class, ".glb", new GLBWrapperLoader(dataResolver));
         assetManager.setLoader(GaiaSkyAssets.class, new GaiaSkyLoader(internalResolver));
         assetManager.setLoader(Scene.class, new SceneLoader(dataResolver));
 

@@ -199,8 +199,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         // CREATE MAIN MODEL INSTANCE
         if (!mesh || !Settings.settings.scene.initialization.lazyMesh) {
             Pair<IntModel, Map<String, Material>> modelMaterial = initModelFile();
-            model = modelMaterial.getFirst();
-            instance = new IntModelInstance(model, localTransform);
+            if (modelMaterial != null) {
+                model = modelMaterial.getFirst();
+                instance = new IntModelInstance(model, localTransform);
+            }
             this.modelInitialised = true;
         }
 
@@ -256,14 +258,21 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             materials = pair.getSecond();
         } else {
             // Data error!
-            logger.error(new RuntimeException("The 'model' element must contain either a 'type' or a 'model' attribute"));
+            if (modelFile != null) {
+                logger.error(new RuntimeException("Error loading model: " + modelFile));
+            } else {
+                logger.error(new RuntimeException("Error loading model type: " + type + " (" + params.toString() + ")"));
+            }
         }
         // Clear base material
-        assert materials != null;
-        if (materials.containsKey("base") && materials.get("base").size() < 2)
-            materials.get("base").clear();
+        if (materials != null) {
+            if (materials.containsKey("base") && materials.get("base").size() < 2)
+                materials.get("base").clear();
 
-        return new Pair<>(model, materials);
+            return new Pair<>(model, materials);
+        } else {
+            return null;
+        }
     }
 
     public void load(Matrix4 localTransform) {

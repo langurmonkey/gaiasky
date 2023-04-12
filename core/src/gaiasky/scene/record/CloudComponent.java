@@ -6,7 +6,6 @@
 package gaiasky.scene.record;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,6 +24,7 @@ import gaiasky.render.BlendMode;
 import gaiasky.scene.api.IUpdatable;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.gdx.loader.OwnTextureLoader.OwnTextureParameter;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.Material;
@@ -44,11 +44,11 @@ import static gaiasky.scene.record.MaterialComponent.convertToComponent;
 
 public class CloudComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<CloudComponent> {
     /** Default texture parameters **/
-    protected static final TextureParameter textureParams;
+    protected static final OwnTextureParameter textureParams;
     private static final Log logger = Logger.getLogger(CloudComponent.class);
 
     static {
-        textureParams = new TextureParameter();
+        textureParams = new OwnTextureParameter();
         textureParams.genMipMaps = true;
         textureParams.magFilter = TextureFilter.Linear;
         textureParams.minFilter = TextureFilter.MipMapLinearNearest;

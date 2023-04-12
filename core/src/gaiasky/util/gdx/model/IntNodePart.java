@@ -62,6 +62,10 @@ public class IntNodePart {
         this(new IntMeshPart(other.meshPart), new Material(other.material));
         bones = other.bones;
         enabled = other.enabled;
+        if (other.invBoneBindTransforms == null) {
+            invBoneBindTransforms = null;
+            bones = null;
+        }
     }
 
     /**

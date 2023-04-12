@@ -78,7 +78,7 @@ public class ModelEntityRenderSystem {
         var model = Mapper.model.get(entity);
 
         ModelComponent mc = model.model;
-        if (mc != null && mc.isModelInitialised()) {
+        if (mc != null && mc.instance != null && mc.isModelInitialised()) {
             if (scaffolding != null) {
                 if (shadow) {
                     prepareShadowEnvironment(entity, model, scaffolding);
@@ -115,7 +115,7 @@ public class ModelEntityRenderSystem {
         var scaffolding = Mapper.modelScaffolding.get(entity);
 
         ModelComponent mc = model.model;
-        if (mc != null && mc.isModelInitialised()) {
+        if (mc != null && mc.instance != null && mc.isModelInitialised()) {
             var base = Mapper.base.get(entity);
             if (scaffolding != null && shadow) {
                 prepareShadowEnvironment(entity, model, scaffolding);

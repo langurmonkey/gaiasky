@@ -30,6 +30,8 @@ public class ColorAttribute extends Attribute {
     public static final int Emissive = register(EmissiveAlias);
     public final static String MetallicAlias = "metallicColor";
     public static final int Metallic = register(MetallicAlias);
+    public final static String RoughnessAlias = "roughnessColor";
+    public static final int Roughness = register(RoughnessAlias);
     public final static String AmbientLightAlias = "ambientLightColor";
     public static final int AmbientLight = register(AmbientLightAlias);
     public final static String FogAlias = "fogColor";
@@ -60,7 +62,7 @@ public class ColorAttribute extends Attribute {
             return Metallic;
         } else if (oldType == com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute.Specular) {
             return Specular;
-        } else if(oldType == PBRColorAttribute.BaseColorFactor){
+        } else if (oldType == PBRColorAttribute.BaseColorFactor) {
             return Diffuse;
         }
         return -1;
@@ -75,6 +77,11 @@ public class ColorAttribute extends Attribute {
     public ColorAttribute(final int index, float r, float g, float b, float a) {
         this(index);
         this.color.set(r, g, b, a);
+    }
+
+    public ColorAttribute(final int index, float l) {
+        this(index);
+        this.color.set(l, l, l, 1.0f);
     }
 
     public ColorAttribute(final ColorAttribute copyFrom) {
@@ -112,6 +119,15 @@ public class ColorAttribute extends Attribute {
     public final static ColorAttribute createMetallic(float r, float g, float b, float a) {
         return new ColorAttribute(Metallic, r, g, b, a);
     }
+
+    public final static ColorAttribute createRoughness(final Color color) {
+        return new ColorAttribute(Roughness, color);
+    }
+
+    public final static ColorAttribute createRoughness(float r, float g, float b, float a) {
+        return new ColorAttribute(Roughness, r, g, b, a);
+    }
+
 
     public final static ColorAttribute createEmissive(final Color color) {
         return new ColorAttribute(Emissive, color);

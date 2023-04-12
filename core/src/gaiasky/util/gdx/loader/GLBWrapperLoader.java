@@ -23,7 +23,7 @@ public class GLBWrapperLoader extends AsynchronousAssetLoader<IntModel, GLBLoade
 
     public GLBWrapperLoader(FileHandleResolver resolver) {
         super(resolver);
-        glbAssetLoader = new GLBAssetLoader();
+        glbAssetLoader = new GLBAssetLoader(resolver);
     }
 
     @Override

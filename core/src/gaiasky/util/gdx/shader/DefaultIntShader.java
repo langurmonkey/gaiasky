@@ -67,7 +67,9 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_metallicColor;
     public final int u_metallicTexture;
     public final int u_shininess;
+    public final int u_roughnessColor;
     public final int u_roughnessTexture;
+    public final int u_occlusionMetallicRoughnessTexture;
     public final int u_normalTexture;
     public final int u_heightTexture;
     public final int u_heightScale;
@@ -232,7 +234,9 @@ public class DefaultIntShader extends BaseIntShader {
         u_metallicColor = register(Inputs.metallicColor, Setters.metallicColor);
         u_metallicTexture = register(Inputs.metallicTexture, Setters.metallicTexture);
         u_shininess = register(Inputs.shininess, Setters.shininess);
+        u_roughnessColor = register(Inputs.roughnessColor, Setters.roughnessColor);
         u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
+        u_occlusionMetallicRoughnessTexture = register(Inputs.occlusionMetallicRoughnessTexture, Setters.occlusionMetallicRoughnessTexture);
         u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
         u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
         u_heightScale = register(Inputs.heightScale, Setters.heightScale);
@@ -366,6 +370,9 @@ public class DefaultIntShader extends BaseIntShader {
         if (attributes.has(TextureAttribute.Roughness)) {
             prefix.append("#define " + TextureAttribute.RoughnessAlias + "Flag\n");
         }
+        if (attributes.has(TextureAttribute.OcclusionMetallicRoughness)) {
+            prefix.append("#define " + TextureAttribute.OcclusionMetallicRoughnessAlias + "Flag\n");
+        }
         if (attributes.has(FloatAttribute.Time)) {
             prefix.append("#define " + FloatAttribute.TimeAlias + "Flag\n");
         }
@@ -384,6 +391,8 @@ public class DefaultIntShader extends BaseIntShader {
             prefix.append("#define " + ColorAttribute.EmissiveAlias + "Flag\n");
         if (attributes.has(ColorAttribute.Metallic))
             prefix.append("#define " + ColorAttribute.MetallicAlias + "Flag\n");
+        if (attributes.has(ColorAttribute.Roughness))
+            prefix.append("#define " + ColorAttribute.RoughnessAlias + "Flag\n");
         if (attributes.has(FloatAttribute.AlphaTest))
             prefix.append("#define " + FloatAttribute.AlphaTestAlias + "Flag\n");
         if (attributes.has(FloatAttribute.Shininess))
@@ -757,7 +766,9 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform metallicColor = new Uniform("u_metallicColor", ColorAttribute.Metallic);
         public final static Uniform metallicTexture = new Uniform("u_metallicTexture", TextureAttribute.Metallic);
         public final static Uniform shininess = new Uniform("u_shininess", FloatAttribute.Shininess);
+        public final static Uniform roughnessColor = new Uniform("u_roughnessColor", ColorAttribute.Roughness);
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureAttribute.Roughness);
+        public final static Uniform occlusionMetallicRoughnessTexture = new Uniform("u_occlusionMetallicRoughnessTexture", TextureAttribute.OcclusionMetallicRoughness);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
@@ -953,10 +964,23 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, ((FloatAttribute) (Objects.requireNonNull(combinedAttributes.get(FloatAttribute.Shininess)))).value);
             }
         };
+        public final static Setter roughnessColor = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, ((ColorAttribute) (Objects.requireNonNull(combinedAttributes.get(ColorAttribute.Roughness)))).color);
+            }
+        };
         public final static Setter roughnessTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.Roughness)))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter occlusionMetallicRoughnessTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (Objects.requireNonNull(combinedAttributes.get(TextureAttribute.OcclusionMetallicRoughness)))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
