@@ -81,6 +81,10 @@ uniform sampler2D u_roughnessTexture;
 uniform samplerCube u_roughnessCubemap;
 #endif
 
+#ifdef AOTextureFlag
+uniform sampler2D u_aoTexture;
+#endif
+
 #ifdef occlusionMetallicRoughnessTextureFlag
 uniform sampler2D u_occlusionMetallicRoughnessTexture;
 #endif
@@ -262,6 +266,15 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorRoughness(texCoord) u_roughnessColor.rgb;
 #endif // roughness
 
+// COLOR AMBIENT OCCLUSION
+#if defined(occlusionMetallicRoughnessTextureFlag)
+    #define fetchColorAmbientOcclusion(texCoord) texture(u_occlusionMetallicRoughnessTexture, texCoord).r
+#elif defined(AOTextureFlag)
+    #define fetchColorAmbientOcclusion(texCoord) texture(u_aoTexture, texCoord).r
+#else
+    #define fetchColorAmbientOcclusion(texCoord) 1.0
+#endif // ambient occlusion
+
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
 #endif // numDirectionalLights
@@ -354,6 +367,10 @@ void main() {
     #else
     vec3 night = vec3(0.0);
     #endif
+
+    float ambientOcclusion = fetchColorAmbientOcclusion(texCoords);
+    diffuse.rgb *= ambientOcclusion;
+    specular.rgb *= ambientOcclusion;
 
     // Alpha value from textures
     float texAlpha = 1.0;
