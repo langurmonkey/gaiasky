@@ -97,6 +97,9 @@ camera.full/camera.GAIA_FOVS_MODE           = NUMPAD_6
 action.toggle/camera.mode                   = CTRL_L M
 action.toggle/camera.cinematic              = CTRL_L C
 
+# Speed up camera movement (hold key(s))
+action.camera.speedup                       = Z
+
 # Debug info
 action.toggle/element.debugmode             = CTRL_L D
 
