@@ -78,6 +78,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
+    private OwnSelectBox<UpscaleFilter> upscaleFilter;
     private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix,
             frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle,
             smResolution, maxFpsInput;
@@ -96,6 +97,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak;
     private boolean lensflareBak, lightGlowBak, debugInfoBak;
     private ReprojectionMode reprojectionBak;
+    private UpscaleFilter upscaleFilterBak;
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
         this(stage, skin, globalResources, false);
@@ -819,6 +821,26 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(backBufferScaleLabel).left().padRight(pad34).padBottom(pad10);
             experimental.add(backBufferScale).left().padRight(pad18).padBottom(pad10);
             experimental.add(backBufferTooltip).left().padBottom(pad10).row();
+
+            // Upscale filter
+            OwnLabel upscaleFilterLabel = new OwnLabel(I18n.msg("gui.upscale.filter"), skin);
+            UpscaleFilter[] upscaleFilterValues = UpscaleFilter.values();
+            upscaleFilter = new OwnSelectBox<>(skin);
+            upscaleFilter.setItems(upscaleFilterValues);
+            upscaleFilter.setWidth(selectWidth);
+            upscaleFilter.setSelected(upscaleFilterValues[settings.postprocess.upscaleFilter.ordinal()]);
+            upscaleFilter.addListener(new OwnTextTooltip(I18n.msg("gui.upscale.filter.info"), skin));
+            upscaleFilter.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    var newMode = upscaleFilter.getSelected();
+                    EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilter.getSelected());
+                    return true;
+                }
+                return false;
+            });
+
+            experimental.add(upscaleFilterLabel).left().padRight(pad34).padBottom(pad10);
+            experimental.add(upscaleFilter).left().padRight(pad18).padBottom(pad10).row();
 
             // Index of refraction of celestial sphere
             OwnLabel celestialSphereIndexOfRefractionLabel = new OwnLabel(I18n.msg("gui.indexofrefraction"), skin);
@@ -2113,6 +2135,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         exposureBak = settings.postprocess.toneMapping.exposure;
         debugInfoBak = settings.program.debugInfo;
         reprojectionBak = settings.postprocess.reprojection.mode;
+        upscaleFilterBak = settings.postprocess.upscaleFilter;
     }
 
     protected void reloadGamepadMappings(Path selectedFile) {
@@ -2570,6 +2593,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.TONEMAPPING_TYPE_CMD, this, toneMappingBak);
         EventManager.publish(Event.SHOW_DEBUG_CMD, this, debugInfoBak);
         EventManager.publish(Event.REPROJECTION_CMD, this, reprojectionBak != ReprojectionMode.DISABLED, reprojectionBak);
+        EventManager.publish(Event.UPSCALE_FILTER_CMD, this, upscaleFilterBak);
     }
 
     private void reloadLanguage() {
