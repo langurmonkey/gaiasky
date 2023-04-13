@@ -15,7 +15,7 @@ import gaiasky.util.math.Vector3b;
  */
 public class BaseInitializer extends AbstractInitSystem {
 
-    private Scene scene;
+    private final Scene scene;
 
     public BaseInitializer(Scene scene, boolean setUp, Family family, int priority) {
         super(setUp, family, priority);

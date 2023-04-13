@@ -13,7 +13,7 @@ import gaiasky.util.i18n.I18n;
 public class SceneGraphBuilderSystem extends AbstractInitSystem {
 
     /** The index reference. **/
-    private Index index;
+    private final Index index;
 
     public SceneGraphBuilderSystem(final Index index, Family family, int priority) {
         super(false, family, priority);

@@ -27,9 +27,9 @@ public interface ITimeFrameProvider {
     double getDt();
 
     /**
-     * Gets the current time
+     * Gets the current time in UTC.
      *
-     * @return The time as an instant
+     * @return The time as an instant, in UTC.
      */
     Instant getTime();
 

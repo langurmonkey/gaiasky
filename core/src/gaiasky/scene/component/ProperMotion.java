@@ -14,12 +14,12 @@ public class ProperMotion implements Component, ICopy {
     public double epochJd = AstroUtils.JD_J2015_5;
 
     /**
-     * Proper motion in cartesian coordinates [U/yr].
+     * Proper motion in cartesian equatorial internal coordinates [U/yr].
      **/
     public Vector3 pm;
 
     /**
-     * MuAlpha [mas/yr], Mudelta [mas/yr], radvel [km/s].
+     * MuAlpha* [mas/yr], MuDelta [mas/yr], RadVel [km/s].
      **/
     public Vector3 pmSph;
 
@@ -39,10 +39,54 @@ public class ProperMotion implements Component, ICopy {
         this.epochJd = AstroUtils.getJulianDate(epochYear);
     }
 
+    public void initPm() {
+        if (pmSph == null) {
+            pmSph = new Vector3();
+        }
+        if (pm == null) {
+            pm = new Vector3();
+        }
+    }
+
+    public void setMuAlpha(Double muAlpha){
+        setMuAlphaMasYr(muAlpha);
+    }
+
+    public void setMuAlphaMasYr(Double muAlpha) {
+        initPm();
+        pmSph.x = muAlpha.floatValue();
+    }
+
+    public void setMuDelta(Double muDelta){
+        setMuDeltaMasYr(muDelta);
+    }
+
+    public void setMuDeltaMasYr(Double muDelta) {
+        initPm();
+        pmSph.y = muDelta.floatValue();
+    }
+
+    public void setVr(Double rv) {
+       setRadialVelocityKms(rv);
+    }
+
+    public void setVrKms(Double rv) {
+        setRadialVelocityKms(rv);
+    }
+    public void setRadialVelocity(Double rv) {
+        setRadialVelocityKms(rv);
+    }
+
+    public void setRadialVelocityKms(Double rv) {
+        initPm();
+        pmSph.z = rv.floatValue();
+    }
+
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());
         copy.pm = new Vector3(pm);
+        copy.pmSph = new Vector3(pmSph);
         copy.hasPm = hasPm;
         return copy;
     }

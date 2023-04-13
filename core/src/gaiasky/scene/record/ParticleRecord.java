@@ -37,7 +37,8 @@ public class ParticleRecord implements IParticleRecord {
     public static final int I_FSIZE = 9;
     /* int */
     public static final int I_FHIP = 10;
-    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
+    protected static TLV3D aux3d1 = new TLV3D();
+    protected static TLV3D aux3d2 = new TLV3D();
     // Particle ID
     public long id;
 

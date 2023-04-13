@@ -52,6 +52,14 @@ public class DatasetDescription implements Component {
 
     }
 
+    public void setCataloginfo(Map<String, Object> map) {
+        setCatalogInfo(map);
+    }
+
+    public void setDatasetInfo(Map<String, Object> map) {
+        setCatalogInfo(map);
+    }
+
     public float getFloat(Map<String, Object> map, String key, float defaultValue) {
         if (map.containsKey(key)) {
             Object value = map.get(key);
@@ -76,7 +84,4 @@ public class DatasetDescription implements Component {
         return defaultValue;
     }
 
-    public void setCataloginfo(Map<String, Object> map) {
-        setCatalogInfo(map);
-    }
 }

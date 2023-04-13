@@ -150,8 +150,10 @@ public class GraphUpdater extends AbstractUpdateSystem {
             // Apply proper motion if needed
             if (Mapper.pm.has(entity)) {
                 var pm = Mapper.pm.get(entity);
-                Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
-                graph.translation.add(pmv);
+                if (pm.hasPm) {
+                    Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
+                    graph.translation.add(pmv);
+                }
             }
 
             // Update supporting attributes

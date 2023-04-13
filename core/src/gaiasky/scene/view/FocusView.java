@@ -30,6 +30,9 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 /**
  * An entity view that implements the {@link IFocus} methods.
  */
@@ -58,7 +61,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     /** The highlight component, initialized lazily. **/
     private Highlight hl;
     /** Implementation of pointer collision. **/
-    private FocusHit focusHit;
+    private final FocusHit focusHit;
     /** Reference to the scene. **/
     private Scene scene;
     /** The focus active computer. **/
@@ -445,7 +448,9 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 // This updates the rest of components of our entity.
                 scene.updateEntity(copy, (float) time.getHdiff());
 
-                EntityUtils.getAbsolutePosition(copy, out);
+                Instant futureTime = time.getTime().plus((long) (time.getHdiff() * Nature.H_TO_MS), ChronoUnit.MILLIS);
+
+                EntityUtils.getAbsolutePosition(copy, futureTime, out);
 
                 // Return to pool.
                 scene.returnCopyObject(copy);

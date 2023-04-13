@@ -1,6 +1,7 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter.Particle;
 import gaiasky.scene.component.*;
 import gaiasky.util.Logger;
 
@@ -68,6 +69,10 @@ public class AttributeMap {
         // Magnitude
         putAll(Magnitude.class, "appmag", "appMag", "absmag", "absMag");
 
+        // Proper motion
+        putAll(ProperMotion.class, "muAlphaMasYr", "muAlpha", "muDeltaMasYr",
+                "muDelta", "rv", "rvKms", "radialVelocity", "radialVelocityKms", "epochYear", "epochJd");
+
         // SolidAngleThresholds
         putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
 
@@ -113,7 +118,7 @@ public class AttributeMap {
 
         // DatasetDescription
         putAll(DatasetDescription.class,
-                "catalogInfo", "cataloginfo", "description:MeshObject");
+                "catalogInfo", "cataloginfo", "datasetInfo", "description:MeshObject");
 
         // Label
         putAll(Label.class,

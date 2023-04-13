@@ -21,12 +21,16 @@ import gaiasky.scene.entity.ParticleUtils;
 import gaiasky.scene.system.render.draw.billboard.BillboardEntityRenderSystem;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
+import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 
 /**
  * Initializes the old Particle and Star objects.
@@ -35,23 +39,29 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
     private final ParticleUtils utils;
     private final double discFactor = Constants.PARTICLE_DISC_FACTOR;
-    private Vector3b B31;
+    private final FocusView view;
+
+    private final Vector3b B31;
+    private final Vector3d D31;
 
     public ParticleInitializer(boolean setUp, Family family, int priority) {
         super(setUp, family, priority);
 
         this.utils = new ParticleUtils();
         this.B31 = new Vector3b();
+        this.D31 = new Vector3d();
+        this.view = new FocusView();
 
         EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD);
     }
 
     @Override
     public void initializeEntity(Entity entity) {
-        var base = Mapper.base.get(entity);
-        var body = Mapper.body.get(entity);
+        view.setEntity(entity);
+        var base = view.base;
+        var body = view.body;
         var celestial = Mapper.celestial.get(entity);
-        var mag = Mapper.magnitude.get(entity);
+        var mag = view.getMag();
         var pm = Mapper.pm.get(entity);
         var extra = Mapper.extra.get(entity);
         var sa = Mapper.sa.get(entity);
@@ -106,6 +116,19 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
             pm.pmSph = new Vector3();
             pm.hasPm = false;
         } else {
+            // Init proper motion.
+            if (pm.pm.len2() == 0 && pm.pmSph.len2() != 0) {
+                // Init cartesian from spherical.
+                gaiasky.util.coord.Coordinates.cartesianToSpherical(view.body.pos, D31);
+                if (view.body.posSph == null) {
+                    view.body.posSph = new Vector2d();
+                }
+                view.body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
+                var distPc = view.getPos().lenDouble() * Constants.U_TO_PC;
+
+                Vector3d pmv = AstroUtils.properMotionsToCartesian(pm.pmSph.x, pm.pmSph.y, pm.pmSph.z, Math.toRadians(view.getAlpha()), Math.toRadians(view.getDelta()), distPc, new Vector3d());
+                pmv.put(pm.pm);
+            }
             pm.hasPm = pm.pm.len2() != 0;
         }
 
