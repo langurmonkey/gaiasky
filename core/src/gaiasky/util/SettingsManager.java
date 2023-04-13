@@ -256,6 +256,9 @@ public class SettingsManager {
         // Add chromatic aberration if not there
         if (settings.postprocess.chromaticAberration == null) {
             settings.postprocess.chromaticAberration = new ChromaticAberrationSettings();
+            if (settings.runtime.openXr) {
+                settings.postprocess.chromaticAberration.amount = 0;
+            }
         }
 
         // Set up proxy if needed
