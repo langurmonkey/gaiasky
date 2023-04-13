@@ -516,6 +516,10 @@ postprocess:
   unsharpMask:
     # Sharpen factor, in [0,3]
     factor: 0.0
+  # Chromatic aberration effect
+  chromaticAberration:
+    # The amount, in [0,0.2]
+    amount: 0.01
   # Motion blur effect
   motionBlur:
     active: false

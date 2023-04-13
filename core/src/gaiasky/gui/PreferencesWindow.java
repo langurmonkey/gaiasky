@@ -66,17 +66,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final Settings settings;
     // This flag is active when the dialog is called from the welcome screen
     private final boolean welcomeScreen;
-    private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
+    private OwnCheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY,
+            highAccuracyPositions, shadowsCb, pointerCoords, modeChangeInfo, debugInfo, crosshairFocus, crosshairClosest,
+            crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
-    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode,
+            screenshotFormat, frameOutputMode, frameOutputFormat, nShadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recGridOrigin;
     private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> gamepadMappings;
     private OwnSelectBox<ReprojectionMode> reprojectionMode;
-    private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix, frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
-    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale, celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize;
+    private OwnTextField fadeTimeField, widthField, heightField, ssWidthField, ssHeightField, frameOutputPrefix,
+            frameOutputFps, foWidthField, foHeightField, camRecFps, cmResolution, plResolution, plAperture, plAngle,
+            smResolution, maxFpsInput;
+    private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
+            celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
+            chromaticAberration;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
@@ -86,7 +93,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private Table controllersTable;
     // Backup values
     private ToneMapping toneMappingBak;
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak;
     private boolean lensflareBak, lightGlowBak, debugInfoBak;
     private ReprojectionMode reprojectionBak;
 
@@ -404,6 +411,20 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
+        // CHROMATIC ABERRATION
+        OwnLabel chromaticAberrationLabel = new OwnLabel(I18n.msg("gui.chromaticaberration"), skin, "default");
+        chromaticAberration = new OwnSliderPlus("", Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT, Constants.SLIDER_STEP_TINY * 0.1f, skin);
+        chromaticAberration.setName("chromatic aberration amount");
+        chromaticAberration.setWidth(sliderWidth);
+        chromaticAberration.setValue(settings.postprocess.unsharpMask.factor);
+        chromaticAberration.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, chromaticAberration, chromaticAberration.getValue());
+                return true;
+            }
+            return false;
+        });
+
         // LABELS
         labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel);
 
@@ -462,6 +483,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(bloomEffect).left().padBottom(pad10).row();
         graphics.add(unsharpMaskLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(unsharpMask).left().padBottom(pad10).row();
+        graphics.add(chromaticAberrationLabel).left().padRight(pad34).padBottom(pad10);
+        graphics.add(chromaticAberration).left().padBottom(pad10).row();
         graphics.add(lensFlareLabel).left().padRight(pad34).padBottom(pad10);
         graphics.add(lensFlare).left().padBottom(pad10).row();
         graphics.add(lightGlowLabel).left().padRight(pad34).padBottom(pad10);
@@ -2052,6 +2075,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Effects
         setSlider(bloomEffect, settings.postprocess.bloom.intensity);
         setSlider(unsharpMask, settings.postprocess.unsharpMask.factor);
+        setSlider(chromaticAberration, settings.postprocess.chromaticAberration.amount);
         setSlider(tessQuality, (float) settings.scene.renderer.elevation.quality);
 
         // Screen mode
@@ -2077,6 +2101,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private void updateBackupValues() {
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
+        aberrationBak = settings.postprocess.chromaticAberration.amount;
         lensflareBak = settings.postprocess.lensFlare.active;
         lightGlowBak = settings.postprocess.lightGlow.active;
         brightnessBak = settings.postprocess.levels.brightness;
@@ -2540,6 +2565,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlowBak);
         EventManager.publish(Event.BLOOM_CMD, this, bloomBak);
         EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMaskBak);
+        EventManager.publish(Event.CHROMATIC_ABERRATION_CMD, this, aberrationBak);
         EventManager.publish(Event.EXPOSURE_CMD, this, exposureBak);
         EventManager.publish(Event.TONEMAPPING_TYPE_CMD, this, toneMappingBak);
         EventManager.publish(Event.SHOW_DEBUG_CMD, this, debugInfoBak);

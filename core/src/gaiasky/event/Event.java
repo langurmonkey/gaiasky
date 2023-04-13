@@ -113,11 +113,15 @@ public enum Event {
      */
     UNSHARP_MASK_CMD,
     /**
+     * Contains the amount of chromatic aberration in [0,0.2].
+     */
+    CHROMATIC_ABERRATION_CMD,
+    /**
      * Contains the brightness level (float) in [-1,1].
      **/
     BRIGHTNESS_CMD,
     /**
-     * Removes the turn of the camera in focus mode.
+     * Removes the turn off the camera in focus mode.
      **/
     CAMERA_CENTER,
     /**

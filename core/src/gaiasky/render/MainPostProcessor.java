@@ -41,7 +41,6 @@ import gaiasky.util.gdx.contrib.postprocess.effects.*;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
-import gaiasky.util.gdx.loader.WarpMeshReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 
@@ -120,7 +119,13 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED, Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD);
+        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD,
+                Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD,
+                Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD,
+                Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION,
+                Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE,
+                Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED, Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD,
+                Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -298,6 +303,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         reprojection.setMode(settings.postprocess.reprojection.mode.mode);
         reprojection.setEnabled(settings.postprocess.reprojection.active);
         ppb.set(reprojection);
+
+        // CHROMATIC ABERRATION
+        ChromaticAberration aberration = new ChromaticAberration(Settings.settings.postprocess.chromaticAberration.amount * GaiaSky.instance.cameraManager.getFovFactor());
+        ppb.set(aberration);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
         initLevels(ppb);
@@ -652,14 +661,23 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
+                        // Light glow.
                         LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
                         if (lightGlow != null) {
                             lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.glowFactor, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
                             lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
                         }
+                        // Reprojection.
                         Reprojection reprojection = (Reprojection) ppb.get(Reprojection.class);
                         if (reprojection != null)
                             reprojection.setFov(newFov);
+                        // Aberration.
+                        ChromaticAberration aberration = (ChromaticAberration) ppb.get(ChromaticAberration.class);
+                        if (aberration != null && aberration.getAberrationAmount() > 0) {
+                            float amount = Settings.settings.postprocess.chromaticAberration.amount * (newFov / 40f);
+                            aberration.setAberrationAmount(amount);
+                            aberration.setEnabled(amount > 0);
+                        }
                     }
                 }
             });
@@ -713,6 +731,17 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     UnsharpMask unsharp = (UnsharpMask) ppb.get(UnsharpMask.class);
                     unsharp.setSharpenFactor(sharpenFactor);
                     unsharp.setEnabled(sharpenFactor > 0);
+                }
+            }
+        });
+        case CHROMATIC_ABERRATION_CMD -> GaiaSky.postRunnable(() -> {
+            var amount = (float) data[0] * GaiaSky.instance.getCameraManager().getFovFactor();
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    ChromaticAberration aberration = (ChromaticAberration) ppb.get(ChromaticAberration.class);
+                    aberration.setAberrationAmount(amount);
+                    aberration.setEnabled(amount > 0);
                 }
             }
         });
@@ -1074,7 +1103,6 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             updateUpscaleFilter(upscaleFilter, backBufferScale, filter, ppb);
         }
     }
-
 
     private void updateUpscaleFilter(UpscaleFilter upscaleFilter, double backBufferScale, XBRZ filter, PostProcessBean ppb) {
         // Actual filter.

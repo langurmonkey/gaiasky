@@ -87,6 +87,8 @@ public class Constants {
      */
     /** Maximum star brightness. **/
     public static final float MAX_STAR_BRIGHTNESS = 8f;
+    public static final float MIN_CHROMATIC_ABERRATION_AMOUNT = 0f;
+    public static final float MAX_CHROMATIC_ABERRATION_AMOUNT = 0.2f;
     public static final float MIN_UNSHARP_MASK_FACTOR = 0f;
     public static final float MAX_UNSHARP_MASK_FACTOR = 3f;
     /** Minimum star brightness power. **/

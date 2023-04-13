@@ -1947,6 +1947,7 @@ public class Settings {
         public Antialias antialias;
         public BloomSettings bloom;
         public UnsharpMaskSettings unsharpMask;
+        public ChromaticAberrationSettings chromaticAberration;
         public LensFlareSettings lensFlare;
         public LightGlowSettings lightGlow;
         public LevelsSettings levels;
@@ -1961,7 +1962,8 @@ public class Settings {
                     Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD,
                     Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
                     Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD,
-                    Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD);
+                    Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD,
+                    Event.CHROMATIC_ABERRATION_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
@@ -1986,6 +1988,7 @@ public class Settings {
             switch (event) {
             case BLOOM_CMD -> bloom.intensity = (float) data[0];
             case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
+            case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
             case LENS_FLARE_CMD -> lensFlare.active = (Boolean) data[0];
             case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
             case SSR_CMD -> ssr.active = (Boolean) data[0];
@@ -2024,6 +2027,11 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UnsharpMaskSettings {
             public float factor;
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class ChromaticAberrationSettings {
+            public float amount = 0.01f;
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
@@ -2155,38 +2163,25 @@ public class Settings {
         public void notify(Event event, Object source, Object... data) {
 
             switch (event) {
-            case INPUT_ENABLED_CMD:
-                inputEnabled = (boolean) data[0];
-                break;
-            case DISPLAY_GUI_CMD:
-                displayGui = (boolean) data[0];
-                break;
-            case DISPLAY_VR_GUI_CMD:
+            case INPUT_ENABLED_CMD -> inputEnabled = (boolean) data[0];
+            case DISPLAY_GUI_CMD -> displayGui = (boolean) data[0];
+            case DISPLAY_VR_GUI_CMD -> {
                 if (data.length > 1) {
                     displayVrGui = (Boolean) data[1];
                 } else {
                     displayVrGui = !displayVrGui;
                 }
-                break;
-            case TOGGLE_UPDATEPAUSE:
+            }
+            case TOGGLE_UPDATEPAUSE -> {
                 updatePause = !updatePause;
                 EventManager.publish(Event.UPDATEPAUSE_CHANGED, this, updatePause);
-                break;
-            case TIME_STATE_CMD:
-                toggleTimeOn((Boolean) data[0]);
-                break;
-            case RECORD_CAMERA_CMD:
-                toggleRecord((Boolean) data[0], settings);
-                break;
-            case GRAV_WAVE_START:
-                gravitationalWaves = true;
-                break;
-            case GRAV_WAVE_STOP:
-                gravitationalWaves = false;
-                break;
-            default:
-                break;
-
+            }
+            case TIME_STATE_CMD -> toggleTimeOn((Boolean) data[0]);
+            case RECORD_CAMERA_CMD -> toggleRecord((Boolean) data[0], settings);
+            case GRAV_WAVE_START -> gravitationalWaves = true;
+            case GRAV_WAVE_STOP -> gravitationalWaves = false;
+            default -> {
+            }
             }
         }
     }

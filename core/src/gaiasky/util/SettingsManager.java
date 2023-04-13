@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ElevationType;
+import gaiasky.util.Settings.PostprocessSettings.ChromaticAberrationSettings;
 import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.SceneSettings.RendererSettings.VirtualTextureSettings;
 import gaiasky.util.Settings.VersionSettings;
@@ -250,6 +251,11 @@ public class SettingsManager {
             settings.screenshot.location = sl.replaceAll("\\\\", "/");
         } catch (IOException e) {
             logger.error("Error initializing frame output location", e);
+        }
+
+        // Add chromatic aberration if not there
+        if (settings.postprocess.chromaticAberration == null) {
+            settings.postprocess.chromaticAberration = new ChromaticAberrationSettings();
         }
 
         // Set up proxy if needed
