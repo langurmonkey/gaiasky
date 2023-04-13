@@ -1,0 +1,131 @@
+{
+  "objects": [
+    {
+      "name": "coordtest-hook",
+      "position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "componentType": [
+        "Stars"
+      ],
+      "parent": "Universe",
+      "archetype": "GenericCatalog",
+      "catalogInfo": {
+        "name": "Coordinates test system",
+        "description": "A system to test body coordinates.",
+        "type": "INTERNAL",
+        "nobjects": "2",
+        "sizebytes": "4867"
+      }
+    },
+    {
+      "names": [
+        "Test Coord Star"
+      ],
+      "color": [
+        0.9,
+        0.9,
+        0.8,
+        1.0
+      ],
+      "ct": "Stars",
+      "absmag": 13.76,
+      "appmag": 7.67,
+      "parent": "coordtest-hook",
+      "archetype": "Star",
+
+      "coordinates": {
+        "impl": "gaiasky.util.coord.StaticCoordinates",
+        "positionEquatorial": [ 20.0, 20.0, 1.0 ]
+      },
+    },
+    {
+      "name": "Test Coord Planet",
+      "color": [
+        1.0,
+        1.0,
+        0.2,
+        0.2
+      ],
+      "size": 2000000.0,
+      "componentType": "Planets",
+      "absmag": 0.5,
+      "parent": "Test Coord Star",
+      "archetype": "Planet",
+      "coordinates": {
+        "impl": "gaiasky.util.coord.OrbitLintCoordinates",
+        "orbitname": "Test Coord Planet Orbit"
+      },
+      "rotation": {
+        "period": 400.536,
+        "axialtilt": 0.0,
+        "inclination": 0.281,
+        "meridianangle": 200.39
+      },
+      "model": {
+        "args": [
+          true
+        ],
+        "type": "sphere",
+        "params": {
+          "quality": 400,
+          "diameter": 1.0,
+          "flip": false
+        }
+      },
+      "atmosphere": {
+        "size": 2580000.0,
+        "wavelengths": [
+          0.7,
+          0.8,
+          0.9
+        ],
+        "m_Kr": 0.0025,
+        "m_Km": 0.0015,
+        "m_eSun": 1.0,
+        "fogdensity": 2.5,
+        "fogcolor": [
+          1.0,
+          0.7,
+          0.6
+        ],
+        "params": {
+          "quality": 600,
+          "diameter": 2.0,
+          "flip": true
+        }
+      },
+    },
+    {
+      "name": "Test Coord Planet Orbit",
+      "color": [
+        1.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "componentType": [
+        "Orbits",
+        "Stars"
+      ],
+      "parent": "Test Coord Star",
+      "archetype": "Orbit",
+      "provider": "gaiasky.data.orbit.OrbitalParametersProvider",
+      "model": "extrasolar_system",
+      "newmethod": true,
+      "orbit": {
+        "period": 33.65128713366755,
+        "epoch": 2457395.0434027873,
+        "semimajoraxis": 26207613.770472337,
+        "eccentricity": 0.19801153180639194,
+        "inclination": 86.96170835920348,
+        "ascendingnode": 105.97050455173306,
+        "argofpericenter": 338.6701107061462,
+        "meananomaly": 0.0,
+        "mu": 9.9998e+21
+      }
+    }
+  ]
+}

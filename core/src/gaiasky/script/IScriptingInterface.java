@@ -13,6 +13,7 @@ import gaiasky.scene.view.FocusView;
 import gaiasky.scene.view.VertsView;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
+import gaiasky.util.coord.IPythonCoordinatesProvider;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
 
 import java.util.List;
@@ -1536,6 +1537,27 @@ public interface IScriptingInterface {
     void setObjectPosition(Entity object, double[] position);
 
     /**
+     * Sets the coordinates provider for the object identified with the given name, if possible.
+     * The provider object must implement {@link IPythonCoordinatesProvider}, and in particular
+     * the method {@link IPythonCoordinatesProvider#getEquatorialCartesianCoordinates(Object)}, which
+     * takes in a julian date and outputs the object coordinates in the internal cartesian system.
+     *
+     * @param name     The name of the object.
+     * @param provider The coordinate provider instance.
+     */
+    void setObjectCoordinatesProvider(String name, IPythonCoordinatesProvider provider);
+
+    /**
+     * Removes the current coordinates provider from the object with the given name. This method must
+     * be called before shutting down the gateway if the coordinates provider has been previously set
+     * for the given object from Python with {@link #setObjectCoordinatesProvider(String, IPythonCoordinatesProvider)}.
+     * Otherwise, Gaia Sky will crash due to the missing connection to Python.
+     *
+     * @param name The name of the object for which to remove the coordinate provider.
+     */
+    void removeObjectCoordinatesProvider(String name);
+
+    /**
      * Adds a new trajectory object with the given name, points and color. The trajectory
      * is rendered using the 'line renderer' setting in the preferences dialog.
      * This is a very similar call to {@link IScriptingInterface#addPolyline(String, double[], double[])},
@@ -2907,6 +2929,24 @@ public interface IScriptingInterface {
     double[] internalUnitsToKilometres(double[] internalUnits);
 
     /**
+     * Converts the value in internal units to parsecs.
+     *
+     * @param internalUnits The value in internal units.
+     *
+     * @return The value in parsecs.
+     */
+    double internalUnitsToParsecs(double internalUnits);
+
+    /**
+     * Converts the array in internal units to parsecs.
+     *
+     * @param internalUnits The array in internal units.
+     *
+     * @return The array in parsecs.
+     */
+    double[] internalUnitsToParsecs(double[] internalUnits);
+
+    /**
      * Converts the metres to internal units.
      *
      * @param metres The value in metres.
@@ -2923,6 +2963,15 @@ public interface IScriptingInterface {
      * @return The value in internal units.
      */
     double kilometresToInternalUnits(double kilometres);
+
+    /**
+     * Converts the parsecs to internal units.
+     *
+     * @param parsecs The value in parsecs.
+     *
+     * @return The value in internal units.
+     */
+    double parsecsToInternalUnits(double parsecs);
 
     /**
      * Gets the current frame number. The number begins at 0 for the first frame produced

@@ -51,8 +51,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ReprojectionMode;
 import gaiasky.util.Settings.ScreenshotSettings;
 import gaiasky.util.color.ColorUtils;
-import gaiasky.util.coord.AbstractOrbitCoordinates;
-import gaiasky.util.coord.Coordinates;
+import gaiasky.util.coord.*;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
@@ -1888,6 +1887,39 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    @Override
+    public void setObjectCoordinatesProvider(String name, IPythonCoordinatesProvider provider) {
+        if (checkObjectName(name) && checkNotNull(provider, "provider")) {
+            var object = getObject(name);
+            if (checkNotNull(object.getEntity(), "object")) {
+                var coord = Mapper.coordinates.get(object.getEntity());
+                if (checkNotNull(coord, "coordinates")) {
+                    IBodyCoordinates coordinates = new PythonBodyCoordinates(provider);
+                    postRunnable(() -> {
+                        coord.coordinates = coordinates;
+                        GaiaSky.instance.touchSceneGraph();
+                    });
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void removeObjectCoordinatesProvider(String name) {
+        if (checkObjectName(name)) {
+            var object = getObject(name);
+            if (checkNotNull(object.getEntity(), "object")) {
+                var coord = Mapper.coordinates.get(object.getEntity());
+                if (checkNotNull(coord, "coordinates")) {
+                    postRunnable(() -> coord.coordinates = null);
+                }
+
+            }
+        }
+
+    }
+
     public void setObjectPosition(Entity object, List<?> position) {
         setObjectPosition(object, dArray(position));
     }
@@ -3599,6 +3631,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return result;
     }
 
+    @Override
+    public double internalUnitsToParsecs(double internalUnits) {
+        return internalUnits * Constants.U_TO_PC;
+    }
+
+    @Override
+    public double[] internalUnitsToParsecs(double[] internalUnits) {
+        double[] result = new double[internalUnits.length];
+        for (int i = 0; i < internalUnits.length; i++) {
+            result[i] = internalUnitsToParsecs(internalUnits[i]);
+        }
+        return result;
+    }
+
     public double[] internalUnitsToKilometres(List<?> internalUnits) {
         double[] result = new double[internalUnits.size()];
         for (int i = 0; i < internalUnits.size(); i++) {
@@ -3615,6 +3661,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double kilometresToInternalUnits(double kilometres) {
         return kilometres * Constants.KM_TO_U;
+    }
+
+    @Override
+    public double parsecsToInternalUnits(double parsecs) {
+        return parsecs * Constants.PC_TO_U;
     }
 
     public double kilometersToInternalUnits(double kilometres) {

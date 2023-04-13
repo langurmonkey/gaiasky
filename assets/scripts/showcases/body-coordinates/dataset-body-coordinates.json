@@ -1,0 +1,17 @@
+{
+  "key": "system-coordtest",
+  "name": "System body coordinates test",
+  "type": "system",
+  "version": 1,
+  "mingsversion": 30500,
+  "description": "A simple system to test body coordinates on single stars.",
+  "releasenotes" : "- None.",
+  "size": 4867,
+  "nobjects": 2,
+  "data": [
+    {
+      "loader": "gaiasky.data.JsonLoader",
+      "files": [ "./assets/scripts/showcases/body-coordinates/particles-body-coordinates.json" ]
+    }
+  ]
+}

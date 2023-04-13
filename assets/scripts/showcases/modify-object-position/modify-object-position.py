@@ -7,7 +7,6 @@ from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 import os
 
 
-
 class PositionUpdateRunnable(object):
 
     def __init__(self, object):

@@ -11,7 +11,7 @@
     "data" : [
         {
             "loader": "gaiasky.data.JsonLoader",
-            "files": [ "./assets/scripts/showcases/particles-shapetest.json" ]
+            "files": [ "./assets/scripts/showcases/modify-object-position/particles-shapetest.json" ]
         }
     ]
 }
