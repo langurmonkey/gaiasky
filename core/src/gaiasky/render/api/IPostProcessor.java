@@ -165,8 +165,24 @@ public interface IPostProcessor extends Disposable {
             return pp.capture();
         }
 
+        public boolean captureCubemap() {
+            return pp.captureCubemap();
+        }
+
+        public boolean captureVR() {
+            return pp.captureVR();
+        }
+
         public boolean captureNoClear() {
             return pp.captureNoClear();
+        }
+
+        public boolean captureNoClearCubemap() {
+            return pp.captureNoClearCubemap();
+        }
+
+        public boolean captureNoClearReprojection() {
+            return pp.captureNoClearReprojection();
         }
 
         public void render() {

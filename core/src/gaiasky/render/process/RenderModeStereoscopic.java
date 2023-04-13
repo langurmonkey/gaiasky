@@ -160,7 +160,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             sgr.getLightGlowPass().renderGlowPass(camera, null);
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
-            boolean postProcess = postProcessCapture(ppb, fb1, tw, th);
+            boolean postProcess = postProcessCapture(ppb, fb1, tw, th, ppb::capture);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);
@@ -179,7 +179,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             sgr.getLightGlowPass().renderGlowPass(camera, null);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
-            postProcess = postProcessCapture(ppb, fb2, tw, th);
+            postProcess = postProcessCapture(ppb, fb2, tw, th, ppb::capture);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);
@@ -257,7 +257,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             sgr.getLightGlowPass().renderGlowPass(camera, null);
 
             FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh, 3);
-            boolean postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh);
+            boolean postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh, ppb::capture);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);
@@ -287,7 +287,7 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
 
             sgr.getLightGlowPass().renderGlowPass(camera, null);
 
-            postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh);
+            postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh, ppb::capture);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);

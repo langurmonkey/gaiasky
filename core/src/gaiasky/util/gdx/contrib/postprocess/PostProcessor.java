@@ -20,7 +20,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.Texture.TextureWrap;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -32,6 +31,8 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.gdx.contrib.utils.ItemsManager;
+
+import java.util.function.IntSupplier;
 
 /**
  * Provides a way to capture the rendered scene to an off-screen buffer and to apply a chain of effects on it before rendering to
@@ -283,6 +284,18 @@ public final class PostProcessor implements Disposable {
         composite.texture2.setWrap(compositeWrapU, compositeWrapV);
     }
 
+    public boolean capture() {
+        return capture(this::buildEnabledEffectsList);
+    }
+
+    public boolean captureCubemap() {
+        return capture(this::buildEnabledEffectsListCubemap);
+    }
+
+    public boolean captureVR() {
+        return capture(this::buildEnabledEffectsListVR);
+    }
+
     /**
      * Starts capturing the scene, clears the buffer with the clear color specified by {@link #setClearColor(Color)} or
      * {@link #setClearColor(float r, float g, float b, float a)}.
@@ -290,11 +303,11 @@ public final class PostProcessor implements Disposable {
      * @return true or false, whether capturing has been initiated. Capturing will fail in case there are no enabled effects
      * in the chain or this instance is not enabled or capturing is already started.
      */
-    public boolean capture() {
+    public boolean capture(IntSupplier supplier) {
         hasCaptured = false;
 
         if (enabled && !capturing) {
-            if (buildEnabledEffectsList() == 0) {
+            if (supplier.getAsInt() == 0) {
                 // no enabled effects
                 return false;
             }
@@ -315,16 +328,28 @@ public final class PostProcessor implements Disposable {
         return false;
     }
 
+    public boolean captureNoClear() {
+        return captureNoClear(this::buildEnabledEffectsList);
+    }
+
+    public boolean captureNoClearCubemap() {
+        return captureNoClear(this::buildEnabledEffectsListCubemap);
+    }
+
+    public boolean captureNoClearReprojection() {
+        return captureNoClear(this::buildEnabledEffectsListVR);
+    }
+
     /**
      * Starts capturing the scene as {@link #capture()}, but <strong>without</strong> clearing the screen.
      *
      * @return true or false, whether or not capturing has been initiated.
      */
-    public boolean captureNoClear() {
+    public boolean captureNoClear(IntSupplier supplier) {
         hasCaptured = false;
 
         if (enabled && !capturing) {
-            if (buildEnabledEffectsList() == 0) {
+            if (supplier.getAsInt() == 0) {
                 // no enabled effects
                 // Gdx.app.log( "PostProcessor::captureNoClear",
                 // "No post-processor effects enabled" );
@@ -439,10 +464,43 @@ public final class PostProcessor implements Disposable {
         render(null);
     }
 
+    public int buildEnabledEffectsList(boolean cubemap, boolean reprojection) {
+        if (cubemap) {
+            return buildEnabledEffectsListCubemap();
+        } else if (reprojection) {
+            return buildEnabledEffectsListVR();
+        } else {
+            return buildEnabledEffectsList();
+        }
+
+    }
+
     public int buildEnabledEffectsList() {
         enabledEffects.clear();
         for (PostProcessorEffect e : effectsManager) {
             if (e.isEnabled()) {
+                enabledEffects.add(e);
+            }
+        }
+
+        return enabledEffects.size;
+    }
+
+    public int buildEnabledEffectsListCubemap() {
+        enabledEffects.clear();
+        for (PostProcessorEffect e : effectsManager) {
+            if (e.isEnabled() && e.isEnabledInCubemap()) {
+                enabledEffects.add(e);
+            }
+        }
+
+        return enabledEffects.size;
+    }
+
+    public int buildEnabledEffectsListVR() {
+        enabledEffects.clear();
+        for (PostProcessorEffect e : effectsManager) {
+            if (e.isEnabled() && e.isEnabledInVR()) {
                 enabledEffects.add(e);
             }
         }

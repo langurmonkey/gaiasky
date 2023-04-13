@@ -171,6 +171,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackbufferScale(settings.runtime.openXr ? (float) settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && glowSettings.active);
+        lightGlow.setEnabledOptions(false, true);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
@@ -220,6 +221,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         CameraMotion cameraBlur = new CameraMotion(width, height);
         cameraBlur.setBlurScale(.8f);
         cameraBlur.setEnabled(settings.postprocess.motionBlur.active && !vr && !safeMode);
+        cameraBlur.setEnabledOptions(false, false);
         ppb.set(cameraBlur);
         updateCameraBlur(ppb, gq);
 
@@ -270,6 +272,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lensFlare.setBaseIntesity(1f);
         lensFlare.setBias(lensSettings.bias);
         lensFlare.setBlurPasses(lensSettings.blurPasses);
+        lensFlare.setEnabledOptions(false, true);
         ppb.set(lensFlare);
 
         // UNSHARP MASK
@@ -295,6 +298,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         curvature.setDistortion(1.2f);
         curvature.setZoom(0.75f);
         curvature.setEnabled(settings.program.modeStereo.active && settings.program.modeStereo.profile == StereoProfile.VR_HEADSET);
+        curvature.setEnabledOptions(false, false);
         ppb.set(curvature);
 
         // RE-PROJECTION
@@ -302,10 +306,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         reprojection.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
         reprojection.setMode(settings.postprocess.reprojection.mode.mode);
         reprojection.setEnabled(settings.postprocess.reprojection.active);
+        reprojection.setEnabledOptions(false, false);
         ppb.set(reprojection);
 
         // CHROMATIC ABERRATION
         ChromaticAberration aberration = new ChromaticAberration(Settings.settings.postprocess.chromaticAberration.amount * GaiaSky.instance.cameraManager.getFovFactor());
+        aberration.setEnabledOptions(false, false);
         ppb.set(aberration);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
@@ -334,6 +340,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 geometryWarp = new GeometryWarp(data);
             }
             geometryWarp.setEnabled(true);
+            geometryWarp.setEnabledOptions(false, false);
             ppb.set(geometryWarp);
 
         }

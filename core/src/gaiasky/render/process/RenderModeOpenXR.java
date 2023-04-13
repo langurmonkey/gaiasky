@@ -135,7 +135,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
         // Update camera.
         viewManager.updateCamera(layerView, camera.getCamera(), (NaturalCamera) camera.getCurrent(), rc);
-        boolean postProcess = postProcessCapture(ppb, frameBuffer, rw, rh);
+        boolean postProcess = postProcessCapture(ppb, frameBuffer, rw, rh, ppb::captureVR);
 
         // Render scene.
         sgr.renderScene(camera, t, rc);

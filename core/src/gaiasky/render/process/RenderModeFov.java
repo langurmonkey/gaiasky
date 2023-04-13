@@ -26,7 +26,7 @@ public class RenderModeFov extends RenderModeAbstract implements IRenderMode {
 
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        boolean postProcess = postProcessCapture(ppb, fb, tw, th);
+        boolean postProcess = postProcessCapture(ppb, fb, tw, th, ppb::capture);
 
         // Viewport
         extendViewport.setCamera(camera.getCamera());

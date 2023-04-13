@@ -16,6 +16,8 @@ import gaiasky.render.api.IPostProcessor.PostProcessBean;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.util.Settings;
 
+import java.util.function.BooleanSupplier;
+
 /**
  * Abstract implementation with some useful methods for all SGRs.
  */
@@ -33,8 +35,8 @@ public class RenderModeAbstract {
         extendViewport = new ExtendViewport(200, 200);
     }
 
-    protected boolean postProcessCapture(PostProcessBean ppb, FrameBuffer fb, int rw, int rh) {
-        boolean postProcess = ppb.capture();
+    protected boolean postProcessCapture(PostProcessBean ppb, FrameBuffer fb, int rw, int rh, BooleanSupplier captureFunction) {
+        boolean postProcess = captureFunction.getAsBoolean();
         if (postProcess) {
             rc.ppb = ppb;
         } else {

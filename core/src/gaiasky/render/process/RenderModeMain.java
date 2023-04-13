@@ -22,7 +22,7 @@ public class RenderModeMain extends RenderModeAbstract implements IRenderMode {
 
     @Override
     public void render(ISceneRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        boolean postProcess = postProcessCapture(ppb, fb, rw, rh);
+        boolean postProcess = postProcessCapture(ppb, fb, rw, rh, ppb::capture);
 
         // Viewport
         extendViewport.setCamera(camera.getCamera());
