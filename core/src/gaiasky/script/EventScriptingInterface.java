@@ -3109,14 +3109,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (objects.size > 0) {
                 GaiaSky.postRunnable(() -> {
                     // THIS WILL BLOCK
+                    objects.forEach(scene.engine::addEntity);
                     objects.forEach(scene::initializeEntity);
                     objects.forEach(scene::addToIndex);
                     while (!GaiaSky.instance.assetManager.isFinished()) {
                         // Active wait
                         sleepFrames(1);
                     }
-                    objects.forEach(scene::setUpEntity);
                     objects.forEach((entity) -> EventManager.publish(Event.SCENE_ADD_OBJECT_NO_POST_CMD, this, entity, false));
+                    objects.forEach(scene::setUpEntity);
 
                     GaiaSky.postRunnable(GaiaSky.instance::touchSceneGraph);
                 });
