@@ -162,11 +162,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Auxiliary focus view object, used to reduce the amount of allocations.
      */
-    private FocusView focusView;
+    private final FocusView focusView;
     /**
      * The tracking object, if any
      */
-    private FocusView trackingObject;
+    private final FocusView trackingObject;
     /**
      * The name of the tracking object
      */
@@ -195,7 +195,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Sets velocity in the direction of the direction vector
      **/
     private double velocityGamepad = 0;
-    private double gamepadMultiplier = 1;
     /** Factor applied to all velocities. **/
     private double movementMultiplier = 1;
     /** Factor applied to speed only. **/
@@ -873,15 +872,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         boolean cinematic = Settings.settings.scene.camera.cinematic;
         // Calculate velocity if coming from gamepad
         if (velocityGamepad != 0) {
-            vel.set(direction).nor().scl(velocityGamepad * gamepadMultiplier * multiplier);
+            vel.set(direction).nor().scl(velocityGamepad * multiplier);
         } else if (velocityVRX != 0 || velocityVRY != 0) {
             aux1.set(velocityVR1).sub(velocityVR0).nor();
 
             // p0-p1 direction (Y)
-            vel.set(aux1).scl(velocityVRY * gamepadMultiplier * multiplier);
+            vel.set(aux1).scl(velocityVRY * multiplier);
 
             // cross(p0,p1) direction (X)
-            aux1.crs(up).nor().scl(velocityVRX * gamepadMultiplier * multiplier);
+            aux1.crs(up).nor().scl(velocityVRX * multiplier);
             vel.add(aux1);
         }
 
@@ -1026,8 +1025,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void updateLateral(double dt, double translateUnits) {
         // Pan with hor
         aux1.set(direction).crs(up).nor();
-        aux1.scl(horizontal.y * gamepadMultiplier * translateUnits * movementMultiplier);
-        aux2.set(up).nor().scl(vertical.y * gamepadMultiplier * translateUnits * movementMultiplier);
+        aux1.scl(horizontal.y * translateUnits * movementMultiplier);
+        aux2.set(up).nor().scl(vertical.y * translateUnits * movementMultiplier);
         aux1.add(aux2);
         if (Settings.settings.scene.camera.speedLimit > 0 && aux1.len() > Settings.settings.scene.camera.speedLimit) {
             aux1.clamp(0, Settings.settings.scene.camera.speedLimit);
@@ -1608,7 +1607,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @return The magnitude.
      */
     private double computeFocusApparentMagnitudeCamera() {
-        if (focus.getMag() != null) {
+        if (focus.isParticle() || focus.getMag() == null) {
+            // Stars.
+
+            // m - M = 5 * log10(d) - 5
+            // m: apparent magnitude
+            // M: absolute magnitude
+            // d: distance [pc]
+            return 5d * Math.log10(focus.getDistToCamera() * Constants.U_TO_PC) - 5d + focus.getAbsmag();
+        } else if (focus.getMag() != null) {
+            // Models, and other bodies.
+
             // m - H = 5 * log10(r * D) + g
             // m: apparent magnitude
             // H: absolute magnitude
@@ -1616,16 +1625,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // D: dist to Earth [au]
             // g: term for phase effects (~0)
             double distCamAu = pos.put(aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() * Constants.U_TO_AU;
+            // Rest (models, etc.), use distance to star.
             IFocus starAncestor = focus.getFirstStarAncestor();
             double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lenDouble() : focus.getAbsolutePosition(aux5b).lenDouble()) * Constants.U_TO_AU;
             return 5d * Math.log10(distStarAu * distCamAu) + focus.getAbsmag();
-        } else {
-            // m - M = 5 * log10(d) - 5
-            // m: apparent magnitude
-            // M: absolute magnitude
-            // d: distance [pc]
-            return 5d * Math.log10(focus.getDistToCamera() * Constants.U_TO_PC) - 5d + focus.getAbsmag();
         }
+        return Double.NaN;
     }
 
     /**

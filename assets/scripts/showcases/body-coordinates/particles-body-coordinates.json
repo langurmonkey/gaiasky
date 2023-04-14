@@ -31,8 +31,7 @@
         1.0
       ],
       "ct": "Stars",
-      "absmag": 13.76,
-      "appmag": 7.67,
+      "absMag": 0.77,
       "parent": "coordtest-hook",
       "archetype": "Star",
 

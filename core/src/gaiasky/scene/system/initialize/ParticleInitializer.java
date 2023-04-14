@@ -70,6 +70,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         var hip = Mapper.hip.get(entity);
         var dist = Mapper.distance.get(entity);
         var focus = Mapper.focus.get(entity);
+        var coordinates = Mapper.coordinates.get(entity);
         var bb = Mapper.billboard.get(entity);
 
         // Focus active.
@@ -80,10 +81,10 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
         if (hip != null) {
             // Initialize star.
-            initializeStar(base, body, celestial, mag, pm, extra, sa, label, render, dist, focus);
+            initializeStar(entity, base, body, celestial, mag, pm, extra, sa, label, render, dist, focus, coordinates);
         } else {
             // Initialize particle.
-            initializeParticle(base, body, celestial, mag, pm, extra, sa, label, render, focus);
+            initializeParticle(entity, base, body, celestial, mag, pm, extra, sa, label, render, focus, coordinates);
         }
     }
 
@@ -94,20 +95,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
             var model = Mapper.model.get(entity);
             model.renderConsumer = ModelEntityRenderSystem::renderParticleStarModel;
             utils.initModel(AssetBean.manager(), model);
-
-            var mag = Mapper.magnitude.get(entity);
-            var coordinates = Mapper.coordinates.get(entity);
-            if (!Float.isFinite(mag.absMag)) {
-                double distPc;
-                if (coordinates.coordinates != null) {
-                    distPc = coordinates.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31).lenDouble() * Constants.U_TO_PC;
-                } else {
-                    distPc = EntityUtils.getAbsolutePosition(entity, B31).lenDouble() * Constants.U_TO_PC;
-                }
-                mag.absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, mag.appMag);
-            }
         }
-
     }
 
     private void baseInitialization(ProperMotion pm, ParticleExtra extra, Celestial celestial, SolidAngle sa, RenderType render) {
@@ -149,7 +137,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
 
     }
 
-    private void initializeParticle(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus) {
+    private void initializeParticle(Entity entity, Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Focus focus, Coordinates coordinates) {
         baseInitialization(pm, extra, celestial, sa, render);
 
         sa.thresholdLabel = sa.thresholdPoint * 1e-2f / Settings.settings.scene.label.number;
@@ -160,7 +148,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         label.renderFunction = LabelView::renderTextParticle;
 
         // Actual initialization.
-        setDerivedAttributes(body, celestial, mag, extra, false);
+        setDerivedAttributes(entity, body, celestial, mag, coordinates, extra, false);
 
         if (base.ct == null)
             base.ct = new ComponentTypes(ComponentType.Galaxies);
@@ -174,7 +162,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         focus.hitRayConsumer = FocusHit::addHitRayCelestial;
     }
 
-    private void initializeStar(Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Distance dist, Focus focus) {
+    private void initializeStar(Entity entity, Base base, Body body, Celestial celestial, Magnitude mag, ProperMotion pm, ParticleExtra extra, SolidAngle sa, Label label, RenderType render, Distance dist, Focus focus, Coordinates coordinates) {
         baseInitialization(pm, extra, celestial, sa, render);
 
         sa.thresholdLabel = sa.thresholdPoint / Settings.settings.scene.label.number;
@@ -186,7 +174,7 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         label.renderConsumer = LabelEntityRenderSystem::renderCelestial;
         label.renderFunction = LabelView::renderTextParticle;
 
-        setDerivedAttributes(body, celestial, mag, extra, true);
+        setDerivedAttributes(entity, body, celestial, mag, coordinates, extra, true);
 
         if (base.ct == null)
             base.ct = new ComponentTypes(ComponentType.Stars);
@@ -201,21 +189,40 @@ public class ParticleInitializer extends AbstractInitSystem implements IObserver
         focus.hitRayConsumer = FocusHit::addHitRayCelestial;
     }
 
-    private void setDerivedAttributes(Body body, Celestial celestial, Magnitude mag, ParticleExtra extra, boolean isStar) {
-        if (!Float.isFinite(mag.absMag)) {
-            // Default
-            mag.absMag = isStar ? 15.0f : -5.0f;
+    private void setDerivedAttributes(Entity entity, Body body, Celestial celestial, Magnitude mag, Coordinates coordinates, ParticleExtra extra, boolean isStar) {
+        double distPc;
+        if (coordinates.coordinates != null) {
+            distPc = coordinates.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31).lenDouble() * Constants.U_TO_PC;
+        } else {
+            distPc = EntityUtils.getAbsolutePosition(entity, B31).lenDouble() * Constants.U_TO_PC;
         }
 
-        double flux = Math.pow(10, -mag.absMag / 2.5f);
+        boolean finiteApparent = Float.isFinite(mag.appMag);
+        boolean finiteAbsolute = Float.isFinite(mag.absMag);
+
+        if (!finiteApparent && !finiteAbsolute) {
+            // We have no magnitudes.
+            // Set default apparent magnitude to 15.
+            mag.appMag = isStar ? 10.0f : -5.0f;
+            mag.absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, mag.appMag);
+        } else if (!finiteApparent) {
+            // We only have absolute magnitude. Compute apparent from absolute.
+            mag.appMag = (float) AstroUtils.absoluteToApparentMagnitude(distPc, mag.absMag);
+        } else if (!finiteAbsolute) {
+            // We only have apparent magnitude. Compute absolute from apparent.
+            mag.absMag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, mag.appMag);
+        }
+
+        // Color.
         setRGB(body, celestial);
 
         // Calculate size - This contains arbitrary boundary values to make
         // things nice on the render side
-        if (!isStar) {
-            body.size = (float) (Math.log(Math.pow(flux, 10.0)) * Constants.PC_TO_U);
-        } else {
+        double flux = Math.pow(10, -mag.absMag / 2.5f);
+        if (isStar) {
             body.size = (float) (Math.min((Math.pow(flux, 0.5f) * Constants.PC_TO_U * 0.16f), 1e9f) / discFactor);
+        } else {
+            body.size = (float) (Math.log(Math.pow(flux, 10.0)) * Constants.PC_TO_U);
         }
         extra.computedSize = 0;
     }

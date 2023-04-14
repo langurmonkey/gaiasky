@@ -26,6 +26,7 @@ import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.Render;
 import gaiasky.scene.system.render.SceneRenderer;
 import gaiasky.scene.view.RenderView;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -152,7 +153,7 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
             tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], base.opacity);
 
             // SIZE
-            tempVerts[curr.vertexIdx + sizeOffset] = (float) view.getRadius();
+            tempVerts[curr.vertexIdx + sizeOffset] = (float) (view.getRadius() * 2.0);
 
             // POSITION
             aux.set(body.pos.x.floatValue(), body.pos.y.floatValue(), body.pos.z.floatValue());

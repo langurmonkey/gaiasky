@@ -38,7 +38,7 @@ public class Constants {
     public static final double STAR_SOLID_ANGLE_THRESHOLD_TOP = 1e-2;
     /** Disc factor for single particles and stars. **/
     public static final double PARTICLE_DISC_FACTOR = 1.5;
-    /** Size factor for single stars. **/
+    /** Size factor for all stars. **/
     public static final double STAR_SIZE_FACTOR = 1.31526e-6;
     /** Minimum generic slider value. **/
     public static final float MIN_SLIDER = 0;

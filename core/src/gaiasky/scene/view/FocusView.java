@@ -1048,4 +1048,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         return list;
     }
 
+    public boolean isSameEntity(FocusView other) {
+        return entity == other.entity;
+    }
+
 }

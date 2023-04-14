@@ -337,7 +337,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             // Absolute magnitude to pseudo-size
                             final double absMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
-                            final float size = (float) absoluteMagnitudeToPseudoSize(absMag);
+                            final float size = (float) AstroUtils.absoluteMagnitudeToPseudoSize(absMag);
 
                             // COLOR
                             float color;
@@ -436,7 +436,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 assert variMags.length == variTimes.length;
                                 for (int j = 0; j < variMagsDouble.length; j++) {
                                     double variAbsoluteMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, variMagsDouble[j]);
-                                    variMags[j] = (float) absoluteMagnitudeToPseudoSize(variAbsoluteMag);
+                                    variMags[j] = (float) AstroUtils.absoluteMagnitudeToPseudoSize(variAbsoluteMag);
                                 }
                             }
 
@@ -708,19 +708,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public void setMagCorrections(boolean magCorrections) {
-    }
-
-    /**
-     * Works out the size from the absolute magnitude.
-     *
-     * @param absMag The absolute magnitude
-     * @return The pseudo-size of this star
-     */
-    private double absoluteMagnitudeToPseudoSize(final double absMag) {
-        // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
-        double pseudoL = Math.pow(10, -0.4 * absMag);
-        double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-        return Math.min((Math.pow(pseudoL, 0.5) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
     }
 
     @Override

@@ -560,6 +560,10 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
                 // Apparent magnitude (earth)
                 appMagEarthLabel.setText(I18n.msg("gui.focusinfo.appmag.earth"));
+                float appMag = view.getAppmag();
+                focusAppMagEarth.setText(nf.format(appMag));
+
+                // Apparent magnitude (camera)
                 appMagCameraLabel.setText(I18n.msg("gui.focusinfo.appmag.camera"));
 
                 // Absolute magnitude
@@ -737,7 +741,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "rawtypes" })
     private void displayInfo(Cell cell, Actor info) {
         cell.setActor(info);
         pack();

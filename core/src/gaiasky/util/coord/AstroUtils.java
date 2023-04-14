@@ -764,4 +764,33 @@ public class AstroUtils {
         final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
         return appMag - v + 5.0;
     }
+
+    /**
+     * Converts an absolute magnitude to an apparent magnitude at the given distance in parsecs.
+     *
+     * @param distPc The distance to the star in parsecs.
+     * @param absMag The absolute magnitude.
+     *
+     * @return The apparent magnitude at the given distance.
+     */
+    public static double absoluteToApparentMagnitude(double distPc, double absMag) {
+        final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
+        return absMag + v - 5.0;
+    }
+
+    /**
+     * Computes the pseudo-size of a star from the absolute magnitude.
+     *
+     * @param absMag The absolute magnitude of the star.
+     *
+     * @return The pseudo-size of this star, mainly used for rendering purposes.
+     *         It has no physical meaning and has no relation to the actual physical size of the star.
+     */
+    public static double absoluteMagnitudeToPseudoSize(final double absMag) {
+        // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
+        double pseudoL = Math.pow(10, -0.4 * absMag);
+        double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
+        return Math.min((Math.pow(pseudoL, 0.5) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
+    }
+
 }
