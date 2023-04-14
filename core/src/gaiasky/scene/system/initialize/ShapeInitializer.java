@@ -12,6 +12,7 @@ import gaiasky.scene.entity.FocusActive;
 import gaiasky.scene.entity.FocusHit;
 import gaiasky.scene.system.render.draw.model.ModelEntityRenderSystem;
 import gaiasky.scene.system.render.draw.text.LabelEntityRenderSystem;
+import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.scene.view.LabelView;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -26,11 +27,17 @@ public class ShapeInitializer extends AbstractInitSystem {
     @Override
     public void initializeEntity(Entity entity) {
         var base = Mapper.base.get(entity);
+        var graph = Mapper.graph.get(entity);
         var modelComp = Mapper.model.get(entity);
+
+        // Model.
         var mc = modelComp.model;
         if (mc != null) {
             mc.initialize(base.getLocalizedName());
         }
+
+        // Updater.
+        graph.positionUpdaterConsumer = GraphUpdater::updateShapeObject;
     }
 
     @Override

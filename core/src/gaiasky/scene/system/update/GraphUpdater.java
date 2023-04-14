@@ -6,10 +6,12 @@ import com.badlogic.gdx.Gdx;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.camera.ICamera;
 import gaiasky.scene.component.*;
 import gaiasky.scene.component.tag.TagNoProcess;
+import gaiasky.scene.entity.EntityUtils;
 import gaiasky.scene.view.SpacecraftView;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
@@ -21,6 +23,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -96,7 +99,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
         }
     }
 
-    public void update(Entity entity, ITimeFrameProvider time, final Vector3b parentTransform, float opacity) {
+    public void update(Entity entity, ITimeFrameProvider time, final Vector3b parentTranslation, float opacity) {
         processed++;
         var graph = Mapper.graph.get(entity);
 
@@ -105,30 +108,27 @@ public class GraphUpdater extends AbstractUpdateSystem {
 
             var base = Mapper.base.get(entity);
             var body = Mapper.body.get(entity);
-            var coordinates = Mapper.coordinates.get(entity);
             var fade = Mapper.fade.get(entity);
 
-            // Update local position here
-            if (time.getHdiff() != 0 && coordinates != null && coordinates.coordinates != null) {
+            // Update rotation.
+            if (time.getHdiff() != 0) {
                 var rotation = Mapper.rotation.get(entity);
-                // Load this object's equatorial cartesian coordinates into pos
-                coordinates.timeOverflow = coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), body.pos) == null;
-
-                // Update the spherical position
-                gaiasky.util.coord.Coordinates.cartesianToSpherical(body.pos, D31);
-                body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
-
-                // Update angle
-                if (rotation != null && rotation.rc != null)
+                if (rotation != null && rotation.rc != null) {
                     rotation.rc.update(time);
+                }
             }
 
-            graph.translation.set(parentTransform);
-            // Update local values.
+            // Update position.
             if (graph.positionUpdaterConsumer != null) {
-                graph.positionUpdaterConsumer.apply(this, entity, graph);
+                graph.positionUpdaterConsumer.apply(this, entity, body, graph);
             }
-            graph.translation.add(body.pos);
+
+            // Update translation.
+            graph.translation.set(parentTranslation).add(body.pos);
+
+            // Update the spherical position.
+            gaiasky.util.coord.Coordinates.cartesianToSpherical(B31.set(graph.translation).add(camera.getPos()), D31);
+            body.posSph.set((float) (Nature.TO_DEG * D31.x), (float) (Nature.TO_DEG * D31.y));
 
             // Update opacity
             if (fade != null && (fade.fadeIn != null || fade.fadeOut != null)) {
@@ -146,15 +146,6 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 base.opacity = opacity;
             }
             base.opacity *= base.getVisibilityOpacityFactor();
-
-            // Apply proper motion if needed
-            if (Mapper.pm.has(entity)) {
-                var pm = Mapper.pm.get(entity);
-                if (pm.hasPm) {
-                    Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
-                    graph.translation.add(pmv);
-                }
-            }
 
             // Update supporting attributes
             body.distToCamera = graph.translation.lenDouble();
@@ -233,20 +224,106 @@ public class GraphUpdater extends AbstractUpdateSystem {
         return (long) (GaiaSky.instance.getT() * 1000f) - base.lastStateChangeTimeMs;
     }
 
-    public boolean mustUpdateLoc(Entity entity, GraphNode graph) {
-        var parentBody = Mapper.body.get(graph.parent);
-        var parentSa = Mapper.sa.get(graph.parent);
-
-        boolean update = parentBody.solidAngle > parentSa.thresholdQuad * 30f;
-        if (update) {
+    /**
+     * This function quickly discards perimeters when the Countries component type is off.
+     *
+     * @param entity The entity.
+     * @param graph  The graph component.
+     *
+     * @return Whether the perimeter must be processed.
+     */
+    public boolean mustUpdatePerimeter(Entity entity, GraphNode graph) {
+        boolean enabled = GaiaSky.instance.sceneRenderer.isOn(ComponentType.Countries);
+        if (enabled) {
             entity.remove(TagNoProcess.class);
-        } else {
+        } else if (entity.getComponent(TagNoProcess.class) == null) {
             entity.add(getEngine().createComponent(TagNoProcess.class));
         }
-        return update;
+        return enabled;
     }
 
-    public void updateSpacecraft(Entity entity, GraphNode graph) {
+    /**
+     * This function quickly discards locations when the Locations component type is off
+     * or when the solid angle of the parent is too small.
+     *
+     * @param entity The entity.
+     * @param graph  The graph component.
+     *
+     * @return Whether the perimeter must be processed.
+     */
+    public boolean mustUpdateLoc(Entity entity, GraphNode graph) {
+        boolean enabled = GaiaSky.instance.sceneRenderer.isOn(ComponentType.Locations);
+        if (enabled) {
+            var parentBody = Mapper.body.get(graph.parent);
+            var parentSa = Mapper.sa.get(graph.parent);
+            boolean update = parentBody.solidAngle > parentSa.thresholdQuad * 30f;
+            if (update) {
+                entity.remove(TagNoProcess.class);
+            } else if (entity.getComponent(TagNoProcess.class) == null) {
+                entity.add(getEngine().createComponent(TagNoProcess.class));
+            }
+            return update;
+        } else {
+            if (entity.getComponent(TagNoProcess.class) == null) {
+                entity.add(getEngine().createComponent(TagNoProcess.class));
+            }
+            return false;
+        }
+    }
+
+    /**
+     * General method to update the position of an entity.
+     *
+     * @param entity The entity to update.
+     * @param body   The body component.
+     * @param graph  The graph component.
+     */
+    public void updatePositionDefault(Entity entity, Body body, GraphNode graph) {
+        var pm = Mapper.pm.get(entity);
+        if (time.getHdiff() != 0 || (pm != null && pm.hasPm)) {
+            var coordinates = Mapper.coordinates.get(entity);
+            if (coordinates != null && coordinates.coordinates != null) {
+                // Load this object's equatorial cartesian coordinates into pos.
+                coordinates.timeOverflow = coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), body.pos) == null;
+            } else if (!body.positionSetInScript) {
+                // Just set the original position.
+                body.pos.set(body.originalPos);
+            }
+
+            // Apply proper motion if needed.
+            if (pm != null && pm.hasPm) {
+                Vector3d pmv = D31.set(pm.pm).scl(AstroUtils.getMsSince(time.getTime(), pm.epochJd) * Nature.MS_TO_Y);
+                body.pos.add(pmv);
+            }
+        }
+
+    }
+
+    /**
+     * Method to update the position of a shape object.
+     *
+     * @param entity The entity to update.
+     * @param body   The body component.
+     * @param graph  The graph component.
+     */
+    public void updateShapeObject(Entity entity, Body body, GraphNode graph) {
+        var shape = Mapper.shape.get(entity);
+        if (shape != null && shape.track != null) {
+            // Overwrite position if track object is set.
+            EntityUtils.getAbsolutePosition(shape.track.getEntity(), shape.trackName.toLowerCase(Locale.ROOT), body.pos);
+        } else {
+            updatePositionDefault(entity, body, graph);
+        }
+    }
+
+    /**
+     * Method to update the position of a spacecraft.
+     *
+     * @param entity The entity to update.
+     * @param body   The body component.
+     * @param graph  The graph component.
+     */
+    public void updateSpacecraft(Entity entity, Body body, GraphNode graph) {
         view.setEntity(entity);
         var engine = view.engine;
 

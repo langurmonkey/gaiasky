@@ -38,14 +38,6 @@ public class ShapeUpdater extends AbstractUpdateSystem {
             LightingUtils.updateLights(model, body, graph, GaiaSky.instance.cameraManager);
         }
 
-        if (shape.track != null) {
-            // Overwrite position if track object is set.
-            EntityUtils.getAbsolutePosition(shape.track.getEntity(), shape.trackName.toLowerCase(Locale.ROOT), body.pos);
-        } else if ((coord == null || coord.coordinates == null) && !body.positionSetInScript) {
-            // Otherwise, set to zero if the position has not been set in a script, or it has coordinates.
-            body.pos.scl(0);
-        }
-
         // Compute local transform.
         graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);
         // Apply reference system transform.

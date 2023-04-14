@@ -140,7 +140,7 @@ public class AddShapeDialog extends GenericDialog {
     }
 
     private void addColor(Table container) {
-        color = new ColorPicker(new float[] { 0.3f, 0.4f, 1f, 1f }, stage, skin);
+        color = new ColorPicker(new float[] { 0.3f, 0.4f, 1f, 0.5f }, stage, skin);
         container.add(new OwnLabel(I18n.msg("gui.shape.color"), skin, titleWidth)).left().padRight(pad18).padBottom(pad10);
         Table lc = new Table(skin);
         lc.add(color).size(cpSize);

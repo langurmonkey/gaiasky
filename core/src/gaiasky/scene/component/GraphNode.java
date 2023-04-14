@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.update.GraphUpdater;
 import gaiasky.util.Consumers.Consumer3;
+import gaiasky.util.Consumers.Consumer4;
 import gaiasky.util.Functions.Function3;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
@@ -15,7 +16,7 @@ import gaiasky.util.math.Vector3b;
 public class GraphNode implements Component, ICopy {
 
     /** Reference to the method to update the position of this object. **/
-    public Consumer3<GraphUpdater, Entity, GraphNode> positionUpdaterConsumer;
+    public Consumer4<GraphUpdater, Entity, Body, GraphNode> positionUpdaterConsumer = GraphUpdater::updatePositionDefault;
 
     /** Reference to the function that returns whether this object must be updated. **/
     public Function3<GraphUpdater, Entity, GraphNode, Boolean> mustUpdateFunction;

@@ -3201,7 +3201,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     return false;
                 }
 
-                if (path.getFileName().endsWith(".json")) {
+                if (path.getFileName().toString().endsWith(".json")) {
                     loadJsonCatalog(dsName, path.toString(), sync);
                 } else if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
                     List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
@@ -3565,7 +3565,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     if (trackObject) {
                         shape.track = new FocusView(trackingObject);
                     } else {
-                        body.pos = EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3b());
+                        body.setPos(EntityUtils.getAbsolutePosition(trackingObject, objectName, new Vector3b()));
                     }
                     shape.trackName = objectName;
 

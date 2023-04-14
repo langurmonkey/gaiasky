@@ -431,7 +431,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     @Override
     public Vector3b getPredictedPosition(Vector3b out, ITimeFrameProvider time, ICamera camera, boolean force) {
         if (getSet() != null) {
-            return getSet().getAbsolutePosition(out);
+            Instant futureTime = time.getTime().plus((long) (time.getHdiff() * Nature.H_TO_MS), ChronoUnit.MILLIS);
+            return getSet().getAbsolutePosition(futureTime, out);
         } else {
             if (!mustUpdatePosition(time) && !force) {
                 return getAbsolutePosition(out);
@@ -448,9 +449,7 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
                 // This updates the rest of components of our entity.
                 scene.updateEntity(copy, (float) time.getHdiff());
 
-                Instant futureTime = time.getTime().plus((long) (time.getHdiff() * Nature.H_TO_MS), ChronoUnit.MILLIS);
-
-                EntityUtils.getAbsolutePosition(copy, futureTime, out);
+                EntityUtils.getAbsolutePosition(copy, out);
 
                 // Return to pool.
                 scene.returnCopyObject(copy);

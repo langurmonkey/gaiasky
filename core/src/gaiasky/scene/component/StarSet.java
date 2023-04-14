@@ -5,10 +5,13 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.util.Nature;
 import gaiasky.util.Settings;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,10 +38,26 @@ public class StarSet extends ParticleSet {
     /** Stars with special label colors. **/
     public Map<Integer, float[]> labelColors;
 
-    public Vector3b getAbsolutePosition(String name, Vector3b aux) {
+    /** Returns the focus position, if any, for the given date in the out vector. **/
+    public Vector3b getAbsolutePosition(Instant date, Vector3b out) {
+        double deltaYears = AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), epochJd) * Nature.MS_TO_Y;
+        IParticleRecord focus = pointData.get(focusIndex);
+        Vector3d aux = this.fetchPosition(focus, cPosD, D31, deltaYears);
+        return out.set(aux).add(GaiaSky.instance.getICamera().getPos());
+    }
+
+    /**
+     * Returns the absolute position of the particle with the given name.
+     *
+     * @param name The name.
+     * @param out  The out vector.
+     *
+     * @return The absolute position in the out vector.
+     */
+    public Vector3b getAbsolutePosition(String name, Vector3b out) {
         Vector3d vec = getAbsolutePosition(name, D31);
-        aux.set(vec);
-        return aux;
+        out.set(vec);
+        return out;
     }
 
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {

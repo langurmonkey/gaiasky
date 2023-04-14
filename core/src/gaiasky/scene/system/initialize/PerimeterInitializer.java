@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scene.Mapper;
 import gaiasky.scene.system.render.draw.line.LineEntityRenderSystem;
+import gaiasky.scene.system.update.GraphUpdater;
 
 public class PerimeterInitializer extends AbstractInitSystem {
     public PerimeterInitializer(boolean setUp, Family family, int priority) {
@@ -26,6 +27,7 @@ public class PerimeterInitializer extends AbstractInitSystem {
 
         body.setColor(new float[] { 0.8f, 0.8f, 0.f, 1f });
         graph.localTransform = new Matrix4();
+        graph.mustUpdateFunction = GraphUpdater::mustUpdatePerimeter;
 
         perimeter.maxlonlat = new Vector2(-1000, -1000);
         perimeter.minlonlat = new Vector2(1000, 1000);

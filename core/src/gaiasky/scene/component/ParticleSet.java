@@ -21,6 +21,7 @@ import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
+import java.time.Instant;
 import java.util.*;
 
 public class ParticleSet implements Component, IDisposable {
@@ -219,6 +220,7 @@ public class ParticleSet implements Component, IDisposable {
      * and computes the geometric center of this group
      *
      * @param pointData The data
+     *
      * @return An map{string,int} mapping names to indices
      */
     public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
@@ -348,6 +350,7 @@ public class ParticleSet implements Component, IDisposable {
      * Returns the size of the particle at index i
      *
      * @param i The index
+     *
      * @return The size
      */
     public double getSize(int i) {
@@ -425,6 +428,7 @@ public class ParticleSet implements Component, IDisposable {
      * Checks whether the particle with the given index is visible
      *
      * @param index The index of the particle
+     *
      * @return The visibility of the particle
      */
     public boolean isVisible(int index) {
@@ -459,6 +463,11 @@ public class ParticleSet implements Component, IDisposable {
     }
 
     /** Returns the current focus position, if any, in the out vector. **/
+    public Vector3b getAbsolutePosition(Instant date, Vector3b out) {
+        return getAbsolutePosition(out);
+    }
+
+    /** Returns the current focus position, if any, in the out vector. **/
     public Vector3b getAbsolutePosition(Vector3b out) {
         return out.set(focusPosition);
     }
@@ -486,6 +495,7 @@ public class ParticleSet implements Component, IDisposable {
      *                    reference system instead of the camera reference system.
      * @param destination The destination factor
      * @param deltaYears  The delta years
+     *
      * @return The vector for chaining
      */
     public Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {

@@ -162,10 +162,10 @@ public class SinglePointRenderer extends ImmediateModeRenderSystem implements IO
             tempVerts[idx + 1] = aux.y;
             tempVerts[idx + 2] = aux.z;
 
-            // PROPER MOTION
-            tempVerts[curr.vertexIdx + pmOffset] = pm != null ? pm.pm.x : 0;
-            tempVerts[curr.vertexIdx + pmOffset + 1] = pm != null ? pm.pm.y : 0;
-            tempVerts[curr.vertexIdx + pmOffset + 2] = pm != null ? pm.pm.z : 0;
+            // PROPER MOTION (body position already has the proper motion for single stars)
+            tempVerts[curr.vertexIdx + pmOffset] = 0;
+            tempVerts[curr.vertexIdx + pmOffset + 1] = 0;
+            tempVerts[curr.vertexIdx + pmOffset + 2] = 0;
 
             curr.vertexIdx += curr.vertexSize;
         });

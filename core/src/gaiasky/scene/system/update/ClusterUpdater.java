@@ -38,7 +38,7 @@ public class ClusterUpdater extends AbstractUpdateSystem {
             cluster.fadeAlpha = (float) MathUtilsDouble.lint(body.solidAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
             body.labelColor[3] = 8.0f * cluster.fadeAlpha;
 
-            graph.localTransform.idt().translate(graph.translation.put(F31)).scl(body.size);
+            graph.localTransform.idt().translate(body.pos.put(F31)).scl(body.size);
         }
     }
 }

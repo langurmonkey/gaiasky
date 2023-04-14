@@ -248,7 +248,7 @@ public class StarClusterLoader extends AbstractSceneLoader {
         graph.setParent(parentName != null ? parentName : "MWSC");
 
         var body = Mapper.body.get(entity);
-        body.pos = pos;
+        body.setPos(pos);
         body.posSph = new Vector2d(posSph.x, posSph.y);
         body.setColor(Arrays.copyOf(clusterColor, clusterColor.length));
         body.setLabelColor(Arrays.copyOf(clusterColor, clusterColor.length));

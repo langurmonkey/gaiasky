@@ -14,6 +14,11 @@ public class Body implements Component, ICopy {
      * {@link gaiasky.util.Constants#U_TO_KM} by default.
      */
     public Vector3b pos = new Vector3b();
+    /**
+     * A copy of the original position at epoch, in case we do not have
+     * a Coordinates component to source positions from.
+     */
+    public Vector3b originalPos = new Vector3b();
 
     /**
      * Position in the equatorial system; ra, dec.
@@ -62,12 +67,18 @@ public class Body implements Component, ICopy {
      */
     public boolean positionSetInScript = false;
 
+    public void setPos(Vector3b pos) {
+        this.pos.set(pos);
+        updateOriginalPos();
+    }
+
     public void setPos(double[] pos) {
         setPosition(pos);
     }
 
     public void setPosition(double[] pos) {
         this.pos.set(pos[0] * Constants.DISTANCE_SCALE_FACTOR, pos[1] * Constants.DISTANCE_SCALE_FACTOR, pos[2] * Constants.DISTANCE_SCALE_FACTOR);
+        updateOriginalPos();
     }
 
     public void setPosKm(double[] pos) {
@@ -76,6 +87,7 @@ public class Body implements Component, ICopy {
 
     public void setPositionKm(double[] pos) {
         this.pos.set(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
+        updateOriginalPos();
     }
 
     public void setPosPc(double[] pos) {
@@ -84,10 +96,15 @@ public class Body implements Component, ICopy {
 
     public void setPositionPc(double[] pos) {
         this.pos.set(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
+        updateOriginalPos();
     }
 
     public void setPosition(int[] pos) {
         setPosition(new double[] { pos[0] * Constants.DISTANCE_SCALE_FACTOR, pos[1] * Constants.DISTANCE_SCALE_FACTOR, pos[2] * Constants.DISTANCE_SCALE_FACTOR });
+    }
+
+    public void updateOriginalPos() {
+        this.originalPos.set(this.pos);
     }
 
     public void setSize(Double size) {

@@ -14,20 +14,14 @@ import gaiasky.scene.component.Celestial;
 import gaiasky.scene.component.ParticleSet;
 import gaiasky.scene.component.Verts;
 import gaiasky.scene.view.FocusView;
-import gaiasky.util.Nature;
-import gaiasky.util.TLV3B;
-import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.math.Vector3b;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
  * This class contains some general utilities applicable to all entities.
  */
 public class EntityUtils {
-
-    private static final TLV3B aux = new TLV3B();
 
     /**
      * Returns the absolute position of this entity in the native coordinates
@@ -39,43 +33,17 @@ public class EntityUtils {
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(final Entity entity, Vector3b out) {
-        return getAbsolutePosition(entity, GaiaSky.instance.time.getTime(), out);
-    }
-
-    /**
-     * Returns the absolute position of this entity in the native coordinates
-     * (equatorial system) and internal units for the given instant.
-     *
-     * @param entity  The entity.
-     * @param instant The instant of the position.
-     * @param out     Auxiliary vector to put the result in.
-     *
-     * @return The vector with the position.
-     */
-    public static Vector3b getAbsolutePosition(final Entity entity, final Instant instant, Vector3b out) {
         if (entity != null) {
-            synchronized (entity) {
-                if (Mapper.body.has(entity)) {
-                    var body = Mapper.body.get(entity);
-                    out.set(body.pos);
+            if (Mapper.body.has(entity)) {
+                var body = Mapper.body.get(entity);
+                out.set(body.pos);
 
-                    // Apply proper motion if necessary.
-                    if (Mapper.pm.has(entity)) {
-                        var pm = Mapper.pm.get(entity);
-                        if (pm.hasPm) {
-                            var dPos = aux.get();
-                            dPos.set(pm.pm).scl(AstroUtils.getMsSince(instant, pm.epochJd) * Nature.MS_TO_Y);
-                            out.add(dPos);
-                        }
-                    }
-
-                    var e = entity;
-                    var graph = Mapper.graph.get(e);
-                    while (graph.parent != null) {
-                        e = graph.parent;
-                        graph = Mapper.graph.get(e);
-                        out.add(Mapper.body.get(e).pos);
-                    }
+                var e = entity;
+                var graph = Mapper.graph.get(e);
+                while (graph.parent != null) {
+                    e = graph.parent;
+                    graph = Mapper.graph.get(e);
+                    out.add(Mapper.body.get(e).pos);
                 }
             }
         }
@@ -93,14 +61,12 @@ public class EntityUtils {
      * @return The vector with the position.
      */
     public static Vector3b getAbsolutePosition(Entity entity, String name, Vector3b out) {
-        synchronized (entity) {
-            if (Mapper.particleSet.has(entity)) {
-                return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
-            } else if (Mapper.starSet.has(entity)) {
-                return Mapper.starSet.get(entity).getAbsolutePosition(name, out);
-            } else {
-                return getAbsolutePosition(entity, out);
-            }
+        if (Mapper.particleSet.has(entity)) {
+            return Mapper.particleSet.get(entity).getAbsolutePosition(name, out);
+        } else if (Mapper.starSet.has(entity)) {
+            return Mapper.starSet.get(entity).getAbsolutePosition(name, out);
+        } else {
+            return getAbsolutePosition(entity, out);
         }
     }
 
