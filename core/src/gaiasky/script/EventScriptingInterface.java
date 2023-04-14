@@ -3125,11 +3125,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadJsonCatalog(dsName, path, true);
     }
 
-    public boolean loadJsonCatalog(String dsName, String path, boolean sync) {
+    public boolean loadJsonCatalog(String dsName, String pathString, boolean sync) {
         // Load internal JSON catalog file.
         try {
-            logger.info(I18n.msg("notif.catalog.loading", path));
-            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(Gdx.files.absolute(path), scene);
+            logger.info(I18n.msg("notif.catalog.loading", pathString));
+            final Array<Entity> objects = SceneJsonLoader.loadJsonFile(Gdx.files.absolute(pathString), scene);
             int i = 0;
             for (Entity e : objects) {
                 if (e == null) {
@@ -3160,10 +3160,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             }
 
         } catch (Exception e) {
-            logger.error(I18n.msg("notif.error", path), e);
+            notifyErrorPopup(I18n.msg("error.loading.format", pathString), e);
             return false;
         }
         return true;
+    }
+
+    private void notifyErrorPopup(String message) {
+        notifyErrorPopup(message, null);
+    }
+
+    private void notifyErrorPopup(String message, Exception e) {
+        if (e != null) {
+            logger.error(message, e);
+        } else {
+            logger.error(message);
+        }
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, message);
     }
 
     private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
@@ -3172,8 +3185,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
-                if (ds.toString().endsWith(".json")) {
-                    loadJsonCatalog(dsName, ds.toString(), sync);
+                // Only local files accepted.
+                Path path = Path.of(ds.getURL().getPath());
+                String pathString = path.toAbsolutePath().toString();
+                if (!Files.exists(path)) {
+                    notifyErrorPopup(I18n.msg("error.loading.notexistent", pathString));
+                    return false;
+                }
+                if (!Files.isReadable(path)) {
+                    notifyErrorPopup(I18n.msg("error.file.read", pathString));
+                    return false;
+                }
+                if (Files.isDirectory(path)) {
+                    notifyErrorPopup(I18n.msg("error.file.isdir", pathString));
+                    return false;
+                }
+
+                if (path.getFileName().endsWith(".json")) {
+                    loadJsonCatalog(dsName, path.toString(), sync);
                 } else if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
                     List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
                     if (data != null && !data.isEmpty()) {

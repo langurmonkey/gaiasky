@@ -20,7 +20,7 @@ class MyCoordinatesProvider(object):
         # Here we need internal coordinates.
         x_km = 150000000 * self.km_to_u
         z_km = 200000000 * self.km_to_u
-        v = [x_km, 0.01, z_km]
+        v = [x_km, (julianDate - 2460048.0) * 100.0, z_km]
 
         # We need to set the result in the out vector.
         outVector.set(v[0], v[1], v[2])
@@ -38,7 +38,7 @@ gateway = ClientServer(java_parameters=JavaParameters(auto_convert=True),
 gs = gateway.entry_point
 
 # Load test star system.
-gs.loadDataset("Test star system", os.path.abspath("./dataset-body-coordinates.json"))
+gs.loadDataset("Test star system", os.path.abspath("./particles-body-coordinates.json"))
 
 # Set coordinates provider.
 provider = MyCoordinatesProvider(gateway)

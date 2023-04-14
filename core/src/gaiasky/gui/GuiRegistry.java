@@ -110,7 +110,10 @@ public class GuiRegistry implements IObserver {
         this.catalogManager = catalogManager;
         this.view = new FocusView();
         // Windows which are visible from any GUI.
-        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION, Event.CLOSE_ALL_GUI_WINDOWS_CMD);
+        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION,
+                Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.SHOW_TEXTURE_WINDOW_ACTION, Event.UI_THEME_RELOAD_INFO,
+                Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION,
+                Event.CLOSE_ALL_GUI_WINDOWS_CMD);
     }
 
     public InputMultiplexer getInputMultiplexer() {
@@ -401,8 +404,8 @@ public class GuiRegistry implements IObserver {
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.msg("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().equalsIgnoreCase("dataset.json"));
-                fc.setAcceptedFiles("*.vot, *.csv, *.fits, dataset.json");
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
+                fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.exists(result) && Files.exists(result)) {

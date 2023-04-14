@@ -31,7 +31,7 @@ gs.cameraStop()
 
 gs.setCameraFocus("Earth")
 
-gs.loadDataset("Shape object dataset", os.path.abspath("./catalog-shapetest.json"))
+gs.loadDataset("Shape object dataset", os.path.abspath("./particles-shapetest.json"))
 
 gs.sleep(3.0)
 
