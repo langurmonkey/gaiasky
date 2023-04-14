@@ -504,7 +504,11 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (set != null) {
             return set.getCandidateSolidAngleApparent();
         } else {
-            return getSolidAngleApparent();
+            if (Mapper.hip.has(entity)) {
+                return getSolidAngleApparent() * 1.0e-4;
+            } else {
+                return getSolidAngleApparent();
+            }
         }
     }
 

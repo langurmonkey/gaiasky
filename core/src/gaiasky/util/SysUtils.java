@@ -406,7 +406,7 @@ public class SysUtils {
     }
 
     public static Path getProceduralPixmapDir() {
-        return Settings.settings.data.dataPath("tex").resolve("procedural");
+        return Settings.settings.data.dataPath("$data/default-data/tex").resolve("procedural");
     }
 
     /**

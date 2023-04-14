@@ -49,7 +49,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
 
     private final Entity target;
     private final FocusView view;
-    private Random rand;
+    private final Random rand;
     private MaterialComponent initMtc, mtc;
     private CloudComponent initClc, clc;
     private AtmosphereComponent initAc, ac;

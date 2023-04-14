@@ -294,8 +294,6 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             setTransparency(alpha, blendSrc, blendDst, blendEnabled);
             if (relativistic) {
                 updateRelativisticEffects(cam);
-            } else {
-                updateRelativisticEffects(cam);
             }
             updateVelocityBufferUniforms(cam);
         }
