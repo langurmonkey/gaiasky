@@ -213,6 +213,7 @@ public class Body implements Component, ICopy {
         copy.size = size;
         copy.distToCamera = distToCamera;
         copy.pos.set(pos);
+        copy.originalPos.set(originalPos);
         return copy;
     }
 }
