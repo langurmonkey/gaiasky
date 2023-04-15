@@ -377,10 +377,10 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private int reloadLeftPane(Cell<?> left, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
-        final Table leftContent = new Table(skin);
-        final Table leftTable = new Table(skin);
+        final var leftContent = new Table(skin);
+        final var leftTable = new Table(skin);
 
-        OwnTextField filter = new OwnTextField("", skin, "big");
+        var filter = new OwnTextField("", skin, "big");
         filter.setMessageText(I18n.msg("gui.filter"));
         filter.setWidth(400f);
         filter.addListener(new ChangeListener() {
@@ -390,11 +390,11 @@ public class DatasetManagerWindow extends GenericDialog {
             }
         });
         leftTable.align(Align.topRight);
+
         leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
         leftScroll.setScrollingDisabled(true, false);
         leftScroll.setForceScroll(false, true);
         leftScroll.setSmoothScrolling(false);
-        leftScroll.setFadeScrollBars(false);
         leftScroll.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -411,15 +411,17 @@ public class DatasetManagerWindow extends GenericDialog {
         selectedIndex = 0;
 
         // Add datasets to table.
-        int added = populateLeftTable(leftTable, mode, dataDescriptor, Settings.settings.data.dataFiles, width, "");
+        var added = populateLeftTable(leftTable, mode, dataDescriptor, Settings.settings.data.dataFiles, width, "");
 
+        final var maxScrollHeight = stage.getHeight() * 0.65f;
+        leftScroll.setFadeScrollBars(maxScrollHeight > leftTable.getHeight());
         leftScroll.setWidth(width * 0.52f);
-        leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+        leftScroll.setHeight(Math.min(maxScrollHeight, leftTable.getHeight()));
         leftScroll.layout();
         leftScroll.setScrollX(scroll[mode.ordinal()][0]);
         leftScroll.setScrollY(scroll[mode.ordinal()][1]);
 
-        leftContent.add(filter).top().center().row();
+        leftContent.add(filter).top().center().padBottom(pad18).row();
         leftContent.add(leftScroll).top().left();
         left.setActor(leftContent);
 
@@ -433,17 +435,17 @@ public class DatasetManagerWindow extends GenericDialog {
             List<DatasetDesc> datasets = type.datasets;
             List<DatasetDesc> filtered = datasets.stream().filter(d -> d.filter(filter) && (mode != DatasetMode.AVAILABLE || !d.exists)).collect(Collectors.toList());
             if (!filtered.isEmpty()) {
-                OwnLabel dsType = new OwnLabel(I18n.msg("gui.download.type." + type.typeStr), skin, "hud-header");
+                var dsType = new OwnLabel(I18n.msg("gui.download.type." + type.typeStr), skin, "hud-header");
                 leftTable.add(dsType).left().padTop(pad34 * 2f).padBottom(pad18).row();
 
                 for (DatasetDesc dataset : filtered) {
-                    Table t = new Table(skin);
+                    var t = new Table(skin);
                     t.pad(pad18, pad18, 0, pad18);
 
-                    String tooltipText = dataset.key;
+                    var tooltipText = dataset.key;
 
                     // Type icon
-                    Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
+                    var typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
                     float scl = 0.7f;
                     float iw = typeImage.getWidth();
                     float ih = typeImage.getHeight();
@@ -451,8 +453,8 @@ public class DatasetManagerWindow extends GenericDialog {
                     typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
                     // Title
-                    String titleString = dataset.name;
-                    OwnLabel title = new OwnLabel(TextUtils.capString(titleString, 60), skin, "huge");
+                    var titleString = dataset.name;
+                    var title = new OwnLabel(TextUtils.capString(titleString, 60), skin, "huge");
                     title.setWidth(width * 0.41f);
                     if (dataset.outdated) {
                         title.setColor(highlight);
@@ -463,7 +465,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     Actor installOrSelect;
                     float installOrSelectSize = 40f;
                     if (mode == DatasetMode.AVAILABLE || dataset.outdated) {
-                        OwnTextIconButton install = new OwnTextIconButton("", skin, "install");
+                        var install = new OwnTextIconButton("", skin, "install");
                         install.setContentAlign(Align.center);
                         install.addListener(new OwnTextTooltip(I18n.msg(dataset.outdated ? "gui.download.update" : "gui.download.install"), skin));
                         install.addListener((event) -> {
@@ -482,7 +484,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         }
                         installOrSelect = install;
                     } else {
-                        OwnCheckBox select = new OwnCheckBox("", skin, 0f);
+                        var select = new OwnCheckBox("", skin, 0f);
                         installOrSelect = select;
                         if (dataset.baseData || dataset.type.equals("texture-pack")) {
                             select.setChecked(true);
@@ -520,7 +522,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     }
 
                     // Size
-                    OwnLabel size = new OwnLabel(dataset.size, skin, "grey-large");
+                    var size = new OwnLabel(dataset.size, skin, "grey-large");
                     size.addListener(new OwnTextTooltip(I18n.msg("gui.download.size.tooltip"), skin, 10));
                     size.setWidth(88f);
 
@@ -536,13 +538,13 @@ public class DatasetManagerWindow extends GenericDialog {
                             version = new OwnLabel(I18n.msg("gui.download.version.local", dataset.myVersion), skin, "grey-large");
                         }
                     }
-                    HorizontalGroup versionSize = new HorizontalGroup();
+                    var versionSize = new HorizontalGroup();
                     versionSize.space(pad34 * 2f);
                     versionSize.addActor(version);
                     versionSize.addActor(size);
 
                     // Progress
-                    OwnProgressBar progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "tiny-horizontal");
+                    var progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "tiny-horizontal");
                     progress.setPrefWidth(850f);
                     progress.setValue(60f);
                     progress.setVisible(false);
@@ -564,7 +566,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         @Override
                         public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
                             if (event instanceof InputEvent) {
-                                InputEvent ie = (InputEvent) event;
+                                var ie = (InputEvent) event;
                                 InputEvent.Type type = ie.getType();
                                 if (type == InputEvent.Type.touchDown) {
                                     if (ie.getButton() == Input.Buttons.LEFT) {
@@ -577,7 +579,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                             if (mode == DatasetMode.INSTALLED) {
                                                 if (dataset.outdated) {
                                                     // Update
-                                                    MenuItem update = new MenuItem(I18n.msg("gui.download.update"), skin, skin.getDrawable("iconic-arrow-circle-bottom"));
+                                                    var update = new MenuItem(I18n.msg("gui.download.update"), skin, skin.getDrawable("iconic-arrow-circle-bottom"));
                                                     update.addListener(new ChangeListener() {
                                                         @Override
                                                         public void changed(ChangeEvent event, Actor actor) {
@@ -590,7 +592,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     boolean enabled = isPathIn(dataset.catalogFile.path(), currentSetting);
                                                     if (enabled) {
                                                         // Disable
-                                                        MenuItem disable = new MenuItem(I18n.msg("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
+                                                        var disable = new MenuItem(I18n.msg("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
                                                         disable.addListener(new ChangeListener() {
                                                             @Override
                                                             public void changed(ChangeEvent event, Actor actor) {
@@ -607,7 +609,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                         datasetContext.addItem(disable);
                                                     } else {
                                                         // Enable
-                                                        MenuItem enable = new MenuItem(I18n.msg("gui.download.enable"), skin, skin.getDrawable("check-on"));
+                                                        var enable = new MenuItem(I18n.msg("gui.download.enable"), skin, skin.getDrawable("check-on"));
                                                         enable.addListener(new ChangeListener() {
                                                             @Override
                                                             public void changed(ChangeEvent event, Actor actor) {
@@ -626,7 +628,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     datasetContext.addSeparator();
                                                 }
                                                 // Delete
-                                                MenuItem delete = new MenuItem(I18n.msg("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
+                                                var delete = new MenuItem(I18n.msg("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
                                                 delete.addListener(new ClickListener() {
                                                     @Override
                                                     public void clicked(InputEvent event, float x, float y) {
@@ -637,7 +639,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                 datasetContext.addItem(delete);
                                             } else if (mode == DatasetMode.AVAILABLE) {
                                                 // Install
-                                                MenuItem install = new MenuItem(I18n.msg("gui.download.install"), skin, skin.getDrawable("iconic-cloud-download"));
+                                                var install = new MenuItem(I18n.msg("gui.download.install"), skin, skin.getDrawable("iconic-cloud-download"));
                                                 install.addListener(new ChangeListener() {
                                                     @Override
                                                     public void changed(ChangeEvent event, Actor actor) {
@@ -682,28 +684,28 @@ public class DatasetManagerWindow extends GenericDialog {
             rightPaneWatcher = null;
         }
         cell.clearActor();
-        Table t = new Table(skin);
+        var rightTable = new Table(skin);
 
         if (dataset == null) {
-            OwnLabel l = new OwnLabel(I18n.msg("gui.download.noselected"), skin);
-            t.add(l).center().padTop(pad34 * 3);
+            var l = new OwnLabel(I18n.msg("gui.download.noselected"), skin);
+            rightTable.add(l).center().padTop(pad34 * 3);
         } else {
             // Type icon
-            String dType = dataset.type != null ? dataset.type : "other";
-            Image typeImage = new OwnImage(skin.getDrawable(getIcon(dType)));
-            float scl = 0.7f;
-            float iw = typeImage.getWidth();
-            float ih = typeImage.getHeight();
+            var dType = dataset.type != null ? dataset.type : "other";
+            var typeImage = new OwnImage(skin.getDrawable(getIcon(dType)));
+            var scl = 0.7f;
+            var iw = typeImage.getWidth();
+            var ih = typeImage.getHeight();
             typeImage.setSize(iw * scl, ih * scl);
             typeImage.addListener(new OwnTextTooltip(dType, skin, 10));
 
             // Title
-            String titleString = dataset.name;
+            var titleString = dataset.name;
             OwnLabel title = new OwnLabel(TextUtils.breakCharacters(titleString, 45), skin, "hud-header");
             title.addListener(new OwnTextTooltip(dataset.description, skin, 10));
 
             // Title group
-            HorizontalGroup titleGroup = new HorizontalGroup();
+            var titleGroup = new HorizontalGroup();
             titleGroup.space(pad18);
             titleGroup.addActor(typeImage);
             titleGroup.addActor(title);
@@ -735,7 +737,7 @@ public class DatasetManagerWindow extends GenericDialog {
             } else {
                 typeString = dType;
             }
-            OwnLabel type = new OwnLabel(I18n.msg("gui.download.type", typeString), skin, "grey-large");
+            var type = new OwnLabel(I18n.msg("gui.download.type", typeString), skin, "grey-large");
             type.addListener(new OwnTextTooltip(dType, skin, 10));
 
             // Version
@@ -752,15 +754,15 @@ public class DatasetManagerWindow extends GenericDialog {
             }
 
             // Key
-            OwnLabel key = new OwnLabel(I18n.msg("gui.download.name", dataset.key), skin, "grey-large");
+            var key = new OwnLabel(I18n.msg("gui.download.name", dataset.key), skin, "grey-large");
 
             // Size
-            OwnLabel size = new OwnLabel(I18n.msg("gui.download.size", dataset.size), skin, "grey-large");
+            var size = new OwnLabel(I18n.msg("gui.download.size", dataset.size), skin, "grey-large");
             size.addListener(new OwnTextTooltip(I18n.msg("gui.download.size.tooltip"), skin, 10));
 
             // Num objects
-            String nObjStr = dataset.nObjects > 0 ? I18n.msg("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.msg("gui.dataset.nobjects.none");
-            OwnLabel nObjects = new OwnLabel(nObjStr, skin, "grey-large");
+            var nObjStr = dataset.nObjects > 0 ? I18n.msg("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.msg("gui.dataset.nobjects.none");
+            var nObjects = new OwnLabel(nObjStr, skin, "grey-large");
             nObjects.addListener(new OwnTextTooltip(I18n.msg("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
 
             // Link
@@ -774,18 +776,18 @@ public class DatasetManagerWindow extends GenericDialog {
             infoTable.align(Align.topLeft);
 
             // Description
-            String descriptionString = dataset.description;
-            OwnLabel desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
+            var descriptionString = dataset.description;
+            var desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
             desc.setWidth(1000f);
 
             // Release notes
-            String releaseNotesString = dataset.releaseNotes;
+            var releaseNotesString = dataset.releaseNotes;
             if (releaseNotesString == null || releaseNotesString.isBlank()) {
                 releaseNotesString = "-";
             }
             releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
-            OwnLabel releaseNotesTitle = new OwnLabel(I18n.msg("gui.download.releasenotes"), skin, "grey-large");
-            OwnLabel releaseNotes = new OwnLabel(releaseNotesString, skin);
+            var releaseNotesTitle = new OwnLabel(I18n.msg("gui.download.releasenotes"), skin, "grey-large");
+            var releaseNotes = new OwnLabel(releaseNotesString, skin);
             releaseNotes.setWidth(1000f);
 
             // Files
@@ -801,11 +803,11 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
                 filesString = filesString.replace(dataLocation, Constants.DATA_LOCATION_TOKEN);
             }
-            OwnLabel files = new OwnLabel(I18n.msg("gui.download.files", filesString), skin, "grey-large");
+            var files = new OwnLabel(I18n.msg("gui.download.files", filesString), skin, "grey-large");
 
             // Data location
-            String dataLocationNoteString = Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location;
-            OwnLabel dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin);
+            var dataLocationNoteString = Constants.DATA_LOCATION_TOKEN + "  =  " + Settings.settings.data.location;
+            var dataLocationNote = new OwnLabel(TextUtils.capString(dataLocationNoteString, 60), skin);
             dataLocationNote.addListener(new OwnTextTooltip(dataLocationNoteString, skin, 10));
 
             infoTable.add(desc).top().left().padBottom(pad34).row();
@@ -815,7 +817,7 @@ public class DatasetManagerWindow extends GenericDialog {
             infoTable.add(dataLocationNote).top().left();
 
             // Scroll
-            OwnScrollPane infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
+            var infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
             infoScroll.setScrollingDisabled(true, false);
             infoScroll.setExpand(true);
             infoScroll.setSmoothScrolling(false);
@@ -839,31 +841,32 @@ public class DatasetManagerWindow extends GenericDialog {
                 });
             }
 
-            t.add(titleGroup).top().left().padBottom(pad10).padTop(pad34).row();
-            t.add(status).top().left().padLeft(pad18 * 3f).padBottom(pad34).row();
-            t.add(type).top().left().padBottom(pad10).row();
-            t.add(version).top().left().padBottom(pad10).row();
-            t.add(key).top().left().padBottom(pad10).row();
-            t.add(size).top().left().padBottom(pad10).row();
-            t.add(nObjects).top().left().padBottom(pad18).row();
-            t.add(link).top().left().padBottom(pad34 * 2f).row();
-            t.add(infoScroll).top().left().padBottom(pad34).row();
-            t.add(cancelDownloadButton).padTop(pad34).center();
+            rightTable.add(titleGroup).top().left().padBottom(pad10).padTop(pad34).row();
+            rightTable.add(status).top().left().padLeft(pad18 * 3f).padBottom(pad34).row();
+            rightTable.add(type).top().left().padBottom(pad10).row();
+            rightTable.add(version).top().left().padBottom(pad10).row();
+            rightTable.add(key).top().left().padBottom(pad10).row();
+            rightTable.add(size).top().left().padBottom(pad10).row();
+            rightTable.add(nObjects).top().left().padBottom(pad18).row();
+            rightTable.add(link).top().left().padBottom(pad34 * 2f).row();
+            rightTable.add(infoScroll).top().left().padBottom(pad34).row();
+            rightTable.add(cancelDownloadButton).padTop(pad34).center();
 
             // Scroll
-            OwnScrollPane scrollPane = new OwnScrollPane(t, skin, "minimalist-nobg");
+            final var maxScrollHeight = stage.getHeight() * 0.65f;
+            var scrollPane = new OwnScrollPane(rightTable, skin, "minimalist-nobg");
             scrollPane.setScrollingDisabled(true, false);
             scrollPane.setSmoothScrolling(false);
             scrollPane.setFadeScrollBars(false);
             scrollPane.setWidth(1050f);
-            scrollPane.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+            scrollPane.setHeight(Math.min(maxScrollHeight, rightTable.getHeight()));
 
-            cell.setActor(t);
+            cell.setActor(rightTable);
             cell.top().left();
             cell.getTable().pack();
 
             // Create watcher
-            rightPaneWatcher = new DatasetWatcher(dataset, null, null, status, t);
+            rightPaneWatcher = new DatasetWatcher(dataset, null, null, status, rightTable);
             watchers.add(rightPaneWatcher);
         }
     }
