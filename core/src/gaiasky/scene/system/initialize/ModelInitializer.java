@@ -125,7 +125,7 @@ public class ModelInitializer extends AbstractInitSystem {
 
         // Init billboard
         if (isBillboard) {
-            initializeBillboard(scaffolding, sa, label);
+            initializeBillboard(scaffolding, sa, label, isBillboardGal);
         }
 
         if (isSatellite) {
@@ -280,6 +280,9 @@ public class ModelInitializer extends AbstractInitSystem {
 
         sa.thresholdPoint = Math.toRadians(0.30);
         sa.thresholdLabel = (Math.toRadians(1e-6) / Settings.settings.scene.label.number) * (base.ct.get(ComponentType.Moons.ordinal()) ? 3000.0 : 25.0);
+        if (isBillboardGal) {
+            sa.thresholdQuad = Math.toRadians(0.9);
+        }
 
         label.labelMax = (float) (0.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
         if (label.labelFactor == 0) {
@@ -301,12 +304,14 @@ public class ModelInitializer extends AbstractInitSystem {
         }
     }
 
-    private void initializeBillboard(ModelScaffolding scaffolding, SolidAngle sa, Label label) {
+    private void initializeBillboard(ModelScaffolding scaffolding, SolidAngle sa, Label label, boolean isBillboardGalaxy) {
         double baseThreshold = Math.toRadians(0.30);
+        sa.thresholdLabel = Math.toRadians(0.2);
         sa.thresholdNone = 0.002;
         sa.thresholdPoint = baseThreshold / 1e9;
-        sa.thresholdQuad = baseThreshold / 8.0;
-        sa.thresholdLabel = Math.toRadians(0.2);
+        if (!isBillboardGalaxy) {
+            sa.thresholdQuad = baseThreshold / 8.0;
+        }
 
         label.textScale = 0.3f;
         label.solidAnglePow = 1f;

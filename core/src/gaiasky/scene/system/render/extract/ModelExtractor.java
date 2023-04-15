@@ -16,8 +16,6 @@ import net.jafama.FastMath;
  */
 public class ModelExtractor extends AbstractExtractSystem {
 
-    protected static double BBGAL_TH = Math.toRadians(0.9);
-
     public ModelExtractor(Family family, int priority) {
         super(family, priority);
     }
@@ -50,7 +48,7 @@ public class ModelExtractor extends AbstractExtractSystem {
 
             if (Mapper.tagBillboardGalaxy.has(entity)) {
                 // Billboard galaxies.
-                double thPoint = (BBGAL_TH * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
+                double thPoint = (sa.thresholdQuad * camera.getFovFactor()) / scaffolding.sizeScaleFactor;
                 if (body.solidAngleApparent >= thPoint) {
                     addToRender(render, RenderGroup.MODEL_DIFFUSE);
                 } else if (base.opacity > 0) {
@@ -133,10 +131,6 @@ public class ModelExtractor extends AbstractExtractSystem {
         return base.names != null
                 && renderer.isOn(ComponentTypes.ComponentType.Labels)
                 && (base.forceLabel || FastMath.pow(body.solidAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
-    }
-
-    private float getThOverFactorScl(Base base) {
-        return base.ct.get(ComponentTypes.ComponentType.Moons.ordinal()) ? 2500f : 25f;
     }
 
     private float getViewAnglePow() {
