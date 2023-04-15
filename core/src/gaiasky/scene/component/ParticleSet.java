@@ -260,8 +260,12 @@ public class ParticleSet implements Component, IDisposable {
         setPosition(new double[] { pos[0], pos[1], pos[2] });
     }
 
-    public void setDatafile(String datafile) {
-        this.datafile = datafile;
+    public void setDataFile(String dataFile) {
+        this.datafile = dataFile;
+    }
+
+    public void setDatafile(String dataFile) {
+        setDataFile(dataFile);
     }
 
     public void setProviderParams(Map<String, Object> params) {

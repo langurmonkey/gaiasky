@@ -86,8 +86,9 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     // Texture location strings.
     public boolean texInitialised, texLoading;
-    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao;
-    public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked;
+    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao, occlusionMetallicRoughness;
+    public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked,
+            heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked, occlusionMetallicRoughnessUnpacked;
     // Material properties and colors.
     public float[] diffuseColor;
     public float[] specularColor;
@@ -105,7 +106,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
     public VirtualTextureComponent diffuseSvt, specularSvt, heightSvt, normalSvt, emissiveSvt, roughnessSvt, metallicSvt;
     public Array<VirtualTextureComponent> svts;
     // Cubemaps.
-    public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
+    public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap,
+            roughnessCubemap, metallicCubemap;
     // Biome lookup texture.
     public String biomeLUT = Constants.DATA_LOCATION_TOKEN + "tex/base/biome-lut.png";
     public float biomeHueShift = 0;
@@ -119,7 +121,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public MaterialComponent() {
         super();
-        EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.TESSELLATION_QUALITY_CMD);
+        EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD,
+                Event.TESSELLATION_QUALITY_CMD);
     }
 
     private static OwnTextureParameter getTP(String tex) {
@@ -155,6 +158,8 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             metallicUnpacked = addToLoad(metallic, getTP(metallic, true), manager);
         if (ao != null && !ao.endsWith(Constants.GEN_KEYWORD))
             aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
+        if (occlusionMetallicRoughness != null && !occlusionMetallicRoughness.endsWith(Constants.GEN_KEYWORD))
+            occlusionMetallicRoughnessUnpacked = addToLoad(occlusionMetallicRoughness, getTP(occlusionMetallicRoughness, true), manager);
         if (height != null && !height.endsWith(Constants.GEN_KEYWORD))
             heightUnpacked = addToLoad(height, getTP(height, true), manager);
         if (ring != null)
@@ -360,6 +365,12 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
             if (!ao.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(aoUnapcked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.AO, tex));
+            }
+        }
+        if (occlusionMetallicRoughness != null && material.get(TextureAttribute.AO) == null) {
+            if (!occlusionMetallicRoughness.endsWith(Constants.GEN_KEYWORD)) {
+                Texture tex = manager.get(occlusionMetallicRoughnessUnpacked, Texture.class);
+                material.set(new TextureAttribute(TextureAttribute.OcclusionMetallicRoughness, tex));
             }
         }
 
@@ -853,6 +864,10 @@ public class MaterialComponent extends NamedComponent implements IObserver, IMat
 
     public void setAo(String ao) {
         this.ao = Settings.settings.data.dataFile(ao);
+    }
+
+    public void setOcclusionMetallicRoughness(String texture) {
+        this.occlusionMetallicRoughness = Settings.settings.data.dataFile(texture);
     }
 
     public void setDiffuseCubemap(String cubemap) {

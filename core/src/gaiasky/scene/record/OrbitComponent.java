@@ -53,8 +53,12 @@ public class OrbitComponent {
         this.epoch = epoch;
     }
 
-    public void setSemimajoraxis(Double semimajoraxis) {
-        this.semimajoraxis = semimajoraxis;
+    public void setSemiMajorAxis(Double semiMajorAxis) {
+        this.semimajoraxis = semiMajorAxis;
+    }
+
+    public void setSemimajoraxis(Double setmiMajorAxis) {
+        setSemiMajorAxis(setmiMajorAxis);
     }
 
     public void setEccentricity(Double e) {
@@ -65,16 +69,28 @@ public class OrbitComponent {
         this.i = i;
     }
 
-    public void setAscendingnode(Double ascendingnode) {
-        this.ascendingnode = ascendingnode;
+    public void setAscendingNode(Double ascendingNode) {
+        this.ascendingnode = ascendingNode;
     }
 
-    public void setArgofpericenter(Double argofpericenter) {
-        this.argofpericenter = argofpericenter;
+    public void setAscendingnode(Double ascendingNode) {
+        setAscendingNode(ascendingNode);
+    }
+
+    public void setArgOfPericenter(Double argOfPericenter) {
+        this.argofpericenter = argOfPericenter;
+    }
+
+    public void setArgofpericenter(Double argOfPericenter) {
+        setArgOfPericenter(argOfPericenter);
+    }
+
+    public void setMeanAnomaly(Double meanAnomaly) {
+        this.meananomaly = meanAnomaly;
     }
 
     public void setMeananomaly(Double meanAnomaly) {
-        this.meananomaly = meanAnomaly;
+        setMeanAnomaly(meanAnomaly);
     }
 
     /**

@@ -148,7 +148,7 @@ public class AttributeMap {
 
         // ParticleSet
         putAll(ParticleSet.class,
-                "provider:ParticleGroup", "position:ParticleGroup", "datafile",
+                "provider:ParticleGroup", "position:ParticleGroup", "datafile", "dataFile",
                 "providerparams", "providerParams", "factor", "profiledecay",
                 "profileDecay", "colornoise", "colorNoise", "particlesizelimits",
                 "particleSizeLimits", "colorMin", "colorMax", "fixedAngularSize", "fixedAngularSizeDeg",
@@ -156,7 +156,7 @@ public class AttributeMap {
 
         // StarSet
         putAll(StarSet.class,
-                "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "providerParams:StarGroup",
+                "provider:StarGroup", "datafile:StarGroup", "dataFile:StarGroup", "providerparams:StarGroup", "providerParams:StarGroup",
                 "factor:StarGroup", "profiledecay:StarGroup", "profileDecay:StarGroup",
                 "colornoise:StarGroup", "colorNoise:StarGroup", "particlesizelimits:StarGroup",
                 "epoch:StarGroup", "variabilityEpoch:StarGroup", "fixedAngularSize:StarGroup", "fixedAngularSizeDeg:StarGroup",
