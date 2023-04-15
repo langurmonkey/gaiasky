@@ -122,7 +122,7 @@ public class AttributeMap {
 
         // Label
         putAll(Label.class,
-                "label", "label2d", "labelposition", "labelPosition",
+                "label", "labelposition", "labelPosition",
                 "labelPositionKm", "labelPositionPc", "labelFactor", "labelMax", "textScale");
 
         // RenderType

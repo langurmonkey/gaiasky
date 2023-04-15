@@ -17,7 +17,9 @@ import java.util.function.Function;
 
 public class Label implements Component {
 
+    /** Factor to apply to the size of the label. **/
     public float labelFactor = 0;
+    /** Internal rednering factor **/
     public float labelMax;
     /** Scale parameter for distance field fonts. **/
     public float textScale = -1;
@@ -32,7 +34,7 @@ public class Label implements Component {
     /**
      * Is it a label or another kind of text?
      */
-    public boolean label, label2d;
+    public boolean label;
 
     /** Function that checks whether the label must be rendered or not. **/
     public Function<LabelView, Boolean> renderFunction;
