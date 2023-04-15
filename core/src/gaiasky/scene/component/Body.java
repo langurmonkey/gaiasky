@@ -10,15 +10,19 @@ import gaiasky.util.math.Vector3b;
 
 public class Body implements Component, ICopy {
     /**
-     * Position of this entity in the local reference system. The units are
-     * {@link gaiasky.util.Constants#U_TO_KM} by default.
+     * Position of this entity in the local reference system and internal units.
+     * This holds the position of the entity in the reference system of its parent.
+     * It is not the absolute position. If the entity has a {@link ProperMotion} component,
+     * the proper motion is applied for the current time. The position at epoch is
+     * kept in {@link Body#posEpoch}.
      */
     public Vector3b pos = new Vector3b();
     /**
-     * A copy of the original position at epoch, in case we do not have
-     * a Coordinates component to source positions from.
+     * A copy of the original position, if any.
+     * If the entity has a {@link ProperMotion} component, this is the
+     * position at epoch {@link ProperMotion#epochJd}.
      */
-    public Vector3b originalPos = new Vector3b();
+    public Vector3b posEpoch = new Vector3b();
 
     /**
      * Position in the equatorial system; ra, dec.
@@ -69,7 +73,7 @@ public class Body implements Component, ICopy {
 
     public void setPos(Vector3b pos) {
         this.pos.set(pos);
-        updateOriginalPos();
+        updatePosEpoch();
     }
 
     public void setPos(double[] pos) {
@@ -78,7 +82,7 @@ public class Body implements Component, ICopy {
 
     public void setPosition(double[] pos) {
         this.pos.set(pos[0] * Constants.DISTANCE_SCALE_FACTOR, pos[1] * Constants.DISTANCE_SCALE_FACTOR, pos[2] * Constants.DISTANCE_SCALE_FACTOR);
-        updateOriginalPos();
+        updatePosEpoch();
     }
 
     public void setPosKm(double[] pos) {
@@ -87,7 +91,7 @@ public class Body implements Component, ICopy {
 
     public void setPositionKm(double[] pos) {
         this.pos.set(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
-        updateOriginalPos();
+        updatePosEpoch();
     }
 
     public void setPosPc(double[] pos) {
@@ -96,15 +100,19 @@ public class Body implements Component, ICopy {
 
     public void setPositionPc(double[] pos) {
         this.pos.set(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
-        updateOriginalPos();
+        updatePosEpoch();
     }
 
     public void setPosition(int[] pos) {
         setPosition(new double[] { pos[0] * Constants.DISTANCE_SCALE_FACTOR, pos[1] * Constants.DISTANCE_SCALE_FACTOR, pos[2] * Constants.DISTANCE_SCALE_FACTOR });
     }
 
-    public void updateOriginalPos() {
-        this.originalPos.set(this.pos);
+    /**
+     * Sets the position at epoch as a copy of the position. This is usually
+     * done at initialization only.
+     */
+    public void updatePosEpoch() {
+        this.posEpoch.set(this.pos);
     }
 
     public void setSize(Double size) {
@@ -213,7 +221,7 @@ public class Body implements Component, ICopy {
         copy.size = size;
         copy.distToCamera = distToCamera;
         copy.pos.set(pos);
-        copy.originalPos.set(originalPos);
+        copy.posEpoch.set(posEpoch);
         return copy;
     }
 }

@@ -21,7 +21,9 @@ import org.apfloat.Apfloat;
 import java.time.Instant;
 
 /**
- * A position that never changes.
+ * Provides a static position that never changes. If the entity using this
+ * provider has a {@link gaiasky.scene.component.ProperMotion} component, this
+ * is the position at epoch {@link gaiasky.scene.component.ProperMotion#epochJd}.
  */
 public class StaticCoordinates implements IBodyCoordinates {
 

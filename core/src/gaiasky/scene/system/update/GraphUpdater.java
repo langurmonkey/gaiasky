@@ -287,7 +287,7 @@ public class GraphUpdater extends AbstractUpdateSystem {
                 coordinates.timeOverflow = coordinates.coordinates.getEquatorialCartesianCoordinates(time.getTime(), body.pos) == null;
             } else if (!body.positionSetInScript) {
                 // Just set the original position.
-                body.pos.set(body.originalPos);
+                body.pos.set(body.posEpoch);
             }
 
             // Apply proper motion if needed.
