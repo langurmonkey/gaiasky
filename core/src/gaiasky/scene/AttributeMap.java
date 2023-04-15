@@ -149,14 +149,16 @@ public class AttributeMap {
         // ParticleSet
         putAll(ParticleSet.class,
                 "provider:ParticleGroup", "position:ParticleGroup", "datafile",
-                "providerparams", "factor", "profiledecay", "colornoise", "particlesizelimits",
+                "providerparams", "providerParams", "factor", "profiledecay",
+                "profileDecay", "colornoise", "colorNoise", "particlesizelimits",
                 "particleSizeLimits", "colorMin", "colorMax", "fixedAngularSize", "fixedAngularSizeDeg",
                 "fixedAngularSizeRad", "renderParticles");
 
         // StarSet
         putAll(StarSet.class,
-                "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup",
-                "factor:StarGroup", "profiledecay:StarGroup", "colornoise:StarGroup", "particlesizelimits:StarGroup",
+                "provider:StarGroup", "datafile:StarGroup", "providerparams:StarGroup", "providerParams:StarGroup",
+                "factor:StarGroup", "profiledecay:StarGroup", "profileDecay:StarGroup",
+                "colornoise:StarGroup", "colorNoise:StarGroup", "particlesizelimits:StarGroup",
                 "epoch:StarGroup", "variabilityEpoch:StarGroup", "fixedAngularSize:StarGroup", "fixedAngularSizeDeg:StarGroup",
                 "fixedAngularSizeRad:StarGroup", "renderParticles:StarGroup");
 
@@ -168,7 +170,7 @@ public class AttributeMap {
         putAll(ParticleExtra.class, "primitiveRenderScale");
 
         // Mesh
-        putAll(Mesh.class, "shading", "additiveblending");
+        putAll(Mesh.class, "shading", "additiveblending", "additiveBlending");
 
         // Shape
         putAll(Shape.class, "focusable");

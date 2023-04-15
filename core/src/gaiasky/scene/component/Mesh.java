@@ -10,11 +10,15 @@ public class Mesh implements Component {
     public MeshShading shading = MeshShading.ADDITIVE;
     public Matrix4 coordinateSystem;
 
-    public void setAdditiveblending(Boolean additive) {
+    public void setAdditiveBlending(Boolean additive) {
         if (additive)
             shading = MeshShading.ADDITIVE;
         else
             shading = MeshShading.DUST;
+    }
+
+    public void setAdditiveblending(Boolean additive) {
+        setAdditiveBlending(additive);
     }
 
     public void setShading(String shadingStr) {

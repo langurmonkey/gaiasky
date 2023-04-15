@@ -264,8 +264,12 @@ public class ParticleSet implements Component, IDisposable {
         this.datafile = datafile;
     }
 
-    public void setProviderparams(Map<String, Object> params) {
+    public void setProviderParams(Map<String, Object> params) {
         this.providerParams = params;
+    }
+
+    public void setProviderparams(Map<String, Object> params) {
+        setProviderParams(params);
     }
 
     public void setFactor(Double factor) {
