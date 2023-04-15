@@ -358,15 +358,16 @@ public class LabelEntityRenderSystem {
         // Horizon
         final float stepAngle = 360f / divisionsU;
 
-        float distToCamera = 10f;
-        float textSize = Settings.settings.runtime.openXr ? 5f : 0.5e-3f;
+        // Labels at 1 parsec.
+        float distToCamera = (float) (1 * Constants.PC_TO_U);
+        float textSize = (float) ((Settings.settings.runtime.openXr ? 2e12 : 2e4) * Constants.DISTANCE_SCALE_FACTOR);
 
         shader.setUniformf("u_viewAngle", 1f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thLabel", 0f);
 
         for (int angle = 0; angle < 360; angle += stepAngle) {
-            F31.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0f, distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
+            F31.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0f, distToCamera, D31).valuesf()).mul(grid.annotTransform);
             effectsPos(F31, camera);
             if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                 D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
@@ -377,13 +378,13 @@ public class LabelEntityRenderSystem {
         // North-south line
         for (int angle = -90; angle <= 90; angle += stepAngle) {
             if (angle != 0) {
-                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
+                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), distToCamera, D31).valuesf()).mul(grid.annotTransform);
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                     D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);
                     render3DLabel(view, batch, shader, ((TextRenderer) sys).fontDistanceField, camera, rc, angleSign(angle), D31, distToCamera, view.textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), 0, true);
                 }
-                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(-angle), -distToCamera, D31).valuesf()).mul(grid.annotTransform).nor();
+                F31.set(Coordinates.sphericalToCartesian(0, Math.toRadians(-angle), -distToCamera, D31).valuesf()).mul(grid.annotTransform);
                 effectsPos(F31, camera);
                 if (F31.dot(camera.getCamera().direction.nor()) > 0) {
                     D31.set(F31).scl(Constants.DISTANCE_SCALE_FACTOR);

@@ -704,8 +704,8 @@ public class Settings {
         public CrosshairSettings crosshair;
         public InitializationSettings initialization;
         public Map<String, Boolean> visibility;
-        @JsonIgnore public double distanceScaleDesktop = 1d;
-        @JsonIgnore public double distanceScaleVr = 1e4d;
+        @JsonIgnore public double distanceScaleDesktop = 1.0;
+        @JsonIgnore public double distanceScaleVr = 1.0e4;
 
         public SceneSettings() {
             EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_WIDTH_CMD);
