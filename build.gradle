@@ -198,6 +198,7 @@ project(":core") {
             include "img/**"
             include "text/**"
             include "shader/**"
+            include "archetypes/**"
             include "data/**"
             include "shaders/**"
             include "skins/**"

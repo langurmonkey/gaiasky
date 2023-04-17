@@ -9,11 +9,15 @@ public class RenderFlags implements Component {
      */
     public boolean renderQuad;
 
-    public void setRenderquad(String renderQuad) {
+    public void setRenderQuad(String renderQuad) {
         this.renderQuad = Boolean.getBoolean(renderQuad);
     }
 
-    public void setRenderquad(Boolean renderQuad) {
+    public void setRenderQuad(Boolean renderQuad) {
         this.renderQuad = renderQuad;
+    }
+
+    public void setRenderquad(Boolean renderQuad) {
+        setRenderQuad(renderQuad);
     }
 }

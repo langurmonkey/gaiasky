@@ -83,4 +83,8 @@ public class Label implements Component {
         this.textScale = textScale.floatValue();
     }
 
+    public void setLabel2d(Boolean b) {
+        // Empty.
+    }
+
 }

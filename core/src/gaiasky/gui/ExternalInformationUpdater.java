@@ -173,8 +173,8 @@ public class ExternalInformationUpdater {
                 urlCheck(url, wikiname, suffixes_gal, listener);
             } else if (Mapper.celestial.has(view.getEntity())) {
                 var celestial = Mapper.celestial.get(view.getEntity());
-                if (celestial.wikiname != null) {
-                    listener.ok(url + celestial.wikiname.replace(' ', '_'));
+                if (celestial.wikiName != null) {
+                    listener.ok(url + celestial.wikiName.replace(' ', '_'));
                 } else {
                     urlCheck(url, wikiname, suffixes_model, listener);
                 }

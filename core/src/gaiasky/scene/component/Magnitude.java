@@ -17,6 +17,10 @@ public class Magnitude implements Component, ICopy {
         setAbsMag(absMag);
     }
 
+    public void setAbsoluteMagnitude(Double absMag) {
+        setAbsMag(absMag);
+    }
+
     public void setAppMag(Double appMag) {
         this.appMag = appMag.floatValue();
     }
@@ -25,6 +29,9 @@ public class Magnitude implements Component, ICopy {
         setAppMag(appMag);
     }
 
+    public void setApparentMagnitude(Double appMag) {
+        setAppMag(appMag);
+    }
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());

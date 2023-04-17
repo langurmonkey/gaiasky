@@ -16,6 +16,14 @@ public class Coordinates implements Component, ICopy {
      */
     public boolean timeOverflow;
 
+    public void setCoordinatesProvider(IBodyCoordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public void setCoordinates(IBodyCoordinates coordinates) {
+        setCoordinatesProvider(coordinates);
+    }
+
     @Override
     public Component getCopy(Engine engine) {
         var copy = engine.createComponent(this.getClass());

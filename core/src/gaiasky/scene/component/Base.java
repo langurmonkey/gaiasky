@@ -207,6 +207,10 @@ public class Base implements Component, ICopy {
             this.ct.set(ComponentType.valueOf(ct).ordinal());
     }
 
+    public void setComponentTypes(String[] cts) {
+        setCt(cts);
+    }
+
     public void setComponentType(String[] cts) {
         setCt(cts);
     }

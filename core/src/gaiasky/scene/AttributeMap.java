@@ -1,12 +1,13 @@
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter.Particle;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
 import gaiasky.scene.component.*;
 import gaiasky.util.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Holds a map with the relations of old object attributes to contained component.
@@ -43,145 +44,63 @@ public class AttributeMap {
     }
 
     public Map<String, Class<? extends Component>> initialize() {
-        // Base
-        putAll(Base.class,
-                "id", "name", "names", "altName", "altname", "opacity",
-                "ct", "componentType", "forceLabel");
+        // Load the attribute map from the JSON definition.
+        var attributeMapFile = Gdx.files.internal("archetypes/attributemap.json");
+        var reader = new JsonReader();
+        var root = reader.parse(attributeMapFile);
 
-        // Body
-        putAll(Body.class,
-                "position", "positionKm", "positionPc", "pos", "posKm", "posPc",
-                "size", "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "radius", "radiusKm",
-                "radiusPc", "diameter", "diameterKm", "color", "labelcolor", "labelColor");
+        if (root.has("components")) {
+            var numComponents = 0;
+            var components = root.get("components");
+            var component = components.child;
+            while (component != null) {
+                // Process component.
+                var name = component.name;
+                var className = "gaiasky.scene.component." + name;
+                var attributes = new Array<String>();
+                var attribute = component.child;
+                while (attribute != null) {
+                    if (!attribute.name.equalsIgnoreCase("description")) {
+                        attributes.add(attribute.name);
+                        if (attribute.hasChild("aliases")) {
+                            // Add all aliases.
+                            var aliases = attribute.get("aliases").asStringArray();
+                            attributes.addAll(aliases);
+                        }
+                    }
+                    attribute = attribute.next();
+                }
 
-        // GraphNode
-        putAll(GraphNode.class, "parent");
+                try {
+                    Class<Component> clazz = (Class<Component>) Class.forName(className);
+                    putAll(clazz, attributes);
+                } catch (ClassNotFoundException e) {
+                    logger.error("Component Class not found: " + className);
+                } catch (ClassCastException e) {
+                    logger.error("Component Class does not implement gaiasky.scene.component.Component: " + className);
+                }
 
-        // Coordinates
-        putAll(Coordinates.class, "coordinates");
-
-        // Rotation
-        putAll(Rotation.class, "rotation");
-
-        // Celestial
-        putAll(Celestial.class, "wikiname", "colorbv", "colorBv");
-
-        // Magnitude
-        putAll(Magnitude.class, "appmag", "appMag", "absmag", "absMag");
-
-        // Proper motion
-        putAll(ProperMotion.class, "muAlphaMasYr", "muAlpha", "muDeltaMasYr",
-                "muDelta", "rv", "rvKms", "radialVelocity", "radialVelocityKms", "epochYear", "epochJd");
-
-        // SolidAngleThresholds
-        putAll(SolidAngle.class, "thresholdNone", "thresholdPoint", "thresholdQuad");
-
-        // ModelScaffolding
-        putAll(ModelScaffolding.class,
-                "refplane", "randomize", "seed", "sizescalefactor", "locvamultiplier",
-                "locVaMultiplier", "locthoverfactor", "locThresholdLabel", "shadowvalues");
-
-        // Model
-        putAll(Model.class, "model");
-
-        // Atmosphere
-        putAll(Atmosphere.class, "atmosphere");
-
-        // Cloud
-        putAll(Cloud.class, "cloud");
-
-        // RenderFlags
-        putAll(RenderFlags.class, "renderquad");
-
-        // Machine
-        putAll(MotorEngine.class, "machines");
-
-        // Trajectory
-        putAll(Trajectory.class,
-                "provider", "orbit", "model:Orbit", "pointcolor",
-                "pointsize", "trail", "orbittrail", "orbitTrail", "trailMap", "newmethod",
-                "newMethod", "onlybody", "onlyBody", "numSamples", "fadeDistanceUp",
-                "fadeDistanceDown");
-
-        // RefSysTransform
-        putAll(RefSysTransform.class,
-                "transformName", "transformFunction", "transformValues", "transformMatrix");
-
-        // AffineTransformations
-        putAll(AffineTransformations.class,
-                "transformations", "scale", "rotate", "translate", "translatePc", "translateKm");
-
-        // Fade
-        putAll(Fade.class,
-                "fadein", "fadeIn", "fadeInMap", "fadeout", "fadeOut", "fadeOutMap",
-                "fade", "fadepc", "fadePc", "positionobjectname", "fadeObjectName", "fadePosition");
-
-        // DatasetDescription
-        putAll(DatasetDescription.class,
-                "catalogInfo", "cataloginfo", "datasetInfo", "description:MeshObject");
-
-        // Label
-        putAll(Label.class,
-                "label", "labelposition", "labelPosition",
-                "labelPositionKm", "labelPositionPc", "labelFactor", "labelMax", "textScale");
-
-        // RenderType
-        putAll(RenderType.class, "rendergroup", "renderGroup", "billboardRenderGroup:Particle");
-
-        // BillboardDataset
-        putAll(BillboardSet.class, "data:BillboardGroup");
-
-        // Title
-        putAll(Title.class, "scale:Text2D", "lines:Text2D", "align:Text2D");
-
-        // Axis
-        putAll(Axis.class, "axesColors");
-
-        // LocationMark
-        putAll(LocationMark.class, "location", "distFactor");
-
-        // Constel
-        putAll(Constel.class, "ids");
-
-        // Boundaries
-        putAll(Boundaries.class, "boundaries", "boundariesEquatorial");
-
-        // ParticleSet
-        putAll(ParticleSet.class,
-                "provider:ParticleGroup", "position:ParticleGroup", "datafile", "dataFile",
-                "providerparams", "providerParams", "factor", "profiledecay",
-                "profileDecay", "colornoise", "colorNoise", "particlesizelimits",
-                "particleSizeLimits", "colorMin", "colorMax", "fixedAngularSize", "fixedAngularSizeDeg",
-                "fixedAngularSizeRad", "renderParticles");
-
-        // StarSet
-        putAll(StarSet.class,
-                "provider:StarGroup", "datafile:StarGroup", "dataFile:StarGroup", "providerparams:StarGroup", "providerParams:StarGroup",
-                "factor:StarGroup", "profiledecay:StarGroup", "profileDecay:StarGroup",
-                "colornoise:StarGroup", "colorNoise:StarGroup", "particlesizelimits:StarGroup",
-                "epoch:StarGroup", "variabilityEpoch:StarGroup", "fixedAngularSize:StarGroup", "fixedAngularSizeDeg:StarGroup",
-                "fixedAngularSizeRad:StarGroup", "renderParticles:StarGroup");
-
-        // Attitude
-        putAll(Attitude.class,
-                "provider:HeliotropicSatellite", "attitudeLocation");
-
-        // ParticleExtra
-        putAll(ParticleExtra.class, "primitiveRenderScale");
-
-        // Mesh
-        putAll(Mesh.class, "shading", "additiveblending", "additiveBlending");
-
-        // Shape
-        putAll(Shape.class, "focusable");
-
-        // Invisible
-        putAll(Raymarching.class, "shader");
+                numComponents++;
+                component = component.next();
+            }
+            logger.info("Processed " + numComponents + " components");
+        }
 
         return attributeMap;
     }
 
     private void putAll(Class<? extends Component> clazz, String... attributes) {
+        for (String attribute : attributes) {
+            if (attributeMap.containsKey(attribute)) {
+                logger.warn("Attribute already defined: " + attribute);
+                throw new RuntimeException("Attribute already defined: " + attribute);
+            } else {
+                attributeMap.put(attribute, clazz);
+            }
+        }
+    }
+
+    private void putAll(Class<? extends Component> clazz, Array<String> attributes) {
         for (String attribute : attributes) {
             if (attributeMap.containsKey(attribute)) {
                 logger.warn("Attribute already defined: " + attribute);

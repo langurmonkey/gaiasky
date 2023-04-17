@@ -55,6 +55,7 @@ public class AstroUtils {
      * elapsed since 1970-01-01T00:00:00Z (UTC) until 2000-01-01T00:00:00Z (UTC).
      **/
     public static final long J2000_MS;
+
     /**
      * Julian date cache, since most dates are used more than once.
      **/

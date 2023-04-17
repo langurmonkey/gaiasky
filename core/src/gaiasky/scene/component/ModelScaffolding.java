@@ -102,6 +102,10 @@ public class ModelScaffolding implements Component {
         this.inverseRefPlaneTransform = "equatorialto" + refplane;
     }
 
+    public void setReferencePlane(String refplane) {
+        this.setRefPlane(refplane);
+    }
+
     public void setRefplane(String refplane) {
         this.setRefPlane(refplane);
     }

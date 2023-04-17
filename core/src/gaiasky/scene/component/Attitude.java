@@ -18,4 +18,12 @@ public class Attitude implements Component {
 
     public Vector3d nonRotatedPos;
 
+    public void setAttitudeProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public void setProvider(String provider) {
+        setAttitudeProvider(provider);
+    }
+
 }

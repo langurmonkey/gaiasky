@@ -148,6 +148,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
         }
 
         // Remove folders
+        delete project.distLib + '/archetypes'
         delete project.distLib + '/conf'
         delete project.distLib + '/data'
         delete project.distLib + '/font'
@@ -167,7 +168,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
     }
 }
 
-task gaiaskyJar(dependsOn: [compileJava, jar, copyToLib], description: "Creates the gaiasky jar and puts it to the dist folder") {
+task gaiaskyJar(dependsOn: [compileJava, jar, copyToLib], description: "Creates the gaiasky jar and puts it to the dist/lib folder") {
     doLast {
         copy {
             from "$baseDir/core/build/libs/core-" + version + ".jar"

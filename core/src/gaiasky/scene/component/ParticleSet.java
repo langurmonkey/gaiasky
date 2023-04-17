@@ -236,24 +236,36 @@ public class ParticleSet implements Component, IDisposable {
         return index;
     }
 
-    public void setPosition(double[] pos) {
+    public void setMeanPosition(double[] pos) {
         this.meanPosition = new Vector3d(pos[0], pos[1], pos[2]);
+    }
+
+    public void setPosition(double[] pos) {
+        setMeanPosition(pos);
     }
 
     public void setPosKm(double[] pos) {
         setPositionKm(pos);
     }
 
-    public void setPositionKm(double[] pos) {
+    public void setMeanPositionKm(double[] pos) {
         this.meanPosition = new Vector3d(pos[0] * Constants.KM_TO_U, pos[1] * Constants.KM_TO_U, pos[2] * Constants.KM_TO_U);
+    }
+
+    public void setPositionKm(double[] pos) {
+        setMeanPositionKm(pos);
     }
 
     public void setPosPc(double[] pos) {
         setPositionPc(pos);
     }
 
-    public void setPositionPc(double[] pos) {
+    public void setMeanPositionPc(double[] pos) {
         this.meanPosition = new Vector3d(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
+    }
+
+    public void setPositionPc(double[] pos) {
+        setMeanPositionPc(pos);
     }
 
     public void setPosition(int[] pos) {

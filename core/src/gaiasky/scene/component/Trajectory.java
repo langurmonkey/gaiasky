@@ -87,7 +87,7 @@ public class Trajectory implements Component {
      *
      * @param model The orientation model.
      */
-    public void setModel(String model) {
+    public void setOrientationModel(String model) {
         model = model.toUpperCase().trim();
         try {
             this.model = OrbitOrientationModel.valueOf(model);
@@ -96,20 +96,39 @@ public class Trajectory implements Component {
         }
     }
 
-    public void setPointsize(Long pointsize) {
-        this.pointSize = pointsize;
+    public void setModel(String model) {
+        setOrientationModel(model);
     }
 
-    public void setPointsize(Double pointsize) {
-        this.pointSize = pointsize.floatValue();
+    public void setPointSize(Long pointSize) {
+        this.pointSize = pointSize;
+    }
+    public void setPointsize(Long pointSize) {
+        setPointSize(pointSize);
     }
 
-    public void setPointcolor(double[] color) {
+    public void setPointSize(Double pointSize) {
+        this.pointSize = pointSize.floatValue();
+    }
+
+    public void setPointsize(Double pointSize) {
+        setPointSize(pointSize);
+    }
+
+    public void setPointColor(double[] color) {
         pointColor = GlobalResources.toFloatArray(color);
     }
 
-    public void setProvider(String provider) {
+    public void setPointcolor(double[] color) {
+        setPointColor(color);
+    }
+
+    public void setOrbitProvider(String provider) {
         this.provider = provider.replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+    }
+
+    public void setProvider(String provider) {
+        setOrbitProvider(provider);
     }
 
     public void setOrbit(OrbitComponent oc) {

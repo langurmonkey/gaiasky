@@ -1,0 +1,655 @@
+{
+  "components": {
+
+    "Base" : {
+      "description" : "Defines basic attributes common to all objects.",
+      "id" : {
+        "description" : "The ID of the object, typically set automatically by Gaia Sky.",
+        "unit" : "Long"
+      },
+      "name" : {
+        "description" : "A single object name, used to identify the object and as a label text, if any. If the object already has names, this attribute overrides the first one in the name list. The first name in the list is also used as the i18n key for translations.",
+        "unit" : "String"
+      },
+      "names" : {
+        "description" : "A list of names, used to identify the object. It overrides the full name list. The first name in the list is used as a label text, and as a i18n key.",
+        "unit" : "String[]"
+      },
+      "altName" : {
+        "description" : "Adds a new name to the name list of this object, at the end.",
+        "unit" : "String",
+        "aliases" : [ "altname" ]
+      },
+      "opacity" : {
+        "description" : "Static opacity value. Typically, this gets overwritten internally in the update process.",
+        "unit" : "Double"
+      },
+      "componentType" : {
+        "description" : "The content type string (or list) for this object. Content types control the visibility of objects. Examples of content types are 'Planets', 'Asteroids', 'Stars', 'Labels', etc.",
+        "unit" : "String | String[]",
+        "aliases" : [ "ct" , "componentTypes" ]
+      },
+      "forceLabel" : {
+        "description" : "Force-display the label of this object, regardless of its solid angle. If 'true', the label for this object is always displayed.",
+        "unit" : "Boolean"
+      }
+    },
+
+    "Body" : {
+      "description" : "Defines physical body attributes common to all objects.",
+      "position" : {
+        "description" : "The position of the object. This is the position at epoch if the object ahs a proper motion, or just a static position. Given in the internal reference system and in internal units by default (see aliases for other units).",
+        "unit" : "Double[3]",
+        "aliases" : [ "pos", "positionKm", "posKm", "positionPc", "posPc" ]
+      },
+      "size" : {
+        "description" : "The diameter of the entity (in some archetypes this is the radius). The default attribute uses internal units (see aliases for other units).",
+        "unit" : "Double",
+        "aliases" : [ "sizeKm", "sizePc", "sizepc", "sizeM", "sizeAU", "diameter", "diameterKm", "diameterPc" ]
+      },
+      "radius" : {
+        "description" : "The half-size. See size attribute.",
+        "unit" : "Double",
+        "aliases" : [ "radiusKm", "radiusPc" ]
+      },
+      "color" : {
+        "description" : "The color of the entity, as a RGBA quartet. Used as the general color of the entity. The last value in the list, alpha, also acts as a transparency value. The color is also applied to the object label unless 'labelColor' is specified.",
+        "unit" : "Double[4]"
+      },
+      "labelColor" : {
+        "description" : "The color of the label of this entity. If set, the label of this entity uses this color. Otherwise, it uses the global entity color.",
+        "unit" : "Double[4]",
+        "aliases" : [ "labelcolor" ]
+      }
+    },
+
+    "GraphNode" : {
+      "description" : "Defines attributes pertaining to the scene graph hierarchy.",
+      "parent" : {
+        "description" : "Name of the parent entity in the scene graph. Positions for every object are typically relative to the position of the parent. In some cases, the orientation of the parent is also contemplated.",
+        "unit" : "String"
+      }
+    },
+
+    "Coordinates" : {
+      "description" : "Defines attributes that provide coordinates and positions to objects.",
+      "coordinatesProvider" : { 
+        "description" : "The coordinates provider object for this object. The coordinates provider computes the position of the object for each time. This is an object containing, at least, the full reference to a Java class that implements ``IBodyCoordinates`` in the \"impl\" attribute. Examples are 'gaiasky.util.coord.StaticCoordinates' or 'gaiasky.util.coord.OrbitLintCoordinates'. See :ref:`coordinate-providers` for more information.",
+        "unit" : "Map",
+        "aliases" : [ "coordinates" ]
+      }
+    },
+
+    "Rotation" : {
+      "description" : "Defines the rotation model of objects.",
+      "rotation" : {
+        "description" : "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes 'angularVelocity', 'period', 'axial tilt', 'inclination', 'ascendingNode' and 'meridianAngle'. See :ref:`rotation` for more information.",
+        "unit" : "Map"
+      }
+    },
+
+    "Celestial" : {
+      "description" : "Defines attributes common to all celestial objects (stars, planets, moons, etc.).",
+      "wikiName" : { 
+        "description": "The name to look up this object in the wikipedia, if any. If this is set, a '+ info' button appears in the focus info interface when this object is the focus, enabling the user to pull information on the object directly from Gaia Sky and display it in a window.",
+        "unit" : "String",
+        "aliases" : [ "wikiname" ]
+      },
+      "colorBV" : {
+        "description" : "The color index B-V of this object. This is only ever used in single particles/stars, and when no 'color' attribute has been specified. If that is the case, we convert the B-V index into an RGB color and use it as the object's global color.",
+        "unit" : "Double",
+        "aliases" : [ "colorbv", "colorBv", "colorIndex" ]
+      }
+    },
+
+    "Magnitude" : {
+      "description" : "Defines magnitude attributes, both apparent and absolute.",
+      "appMag" : { 
+        "description": "The apparent magnitude. If it is not given, it is computed automatically from the absolute magnitude (if present) and the distance.",
+        "unit" : "Double",
+        "aliases" : [ "appmag", "apparentMagnitude" ]
+      },
+      "absMag" : {
+        "description" : "The absolute magnitude. If it is not given, it is computed automatically from the apparent magnitude (if present) and the distance. In single stars, the absolute magnitude is used to compute the pseudo-size. See the 'star rendering' section for more information.",
+        "unit" : "Double",
+        "aliases" : [ "absmag", "absoluteMagnitude" ]
+      }
+    },
+
+    "ProperMotion" : {
+      "description" : "Defines proper motion attributes.",
+      "muAlpha" : {
+        "description" : "Proper motion in right ascension, the :math:`\\mu_{\\alpha\\star}`, in mas/yr.",
+        "units" : "Double",
+        "aliases" : [ "muAlphaMasYr" ]
+      },
+      "muDelta" : {
+        "description" : "Proper motion in declination, the :math:`\\mu_{\\delta}`, in mas/yr.",
+        "units" : "Double",
+        "aliases" : [ "muDeltaMasYr" ]
+      },
+      "radialVelocity" : {
+        "description" : "The radial velocity, in km/s.",
+        "units" : "Double",
+        "aliases" : [ "rv", "rvKms", "radialVelocityKms" ]
+      },
+      "epochJd" : {
+        "description" : "The epoch as a Julian date. For instance, 2015.5 corresponds to a Julian date of 2457206.125.",
+        "units" : "Double"
+      },
+      "epochYear" : {
+        "description" : "The epoch as a year plus fraction (e.g. 2015.5). This gets converted to a Julian date internally.",
+        "units" : "Double"
+      }
+    },
+
+    "SolidAngle" : {
+      "description" : "Defines solid angle thresholds for the various rendering modes.",
+      "thresholdNone" : {
+        "description" : "Solid angle threshold to start rendering this object at all. Mainly for internal use. Gets overwritten during initialization.",
+        "units" : "Double"
+      },
+      "thresholdPoint" : {
+        "description" : "Solid angle threshold boundary between rendering the object as a point and as a quad. Mainly for internal use. Gets overwritten during initialization.",
+        "units" : "Double"
+      },
+      "thresholdQuad" : {
+        "description" : "Solid angle threshold boundary between rendering the object as a quad and as a model. Mainly for internal use. Gets overwritten during initialization.",
+        "units" : "Double"
+      }
+    },
+
+    "Trajectory" : {
+      "description" : "Defines attributes related to orbits and trajectory objects. See :ref:`orbits` for more information.",
+      "orbitProvider" : {
+        "description" : "In *Orbit* archetype objects, this is the fully-qualified Java class that provides orbit data. This class needs to implement ``IOrbitDataProvider``. Possible values are ``gaiasky.data.orbit.OrbitalParametersProvider``, for orbits defined as orbital elements, or ``gaiasky.data.orbit.OrbitFileDataProvider``, for orbits sourced from a file of samples. See :ref:`orbits` for more information.",
+        "units" : "String",
+        "aliases" : [ "provider" ]
+      },
+      "orbit" : {
+        "description" : "The orbit component, containing some additional information, like the orbital elements, the period, etc. See :ref:`orbits` for a full description of the format and possible values of this attribute.",
+        "units" : "Map"
+      },
+      "orientationModel" : {
+        "description" : "The orientation model of this orbit. Must be one of 'default' or 'extrasolar_system'. See :ref:`orbits` for more information.",
+        "units" : "String",
+        "aliases" : [ "model:Orbit" ]
+      },
+      "onlyBody" : {
+        "description" : "In object-less orbits (orbits not attached to any object), it may be interesting to not render the orbit itself as a line, but only a point at the head of that orbit in the current time. If this attribute is set to true, the orbit is rendered as a single point at the head. Useful essentially to render many particles using orbital elements.",
+        "units" : "Boolean",
+        "aliases" : [ "onlybody" ]
+      },
+      "pointColor" : {
+        "description" : "The color of the point at the head of the trajectory in object-less orbits (orbits that are not attached to any object). Examples of this are asteroids, where orbits are defined via the orbital elements, and not all orbits are attached to an asteroid object for performance purposes. In these cases, the color of the point at the head of the orbit is set in this property.",
+        "units" : "Double[4]",
+        "aliases" : [ "pointcolor" ]
+      },
+      "pointSize" : {
+        "description" : "The size of the point at the head of the trajectory in object-less orbits (orbits that are not attached to any object). Examples of this are asteroids, where orbits are defined via the orbital elements, and not all orbits are attached to an asteroid object for performance purposes. In these cases, the size of the point at the head of the orbit is set in this property.",
+        "units" : "Double",
+        "aliases" : [ "pointsize" ]
+      },
+      "orbitTrail" : {
+        "description" : "Whether to fade the orbit as it gets further away from the head (or object), in the opposite direction of travel. By default, the head is mapped to an opacity of 1, and the tail is mapped to an opacity of 0.",
+        "units" : "Boolean",
+        "aliases" : [ "orbittrail", "trail" ]
+      },
+      "trailMap" : {
+        "description" : "Modify the tail mapping value in case ``orbitTrail`` is set to ``true``. This mapping parameter defines the location in the orbit (int [0,1]) where we map the opacity value of 0. The default value is 0. Set it to 0.5 to have a trail from the object to half the orbit. This enables having shorter trails, while improving the performance due to less lines being rendered.",
+        "units" : "Double"
+      },
+      "newMethod" : {
+        "description" : "Internal parameter. Changes the way in which transformations are applied to the orbit objects. Asteroids have this set to true.",
+        "units" : "Boolean",
+        "aliases" : ["newmethod"]
+      },
+      "numSamples" : {
+        "description" : "Override the number of samples to be used for this orbit. Gaia Sky computes the number of samples internally, but in some cases it may be necessary to override it to give orbits more detail.",
+        "units" : "Integer"
+      },
+      "fadeDistanceUp" : {
+        "description" : "Override the distance at which the orbit becomes totally invisible. In internal units. If not overridden, this is computed internally from the radius of the attached body.",
+        "units" : "Double"
+      },
+      "fadeDistanceDown" : {
+        "description" : "Override the distance at which the orbit starts to fade out. In internal units. If not overridden, this is computed internally from the radius of the attached body.",
+        "units" : "Double"
+      }
+    },
+
+    "ModelScaffolding" : {
+      "description" : "Defines attributes related objects with 3D models.",
+      "referencePlane" : {
+        "description" : "The reference plane to use for this model object. Can be one of 'ecliptic', 'galactic' or the default, 'equatorial'.",
+        "units" : "String",
+        "aliases" : [ "refPlane", "refplane" ]
+      },
+      "randomize" : {
+        "description" : "A list with the components of this model that need to be randomized via procedural generation. Can contain 'model', 'atmosphere', and/or 'cloud'.",
+        "units" : "String[]"
+      },
+      "seed" : {
+        "description" : "In case the 'randomize' attribute is defined, this attribute defines the RNG seed to use.",
+        "units" : "Double"
+      },
+      "sizeScaleFactor" : {
+        "description" : "Scale factor to apply to the 3D model of this object. Mainly used internally. Using the model or object attributes directly to specify the size is recommended.",
+        "units" : "Double",
+        "aliases" : [ "sizescalefactor" ]
+      },
+      "locVaMultiplier" : {
+        "description" : "Solid angle multiplier for children location objects (Loc) of this object. If set, this scales the solid angle of the object for children locations.",
+        "units" : "Double",
+        "aliases" : [ "locvamultiplier" ]
+      },
+      "locThresholdLabel" : {
+        "description" : "Threshold label value for children locations. Mainly used internally, should not be touched externally.",
+        "units" : "Double",
+        "aliases" : [ "locThOverFactor", "locthoverfactor" ]
+      },
+      "shadowValues" : {
+        "description" : "Override the distance, the camera near and the camera far values of the light camera for this object in the shadow mapping pass. All are given in units of the radius of the object.",
+        "units" : "Double[3]",
+        "aliases" : [ "shadowvalues" ]
+      }
+    },
+
+    "Model" : {
+      "description" : "Defines the actual model of objects with 3D models.",
+      "model" : {
+        "description" : "Model definition for this object. See the :ref:`model` documentation for more information.",
+        "units" : "Map"
+      }
+    },
+
+    "Atmosphere" : {
+      "description" : "Defines the atmosphere of a planet or moon.",
+      "atmosphere" : {
+        "description" : "Atmosphere definition for this object. See the :ref:`atmospheric-scattering` documentation for more information.",
+        "units" : "Map"
+      }
+    },
+
+    "Cloud" : {
+      "description" : "Defines the cloud layer of a planet or moon.",
+      "cloud" : {
+        "description" : "Cloud layer definition for this object. See the :ref:`clouds` documentation for more information.",
+        "units" : "Map"
+      }
+    },
+
+    "RenderFlags" : {
+      "description" : "Defines rendering flags.",
+      "renderQuad" : {
+        "description" : "Whether to render this entity as a billboard (quad).",
+        "units" : "Boolean",
+        "aliases" : ["renderquad"]
+      }
+    },
+
+    "MotorEngine" : {
+      "description" : "Defines machines for the spacecraft mode.",
+      "machines" : {
+        "description" : "Provides machine definitions for the spacecraft mode. Check out the spacecraft object definition in the default data pack for more information.",
+        "units" : "Map"
+      }
+    },
+
+    "RefSysTransform" : {
+      "description" : "Defines an arbitrary reference system transformation via a 4x4 matrix. See :ref:`ref-sys-transform` for more information.",
+      "transformFunction" : {
+        "description" : "Defines a transformation matrix to apply to the position of the object. The name of the transformation to apply. Possible values are 'equatorialToEcliptic', 'eclipticToEquatorial', 'equatorialToGalactic', 'galacticToEquatorial', 'eclipticToGalactic' and 'galacticToEcliptic'. See :ref:`ref-sys-transform` for more information.",
+        "units" : "String",
+        "aliases" : [ "transformName" ]
+      },
+      "transformMatrix" : {
+        "description" : "The 16 values of the 4x4 transformation matrix, in column-major order. See :ref:`ref-sys-transform` for more information.",
+        "units" : "Double[16]",
+        "aliases" : [ "transformValues" ]
+      }
+    },
+
+    "AffineTransformations" : {
+      "description" : "Defines arbitrary affine transformations, applied in the order they are defined. See :ref:`affine-transformations` for more information.",
+      "translate" : {
+        "description" : "A translation vector, in internal units (see aliases for other units). See :ref:`affine-transformations` for more information.",
+        "units" : "Double[3]",
+        "aliases" : [ "translatePc", "translateKm" ]
+      },
+      "rotate" : {
+        "description" : "A rotation axis and angle, in degrees. The vector is expected as [X, Y, Z, angle]. See :ref:`affine-transformations` for more information.",
+        "units" : "Double[4]"
+      },
+      "scale" : {
+        "description" : "A scale transformation. Can be a 3-vector or a single value. See :ref:`affine-transformations` for more information.",
+        "units" : "Double[3] | Double"
+      },
+      "transformations" : {
+        "description" : "Describe the transformations directly in a map, with 'impl', and whatever attributes. The usage of the attributes 'translate', 'scale' and 'rotate' is strongly recommended over this.",
+        "units" : "Map"
+      }
+    },
+
+    "Fade" : {
+      "description" : "Defines the properties that control the fading in and out of the object.",
+      "fadeIn" : {
+        "description" : "The starting and ending fade-in distances, in parsecs, from the reference system origin (unless 'fadeObjectName' or 'fadePosition' are defined, in which case the distances are relative to the given object or position), where the object starts and ends its fade-in transition. ",
+        "units" : "Double[2]",
+        "aliases" : [ "fadein" ]
+      },
+      "fadeInMap" : {
+        "description" : "The alpha/opacity values to which the fade-in starting and ending distances are mapped. They default to [0,1].",
+        "units" : "Double[2]"
+      },
+      "fadeOut" : {
+        "description" : "The starting and ending fade-out distances, in parsecs, from the reference system origin (unless 'fadeObjectName' or 'fadePosition' are defined, in which case the distances are relative to the given object or position), where the object starts and ends its fade-out transition. ",
+        "units" : "Double[2]",
+        "aliases" : [ "fadeout" ]
+      },
+      "fadeOutMap" : {
+        "description" : "The alpha/opacity values to which the fade-out starting and ending distances are mapped. They default to [1,0].",
+        "units" : "Double[2]"
+      },
+      "fadeObjectName" : {
+        "description" : "The name of the object to be used to compute the current distance for the fade in and out operations.",
+        "units" : "String",
+        "aliases" : [ "positionobjectname" ]
+      },
+      "fadePosition" : {
+        "description" : "The position, in the internal reference system and internal units, to be used to compute the current distance for the fade in and out operations.",
+        "units" : "Double[3]"
+      }
+    },
+
+    "DatasetDescription" : {
+      "description" : "Contains metadata about the dataset represented by this object. All objects with this component get an entry in the datasets list.",
+      "catalogInfo" : {
+        "description" : "A map containing the metadata for the catalog represented by this object. The map can contain the attributes 'name', 'description', 'type' (INTERNAL|SCRIPT|LOD|SAMP|UI), 'nParticles', 'sizebytes'. See :ref:`catalog-formats` for more information.",
+        "units" : "Map",
+        "aliases" : [ "datasetInfo", "cataloginfo" ]
+      },
+      "description:MeshObject" : null
+    },
+
+    "Label" : {
+      "description" : "Defines attributes that control how labels are processed and rendered. See :ref:`labels` for more information.",
+      "label" : {
+        "description" : "A boolean to disable or enable label rendering for this object.",
+        "units" : "Boolean"
+      },
+      "label2d" : {
+        "description" : "Unused, here for backwards compatibility.",
+        "units" : "Boolean"
+      },
+      "labelPosition" : {
+        "description" : "Override the position at which to render this label, in the internal reference system and internal units (see aliases for more unit options). If this is not given, the position of the object is used.",
+        "units" : "Double[3]",
+        "aliases" : [ "labelposition", "labelPositionPc", "labelPositionKm" ]
+      },
+      "labelFactor" : {
+        "description" : "Factor to apply to the size of the label for this object.",
+        "units" : "Double"
+      },
+      "labelMax" : {
+        "description" : "Internal rendering factor, should not be set externally.",
+        "units" : "Double"
+      },
+      "textScale" : {
+        "description" : "Internal rendering factor, should not be set externally.",
+        "units" : "Double"
+      }
+    },
+
+    "RenderType" : {
+      "description" : "Defines attributes that control rendering operations for this object.",
+      "renderGroup" : {
+        "description" : "The render group (see enum ``RenderGroup``) to use for this objects.",
+        "units" : "String",
+        "aliases" : [ "rendergroup" ]
+      },
+      "billboardRenderGroup:Particle" : null
+    },
+
+    "BillboardSet" : {
+      "description" : "Defines attributes related to billboard set objects.",
+      "data:BillboardGroup" : {
+        "description" : "A list of ``BillboardDataset`` objects. Mainly used for the Milky Way model. Each object contains 'impl', 'file', 'type', 'size', 'intensity', 'layers', and 'maxsizes'. See the Milky Way object in the ``universe.json`` file in the default data pack for an example.",
+        "units" : "BillboardDataset[]"
+      }
+    },
+
+    "Title" : {
+      "description" : "Defines attributes related to two-dimensional titles.",
+      "scale:Text2D" : {
+        "description" : "Scale factor to scale up or down the title.",
+        "units" : "Double"
+      },
+      "lines:Text2D" : {
+        "description" : "Whether to render frame lines above and below the title or not.",
+        "units" : "Boolean"
+      },
+      "align:Text2D" : {
+        "description" : "The horizontal alignment of the title. Center (1), left (8) or right (16).",
+        "units" : "Integer"
+      }
+    },
+
+    "Axis" : {
+      "description" : "Defines attributes related to reference system axes.",
+      "axesColors" : {
+        "description" : "A 3x3 matrix with the color for each of the axes in the reference system.",
+        "units" : "Double[3][3]"
+      }
+    },
+
+    "LocationMark" : {
+      "description" : "Defines attributes related to locations and location mark objects.",
+      "location" : {
+        "description" : "A 2-dimensional position [longitude, latitude] on the surface of the parent, in degrees.",
+        "units" : "Double[2]"
+      },
+      "distFactor" : {
+        "description" : "The distance from the center of the object, in case of non-spherical parent objects. This is essentially the radius, as the locations are given in [longitude, latitude, radius]. Typically the radius is that of the object, but this parameter overrides it.",
+        "units" : "Double"
+      }
+    },
+
+    "Constel" : {
+      "description" : "Defines attributes related to constellation objects.",
+      "ids" : {
+        "description" : "Contains a list of segments (a list of lists of points) with the HIP identifiers for each of the stars of this constellation.",
+        "units" : "Integer[][]"
+      }
+    },
+
+    "Boundaries" : {
+      "description" : "Defines attributes related to constellation boundary objects.",
+      "boundaries" : {
+        "description" : "Contains a list of lists of sky coordinates :math:`(\\alpha, \\delta)`, in degrees, defining the lines of the constellation boundaries.",
+        "units" : "Double[][][2]",
+        "aliases" : [ "boundariesEquatorial" ]
+      }
+    },
+
+    "ParticleSet" : {
+      "description" : "Defines attributes related to particle set objects, which contain a point cloud.",
+      "provider:ParticleGroup" : {
+        "description" : "The class to be used to load the data. This class must implement ``IParticleGroupDataProvider``. This should have the fully-qualified class name. For instance, ``gaiasky.data.group.STILDataProvider``.",
+        "units" : "String"
+      },
+      "providerParams" : {
+        "description" : "Parameters to be passed into the provider class.",
+        "units" : "Map",
+        "aliases" : [ "providerparams" ]
+      },
+      "meanPosition" : {
+        "description" : "The mean position of this particle set, in the internal reference system and internal units (see aliases for more units). If not given, this is computed automatically from the particle positions.",
+        "units" : "Double[3]",
+        "aliases" : [ "meanPositionKm", "meanPositionPc", "pos:ParticleGroup", "posKm:ParticleGroup", "posPc:ParticleGroup", "position:ParticleGroup" ]
+      },
+      "dataFile" : {
+        "description" : "The path to the data file with the particles to be loaded by the provider.",
+        "units" : "String",
+        "aliases" : [ "datafile" ]
+      },
+      "factor" : {
+        "description" : "A multiplicative factor to apply to the positions of all particles during loading.",
+        "units" : "Double"
+      },
+      "profileDecay" : {
+        "description" : "The profile decay of the particles in the shader. Controls how sudden is the color and intensity falloff from the center.",
+        "units" : "Double",
+        "aliases" : [ "profiledecay" ]
+      },
+      "colorNoise" : {
+        "description" : "Noise factor for the color, in [0,1]. This randomly generates colors from the main color. The larger the color noise, the more different the generated colors from the main color.",
+        "units" : "Double",
+        "aliases" : [ "colornoise" ]
+      },
+      "particleSizeLimits" : {
+        "description" : "Minimum and maximum solid angle limits of the particles, as :math:`(tan(\\alpha_{min}), tan(\\alpha_{max}))`.",
+        "units" : "Double[2]",
+        "aliases" : [ "particlesizelimits" ]
+      },
+      "colorMin" : {
+        "description" : "The color of the particles at the closest distance, as RGBA. If this is set, the color of the particles gets interpolated from ``colorMin`` to ``colorMax`` depending on the distance of the particles to the origin.",
+        "units" : "Double[4]"
+      },
+      "colorMax" : {
+        "description" : "The color of the particles at the maximum distance, as RGBA. If this is set, the color of the particles gets interpolated from ``colorMin`` to ``colorMax`` depending on the distance of the particles to the origin.",
+        "units" : "Double[4]"
+      },
+      "fixedAngularSize" : {
+        "description" : "Set a fixed angular size for all particles in this set, as a solid angle in radians (see aliases for other units).",
+        "units" : "Double",
+        "aliases" : [ "fixedAngularSizeDeg", "fixedAngularSizeRad" ]
+      },
+      "renderParticles" : {
+        "description" : "Disable particle rendering by setting this to false. Labels, in case of star sets, will still be rendered.",
+        "units" : "Boolean"
+      }
+    },
+
+    "StarSet" : {
+      "description" : "Defines attributes related to star set objects, which contain a star catalog or group.",
+      "provider:StarGroup" : {
+        "description" : "The class to be used to load the data. This class must implement ``IParticleGroupDataProvider``. This should have the fully-qualified class name. For instance, ``gaiasky.data.group.STILDataProvider``.",
+        "units" : "String"
+      },
+      "providerParams:StarGroup" : {
+        "description" : "Parameters to be passed into the provider class.",
+        "units" : "Map",
+        "aliases" : [ "providerparams:StarGroup" ]
+      },
+      "meanPosition:StarGroup" : {
+        "description" : "The mean position of this particle set, in the internal reference system and internal units (see aliases for more units). If not given, this is computed automatically from the particle positions.",
+        "units" : "Double[3]",
+        "aliases" : [ "meanPositionKm:StarGroup", "meanPositionPc:StarGroup", "pos:StarGroup", "posKm:StarGroup", "posPc:StarGroup", "position:StarGroup" ]
+      },
+      "dataFile:StarGroup" : {
+        "description" : "The path to the data file with the particles to be loaded by the provider.",
+        "units" : "String",
+        "aliases" : [ "datafile:StarGroup" ]
+      },
+      "factor:StarGroup" : {
+        "description" : "A multiplicative factor to apply to the positions of all particles during loading.",
+        "units" : "Double"
+      },
+      "profileDecay:StarGroup" : {
+        "description" : "The profile decay of the particles in the shader. Controls how sudden is the color and intensity falloff from the center.",
+        "units" : "Double",
+        "aliases" : [ "profiledecay:StarGroup" ]
+      },
+      "colorNoise:StarGroup" : {
+        "description" : "Noise factor for the color, in [0,1]. This randomly generates colors from the main color. The larger the color noise, the more different the generated colors from the main color.",
+        "units" : "Double",
+        "aliases" : [ "colornoise:StarGroup" ]
+      },
+      "particleSizeLimits:StarGroup" : {
+        "description" : "Minimum and maximum solid angle limits of the particles, as :math:`(tan(\\alpha_{min}), tan(\\alpha_{max}))`.",
+        "units" : "Double[2]",
+        "aliases" : [ "particlesizelimits:StarGroup" ]
+      },
+      "colorMin:StarGroup" : {
+        "description" : "The color of the particles at the closest distance, as RGBA. If this is set, the color of the particles gets interpolated from ``colorMin`` to ``colorMax`` depending on the distance of the particles to the origin.",
+        "units" : "Double[4]"
+      },
+      "colorMax:StarGroup" : {
+        "description" : "The color of the particles at the maximum distance, as RGBA. If this is set, the color of the particles gets interpolated from ``colorMin`` to ``colorMax`` depending on the distance of the particles to the origin.",
+        "units" : "Double[4]"
+      },
+      "fixedAngularSize:StarGroup" : {
+        "description" : "Set a fixed angular size for all particles in this set, as a solid angle in radians (see aliases for other units).",
+        "units" : "Double",
+        "aliases" : [ "fixedAngularSizeDeg:StarGroup", "fixedAngularSizeRad:StarGroup" ]
+      },
+      "renderParticles:StarGroup" : {
+        "description" : "Disable particle rendering by setting this to false. Labels, in case of star sets, will still be rendered.",
+        "units" : "Boolean"
+      },
+      "epochJd:StarGroup" : {
+        "description" : "The epoch for the positions of this star group as a Julian date.",
+        "units" : "Double",
+        "aliases" : [ "epoch:StarGroup" ]
+      },
+      "variabilityEpochJd:StarGroup" : {
+        "description" : "The light curve epoch for the variable stars in this star group as a Julian date.",
+        "units" : "Double",
+        "aliases" : [ "variabilityEpoch:StarGroup" ]
+      }
+    },
+
+    "Attitude" : {
+      "description" : "Defines attributes related to the attitude of satellites and spacecraft.",
+      "attitudeProvider" : {
+        "description" : "Provider class for the attitude.",
+        "units" : "String",
+        "aliases" : [ "provider:HeliotropicSatellite" ]
+      },
+      "attitudeLocation" : {
+        "description" : "Location of the data file(s) necessary for the attitude provider.",
+        "units" : "String"
+      }
+    },
+
+    "ParticleExtra" : {
+      "description" : "Defines attributes related to single particles and single star objects.",
+      "primitiveRenderScale" : {
+        "description" : "Artificial scale factor for the size of this particle during rendering.",
+        "units" : "Double"
+      }
+    },
+
+    "Mesh" : {
+      "description" : "Defines attributes related to meshes and iso-density surfaces. See :ref:`mesh-objects` for more inforamtion.",
+      "shading" : {
+        "description" : "Shading mode for the mesh. Can be 'additive', for additive blending, 'dust', to use an opaque mesh with transparency at the edges, or 'regular', to use the regular general-purpose PBR shader.",
+        "units" : "String"
+      },
+      "additiveBlending" : {
+        "description" : "Sets the shading mode to 'additive'.",
+        "units" : "Boolean",
+        "aliases" : [ "additiveblending" ]
+      }
+    },
+
+    "Shape" : {
+      "description" : "Defines attributes related to shape objects.",
+      "focusable" : {
+        "description" : "Defines whether the shape object is focusable or not.",
+        "units" : "Boolean"
+      }
+    },
+
+    "Raymarching" : {
+      "description" : "Defines attributes related to ray-marched objects.",
+      "shader" : {
+        "description" : "Defines the fragment shader file to use to render this object. The fragment shader is processed for each pixel in the image, and must produce a ray-marched representation of the object.",
+        "units" : "String"
+      }
+    }
+
+
+  }
+}

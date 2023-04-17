@@ -167,6 +167,10 @@ public class Body implements Component, ICopy {
         setDiameter(diameterKm * Constants.KM_TO_U);
     }
 
+    public void setDiameterPc(Double diameterPc) {
+        setDiameter(diameterPc * Constants.PC_TO_U);
+    }
+
     /**
      * Sets the object color, as an RGBA double array.
      *
