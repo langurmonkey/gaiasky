@@ -18,7 +18,6 @@ import java.util.Map;
  * A container for data and logic concerning {@link Archetype}s.
  */
 public class Archetypes {
-    private static final Log logger = Logger.getLogger(Archetypes.class);
 
     /** Archetypes map, links old scene graph model objects to artemis archetypes. **/
     protected Map<String, Archetype> archetypes;
@@ -254,8 +253,11 @@ public class Archetypes {
 
         // Log.
         // Print archetypes list.
-        final boolean printRSTArchetypes = true;
+        final boolean printRSTArchetypes = false;
         if (printRSTArchetypes && !archetypeName.startsWith("gaiasky")) {
+            AttributeMap map = new AttributeMap();
+            map.initialize(true);
+
             StringBuilder sb = new StringBuilder();
 
             sb.append("* - **").append(archetypeName).append("**\n");
@@ -266,12 +268,17 @@ public class Archetypes {
             }
             int i = 0;
             for (var c : classes) {
+                boolean inMap = map.containsValue(c);
                 if(i == 0) {
                     sb.append("  - | ");
                 } else {
                     sb.append("    | ");
                 }
-                sb.append(":ref:`").append(c.getSimpleName()).append(" <comp-").append(c.getSimpleName()).append(">`\n");
+                if(inMap) {
+                    sb.append(":ref:`").append(c.getSimpleName()).append(" <comp-").append(c.getSimpleName()).append(">`\n");
+                } else {
+                    sb.append(c.getSimpleName()).append("\n");
+                }
                 i++;
             }
             System.out.print(sb);

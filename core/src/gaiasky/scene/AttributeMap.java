@@ -25,7 +25,6 @@ public class AttributeMap {
      * Returns the component class to which the specified key is mapped.
      *
      * @param key The key.
-     *
      * @return The component class.
      */
     public Class<? extends Component> get(String key) {
@@ -36,14 +35,21 @@ public class AttributeMap {
      * Checks whether the given key is in the attribute map.
      *
      * @param key The key.
-     *
      * @return <code>true</code> if this map contains a mapping with the specified key.
      */
     public boolean containsKey(String key) {
         return attributeMap.containsKey(key);
     }
 
+    public boolean containsValue(Class<? extends Component> value) {
+        return attributeMap.containsValue(value);
+    }
+
     public Map<String, Class<? extends Component>> initialize() {
+        return initialize(false);
+    }
+
+    public Map<String, Class<? extends Component>> initialize(boolean silent) {
         // Load the attribute map from the JSON definition.
         var attributeMapFile = Gdx.files.internal("archetypes/attributemap.json");
         var reader = new JsonReader();
@@ -83,7 +89,9 @@ public class AttributeMap {
                 numComponents++;
                 component = component.next();
             }
-            logger.info("Processed " + numComponents + " components");
+            if (!silent) {
+                logger.info("Processed " + numComponents + " components");
+            }
         }
 
         return attributeMap;
