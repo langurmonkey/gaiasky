@@ -38,7 +38,7 @@
     "Body" : {
       "description" : "Defines physical body attributes common to all objects.",
       "position" : {
-        "description" : "The position of the object. This is the position at epoch if the object ahs a proper motion, or just a static position. Given in the internal reference system and in internal units by default (see aliases for other units).",
+        "description" : "The position of the object. This is the position at epoch if the object has a proper motion, or just a static position. Given in the internal reference system and in internal units by default (see aliases for other units).",
         "unit" : "Double[3]",
         "aliases" : [ "pos", "positionKm", "posKm", "positionPc", "posPc" ]
       },
@@ -74,7 +74,7 @@
     "Coordinates" : {
       "description" : "Defines attributes that provide coordinates and positions to objects.",
       "coordinatesProvider" : { 
-        "description" : "The coordinates provider object for this object. The coordinates provider computes the position of the object for each time. This is an object containing, at least, the full reference to a Java class that implements ``IBodyCoordinates`` in the \"impl\" attribute. Examples are 'gaiasky.util.coord.StaticCoordinates' or 'gaiasky.util.coord.OrbitLintCoordinates'. See :ref:`coordinate-providers` for more information.",
+        "description" : "The coordinates provider object for this object. The coordinates provider computes the position of the object for each time. This is an object containing, at least, the full reference to a Java class that implements ``IBodyCoordinates`` in the \"impl\" attribute. Examples are ``gaiasky.util.coord.StaticCoordinates`` or ``gaiasky.util.coord.OrbitLintCoordinates``. See :ref:`coordinate-providers` for more information.",
         "unit" : "Map",
         "aliases" : [ "coordinates" ]
       }
@@ -83,7 +83,7 @@
     "Rotation" : {
       "description" : "Defines the rotation model of objects.",
       "rotation" : {
-        "description" : "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes 'angularVelocity', 'period', 'axial tilt', 'inclination', 'ascendingNode' and 'meridianAngle'. See :ref:`rotation` for more information.",
+        "description" : "The rotation object for this object. This attribute describes a rigid body rotation. This is given in the form of a map with the attributes ``angularVelocity``, ``period``, ``axialtilt``, ``inclination``, ``ascendingNode`` and ``meridianAngle``. See :ref:`rotation` for more information.",
         "unit" : "Map"
       }
     },
@@ -256,7 +256,7 @@
     },
 
     "Model" : {
-      "description" : "Defines the actual model of objects with 3D models.",
+      "description" : "Defines the actual model of objects with 3D models. See :ref:`model` for more information.",
       "model" : {
         "description" : "Model definition for this object. See the :ref:`model` documentation for more information.",
         "units" : "Map"
@@ -264,7 +264,7 @@
     },
 
     "Atmosphere" : {
-      "description" : "Defines the atmosphere of a planet or moon.",
+      "description" : "Defines the atmosphere of a planet or moon. See the :ref:`atmospheric-scattering` documentation for more information.",
       "atmosphere" : {
         "description" : "Atmosphere definition for this object. See the :ref:`atmospheric-scattering` documentation for more information.",
         "units" : "Map"
@@ -272,7 +272,7 @@
     },
 
     "Cloud" : {
-      "description" : "Defines the cloud layer of a planet or moon.",
+      "description" : "Defines the cloud layer of a planet or moon. See the :ref:`clouds` documentation for more information.",
       "cloud" : {
         "description" : "Cloud layer definition for this object. See the :ref:`clouds` documentation for more information.",
         "units" : "Map"

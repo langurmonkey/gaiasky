@@ -254,7 +254,7 @@ public class Archetypes {
 
         // Log.
         // Print archetypes list.
-        final boolean printRSTArchetypes = false;
+        final boolean printRSTArchetypes = true;
         if (printRSTArchetypes && !archetypeName.startsWith("gaiasky")) {
             StringBuilder sb = new StringBuilder();
 
@@ -271,7 +271,7 @@ public class Archetypes {
                 } else {
                     sb.append("    | ");
                 }
-                sb.append(c.getSimpleName()).append("\n");
+                sb.append(":ref:`").append(c.getSimpleName()).append(" <comp-").append(c.getSimpleName()).append(">`\n");
                 i++;
             }
             System.out.print(sb);
