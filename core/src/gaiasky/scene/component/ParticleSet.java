@@ -482,6 +482,9 @@ public class ParticleSet implements Component, IDisposable {
 
     /** Returns the position of the particle with the given name, if any, in the out vector. **/
     public Vector3b getAbsolutePosition(String name, Vector3b out) {
+        if (name == null || out == null) {
+            return null;
+        }
         name = name.toLowerCase().trim();
         if (index.containsKey(name)) {
             int idx = index.get(name);
