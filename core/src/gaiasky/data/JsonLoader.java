@@ -40,21 +40,24 @@ public class JsonLoader extends AbstractSceneLoader {
 
     private static final Map<String, String> REPLACE = new HashMap<>();
 
+    /** Maps old attributes to components. **/
+    private static final AttributeMap attributeMap;
+
     static {
         REPLACE.put("gaiasky.scenegraph.MachineDefinition", MachineDefinition.class.getName());
         REPLACE.put("gaiasky.scenegraph.particle.BillboardDataset", BillboardDataset.class.getName());
         REPLACE.put("gaiasky.scenegraph.component.RotateTransform", RotateTransform.class.getName());
+
+        // Initialize attribute map.
+        attributeMap = new AttributeMap();
+        attributeMap.initialize();
     }
 
-    /** Maps old attributes to components. **/
-    private final AttributeMap attributeMap;
 
     /**
      * Creates a new instance with the given index.
      */
     public JsonLoader(Map<String, Entity> index) {
-        this.attributeMap = new AttributeMap();
-        this.attributeMap.initialize();
         this.index = index;
     }
 
@@ -230,7 +233,7 @@ public class JsonLoader extends AbstractSceneLoader {
                         while (vectorAttribute != null) {
                             String clazzName = vectorAttribute.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
                             clazzName = replace(clazzName);
-                            @SuppressWarnings("unchecked") Class<Object> childClazz = (Class<Object>) ClassReflection.forName(clazzName);
+                            Class<Object> childClazz = (Class<Object>) ClassReflection.forName(clazzName);
                             ((Object[]) value)[i] = convertJsonToObject(vectorAttribute, childClazz);
                             i++;
                             vectorAttribute = vectorAttribute.next;

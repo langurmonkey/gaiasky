@@ -1,0 +1,464 @@
+{
+    "archetypes": {
+        "SceneGraphNode": {
+            "parent": null,
+            "components": [
+                "Base",
+                "Body",
+                "GraphNode",
+                "Octant*",
+                "Render*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.SceneGraphNode"
+            ]
+        },
+        "Universe": {
+            "parent": null,
+            "components": [
+                "Base",
+                "Body",
+                "GraphNode",
+                "GraphRoot*"
+            ]
+        },
+        "CelestialBody": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Celestial",
+                "Magnitude",
+                "Coordinates",
+                "Rotation",
+                "Label",
+                "SolidAngle",
+                "Focus*",
+                "Billboard*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.CelestialBody"
+            ]
+        },
+        "ModelBody": {
+            "parent": "CelestialBody",
+            "components": [
+                "Model",
+                "RenderType",
+                "ModelScaffolding",
+                "AffineTransformations"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.ModelBody"
+            ]
+        },
+        "Planet": {
+            "parent": "ModelBody",
+            "components": [
+                "Atmosphere",
+                "Cloud"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Planet"
+            ]
+        },
+        "Particle": {
+            "parent": "CelestialBody",
+            "components": [
+                "ProperMotion",
+                "RenderType",
+                "ParticleExtra"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Particle"
+            ]
+        },
+        "Star": {
+            "parent": "Particle",
+            "components": [
+                "Hip*",
+                "Distance*",
+                "Model",
+                "ModelScaffolding"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Star"
+            ]
+        },
+        "Satellite": {
+            "parent": "ModelBody",
+            "components": [
+                "ParentOrientation*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Satellite"
+            ]
+        },
+        "HeliotropicSatellite": {
+            "parent": "Satellite",
+            "components": [
+                "Attitude",
+                "TagHeliotropic*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.HeliotropicSatellite"
+            ]
+        },
+        "GenericSpacecraft": {
+            "parent": "Satellite",
+            "components": [
+                "RenderFlags"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.GenericSpacecraft"
+            ]
+        },
+        "Spacecraft": {
+            "parent": "GenericSpacecraft",
+            "components": [
+                "MotorEngine"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Spacecraft"
+            ]
+        },
+        "StarCluster": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Model",
+                "Cluster*",
+                "ProperMotion",
+                "Label",
+                "Focus*",
+                "Billboard*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.StarCluster"
+            ]
+        },
+        "Billboard": {
+            "parent": "ModelBody",
+            "components": [
+                "TagQuaternionOrientation*",
+                "Fade"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Billboard"
+            ]
+        },
+        "BillboardGalaxy": {
+            "parent": "Billboard",
+            "components": [
+                "TagBillboardGalaxy*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.BillboardGalaxy"
+            ]
+        },
+        "VertsObject": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Verts*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.VertsObject"
+            ]
+        },
+        "Polyline": {
+            "parent": "VertsObject",
+            "components": [
+                "Arrow*",
+                "Line*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Polyline"
+            ]
+        },
+        "Orbit": {
+            "parent": "Polyline",
+            "components": [
+                "Trajectory",
+                "RefSysTransform"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Orbit"
+            ]
+        },
+        "HeliotropicOrbit": {
+            "parent": "Orbit",
+            "components": [
+                "TagHeliotropic*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.HeliotropicOrbit"
+            ]
+        },
+        "FadeNode": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Fade",
+                "Label"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.FadeNode"
+            ]
+        },
+        "GenericCatalog": {
+            "parent": "FadeNode",
+            "components": [
+                "DatasetDescription",
+                "Highlight*",
+                "RefSysTransform"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.GenericCatalog"
+            ]
+        },
+        "MeshObject": {
+            "parent": "FadeNode",
+            "components": [
+                "Mesh",
+                "Model",
+                "DatasetDescription",
+                "RefSysTransform",
+                "AffineTransformations"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.MeshObject"
+            ]
+        },
+        "BackgroundModel": {
+            "parent": "FadeNode",
+            "components": [
+                "TagBackgroundModel*",
+                "RefSysTransform",
+                "Model",
+                "Label",
+                "Coordinates",
+                "RenderType"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.BackgroundModel"
+            ]
+        },
+        "SphericalGrid": {
+            "parent": "BackgroundModel",
+            "components": [
+                "GridUV*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.SphericalGrid"
+            ]
+        },
+        "RecursiveGrid": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "GridRecursive*",
+                "Fade",
+                "RefSysTransform",
+                "Model",
+                "Label",
+                "Line*",
+                "RenderType"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.RecursiveGrid"
+            ]
+        },
+        "BillboardGroup": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "BillboardSet",
+                "RefSysTransform",
+                "Label",
+                "Fade",
+                "Coordinates"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.BillboardGroup"
+            ]
+        },
+        "Text2D": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Fade",
+                "Title",
+                "Label"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Text2D"
+            ]
+        },
+        "Axes": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Axis",
+                "RefSysTransform",
+                "Line*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Axes"
+            ]
+        },
+        "Loc": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "LocationMark",
+                "Label"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Loc"
+            ]
+        },
+        "Area": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Perimeter*",
+                "Line*",
+                "TagNoProcessGraph*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Area"
+            ]
+        },
+        "ParticleGroup": {
+            "parent": "GenericCatalog",
+            "components": [
+                "ParticleSet",
+                "TagNoProcessChildren*",
+                "Focus*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.ParticleGroup"
+            ]
+        },
+        "StarGroup": {
+            "parent": "GenericCatalog",
+            "components": [
+                "StarSet",
+                "Model",
+                "Label",
+                "Line*",
+                "Focus*",
+                "Billboard*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.StarGroup"
+            ]
+        },
+        "Constellation": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Constel",
+                "Line*",
+                "Label",
+                "TagNoProcessGraph*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Constellation"
+            ]
+        },
+        "ConstellationBoundaries": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Boundaries",
+                "Line*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.ConstellationBoundaries"
+            ]
+        },
+        "CosmicRuler": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Ruler*",
+                "Line*",
+                "Label"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.CosmicRuler"
+            ]
+        },
+        "OrbitalElementsGroup": {
+            "parent": "GenericCatalog",
+            "components": [
+                "OrbitElementsSet*",
+                "TagNoProcessChildren*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.OrbitalElementsGroup"
+            ]
+        },
+        "Invisible": {
+            "parent": "CelestialBody",
+            "components": [
+                "Raymarching",
+                "TagInvisible*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Invisible"
+            ]
+        },
+        "OctreeWrapper": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Fade",
+                "DatasetDescription",
+                "Highlight*",
+                "Octree*",
+                "Octant*",
+                "TagNoProcessChildren*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.OctreeWrapper",
+                "octreewrapper.OctreeWrapper",
+                "gaiasky.scenegraph.octreewrapper.OctreeWrapper"
+            ]
+        },
+        "Model": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "Model",
+                "RenderType",
+                "Coordinates",
+                "SolidAngle",
+                "RefSysTransform",
+                "AffineTransformations"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.Model"
+            ]
+        },
+        "ShapeObject": {
+            "parent": "Model",
+            "components": [
+                "Shape",
+                "Label",
+                "Line*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.ShapeObject"
+            ]
+        },
+        "KeyframesPathObject": {
+            "parent": "VertsObject",
+            "components": [
+                "Keyframes*",
+                "Label"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.KeyframesPathObject"
+            ]
+        },
+        "VRDeviceModel": {
+            "parent": "SceneGraphNode",
+            "components": [
+                "VRDevice*",
+                "Model",
+                "Line*",
+                "TagNoClosest*"
+            ],
+            "aliases": [
+                "gaiasky.scenegraph.VRDeviceModel"
+            ]
+        }
+    }
+}

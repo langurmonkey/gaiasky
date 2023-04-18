@@ -3,13 +3,10 @@ package gaiasky.scene;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import gaiasky.scene.component.*;
-import gaiasky.scene.component.tag.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.JsonReader;
 import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
-import gaiasky.util.math.Matrix4d;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +15,7 @@ import java.util.Map;
  * A container for data and logic concerning {@link Archetype}s.
  */
 public class Archetypes {
+    private static final Logger.Log logger = Logger.getLogger(Archetypes.class);
 
     /** Archetypes map, links old scene graph model objects to artemis archetypes. **/
     protected Map<String, Archetype> archetypes;
@@ -113,130 +111,50 @@ public class Archetypes {
         if (engine != null) {
             this.archetypes = new HashMap<>();
 
-            // SceneGraphNode
-            addArchetype(modelNames("SceneGraphNode"), Base.class, Body.class, GraphNode.class, Octant.class, Render.class);
+            // Load the archetypes from the JSON definition.
+            var attributeMapFile = Gdx.files.internal("archetypes/archetypes.json");
+            var reader = new JsonReader();
+            var root = reader.parse(attributeMapFile);
 
-            // Universe
-            addArchetype(Scene.ROOT_NAME, Base.class, Body.class, GraphNode.class, GraphRoot.class);
+            if (root.has("archetypes")) {
+                var numArchetypes = 0;
+                var archetypesElement = root.get("archetypes");
+                var archetypeElement = archetypesElement.child;
+                while (archetypeElement != null) {
+                    // Process component.
+                    String[] aliases = archetypeElement.has("aliases") ? archetypeElement.get("aliases").asStringArray() : null;
+                    int numNames = aliases != null ? aliases.length + 1 : 1;
+                    String[] names = new String[numNames];
+                    names[0] = archetypeElement.name;
+                    if (aliases != null) {
+                        for (int i = 0; i < aliases.length; i++) {
+                            names[i + 1] = aliases[i];
+                        }
+                    }
+                    String parent = archetypeElement.getString("parent");
+                    String[] componentsString = archetypeElement.get("components").asStringArray();
+                    Class<? extends Component>[] components = new Class[componentsString.length];
+                    int j = 0;
+                    for (String componentString : componentsString) {
+                        componentString = componentString.replace("*", "");
+                        try {
+                            var packageName = componentString.startsWith("Tag") ? "gaiasky.scene.component.tag." : "gaiasky.scene.component.";
+                            var clazz = (Class<? extends Component>) Class.forName(packageName + componentString);
+                            components[j] = clazz;
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        j++;
+                    }
 
-            // Celestial
-            addArchetype(modelNames("CelestialBody"), "SceneGraphNode", Celestial.class, Magnitude.class,
-                    Coordinates.class, Rotation.class, Label.class, SolidAngle.class, Focus.class, Billboard.class);
-
-            // ModelBody
-            addArchetype(modelNames("ModelBody"), "CelestialBody", Model.class, RenderType.class, ModelScaffolding.class, AffineTransformations.class);
-
-            // Planet
-            addArchetype(modelNames("Planet"), "ModelBody", Atmosphere.class, Cloud.class);
-
-            // Particle
-            addArchetype(modelNames("Particle"), "CelestialBody", ProperMotion.class, RenderType.class, ParticleExtra.class);
-
-            // Star
-            addArchetype(modelNames("Star"), "Particle", Hip.class, Distance.class, Model.class, ModelScaffolding.class);
-
-            // Satellite
-            addArchetype(modelNames("Satellite"), "ModelBody", ParentOrientation.class);
-
-            // HeliotropicSatellite
-            addArchetype(modelNames("HeliotropicSatellite"), "Satellite", Attitude.class, TagHeliotropic.class);
-
-            // GenericSpacecraft
-            addArchetype(modelNames("GenericSpacecraft"), "Satellite", RenderFlags.class);
-
-            // Spacecraft
-            addArchetype(modelNames("Spacecraft"), "GenericSpacecraft", MotorEngine.class);
-
-            // StarCluster
-            addArchetype(modelNames("StarCluster"), "SceneGraphNode", Model.class, Cluster.class, ProperMotion.class, Label.class, Focus.class, Billboard.class);
-
-            // Billboard
-            addArchetype(modelNames("Billboard"), "ModelBody", TagQuaternionOrientation.class, Fade.class);
-
-            // BillboardGalaxy
-            addArchetype(modelNames("BillboardGalaxy"), "Billboard", TagBillboardGalaxy.class);
-
-            // VertsObject
-            addArchetype(modelNames("VertsObject"), "SceneGraphNode", Verts.class);
-
-            // Polyline
-            addArchetype(modelNames("Polyline"), "VertsObject", Arrow.class, Line.class);
-
-            // Orbit
-            addArchetype(modelNames("Orbit"), "Polyline", Trajectory.class, RefSysTransform.class);
-
-            // HeliotropicOrbit
-            addArchetype(modelNames("HeliotropicOrbit"), "Orbit", TagHeliotropic.class);
-
-            // FadeNode
-            addArchetype(modelNames("FadeNode"), "SceneGraphNode", Fade.class, Label.class);
-
-            // GenericCatalog
-            addArchetype(modelNames("GenericCatalog"), "FadeNode", DatasetDescription.class, Highlight.class, RefSysTransform.class);
-
-            // MeshObject
-            addArchetype(modelNames("MeshObject"), "FadeNode", Mesh.class, Model.class, DatasetDescription.class, RefSysTransform.class, AffineTransformations.class);
-
-            // BackgroundModel
-            addArchetype(modelNames("BackgroundModel"), "FadeNode", TagBackgroundModel.class, RefSysTransform.class, Model.class, Label.class, Coordinates.class, RenderType.class);
-
-            // SphericalGrid
-            addArchetype(modelNames("SphericalGrid"), "BackgroundModel", GridUV.class);
-
-            // RecursiveGrid
-            addArchetype(modelNames("RecursiveGrid"), "SceneGraphNode", GridRecursive.class, Fade.class, RefSysTransform.class, Model.class, Label.class, Line.class, RenderType.class);
-
-            // BillboardGroup
-            addArchetype(modelNames("BillboardGroup"), "SceneGraphNode", BillboardSet.class, RefSysTransform.class, Label.class, Fade.class, Coordinates.class);
-
-            // Text2D
-            addArchetype(modelNames("Text2D"), "SceneGraphNode", Fade.class, Title.class, Label.class);
-
-            // Axes
-            addArchetype(modelNames("Axes"), "SceneGraphNode", Axis.class, RefSysTransform.class, Line.class);
-
-            // Loc
-            addArchetype(modelNames("Loc"), "SceneGraphNode", LocationMark.class, Label.class);
-
-            // Area
-            addArchetype(modelNames("Area"), "SceneGraphNode", Perimeter.class, Line.class, TagNoProcessGraph.class);
-
-            // ParticleGroup
-            addArchetype(modelNames("ParticleGroup"), "GenericCatalog", ParticleSet.class, TagNoProcessChildren.class, Focus.class);
-
-            // StarGroup
-            addArchetype(modelNames("StarGroup"), "GenericCatalog", StarSet.class, Model.class, Label.class, Line.class, Focus.class, Billboard.class);
-
-            // Constellation
-            addArchetype(modelNames("Constellation"), "SceneGraphNode", Constel.class, Line.class, Label.class, TagNoProcessGraph.class);
-
-            // ConstellationBoundaries
-            addArchetype(modelNames("ConstellationBoundaries"), "SceneGraphNode", Boundaries.class, Line.class);
-
-            // CosmicRuler
-            addArchetype(modelNames("CosmicRuler"), "SceneGraphNode", Ruler.class, Line.class, Label.class);
-
-            // OrbitalElementsGroup
-            addArchetype(modelNames("OrbitalElementsGroup"), "GenericCatalog", OrbitElementsSet.class, TagNoProcessChildren.class);
-
-            // Invisible
-            addArchetype(modelNames("Invisible"), "CelestialBody", Raymarching.class, TagInvisible.class);
-
-            // OctreeWrapper
-            addArchetype(modelNames("OctreeWrapper", "octreewrapper.OctreeWrapper"), "SceneGraphNode", Fade.class, DatasetDescription.class, Highlight.class, Octree.class, Octant.class, TagNoProcessChildren.class);
-
-            // Model - a generic model
-            addArchetype(modelNames("Model"), "SceneGraphNode", Model.class, RenderType.class, Coordinates.class, SolidAngle.class, RefSysTransform.class, AffineTransformations.class);
-
-            // ShapeObject
-            addArchetype(modelNames("ShapeObject"), "Model", Shape.class, Label.class, Line.class);
-
-            // KeyframesPathObject
-            addArchetype(modelNames("KeyframesPathObject"), "VertsObject", Keyframes.class, Label.class);
-
-            // VRDeviceModel
-            addArchetype(modelNames("VRDeviceModel"), "SceneGraphNode", VRDevice.class, Model.class, Line.class, TagNoClosest.class);
-
+                    // Add archetype.
+                    addArchetype(names, parent, components);
+                    numArchetypes++;
+                    // Advance.
+                    archetypeElement = archetypeElement.next();
+                }
+                logger.debug("Initialized " + numArchetypes + " archetypes");
+            }
             return archetypes;
         } else {
             throw new RuntimeException("Can't create archetypes: the engine is null!");
@@ -251,38 +169,6 @@ public class Archetypes {
         }
         this.archetypes.put(archetypeName, new Archetype(engine, parent, archetypeName, classes));
 
-        // Log.
-        // Print archetypes list.
-        final boolean printRSTArchetypes = false;
-        if (printRSTArchetypes && !archetypeName.startsWith("gaiasky")) {
-            AttributeMap map = new AttributeMap();
-            map.initialize(true);
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("* - **").append(archetypeName).append("**\n");
-            if (parentArchetypeName != null) {
-                sb.append("  - ").append(parentArchetypeName).append("\n");
-            } else {
-                sb.append("  - \n");
-            }
-            int i = 0;
-            for (var c : classes) {
-                boolean inMap = map.containsValue(c);
-                if(i == 0) {
-                    sb.append("  - | ");
-                } else {
-                    sb.append("    | ");
-                }
-                if(inMap) {
-                    sb.append(":ref:`").append(c.getSimpleName()).append(" <comp-").append(c.getSimpleName()).append(">`\n");
-                } else {
-                    sb.append(c.getSimpleName()).append("\n");
-                }
-                i++;
-            }
-            System.out.print(sb);
-        }
     }
 
     @SafeVarargs
@@ -303,4 +189,5 @@ public class Archetypes {
             addArchetype(archetypeName, classes);
         }
     }
+
 }
