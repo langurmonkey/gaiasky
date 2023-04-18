@@ -440,6 +440,10 @@ public class Settings {
     }
 
     public enum DistanceUnits {
+        INTERNAL(Constants.U_TO_KM, Constants.KM_TO_U, "internal"),
+        M(1.0e-3, 1000, "m"),
+        KM(1, 1, "km"),
+        AU(Nature.AU_TO_KM, Nature.KM_TO_AU, "au"),
         PC(Nature.PC_TO_KM, Nature.KM_TO_PC, "pc"),
         LY(Nature.LY_TO_KM, Nature.KM_TO_LY, "ly");
         // Factor to apply to this unit to get kilometres
@@ -457,6 +461,30 @@ public class Settings {
         public String getUnitString() {
             return I18n.msg("gui.unit." + this.unitString);
         }
+
+        /**
+         * Converts the given value in the units represented by this object in
+         * internal units.
+         *
+         * @param value The value in the units represented by this object.
+         *
+         * @return The value in internal units.
+         */
+        public double toInternalUnits(double value) {
+            return value * toKm * Constants.KM_TO_U;
+        }
+
+        /**
+         * Returns the given value, given in internal units, in the units represented by this object.
+         *
+         * @param internal The value in internal units.
+         *
+         * @return The value in the units represented by this object.
+         */
+        public double fromInternalUnits(double internal) {
+            return internal * Constants.U_TO_KM * fromKm;
+        }
+
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

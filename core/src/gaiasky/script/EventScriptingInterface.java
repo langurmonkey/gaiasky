@@ -48,6 +48,7 @@ import gaiasky.scene.view.VertsView;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.ReprojectionMode;
 import gaiasky.util.Settings.ScreenshotSettings;
 import gaiasky.util.color.ColorUtils;
@@ -345,8 +346,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setCameraPosition(double x, double y, double z, String units) {
+        setCameraPosition(new double[] { x, y, z }, units);
+    }
+
+    @Override
     public void setCameraPosition(double x, double y, double z, boolean immediate) {
         setCameraPosition(new double[] { x, y, z }, immediate);
+    }
+
+    @Override
+    public void setCameraPosition(double x, double y, double z, String units, boolean immediate) {
+        setCameraPosition(new double[] { x, y, z }, units, immediate);
     }
 
     public void setCameraPosition(final List<?> vec, boolean immediate) {
@@ -355,37 +366,67 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraPosition(double[] position, boolean immediate) {
-        if (checkLength(position, 3, "position")) {
-            if (immediate) {
-                cameraPositionEvent(position);
-            } else {
-                postRunnable(() -> cameraPositionEvent(position));
-            }
-        }
+        setCameraPosition(position, "km", immediate);
     }
 
-    private void cameraPositionEvent(double[] position) {
+    @Override
+    public void setCameraPosition(double[] position, String units, boolean immediate) {
+        if (checkLength(position, 3, "position")
+                && checkDistanceUnits(units, "units")) {
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            if (immediate) {
+                cameraPositionEvent(position, u);
+            } else {
+                postRunnable(() -> cameraPositionEvent(position, u));
+            }
+        }
+
+    }
+
+    private void cameraPositionEvent(double[] position, DistanceUnits units) {
         // Convert to km
-        position[0] = position[0] * Constants.KM_TO_U;
-        position[1] = position[1] * Constants.KM_TO_U;
-        position[2] = position[2] * Constants.KM_TO_U;
+        position[0] = units.toInternalUnits(position[0]);
+        position[1] = units.toInternalUnits(position[1]);
+        position[2] = units.toInternalUnits(position[2]);
         // Send event
         em.post(Event.CAMERA_POS_CMD, this, (Object) position);
     }
 
     @Override
     public double[] getCameraPosition() {
-        Vector3d campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
-        return new double[] { campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM };
+        return getCameraPosition("km");
+    }
+
+    @Override
+    public double[] getCameraPosition(String units) {
+        if (checkDistanceUnits(units, "units")) {
+            var u = DistanceUnits.valueOf(units.toUpperCase());
+            Vector3d campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
+            return new double[] {
+                    u.fromInternalUnits(campos.x),
+                    u.fromInternalUnits(campos.y),
+                    u.fromInternalUnits(campos.z)
+            };
+        }
+        return null;
     }
 
     @Override
     public void setCameraPosition(final double[] position) {
-        setCameraPosition(position, false);
+        setCameraPosition(position, "km", false);
+    }
+
+    @Override
+    public void setCameraPosition(double[] position, String units) {
+        setCameraPosition(position, units, false);
     }
 
     public void setCameraPosition(final List<?> vec) {
-        setCameraPosition(dArray(vec));
+        setCameraPosition(vec, "km");
+    }
+
+    public void setCameraPosition(final List<?> vec, String units) {
+        setCameraPosition(dArray(vec), units);
     }
 
     public void setCameraDirection(final List<?> dir, final boolean immediate) {
@@ -1836,53 +1877,105 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] getObjectPosition(String name) {
-        if (checkObjectName(name)) {
+        return getObjectPosition(name, "internal");
+    }
+
+    @Override
+    public double[] getObjectPosition(String name, String units) {
+        if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
             Entity entity = getEntity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getAbsolutePosition(name, aux3b1);
-            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            return new double[] {
+                    u.fromInternalUnits(aux3b1.x.doubleValue()),
+                    u.fromInternalUnits(aux3b1.y.doubleValue()),
+                    u.fromInternalUnits(aux3b1.z.doubleValue()) };
         }
         return null;
     }
 
     @Override
     public double[] getObjectPredictedPosition(String name) {
-        if (checkObjectName(name)) {
+        return getObjectPredictedPosition(name, "intenal");
+    }
+
+    @Override
+    public double[] getObjectPredictedPosition(String name, String units) {
+        if (checkObjectName(name) && checkDistanceUnits(units, "units")) {
             Entity entity = getEntity(name);
             focusView.setEntity(entity);
             focusView.getFocus(name);
             focusView.getPredictedPosition(aux3b1, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
-            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            return new double[] {
+                    u.fromInternalUnits(aux3b1.x.doubleValue()),
+                    u.fromInternalUnits(aux3b1.y.doubleValue()),
+                    u.fromInternalUnits(aux3b1.z.doubleValue()) };
         }
         return null;
     }
 
     @Override
     public void setObjectPosition(String name, double[] position) {
+        setObjectPosition(name, position, "internal");
+    }
+
+    @Override
+    public void setObjectPosition(String name, double[] position, String units) {
         if (checkObjectName(name)) {
-            setObjectPosition(getObject(name), position);
+            setObjectPosition(getObject(name), position, units);
         }
+
     }
 
     public void setObjectPosition(String name, List<?> position) {
-        setObjectPosition(name, dArray(position));
+        setObjectPosition(name, position, "internal");
+    }
+
+    public void setObjectPosition(String name, List<?> position, String units) {
+        setObjectPosition(name, dArray(position), units);
     }
 
     @Override
     public void setObjectPosition(FocusView object, double[] position) {
-        setObjectPosition(object.getEntity(), position);
+        setObjectPosition(object, position, "internal");
+    }
+
+    @Override
+    public void setObjectPosition(FocusView object, double[] position, String units) {
+        setObjectPosition(object.getEntity(), position, units);
     }
 
     public void setObjectPosition(FocusView object, List<?> position) {
-        setObjectPosition(object, dArray(position));
+        setObjectPosition(object, position, "internal");
+    }
+
+    public void setObjectPosition(FocusView object, List<?> position, String units) {
+        setObjectPosition(object, dArray(position), units);
     }
 
     @Override
     public void setObjectPosition(Entity object, double[] position) {
-        if (checkNotNull(object, "object") && checkLength(position, 3, "position")) {
+        setObjectPosition(object, position, "internal");
+    }
+
+    @Override
+    public void setObjectPosition(Entity object, double[] position, String units) {
+        if (checkNotNull(object, "object")
+                && checkLength(position, 3, "position")
+                && checkDistanceUnits(units, "units")) {
+
+            DistanceUnits u = DistanceUnits.valueOf(units.toUpperCase());
+            double[] posUnits = new double[] {
+                    u.toInternalUnits(position[0]),
+                    u.toInternalUnits(position[1]),
+                    u.toInternalUnits(position[2])
+            };
+
             var body = Mapper.body.get(object);
-            body.pos.set(position);
+            body.pos.set(posUnits);
             body.positionSetInScript = true;
         }
     }
@@ -2251,7 +2344,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds) {
-        cameraTransition(internalUnitsToKilometres(camPos), camDir, camUp, seconds, true);
+        cameraTransition(camPos, "km", camDir, camUp, seconds, true);
     }
 
     public void cameraTransitionKm(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
@@ -2264,59 +2357,98 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds) {
-        cameraTransition(camPos, camDir, camUp, seconds, true);
+        cameraTransition(camPos, "internal", camDir, camUp, seconds);
+    }
+
+    @Override
+    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds) {
+        cameraTransition(camPos, units, camDir, camUp, seconds, true);
     }
 
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, long seconds) {
-        cameraTransition(camPos, camDir, camUp, (double) seconds);
+        cameraTransition(camPos, "internal", camDir, camUp, seconds);
+    }
+
+    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, long seconds) {
+        cameraTransition(camPos, units, camDir, camUp, (double) seconds);
     }
 
     public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
-        cameraTransition(dArray(camPos), dArray(camDir), dArray(camUp), seconds);
+        cameraTransition(camPos, "internal", camDir, camUp, seconds);
+    }
+
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, double seconds) {
+        cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds);
     }
 
     public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
-        cameraTransition(camPos, camDir, camUp, (double) seconds);
+        cameraTransition(camPos, "internal", camDir, camUp, seconds);
+    }
+
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, long seconds) {
+        cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds);
     }
 
     @Override
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
-        NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
+        cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
+    }
 
-        // Put camera in free mode.
-        em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+    @Override
+    public void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds, boolean sync) {
+        if(checkDistanceUnits(units, "units")) {
+            NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
-        // Set up final actions
-        String name = "cameraTransition" + (cTransSeq++);
-        Runnable end = null;
-        if (!sync)
-            end = () -> unparkRunnable(name);
+            // Put camera in free mode.
+            em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
 
-        // Create and park runnable
-        CameraTransitionRunnable r = new CameraTransitionRunnable(cam, camPos, camDir, camUp, seconds, end);
-        parkRunnable(name, r);
+            // Set up final actions
+            String name = "cameraTransition" + (cTransSeq++);
+            Runnable end = null;
+            if (!sync)
+                end = () -> unparkRunnable(name);
 
-        if (sync) {
-            // Wait on lock
-            synchronized (r.lock) {
-                try {
-                    r.lock.wait();
-                } catch (InterruptedException e) {
-                    logger.error(e);
+            var u = DistanceUnits.valueOf(units.toUpperCase());
+            double[] posUnits = new double[] {
+                    u.toInternalUnits(camPos[0]),
+                    u.toInternalUnits(camPos[1]),
+                    u.toInternalUnits(camPos[2])
+            };
+
+            // Create and park runnable
+            CameraTransitionRunnable r = new CameraTransitionRunnable(cam, posUnits, camDir, camUp, seconds, end);
+            parkRunnable(name, r);
+
+            if (sync) {
+                // Wait on lock
+                synchronized (r.lock) {
+                    try {
+                        r.lock.wait();
+                    } catch (InterruptedException e) {
+                        logger.error(e);
+                    }
                 }
-            }
 
-            // Remove and return
-            unparkRunnable(name);
+                // Remove and return
+                unparkRunnable(name);
+            }
         }
     }
 
     public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds, boolean sync) {
-        cameraTransition(dArray(camPos), dArray(camDir), dArray(camUp), seconds, sync);
+        cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
+    }
+
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, double seconds, boolean sync) {
+        cameraTransition(dArray(camPos), units, dArray(camDir), dArray(camUp), seconds, sync);
     }
 
     public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds, boolean sync) {
-        cameraTransition(camPos, camDir, camUp, (double) seconds, sync);
+        cameraTransition(camPos, "internal", camDir, camUp, seconds, sync);
+    }
+
+    public void cameraTransition(List<?> camPos, String units, List<?> camDir, List<?> camUp, long seconds, boolean sync) {
+        cameraTransition(camPos, units, camDir, camUp, (double) seconds, sync);
     }
 
     @Override
@@ -2645,8 +2777,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setBloom(float value) {
-        if (checkNum(value, 0f, 1f, "bloom"))
+        if (checkNum(value, 0f, 1f, "bloom strength")) {
             postRunnable(() -> em.post(Event.BLOOM_CMD, this, value));
+        }
+    }
+
+    @Override
+    public void setChromaticAberration(float value) {
+        if (checkNum(value, Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT, "chromatic aberration amount")) {
+            postRunnable(() -> em.post(Event.CHROMATIC_ABERRATION_CMD, this, value));
+        }
     }
 
     public void setBloom(int level) {
@@ -3778,22 +3918,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-        case INPUT_EVENT:
-            inputCode = (Integer) data[0];
-            break;
-        case DISPOSE:
+        case INPUT_EVENT -> inputCode = (Integer) data[0];
+        case DISPOSE -> {
             // Stop all
             for (AtomicBoolean stop : stops) {
                 if (stop != null)
                     stop.set(true);
             }
-            break;
-        case SCENE_LOADED:
+        }
+        case SCENE_LOADED -> {
             this.scene = (Scene) data[0];
             this.focusView.setScene(this.scene);
-            break;
-        default:
-            break;
+        }
+        default -> {
+        }
         }
 
     }
@@ -3939,6 +4077,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         }
         return true;
+    }
+
+    private boolean checkDistanceUnits(String units, String name) {
+        try {
+            DistanceUnits.valueOf(units.toUpperCase());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     class CameraTransitionRunnable implements Runnable {

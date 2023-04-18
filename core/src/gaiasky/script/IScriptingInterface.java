@@ -388,14 +388,37 @@ public interface IScriptingInterface {
     void setCameraPosition(double[] position, boolean immediate);
 
     /**
+     * Sets the camera position to the given coordinates, in the internal reference system and in the requested units.
+     * The <code>immediate</code> parameter enables setting the camera state
+     * immediately without waiting for the possible current update
+     * operation to finish. Set this to true if you run this function
+     * from within a parked runnable.
+     *
+     * @param position  Vector of three components in internal coordinates and the requested units.
+     * @param units     The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param immediate Whether to apply the changes immediately, or wait for the next frame.
+     */
+    void setCameraPosition(double[] position, String units, boolean immediate);
+
+    /**
      * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[])}.
      */
     void setCameraPosition(double x, double y, double z);
 
     /**
+     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], String)}.
+     */
+    void setCameraPosition(double x, double y, double z, String units);
+
+    /**
      * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], boolean)}.
      */
     void setCameraPosition(double x, double y, double z, boolean immediate);
+
+    /**
+     * Component-wise version of {@link IScriptingInterface#setCameraPosition(double[], String, boolean)}.
+     */
+    void setCameraPosition(double x, double y, double z, String units, boolean immediate);
 
     /**
      * Gets the current camera position, in km.
@@ -404,6 +427,15 @@ public interface IScriptingInterface {
      * in km.
      */
     double[] getCameraPosition();
+
+    /**
+     * Gets the current camera position, in the requested units.
+     *
+     * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     *
+     * @return The camera position coordinates in the internal reference system and in the requested units.
+     */
+    double[] getCameraPosition(String units);
 
     /**
      * Sets the camera position to the given coordinates, in the internal reference system and kilometres.
@@ -415,6 +447,18 @@ public interface IScriptingInterface {
      * @param position Vector of three components in internal coordinates and Km.
      */
     void setCameraPosition(double[] position);
+
+    /**
+     * Sets the camera position to the given coordinates, in the internal reference system and the given units.
+     * The default behavior of this method posts a runnable to update the
+     * camera after the current frame. If you need to call this method from
+     * within a parked runnable, use {@link IScriptingInterface#setCameraPosition(double[], boolean)},
+     * with the boolean set to <code>true</code>.
+     *
+     * @param position Vector of three components in internal coordinates and the given units.
+     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     */
+    void setCameraPosition(double[] position, String units);
 
     /**
      * Sets the camera direction vector to the given vector, in the internal reference system.
@@ -1489,9 +1533,21 @@ public interface IScriptingInterface {
      *
      * @param name The name or id (HIP, TYC, sourceId) of the object.
      *
-     * @return A 3-vector with the object's position in the internal reference system.
+     * @return A 3-vector with the object's position in internal units and the internal reference system.
      */
     double[] getObjectPosition(String name);
+
+    /**
+     * Gets the current position of the object identified by <code>name</code> in
+     * the internal coordinate system and the requested distance units. If the object does not exist,
+     * it returns null.
+     *
+     * @param name  The name or id (HIP, TYC, sourceId) of the object.
+     * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     *
+     * @return A 3-vector with the object's position in the requested units and internal reference system.
+     */
+    double[] getObjectPosition(String name, String units);
 
     /**
      * Gets the predicted position of the object identified by <code>name</code> in
@@ -1507,6 +1563,20 @@ public interface IScriptingInterface {
     double[] getObjectPredictedPosition(String name);
 
     /**
+     * Gets the predicted position of the object identified by <code>name</code> in
+     * the internal coordinate system and the requested distance units. If the object does not exist,
+     * it returns null.
+     * The predicted position is the position of the object in the next update cycle, and
+     * may be useful to compute the camera state.
+     *
+     * @param name  The name or id (HIP, TYC, sourceId) of the object.
+     * @param units The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     *
+     * @return A 3-vector with the object's predicted position in the requested units and in the internal reference system.
+     */
+    double[] getObjectPredictedPosition(String name, String units);
+
+    /**
      * Sets the internal position of the object identified by <code>name</code>. Note that
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
@@ -1515,6 +1585,17 @@ public interface IScriptingInterface {
      * @param position The position in the internal reference system and internal units.
      */
     void setObjectPosition(String name, double[] position);
+
+    /**
+     * Sets the internal position of the object identified by <code>name</code>. Note that
+     * depending on the object type, the position may be already calculated and set elsewhere
+     * in the update stage, so use with care.
+     *
+     * @param name     The name of the object.
+     * @param position The position in the internal reference system and the given units.
+     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     */
+    void setObjectPosition(String name, double[] position, String units);
 
     /**
      * Sets the internal position of the given entity object. Note that
@@ -1531,15 +1612,37 @@ public interface IScriptingInterface {
      * depending on the object type, the position may be already calculated and set elsewhere
      * in the update stage, so use with care.
      *
+     * @param object   The object in a focus view wrapper.
+     * @param position The position in the internal reference system and the given units.
+     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     */
+    void setObjectPosition(FocusView object, double[] position, String units);
+
+    /**
+     * Sets the internal position of the given entity object. Note that
+     * depending on the object type, the position may be already calculated and set elsewhere
+     * in the update stage, so use with care.
+     *
      * @param object   The object entity.
      * @param position The position in the internal reference system and internal units.
      */
     void setObjectPosition(Entity object, double[] position);
 
     /**
+     * Sets the internal position of the given entity object. Note that
+     * depending on the object type, the position may be already calculated and set elsewhere
+     * in the update stage, so use with care.
+     *
+     * @param object   The object entity.
+     * @param position The position in the internal reference system and the given units.
+     * @param units    The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     */
+    void setObjectPosition(Entity object, double[] position, String units);
+
+    /**
      * Sets the coordinates provider for the object identified with the given name, if possible.
      * The provider object must implement {@link IPythonCoordinatesProvider}, and in particular
-     * the method {@link IPythonCoordinatesProvider#getEquatorialCartesianCoordinates(Object)}, which
+     * the method {@link IPythonCoordinatesProvider#getEquatorialCartesianCoordinates(Object, Object)}, which
      * takes in a julian date and outputs the object coordinates in the internal cartesian system.
      *
      * @param name     The name of the object.
@@ -1883,6 +1986,21 @@ public interface IScriptingInterface {
     void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds);
 
     /**
+     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. This function waits for the transition to finish and then returns control
+     * to the script.
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos  The target camera position in the internal reference system and the given distance units.
+     * @param units   The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     */
+    void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds);
+
+    /**
      * Same as {@link IScriptingInterface#cameraTransition(double[], double[], double[], double)} but the
      * camera position is given in Km.
      *
@@ -1897,7 +2015,7 @@ public interface IScriptingInterface {
      * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
      * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
      * current script.
-     * This function will put the camera in free mode, so make sure to change it afterwards if you need to. Also,
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
      * this only works with the natural camera.
      *
      * @param camPos  The target camera position in the internal reference system.
@@ -1907,6 +2025,22 @@ public interface IScriptingInterface {
      * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
      */
     void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync);
+
+    /**
+     * Creates a smooth transition from the current camera state to the given camera state {camPos, camDir, camUp} in
+     * the given number of seconds. Optionally, the transition may be run synchronously or asynchronously to the
+     * current script.
+     * This function will put the camera in free mode, so make sure to change it afterward if you need to. Also,
+     * this only works with the natural camera.
+     *
+     * @param camPos  The target camera position in the internal reference system and the given distance units.
+     * @param units   The distance units to use. One of "m", "km", "au", "ly", "pc", "internal".
+     * @param camDir  The target camera direction in the internal reference system.
+     * @param camUp   The target camera up in the internal reference system.
+     * @param seconds The duration of the transition in seconds.
+     * @param sync    If true, the call waits for the transition to finish before returning, otherwise it returns immediately
+     */
+    void cameraTransition(double[] camPos, String units, double[] camDir, double[] camUp, double seconds, boolean sync);
 
     /**
      * Sleeps for the given number of seconds in the application time (FPS), so
@@ -2272,6 +2406,13 @@ public interface IScriptingInterface {
      *              bloom.
      */
     void setBloom(float value);
+
+    /**
+     * Sets the amount of chromatic aberration. Set to 0 to disable the effect.
+     *
+     * @param value Chromatic aberration amount in [0,0.2].
+     */
+    void setChromaticAberration(float value);
 
     /**
      * Sets the value of smooth lod transitions, allowing or disallowing octant fade-ins of
