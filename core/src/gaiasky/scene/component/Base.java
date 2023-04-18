@@ -58,12 +58,6 @@ public class Base implements Component, ICopy {
     public boolean visible = true;
 
     /**
-     * Force to render the label of this entity,
-     * bypassing the solid angle check
-     */
-    public boolean forceLabel = false;
-
-    /**
      * Is this just a copy?
      */
     public boolean copy = false;
@@ -179,10 +173,6 @@ public class Base implements Component, ICopy {
                 }
             }
         }
-    }
-
-    public void setForceLabel(Boolean force) {
-        this.forceLabel = force;
     }
 
     public void setAltname(String altname) {

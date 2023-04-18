@@ -14,6 +14,7 @@ public class ShapeExtractor extends AbstractExtractSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         var base = Mapper.base.get(entity);
         var render = Mapper.render.get(entity);
+        var label = Mapper.label.get(entity);
         boolean mustRender = mustRender(base);
         if (mustRender) {
             var renderType = Mapper.renderType.get(entity);
@@ -22,7 +23,7 @@ public class ShapeExtractor extends AbstractExtractSystem {
                 addToRender(render, renderType.renderGroup != null ? renderType.renderGroup : RenderGroup.MODEL_VERT_ADDITIVE);
             }
         }
-        if (mustRender || base.forceLabel) {
+        if (mustRender || label.forceLabel) {
             addToRender(render, RenderGroup.FONT_LABEL);
         }
     }

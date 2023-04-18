@@ -44,6 +44,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
             var trajectory = Mapper.trajectory.get(entity);
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
+            var label = Mapper.label.get(entity);
 
             if (!trajectory.onlyBody) {
                 // If there is overflow, return.
@@ -88,7 +89,7 @@ public class TrajectoryExtractor extends AbstractExtractSystem {
             if (trajectory.body == null && !trajectory.isInOrbitalElementsGroup && base.ct.get(ComponentType.Asteroids.ordinal()) && renderer.isOn(ComponentType.Asteroids)) {
                 addToRender(render, RenderGroup.ORBITAL_ELEMENTS_PARTICLE);
             }
-            if (base.forceLabel) {
+            if (label.forceLabel) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
         }

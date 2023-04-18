@@ -45,7 +45,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     public Ruler ruler;
     public LocationMark loc;
 
-    private LabelEntityRenderSystem renderSystem;
+    private final LabelEntityRenderSystem renderSystem;
 
     public LabelView() {
         renderSystem = new LabelEntityRenderSystem();
@@ -84,7 +84,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextCelestial() {
-        return base.names != null && renderTextBase() && (base.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel);
+        return base.names != null && renderTextBase() && (label.forceLabel || FastMath.pow(body.solidAngleApparent, label.solidAnglePow) >= sa.thresholdLabel);
     }
 
     public boolean renderTextParticle() {
@@ -94,7 +94,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextLocation() {
-        if (renderTextBase() && (body.solidAngle >= LocationMark.LOWER_LIMIT / 10 && body.solidAngle <= LocationMark.UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || base.forceLabel)) {
+        if (renderTextBase() && (body.solidAngle >= LocationMark.LOWER_LIMIT / 10 && body.solidAngle <= LocationMark.UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || label.forceLabel)) {
             Vector3d aux = D31;
             graph.translation.put(aux).scl(-1);
 
@@ -123,7 +123,7 @@ public class LabelView extends RenderView implements I3DTextRenderable {
     }
 
     public boolean renderTextTrajectory() {
-        return renderTextBase() && base.forceLabel;
+        return renderTextBase() && label.forceLabel;
     }
 
     public boolean renderTextGridRec() {

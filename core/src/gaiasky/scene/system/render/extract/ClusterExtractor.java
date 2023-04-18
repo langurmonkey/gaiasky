@@ -22,11 +22,12 @@ public class ClusterExtractor extends AbstractExtractSystem {
         if (mustRender(base)) {
             var body = Mapper.body.get(entity);
             var render = Mapper.render.get(entity);
+            var label = Mapper.label.get(entity);
 
             if (body.solidAngleApparent >= ClusterUpdater.TH_ANGLE) {
                 addToRender(render, RenderGroup.MODEL_VERT_ADDITIVE);
             }
-            if (body.solidAngleApparent >= ClusterUpdater.TH_ANGLE || base.forceLabel) {
+            if (body.solidAngleApparent >= ClusterUpdater.TH_ANGLE || label.forceLabel) {
                 addToRender(render, RenderGroup.FONT_LABEL);
             }
 

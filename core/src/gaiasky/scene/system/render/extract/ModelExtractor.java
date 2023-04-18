@@ -43,6 +43,7 @@ public class ModelExtractor extends AbstractExtractSystem {
             var atmosphere = Mapper.atmosphere.get(entity);
             var cloud = Mapper.cloud.get(entity);
             var render = Mapper.render.get(entity);
+            var label = Mapper.label.get(entity);
 
             camera.checkClosestBody(entity);
 
@@ -55,7 +56,7 @@ public class ModelExtractor extends AbstractExtractSystem {
                     addToRender(render, RenderGroup.BILLBOARD_GAL);
                 }
 
-                if (renderText(base, body, sa)) {
+                if (renderText(base, body, sa, label)) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
             } else if (Mapper.tagQuatOrientation.has(entity)) {
@@ -85,11 +86,11 @@ public class ModelExtractor extends AbstractExtractSystem {
                         addToRender(render, RenderGroup.BILLBOARD_SSO);
                         addToRenderModel(render, model);
                     }
-                    if (renderText(base, body, sa)) {
+                    if (renderText(base, body, sa, label)) {
                         addToRender(render, RenderGroup.FONT_LABEL);
                     }
                 }
-                if (!isInRender(render, RenderGroup.FONT_LABEL) && base.forceLabel) {
+                if (!isInRender(render, RenderGroup.FONT_LABEL) && label.forceLabel) {
                     addToRender(render, RenderGroup.FONT_LABEL);
                 }
 
@@ -127,10 +128,10 @@ public class ModelExtractor extends AbstractExtractSystem {
         return Settings.settings.scene.renderer.elevation.type.isTessellation() && model.model.hasHeight();
     }
 
-    private boolean renderText(Base base, Body body, SolidAngle sa) {
+    private boolean renderText(Base base, Body body, SolidAngle sa, Label label) {
         return base.names != null
                 && renderer.isOn(ComponentTypes.ComponentType.Labels)
-                && (base.forceLabel || FastMath.pow(body.solidAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
+                && (label.forceLabel || FastMath.pow(body.solidAngleApparent, getViewAnglePow()) >= sa.thresholdLabel);
     }
 
     private float getViewAnglePow() {

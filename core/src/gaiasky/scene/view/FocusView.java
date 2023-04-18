@@ -759,8 +759,8 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
     public void setForceLabel(Boolean forceLabel, String name) {
         if (starSet != null) {
             starSet.setForceLabel(forceLabel, name);
-        } else {
-            setForceLabel(forceLabel);
+        } else if (Mapper.label.has(entity)) {
+            Mapper.label.get(entity).setForceLabel(forceLabel);
         }
     }
 
@@ -768,8 +768,16 @@ public class FocusView extends BaseView implements IFocus, IVisibilitySwitch {
         if (starSet != null) {
             return starSet.isForceLabel(name);
         } else {
-            return base.forceLabel;
+            return isForceLabel();
         }
+    }
+
+    @Override
+    public boolean isForceLabel() {
+        if (Mapper.label.has(entity)) {
+            return Mapper.label.get(entity).forceLabel;
+        }
+        return false;
     }
 
     /**

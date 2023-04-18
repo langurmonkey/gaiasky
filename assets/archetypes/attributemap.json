@@ -28,10 +28,6 @@
         "description" : "The content type string (or list) for this object. Content types control the visibility of objects. Examples of content types are 'Planets', 'Asteroids', 'Stars', 'Labels', etc.",
         "unit" : "String | String[]",
         "aliases" : [ "ct" , "componentTypes" ]
-      },
-      "forceLabel" : {
-        "description" : "Force-display the label of this object, regardless of its solid angle. If 'true', the label for this object is always displayed.",
-        "unit" : "Boolean"
       }
     },
 
@@ -386,6 +382,10 @@
         "description" : "Override the position at which to render this label, in the internal reference system and internal units (see aliases for more unit options). If this is not given, the position of the object is used.",
         "units" : "Double[3]",
         "aliases" : [ "labelposition", "labelPositionPc", "labelPositionKm" ]
+      },
+      "forceLabel" : {
+        "description" : "Force-display the label of this object, regardless of its solid angle. If 'true', the label for this object is always displayed.",
+        "unit" : "Boolean"
       },
       "labelFactor" : {
         "description" : "Factor to apply to the size of the label for this object.",

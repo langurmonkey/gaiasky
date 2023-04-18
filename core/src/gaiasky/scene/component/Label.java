@@ -17,6 +17,12 @@ import java.util.function.Function;
 
 public class Label implements Component {
 
+
+    /**
+     * Force to render the label of this entity,
+     * bypassing the solid angle check
+     */
+    public boolean forceLabel = false;
     /** Factor to apply to the size of the label. **/
     public float labelFactor = 0;
     /** Internal rednering factor **/
@@ -44,6 +50,11 @@ public class Label implements Component {
 
     /** The label rendering code. **/
     public Consumer7<LabelEntityRenderSystem, LabelView, ExtSpriteBatch, ExtShaderProgram, FontRenderSystem, RenderingContext, ICamera> renderConsumer;
+
+
+    public void setForceLabel(Boolean force) {
+        this.forceLabel = force;
+    }
 
     /**
      * Sets the position of the label, in parsecs and in the internal reference

@@ -176,7 +176,8 @@
             "parent": "Polyline",
             "components": [
                 "Trajectory",
-                "RefSysTransform"
+                "RefSysTransform",
+                "Label"
             ],
             "aliases": [
                 "gaiasky.scenegraph.Orbit"
