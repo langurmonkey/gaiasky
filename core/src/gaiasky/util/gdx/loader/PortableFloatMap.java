@@ -170,14 +170,9 @@ public final class PortableFloatMap {
         // Write header text data. Must use Unix newlines, not universal style
         PrintWriter pout = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.US_ASCII));
         switch (mode) {
-        case COLOR:
-            pout.print("PF\n");
-            break;
-        case GRAYSCALE:
-            pout.print("Pf\n");
-            break;
-        default:
-            throw new AssertionError();
+        case COLOR -> pout.print("PF\n");
+        case GRAYSCALE -> pout.print("Pf\n");
+        default -> throw new AssertionError();
         }
         pout.print(width + " " + height + "\n");
         pout.print((bigEndian ? "1.0" : "-1.0") + "\n");
@@ -185,13 +180,13 @@ public final class PortableFloatMap {
         // Detach the PrintWriter stream
 
         // Write float32 image pixel data
-        DataOutput dout = new DataOutputStream(out);
+        DataOutput dataOutput = new DataOutputStream(out);
         if (bigEndian) {
             for (float x : pixels)
-                dout.writeFloat(x);
+                dataOutput.writeFloat(x);
         } else {
             for (float x : pixels)
-                dout.writeInt(Integer.reverseBytes(Float.floatToIntBits(x)));
+                dataOutput.writeInt(Integer.reverseBytes(Float.floatToIntBits(x)));
         }
     }
 

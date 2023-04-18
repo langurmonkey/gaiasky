@@ -45,6 +45,7 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
@@ -328,7 +329,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 data = manager.get(warpFile.toString());
             } else {
                 // Generate identity
-                data = PFMReader.constructPFMData(50, 50, val -> val);
+                data = PFMReader.constructPFMData(50, 50, x -> x, y -> y);
             }
             GeometryWarp geometryWarp;
             if (blendFile != null) {
@@ -337,13 +338,20 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 geometryWarp = new GeometryWarp(data, blendTex);
             } else {
                 // No blend
-                geometryWarp = new GeometryWarp(data);
+                geometryWarp = new GeometryWarp(data, width, height);
             }
             geometryWarp.setEnabled(true);
             geometryWarp.setEnabledOptions(false, false);
             ppb.set(geometryWarp);
 
         }
+
+        // GEOMETRY WARP TEST
+        // PFMData data = PFMReader.readPFMData(Gdx.files.absolute("/home/tsagrista/Documents/mpcdi/warp-natural.pfm"), false, false);
+        // GeometryWarp warp = new GeometryWarp(data, width, height);
+        // warp.setEnabled(true);
+        // warp.setEnabledOptions(false, false);
+        // ppb.set(warp);
 
         // UPSCALE (only screen, last effect in chain!)
         if (rt == RenderType.screen) {

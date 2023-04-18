@@ -13,10 +13,14 @@ import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.glutils.FloatTextureData;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.Logger;
+import gaiasky.util.gdx.loader.PortableFloatMap.Mode;
 import gaiasky.util.math.MathUtilsDouble;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -47,24 +51,49 @@ public class PFMReader {
         }
     }
 
-    static public PFMData readPFMData(FileHandle file, boolean invert) {
+    static public PFMData readPFMData(FileHandle file, boolean normalize, boolean invert) {
         try {
             PortableFloatMap pfm = new PortableFloatMap(file.file());
             float[] data = pfm.pixels;
             int width = pfm.width;
             int height = pfm.height;
-            //data = generateMapping(width, height, val -> val * val);
             if (invert) {
                 data = invertWarp(data, width, height);
-            } else {
+            } else if (normalize) {
                 // Normalize
-                for (int i = 0; i < data.length; i++)
-                    data[i] = (float) nor(data[i]);
+                for (int i = 0; i < data.length; i++) {
+                    data[i] = (float) nor(data[i], 0, 1);
+                }
             }
 
             return new PFMData(data, width, height);
         } catch (Exception e) {
             throw new GdxRuntimeException("Couldn't read PFM file '" + file + "'", e);
+        }
+    }
+
+    /**
+     * Writes the given PFM data to the given file.
+     *
+     * @param file      The file to write.
+     * @param grayscale Whether the PFM is grayscale (true) or color (false).
+     * @param bigEndian Whether the PFM is big endian (true) or little endian (false).
+     * @param data      The PFM data.
+     */
+    static public void writePFMFile(Path file, boolean grayscale, boolean bigEndian, PFMData data) {
+        var pfm = new PortableFloatMap();
+        pfm.bigEndian = bigEndian;
+        pfm.mode = grayscale ? Mode.GRAYSCALE : Mode.COLOR;
+        pfm.pixels = data.data;
+        pfm.width = data.width;
+        pfm.height = data.height;
+
+        if (Files.notExists(file)) {
+            try {
+                pfm.write(file.toFile());
+            } catch (IOException e) {
+                throw new GdxRuntimeException("Error writing PFM file", e);
+            }
         }
     }
 
@@ -74,14 +103,9 @@ public class PFMReader {
             float[] data = pfm.pixels;
             int width = pfm.width;
             int height = pfm.height;
-            //int width = 100;
-            //int height = 100;
-            //float[] floatData = generateMapping(width, height, val -> val);
             if (invert)
                 data = invertWarp(data, width, height);
             int totalSize = pfm.pixels.length;
-            //int totalSize = width * height * 3;
-
             // Convert to Pixmap
             Format format = Format.RGB888;
             Pixmap pixmap = new Pixmap(width, height, format);
@@ -115,12 +139,16 @@ public class PFMReader {
 
     private static double nor(double value) {
         return MathUtilsDouble.clamp(value + 0.5d, 0d, 1d);
-        //return value;
     }
 
-    static public PFMData constructPFMData(int width, int height, Function<Float, Float> f) {
+    private static double nor(double value, double min, double max) {
+        double val = MathUtilsDouble.clamp(value, min, max);
+        return (val - min) / (max - min);
+    }
+
+    static public PFMData constructPFMData(int width, int height, Function<Float, Float> fx, Function<Float, Float> fy) {
         try {
-            float[] data = generateMapping(width, height, f);
+            float[] data = generateMapping(width, height, fx, fy);
             return new PFMData(data, width, height);
         } catch (Exception e) {
             throw new GdxRuntimeException("Couldn't construct PFM data", e);
@@ -128,7 +156,17 @@ public class PFMReader {
         }
     }
 
-    private static float[] generateMapping(int w, int h, Function<Float, Float> f) {
+    static public PFMData constructPFMData(int width, int height, Function<Float, Float> f) {
+        try {
+            float[] data = generateMapping(width, height, f, f);
+            return new PFMData(data, width, height);
+        } catch (Exception e) {
+            throw new GdxRuntimeException("Couldn't construct PFM data", e);
+        } finally {
+        }
+    }
+
+    private static float[] generateMapping(int w, int h, Function<Float, Float> fx, Function<Float, Float> fy) {
         float[] out = new float[w * h * 3];
 
         for (int j = 0; j < h; j++) {
@@ -137,8 +175,8 @@ public class PFMReader {
                 float v = (float) j / (float) (h - 1);
 
                 // Store this pixel's position at end location
-                out[(w * j + i) * 3 + 0] = f.apply(u);
-                out[(w * j + i) * 3 + 1] = f.apply(v);
+                out[(w * j + i) * 3 + 0] = fx.apply(u);
+                out[(w * j + i) * 3 + 1] = fy.apply(v);
                 out[(w * j + i) * 3 + 2] = Float.NaN;
             }
         }

@@ -32,7 +32,7 @@ public class PFMDataLoader extends AsynchronousAssetLoader<PFMData, PFMDataLoade
     public void loadAsync(AssetManager manager, String fileName, FileHandle file, PFMDataParameter parameter) {
         info.filename = fileName;
         logger.info("Loading PFM: " + file.path());
-        info.data = PFMReader.readPFMData(file, parameter.invert);
+        info.data = PFMReader.readPFMData(file, false, parameter.invert);
     }
 
     @Override

@@ -15,8 +15,8 @@ import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
 public final class GeometryWarp extends PostProcessorEffect {
     private GeometryWarpFilter warpFilter;
 
-    public GeometryWarp(PFMData data) {
-        warpFilter = new GeometryWarpFilter(data);
+    public GeometryWarp(PFMData data, float rw, float rh) {
+        warpFilter = new GeometryWarpFilter(data, rw, rh);
     }
 
     public GeometryWarp(PFMData data, Texture blend) {

@@ -19,19 +19,21 @@ import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
 public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
     private final FullscreenMesh mesh;
     private Texture blendTexture;
-    private Vector2 viewport;
+    private final Vector2 viewport;
     private int blend;
 
-    public GeometryWarpFilter(PFMData warpData) {
+    public GeometryWarpFilter(PFMData warpData, float rw, float rh) {
         super(ShaderLoader.fromFile("screenspace", "geometrywarp"));
         this.blend = 0;
         this.mesh = new FullscreenMesh(warpData.data, warpData.width, warpData.height);
+        this.viewport = new Vector2(rw, rh);
         rebind();
     }
 
     public GeometryWarpFilter(PFMData warpData, Texture blend) {
         super(ShaderLoader.fromFile("screenspace", "geometrywarp"));
         this.mesh = new FullscreenMesh(warpData.data, warpData.width, warpData.height);
+        this.viewport = new Vector2();
         rebind();
         setBlendTexture(blend);
     }
