@@ -11,7 +11,7 @@ uniform vec2 u_viewportInverse;
 uniform int u_ghosts; // number of ghost samples
 uniform float u_haloWidth;
 float u_ghostDispersal = 0.4;
-float u_distortion = 1.5;
+float u_aberrationAmount = 3.5;
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
@@ -35,7 +35,7 @@ void main() {
     vec2 ghostVec = (vec2(0.5) - texcoord) * u_ghostDispersal;
     vec2 haloVec = normalize(ghostVec) * u_haloWidth;
     	
-    vec3 distortion = vec3(-texelSize.x * u_distortion, 0.0, texelSize.x * u_distortion);
+    vec3 distortion = vec3(-texelSize.x * u_aberrationAmount, 0.0, texelSize.x * u_aberrationAmount);
     
     vec4 result = vec4(0.0);
     for (int i = 0; i < u_ghosts; i = i + 1) { 

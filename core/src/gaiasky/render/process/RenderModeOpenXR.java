@@ -125,7 +125,6 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
             }
         }
-
     }
 
     @Override
