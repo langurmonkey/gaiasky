@@ -1898,7 +1898,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] getObjectPredictedPosition(String name) {
-        return getObjectPredictedPosition(name, "intenal");
+        return getObjectPredictedPosition(name, "internal");
     }
 
     @Override
