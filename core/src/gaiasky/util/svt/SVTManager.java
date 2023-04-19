@@ -25,10 +25,10 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Manages the SVT cache and indirection buffers. It processes the tile detection
@@ -38,8 +38,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class SVTManager implements IObserver {
     private static final Log logger = Logger.getLogger(SVTManager.class);
 
-    /** Maximum number of tiles to process per frame. */
-    private static final int MAX_TILES_PER_FRAME = 3;
     /**
      * Size of the square cache texture. All SVTs share the same cache, so
      * the size needs to be a multiple of the tile size, and tile sizes are powers of two,
@@ -63,7 +61,7 @@ public class SVTManager implements IObserver {
     private AssetManager manager;
 
     /**
-     * Map IDs to virtual texture components.
+     * Map virtual texture ID to component.
      */
     private final IntMap<Array<VirtualTextureComponent>> vtIdMap;
     /**
@@ -77,7 +75,7 @@ public class SVTManager implements IObserver {
     /**
      * Tiles queued to be paged in.
      */
-    private final Queue<SVTQuadtreeNode<Path>> queuedTiles;
+    private final Deque<SVTQuadtreeNode<Path>> queuedTiles;
 
     /**
      * The tile size. The system can't mix SVTs with different tile sizes,
@@ -120,8 +118,8 @@ public class SVTManager implements IObserver {
         this.observedTiles = new Array<>(50);
         this.tilePixmaps = new HashMap<>();
         this.tileLocation = new HashMap<>();
-        this.vtIdMap = new IntMap<>(10);
-        this.queuedTiles = new ArrayBlockingQueue<>(500);
+        this.vtIdMap = new IntMap<>(30);
+        this.queuedTiles = new ArrayDeque<>(50);
     }
 
     public void doneLoading(AssetManager manager) {
@@ -194,13 +192,14 @@ public class SVTManager implements IObserver {
                     }
                     // Retrieve texture and put in queue.
                     tilePixmaps.put(path, pixmap);
-                    queuedTiles.add(tile);
+                    // Add to head of queue.
+                    queuedTiles.offerFirst(tile);
                     tile.state = STATE_QUEUED;
                 }
             }
             case STATE_LOADED -> {
-                // Already loaded, just queue.
-                queuedTiles.add(tile);
+                // Already loaded, just add to the head of the queue.
+                queuedTiles.offerFirst(tile);
                 tile.state = STATE_QUEUED;
             }
             case STATE_QUEUED, STATE_CACHED -> {
@@ -213,7 +212,7 @@ public class SVTManager implements IObserver {
         int addedTiles = 0;
         int removedTiles = 0;
         SVTQuadtreeNode<Path> tile;
-        while ((tile = queuedTiles.poll()) != null && addedTiles < MAX_TILES_PER_FRAME) {
+        while ((tile = queuedTiles.poll()) != null && addedTiles < Settings.settings.scene.renderer.virtualTextures.maxTilesPerFrame) {
             if (tile.state == STATE_QUEUED) {
                 if (!tileLocation.containsKey(tile)) {
                     if (tileLocation.size() < cacheSizeInTiles * cacheSizeInTiles) {

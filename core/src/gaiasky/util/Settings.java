@@ -1147,6 +1147,8 @@ public class Settings {
                  * The tile detection buffer is smaller than the main window by this factor.
                  **/
                 public double detectionBufferFactor;
+                /** Maximum number of tiles to load each frame. **/
+                public int maxTilesPerFrame = 8;
             }
 
         }
