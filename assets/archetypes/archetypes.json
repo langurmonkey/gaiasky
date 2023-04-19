@@ -125,6 +125,7 @@
             "components": [
                 "Model",
                 "Cluster*",
+                "SolidAngle",
                 "ProperMotion",
                 "Label",
                 "Focus*",

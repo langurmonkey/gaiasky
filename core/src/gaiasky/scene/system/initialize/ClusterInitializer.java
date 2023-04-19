@@ -50,6 +50,7 @@ public class ClusterInitializer extends AbstractInitSystem {
         var base = Mapper.base.get(entity);
         var body = Mapper.body.get(entity);
         var cluster = Mapper.cluster.get(entity);
+        var sa = Mapper.sa.get(entity);
         var label = Mapper.label.get(entity);
         var focus = Mapper.focus.get(entity);
 
@@ -59,6 +60,10 @@ public class ClusterInitializer extends AbstractInitSystem {
         // Focus hits.
         focus.hitCoordinatesConsumer = FocusHit::addHitCoordinateCluster;
         focus.hitRayConsumer = FocusHit::addHitRayCluster;
+
+        // Solid angle.
+        sa.thresholdQuad = Math.toRadians(1.3);
+        sa.thresholdPoint = Math.toRadians(1.0);
 
         base.ct = new ComponentTypes(ComponentType.Clusters.ordinal());
         // Compute size from distance and radius, convert to units

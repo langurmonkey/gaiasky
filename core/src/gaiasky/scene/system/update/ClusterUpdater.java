@@ -15,9 +15,6 @@ import gaiasky.util.math.MathUtilsDouble;
 
 public class ClusterUpdater extends AbstractUpdateSystem {
 
-    public static final double TH_ANGLE = Math.toRadians(0.5);
-    public static final double TH_ANGLE_OVERLAP = Math.toRadians(0.7);
-
     private final Vector3 F31;
 
     public ClusterUpdater(Family family, int priority) {
@@ -37,9 +34,10 @@ public class ClusterUpdater extends AbstractUpdateSystem {
             var body = Mapper.body.get(entity);
             var graph = Mapper.graph.get(entity);
             var cluster = Mapper.cluster.get(entity);
+            var sa = Mapper.sa.get(entity);
 
             base.opacity *= 0.1f * base.getVisibilityOpacityFactor();
-            cluster.fadeAlpha = (float) MathUtilsDouble.lint(body.solidAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
+            cluster.fadeAlpha = (float) MathUtilsDouble.lint(body.solidAngleApparent, sa.thresholdPoint, sa.thresholdQuad, 0f, 1f);
             body.labelColor[3] = 8.0f * cluster.fadeAlpha;
 
             // Compute local transform.
