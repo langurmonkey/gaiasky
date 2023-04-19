@@ -6,6 +6,6 @@
  */
 
 /**
- * Contains the classes relative to the graphical user interface.
+ * Some test utils.
  */
-package gaiasky.gui;
+package gaiasky.test;

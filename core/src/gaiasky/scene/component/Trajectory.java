@@ -10,7 +10,7 @@ package gaiasky.scene.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.MathUtils;
-import gaiasky.data.orbit.IOrbitDataProvider;
+import gaiasky.data.api.IOrbitDataProvider;
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.scene.record.OrbitComponent;
 import gaiasky.util.Constants;

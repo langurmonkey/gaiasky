@@ -5,18 +5,7 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.data;
-
-import gaiasky.util.tree.OctreeNode;
-
-public interface IOctantLoader {
-    void queue(OctreeNode octant);
-
-    void clearQueue();
-
-    void touch(OctreeNode octant);
-
-    int getLoadQueueSize();
-
-    int getNLoadedStars();
-}
+/**
+ * Contains all the input listeners.
+ */
+package gaiasky.input;

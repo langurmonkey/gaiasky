@@ -12,6 +12,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.data.api.IOctantLoader;
 import gaiasky.data.group.BinaryDataProvider;
 import gaiasky.data.group.MetadataBinaryIO;
 import gaiasky.event.Event;

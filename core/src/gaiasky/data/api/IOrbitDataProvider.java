@@ -5,7 +5,7 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.data.orbit;
+package gaiasky.data.api;
 
 import gaiasky.data.util.OrbitDataLoader.OrbitDataLoaderParameters;
 import gaiasky.data.util.PointCloudData;

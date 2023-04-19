@@ -5,12 +5,18 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.data.attitude;
+package gaiasky.data.api;
 
-import gaiasky.util.gaia.IAttitude;
+import gaiasky.util.tree.OctreeNode;
 
-import java.util.Date;
+public interface IOctantLoader {
+    void queue(OctreeNode octant);
 
-public interface IAttitudeServer {
-    IAttitude getAttitude(final Date date);
+    void clearQueue();
+
+    void touch(OctreeNode octant);
+
+    int getLoadQueueSize();
+
+    int getNLoadedStars();
 }

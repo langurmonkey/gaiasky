@@ -5,7 +5,7 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.data;
+package gaiasky.data.api;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;

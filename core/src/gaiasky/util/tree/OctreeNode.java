@@ -9,7 +9,7 @@ package gaiasky.util.tree;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.data.IOctantLoader;
+import gaiasky.data.api.IOctantLoader;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.api.ILineRenderable;

@@ -27,7 +27,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.data.AssetBean;
 import gaiasky.data.OctreeLoader;
-import gaiasky.data.attitude.IAttitudeServer;
+import gaiasky.data.api.IAttitudeServer;
 import gaiasky.data.util.AttitudeLoader;
 import gaiasky.data.util.OrbitDataLoader;
 import gaiasky.data.util.PointCloudData;
@@ -84,9 +84,6 @@ import gaiasky.vr.openxr.XrDriver;
 import gaiasky.vr.openxr.XrLoadStatus;
 import gaiasky.vr.openxr.input.XrControllerDevice;
 import gaiasky.vr.openxr.input.XrInputListener;
-import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
-import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import org.lwjgl.opengl.GL30;
 
 import java.io.File;

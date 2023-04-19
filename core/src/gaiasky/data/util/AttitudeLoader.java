@@ -14,7 +14,7 @@ import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.data.attitude.IAttitudeServer;
+import gaiasky.data.api.IAttitudeServer;
 import gaiasky.data.util.AttitudeLoader.AttitudeLoaderParameters;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

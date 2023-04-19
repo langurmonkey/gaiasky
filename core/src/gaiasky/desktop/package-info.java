@@ -4,4 +4,9 @@
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
+
+/**
+ * Contains the main entry point of Gaia Sky, plus support applications
+ * that need to be run in a standalone fashion.
+ */
 package gaiasky.desktop;

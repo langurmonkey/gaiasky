@@ -7,7 +7,7 @@
 
 package gaiasky.util.gaia;
 
-import gaiasky.data.attitude.IAttitudeServer;
+import gaiasky.data.api.IAttitudeServer;
 import gaiasky.util.BinarySearchTree;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

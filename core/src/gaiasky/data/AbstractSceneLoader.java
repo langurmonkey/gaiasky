@@ -8,6 +8,7 @@
 package gaiasky.data;
 
 import com.badlogic.ashley.core.Entity;
+import gaiasky.data.api.ISceneLoader;
 import gaiasky.scene.Scene;
 import uk.ac.starlink.util.DataSource;
 

@@ -8,7 +8,7 @@
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
-import gaiasky.data.attitude.IAttitudeServer;
+import gaiasky.data.api.IAttitudeServer;
 import gaiasky.util.gaia.IAttitude;
 import gaiasky.util.math.Vector3d;
 

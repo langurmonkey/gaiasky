@@ -7,6 +7,7 @@
 
 package gaiasky.data.group;
 
+import gaiasky.data.api.BinaryIO;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.util.Settings;
 import gaiasky.util.i18n.I18n;

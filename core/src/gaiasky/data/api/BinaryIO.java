@@ -5,7 +5,7 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-package gaiasky.data.group;
+package gaiasky.data.api;
 
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.ParticleRecord;

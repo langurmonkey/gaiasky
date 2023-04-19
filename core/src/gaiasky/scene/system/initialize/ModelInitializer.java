@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.AssetBean;
-import gaiasky.data.attitude.IAttitudeServer;
+import gaiasky.data.api.IAttitudeServer;
 import gaiasky.data.util.AttitudeLoader.AttitudeLoaderParameters;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;

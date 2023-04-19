@@ -6,6 +6,6 @@
  */
 
 /**
- * Contains the classes relative to the graphical user interface.
+ * Contains the implementation of the VR capabilities of Gaia Sky. Uses OpenXR.
  */
-package gaiasky.gui;
+package gaiasky.vr;

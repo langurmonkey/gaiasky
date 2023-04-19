@@ -4,4 +4,8 @@
  *  You may use, distribute and modify this code under the terms of MPL2.
  *  See the file LICENSE.md in the project root for full license details.
  */
+
+/**
+ * Implements the REST API.
+ */
 package gaiasky.rest;

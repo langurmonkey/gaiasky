@@ -6,6 +6,6 @@
  */
 
 /**
- * Contains the classes relative to the graphical user interface.
+ * Contains the API for the Gaia Sky data package.
  */
-package gaiasky.gui;
+package gaiasky.data.api;

@@ -7,6 +7,7 @@
 
 package gaiasky.data.group;
 
+import gaiasky.data.api.IParticleGroupDataProvider;
 import gaiasky.scene.api.IParticleRecord;
 import gaiasky.scene.record.PointParticleRecord;
 import gaiasky.util.Logger;

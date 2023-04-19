@@ -6,6 +6,7 @@
  */
 
 /**
- * Contains the classes relative to the graphical user interface.
+ * Contains all classes and utilities directly related to the scene, the scene
+ * graph and the entity-component-system.
  */
-package gaiasky.gui;
+package gaiasky.scene;

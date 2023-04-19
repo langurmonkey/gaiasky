@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import gaiasky.data.api.ISceneLoader;
 import gaiasky.scene.Scene;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

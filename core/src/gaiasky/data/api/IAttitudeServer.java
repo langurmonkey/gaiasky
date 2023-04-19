@@ -5,7 +5,12 @@
  *  See the file LICENSE.md in the project root for full license details.
  */
 
-/**
- * Contains the classes relative to the graphical user interface.
- */
-package gaiasky.gui;
+package gaiasky.data.api;
+
+import gaiasky.util.gaia.IAttitude;
+
+import java.util.Date;
+
+public interface IAttitudeServer {
+    IAttitude getAttitude(final Date date);
+}
