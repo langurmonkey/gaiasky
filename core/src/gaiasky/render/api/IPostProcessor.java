@@ -31,14 +31,18 @@ public interface IPostProcessor extends Disposable {
 
     void resizeImmediate(int width, int height, int targetWidth, int targetHeight);
 
+    boolean isEnabled(Class<? extends PostProcessorEffect> clazz);
+
     boolean isLightScatterEnabled();
+
+    boolean isLensFlareEnabled();
 
     enum RenderType {
         screen(0),
         screenshot(1),
         frame(2);
 
-        public int index;
+        public final int index;
 
         RenderType(int index) {
             this.index = index;

@@ -18,7 +18,7 @@ public final class PseudoLensFlareFilter extends Filter<PseudoLensFlareFilter> {
     private Texture lensColorTexture;
 
     public PseudoLensFlareFilter(int width, int height) {
-        super(ShaderLoader.fromFile("screenspace", "flare"));
+        super(ShaderLoader.fromFile("screenspace", "pseudolensflare"));
         viewportInverse = new Vector2(1f / width, 1f / height);
         rebind();
     }

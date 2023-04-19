@@ -16,7 +16,7 @@ public final class PseudoLensFlareDirt extends Filter<PseudoLensFlareDirt> {
     private float starburstOffset;
 
     public PseudoLensFlareDirt() {
-        super(ShaderLoader.fromFile("screenspace", "flaredirt"));
+        super(ShaderLoader.fromFile("screenspace", "pseudolensflaredirt"));
         rebind();
     }
 

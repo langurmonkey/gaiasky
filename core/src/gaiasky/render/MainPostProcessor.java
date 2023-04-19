@@ -51,6 +51,9 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Main post-processor of Gaia Sky, aggregating all post-processing effects for all render targets.
+ */
 public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
     /**
@@ -252,7 +255,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             };
             Timer.schedule(enableLG, 5);
         }
-        // LENS FLARE
+        // PSEUDO LENS FLARE
         LensFlareSettings lensSettings = settings.postprocess.lensFlare;
         Texture lensColor = manager.get(lensColorName);
         lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -260,19 +263,26 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lensStarBurst = manager.get(lensStarburstName);
         lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        PseudoLensFlare lensFlare = new PseudoLensFlare((int) (width * lensSettings.fboScale), (int) (height * lensSettings.fboScale));
-        lensFlare.setGhosts(lensSettings.numGhosts);
-        lensFlare.setHaloWidth(lensSettings.haloWidth);
-        lensFlare.setLensColorTexture(lensColor);
-        lensFlare.setLensDirtTexture(lensDirt);
-        lensFlare.setLensStarburstTexture(lensStarBurst);
-        lensFlare.setFlareIntesity(lensSettings.active ? lensSettings.intensity : 0f);
-        lensFlare.setFlareSaturation(lensSettings.flareSaturation);
-        lensFlare.setBaseIntesity(1f);
-        lensFlare.setBias(lensSettings.bias);
-        lensFlare.setBlurPasses(lensSettings.blurPasses);
-        lensFlare.setEnabledOptions(false, true);
-        ppb.set(lensFlare);
+        PseudoLensFlare pseudoLensFlare = new PseudoLensFlare((int) (width * lensSettings.fboScale), (int) (height * lensSettings.fboScale));
+        pseudoLensFlare.setGhosts(lensSettings.numGhosts);
+        pseudoLensFlare.setHaloWidth(lensSettings.haloWidth);
+        pseudoLensFlare.setLensColorTexture(lensColor);
+        pseudoLensFlare.setLensDirtTexture(lensDirt);
+        pseudoLensFlare.setLensStarburstTexture(lensStarBurst);
+        pseudoLensFlare.setFlareIntesity(lensSettings.active ? lensSettings.intensity : 0f);
+        pseudoLensFlare.setFlareSaturation(lensSettings.flareSaturation);
+        pseudoLensFlare.setBaseIntesity(1f);
+        pseudoLensFlare.setBias(lensSettings.bias);
+        pseudoLensFlare.setBlurPasses(lensSettings.blurPasses);
+        pseudoLensFlare.setEnabledOptions(false, true);
+        ppb.set(pseudoLensFlare);
+
+        // TRUE LENS FLARE
+        //LensFlare lensFlare = new LensFlare((int) width, (int) height, 1f);
+        //lensFlare.setColor(new float[]{1f, 1f, 1f});
+        //lensFlare.setEnabled(true);
+        //lensFlare.setEnabledOptions(false, true);
+        //ppb.set(lensFlare);
 
         // UNSHARP MASK
         UnsharpMask unsharp = new UnsharpMask();
@@ -646,12 +656,21 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
-                    if (lightGlow != null) {
+                    if (lightGlow != null && lightGlow.isEnabled()) {
                         lightGlow.setLightPositions(nLights, lightPos);
                         lightGlow.setLightViewAngles(angles);
                         lightGlow.setLightColors(colors);
                         if (prePass != null)
                             lightGlow.setPrePassTexture(prePass);
+                    }
+                    LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
+                    if (lensFlare != null && lensFlare.isEnabled()) {
+                        lensFlare.setLightPosition(lightPos);
+                        if (nLights <= 0) {
+                            lensFlare.setIntensity(0);
+                        } else {
+                            lensFlare.setIntensity(1);
+                        }
                     }
                 }
             }
@@ -1088,8 +1107,22 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     }
 
     @Override
+    public boolean isEnabled(Class<? extends PostProcessorEffect> clazz) {
+        if (pps == null || pps[RenderType.screen.index] == null) {
+            return false;
+        }
+        var effect = pps[RenderType.screen.index].get(clazz);
+        return (effect != null && effect.isEnabled());
+    }
+
+    @Override
     public boolean isLightScatterEnabled() {
-        return pps != null && pps[RenderType.screen.index] != null && pps[RenderType.screen.index].get(LightGlow.class) != null && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
+        return isEnabled(LightGlow.class);
+    }
+
+    @Override
+    public boolean isLensFlareEnabled() {
+        return isEnabled(LensFlare.class);
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {

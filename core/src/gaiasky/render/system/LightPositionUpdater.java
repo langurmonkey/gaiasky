@@ -87,7 +87,8 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
         synchronized (lock) {
             int size = renderables.size();
             Settings settings = Settings.settings;
-            if (GaiaSky.instance.getPostProcessor().isLightScatterEnabled()) {
+            if (GaiaSky.instance.getPostProcessor().isLightScatterEnabled() ||
+                    GaiaSky.instance.getPostProcessor().isLensFlareEnabled()) {
                 // Compute light positions for light scattering or light
                 // glow
                 int lightIndex = 0;
