@@ -1,5 +1,5 @@
 #version 330 core
-// Simple lens flare implementation by Toni Sagrista
+// Simple lens flare implementation by Toni Sagrista. This implementation needs the position of the light.
 
 uniform sampler2D u_texture0;
 
@@ -86,8 +86,11 @@ void main(void) {
         }
         lum /= N_SAMPLES;
 
-        if (u_intensity * lum > 0.0) {
-            vec3 color = u_color * lensflare(uv, lpos - 0.5, u_intensity * lum);
+        float weight = clamp(1.0 - length(lpos - 0.5), 0.0, 1.0);
+        float intensity = u_intensity * lum * weight;
+
+        if (intensity > 0.0) {
+            vec3 color = u_color * lensflare(uv, lpos - 0.5, intensity * lum);
             color = cc(color, .5, .1) + texture(u_texture0, v_texCoords).rgb;
             fragColor = vec4(color, 1.0);
         } else {

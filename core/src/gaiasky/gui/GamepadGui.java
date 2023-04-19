@@ -946,7 +946,7 @@ public class GamepadGui extends AbstractGui {
             flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
             flareButton.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.LENS_FLARE_CMD, flareButton, flareButton.isChecked());
+                    EventManager.publish(Event.LENS_FLARE_CMD, flareButton, flareButton.isChecked() ? 1f : 0f);
                     return true;
                 }
                 return false;

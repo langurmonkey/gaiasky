@@ -531,10 +531,19 @@ postprocess:
   # Lens flare effect settings
   lensFlare:
     active: true
-    intensity: 0.15
+    # Type of lens flare effect, one of [PSEUDO|REAL].
+    type: REAL
+    # Intensity of the real lens flare type.
+    intensity: 1.0
+    # Intensity of the pseudo lens flare type.
+    pseudoIntensity: 0.15
+    # Number of ghosts of the pseudo lens flare.
     numGhosts: 8
+    # Halo width of the pseudo lens flare.
     haloWidth: 0.5
+    # Number of blur passes for the pseudo lens flare.
     blurPasses: 35
+    # Flare saturation for the pseudo lens flare.
     flareSaturation: 0.8
     bias: -0.98
     texLensColor: $data/default-data/tex/base/lenscolor.png

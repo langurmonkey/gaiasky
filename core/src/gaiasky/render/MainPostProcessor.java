@@ -121,13 +121,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD,
-                Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD,
-                Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD,
-                Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION,
-                Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE,
-                Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED, Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD,
-                Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);
+        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_GLOW_FACTOR_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.BILLBOARD_TEXTURE_IDX_CMD, Event.SCENE_LOADED, Event.INDEXOFREFRACTION_CMD, Event.BACKBUFFER_SCALE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -255,34 +249,38 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             };
             Timer.schedule(enableLG, 5);
         }
-        // PSEUDO LENS FLARE
-        LensFlareSettings lensSettings = settings.postprocess.lensFlare;
-        Texture lensColor = manager.get(lensColorName);
-        lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture lensDirt = manager.get(lensDirtName);
-        lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture lensStarBurst = manager.get(lensStarburstName);
-        lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        PseudoLensFlare pseudoLensFlare = new PseudoLensFlare((int) (width * lensSettings.fboScale), (int) (height * lensSettings.fboScale));
-        pseudoLensFlare.setGhosts(lensSettings.numGhosts);
-        pseudoLensFlare.setHaloWidth(lensSettings.haloWidth);
-        pseudoLensFlare.setLensColorTexture(lensColor);
-        pseudoLensFlare.setLensDirtTexture(lensDirt);
-        pseudoLensFlare.setLensStarburstTexture(lensStarBurst);
-        pseudoLensFlare.setFlareIntesity(lensSettings.active ? lensSettings.intensity : 0f);
-        pseudoLensFlare.setFlareSaturation(lensSettings.flareSaturation);
-        pseudoLensFlare.setBaseIntesity(1f);
-        pseudoLensFlare.setBias(lensSettings.bias);
-        pseudoLensFlare.setBlurPasses(lensSettings.blurPasses);
-        pseudoLensFlare.setEnabledOptions(false, true);
-        ppb.set(pseudoLensFlare);
 
-        // TRUE LENS FLARE
-        //LensFlare lensFlare = new LensFlare((int) width, (int) height, 1f);
-        //lensFlare.setColor(new float[]{1f, 1f, 1f});
-        //lensFlare.setEnabled(true);
-        //lensFlare.setEnabledOptions(false, true);
-        //ppb.set(lensFlare);
+        // LENS FLARE
+        LensFlareSettings lensFlareSettings = settings.postprocess.lensFlare;
+        if (lensFlareSettings.type == LensFlareType.PSEUDO) {
+            // PSEUDO LENS FLARE
+            Texture lensColor = manager.get(lensColorName);
+            lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            Texture lensDirt = manager.get(lensDirtName);
+            lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            Texture lensStarBurst = manager.get(lensStarburstName);
+            lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            PseudoLensFlare pseudoLensFlare = new PseudoLensFlare((int) (width * lensFlareSettings.fboScale), (int) (height * lensFlareSettings.fboScale));
+            pseudoLensFlare.setGhosts(lensFlareSettings.numGhosts);
+            pseudoLensFlare.setHaloWidth(lensFlareSettings.haloWidth);
+            pseudoLensFlare.setLensColorTexture(lensColor);
+            pseudoLensFlare.setLensDirtTexture(lensDirt);
+            pseudoLensFlare.setLensStarburstTexture(lensStarBurst);
+            pseudoLensFlare.setFlareIntesity(lensFlareSettings.active ? lensFlareSettings.pseudoIntensity : 0f);
+            pseudoLensFlare.setFlareSaturation(lensFlareSettings.flareSaturation);
+            pseudoLensFlare.setBaseIntesity(1f);
+            pseudoLensFlare.setBias(lensFlareSettings.bias);
+            pseudoLensFlare.setBlurPasses(lensFlareSettings.blurPasses);
+            pseudoLensFlare.setEnabledOptions(false, true);
+            ppb.set(pseudoLensFlare);
+        } else {
+            // TRUE LENS FLARE
+            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity);
+            lensFlare.setColor(new float[] { 1f, 1f, 1f });
+            lensFlare.setEnabled(lensFlareSettings.active);
+            lensFlare.setEnabledOptions(false, true);
+            ppb.set(lensFlare);
+        }
 
         // UNSHARP MASK
         UnsharpMask unsharp = new UnsharpMask();
@@ -652,6 +650,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             var angles = (float[]) data[2];
             var colors = (float[]) data[3];
             var prePass = (Texture) data[4];
+            var lensFlareSettings = Settings.settings.postprocess.lensFlare;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
@@ -663,13 +662,15 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         if (prePass != null)
                             lightGlow.setPrePassTexture(prePass);
                     }
-                    LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
-                    if (lensFlare != null && lensFlare.isEnabled()) {
-                        lensFlare.setLightPosition(lightPos);
-                        if (nLights <= 0) {
-                            lensFlare.setIntensity(0);
-                        } else {
-                            lensFlare.setIntensity(1);
+                    if (lensFlareSettings.type.isRealLensFlare()) {
+                        LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
+                        if (lensFlare != null && lensFlare.isEnabled()) {
+                            lensFlare.setLightPosition(lightPos);
+                            if (nLights <= 0) {
+                                lensFlare.setIntensity(0);
+                            } else {
+                                lensFlare.setIntensity(lensFlareSettings.intensity);
+                            }
                         }
                     }
                 }
@@ -778,16 +779,28 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
         });
         case LENS_FLARE_CMD -> {
-            var lensFlareActive = (Boolean) data[0];
-            var numGhosts = lensFlareActive ? Settings.settings.postprocess.lensFlare.numGhosts : 0;
-            var intensity = lensFlareActive ? Settings.settings.postprocess.lensFlare.intensity : 0;
-            for (int i = 0; i < RenderType.values().length; i++) {
-                if (pps[i] != null) {
-                    PostProcessBean ppb = pps[i];
-                    PseudoLensFlare lensFlare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
-                    lensFlare.setGhosts(numGhosts);
-                    lensFlare.setFlareIntesity(intensity);
+            var lensFlareActive = ((Float) data[0]) != 0;
+            var lensFlareSettings = Settings.settings.postprocess.lensFlare;
+            if (lensFlareSettings.type.isPseudoLensFlare()) {
+                // Pseudo lens flare.
+                var numGhosts = lensFlareActive ? lensFlareSettings.numGhosts : 0;
+                var intensity = lensFlareActive ? lensFlareSettings.pseudoIntensity : 0;
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        PseudoLensFlare lensFlare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
+                        lensFlare.setGhosts(numGhosts);
+                        lensFlare.setFlareIntesity(intensity);
+                    }
                 }
+            } else {
+                // Real lens flare.
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    PostProcessBean ppb = pps[i];
+                    LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
+                    lensFlare.setEnabled(lensFlareActive);
+                }
+
             }
         }
         case CAMERA_MOTION_UPDATE -> {

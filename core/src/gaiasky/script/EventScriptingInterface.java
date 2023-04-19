@@ -2756,7 +2756,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setLensFlare(boolean state) {
-        postRunnable(() -> em.post(Event.LENS_FLARE_CMD, this, state));
+        postRunnable(() -> em.post(Event.LENS_FLARE_CMD, this, state ? 1f : 0f));
     }
 
     @Override

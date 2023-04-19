@@ -104,30 +104,18 @@ public class Settings {
     public int configVersion;
     @JsonIgnore public boolean initialized = false;
     @JsonIgnore public VersionSettings version;
-    @JsonInclude(Include.NON_NULL)
-    public DataSettings data;
-    @JsonInclude(Include.NON_NULL)
-    public PerformanceSettings performance;
-    @JsonInclude(Include.NON_NULL)
-    public GraphicsSettings graphics;
-    @JsonInclude(Include.NON_NULL)
-    public SceneSettings scene;
-    @JsonInclude(Include.NON_NULL)
-    public ProgramSettings program;
-    @JsonInclude(Include.NON_NULL)
-    public ControlsSettings controls;
-    @JsonInclude(Include.NON_NULL)
-    public FrameSettings frame;
-    @JsonInclude(Include.NON_NULL)
-    public ScreenshotSettings screenshot;
-    @JsonInclude(Include.NON_NULL)
-    public CamrecorderSettings camrecorder;
-    @JsonInclude(Include.NON_NULL)
-    public PostprocessSettings postprocess;
-    @JsonInclude(Include.NON_NULL)
-    public SpacecraftSettings spacecraft;
-    @JsonInclude(Include.NON_NULL)
-    public ProxySettings proxy;
+    @JsonInclude(Include.NON_NULL) public DataSettings data;
+    @JsonInclude(Include.NON_NULL) public PerformanceSettings performance;
+    @JsonInclude(Include.NON_NULL) public GraphicsSettings graphics;
+    @JsonInclude(Include.NON_NULL) public SceneSettings scene;
+    @JsonInclude(Include.NON_NULL) public ProgramSettings program;
+    @JsonInclude(Include.NON_NULL) public ControlsSettings controls;
+    @JsonInclude(Include.NON_NULL) public FrameSettings frame;
+    @JsonInclude(Include.NON_NULL) public ScreenshotSettings screenshot;
+    @JsonInclude(Include.NON_NULL) public CamrecorderSettings camrecorder;
+    @JsonInclude(Include.NON_NULL) public PostprocessSettings postprocess;
+    @JsonInclude(Include.NON_NULL) public SpacecraftSettings spacecraft;
+    @JsonInclude(Include.NON_NULL) public ProxySettings proxy;
     @JsonIgnore public RuntimeSettings runtime;
 
     public static Path assetsPath(String relativeAssetsLoc) {
@@ -198,6 +186,19 @@ public class Settings {
             } else {
                 return this.name();
             }
+        }
+    }
+
+    public enum LensFlareType {
+        PSEUDO,
+        REAL;
+
+        public boolean isPseudoLensFlare() {
+            return this == PSEUDO;
+        }
+
+        public boolean isRealLensFlare() {
+            return this == REAL;
         }
     }
 
@@ -470,7 +471,6 @@ public class Settings {
          * internal units.
          *
          * @param value The value in the units represented by this object.
-         *
          * @return The value in internal units.
          */
         public double toInternalUnits(double value) {
@@ -481,7 +481,6 @@ public class Settings {
          * Returns the given value, given in internal units, in the units represented by this object.
          *
          * @param internal The value in internal units.
-         *
          * @return The value in the units represented by this object.
          */
         public double fromInternalUnits(double internal) {
@@ -599,7 +598,6 @@ public class Settings {
          * Adds the given catalog descriptor file to the list of JSON selected files.
          *
          * @param catalog The catalog descriptor file pointer.
-         *
          * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not readable, or it is already in the list.
          */
         public boolean addSelectedCatalog(Path catalog) {
@@ -1083,8 +1081,7 @@ public class Settings {
             public ShadowSettings shadow;
             public ElevationSettings elevation;
             public VirtualTextureSettings virtualTextures;
-            @JsonIgnore
-            public double orbitSolidAngleThreshold = Math.toRadians(1.5);
+            @JsonIgnore public double orbitSolidAngleThreshold = Math.toRadians(1.5);
 
             public RendererSettings() {
                 EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD, Event.ORBIT_SOLID_ANGLE_TH_CMD, Event.SVT_CACHE_SIZE_CMD);
@@ -1210,10 +1207,7 @@ public class Settings {
         public DefaultTimeZone timeZone = DefaultTimeZone.UTC;
 
         public ProgramSettings() {
-            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD,
-                    Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION,
-                    Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD,
-                    Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_PROJECTION_CMD, Event.INDEXOFREFRACTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.PLANETARIUM_GEOMETRYWARP_FILE_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
         }
 
         @JsonIgnore
@@ -1991,12 +1985,7 @@ public class Settings {
         public UpscaleFilter upscaleFilter = UpscaleFilter.NEAREST;
 
         public PostprocessSettings() {
-            EventManager.instance.subscribe(this,
-                    Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD,
-                    Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD,
-                    Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD,
-                    Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD,
-                    Event.CHROMATIC_ABERRATION_CMD);
+            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
@@ -2022,7 +2011,7 @@ public class Settings {
             case BLOOM_CMD -> bloom.intensity = (float) data[0];
             case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
             case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
-            case LENS_FLARE_CMD -> lensFlare.active = (Boolean) data[0];
+            case LENS_FLARE_CMD -> lensFlare.active = ((Float) data[0]) != 0;
             case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
             case SSR_CMD -> ssr.active = (Boolean) data[0];
             case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
@@ -2070,7 +2059,9 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class LensFlareSettings {
             public boolean active;
-            public float intensity = 0.15f;
+            public LensFlareType type = LensFlareType.REAL;
+            public float intensity = 1.0f;
+            public float pseudoIntensity = 0.15f;
             public int numGhosts = 8;
             public float haloWidth = 0.5f;
             public int blurPasses = 35;
@@ -2080,6 +2071,10 @@ public class Settings {
             public String texLensDirt = Constants.DATA_LOCATION_TOKEN + "tex/base/lensdirt" + Constants.STAR_SUBSTITUTE + ".jpg";
             public String texLensStarburst = Constants.DATA_LOCATION_TOKEN + "tex/base/lensstarburst.jpg";
             public float fboScale = 0.2f;
+
+            public void setType(String type) {
+                this.type = LensFlareType.valueOf(type.toUpperCase());
+            }
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
@@ -2222,30 +2217,19 @@ public class Settings {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ProxySettings {
 
-        @JsonInclude(Include.NON_NULL)
-        public ProxyBean http;
-        @JsonInclude(Include.NON_NULL)
-        public ProxyBean https;
-        @JsonInclude(Include.NON_NULL)
-        public ProxyBean socks;
-        @JsonInclude(Include.NON_NULL)
-        public ProxyBean ftp;
-        @JsonInclude(Include.NON_NULL)
-        public Boolean useSystemProxies;
+        @JsonInclude(Include.NON_NULL) public ProxyBean http;
+        @JsonInclude(Include.NON_NULL) public ProxyBean https;
+        @JsonInclude(Include.NON_NULL) public ProxyBean socks;
+        @JsonInclude(Include.NON_NULL) public ProxyBean ftp;
+        @JsonInclude(Include.NON_NULL) public Boolean useSystemProxies;
 
         public static class ProxyBean {
-            @JsonInclude(Include.NON_NULL)
-            public Integer version;
-            @JsonInclude(Include.NON_NULL)
-            public Integer port;
-            @JsonInclude(Include.NON_EMPTY)
-            public String host;
-            @JsonInclude(Include.NON_EMPTY)
-            public String username;
-            @JsonInclude(Include.NON_EMPTY)
-            public String password;
-            @JsonInclude(Include.NON_EMPTY)
-            public String nonProxyHosts;
+            @JsonInclude(Include.NON_NULL) public Integer version;
+            @JsonInclude(Include.NON_NULL) public Integer port;
+            @JsonInclude(Include.NON_EMPTY) public String host;
+            @JsonInclude(Include.NON_EMPTY) public String username;
+            @JsonInclude(Include.NON_EMPTY) public String password;
+            @JsonInclude(Include.NON_EMPTY) public String nonProxyHosts;
         }
     }
 }

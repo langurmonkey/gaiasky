@@ -72,7 +72,7 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         Texture("u_texture0", 0),
         LightPosition("u_lightPosition", 2),
         Color("u_color", 3),
-        Intensity("u_intensity", 1),
+        Intensity("u_intensity", 0),
         Viewport("u_viewport", 2);
         // @formatter:on
 

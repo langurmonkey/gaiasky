@@ -93,8 +93,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private Table controllersTable;
     // Backup values
     private ToneMapping toneMappingBak;
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak;
-    private boolean lensflareBak, lightGlowBak, debugInfoBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak, aberrationBak, lensFlareBak;
+    private boolean lightGlowBak, debugInfoBak;
     private ReprojectionMode reprojectionBak;
     private UpscaleFilter upscaleFilterBak;
 
@@ -435,7 +435,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lensFlare.setName("lens flare");
         lensFlare.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.isChecked());
+                EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.isChecked() ? 1f : 0f);
                 return true;
             }
             return false;
@@ -2123,7 +2123,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         aberrationBak = settings.postprocess.chromaticAberration.amount;
-        lensflareBak = settings.postprocess.lensFlare.active;
+        lensFlareBak = settings.postprocess.lensFlare.active ? 1f : 0f;
         lightGlowBak = settings.postprocess.lightGlow.active;
         brightnessBak = settings.postprocess.levels.brightness;
         contrastBak = settings.postprocess.levels.contrast;
@@ -2583,7 +2583,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.HUE_CMD, this, hueBak);
         EventManager.publish(Event.SATURATION_CMD, this, saturationBak);
         EventManager.publish(Event.GAMMA_CMD, this, gammaBak);
-        EventManager.publish(Event.LENS_FLARE_CMD, this, lensflareBak);
+        EventManager.publish(Event.LENS_FLARE_CMD, this, lensFlareBak);
         EventManager.publish(Event.LIGHT_GLOW_CMD, this, lightGlowBak);
         EventManager.publish(Event.BLOOM_CMD, this, bloomBak);
         EventManager.publish(Event.UNSHARP_MASK_CMD, this, unsharpMaskBak);
