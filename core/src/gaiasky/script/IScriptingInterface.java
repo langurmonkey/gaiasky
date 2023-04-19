@@ -2577,7 +2577,7 @@ public interface IScriptingInterface {
      *
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
      *               dataset.
-     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the file to load.
      * @param sync   Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2599,7 +2599,7 @@ public interface IScriptingInterface {
      *
      * @param dsName  The name of the dataset, used to identify the subsequent operations on the
      *                dataset.
-     * @param path    Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path    Absolute path (or relative to the working path of Gaia Sky) to the file to load.
      * @param type    The {@link CatalogInfoSource} object to use as the dataset type.
      * @param options The {@link DatasetOptions} object holding the options for this dataset.
      * @param sync    Whether the load must happen synchronously or asynchronously.
@@ -2609,7 +2609,7 @@ public interface IScriptingInterface {
     boolean loadDataset(final String dsName, final String path, final CatalogInfoSource type, final DatasetOptions options, final boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * Loads a star dataset from a VOTable, a CSV or a FITS file.
      * The dataset does not have a label.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -2617,7 +2617,7 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName The name of the dataset.
-     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param sync   Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
@@ -2625,7 +2625,7 @@ public interface IScriptingInterface {
     boolean loadStarDataset(String dsName, String path, boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * Loads a star dataset from a VOTable, a CSV or a FITS file.
      * The dataset does not have a label.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
@@ -2633,7 +2633,7 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *
@@ -2642,14 +2642,14 @@ public interface IScriptingInterface {
     boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * Loads a star dataset from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param sync           Whether the load must happen synchronously or asynchronously.
@@ -2659,14 +2659,14 @@ public interface IScriptingInterface {
     boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, boolean sync);
 
     /**
-     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * Loads a star dataset from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
@@ -2678,14 +2678,14 @@ public interface IScriptingInterface {
     boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
-     * Loads a particle dataset (only positions and extra attributes) from a VOTable file (<code>.vot</code>).
+     * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
      * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
@@ -2699,14 +2699,14 @@ public interface IScriptingInterface {
     boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, boolean sync);
 
     /**
-     * Loads a particle dataset (only positions and extra attributes) from a VOTable file (<code>.vot</code>).
+     * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
      * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
@@ -2722,14 +2722,14 @@ public interface IScriptingInterface {
     boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
-     * Loads a particle dataset (only positions and extra attributes) from a VOTable file (<code>.vot</code>).
+     * Loads a particle dataset (point cloud) from a VOTable, a CSV or a FITS file.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
      * If <code>sync</code> is false, the loading happens in a new thread and
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName             The name of the dataset.
-     * @param path               Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path               Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param profileDecay       The profile decay of the particles as in 1 - distCentre^decay.
      * @param particleColor      The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param colorNoise         In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
@@ -2755,7 +2755,7 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
@@ -2774,7 +2774,7 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
@@ -2795,7 +2795,7 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
@@ -2815,7 +2815,7 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName        The name of the dataset.
-     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
@@ -2828,7 +2828,7 @@ public interface IScriptingInterface {
     boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
-     * Loads a variable star dataset from a VOTable file (<code>.vot</code>).
+     * Loads a variable star dataset from a VOTable, CSV or FITS file.
      * The variable star table must have the following columns representing the light curve:
      * <ul>
      *     <li><code>g_transit_time</code>: list of times as Julian days since J2010 for each of the magnitudes</li>
@@ -2841,7 +2841,7 @@ public interface IScriptingInterface {
      * the call returns immediately. It includes some parameters to apply to the new star group.
      *
      * @param dsName         The name of the dataset.
-     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code>, <code>.csv</code> or <code>.fits</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the magnitudes in the light curve, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset. Set to null to disable.
@@ -2853,14 +2853,43 @@ public interface IScriptingInterface {
     boolean loadVariableStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
-     * Loads a JSON catalog file. This call does not block.
+     * Loads a Gaia Sky JSON dataset file asynchronously. The call returns immediately, and the
+     * dataset becomes available when it finished loading.
+     * The Gaia Sky JSON data format is described 
+     * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
      *
      * @param dsName The name of the dataset.
-     * @param path   The absolute path, or the path in the data directory, of the catalog file.
+     * @param path   The absolute path, or the path in the data directory, of the dataset file.
      *
      * @return False if the dataset could not be loaded. True otherwise.
      */
     boolean loadJsonCatalog(String dsName, String path);
+
+    /**
+     * Loads a JSON Gaia Sky dataset file asynchronously. The call returns immediately, and the
+     * dataset becomes available when it finished loading.
+     * The Gaia Sky JSON data format is described 
+     * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
+     *
+     * @param dsName The name of the dataset.
+     * @param path   The absolute path, or the path in the data directory, of the dataset file.
+     *
+     * @return False if the dataset could not be loaded. True otherwise.
+     */
+    boolean loadJsonDataset(String dsName, String path);
+
+    /**
+     * Loads a Gaia Sky JSON dataset file in a synchronous or asynchronous manner.
+     * The Gaia Sky JSON data format is described 
+     * <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Data-format.html#json-data-format">here</a>.
+     *
+     * @param dsName The name of the dataset.
+     * @param path   The absolute path, or the path in the data directory, of the dataset file.
+     * @param sync   If true, the call does not return until the dataset is loaded and available in Gaia Sky.
+     *
+     * @return False if the dataset could not be loaded. True otherwise.
+     */
+    boolean loadJsonDataset(String dsName, String path, boolean sync);
 
     /**
      * Removes the dataset identified by the given name, if it exists.

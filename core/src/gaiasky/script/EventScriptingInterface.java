@@ -3261,11 +3261,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public boolean loadJsonCatalog(String dsName, String path) {
-        return loadJsonCatalog(dsName, path, true);
+        return loadJsonDataset(dsName, path, true);
     }
 
-    public boolean loadJsonCatalog(String dsName, String pathString, boolean sync) {
-        // Load internal JSON catalog file.
+    @Override
+    public boolean loadJsonDataset(String dsName, String path) {
+        return loadJsonDataset(dsName, path, true);
+    }
+
+    public boolean loadJsonDataset(String dsName, String pathString, boolean sync) {
+        // Load internal JSON dataset file.
         try {
             logger.info(I18n.msg("notif.catalog.loading", pathString));
             final Array<Entity> objects = SceneJsonLoader.loadJsonFile(Gdx.files.absolute(pathString), scene);
@@ -3279,7 +3284,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             logger.info(I18n.msg("notif.catalog.loaded", objects.size, I18n.msg("gui.objects")));
             if (objects.size > 0) {
                 GaiaSky.postRunnable(() -> {
-                    // THIS WILL BLOCK
                     objects.forEach(scene.engine::addEntity);
                     objects.forEach(scene::initializeEntity);
                     objects.forEach(scene::addToIndex);
@@ -3341,7 +3345,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
 
                 if (path.getFileName().toString().endsWith(".json")) {
-                    loadJsonCatalog(dsName, path.toString(), sync);
+                    loadJsonDataset(dsName, path.toString(), sync);
                 } else if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
                     List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
                     if (data != null && !data.isEmpty()) {

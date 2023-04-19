@@ -414,7 +414,10 @@ public class GuiRegistry implements IObserver {
                                 if (fileName.endsWith(".json")) {
                                     // Load internal JSON catalog file.
                                     GaiaSky.instance.getExecutorService().execute(() -> {
-                                        GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
+                                        var loaded = GaiaSky.instance.scripting().loadJsonCatalog(fileName, result.toAbsolutePath().toString());
+                                        if (!loaded) {
+                                            logger.warn("The dataset could not be loaded: " + result.toAbsolutePath().toString());
+                                        }
                                     });
                                 } else {
                                     final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.msg("gui.dsload.title") + ": " + fileName, fileName, skin, stage);
