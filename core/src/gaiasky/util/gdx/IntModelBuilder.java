@@ -1,18 +1,9 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
 
 package gaiasky.util.gdx;
 
@@ -34,19 +25,6 @@ import gaiasky.util.gdx.model.IntNode;
 import gaiasky.util.gdx.model.IntNodePart;
 import gaiasky.util.gdx.shader.Material;
 
-/**
- * Helper class to create {@link IntModel}s from code. To start building use the
- * {@link #begin()} method, when finished building use the {@link #end()}
- * method. The end method returns the model just build. Building cannot be
- * nested, only one model (per ModelBuilder) can be build at the time. The same
- * ModelBuilder can be used to build multiple models sequential. Use the
- * {@link #node()} method to start a new node. Use one of the #part(...) methods
- * to add a part within a node. The
- * {@link #part(String, int, VertexAttributes, Material)} method will return a
- * {@link IntMeshPartBuilder} which can be used to build the node part.
- *
- * @author Xoppa
- */
 public class IntModelBuilder {
     /** The mesh builders created between begin and end */
     private final Array<IntIntMeshBuilder> builders = new Array<>();

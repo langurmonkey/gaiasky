@@ -1,18 +1,9 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
 
 package gaiasky.util.gdx;
 
@@ -29,45 +20,6 @@ import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gdx.shader.provider.IntShaderProvider;
 
-/**
- * A Renderable contains all information about a single render instruction (typically a draw call).</p>
- * <p>
- * It defines what (the shape), how (the material) and where (the transform) should be rendered by which shader.</p>
- * <p>
- * The shape is defined using the mesh, meshPartOffset, meshPartSize and primitiveType members. This matches the members of the
- * {@link IntMeshPart} class. The meshPartOffset is used to specify the offset within the mesh and the meshPartSize is used to
- * specify the part (in total number of vertices) to render. If the mesh is indexed (which is when {@link IntMesh#getNumIndices()} >
- * 0) then both values are in number of indices within the indices array of the mesh, otherwise they are in number of vertices
- * within the vertices array of the mesh. Note that some classes might require the mesh to be indexed.
- * <p>
- * The {@link #material} and (optional) {@link #environment} values are combined to specify how the shape should look like.
- * Typically these are used to specify uniform values or other OpenGL state changes. When a value is present in both the
- * {@link #material} and {@link #environment}, then the value of the {@link #material} will be used.
- * <p>
- * Renderables can be rendered directly using a {@link IntShader} (in which case the {@link #shader} member is ignored). Though more
- * typically Renderables are rendered via a {@link IntModelBatch}, either directly, or by passing a {@link IntRenderableProvider} like
- * {@link IntModelInstance} to the RenderBatch.
- * <p>
- * A ModelInstance returns all Renderables via its {@link IntModelInstance#getRenderables(Array, Pool)} method. In which case the
- * value of {@link IntModelInstance#userData} will be set to the {@link #userData} member. The {@link #userData} member can be used
- * to pass additional data to the shader. However, in most scenario's it is advised to use the {@link #material} or
- * {@link #environment} member with custom {@link Attribute}s to pass data to the shader.
- * <p>
- * In some cases, (for example for non-hierarchical basic game objects requiring only a single draw call) it is possible to extend
- * the Renderable class and add additional fields to pass to the shader. While extending the Renderable class can be useful, the
- * shader should not rely on it. Similar to the {@link #userData} member it is advised to use the {@link #material} and
- * {@link #environment} members to pass data to the shader.
- * <p>
- * When using a ModelBatch to render a Renderable, The Renderable and all its values must not be changed in between the call to
- * {@link IntModelBatch#begin(com.badlogic.gdx.graphics.Camera)} and {@link IntModelBatch#end()}. Therefor Renderable instances cannot
- * be reused for multiple render calls.
- * <p>
- * When the {@link #shader} member of the Renderable is set, the {@link IntShaderProvider} of the {@link IntModelBatch} may decide to
- * use that shader instead of the default shader. Therefor, to assure the default shader is used, the {@link #shader} member must
- * be set to null.
- *
- * @author badlogic, xoppa
- */
 public class IntRenderable {
     /**
      * Used to specify the transformations (like translation, scale and rotation) to apply to the shape. In other words: it is used

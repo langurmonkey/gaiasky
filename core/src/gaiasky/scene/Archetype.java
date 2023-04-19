@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.Component;
@@ -11,10 +18,6 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * An archetype is a class of {@link Entity} containing a pre-defined set of {@link Component}s for convenient
- * creation and extension.
- */
 public class Archetype {
 
     private Engine engine;

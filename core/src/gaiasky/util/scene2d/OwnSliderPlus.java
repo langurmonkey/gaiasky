@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.scene2d;
@@ -21,9 +23,6 @@ import gaiasky.util.scene2d.OwnSlider.OwnSliderStyle;
 import java.text.DecimalFormat;
 import java.util.function.Function;
 
-/**
- * Same as a regular slider, but contains the title (name) and the value within its bounds.
- */
 public class OwnSliderPlus extends Slider {
 
     private final Skin skin;

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.comp;
 
 import java.math.BigInteger;
@@ -5,9 +12,6 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 
-/**
- * Sorts strings with a combination of alphabetic and numeric criteria.
- */
 public final class FilenameComparator implements Comparator<Path> {
     private static final Pattern NUMBERS =
             Pattern.compile("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");

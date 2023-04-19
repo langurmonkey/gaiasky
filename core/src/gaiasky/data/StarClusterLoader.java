@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.data;
@@ -42,21 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Loads the star cluster catalogs from CSV files or STIL data sources. The column order is not important. The
- * column names, however, must be:
- *
- * <ul>
- * <li>name: {@link UCDParser#idcolnames}, separate multiple names with '|'</li>
- * <li>ra[deg]: {@link UCDParser#racolnames}</li>
- * <li>dist|distance[pc]: {@link UCDParser#distcolnames}</li>
- * <li>pmra[mas/yr]: {@link UCDParser#pmracolnames}</li>
- * <li>pmde[mas/yr]: {@link UCDParser#pmdeccolnames}</li>
- * <li>rv[km/s]: {@link UCDParser#radvelcolnames}</li>
- * <li>radius[deg]: {@link UCDParser#radiuscolnames}</li>
- * <li>nstars: {@link UCDParser#nstarscolnames}</li>
- * </ul>
- */
 public class StarClusterLoader extends AbstractSceneLoader {
     private static final Log logger = Logger.getLogger(StarClusterLoader.class);
     boolean active = true;

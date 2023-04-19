@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.coord;
@@ -9,26 +11,6 @@ import gaiasky.util.Nature;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 
-/**
- * Analytical representation of the Nominal Sun for the Gaia NSL.
- * <p>
- * Uses a low precision formula for the solar longitude (apparent longitude)
- * valid for the period 1980-2020 with an accuracy of 0.005 deg.
- * <p>
- * The reference frame is the ecliptic equinox J2000.
- * <p>
- * The analytical formula for calculating the longitude is written in terms of
- * the number of days since J2000.0(TCB). Since the zero point for GaiaTime (the
- * Mission Reference Epoch, see GAIA-CA-SP-ARI-BAS-003-06, rev. 1, Sect. 3.5) is
- * different from J2000.0 (actually it is J2010.0), it is necessary to add the
- * number of days from J2000.0 to the Mission Reference Epoch before doing the
- * calculation. This number is given by missionReferenceEpochDaysFromJ2000.
- * <p>
- * Since the time may be specified as the number of elapsed ns since a time
- * origin that is a settable attribute of the attitude data server, the NslSun
- * has a field timeOriginDaysFromJ2000 that can be set with setTimeOrigin(). By
- * default the origin time is the Mission Reference Epoch.
- */
 public class NslSun {
 
     // the zero point for mission reference

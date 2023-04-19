@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -15,31 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 
-/**
- * <p>
- * Generates sytle-aware tips from a series of strings in the i18n bundle files.
- * Each tip is a sequence of strings, or groups, separated by '|'. For example,
- * 'first part|second part|third part' is a tip with three groups, processed separately.
- * Each group optionally defines the label style to use by prefixing '%%', followed by the
- * style name. For instance, '%%mono-big here is a text' would print 'here is a text' using the
- * label style 'mono-big'.
- * </p><p>
- * Additionally, styles can be followed by an action ID, which is converted to the keyboard mappings.
- * For instance, '%%mono-big action.close' would print 'Esc' in the 'mono-big' label style. The
- * key mappings are separated by '+' and given each a style separately.
- * </p><p>
- * Additionally, groups can also define images stored in the default skin
- * as drawables. To include an image, use the prefix '$$', followed by the identifier of the
- * image to include. For example, use '$$gamepad-a' to include an image of the A gamepad button.
- * Images need to live in their own group. The rest of the content of the group is ignored.
- * </p>
- * <p>
- * An example of a full tip would be:
- * </p>
- * <ul><li>
- * "You can use|%%key-big Enter|or|$$gamepad-start|to perform an action."
- * </li></ul>
- */
 public class TipsGenerator {
     private static final int MAX_KEYS = 100;
 

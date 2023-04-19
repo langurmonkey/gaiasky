@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.system.render.extract;
 
 import com.badlogic.ashley.core.Entity;
@@ -7,9 +14,6 @@ import gaiasky.render.RenderGroup;
 import gaiasky.scene.Mapper;
 import gaiasky.util.Settings;
 
-/**
- * Extracts background model object and UV grid data to feed to the render stage.
- */
 public class BackgroundExtractor extends AbstractExtractSystem {
     public BackgroundExtractor(Family family, int priority) {
         super(family, priority);

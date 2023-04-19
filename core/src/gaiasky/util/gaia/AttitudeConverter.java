@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -10,12 +12,6 @@ import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 
-/**
- * Convert a given set of heliotropic angles into a quaternion
- *
- * @author Lennart Lindegren
- * @version $Id: AttitudeConverter.java 311494 2013-08-23 14:44:30Z llindegr $
- */
 public class AttitudeConverter {
     /** Mathematical constants **/
     static final double PI = Math.PI;

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.loader;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
@@ -17,14 +24,6 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.util.gdx.OwnCubemap;
 import gaiasky.util.gdx.loader.CubemapLoader.CubemapParameter;
 
-/**
- * {@link AssetLoader} for {@link OwnCubemap} instances. The pixel data is loaded asynchronously. The texture is then created on the
- * rendering thread, synchronously. Passing a {@link CubemapParameter} to
- * {@link AssetManager#load(String, Class, AssetLoaderParameters)} allows one to specify parameters as can be passed to the
- * various Cubemap constructors, e.g. filtering and so on.
- *
- * @author mzechner, Vincent Bousquet
- */
 public class CubemapLoader extends AsynchronousAssetLoader<OwnCubemap, CubemapParameter> {
     CubemapLoaderInfo info = new CubemapLoaderInfo();
 

@@ -1,16 +1,16 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.utils.Array;
 
-/**
- * An {@link Attribute} which can be used to send an {@link Array} of {@link DirectionalLight} instances to the {@link Shader}.
- * The lights are stored by reference, the {@link #copy()} or {@link #DirectionalLightsAttribute(DirectionalLightsAttribute)}
- * method will not create new lights.
- *
- * @author Xoppa
- */
 public class DirectionalLightsAttribute extends Attribute {
     public final static String Alias = "directionalLights";
     public final static int Type = register(Alias);

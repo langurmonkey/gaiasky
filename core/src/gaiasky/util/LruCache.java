@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util;
@@ -8,9 +10,6 @@ package gaiasky.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Least Recently Used cache implementation
- */
 public class LruCache<A, B> extends LinkedHashMap<A, B> {
     private final int maxEntries;
 

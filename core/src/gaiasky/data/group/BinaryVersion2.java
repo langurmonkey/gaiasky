@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.data.group;
 
 import gaiasky.scene.api.IParticleRecord;
@@ -5,11 +12,6 @@ import gaiasky.scene.api.IParticleRecord;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-/**
- * Binary version 2, used in latter eDR3 runs, and DR3+.
- * Contains 6 doubles, 7 floats and 1 int (hip). It is more compact than version 0 and 1,
- * for only positions and velocity vectors are stored as doubles.
- */
 public class BinaryVersion2 extends BinaryIOBase {
 
     protected BinaryVersion2() {

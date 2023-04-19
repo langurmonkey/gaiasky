@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.svt;
 
 import com.badlogic.gdx.assets.AssetManager;
@@ -30,11 +37,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Manages the SVT cache and indirection buffers. It processes the tile detection
- * buffer, determines the observed tiles, loads them, adds them to the cache and
- * updates the indirection buffer.
- */
 public class SVTManager implements IObserver {
     private static final Log logger = Logger.getLogger(SVTManager.class);
 

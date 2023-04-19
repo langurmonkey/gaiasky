@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.gui.vr;
 
 import com.badlogic.gdx.Gdx;
@@ -10,9 +17,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
 
-/**
- * A viewport which does not depend on the screen size at all. To be used in VR GUIs.
- */
 public class FixedScreenViewport extends Viewport {
     private final int width;
     private final int height;

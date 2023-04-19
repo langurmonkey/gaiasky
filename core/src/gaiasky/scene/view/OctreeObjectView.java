@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.view;
 
 import com.badlogic.ashley.core.Entity;
@@ -8,7 +15,6 @@ import gaiasky.scene.entity.StarSetUtils;
 import gaiasky.util.tree.IOctreeObject;
 import gaiasky.util.tree.OctreeNode;
 
-/** A view that implements {@link gaiasky.util.tree.IOctreeObject} methods for entities. **/
 public class OctreeObjectView extends PositionView implements IOctreeObject {
 
     public StarSet set;

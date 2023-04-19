@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gravwaves;
@@ -20,10 +22,6 @@ import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
-/**
- * Central hub where the parameters of the current relativistic
- * effects (aberration, doppler, grav waves) are updated and served to the renderers.
- */
 public class RelativisticEffectsManager implements IObserver {
 
     private static RelativisticEffectsManager instance;

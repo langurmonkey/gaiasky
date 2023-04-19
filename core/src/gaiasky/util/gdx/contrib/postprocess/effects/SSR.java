@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -7,10 +14,6 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.SSRFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
-/**
- * Screen Space Reflections effect. Uses the color, depth, normal and reflection mask
- * textures to implement screen space reflections.
- */
 public class SSR extends PostProcessorEffect {
     private SSRFilter filter;
 

@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util;
@@ -18,10 +20,6 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3d;
 
-/**
- * This class provides utils to use Sprites and Fonts as if they were Decals,
- * this is, flat textures in the 3D space.
- */
 public class DecalUtils {
 
     static Vector3 tmp, tmp2, tmp3;

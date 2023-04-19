@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.math;
@@ -12,18 +14,6 @@ import com.badlogic.gdx.math.Vector3;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * Encapsulates a <a href=
- * "http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column
- * major</a> 4 by 4 matrix. Like the {@link Vector3d} class it allows the
- * chaining of methods by returning a reference to itself. For example:
- *
- * <pre>
- * Matrix4d mat = new Matrix4d().trn(position).mul(camera.combined);
- * </pre>
- *
- * @author badlogicgames@gmail.com
- */
 @SuppressWarnings("unused")
 public class Matrix4d implements Serializable {
     /**

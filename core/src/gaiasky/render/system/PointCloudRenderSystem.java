@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.render.system;
@@ -17,11 +19,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 
-/**
- * Contains some common code to all point cloud renderers and some
- * scaffolding to make life easier. Should be used by point
- * clouds that render their particles as GL_POINTS.
- */
 public abstract class PointCloudRenderSystem extends ImmediateModeRenderSystem implements IObserver {
 
     public PointCloudRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {

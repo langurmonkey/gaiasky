@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.render.system;
@@ -17,9 +19,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 
-/**
- * Common code to all render systems that render quads with GPU instancing.
- */
 public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem implements IObserver {
 
     // Auxiliary array that holds vertices temporarily

@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gdx.contrib.postprocess.effects;
@@ -12,10 +14,6 @@ import gaiasky.util.gdx.contrib.postprocess.filters.AccumulationBlurFilter;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
-/**
- * A motion blur effect which draws the last frame with a lower opacity. The
- * result is then stored as the next last frame to create the trail effect.
- */
 public class AccumulationBlur extends PostProcessorEffect {
     private final Copy copyFilter;
     private AccumulationBlurFilter motionFilter;

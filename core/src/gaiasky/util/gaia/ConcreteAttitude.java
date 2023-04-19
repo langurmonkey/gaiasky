@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -10,23 +12,6 @@ import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 
-/**
- * This class implements the Attitude interface and contains just the minimum
- * fields necessary to define a unique attitude at a given time, plus a large
- * number of methods to compute quantities that depend only on this attitude and
- * time.
- * <p>
- * The various scanning laws and specific attitude representations (e.g., using
- * splines, or tables for interpolation) can be implemented as providing
- * attitude objects of this type.
- * <p>
- * In some cases (in particular for simple analytical scanning laws) there are
- * more direct ways to retrieve some of the quantities for which there are
- * methods in this class (e.g., {@link #getHeliotropicAnglesRates()}); the
- * present method(s) may then be overridden for efficiency.
- *
- * @author Lennart Lindegren, Uwe Lammers
- */
 public class ConcreteAttitude implements IAttitude {
 
     private static final double BASICANGLE_DEGREE = 106.5;

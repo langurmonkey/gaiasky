@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.gui;
@@ -26,10 +28,6 @@ import gaiasky.util.validator.IValidator;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
-/**
- * A little widget showing a color and allowing to change it
- * using a color picker dialog.
- */
 public class ColorPicker extends ColorPickerAbstract {
 
     public ColorPicker(Stage stage, Skin skin) {

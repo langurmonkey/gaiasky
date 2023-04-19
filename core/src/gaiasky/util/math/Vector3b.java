@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.math;
@@ -15,9 +17,6 @@ import org.apfloat.ApfloatMath;
 
 import java.io.Serializable;
 
-/**
- * Vector of arbitrary precision floating point numbers using ApFloat.
- */
 public class Vector3b implements Serializable {
     public final static Vector3b X = new Vector3b(1, 0, 0);
     public final static Vector3b Y = new Vector3b(0, 1, 0);

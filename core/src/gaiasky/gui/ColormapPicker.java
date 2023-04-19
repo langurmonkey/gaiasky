@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.gui;
@@ -43,11 +45,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * A version of ColorPicker on steroids. This guy shows a color and allows
- * to change it using a color picker, or optionally define a colormap on
- * an arbitrary property of a dataset.
- */
 public class ColormapPicker extends ColorPickerAbstract {
 
     // Stores minimum and maximum mapping values for the session

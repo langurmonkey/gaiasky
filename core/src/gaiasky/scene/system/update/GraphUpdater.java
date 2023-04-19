@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.system.update;
 
 import com.badlogic.ashley.core.Entity;
@@ -26,11 +33,6 @@ import net.jafama.FastMath;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Processes entities in a scene graph, which have a {@link GraphRoot}
- * component. Generally, this should be a single entity unless
- * we have more than one scene graph.
- */
 public class GraphUpdater extends AbstractUpdateSystem {
     private static final Logger.Log logger = Logger.getLogger(GraphUpdater.class);
     private final ITimeFrameProvider time;

@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.time;
@@ -16,10 +18,6 @@ import gaiasky.util.Settings;
 
 import java.time.Instant;
 
-/**
- * Keeps pace of the simulation time vs real time and holds the global clock. It
- * uses a time warp factor which is a multiplier to real time.
- */
 public class GlobalClock implements IObserver, ITimeFrameProvider {
     private static final Log logger = Logger.getLogger(GlobalClock.class);
 

@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.data.group;
@@ -15,25 +17,6 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Reads arrays of star beans from binary files, usually to go in an octree.
- * The header of the format depends on the version.
- *
- * <ul>
- * <li>
- * Versions 0 and 1:
- *      <ul><li>int: number of stars</li></ul>
- * </li>
- * <li>
- * Version 2+:
- *      <ul>
- *          <li>int: negative integer token to differentiate from versions 0/1 (-1)</li>
- *          <li>int: format version number</li>
- *          <li>int: number of stars</li>
- *      </ul>
- * </li>
- * </ul>
- */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     /** The default output format version to use for writing **/

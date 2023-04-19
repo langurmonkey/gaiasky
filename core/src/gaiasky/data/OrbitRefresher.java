@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.data;
@@ -24,9 +26,6 @@ import gaiasky.util.concurrent.ServiceThread;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
-/**
- * Refreshes sampled orbit data from the underlying data provider algorithms.
- */
 public class OrbitRefresher implements IObserver {
     // Maximum number of pages to send to load every batch.
     protected static final int MAX_LOAD_CHUNK = 5;

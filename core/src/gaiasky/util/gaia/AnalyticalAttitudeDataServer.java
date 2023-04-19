@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -11,15 +13,6 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.coord.NslSun;
 import gaiasky.util.math.Vector3d;
 
-/**
- * This abstract class defines the fields and implements the methods that any
- * analytically defined attitude (e.g., NSL or EPSL) need in addition to those
- * in the superclass.
- *
- * @author Lennart Lindegren
- * @version $Id: AnalyticalAttitudeDataServer.java 329790 2013-11-15 16:31:56Z
- * ulammers $
- */
 public abstract class AnalyticalAttitudeDataServer extends BaseAttitudeDataServer<IAttitude> {
 
     /** Mathematical constants **/

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.system.render.pass;
 
 import com.badlogic.gdx.Gdx;
@@ -28,9 +35,6 @@ import java.util.List;
 import static gaiasky.render.RenderGroup.MODEL_PIX;
 import static gaiasky.render.RenderGroup.MODEL_PIX_TESS;
 
-/**
- * Sparse virtual texture (SVT) tile detection render pass.
- */
 public class SVTRenderPass {
     /**
      * The tile detection buffer is smaller than the main window by this factor.

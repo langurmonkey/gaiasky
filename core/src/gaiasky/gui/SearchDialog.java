@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.gui;
@@ -41,10 +43,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-/**
- * The dialog to search objects. It optionally presents the user with a list of suggestions as the
- * user types in the name of the object.
- */
 public class SearchDialog extends GenericDialog {
     private static final Log logger = Logger.getLogger(SearchDialog.class);
     private final Scene scene;

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +34,6 @@ import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.Properties;
 
-/**
- * Initializes and stores the YAML configuration file for Gaia Sky.
- */
 public class SettingsManager {
     private static final Logger.Log logger = Logger.getLogger(SettingsManager.class);
 

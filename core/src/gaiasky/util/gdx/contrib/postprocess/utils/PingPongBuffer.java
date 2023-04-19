@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.contrib.postprocess.utils;
 
 import com.badlogic.gdx.Gdx;
@@ -9,25 +16,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-/**
- * Encapsulates a frame buffer with the ability to ping-pong between two buffers.
- * <p>
- * Upon {@link #begin()} the buffer is reset to a known initial state, this is
- * usually done just before the first usage of the buffer.
- * <p>
- * Subsequent {@link #capture()} calls will initiate writing to the next
- * available buffer, returning the previously used one, effectively ping-ponging
- * between the two. Until {@link #end()} is called, chained rendering will be
- * possible by retrieving the necessary buffers via {@link PingPongBuffer#getSouceTexture()},
- * {@link #getSourceBuffer()}, {@link #getResultTexture()} or
- * {@link #getResultBuffer}.
- * <p>
- * When finished, {@link #end()} should be called to stop capturing. When the
- * OpenGL context is lost, {@link #rebind()} should be called.
- *
- * @author bmanuel
- * @author tsagrista
- */
 public final class PingPongBuffer {
     public final boolean ownResources;
     // save/restore state

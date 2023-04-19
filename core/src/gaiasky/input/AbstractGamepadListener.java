@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.input;
 
 import com.badlogic.gdx.controllers.Controller;
@@ -14,9 +21,6 @@ import gaiasky.util.Logger.Log;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Contains some utils common to all gamepad listeners.
- */
 public abstract class AbstractGamepadListener implements ControllerListener, IInputListener, IObserver {
     protected static final float MIN_ZERO_POINT = 0.3f;
     protected static final long AXIS_EVT_DELAY = 250;

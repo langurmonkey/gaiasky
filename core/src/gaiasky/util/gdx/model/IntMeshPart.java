@@ -1,23 +1,9 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
-
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 
 package gaiasky.util.gdx.model;
 
@@ -29,28 +15,6 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-/**
- * A libgdx MeshPart which uses {@link IntMesh} (for integer indices) instead of a regular {@link Mesh}
- * <p>
- * A MeshPart is composed of a subset of vertices of a {@link IntMesh}, along with the primitive type. The vertices subset is
- * described by an offset and size. When the mesh is indexed (which is when {@link IntMesh#getNumIndices()} > 0), then the
- * {@link #offset} represents the offset in the indices array and {@link #size} represents the number of indices. When the mesh
- * isn't indexed, then the {@link #offset} member represents the offset in the vertices array and the {@link #size} member
- * represents the number of vertices.
- * <p>
- * In other words: Regardless whether the mesh is indexed or not, when {@link #primitiveType} is not a strip, then {@link #size}
- * equals the number of primitives multiplied by the number of vertices per primitive. So if the MeshPart represents 4 triangles (
- * {@link #primitiveType} is GL_TRIANGLES), then the {@link #size} member is 12 (4 triangles * 3 vertices = 12 vertices total).
- * Likewise, if the part represents 12 lines ({@link #primitiveType} is GL_LINES), then the size is 24 (12 lines * 2 vertices = 24
- * vertices total).
- * <p>
- * Note that some classes might require the mesh (part) to be indexed.
- * <p>
- * The {@link IntMesh} referenced by the {@link #mesh} member must outlive the MeshPart. When the mesh is disposed, the MeshPart is
- * unusable.
- *
- * @author badlogic, Xoppa
- */
 public class IntMeshPart {
     /** Temporary static {@link BoundingBox} instance, used in the {@link #update()} method. **/
     private final static BoundingBox bounds = new BoundingBox();

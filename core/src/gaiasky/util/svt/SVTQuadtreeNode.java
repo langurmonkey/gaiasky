@@ -1,30 +1,14 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.svt;
 
 import gaiasky.scene.record.VirtualTextureComponent;
 
-/**
- * <p>
- * A quadtree node that represents a single tile with a specific level of detail (LOD)
- * in the Sparse Virtual Texture (SVT).
- * Contains the level of detail ({@link #level}), the column within the level ({@link #col}), the
- * row within the level ({@link #row}) and the path to the actual texture file.
- * </p>
- * <p>
- * Each node is subdivided into four tiles like so:
- * </p>
- * <pre>
- *      0     1
- *    .----.----.
- * 0  | TL | TR |
- *    :----+----:
- * 1  | BL | BR |
- *    '----'----'
- * </pre>
- * <p>
- * Columns increase left-to-right, and rows increase top-to-bottom. Note that in UV coordinates, the V
- * coordinate, corresponding to the rows, is inverted.
- * </p>
- */
 public class SVTQuadtreeNode<T> implements Comparable<SVTQuadtreeNode> {
 
     /** The tree this node belongs to. **/

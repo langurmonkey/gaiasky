@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.entity;
 
 import com.badlogic.ashley.core.Entity;
@@ -22,10 +29,6 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.List;
 
-/**
- * This class contains the methods that implement {@link IFocus#addHitRay(Vector3d, Vector3d, NaturalCamera, Array)}
- * and {@link IFocus#addHitCoordinate(int, int, int, int, int, NaturalCamera, Array)}.
- */
 public class FocusHit {
 
     private final Vector3 F31 = new Vector3();

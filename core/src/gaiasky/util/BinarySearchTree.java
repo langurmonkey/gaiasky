@@ -1,30 +1,11 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util;// BinarySearchTree class
-//
-// CONSTRUCTION: with no initializer
-//
-// ******************PUBLIC OPERATIONS*********************
-// void insert( x )       --> Insert x
-// void remove( x )       --> Remove x
-// void removeMin( )      --> Remove minimum item
-// Comparable find( x )   --> Return item that matches x
-// Comparable findMin( )  --> Return smallest item
-// Comparable findMax( )  --> Return largest item
-// boolean isEmpty( )     --> Return true if empty; else false
-// void makeEmpty( )      --> Remove all items
-// ******************ERRORS********************************
-// Exceptions are thrown by insert, remove, and removeMin if warranted
-
-/**
- * Implements an unbalanced binary search tree.
- * Note that all "matching" is based on the compareTo method.
- *
- * @author Mark Allen Weiss
- */
 public class BinarySearchTree<T extends Comparable<T>> {
     /** The tree root. */
     protected BinaryNode<T> root;

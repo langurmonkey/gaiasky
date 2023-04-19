@@ -1,20 +1,21 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-/**
- * This adds the lens dirt and starburst effects to the lens flare.
- *
- * @see <a href=
- * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
- **/
-public final class FlareDirt extends Filter<FlareDirt> {
+public final class PseudoLensFlareDirt extends Filter<PseudoLensFlareDirt> {
     private Texture lensDirtTexture;
     private Texture lensStarburstTexture;
     private float starburstOffset;
 
-    public FlareDirt() {
+    public PseudoLensFlareDirt() {
         super(ShaderLoader.fromFile("screenspace", "flaredirt"));
         rebind();
     }

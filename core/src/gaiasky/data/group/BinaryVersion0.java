@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.data.group;
 
 import gaiasky.scene.api.IParticleRecord;
@@ -5,10 +12,6 @@ import gaiasky.scene.api.IParticleRecord;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-/**
- * Original binary version (0), used in DR1 and DR2.
- * Contains 9 doubles, 4 floats, 1 integer (hip), 3 integers for the tycho identifiers, a long (id) and the name.
- **/
 public class BinaryVersion0 extends BinaryIOBase {
 
     public BinaryVersion0() {

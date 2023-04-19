@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.camera.rec;
@@ -27,14 +29,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 
-/**
- * Contains the logic to record the camera state at each frame. The format is as
- * follows: > time[s](float) cam_pos(double x3) cam_dir(double x3) cam_up(double
- * x3)
- * <p>
- * The time is the time in seconds since the start of the recording, to
- * synchronize with the current FPS in playing mode.
- */
 public class CamRecorder implements IObserver {
     private static final Log logger = Logger.getLogger(CamRecorder.class);
     private static final String sep = " ";

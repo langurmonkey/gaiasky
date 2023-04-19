@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.scene.camera;
@@ -55,15 +57,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import org.lwjgl.opengl.GL30;
 
-/**
- * Models the default camera in Gaia Sky.
- * The camera has four modes:
- * <ul>
- *     <li>Focus mode</li>: An object acts as a focus, camera movement is relative to it.
- *     <li>Free mode</li>: The camera is free to move around.
- *     <li>Game mode</li>: Like free mode, but the mouse and keyboard bindings change to WASD+mouse look.
- * </ul>
- */
 public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private static final double MIN_DIST = 1 * Constants.M_TO_U;

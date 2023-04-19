@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.gui;
@@ -16,10 +18,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnLabel;
 
-/**
- * Generic dialog that displays the confirmation quit message and offers options
- * to cancel it or go through.
- */
 public class QuitWindow extends GenericDialog {
 
     private OwnCheckBox doNotAsk;

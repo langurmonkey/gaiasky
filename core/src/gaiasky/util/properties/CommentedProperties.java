@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.properties;
@@ -12,13 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-/**
- * The CommentedProperties class is an extension of java.util.Properties
- * to allow retention of comment lines and blank (whitespace only) lines
- * in the properties file.
- * <p>
- * Written for Java version 1.4
- */
 public class CommentedProperties extends java.util.Properties {
 
     private static final char[] hexDigit = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };

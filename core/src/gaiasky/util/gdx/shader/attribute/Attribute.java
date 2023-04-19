@@ -1,18 +1,15 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Bits;
 
-/**
- * Extend this class to implement a material attribute. Register the attribute type by statically calling the
- * {@link #register(String)} method, whose return value should be used to instantiate the attribute. A class can implement
- * multiple types.
- * <p>
- * Modified to use {@link Bits} instead of a long to store the attribute types. A long only allows for 64 attributes, while the
- * solution implemented here enables an unlimited number of them.
- *
- * @author Xoppa, modified by langurmonkey
- */
 public abstract class Attribute implements Comparable<Attribute> {
     /** The registered type aliases */
     private final static Array<String> types = new Array<>();

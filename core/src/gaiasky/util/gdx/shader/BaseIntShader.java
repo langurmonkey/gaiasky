@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gdx.shader;
@@ -22,10 +24,6 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
 import gaiasky.util.gdx.shader.attribute.Attributes;
 
-/**
- * @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does
- * not manage the ShaderPogram, you are still responsible for disposing the ExtShaderProgram.
- */
 public abstract class BaseIntShader implements IntShader {
     private final Array<String> uniforms = new Array<>();
     private final Array<Validator> validators = new Array<>();

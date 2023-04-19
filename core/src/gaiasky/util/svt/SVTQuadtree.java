@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.svt;
 
 import com.badlogic.gdx.utils.LongMap;
 
-/**
- * A Sparse Virtual Texture (SVT) quadtree with a certain LOD depth and tile size.
- * Only square tiles are supported. The tree typically contains two root nodes,
- * since the textures that wrap around spherical objects have an aspect ratio of 2:1.
- */
 public class SVTQuadtree<T> {
     public final int MAX_LEVEL = 15;
 

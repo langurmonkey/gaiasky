@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.render.process;
@@ -11,9 +13,6 @@ import gaiasky.render.api.IRenderMode;
 import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.camera.ICamera;
 
-/**
- * Normal single-window desktop render mode.
- */
 public class RenderModeMain extends RenderModeAbstract implements IRenderMode {
 
     public RenderModeMain() {

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.render.process;
 
 import com.badlogic.ashley.core.Entity;
@@ -35,9 +42,6 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.*;
 
-/**
- * Renders to OpenXR using the {@link XrDriver}.
- */
 public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode, XrRenderer {
     private final Scene scene;
     private final XrDriver driver;

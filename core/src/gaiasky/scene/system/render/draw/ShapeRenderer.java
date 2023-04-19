@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.scene.system.render.draw;
@@ -17,9 +19,6 @@ import gaiasky.scene.system.render.draw.shape.ShapeEntityRenderSystem;
 
 import java.util.List;
 
-/**
- * System that renders shapes through a {@link com.badlogic.gdx.graphics.glutils.ShapeRenderer}
- */
 public class ShapeRenderer extends AbstractRenderSystem {
 
     private final ShapeEntityRenderSystem renderSystem;

@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.ucd;
@@ -17,10 +19,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Parses the ucds of a star table and builds some metadata on
- * the relevant quantities for Gaia Sky (position, proper motion, magnitudes, colors, etc.)
- */
 public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked
     // first with equals() and then with matches()

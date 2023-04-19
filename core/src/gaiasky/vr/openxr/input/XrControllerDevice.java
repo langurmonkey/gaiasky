@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.vr.openxr.input;
 
 import com.badlogic.gdx.math.Matrix4;
@@ -9,10 +16,6 @@ import gaiasky.vr.openxr.XrHelper;
 import gaiasky.vr.openxr.input.actions.*;
 import org.lwjgl.openxr.XrPosef;
 
-/**
- * Represents a single VR controller device, and keeps its pose (position and
- * orientation) up to date. It also holds the model.
- */
 public class XrControllerDevice {
 
     /**

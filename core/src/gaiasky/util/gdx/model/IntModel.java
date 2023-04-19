@@ -1,23 +1,9 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
-
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 
 package gaiasky.util.gdx.model;
 
@@ -49,22 +35,6 @@ import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 
-/**
- * This implementation uses {@link IntMesh} and {@link IntMeshPart} instead of {@link Mesh} and {@link MeshPart}.
- * <p>
- * A model represents a 3D assets. It stores a hierarchy of nodes. A node has a transform and optionally a graphical part in form
- * of a {@link IntMeshPart} and {@link Material}. Mesh parts reference subsets of vertices in one of the meshes of the model.
- * Animations can be applied to nodes, to modify their transform (translation, rotation, scale) over time.</p>
- * <p>
- * A model can be rendered by creating a {@link IntModelInstance} from it. That instance has an additional transform to position the
- * model in the world, and allows modification of materials and nodes without destroying the original model. The original model is
- * the owner of any meshes and textures, all instances created from the model share these resources. Disposing the model will
- * automatically make all instances invalid!</p>
- * <p>
- * A model is created from {@link IntModelData}, which in turn is loaded by a {@link IntModelLoader}.
- *
- * @author badlogic, xoppa
- */
 public class IntModel implements Disposable {
     /** the materials of the model, used by nodes that have a graphical representation **/
     public final Array<Material> materials = new Array<>();

@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -8,12 +10,6 @@ package gaiasky.util.gaia;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 
-/**
- * Implementation of the Ecliptic Pole Scanning Law (EPSL)
- *
- * @author Lennart Lindegren
- * @version $Id: Epsl.java 373288 2014-06-24 10:35:37Z pbalm $
- */
 public class Epsl extends AnalyticalAttitudeDataServer {
     /** The unit vector towards the North Ecliptic Pole, expressed in ICRS **/
     static final Vector3d NECLP = new Vector3d(-Math.sin(OBLIQUITY_RAD), Math.cos(OBLIQUITY_RAD), 0.0);

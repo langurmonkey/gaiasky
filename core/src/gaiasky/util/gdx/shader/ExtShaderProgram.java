@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gdx.shader;
@@ -23,36 +25,6 @@ import gaiasky.util.i18n.I18n;
 import java.lang.StringBuilder;
 import java.nio.*;
 
-/**
- * <p>
- * A shader program encapsulates a vertex and fragment shader pair linked to form a shader program.
- * </p>
- *
- * <p>
- * After construction a ShaderProgram can be used to draw {@link Mesh}. To make the GPU use a specific ShaderProgram the programs
- * {@link ExtShaderProgram#begin()} method must be used which effectively binds the program.
- * </p>
- *
- * <p>
- * When a ShaderProgram is bound one can set uniforms, vertex attributes and attributes as needed via the respective methods.
- * </p>
- *
- * <p>
- * A ShaderProgram can be unbound with a call to {@link ExtShaderProgram#end()}
- * </p>
- *
- * <p>
- * A ShaderProgram must be disposed via a call to {@link ExtShaderProgram#dispose()} when it is no longer needed
- * </p>
- *
- * <p>
- * ShaderPrograms are managed. In case the OpenGL context is lost all shaders get invalidated and have to be reloaded. This
- * happens on Android when a user switches to another application or receives an incoming call. Managed ShaderPrograms are
- * automatically reloaded when the OpenGL context is recreated so you don't have to do this manually.
- * </p>
- *
- * @author mzechner
- */
 public class ExtShaderProgram implements Disposable {
     /** Default name for position attributes. **/
     public static final String POSITION_ATTRIBUTE = "a_position";

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.Entity;
@@ -16,11 +23,6 @@ import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Contains the index of objects. For each object name, the index keeps a reference to the
- * object itself. It also contains the Hipparcos index, where each HIP id is linked to
- * a star.
- */
 public class Index {
     private static final Logger.Log logger = Logger.getLogger(Index.class);
 

@@ -1,11 +1,14 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.concurrent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * An interface that can optionally use an {@link java.util.concurrent.atomic.AtomicBoolean}
- * as a signal to abort its execution.
- */
 public interface AbortableRunnable extends Runnable {
     /**
      * Sets the abort object.

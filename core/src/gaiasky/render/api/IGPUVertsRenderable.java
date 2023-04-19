@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.render.api;
@@ -9,10 +11,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.util.PointCloudData;
 
-/**
- * Defines the interface that all objects composed by a collection of vertices
- * to be rendered with a VBO must adhere to.
- */
 public interface IGPUVertsRenderable extends IRenderable {
 
     void markForUpdate();

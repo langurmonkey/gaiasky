@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util;
@@ -25,10 +27,6 @@ import java.net.http.HttpResponse.BodySubscriber;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * Manages a master instance which makes available state information to others
- * in order to synchronize a session.
- */
 public class MasterManager implements IObserver {
     private static final Log logger = Logger.getLogger(MasterManager.class);
 

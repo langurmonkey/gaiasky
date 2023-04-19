@@ -1,76 +1,16 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.math;
-
-/******************************************************************************
- *  Compilation:  javac StdRandom.java
- *  Execution:    java StdRandom
- *  Dependencies: StdOut.java
- *
- *  A library of static methods to generate pseudo-random numbers from
- *  different distributions (bernoulli, uniform, gaussian, discrete,
- *  and exponential). Also includes a method for shuffling an array.
- *
- *
- *  %  java StdRandom 5
- *  seed = 1316600602069
- *  59 16.81826  true 8.83954  0 
- *  32 91.32098  true 9.11026  0 
- *  35 10.11874  true 8.95396  3 
- *  92 32.88401  true 8.87089  0 
- *  72 92.55791  true 9.46241  0 
- *
- *  % java StdRandom 5
- *  seed = 1316600616575
- *  96 60.17070  true 8.72821  0 
- *  79 32.01607  true 8.58159  0 
- *  81 59.49065  true 9.10423  1 
- *  96 51.65818  true 9.02102  0 
- *  99 17.55771  true 8.99762  0 
- *
- *  % java StdRandom 5 1316600616575
- *  seed = 1316600616575
- *  96 60.17070  true 8.72821  0 
- *  79 32.01607  true 8.58159  0 
- *  81 59.49065  true 9.10423  1 
- *  96 51.65818  true 9.02102  0 
- *  99 17.55771  true 8.99762  0 
- *
- *
- *  Remark
- *  ------
- *    - Relies on randomness of nextDouble() method in java.util.Random
- *      to generate pseudorandom numbers in [0, 1).
- *
- *    - This library allows you to set and get the pseudorandom number seed.
- *
- *    - See http://www.honeylocust.com/RngPack/ for an industrial
- *      strength random number generator in Java.
- *
- ******************************************************************************/
 
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.Random;
 
-/**
- * The {@code StdRandom} class provides static methods for generating
- * random number from various discrete and continuous distributions,
- * including Bernoulli, uniform, Gaussian, exponential, pareto,
- * Poisson, and Cauchy. It also provides method for shuffling an
- * array or subarray.
- * <p>
- * For additional documentation,
- * see <a href="http://introcs.cs.princeton.edu/22library">Section 2.2</a> of
- * <i>Introduction to Programming in Java: An Interdisciplinary Approach</i>
- * by Robert Sedgewick and Kevin Wayne.
- *
- * @author Robert Sedgewick
- * @author Kevin Wayne
- */
 public final class StdRandom {
 
     private static Random random; // pseudo-random number generator

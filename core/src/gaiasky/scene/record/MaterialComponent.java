@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.scene.record;
@@ -47,11 +49,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/**
- * A basic component that fully describes the material of an object.
- * It contains basic textures (diffuse, specular, reflection, emissive, etc.),
- * cubemaps (same as textures), and even some sparse virtual texture trees (SVT).
- */
 public class MaterialComponent extends NamedComponent implements IObserver, IMaterialProvider, IUpdatable<MaterialComponent> {
     /** Default texture parameters **/
     protected static final OwnTextureParameter textureParamsMipMap, textureParams;

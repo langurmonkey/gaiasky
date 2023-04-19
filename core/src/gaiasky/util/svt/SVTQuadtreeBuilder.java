@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.svt;
 
 import gaiasky.util.Logger;
@@ -10,23 +17,6 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-/**
- * <p>
- * Builds a quadtree from a file system path.
- * </p>
- * <p>
- * The SVT is laid out in a quadtree where each tile is subdivided into four at each level. In the file system,
- * tiles are grouped by level. Each level is in its own directory with the format:
- * </p>
- * <ud>
- * <li>level\d+ -> (level3)</li>
- * </ud>
- * <p>The files use the format:</p>
- * <ud>
- * <li>tx[_|-| ]\d+[_|-| ]\d+\.\w+ -> (tx_0_2.jpg)</li>
- * </ud>
- * <p>The tiles can be in any of the supported image formats in Gaia Sky.</p>
- */
 public class SVTQuadtreeBuilder {
     private static final Logger.Log logger = Logger.getLogger(SVTQuadtreeBuilder.class);
 

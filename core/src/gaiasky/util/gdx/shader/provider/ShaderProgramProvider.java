@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gdx.shader.provider;
@@ -18,19 +20,6 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.loader.ShaderTemplatingLoader;
 
-/**
- * {@link AssetLoader} for {@link ExtShaderProgram} instances loaded from text files. If the file suffix is ".vert", it is assumed
- * to be a vertex shader, and a fragment shader is found using the same file name with a ".frag" suffix. And vice versa if the
- * file suffix is ".frag". These default suffixes can be changed in the ShaderProgramLoader constructor.
- * <p>
- * For all other file suffixes, the same file is used for both (and therefore should internally distinguish between the programs
- * using preprocessor directives and {@link ExtShaderProgram#prependVertexCode} and {@link ExtShaderProgram#prependFragmentCode}).
- * <p>
- * The above default behavior for finding the files can be overridden by explicitly setting the file names in a
- * {@link ShaderProgramParameter}. The parameter can also be used to prepend code to the programs.
- *
- * @author cypherdare
- */
 public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProgram, ShaderProgramProvider.ShaderProgramParameter> {
 
     private String vertexFileSuffix = ".vertex.glsl";

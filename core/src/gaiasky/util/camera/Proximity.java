@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.camera;
 
 import com.badlogic.ashley.core.Entity;
@@ -17,9 +24,6 @@ import gaiasky.util.tree.OctreeNode;
 
 import java.util.Arrays;
 
-/**
- * Holds information on the order and properties of nearby particles to the camera.
- */
 public class Proximity {
     // Default number of proximity entries
     private static final int DEFAULT_SIZE = 4;

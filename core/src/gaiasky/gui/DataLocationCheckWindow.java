@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.gui;
 
 import com.badlogic.gdx.graphics.Color;
@@ -9,10 +16,6 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 
-/**
- * This window informs the user that old datasets have been found in the default
- * data location, and offers to clean them up.
- */
 public class DataLocationCheckWindow extends GenericDialog {
     public DataLocationCheckWindow(String title, Skin skin, Stage stage) {
         super(title, skin, stage);

@@ -1,60 +1,15 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.event;
 
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectSet;
 
-/**
- * An unbounded priority queue based on a priority heap. The elements of the priority queue are ordered according to their
- * {@linkplain Comparable natural ordering}. A priority queue does not permit {@code null} elements.
- *
- * <p>
- * The queue can be set to accept or reject the insertion of non unique elements through the method {@code setUniqueness}.
- * Uniqueness is disabled by default.
- *
- * <p>
- * The <em>head</em> of this queue is the <em>least</em> element with respect to the specified ordering. If multiple elements are
- * tied for least value (provided that uniqueness is set to false), the head is one of those elements -- ties are broken
- * arbitrarily. The queue retrieval operations {@code poll}, {@code remove}, {@code peek}, and {@code element} access the element
- * at the head of the queue.
- *
- * <p>
- * A priority queue is unbounded, but has an internal <i>capacity</i> governing the size of an array used to store the elements on
- * the queue. It is always at least as large as the queue size. As elements are added to a priority queue, its capacity grows
- * automatically.
- *
- * <p>
- * Iterating the queue with the method {@link #get(int) get} is <em>not</em> guaranteed to traverse the elements of the priority
- * queue in any particular order.
- *
- * <p>
- * Implementation note: this implementation provides O(log(n)) time for the enqueing and dequeing methods ({@code add} and
- * {@code poll} ; and constant time for the retrieval methods ({@code peek} and {@code size}).
- *
- * @param <E> the type of comparable elements held in this queue
- *
- * @author davebaol
- */
 public class PriorityQueue<E extends Comparable<E>> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 11;

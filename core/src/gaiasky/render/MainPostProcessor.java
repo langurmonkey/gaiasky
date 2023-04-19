@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.render;
@@ -45,14 +47,10 @@ import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Centralized repository for all post-processing effects in Gaia Sky.
- */
 public class MainPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(MainPostProcessor.class);
     /**
@@ -262,7 +260,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lensStarBurst = manager.get(lensStarburstName);
         lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        LensFlare lensFlare = new LensFlare((int) (width * lensSettings.fboScale), (int) (height * lensSettings.fboScale));
+        PseudoLensFlare lensFlare = new PseudoLensFlare((int) (width * lensSettings.fboScale), (int) (height * lensSettings.fboScale));
         lensFlare.setGhosts(lensSettings.numGhosts);
         lensFlare.setHaloWidth(lensSettings.haloWidth);
         lensFlare.setLensColorTexture(lensColor);
@@ -767,7 +765,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
+                    PseudoLensFlare lensFlare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
                     lensFlare.setGhosts(numGhosts);
                     lensFlare.setFlareIntesity(intensity);
                 }
@@ -782,7 +780,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    LensFlare flare = (LensFlare) ppb.get(LensFlare.class);
+                    PseudoLensFlare flare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
                     if (flare != null)
                         flare.setStarburstOffset(cameraOffset);
                     LightGlow glow = (LightGlow) ppb.get(LightGlow.class);

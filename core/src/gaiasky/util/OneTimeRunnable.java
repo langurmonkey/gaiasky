@@ -1,13 +1,15 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util;
 
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 
-/**
- * Wrapper class which handles a one-time update runnable.
- * Use the {@link OneTimeRunnable#post()} method to publish it. The runnable
- * will be published, run once, and unpublished.
- */
 public abstract class OneTimeRunnable implements Runnable {
     private final String name;
 

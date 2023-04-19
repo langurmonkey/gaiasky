@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,16 +45,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 
-/**
- * This class converts settings from the old Java properties file to the
- * new YAML-based configuration. This should happen whenever Gaia Sky detects
- * that there exists a <code>global.properties</code> file in the configuration
- * folder, but no <code>config.yaml</code> is found. In such a case, the way
- * to proceed is to load the <code>global.properties</code> file into
- * memory, create and fill up a {@link Settings} instance manually and
- * save it in to the <code>config.yaml</code> file in the configuration
- * folder.
- */
 public class SettingsMorph {
 
     /**

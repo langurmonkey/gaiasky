@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.data.orbit;
@@ -30,10 +32,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 
-/**
- * Samples an orbit for a particular Body. This guy is typically
- * used to load orbit data by the {@link OrbitRefresher} daemon.
- */
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private static final String writeDataPath = "/tmp/";
     private static boolean writeData = false;

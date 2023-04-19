@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
@@ -11,10 +18,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenQuad3;
 
-/**
- * The base class for any single-pass filter.
- * Uses a {@link FullscreenQuad3}, in contrast to a regular {@link Filter}.
- */
 public abstract class Filter3<T> {
     protected static final Log logger = Logger.getLogger(Filter3.class);
     protected static final FullscreenQuad3 quad = new FullscreenQuad3();

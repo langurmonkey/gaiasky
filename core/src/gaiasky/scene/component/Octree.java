@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.component;
 
 import com.badlogic.ashley.core.Component;
@@ -9,10 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A component that defines an octree structure.
- * The root of the octree is in the component {@link Octant}.
- */
 public class Octree implements Component {
 
     /** The list with the currently observed objects. **/

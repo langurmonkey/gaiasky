@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.event;
@@ -13,11 +15,6 @@ import gaiasky.scene.entity.EntityRadio;
 
 import java.util.*;
 
-/**
- * Event manager that allows for subscription of observers to events (identified
- * by strings), and also for the creation of event objects by anyone. Events can also
- * be added to be processed with a delay.
- */
 public class EventManager implements IObserver {
 
     /** Singleton pattern **/

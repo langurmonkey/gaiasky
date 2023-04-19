@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.math;
@@ -11,9 +13,6 @@ import net.jafama.FastMath;
 
 import java.io.Serializable;
 
-/**
- * Counterpart to libgdx's Vector3 class, but using double-precision floating point numbers.
- */
 @SuppressWarnings("unused")
 public class Vector3d implements Serializable, Vectord<Vector3d> {
     public final static Vector3d X = new Vector3d(1, 0, 0);

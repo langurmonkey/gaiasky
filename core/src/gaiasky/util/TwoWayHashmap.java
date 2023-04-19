@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util;
@@ -8,12 +10,6 @@ package gaiasky.util;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Simple two-way hashmap implemented with two maps.
- *
- * @param <K> Key type in forward map, value in backward map
- * @param <V> Value type in forward map, key in backward map
- */
 public class TwoWayHashmap<K extends Object, V extends Object> {
 
     private final Map<K, V> forward = new HashMap<K, V>();

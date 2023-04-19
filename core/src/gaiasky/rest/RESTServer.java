@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.rest;
@@ -21,75 +23,6 @@ import java.util.*;
 
 import static spark.Spark.*;
 
-/*
- * REST API for remote procedure calls
- *
- * @author Volker Gaibler, HITS
- * <p>
- * WARNING: only allow and use this in a trusted environment. Incoming commands are
- * *not checked at all* before execution! Remote command execution is generally
- * dangerous. This REST API was developed for an exhibition with an isolated network.
- * <p>
- * The API allows calling methods from the scripting interface
- * ({@link IScriptingInterface}) remotely via HTTP for remote control.
- * <p>
- * Syntax of API commands is set to be close to the Java method interface, but does not cover
- * it in all generality to permit simple usage. Particularly note that the REST server receives
- * strings from the client and will try to convert them into correct types.
- * <p>
- * Commands require HTTP request parameter having the names for the formal parameters of the
- * script interface methods to allow simple construction of HTTP requests based on the scripting
- * interface source documentation. We use Java reflections with access to the formal parameter
- * names. Accordingly, the code needs to be compiled with "-parameters" (otherwise parameters
- * are named arg0, arg1, ...).
- * <p>
- * Both GET and POST requests are accepted. Although GET requests are not supposed to have
- * side effects, we include them for easy usage with a browser.
- * <p>
- * Issue commands with a syntax like the following:
- * - http://localhost:8080/api/setCameraUp?up=[1.,0.,0.]
- * - http://localhost:8080/api/getScreenWidth
- * - http://localhost:8080/api/goToObject?name=Jupiter&angle=32.9&focusWait=2
- * <p>
- * Give booleans, ints, floats, doubles, strings as they are, vectors comma-separated with
- * square brackets around: true, 42, 3.1, 3.14, Super-string, [1,2,3], [Do,what,they,told,ya].
- * Note that you might need to escape or url-encode characters in a browser for this
- * (e.g. spaces or "=").
- * <p>
- * Response with return data is in JSON format, containing key/value pairs.
- * The "success" pair tells you about success/failure of the call,
- * the "value" pair gives the return value. Void methods will contain a "null" return value.
- * The "text" pair can give additional information on the call.
- * <p>
- * The 'cmd_syntax' entry you get from the 'help' command (e.g. http://localhost:8080/api/help)
- * gives a summary of permitted commands and their return type. Details on the meaning of the
- * command and its parameters need to be found from the scripting API documentation:
- * https://gaia.ari.uni-heidelberg.de/gaiasky/docs/javadoc/latest/gaiasky/script/IScriptingInterface.html
- * <p>
- * To examine, what happens during an API call, set the default log level of SimpleLogger to
- * 'info' or lower (in core/build.gradle).
- * <p>
- * Return values are given as JSON objects that contain key-value pairs:
- * - "success" indicates whether the API call was executed successful or not
- * - "text" may give additional text information
- * - "value" contains the return value or null if there is no return value
- * <p>
- * For testing with curl, a call like the following allows will deal with url-encoding:
- * curl "http://localhost:8080/api/setHeadlineMessage" --data headline='Hi, how are you?'
- */
-
-/**
- * REST Server class to implement the REST API
- *
- * @author Volker Gaibler
- * <p>
- * Implemented with Spark, which launches an embedded jetty. Spark
- * recommends static context.
- * <p>
- * This gets initialized in
- * core/src/gaiasky/desktop/GaiaSkyDesktop.java with some
- * lazy initialization since Spark wants to be used in static context.
- */
 public class RESTServer {
 
     /* Class variables: */

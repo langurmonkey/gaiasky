@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.data.group;
@@ -22,23 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Writes and reads the metadata to/from binary. The format is as follows:
- * <p>
- * - 32 bits (int) with the number of nodes, nNodes repeat the following nNodes times (for each node)
- * - 32 bits (int) - pageId - The ID of the octant, or octree node
- * - 32 bits (float) - centreX - The x component of the centre
- * - 32 bits (float) - centreY - The y component of the centre
- * - 32 bits (float) - centreZ - The z component of the centre
- * - 32 bits (float) - sx - The half-size in x
- * - 32 bits (float) - sy - The half-size in y
- * - 32 bits (float) - sz - The half-size in z
- * - 32 bits * 8 (int) - childrenIds - 8 integers with the ids of the children. If no child in the given position, the id is negative.
- * - 32 bits (int) - depth - The level (depth) of the node in the tree
- * - 32 bits (int) - nObjects - The cumulative number of objects of this node and its descendants
- * - 32 bits (int) - ownObjects - The number of objects of this node
- * - 32 bits (int) - childCount - The number of children nodes
- */
 public class MetadataBinaryIO {
     private static final Log logger = Logger.getLogger(MetadataBinaryIO.class);
 

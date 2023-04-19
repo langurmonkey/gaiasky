@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.contrib.postprocess.utils;
 
 import com.badlogic.gdx.graphics.GL20;
@@ -6,10 +13,6 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
-/**
- * Encapsulates a fullscreen quad, geometry is aligned to the screen corners.
- * Contains the frustum corner index as an additional vertex attribute.
- */
 public class FullscreenQuad3 {
     private static final int VERT_SIZE = 20;
     private static final float[] verts = new float[VERT_SIZE];

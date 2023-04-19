@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util;
 
 import com.badlogic.gdx.utils.Array;
@@ -8,11 +15,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Scanner;
 
-/**
- * Manages and generates sentences to display during loading.
- * It uses a series of files containing verbs, adjectives and objects, which are
- * optionally localized, and an order file to compose random sentences.
- */
 public class LoadingTextGenerator {
     private static final int MAX_KEYS = 100;
     private final String[] verbs;

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.system.render.draw;
 
 import com.badlogic.ashley.core.Entity;
@@ -27,11 +34,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 
-/**
- * Renders billboards (camera-oriented quads), optionally with a global texture. If a texture is not provided,
- * it is expected that the provided shader program does the rendering procedurally, or
- * the object itself binds its own texture.
- */
 public class BillboardRenderer extends AbstractRenderSystem implements IObserver {
 
     private final ComponentType componentType;

@@ -1,23 +1,9 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
-
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 
 package gaiasky.util.gdx.model;
 
@@ -35,16 +21,6 @@ import gaiasky.util.gdx.IntRenderableProvider;
 import gaiasky.util.gdx.shader.IntShader;
 import gaiasky.util.gdx.shader.Material;
 
-/**
- * An instance of a {@link IntModel}, allows to specify global transform and modify the materials, as it has a copy of the model's
- * materials. Multiple instances can be created from the same IntModel, all sharing the meshes and textures of the IntModel. The IntModel
- * owns the meshes and textures, to dispose of these, the IntModel has to be disposed. Therefor, the IntModel must outlive all its
- * IntModelInstances</p>
- * <p>
- * The IntModelInstance creates a full copy of all materials, nodes and animations.
- *
- * @author badlogic, xoppa
- */
 public class IntModelInstance implements IntRenderableProvider {
     /**
      * Whether, by default, {@link NodeKeyframe}'s are shared amongst {@link IntModel} and IntModelInstance. Can be overridden per

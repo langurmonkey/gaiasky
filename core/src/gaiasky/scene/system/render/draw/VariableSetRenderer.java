@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.scene.system.render.draw;
@@ -35,9 +37,6 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-/**
- * Renders variable star sets using regular arrays via billboards with geometry (quads as two triangles).
- */
 public class VariableSetRenderer extends PointCloudTriRenderSystem implements IObserver {
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;

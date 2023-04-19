@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.loader;
 
 import com.badlogic.gdx.files.FileHandle;
@@ -11,23 +18,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Reads warp mesh files as defined by Paul Bourke <a href="http://paulbourke.net/dataformats/meshwarp/">here</a>.
- *
- * <ol>
- * <li>First line contains the mesh type, (2) rectangular or (1) polar.</li>
- * <li>Second line contains two integers with the dimensions, nx and ny.</li>
- * <li>The following lines contain the nodes, nx times ny. Each line contains 5 values:
- * <ol>
- *     <li>Position x and y of the node in normalized coordinates. These coordinates can extend beyond the image bounds [0,1].</li>
- *     <li>Texture coordinates UV in [0,1]. These refer to the original input image. Values outside of [0,1] indicate that the node is not to be used.</li>
- *     <li>Multiplicative intensity (alpha?) for brightness compensation.</li>
- * </ol>
- *
- * </li>
- *
- * </ol>
- */
 public class WarpMeshReader {
 
     static public boolean isValidWarpMeshAscii(Path file) {

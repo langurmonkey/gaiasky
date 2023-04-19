@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.system.render.draw.text;
 
 import com.badlogic.gdx.Gdx;
@@ -33,9 +40,6 @@ import java.text.DecimalFormat;
 
 import static gaiasky.scene.Mapper.base;
 
-/**
- * Contains the logic to render labels for specific objects.
- */
 public class LabelEntityRenderSystem {
 
     private final Vector3d D31 = new Vector3d();

@@ -1,23 +1,12 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia.utils;
 
-/**
- * This interface provides the method through which a set of ODEs may be coded
- * and supplied to the methods in the class RungeKutta. This class is taken from
- * the Java library developed by Michael Thomas Flanagan available at
- * <a href="www.ee.ucl.ac.uk/~mflanaga">Michael Thomas Flanagan</a>.
- *
- * <p>NOTE: This is for RSLS use only - do not use in any other software</p>
- *
- * @author Francesca De Angeli (fda@ast.cam.ac.uk)
- * <p>
- * Modified by L. Lindegren to use long (e.g. time in ns) as independent
- * variable
- */
 public interface DiffnFunctionNs {
     /**
      * @param t time

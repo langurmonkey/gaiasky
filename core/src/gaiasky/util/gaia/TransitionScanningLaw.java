@@ -1,26 +1,10 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
-/*
- * GaiaTools Copyright (C) 2006 Gaia Data Processing and Analysis Consortium
- *
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or (at your option)
- * any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- */
 package gaiasky.util.gaia;
 
 import gaiasky.util.Nature;
@@ -28,31 +12,6 @@ import gaiasky.util.coord.NslSun;
 import gaiasky.util.gaia.time.Duration;
 import gaiasky.util.math.Quaterniond;
 
-/**
- * Implements a smooth transition from {@link Nsl37} to {@link Epsl}, or vice
- * versa.
- * <p>
- * The scanning law used by this AttitudeDataServer is only valid (to required
- * accuracy) in a short (< 0.5 day) time interval when the spin axis is less
- * than a degree of the ecliptic. The revolving phase angle (nu) is written as
- * nu(t) = 0.5 * acc * t^2 (in preceding mode, that is when nu is close to 0) or
- * as nu(t) = PI + 0.5 * acc * t^2 (in following mode, that is when nu is close
- * to PI). Here t is the time in [days] from the reference time (tRef) of this
- * scanning law, and acc is a constant. On initialization, acc is set to a value
- * such that nu(t) according to this law agrees with Nsl37 (for some suitable
- * choice of initial angles) both in value and rate at t = tRef + T, where T is
- * the ramp-up time (if T > 0) or ramp-down time (if T < 0). At t = tRef the
- * revolving phase is exactly 0 (preceding mode) or PI (following mode).
- * <p>
- * A number of reference quantities can be set as usual by means of setRefTime,
- * setXiRef, setOmegaRef, setTargetPrecRate, and setTargetScanRate from the
- * AnalyticalAttitudeDataServer. Only setNuRef should not be used; it is
- * replaced by setMode(Epsl.Mode). [Nevertheless it is possible to use
- * setNuRef(0.0) instead of setMode(Epsl.Mode.PRECEDING) and setNuRef(Math.PI)
- * instead of setMode(Epsl.Mode.PRECEDING).]
- *
- * @author lennartlindegren
- */
 public class TransitionScanningLaw extends AnalyticalAttitudeDataServer {
 
     protected Duration ramp;

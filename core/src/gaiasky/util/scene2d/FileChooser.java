@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.scene2d;
@@ -31,9 +33,6 @@ import java.nio.file.*;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
-/**
- * A simple file chooser for scene2d.ui
- */
 public class FileChooser extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(FileChooser.class);
     private static final Comparator<FileListItem> dirListComparator = (file1, file2) -> {

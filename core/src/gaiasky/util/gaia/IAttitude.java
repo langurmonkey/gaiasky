@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -8,21 +10,6 @@ package gaiasky.util.gaia;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 
-/**
- * This is the basic interface for all attitude representations and scanning
- * laws. An {@linkplain IAttitude} represents the three-dimensional orientation
- * of the SRS of Gaia at a specific instant in time as well as its inertial
- * angular rotation at that moment.
- * <p>
- * Getters exists to provide the attitude and inertial rotation in various
- * forms, including a quaternion ({@link #getQuaternion()}, a set of heliotropic
- * or equatorial angles and corresponding time derivatives. There are
- * also methods to obtain a number of attitude-related quantities, e.g., the
- * celestial pointings of two FOVs and the AL and AC rates for a particular
- * point in the FoV.
- *
- * @author Lennart Lindegren, Uwe Lammers
- */
 public interface IAttitude {
     /**
      * Get the time that this attitude is valid for as a single long value. The

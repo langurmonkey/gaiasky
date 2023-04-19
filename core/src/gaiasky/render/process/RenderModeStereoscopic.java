@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.render.process;
@@ -37,11 +39,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Renders all the 3D/stereoscopic modes. Renders basically two scenes, one for
- * each eye, and then blends them together on screen with the necessary
- * processing depending on the 3D regime (anaglyph 3D, 3DTV, cross-eye, VR)
- */
 public class RenderModeStereoscopic extends RenderModeAbstract implements IRenderMode, IObserver {
 
     private static final double EYE_ANGLE_DEG = 1.5;

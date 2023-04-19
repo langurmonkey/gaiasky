@@ -1,26 +1,12 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gdx.contrib.utils;
 
-/**************************************************************************
- * *
- * General Purpose Hash Function Algorithms Library *
- * *
- * Author: Arash Partow - 2002 *
- * URL: http://www.partow.net *
- * URL: http://www.partow.net/programming/hashfunctions/index.html *
- * *
- * Copyright notice: *
- * Free use of the General Purpose Hash Function Algorithms Library is *
- * permitted under the guidelines and in accordance with the most current *
- * version of the Common Public License. *
- * http://www.opensource.org/licenses/cpl1.0.php *
- * *
- * *************************************************************************
- */
 public final class Hash {
 
     private Hash() {

@@ -1,18 +1,9 @@
-/*******************************************************************************
- * Copyright 2012 tsagrista
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
 
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
@@ -27,26 +18,21 @@ import gaiasky.util.gdx.contrib.postprocess.filters.Blur.BlurType;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
-/**
- * Pseudo lens flare implementation. This is a post-processing effect entirely,
- * no need for light positions or anything. It includes ghost generation, halos,
- * chromatic distortion and blur.
- */
-public final class LensFlare extends PostProcessorEffect {
+public final class PseudoLensFlare extends PostProcessorEffect {
     private final PingPongBuffer pingPongBuffer;
-    private final Flare lensBefore;
-    private final FlareDirt lensAfter;
+    private final PseudoLensFlareFilter lensBefore;
+    private final PseudoLensFlareDirt lensAfter;
     private final Blur blur;
     private final Bias bias;
     private final Combine combine;
     private Settings settings;
     private boolean blending = false;
     private int sfactor, dfactor;
-    public LensFlare(int fboWidth, int fboHeight) {
+    public PseudoLensFlare(int fboWidth, int fboHeight) {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
 
-        lensBefore = new Flare(fboWidth, fboHeight);
-        lensAfter = new FlareDirt();
+        lensBefore = new PseudoLensFlareFilter(fboWidth, fboHeight);
+        lensAfter = new PseudoLensFlareDirt();
         blur = new Blur(fboWidth, fboHeight);
         bias = new Bias();
         combine = new Combine();

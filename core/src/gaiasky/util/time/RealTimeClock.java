@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.time;
@@ -11,10 +13,6 @@ import gaiasky.event.EventManager;
 
 import java.time.Instant;
 
-/**
- * Implements a real time clock. Time flows at the same pace as real life.
- * Similar to GlobalClock with a time warp of 1.
- */
 public class RealTimeClock implements ITimeFrameProvider {
     private static final double SEC_TO_HOUR = 1d / 3600d;
 

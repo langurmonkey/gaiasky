@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.task;
 
 import com.badlogic.ashley.core.Entity;
@@ -25,9 +32,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.util.Arrays;
 import java.util.Comparator;
 
-/**
- * Implements index update process of particle sets.
- */
 public class ParticleSetUpdaterTask implements Runnable, IObserver {
 
     // Minimum amount of time [ms] between two update calls

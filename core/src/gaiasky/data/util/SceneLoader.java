@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.data.util;
 
 import com.badlogic.gdx.Gdx;
@@ -23,9 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-/**
- * Loads the world and all its entities from a list of JSON descriptor files.
- */
 public class SceneLoader extends AsynchronousAssetLoader<Scene, SceneLoaderParameters> {
     private static final Log logger = Logger.getLogger(SceneLoader.class);
 

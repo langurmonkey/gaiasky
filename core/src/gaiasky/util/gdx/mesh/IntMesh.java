@@ -1,23 +1,9 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
-
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 
 package gaiasky.util.gdx.mesh;
 
@@ -43,32 +29,6 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * <p>
- * This implementation uses 32-bit integer indices instead of 16-bit shorts used in {@link com.badlogic.gdx.graphics.Mesh}
- * </p>
- * <p>
- * A Mesh holds vertices composed of attributes specified by a {@link VertexAttributes} instance. The vertices are held either in
- * VRAM in form of vertex buffer objects or in RAM in form of vertex arrays. The former variant is more performant and is
- * preferred over vertex arrays if hardware supports it.
- * </p>
- *
- * <p>
- * Meshes are automatically managed. If the OpenGL context is lost all vertex buffer objects get invalidated and must be reloaded
- * when the context is recreated. This only happens on Android when a user switches to another application or receives an incoming
- * call. A managed Mesh will be reloaded automagically so you don't have to do this manually.
- * </p>
- *
- * <p>
- * A Mesh consists of vertices and optionally indices which specify which vertices define a triangle. Each vertex is composed of
- * attributes such as position, normal, color or texture coordinate. Note that not all of this attributes must be given, except
- * for position which is non-optional. Each attribute has an alias which is used when rendering a Mesh in OpenGL ES 2.0. The alias
- * is used to bind a specific vertex attribute to a shader attribute. The shader source and the alias of the attribute must match
- * exactly for this to work.
- * </p>
- *
- * @author mzechner, Dave Clayton <contact@redskyforge.com>, Xoppa
- */
 public class IntMesh implements Disposable {
     /** list of all meshes **/
     static final Map<Application, Array<IntMesh>> meshes = new HashMap<>();

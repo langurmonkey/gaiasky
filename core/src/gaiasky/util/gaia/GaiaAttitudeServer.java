@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -15,11 +17,6 @@ import gaiasky.util.math.Quaterniond;
 
 import java.util.Date;
 
-/**
- * Provides caching of the last Nsl37 attitude requested. This allows for
- * calculating the attitude only once in each time step and using it in several
- * points in the processing.
- */
 public class GaiaAttitudeServer implements IAttitudeServer {
     private static final Log logger = Logger.getLogger(GaiaAttitudeServer.class);
     // Dummy attitude for launch sequence

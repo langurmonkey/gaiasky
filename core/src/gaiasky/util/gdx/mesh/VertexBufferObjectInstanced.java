@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gdx.mesh;
@@ -19,30 +21,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-/**
- * <p>
- * A {@link VertexData} implementation that uses vertex buffer objects and vertex array objects to
- * construct a global buffer and an instance buffer for instanced rendering.
- * The global buffer holds the attributes that do not change (i.e. position, uv, etc.), the instance buffer holds attributes
- * that change for every instance.
- * (This is required for OpenGL 3.0+ core profiles. In particular, the default VAO has been
- * deprecated, as has the use of client memory for passing vertex attributes.) Use of VAOs should
- * give a slight performance benefit since you don't have to bind the attributes on every draw
- * anymore.
- * </p>
- *
- * <p>
- * If the OpenGL ES context was lost you can call {@link #invalidate()} to recreate a new OpenGL vertex buffer object.
- * </p>
- *
- * <p>
- * VertexBufferObjectInstanced objects must be disposed via the {@link #dispose()} method when no longer needed
- * </p>
- * <p>
- * Code adapted from {@link VertexBufferObject}.
- *
- * @author mzechner, Dave Clayton <contact@redskyforge.com>, Nate Austin <nate.austin gmail>
- */
 public class VertexBufferObjectInstanced implements IntVertexData {
     final static IntBuffer tmpHandle = BufferUtils.newIntBuffer(1);
 

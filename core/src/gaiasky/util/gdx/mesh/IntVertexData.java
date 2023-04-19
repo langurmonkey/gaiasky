@@ -1,23 +1,9 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
-
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
 
 package gaiasky.util.gdx.mesh;
 
@@ -29,12 +15,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.nio.FloatBuffer;
 
-/**
- * A VertexData instance holds vertices for rendering with OpenGL. It is implemented as either a {@link VertexArray} or a
- * {@link VertexBufferObject}. Only the later supports OpenGL ES 2.0.
- *
- * @author mzechner
- */
 public interface IntVertexData extends Disposable {
     /** @return the number of vertices this VertexData stores */
     int getNumVertices();

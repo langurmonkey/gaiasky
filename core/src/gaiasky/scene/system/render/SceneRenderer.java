@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.scene.system.render;
@@ -61,9 +63,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.render.RenderGroup.*;
 
-/**
- * Initializes the render infrastructure renders the scene using different render systems.
- */
 public class SceneRenderer implements ISceneRenderer, IObserver {
     private static final Log logger = Logger.getLogger(SceneRenderer.class);
     // Indexes

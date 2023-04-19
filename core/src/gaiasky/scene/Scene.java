@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene;
 
 import com.badlogic.ashley.core.*;
@@ -31,10 +38,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Represents a scene, contains and manages the engine. The engine contains
- * and manages all entities and systems in the world.
- */
 public class Scene {
     public static final String ROOT_NAME = "Universe";
     private static final Logger.Log logger = Logger.getLogger(Scene.class);

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.g2d;
 
 import com.badlogic.gdx.Gdx;
@@ -15,13 +22,6 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.mesh.IntMesh.VertexDataType;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-/**
- * Draws batched quads using indices.
- *
- * @author mzechner
- * @author Nathan Sweet
- * @see Batch
- */
 public class ExtSpriteBatch implements ExtBatch {
     /**
      * @deprecated Do not use, this field is for testing only and is likely to be removed. Sets the {@link VertexDataType} to be

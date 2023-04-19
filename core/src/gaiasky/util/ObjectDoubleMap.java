@@ -1,18 +1,9 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
 
 package gaiasky.util;
 
@@ -24,25 +15,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/**
- * An unordered map where the keys are objects and the values are unboxed doubles. Null keys are not allowed. No allocation is
- * done except when growing the table size.
- * <p>
- * This class performs fast contains and remove (typically O(1), worst case O(n) but that is rare in practice). Add may be
- * slightly slower, depending on hash collisions. Hashcodes are rehashed to reduce collisions and the need to resize. Load factors
- * greater than 0.91 greatly increase the chances to resize to the next higher POT size.
- * <p>
- * Unordered sets and maps are not designed to provide especially fast iteration. Iteration is faster with OrderedSet and
- * OrderedMap.
- * <p>
- * This implementation uses linear probing with the backward shift algorithm for removal. Hashcodes are rehashed using Fibonacci
- * hashing, instead of the more common power-of-two mask, to better distribute poor hashCodes (see <a href=
- * "https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/">Malte
- * Skarupke's blog post</a>). Linear probing continues to work even when all hashCodes collide, just more slowly.
- *
- * @author Nathan Sweet
- * @author Tommy Ettinger
- */
 @SuppressWarnings("unchecked")
 public class ObjectDoubleMap<K> implements Iterable<ObjectDoubleMap.Entry<K>> {
     public int size;

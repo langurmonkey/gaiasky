@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.vr.openxr;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -16,9 +23,6 @@ import org.lwjgl.system.MemoryStack;
 import static com.badlogic.gdx.math.Matrix4.M00;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
-/**
- * Manages an OpenXR view and sets the perspective camera to its right state.
- */
 public class XrViewManager {
 
     private final Quaternion quaternion = new Quaternion();

@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.scene.system.render.draw;
@@ -29,9 +31,6 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.List;
 
-/**
- * Renders symbolic objects (usually part of the UI) as points.
- */
 public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     protected static final Log logger = Logger.getLogger(PointPrimitiveRenderSystem.class);
 

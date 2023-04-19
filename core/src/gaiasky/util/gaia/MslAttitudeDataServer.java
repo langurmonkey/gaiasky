@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -12,13 +14,6 @@ import gaiasky.util.math.Quaterniond;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This class implements the Modified Scanning Law (MSL) by Hermite
- * interpolation of the attitude quaternion among values obtained by numerical
- * integration of the basic equations in heliotropic angles.
- *
- * @author Lennart Lindegren
- */
 public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer {
 
     protected ModifiedScanningLaw msl;

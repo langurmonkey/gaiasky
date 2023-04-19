@@ -1,6 +1,8 @@
 /*
- * Copyright LWJGL. All rights reserved.
- * License terms: https://www.lwjgl.org/license
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 package gaiasky.vr.openxr;
 
@@ -31,10 +33,6 @@ import static org.lwjgl.system.MemoryStack.stackInts;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memPutInt;
 
-/**
- * A helper class with some static methods to help applications with OpenXR related tasks that are cumbersome in
- * some way.
- */
 public final class XrHelper {
 
     private XrHelper() {

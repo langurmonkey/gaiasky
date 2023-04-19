@@ -1,17 +1,14 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.math;
 
 import java.io.Serializable;
 
-/**
- * Encapsulates a Rayd having a starting position and a unit length direction.
- *
- * @author badlogicgames@gmail.com
- */
 public class Rayd implements Serializable {
     private static final long serialVersionUID = -620692054835390878L;
     static Vector3d tmp = new Vector3d();

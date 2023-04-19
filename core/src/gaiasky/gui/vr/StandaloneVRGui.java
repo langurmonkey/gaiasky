@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.gui.vr;
 
 import com.badlogic.gdx.Gdx;
@@ -51,12 +58,6 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.*;
 
-/**
- * Manages the full rendering cycle of a VR user interface.
- * Creates a surface in front of the user (in 3D world) with the given IGui, and
- * takes into account the HMD position/orientation. It also renders the detected
- * controller(s).
- */
 public class StandaloneVRGui<T extends IGui> implements IGui, XrRenderer {
     private static final Logger.Log logger = Logger.getLogger(StandaloneVRGui.class);
 

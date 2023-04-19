@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.gdx.loader;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
@@ -22,14 +29,6 @@ import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.gdx.graphics.BufferedImageTextureData;
 
-/**
- * {@link AssetLoader} for {@link Texture} instances. The pixel data is loaded asynchronously. The texture is then created on the
- * rendering thread, synchronously. Passing a {@link TextureParameter} to
- * {@link AssetManager#load(String, Class, AssetLoaderParameters)} allows one to specify parameters as can be passed to the
- * various Texture constructors, e.g. filtering, whether to generate mipmaps and so on.
- *
- * @author mzechner
- */
 public class OwnTextureLoader extends AsynchronousAssetLoader<Texture, TextureParameter> {
     static public class TextureLoaderInfo {
         String filename;

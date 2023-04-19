@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.scene.system;
 
 import com.badlogic.ashley.core.Engine;
@@ -12,14 +19,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
 
-/**
- * A simple EntitySystem that iterates over each entity in parallel and calls processEntity() for each entity every time the EntitySystem is
- * updated. The main difference with {@link IteratingSystem} is that this system processes the entities in the
- * family in parallel. There is an overhead each time the system is called to copy the list of entities to
- * a Java streams-ready collection for parallel streaming.
- *
- * @author Toni Sagrista
- */
 public abstract class ParallelSystem extends EntitySystem {
     private final Family family;
     private final ForkJoinPool forkJoinPool;

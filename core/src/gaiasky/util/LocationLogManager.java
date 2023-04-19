@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util;
 
 import gaiasky.GaiaSky;
@@ -15,10 +22,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.time.Instant;
 import java.util.LinkedList;
 
-/**
- * This guy is in charge of logging the visited locations and serving
- * them to the corresponding subsystems.
- */
 public class LocationLogManager implements IObserver {
     protected static final Log logger = Logger.getLogger(LocationLogManager.class);
 

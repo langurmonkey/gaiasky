@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
+ */
+
 package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -6,9 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.gui.vr.FixedScreenViewport;
 
-/**
- * This stage does not depend on screen dimensions, but rather on a fixed size given at creation.
- */
 public class FixedStage extends Stage {
 
     private final int width;

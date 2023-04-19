@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.input;
@@ -30,9 +32,6 @@ import gaiasky.util.comp.ViewAngleComparator;
 import java.util.Comparator;
 import java.util.Objects;
 
-/**
- * Mouse and keyboard input listener for the natural camera.
- */
 public class MainMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
 
     /** Maximum double click time, in ms **/

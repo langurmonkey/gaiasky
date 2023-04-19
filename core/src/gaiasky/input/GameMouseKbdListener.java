@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.input;
@@ -18,9 +20,6 @@ import gaiasky.gui.ModePopupInfo;
 import gaiasky.scene.camera.NaturalCamera;
 import org.lwjgl.glfw.GLFW;
 
-/**
- * Mouse and keyboard input listener for the natural camera in game mode.
- */
 public class GameMouseKbdListener extends AbstractMouseKbdListener implements IObserver {
     private final NaturalCamera camera;
     private float prevX = 0, prevY = 0;

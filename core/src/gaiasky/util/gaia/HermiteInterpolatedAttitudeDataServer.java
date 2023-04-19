@@ -1,6 +1,8 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia;
@@ -12,13 +14,6 @@ import gaiasky.util.gaia.utils.AttitudeUtils;
 import gaiasky.util.gaia.utils.Interpolator;
 import gaiasky.util.math.Quaterniond;
 
-/**
- * This abstract class contains the fields needed to store numerical attitude in
- * the form of arrays (q and SRS rates), and a method to calculate the attitude
- * for any given time using cubic Hermite interpolation
- *
- * @author Lennart Lindegren
- */
 public abstract class HermiteInterpolatedAttitudeDataServer extends
         NumericalAttitudeDataServer<IAttitude> {
     protected int nT;

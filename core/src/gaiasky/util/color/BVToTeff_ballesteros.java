@@ -1,18 +1,12 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.color;
 
-/**
- * Black-body based conversion between effective temperature and B-V color.
- * <p>
- * Ballesteros 2012 (EPL 97, 34008) present a conversion between
- * effective temperature and B-V color index based on a black body
- * spectrum and the filter functions.
- * </p>
- */
 public class BVToTeff_ballesteros {
     private final double a;
     private final double b;

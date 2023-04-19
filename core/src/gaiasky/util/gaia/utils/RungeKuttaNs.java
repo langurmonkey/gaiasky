@@ -1,29 +1,12 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.gaia.utils;
 
-/**
- * Provides an implementation of the Runge-Kutta method for solving single or
- * sets of ordinary differential equations (ODEs).
- * <p>
- * A set of ODEs are supplied by means of the interface DiffnFunction.
- * <p>
- * <p>
- * This class is taken from the Java library developed by Michael Thomas
- * Flanagan available at <a href="http://www.ee.ucl.ac.uk/~mflanaga/java/RungeKutta.html">
- * http://www.ee.ucl.ac.uk/~mflanaga/java/RungeKutta.html </a>
- *
- *
- * <p>NOTE: This is for RSLS use only - do not use in any other software</p>
- *
- * @author Francesca De Angeli (fda@ast.cam.ac.uk)
- * <p>
- * Modified by L. Lindegren to include only one method, and using long
- * (e.g., time in ns) as independent variable
- */
 public class RungeKuttaNs {
 
     /**

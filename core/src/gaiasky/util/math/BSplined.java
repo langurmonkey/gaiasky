@@ -1,13 +1,14 @@
 /*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
+ * Copyright (c) 2023 Gaia Sky - All rights reserved.
+ *  This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
+ *  You may use, distribute and modify this code under the terms of MPL2.
+ *  See the file LICENSE.md in the project root for full license details.
  */
 
 package gaiasky.util.math;
 
 import com.badlogic.gdx.utils.Array;
 
-/** @author Xoppa */
 public class BSplined<T extends Vectord<T>> implements Pathd<T> {
     private final static double d6 = 1f / 6f;
     public T[] controlPoints;
