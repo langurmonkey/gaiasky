@@ -12,39 +12,40 @@ uniform vec3 u_color;
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
 
+#ifdef simpleLensFlare
 // =================
 // SIMPLE LENS FLARE
 // =================
-vec3 lensflare(vec2 uv, vec2 pos, float intensity) {
+vec3 flare_simple(vec2 uv, vec2 pos, float intensity) {
     vec2 main = uv - pos;
     vec2 uvd = uv * (length(uv));
 
     float dist = length(main);
-    dist = pow(dist, .1);
+    dist = pow(dist, 0.1);
 
-    float f1 = max(0.01-pow(length(uv+1.2*pos), 1.9), .0)*7.0;
+    float f1 = max(0.01-pow(length(uv+1.2*pos), 1.9), 0.0)*7.0;
 
-    float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos), 2.0)), .0)*00.1;
-    float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos), 2.0)), .0)*00.08;
-    float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*pos), 2.0)), .0)*00.06;
+    float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos), 2.0)), 0.0)*00.1;
+    float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos), 2.0)), 0.0)*00.08;
+    float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*pos), 2.0)), 0.0)*00.06;
 
     vec2 uvx = mix(uv, uvd, -0.5);
 
-    float f4 = max(0.01-pow(length(uvx+0.4*pos), 2.4), .0)*6.0;
-    float f42 = max(0.01-pow(length(uvx+0.47*pos), 2.4), .0)*5.0;
-    float f43 = max(0.01-pow(length(uvx+0.54*pos), 2.4), .0)*3.0;
+    float f4 = max(0.01-pow(length(uvx+0.4*pos), 2.4), 0.0)*6.0;
+    float f42 = max(0.01-pow(length(uvx+0.47*pos), 2.4), 0.0)*5.0;
+    float f43 = max(0.01-pow(length(uvx+0.54*pos), 2.4), 0.0)*3.0;
 
     uvx = mix(uv, uvd, -.4);
 
-    float f5 = max(0.01-pow(length(uvx+0.2*pos), 5.5), .0)*2.0;
-    float f52 = max(0.01-pow(length(uvx+0.4*pos), 5.5), .0)*2.0;
-    float f53 = max(0.01-pow(length(uvx+0.6*pos), 5.5), .0)*2.0;
+    float f5 = max(0.01-pow(length(uvx+0.2*pos), 5.5), 0.0)*2.0;
+    float f52 = max(0.01-pow(length(uvx+0.4*pos), 5.5), 0.0)*2.0;
+    float f53 = max(0.01-pow(length(uvx+0.6*pos), 5.5), 0.0)*2.0;
 
     uvx = mix(uv, uvd, -0.5);
 
-    float f6 = max(0.01-pow(length(uvx-0.3*pos), 1.6), .0)*6.0;
-    float f62 = max(0.01-pow(length(uvx-0.325*pos), 1.6), .0)*3.0;
-    float f63 = max(0.01-pow(length(uvx-0.35*pos), 1.6), .0)*5.0;
+    float f6 = max(0.01-pow(length(uvx-0.3*pos), 1.6), 0.0)*6.0;
+    float f62 = max(0.01-pow(length(uvx-0.325*pos), 1.6), 0.0)*3.0;
+    float f63 = max(0.01-pow(length(uvx-0.35*pos), 1.6), 0.0)*5.0;
 
     vec3 c = vec3(.0);
 
@@ -61,12 +62,14 @@ vec3 cc(vec3 color, float factor, float factor2) {
     return mix(color, vec3(w) * factor, w * factor2);
 }
 
-vec4 lens_flare_simple(vec2 uv, float intensity, vec2 light_pos) {
-    vec3 color = u_color * lensflare(uv, light_pos, intensity);
+vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
+    vec3 color = u_color * flare_simple(uv, light_pos, intensity);
     color = cc(color, 0.5, 0.1) + texture(u_texture0, v_texCoords).rgb;
     return vec4(color, 1.0);
 }
+#endif // simpleLensFlare
 
+#ifdef complexLensFlare
 // ===================
 // COMOPLEX LENS FLARE
 // ===================
@@ -77,16 +80,16 @@ float rnd(vec2 p) {
 }
 
 float rnd(float w) {
-    float f = fract(sin(w)*1000.);
+    float f = fract(sin(w)*1000.0);
     return f;
 }
 
 float regShape(vec2 p, int N) {
     float f;
 
-    float a=atan(p.x, p.y)+.2;
+    float a=atan(p.x, p.y)+0.2;
     float b=6.28319/float(N);
-    f=smoothstep(.5, .51, cos(floor(.5+a/b)*b-a)*length(p.xy));
+    f=smoothstep(0.5, 0.51, cos(floor(0.5+a/b)*b-a)*length(p.xy));
 
     return f;
 }
@@ -103,13 +106,13 @@ vec3 circle(vec2 p, float size, float decay, vec3 color, vec3 color2, float dist
 
     // Circles big (c), rings (c1), and  tiny (c2).
     float c = max(00.01-pow(length(p + mouse*dist), size*1.4), 0.0)*50.0;
-    float c1 = max(0.001-pow(l-0.3, 1.0/40.)+sin(l*30.), 0.0)*3.0;
+    float c1 = max(0.001-pow(l-0.3, 1.0/40.0)+sin(l*30.0), 0.0)*3.0;
     //float c2 =  max(0.04/pow(length(p-mouse*dist/2. + 0.09)*1.0, 1.0), 0.0)/20.;
     float c2 = 0.0;
-    float s = max(00.01-pow(regShape(p*5.0 + mouse*dist*5.0 + 0.9, 6), 1.0), 0.0)*5.0;
+    float s = max(0.01-pow(regShape(p*5.0 + mouse*dist*5.0 + 0.9, 6), 1.0), 0.0)*5.0;
 
     color = 0.5 + 0.5 * sin(color);
-    color = cos(vec3(0.44, .24, .2) * 8.0 + dist * 4.0) * 0.5 + 0.5;
+    color = cos(vec3(0.44, 0.24, 0.2) * 8.0 + dist * 4.0) * 0.5 + 0.5;
     vec3 f = c * color;
     f += c1 * color;
 
@@ -118,7 +121,7 @@ vec3 circle(vec2 p, float size, float decay, vec3 color, vec3 color2, float dist
     return f - 0.01;
 }
 
-vec4 lens_flare_complex(vec2 uv, float intensity, vec2 light_pos) {
+vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     vec3 circColor = vec3(0.9, 0.2, 0.1);
     vec3 circColor2 = vec3(0.3, 0.1, 0.5);
 
@@ -127,12 +130,12 @@ vec4 lens_flare_complex(vec2 uv, float intensity, vec2 light_pos) {
 
     //this calls the function which adds three circle types every time through the loop based on parameters I
     //got by trying things out. rnd i*2000. and rnd i*20 are just to help randomize things more
-    for (int i = 0; i < 20; i+= 2){
-        color += circle(uv, pow(rnd(i*2000.)*1.0, 2.)+1.41, 0.0, circColor+i, circColor2+i, rnd(i*20.)*3.+0.2-.5, light_pos) * intensity;
+    for (int i = 0; i < 10; i++){
+        color += circle(uv, pow(rnd(i * 2000.0) * 1.0, 2.0) + 1.41, 0.0, circColor+i, circColor2+i, rnd(i * 20.0) * 3.0 + 0.2 - 0.5, light_pos) * intensity;
     }
     //get angle and length of the sun (uv - mouse)
-    float a = atan(uv.y-light_pos.y, uv.x-light_pos.x);
-    float l = max(1.0-length(uv-light_pos)-0.84, 0.0);
+    float a = atan(uv.y - light_pos.y, uv.x - light_pos.x);
+    float l = max(1.0 - length(uv - light_pos) - 0.84, 0.0);
 
     float bright = 0.1;//+0.1/1/3.;//add brightness based on how the sun moves so that it is brightest
     //when it is lined up with the center
@@ -140,9 +143,10 @@ vec4 lens_flare_complex(vec2 uv, float intensity, vec2 light_pos) {
     //multiply by the exponetial e^x ? of 1.0-length which kind of masks the brightness more so that
     //there is a sharper roll of of the light decay from the sun.
     color *= exp(1.0 - length(uv-light_pos)) / 5.0;
-    color = color + texture(u_texture0, v_texCoords).rgb;
+    color = color * 0.5 + texture(u_texture0, v_texCoords).rgb;
     return vec4(color, 1.0);
 }
+#endif // complexLensFlare
 
 float fx(float t, float a) {
     return a * t * cos(t);
@@ -172,12 +176,11 @@ void main(void) {
         }
         lum /= N_SAMPLES;
 
-        float weight = clamp(1.0 - length(light_pos - 0.5), 0.0, 1.0);
+        float weight = clamp(1.0 - 2.0 * length(light_pos), 0.0, 1.0);
         float intensity = u_intensity * lum * weight;
 
         if (intensity > 0.0) {
-            //fragColor = lens_flare_simple(uv, intensity, light_pos);
-            fragColor = lens_flare_complex(uv, intensity, light_pos);
+            fragColor = lens_flare(uv, intensity, light_pos);
         } else {
             fragColor = texture(u_texture0, v_texCoords);
         }

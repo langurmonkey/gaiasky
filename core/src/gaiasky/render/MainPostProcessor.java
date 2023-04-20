@@ -275,7 +275,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             ppb.set(pseudoLensFlare);
         } else {
             // TRUE LENS FLARE
-            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity);
+            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity, 1);
             lensFlare.setColor(new float[] { 1f, 1f, 1f });
             lensFlare.setEnabled(lensFlareSettings.active);
             lensFlare.setEnabledOptions(false, true);

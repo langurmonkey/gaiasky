@@ -15,13 +15,24 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * Simple lens flare filter.
  */
 public final class LensFlareFilter extends Filter<LensFlareFilter> {
+    // Flare type: 0: simple, 1: complex
+    private int type;
     private final Vector2 viewport;
     private final Vector2 lightPosition;
     private final Vector3 color;
     private float intensity;
 
-    public LensFlareFilter(int width, int height, float intensity) {
-        super(ShaderLoader.fromFile("screenspace", "lensflare"));
+    /**
+     * Creates a new lens flare filter with the given parameters.
+     *
+     * @param width The viewport width.
+     * @param height The viewport height.
+     * @param intensity The intensity of the effect.
+     * @param type The type, 0 for simple, 1 for complex.
+     */
+    public LensFlareFilter(int width, int height, float intensity, int type) {
+        super(ShaderLoader.fromFile("screenspace", "lensflare", type == 0 ? "#define simpleLensFlare" : "#define complexLensFlare"));
+        this.type = type;
         this.viewport = new Vector2(width, height);
         this.intensity = intensity;
         this.lightPosition = new Vector2();
@@ -30,6 +41,9 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         rebind();
     }
 
+    public void setType(int type) {
+        this.type = type;
+    }
 
     public void setViewportSize(float width, float height) {
         this.viewport.set(width, height);
