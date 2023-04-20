@@ -2060,8 +2060,10 @@ public class Settings {
         public static class LensFlareSettings {
             public boolean active;
             public LensFlareType type = LensFlareType.REAL;
-            public float intensity = 1.0f;
-            public float pseudoIntensity = 0.15f;
+            /** Strength of the real lens flare. **/
+            public float strength = 1.0f;
+            /** Intensity of the pseudo lens flare type. **/
+            public float intensity = 0.15f;
             public int numGhosts = 8;
             public float haloWidth = 0.5f;
             public int blurPasses = 35;

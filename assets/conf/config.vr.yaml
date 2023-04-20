@@ -533,10 +533,10 @@ postprocess:
     active: true
     # Type of lens flare effect, one of [PSEUDO|REAL].
     type: REAL
-    # Intensity of the real lens flare type.
-    intensity: 1.0
+    # Strength of the real lens flare type.
+    strength: 1.0
     # Intensity of the pseudo lens flare type.
-    pseudoIntensity: 0.15
+    intensity: 0.15
     # Number of ghosts of the pseudo lens flare.
     numGhosts: 8
     # Halo width of the pseudo lens flare.

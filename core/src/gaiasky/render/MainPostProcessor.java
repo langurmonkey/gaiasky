@@ -266,7 +266,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             pseudoLensFlare.setLensColorTexture(lensColor);
             pseudoLensFlare.setLensDirtTexture(lensDirt);
             pseudoLensFlare.setLensStarburstTexture(lensStarBurst);
-            pseudoLensFlare.setFlareIntesity(lensFlareSettings.active ? lensFlareSettings.pseudoIntensity : 0f);
+            pseudoLensFlare.setFlareIntesity(lensFlareSettings.active ? lensFlareSettings.intensity : 0f);
             pseudoLensFlare.setFlareSaturation(lensFlareSettings.flareSaturation);
             pseudoLensFlare.setBaseIntesity(1f);
             pseudoLensFlare.setBias(lensFlareSettings.bias);
@@ -669,7 +669,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                             if (nLights <= 0) {
                                 lensFlare.setIntensity(0);
                             } else {
-                                lensFlare.setIntensity(lensFlareSettings.intensity);
+                                lensFlare.setIntensity(lensFlareSettings.strength);
                             }
                         }
                     }
@@ -784,7 +784,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             if (lensFlareSettings.type.isPseudoLensFlare()) {
                 // Pseudo lens flare.
                 var numGhosts = lensFlareActive ? lensFlareSettings.numGhosts : 0;
-                var intensity = lensFlareActive ? lensFlareSettings.pseudoIntensity : 0;
+                var intensity = lensFlareActive ? lensFlareSettings.intensity : 0;
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
