@@ -9,6 +9,7 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.util.gdx.contrib.postprocess.filters.Glow.Param;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -18,7 +19,8 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
     // Flare type: 0: simple, 1: complex
     private int type;
     private final Vector2 viewport;
-    private final Vector2 lightPosition;
+    private float[] lightPositions;
+    private int nLights = 0;
     private final Vector3 color;
     private float intensity;
 
@@ -35,7 +37,6 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         this.type = type;
         this.viewport = new Vector2(width, height);
         this.intensity = intensity;
-        this.lightPosition = new Vector2();
         this.color = new Vector3(1.5f, 1.2f, 1.2f);
 
         rebind();
@@ -50,9 +51,11 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         setParam(Param.Viewport, this.viewport);
     }
 
-    public void setLightPosition(float[] pos) {
-        this.lightPosition.set(pos[0], pos[1]);
-        setParam(Param.LightPosition, this.lightPosition);
+    public void setLightPositions(int nLights, float[] vec) {
+        this.nLights = nLights;
+        this.lightPositions = vec;
+        setParam(Glow.Param.NLights, this.nLights);
+        setParamv(Glow.Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
     }
 
     public void setIntensity(float intensity) {
@@ -71,8 +74,10 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         setParams(Param.Texture, u_texture0);
         setParams(Param.Viewport, viewport);
         setParams(Param.Intensity, intensity);
-        setParams(Param.LightPosition, lightPosition);
         setParams(Param.Color, color);
+        setParams(Glow.Param.NLights, nLights);
+        if (lightPositions != null)
+            setParamsv(Glow.Param.LightPositions, lightPositions, 0, nLights * 2);
         endParams();
     }
 
@@ -84,7 +89,8 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
-        LightPosition("u_lightPosition", 2),
+        LightPositions("u_lightPositions", 2),
+        NLights("u_nLights", 0),
         Color("u_color", 3),
         Intensity("u_intensity", 0),
         Viewport("u_viewport", 2);

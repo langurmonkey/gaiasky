@@ -3,10 +3,13 @@
 
 uniform sampler2D u_texture0;
 
+#define MAX_LIGHTS 10
+
 // Viewport dimensions along X and Y
 uniform vec2 u_viewport;
 uniform float u_intensity;
-uniform vec2 u_lightPosition;
+uniform vec2 u_lightPositions[MAX_LIGHTS];
+uniform int u_nLights;
 uniform vec3 u_color;
 
 in vec2 v_texCoords;
@@ -64,10 +67,10 @@ vec3 cc(vec3 color, float factor, float factor2) {
 
 vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     vec3 color = u_color * flare_simple(uv, light_pos, intensity);
-    color = cc(color, 0.5, 0.1) + texture(u_texture0, v_texCoords).rgb;
+    color = cc(color, 0.5, 0.1);
     return vec4(color, 1.0);
 }
-#endif // simpleLensFlare
+#endif// simpleLensFlare
 
 #ifdef complexLensFlare
 // ===================
@@ -104,26 +107,23 @@ vec3 circle(vec2 p, float size, float decay, vec3 color, vec3 color2, float dist
     // l2 is used in the rings as well
     float l2 = length(p + mouse*(dist*4.0))+size/3.0;
 
-    // Circles big (c), rings (c1), and  tiny (c2).
-    float c = max(00.01-pow(length(p + mouse*dist), size*1.4), 0.0)*50.0;
-    float c1 = max(0.001-pow(l-0.3, 1.0/40.0)+sin(l*30.0), 0.0)*3.0;
-    //float c2 =  max(0.04/pow(length(p-mouse*dist/2. + 0.09)*1.0, 1.0), 0.0)/20.;
-    float c2 = 0.0;
-    float s = max(0.01-pow(regShape(p*5.0 + mouse*dist*5.0 + 0.9, 6), 1.0), 0.0)*5.0;
+    // Circles big (c), rings (c1).
+    float c = max(00.01-pow(length(p + mouse*dist), size*1.4), 0.0) * 35.0;
+    float c1 = max(0.001-pow(l-0.3, 1.0/40.0)+sin(l*30.0), 0.0) * 9.0;
+    float s = max(0.01-pow(regShape(p*5.0 + mouse*dist*5.0 + 0.9, 6), 1.0), 0.0) * 9.0;
 
     color = 0.5 + 0.5 * sin(color);
     color = cos(vec3(0.44, 0.24, 0.2) * 8.0 + dist * 4.0) * 0.5 + 0.5;
     vec3 f = c * color;
     f += c1 * color;
 
-    f += c2 * color;
     f +=  s * color;
     return f - 0.01;
 }
 
 vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
-    vec3 circColor = vec3(0.9, 0.2, 0.1);
-    vec3 circColor2 = vec3(0.3, 0.1, 0.5);
+    vec3 circColor = u_color;
+    vec3 circColor2 = clamp(u_color + vec3(-0.4, -0.1, 0.4), 0.0, 1.0);
 
     //now to make the sky not black
     vec3 color = vec3(0.0);
@@ -131,7 +131,7 @@ vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     //this calls the function which adds three circle types every time through the loop based on parameters I
     //got by trying things out. rnd i*2000. and rnd i*20 are just to help randomize things more
     for (int i = 0; i < 10; i++){
-        color += circle(uv, pow(rnd(i * 2000.0) * 1.0, 2.0) + 1.41, 0.0, circColor+i, circColor2+i, rnd(i * 20.0) * 3.0 + 0.2 - 0.5, light_pos) * intensity;
+        color += circle(uv, pow(rnd(i * 2000.0) * 1.0, 2.0) + 1.41, 0.0, circColor+i, circColor2+i, rnd(i * 20.0) * 3.0 + 0.2 - 0.5, light_pos);
     }
     //get angle and length of the sun (uv - mouse)
     float a = atan(uv.y - light_pos.y, uv.x - light_pos.x);
@@ -142,11 +142,11 @@ vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
 
     //multiply by the exponetial e^x ? of 1.0-length which kind of masks the brightness more so that
     //there is a sharper roll of of the light decay from the sun.
-    color *= exp(1.0 - length(uv-light_pos)) / 5.0;
-    color = color * 0.5 + texture(u_texture0, v_texCoords).rgb;
+    color *= exp(1.0 - length(uv - light_pos)) / 5.0;
+    color = color * 0.4 * intensity;
     return vec4(color, 1.0);
 }
-#endif // complexLensFlare
+#endif// complexLensFlare
 
 float fx(float t, float a) {
     return a * t * cos(t);
@@ -162,28 +162,32 @@ void main(void) {
         vec2 uv = v_texCoords - 0.5;
         float ar = u_viewport.x / u_viewport.y;
         uv.x *= ar;
-        vec2 light_pos = u_lightPosition - 0.5;
+        vec4 color = texture(u_texture0, v_texCoords);
 
-        // Compute intensity of light.
-        float t = 0;
-        float a = 6.0e-4;
-        float dt = 3.0 * 3.14159 / N_SAMPLES;
-        float lum = 0.0;
-        for (int idx = 0; idx < N_SAMPLES; idx++){
-            vec2 curr_coord = clamp(light_pos + vec2(0.5) + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
-            lum += (clamp(texture(u_texture0, curr_coord), 0.0, 1.0)).r;
-            t += dt;
+        for (int light = 0; light < u_nLights; light++) {
+            vec2 light_pos = u_lightPositions[light] - 0.5;
+
+            // Compute intensity of light.
+            float t = 0;
+            float a = 6.0e-3;
+            float dt = 3.0 * 3.14159 / N_SAMPLES;
+            float lum = 0.0;
+            for (int idx = 0; idx < N_SAMPLES; idx++){
+                vec2 curr_coord = clamp(light_pos + vec2(0.5) + vec2(fx(t, a) / ar, fy(t, a)), 0.0, 1.0);
+                lum += (clamp(texture(u_texture0, curr_coord), 0.0, 1.0)).r;
+                t += dt;
+            }
+            lum /= N_SAMPLES;
+
+            float weight = clamp(1.4 - 2.0 * length(light_pos), 0.0, 1.0);
+            float intensity = u_intensity * lum * weight;
+
+            if (intensity > 0.0) {
+                color += lens_flare(uv, intensity, light_pos);
+            }
         }
-        lum /= N_SAMPLES;
 
-        float weight = clamp(1.0 - 2.0 * length(light_pos), 0.0, 1.0);
-        float intensity = u_intensity * lum * weight;
-
-        if (intensity > 0.0) {
-            fragColor = lens_flare(uv, intensity, light_pos);
-        } else {
-            fragColor = texture(u_texture0, v_texCoords);
-        }
+        fragColor = color;
     } else {
         fragColor = texture(u_texture0, v_texCoords);
     }

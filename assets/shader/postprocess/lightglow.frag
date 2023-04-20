@@ -1,7 +1,7 @@
 #version 330 core
 // Light scattering implementation by Toni Sagrista
 
-#define N 30
+#define MAX_LIGHTS 30
 
 // Current frame
 uniform sampler2D u_texture0;
@@ -10,14 +10,14 @@ uniform sampler2D u_texture1;
 
 uniform vec2 u_viewport;
 uniform float u_textureScale;
-uniform vec2 u_lightPositions[N];
-uniform float u_lightViewAngles[N];
-uniform vec3 u_lightColors[N];
+uniform vec2 u_lightPositions[MAX_LIGHTS];
+uniform float u_lightViewAngles[MAX_LIGHTS];
+uniform vec3 u_lightColors[MAX_LIGHTS];
 uniform int u_nLights;
 uniform float u_orientation;
 uniform float u_backbufferScale;
 
-in float v_lums[N];
+in float v_lums[MAX_LIGHTS];
 in vec2 v_texCoords;
 
 layout (location = 0) out vec4 fragColor;

@@ -29,10 +29,10 @@ public class Proximity {
     private static final int DEFAULT_SIZE = 4;
 
     // proximity record type
-    private static byte TYPE_UNDEFINED = -1;
-    private static byte TYPE_STAR = 0;
-    private static byte TYPE_STAR_GROUP = 1;
-    private static byte TYPE_OTHER = 2;
+    private static final byte TYPE_UNDEFINED = -1;
+    private static final byte TYPE_STAR = 0;
+    private static final byte TYPE_STAR_GROUP = 1;
+    private static final byte TYPE_OTHER = 2;
 
     public NearbyRecord[] updating, effective, array0, array1;
 

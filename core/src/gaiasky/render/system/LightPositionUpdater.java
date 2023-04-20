@@ -129,6 +129,42 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                                 colors[lightIndex * 3 + 2] = body.color[2];
                                 lightIndex++;
                             }
+                        } else if(Mapper.starSet.has(entity)) {
+                            // Star set.
+                            var starSet = Mapper.starSet.get(entity);
+                            var proximityArray = starSet.proximity.updating;
+                            for(var record : proximityArray) {
+                                if(record != null) {
+
+                                    Vector3d pos3d = auxD.set(record.absolutePos).sub(camera.getPos());
+                                    double angle = GaiaSky.instance.cameraManager.getDirection().angle(pos3d);
+                                    if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openXr || angle < angleEdgeDeg)) {
+
+                                        // Apply relativistic effects.
+                                        GlobalResources.applyRelativisticAberration(pos3d, camera);
+                                        RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
+
+                                        Vector3 pos3 = pos3d.put(auxV);
+
+                                        float w = settings.graphics.resolution[0];
+                                        float h = settings.graphics.resolution[1];
+
+                                        camera.getCamera().project(pos3, 0, 0, w, h);
+                                        // Here we **need** to use
+                                        // Gdx.graphics.getWidth/Height() because we use
+                                        // camera.project() which uses screen
+                                        // coordinates only
+                                        var body = Mapper.body.get(entity);
+                                        positions[lightIndex * 2] = auxV.x / w;
+                                        positions[lightIndex * 2 + 1] = auxV.y / h;
+                                        viewAngles[lightIndex] = (float) body.solidAngleApparent;
+                                        colors[lightIndex * 3] = body.color[0];
+                                        colors[lightIndex * 3 + 1] = body.color[1];
+                                        colors[lightIndex * 3 + 2] = body.color[2];
+                                        lightIndex++;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

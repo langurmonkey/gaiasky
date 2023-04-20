@@ -252,7 +252,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         // LENS FLARE
         LensFlareSettings lensFlareSettings = settings.postprocess.lensFlare;
-        if (lensFlareSettings.type == LensFlareType.PSEUDO) {
+        if (lensFlareSettings.type.isPseudoLensFlare()) {
             // PSEUDO LENS FLARE
             Texture lensColor = manager.get(lensColorName);
             lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -275,7 +275,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             ppb.set(pseudoLensFlare);
         } else {
             // TRUE LENS FLARE
-            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity, 1);
+            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity, lensFlareSettings.type.ordinal());
             lensFlare.setColor(new float[] { 1f, 1f, 1f });
             lensFlare.setEnabled(lensFlareSettings.active);
             lensFlare.setEnabledOptions(false, true);
@@ -662,10 +662,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                         if (prePass != null)
                             lightGlow.setPrePassTexture(prePass);
                     }
-                    if (lensFlareSettings.type.isRealLensFlare()) {
+                    if (!lensFlareSettings.type.isPseudoLensFlare()) {
                         LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
                         if (lensFlare != null && lensFlare.isEnabled()) {
-                            lensFlare.setLightPosition(lightPos);
+                            lensFlare.setLightPositions(nLights, lightPos);
                             if (nLights <= 0) {
                                 lensFlare.setIntensity(0);
                             } else {

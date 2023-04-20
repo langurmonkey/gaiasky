@@ -531,8 +531,12 @@ postprocess:
   # Lens flare effect settings.
   lensFlare:
     active: true
-    # Type of lens flare effect, one of [PSEUDO|REAL].
-    type: REAL
+    # Type of lens flare effect (essentially, the shader to use).
+    # Possible values are:
+    # SIMPLE - simple lens flare shader with 4 ghosts and a reasonable look.
+    # COMPLEX - a more complex lens flare shader with more ghosts.
+    # PSEUDO - pseudo lens flare effect that works from the actual frame buffer values.
+    type: COMPLEX
     # Strength of the real lens flare type.
     strength: 1.0
     # Intensity of the pseudo lens flare type.

@@ -190,15 +190,20 @@ public class Settings {
     }
 
     public enum LensFlareType {
-        PSEUDO,
-        REAL;
+        SIMPLE,
+        COMPLEX,
+        PSEUDO;
 
         public boolean isPseudoLensFlare() {
             return this == PSEUDO;
         }
 
-        public boolean isRealLensFlare() {
-            return this == REAL;
+        public boolean isSimpleLensFlare() {
+            return this == SIMPLE;
+        }
+
+        public boolean isComplexLensFlare() {
+            return this == COMPLEX;
         }
     }
 
@@ -2059,7 +2064,7 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class LensFlareSettings {
             public boolean active;
-            public LensFlareType type = LensFlareType.REAL;
+            public LensFlareType type = LensFlareType.COMPLEX;
             /** Strength of the real lens flare. **/
             public float strength = 1.0f;
             /** Intensity of the pseudo lens flare type. **/
