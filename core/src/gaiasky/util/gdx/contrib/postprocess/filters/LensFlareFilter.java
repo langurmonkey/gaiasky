@@ -9,7 +9,6 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.util.gdx.contrib.postprocess.filters.Glow.Param;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -27,19 +26,33 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
     /**
      * Creates a new lens flare filter with the given parameters.
      *
-     * @param width The viewport width.
-     * @param height The viewport height.
-     * @param intensity The intensity of the effect.
-     * @param type The type, 0 for simple, 1 for complex.
+     * @param width       The viewport width.
+     * @param height      The viewport height.
+     * @param intensity   The intensity of the effect.
+     * @param type        The type, 0 for simple, 1 for complex.
+     * @param useLensDirt Whether to use the lens dirt effect.
      */
-    public LensFlareFilter(int width, int height, float intensity, int type) {
-        super(ShaderLoader.fromFile("screenspace", "lensflare", type == 0 ? "#define simpleLensFlare" : "#define complexLensFlare"));
+    public LensFlareFilter(int width, int height, float intensity, int type, boolean useLensDirt) {
+        super(ShaderLoader.fromFile("screenspace", "lensflare", getDefines(type, useLensDirt)));
         this.type = type;
         this.viewport = new Vector2(width, height);
         this.intensity = intensity;
         this.color = new Vector3(1.5f, 1.2f, 1.2f);
 
         rebind();
+    }
+
+    private static String getDefines(int type, boolean useLensDirt) {
+        StringBuilder sb = new StringBuilder();
+        if(type == 0) {
+            sb.append("#define simpleLensFlare\n");
+        } else {
+            sb.append("#define complexLensFlare\n");
+        }
+        if(useLensDirt) {
+            sb.append("#define useLensDirt\n");
+        }
+        return sb.toString();
     }
 
     public void setType(int type) {

@@ -169,8 +169,17 @@ public class StarSet extends ParticleSet {
     }
 
     public double getCandidateSolidAngleApparent() {
-        if (candidateFocusIndex >= 0) {
-            IParticleRecord candidate = pointData.get(candidateFocusIndex);
+        return getSolidAngleApparent(candidateFocusIndex);
+    }
+
+    /**
+     * Returns the apparent solid angle of the star with the given index.
+     * @param index The index in the star list.
+     * @return The apparent solid angle.
+     */
+    public double getSolidAngleApparent(int index) {
+        if (index >= 0) {
+            IParticleRecord candidate = pointData.get(index);
             Vector3d aux = candidate.pos(D31);
             ICamera camera = GaiaSky.instance.getICamera();
             double va = (float) ((candidate.radius() / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
@@ -178,6 +187,7 @@ public class StarSet extends ParticleSet {
         } else {
             return -1;
         }
+
     }
 
     public double getClosestDistToCamera() {

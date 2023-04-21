@@ -137,25 +137,27 @@ scene:
     # Control the glow amount when close to stars.
     # Should be set rather low, i.e., in [0.01, 0.5].
     glowFactor: 0.06
-    # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png
-    # 1 - horizontal spike
-    # 2 - god rays
-    # 3 - horizontal and vertical spikes
-    # 4 - simple radial profile
+    # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png.
+    # 1 - horizontal spike.
+    # 2 - god rays.
+    # 3 - horizontal and vertical spikes.
+    # 4 - simple radial profile.
     textureIndex: 4
-    # Star opacity mapping, as in [min, max]
+    # Same as textureIndex, but used for close-by stars with glow effect.
+    textureIndexLens: 1
+    # Star opacity mapping, as in [min, max].
     opacity: [ 0.0, 1.0 ]
-    # Star groups
+    # Star groups.
     group:
-      # Enable or disable the star billboards when stars are close
+      # Enable or disable the star billboards when stars are close.
       billboard: true
-      # Maximum number of star billboards per group
+      # Maximum number of star billboards per group.
       numBillboard: 30
-      # Maximum number of labels per star group
+      # Maximum number of labels per star group.
       numLabel: 50
-      # Maximum number of velocity vectors per star group
+      # Maximum number of velocity vectors per star group.
       numVelocityVector: 500
-    # Star threshold values
+    # Star threshold values.
     threshold:
       # Threshold radius/distance for stars. This controls the threshold to render stars as points or as quads
       # radius/distance limit for rendering as quad. If angle is any bigger, we render as a model.
@@ -164,7 +166,7 @@ scene:
       point: 1.7e-8
       # radius/distance limit for rendering at all. If angle is smaller than this quantity, no rendering happens.
       none: 0.0
-  # Label settings
+  # Label settings.
   label:
     # Label size factor.
     size: 0.85
@@ -536,7 +538,7 @@ postprocess:
     # SIMPLE - simple lens flare shader with 4 ghosts and a reasonable look.
     # COMPLEX - a more complex lens flare shader with more ghosts.
     # PSEUDO - pseudo lens flare effect that works from the actual frame buffer values.
-    type: COMPLEX
+    type: SIMPLE
     # Strength of the real lens flare type.
     strength: 1.0
     # Intensity of the pseudo lens flare type.

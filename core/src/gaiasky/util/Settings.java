@@ -351,15 +351,15 @@ public class Settings {
 
         public int getGlowNLights() {
             if (isLow()) {
-                return 10;
+                return 3;
             } else if (isNormal()) {
-                return 20;
+                return 4;
             } else if (isHigh()) {
-                return 30;
+                return 5;
             } else if (isUltra()) {
-                return 40;
+                return 6;
             }
-            return 20;
+            return 4;
         }
     }
 
@@ -368,7 +368,7 @@ public class Settings {
         LINEAR(TextureFilter.Linear, TextureFilter.Linear),
         XBRZ(TextureFilter.Nearest, TextureFilter.Nearest);
 
-        public TextureFilter minification, magnification;
+        public final TextureFilter minification, magnification;
 
         UpscaleFilter(TextureFilter min, TextureFilter mag) {
             this.minification = min;
@@ -899,7 +899,10 @@ public class Settings {
              **/
             public double glowFactor = 0.06;
             public float[] opacity;
-            public int textureIndex;
+            /** Texture index to use for regular star rendering. **/
+            public int textureIndex = 4;
+            /** Texture index to use for the light glow effect. Usually includes a lens artifact. **/
+            public int textureIndexLens = 1;
             public GroupSettings group;
             public ThresholdSettings threshold;
             @JsonIgnore private float pointSizeBak;
@@ -930,7 +933,7 @@ public class Settings {
             }
 
             @JsonIgnore
-            public String getStarTexture() {
+            public String getStarTexture(int textureIndex) {
                 String starTexIdx = String.format("%02d", textureIndex);
                 String texture = settings.data.dataFile(GlobalResources.unpackAssetPath(Constants.DATA_LOCATION_TOKEN + "tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                 if (!Files.exists(Path.of(texture))) {
@@ -947,6 +950,16 @@ public class Settings {
                 return null;
             }
 
+            @JsonIgnore
+            public String getStarTexture() {
+                return getStarTexture(textureIndex);
+            }
+
+            @JsonIgnore
+            public String getStarLensTexture() {
+                return getStarTexture(textureIndexLens);
+            }
+
             public void setPointSize(float pointSize) {
                 this.pointSize = pointSize;
                 this.pointSizeBak = pointSize;
@@ -954,43 +967,27 @@ public class Settings {
 
             public void notify(final Event event, Object source, final Object... data) {
                 switch (event) {
-                case STAR_POINT_SIZE_CMD:
-                    pointSize = (float) data[0];
-                    break;
-                case STAR_POINT_SIZE_INCREASE_CMD:
+                case STAR_POINT_SIZE_CMD -> pointSize = (float) data[0];
+                case STAR_POINT_SIZE_INCREASE_CMD -> {
                     float size = Math.min(this.pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
                     EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
-                    break;
-                case STAR_POINT_SIZE_DECREASE_CMD:
-                    size = Math.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
+                }
+                case STAR_POINT_SIZE_DECREASE_CMD -> {
+                    float size = Math.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
                     EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
-                    break;
-                case STAR_POINT_SIZE_RESET_CMD:
-                    this.pointSize = pointSizeBak;
-                    break;
-                case STAR_BASE_LEVEL_CMD:
-                    opacity[0] = (float) data[0];
-                    break;
-                case STAR_GROUP_BILLBOARD_CMD:
-                    group.billboard = (boolean) data[0];
-                    break;
-                case STAR_GROUP_NEAREST_CMD:
+                }
+                case STAR_POINT_SIZE_RESET_CMD -> this.pointSize = pointSizeBak;
+                case STAR_BASE_LEVEL_CMD -> opacity[0] = (float) data[0];
+                case STAR_GROUP_BILLBOARD_CMD -> group.billboard = (boolean) data[0];
+                case STAR_GROUP_NEAREST_CMD -> {
                     group.numBillboard = (int) data[0];
                     group.numLabel = (int) data[0];
                     group.numVelocityVector = (int) data[0];
-                    break;
-                case BILLBOARD_TEXTURE_IDX_CMD:
-                    textureIndex = (int) data[0];
-                    break;
-                case STAR_BRIGHTNESS_CMD:
-                    brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS);
-                    break;
-                case STAR_BRIGHTNESS_POW_CMD:
-                    power = (float) data[0];
-                    break;
-                case STAR_GLOW_FACTOR_CMD:
-                    glowFactor = (float) data[0];
-                    break;
+                }
+                case BILLBOARD_TEXTURE_IDX_CMD -> textureIndex = (int) data[0];
+                case STAR_BRIGHTNESS_CMD -> brightness = MathUtilsDouble.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS);
+                case STAR_BRIGHTNESS_POW_CMD -> power = (float) data[0];
+                case STAR_GLOW_FACTOR_CMD -> glowFactor = (float) data[0];
                 }
             }
 
@@ -2064,7 +2061,7 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class LensFlareSettings {
             public boolean active;
-            public LensFlareType type = LensFlareType.COMPLEX;
+            public LensFlareType type = LensFlareType.SIMPLE;
             /** Strength of the real lens flare. **/
             public float strength = 1.0f;
             /** Intensity of the pseudo lens flare type. **/

@@ -137,15 +137,17 @@ scene:
     # Control the glow amount when close to stars.
     # Should be set rather low, i.e., in [0.01, 0.5].
     glowFactor: 0.06
-    # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png
-    # 1 - horizontal spike
-    # 2 - god rays
-    # 3 - horizontal and vertical spikes
-    # 4 - simple radial profile
+    # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png.
+    # 1 - horizontal spike.
+    # 2 - god rays.
+    # 3 - horizontal and vertical spikes.
+    # 4 - simple radial profile.
     textureIndex: 4
-    # Star opacity mapping, as in [min, max]
+    # Same as textureIndex, but used for close-by stars with glow effect.
+    textureIndexLens: 1
+    # Star opacity mapping, as in [min, max].
     opacity: [ 0.0, 1.0 ]
-    # Star groups
+    # Star groups.
     group:
       # Enable or disable the star billboards when stars are close.
       billboard: true
@@ -536,7 +538,7 @@ postprocess:
     # SIMPLE - simple lens flare shader with 4 ghosts and a reasonable look.
     # COMPLEX - a more complex lens flare shader with more ghosts.
     # PSEUDO - pseudo lens flare effect that works from the actual frame buffer values.
-    type: COMPLEX
+    type: SIMPLE
     # Strength of the real lens flare type.
     strength: 1.0
     # Intensity of the pseudo lens flare type.

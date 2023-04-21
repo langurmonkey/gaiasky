@@ -19,6 +19,13 @@ layout (location = 0) out vec4 fragColor;
 // =================
 // SIMPLE LENS FLARE
 // =================
+
+#ifdef useLensDirt
+#define STRENGTH 0.35
+#else
+#define STRENGTH 1.0
+#endif // useLensDirt
+
 vec3 flare_simple(vec2 uv, vec2 pos, float intensity) {
     vec2 main = uv - pos;
     vec2 uvd = uv * (length(uv));
@@ -66,7 +73,7 @@ vec3 cc(vec3 color, float factor, float factor2) {
 }
 
 vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
-    vec3 color = u_color * flare_simple(uv, light_pos, intensity) * 0.6;
+    vec3 color = u_color * flare_simple(uv, light_pos, intensity) * STRENGTH;
     color = cc(color, 0.5, 0.1);
     return vec4(color, 1.0);
 }
@@ -76,6 +83,12 @@ vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
 // ===================
 // COMOPLEX LENS FLARE
 // ===================
+
+#ifdef useLensDirt
+#define STRENGTH 0.35
+#else
+#define STRENGTH 0.4
+#endif // useLensDirt
 
 float rnd(vec2 p) {
     float f = fract(sin(dot(p, vec2(12.1234, 72.8392))*45123.2));
@@ -143,7 +156,7 @@ vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     //multiply by the exponetial e^x ? of 1.0-length which kind of masks the brightness more so that
     //there is a sharper roll of of the light decay from the sun.
     color *= exp(1.0 - length(uv - light_pos)) / 5.0;
-    color = color * 0.35 * intensity;
+    color = color * intensity * STRENGTH;
     return vec4(color, 1.0);
 }
 #endif// complexLensFlare
@@ -156,21 +169,24 @@ float fy(float t, float a) {
     return a * t * sin(t);
 }
 
-#define N_SAMPLES 10
+#define N_SAMPLES 6
 void main(void) {
     if (u_intensity > 0.0) {
         vec2 uv = v_texCoords - 0.5;
         float ar = u_viewport.x / u_viewport.y;
         uv.x *= ar;
-        //vec4 color = texture(u_texture0, v_texCoords);
+        #ifdef useLensDirt
         vec4 color = vec4(0.0);
+        #else
+        vec4 color = texture(u_texture0, v_texCoords);
+        #endif // useLensDirt
 
         for (int light = 0; light < u_nLights; light++) {
             vec2 light_pos = u_lightPositions[light] - 0.5;
 
             // Compute intensity of light.
             float t = 0;
-            float a = 0.01;
+            float a = 0.001;
             float dt = 3.0 * 3.14159 / N_SAMPLES;
             float lum = 0.0;
             for (int idx = 0; idx < N_SAMPLES; idx++){
@@ -180,7 +196,7 @@ void main(void) {
             }
             lum /= N_SAMPLES;
 
-            float weight = clamp(1.4 - 2.0 * length(light_pos), 0.0, 1.0);
+            float weight = clamp(1.6 - 2.0 * length(light_pos), 0.0, 1.0);
             float intensity = u_intensity * lum * weight;
 
             if (intensity > 0.0) {
@@ -190,6 +206,10 @@ void main(void) {
 
         fragColor = color;
     } else {
+        #ifdef useLensDirt
         fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        #else
+        fragColor = texture(u_texture0, v_texCoords);
+        #endif // useLensDirt
     }
 }

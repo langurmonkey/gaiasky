@@ -78,7 +78,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
     private PostProcessBean[] pps;
     /** Reference to the scene. **/
     private Scene scene;
-    private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
+    private String starLensTextureName, lensDirtName, lensColorName, lensStarburstName;
 
     public MainPostProcessor(Scene scene) {
         ShaderLoader.BasePath = "shader/postprocess/";
@@ -112,8 +112,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         lensColorName = Settings.settings.data.dataFile(settings.texLensColor);
         lensStarburstName = Settings.settings.data.dataFile(settings.texLensStarburst);
 
-        starTextureName = Settings.settings.scene.star.getStarTexture();
-        manager.load(starTextureName, Texture.class);
+        starLensTextureName = Settings.settings.scene.star.getStarLensTexture();
+        manager.load(starLensTextureName, Texture.class);
         manager.load(lensDirtName, Texture.class);
         manager.load(lensColorName, Texture.class);
         manager.load(lensStarburstName, Texture.class);
@@ -159,7 +159,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
 
         // LIGHT GLOW
         LightGlowSettings glowSettings = Settings.settings.postprocess.lightGlow;
-        Texture glow = manager.get(starTextureName);
+        Texture glow = manager.get(starLensTextureName);
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         LightGlow lightGlow = new LightGlow(5, 5);
         lightGlow.setLightGlowTexture(glow);
@@ -283,7 +283,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             Texture lensStarBurst = manager.get(lensStarburstName);
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
-            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity, lensFlareSettings.type.ordinal());
+            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity, lensFlareSettings.type.ordinal(), true);
             lensFlare.setColor(new float[] { 1f, 1f, 1f });
             lensFlare.setLensDirtTexture(lensDirt);
             lensFlare.setLensStarburstTexture(lensStarBurst);
@@ -667,7 +667,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                     LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
                     if (lightGlow != null && lightGlow.isEnabled()) {
                         lightGlow.setLightPositions(nLights, lightPos);
-                        lightGlow.setLightViewAngles(angles);
+                        lightGlow.setLightSolidAngles(angles);
                         lightGlow.setLightColors(colors);
                         if (prePass != null)
                             lightGlow.setPrePassTexture(prePass);

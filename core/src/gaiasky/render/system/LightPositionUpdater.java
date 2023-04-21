@@ -35,7 +35,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     private final Vector3d auxD;
     private int nLights;
     private float[] positions;
-    private float[] viewAngles;
+    private float[] solidAngles;
     private float[] colors;
     private Texture glowTex;
 
@@ -54,7 +54,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
         synchronized (lock) {
             this.nLights = nLights;
             this.positions = initializeList(null, nLights * 2);
-            this.viewAngles = initializeList(null, nLights);
+            this.solidAngles = initializeList(null, nLights);
             this.colors = initializeList(null, nLights * 3);
         }
     }
@@ -123,7 +123,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                                 var body = Mapper.body.get(entity);
                                 positions[lightIndex * 2] = auxV.x / w;
                                 positions[lightIndex * 2 + 1] = auxV.y / h;
-                                viewAngles[lightIndex] = (float) body.solidAngleApparent;
+                                solidAngles[lightIndex] = (float) body.solidAngleApparent;
                                 colors[lightIndex * 3] = body.color[0];
                                 colors[lightIndex * 3 + 1] = body.color[1];
                                 colors[lightIndex * 3 + 2] = body.color[2];
@@ -157,10 +157,10 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                                         var body = Mapper.body.get(entity);
                                         positions[lightIndex * 2] = auxV.x / w;
                                         positions[lightIndex * 2 + 1] = auxV.y / h;
-                                        viewAngles[lightIndex] = (float) body.solidAngleApparent;
-                                        colors[lightIndex * 3] = body.color[0];
-                                        colors[lightIndex * 3 + 1] = body.color[1];
-                                        colors[lightIndex * 3 + 2] = body.color[2];
+                                        solidAngles[lightIndex] = (float) starSet.getSolidAngleApparent(record.index);
+                                        colors[lightIndex * 3] = record.col[0];
+                                        colors[lightIndex * 3 + 1] = record.col[1];
+                                        colors[lightIndex * 3 + 2] = record.col[2];
                                         lightIndex++;
                                     }
                                 }
@@ -168,9 +168,9 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                         }
                     }
                 }
-                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, lightIndex, positions, viewAngles, colors, glowTex);
+                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, lightIndex, positions, solidAngles, colors, glowTex);
             } else {
-                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, 0, positions, viewAngles, colors, glowTex);
+                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, 0, positions, solidAngles, colors, glowTex);
             }
         }
 

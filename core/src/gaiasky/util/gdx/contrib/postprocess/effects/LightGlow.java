@@ -35,7 +35,7 @@ public final class LightGlow extends PostProcessorEffect {
         glow.setLightPositions(nLights, vec);
     }
 
-    public void setLightViewAngles(float[] vec) {
+    public void setLightSolidAngles(float[] vec) {
         glow.setLightViewAngles(vec);
     }
 
