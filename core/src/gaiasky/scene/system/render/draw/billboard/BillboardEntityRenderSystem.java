@@ -86,7 +86,7 @@ public class BillboardEntityRenderSystem implements IObserver {
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
 
-    private void renderCloseUpStar(StarSet set, Highlight highlight, DatasetDescription desc, int idx, float fovFactor, Vector3d cPosD, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, float alpha) {
+    private void renderCloseUpStar(StarSet set, Highlight highlight, DatasetDescription desc, int idx, float fovFactor, Vector3d cPosD, ICamera camera, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, float alpha) {
         if (utils.filter(idx, set, desc) && set.isVisible(idx)) {
             IParticleRecord star = set.pointData.get(idx);
             double varScl = utils.getVariableSizeScaling(set, idx);
@@ -94,7 +94,7 @@ public class BillboardEntityRenderSystem implements IObserver {
             double size = set.getSize(idx);
             double sizeVar = size * varScl;
             double radius = sizeVar * Constants.STAR_SIZE_FACTOR;
-            Vector3d starPos = set.fetchPosition(star, cPosD, D31, set.currDeltaYears);
+            Vector3d starPos = set.fetchPosition(star, camera.getPos().put(D31), D31, set.currDeltaYears);
             double distToCamera = starPos.len();
             double solidAngle = (size * Constants.STAR_SIZE_FACTOR / distToCamera);
 
@@ -146,7 +146,6 @@ public class BillboardEntityRenderSystem implements IObserver {
          */
 
         // Star set
-
         double thPointTimesFovFactor = Settings.settings.scene.star.threshold.point * fovFactor;
         double innerRad = 0.006 + Settings.settings.scene.star.pointSize * 0.008;
         alpha = alpha * base.opacity;
@@ -161,11 +160,11 @@ public class BillboardEntityRenderSystem implements IObserver {
         boolean focusRendered = false;
         int n = Math.min(Settings.settings.scene.star.group.numBillboard, set.pointData.size());
         for (int i = 0; i < n; i++) {
-            renderCloseUpStar(set, highlight, desc, set.active[i], fovFactor, set.cPosD, shader, mesh, thPointTimesFovFactor, alpha);
+            renderCloseUpStar(set, highlight, desc, set.active[i], fovFactor, set.cPosD, camera, shader, mesh, thPointTimesFovFactor, alpha);
             focusRendered = focusRendered || set.active[i] == set.focusIndex;
         }
         if (set.focus != null && !focusRendered) {
-            renderCloseUpStar(set, highlight, desc, set.focusIndex, fovFactor, set.cPosD, shader, mesh, thPointTimesFovFactor, alpha);
+            renderCloseUpStar(set, highlight, desc, set.focusIndex, fovFactor, set.cPosD, camera, shader, mesh, thPointTimesFovFactor, alpha);
         }
     }
 

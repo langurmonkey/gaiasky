@@ -27,7 +27,6 @@ import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
-import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
@@ -40,6 +39,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Renders all the 3D/stereoscopic modes. Renders basically two scenes, one for
+ * each eye, and then blends them together on screen with the necessary
+ * processing depending on the 3D regime (anaglyph 3D, 3DTV, cross-eye, VR)
+ */
 public class RenderModeStereoscopic extends RenderModeAbstract implements IRenderMode, IObserver {
 
     private static final double EYE_ANGLE_DEG = 1.5;
@@ -338,15 +342,6 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             camera.getPos().sub(sideRemainder);
         }
         cam.update();
-
-        // Update natural camera too.
-        if (camera instanceof NaturalCamera) {
-            var naturalCamera = (NaturalCamera) camera;
-            naturalCamera.vrOffset.set(cam.position).scl(Constants.M_TO_U);
-            naturalCamera.direction.set(cam.direction);
-            naturalCamera.up.set(cam.up);
-            rc.vrOffset = naturalCamera.vrOffset;
-        }
     }
 
     private int getKey(int w, int h) {

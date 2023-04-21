@@ -31,6 +31,7 @@ import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.gdx.shader.attribute.ColorAttribute;
 import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsDouble;
+import gaiasky.util.math.Vector3d;
 
 import java.util.Objects;
 
@@ -38,6 +39,7 @@ public class ModelEntityRenderSystem {
 
     private final ParticleUtils utils;
     private final SceneRenderer sceneRenderer;
+    private final Vector3d aux3d1 = new Vector3d(), aux3d2 = new Vector3d();
 
     public ModelEntityRenderSystem(SceneRenderer sr) {
         this.sceneRenderer = sr;
@@ -291,7 +293,10 @@ public class ModelEntityRenderSystem {
                     ((FloatAttribute) Objects.requireNonNull(mc.env.get(FloatAttribute.Time))).value = (float) t;
                     // Local transform
                     double variableScaling = utils.getVariableSizeScaling(set, set.proximity.updating[0].index);
-                    mc.instance.transform.idt().translate((float) set.proximity.updating[0].pos.x, (float) set.proximity.updating[0].pos.y, (float) set.proximity.updating[0].pos.z).scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
+                    int idx = set.proximity.updating[0].index;
+                    // We need to fetch the position again, for the camera position is different in stereoscopic mode.
+                    var pos = set.fetchPosition(set.get(idx), GaiaSky.instance.getICamera().getPos().put(aux3d1), aux3d2, set.currDeltaYears);
+                    mc.instance.transform.idt().translate((float) pos.x, (float) pos.y, (float) pos.z).scl((float) (set.getRadius(set.active[0]) * 2d * variableScaling));
                     if (relativistic) {
                         mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
                     }

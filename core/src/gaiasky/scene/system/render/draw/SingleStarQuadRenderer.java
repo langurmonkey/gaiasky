@@ -85,7 +85,8 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-        shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        // The graph.translation already contains the position corrected by the camera.
+        shaderProgram.setUniformf("u_camPos", 0f, 0f, 0f);
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
         triComponent.fovMode = camera.getMode().getGaiaFovMode();
@@ -128,6 +129,7 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
             view.setEntity(entity);
             var base = Mapper.base.get(entity);
             var body = Mapper.body.get(entity);
+            var graph = Mapper.graph.get(entity);
             float[] col = body.color;
             // 4 vertices per star
             for (int vert = 0; vert < 4; vert++) {
@@ -146,7 +148,7 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
                 tempVerts[curr.vertexIdx + sizeOffset] = (float) (view.getRadius() * 5.0);
 
                 // POSITION
-                aux1.set(body.pos.x.floatValue(), body.pos.y.floatValue(), body.pos.z.floatValue());
+                graph.translation.put(aux1);
                 tempVerts[curr.vertexIdx + starPosOffset] = aux1.x;
                 tempVerts[curr.vertexIdx + starPosOffset + 1] = aux1.y;
                 tempVerts[curr.vertexIdx + starPosOffset + 2] = aux1.z;

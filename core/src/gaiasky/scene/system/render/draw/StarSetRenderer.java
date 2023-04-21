@@ -81,6 +81,7 @@ public class StarSetRenderer extends PointCloudQuadRenderer implements IObserver
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
         triComponent.fovMode = camera.getMode().getGaiaFovMode();
