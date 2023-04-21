@@ -52,9 +52,9 @@ This file contains the following sections:
 This is the Gaia Sky source repository. We recommend using the [pre-built packages](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads) for the different Operating Systems in case you want a stable and hassle-free experience. We offer pre-built packages for Linux, macOS or Windows [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/).
 
 
-### 3. Running from source repository
+### 3. Development branch
 
-In order to compile and run Gaia Sky from source, you need the following installed in your system:
+In order to compile and run Gaia Sky using the `master` branch sources, you need the following installed in your system:
 
 - `JDK`, latest LTS version recommended
 - `git`
@@ -93,9 +93,9 @@ gradlew core:run --args='-h'
 
 ### 3.2 Getting the data
 
-As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
+As of version `2.1.0`, Gaia Sky offers an integrated way to download and manage all datasets and catalogs from within the application. The dataset manager, accessible from the welcome screen, enables browsing and downloading available datasets, and enabling and disabling already installed/downloaded datasets.
 
-You can also download the **data packs manually** [here](https://gaia.ari.uni-heidelberg.de/gaiasky/repository/).
+You can also download the **datasets manually** [here](https://gaia.ari.uni-heidelberg.de/gaiasky/repository/). Once downloaded, the datasets, which usually come in `.tar.gz` packages, can be extracted directly in the [Gaia Sky data directory](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/master/Folders.html#dataset-location).
 
 ##  4. Gaia Sky VR
 
