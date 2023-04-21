@@ -2365,11 +2365,18 @@ public interface IScriptingInterface {
     long getCurrentFrameNumber();
 
     /**
-     * Enables or deisables the lens flare effect.
+     * Enables or disables the lens flare effect.
      *
      * @param state Activate (true) or deactivate (false).
      */
     void setLensFlare(boolean state);
+    /**
+     * Sets the strength of the lens flare effect, in [0,1].
+     * Set to 0 to disable the effect.
+     *
+     * @param strength The strength or intensity of the lens flare, in [0,1].
+     */
+    void setLensFlare(double strength);
 
     /**
      * Enables or disables the motion blur effect.

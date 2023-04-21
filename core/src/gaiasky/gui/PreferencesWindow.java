@@ -83,7 +83,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             smResolution, maxFpsInput;
     private OwnSliderPlus lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale, backBufferScale,
             celestialSphereIndexOfRefraction, bloomEffect, screenshotQuality, frameQuality, unsharpMask, svtCacheSize,
-            chromaticAberration;
+            chromaticAberration, lensFlare;
     private OwnTextButton screenshotsLocation, frameOutputLocation, meshWarpFileLocation;
     private Path screenshotsPath, frameOutputPath, meshWarpFilePath;
     private OwnLabel frameSequenceNumber;
@@ -431,16 +431,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LENS FLARE
         OwnLabel lensFlareLabel = new OwnLabel(I18n.msg("gui.lensflare"), skin);
-        CheckBox lensFlare = new OwnCheckBox("", skin);
-        lensFlare.setName("lens flare");
+        lensFlare = new OwnSliderPlus("", Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, Constants.SLIDER_STEP_TINY, skin);
+        lensFlare.setName("lens flare strength");
+        lensFlare.setWidth(sliderWidth);
+        lensFlare.setValue(settings.postprocess.lensFlare.strength);
         lensFlare.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.isChecked() ? 1f : 0f);
+                EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.getValue());
                 return true;
             }
             return false;
         });
-        lensFlare.setChecked(settings.postprocess.lensFlare.active);
 
         // LIGHT GLOW
         OwnLabel lightGlowLabel = new OwnLabel(I18n.msg("gui.lightscattering"), skin);
@@ -2123,7 +2124,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         aberrationBak = settings.postprocess.chromaticAberration.amount;
-        lensFlareBak = settings.postprocess.lensFlare.active ? 1f : 0f;
+        lensFlareBak = settings.postprocess.lensFlare.strength;
         lightGlowBak = settings.postprocess.lightGlow.active;
         brightnessBak = settings.postprocess.levels.brightness;
         contrastBak = settings.postprocess.levels.contrast;

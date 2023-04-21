@@ -540,9 +540,7 @@ postprocess:
     # PSEUDO - pseudo lens flare effect that works from the actual frame buffer values.
     type: SIMPLE
     # Strength of the real lens flare type.
-    strength: 1.0
-    # Intensity of the pseudo lens flare type.
-    intensity: 0.15
+    strength: 0.3
     # Number of ghosts of the pseudo lens flare.
     numGhosts: 8
     # Halo width of the pseudo lens flare.

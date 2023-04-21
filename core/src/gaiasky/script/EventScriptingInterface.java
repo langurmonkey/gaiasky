@@ -2760,6 +2760,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setLensFlare(double strength) {
+        if(checkNum(strength, Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, "strength")) {
+            postRunnable(() -> em.post(Event.LENS_FLARE_CMD, this, (float) strength));
+        }
+    }
+
+    @Override
     public void setMotionBlur(boolean state) {
         postRunnable(() -> em.post(Event.MOTION_BLUR_CMD, this, state));
     }

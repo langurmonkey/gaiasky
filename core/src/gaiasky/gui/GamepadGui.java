@@ -79,8 +79,9 @@ public class GamepadGui extends AbstractGui {
     private FocusInfoInterface focusInterface;
     private OwnCheckBox cinematic, crosshairFocus, crosshairClosest, crosshairHome;
     private OwnSelectBox<CameraComboBoxBean> cameraMode;
-    private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton, invertYButton, invertXButton;
-    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness, magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, ambientLight;
+    private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, starGlowButton, invertYButton, invertXButton;
+    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider, unsharpMaskSlider, starBrightness,
+            magnitudeMultiplier, starGlowFactor, pointSize, starBaseLevel, ambientLight, lensFlare;
     private OwnTextField searchField;
     private OwnLabel infoMessage, cameraModeLabel, cameraFocusLabel;
     private Actor[][] currentModel;
@@ -129,6 +130,7 @@ public class GamepadGui extends AbstractGui {
 
         // Comment to hide this whole dialog and functionality
         registerEvents();
+        initialized = true;
     }
 
     public void initialize(Stage stage) {
@@ -940,13 +942,14 @@ public class GamepadGui extends AbstractGui {
 
         if (!vr) {
             // Lens flare
-            flareButton = new OwnTextButton(I18n.msg("gui.lensflare"), skin, "toggle-big");
-            graphicsModel[1][0] = flareButton;
-            flareButton.setWidth(ww);
-            flareButton.setChecked(Settings.settings.postprocess.lensFlare.active);
-            flareButton.addListener(event -> {
+            lensFlare = new OwnSliderPlus(I18n.msg("gui.lensflare"), Constants.MIN_LENS_FLARE_STRENGTH, Constants.MAX_LENS_FLARE_STRENGTH, Constants.SLIDER_STEP_TINY, false, skin, "header-raw");
+            graphicsModel[1][0] = lensFlare;
+            lensFlare.setWidth(ww);
+            lensFlare.setHeight(sh);
+            lensFlare.setValue(Settings.settings.postprocess.lensFlare.strength);
+            lensFlare.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.publish(Event.LENS_FLARE_CMD, flareButton, flareButton.isChecked() ? 1f : 0f);
+                    EventManager.publish(Event.LENS_FLARE_CMD, lensFlare, lensFlare.getValue());
                     return true;
                 }
                 return false;
@@ -1030,7 +1033,7 @@ public class GamepadGui extends AbstractGui {
         // Add to table
         graphicsT.add(starBrightness).padBottom(pad10).padRight(pad40);
         if (!vr)
-            graphicsT.add(flareButton).padBottom(pad10).row();
+            graphicsT.add(lensFlare).padBottom(pad10).row();
         graphicsT.add(magnitudeMultiplier).padBottom(pad10).padRight(pad40);
         graphicsT.add(starGlowButton).padBottom(pad10).row();
         graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad40);
@@ -1356,6 +1359,7 @@ public class GamepadGui extends AbstractGui {
      * @param i     The column
      * @param j     The row
      * @param right Whether scan right or left
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInRow(int i, int j, boolean right) {
@@ -1384,6 +1388,7 @@ public class GamepadGui extends AbstractGui {
      * @param i    The column
      * @param j    The row
      * @param down Whether scan up or down
+     *
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {

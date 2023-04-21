@@ -131,6 +131,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
             gamepadGui.initialize(stage);
         }
         gamepadGui.build();
+
         Table content = gamepadGui.getContent();
         content.setFillParent(true);
         content.left().top();

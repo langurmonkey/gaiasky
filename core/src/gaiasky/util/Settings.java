@@ -2013,7 +2013,11 @@ public class Settings {
             case BLOOM_CMD -> bloom.intensity = (float) data[0];
             case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
             case CHROMATIC_ABERRATION_CMD -> chromaticAberration.amount = (float) data[0];
-            case LENS_FLARE_CMD -> lensFlare.active = ((Float) data[0]) != 0;
+            case LENS_FLARE_CMD -> {
+                float strength = (Float) data[0];
+                lensFlare.active = strength > 0;
+                lensFlare.strength = strength;
+            }
             case LIGHT_GLOW_CMD -> lightGlow.active = (Boolean) data[0];
             case SSR_CMD -> ssr.active = (Boolean) data[0];
             case MOTION_BLUR_CMD -> motionBlur.active = (Boolean) data[0];
@@ -2064,8 +2068,6 @@ public class Settings {
             public LensFlareType type = LensFlareType.SIMPLE;
             /** Strength of the real lens flare. **/
             public float strength = 1.0f;
-            /** Intensity of the pseudo lens flare type. **/
-            public float intensity = 0.15f;
             public int numGhosts = 8;
             public float haloWidth = 0.5f;
             public int blurPasses = 35;

@@ -618,8 +618,7 @@ public enum Event {
     LAND_ON_OBJECT,
 
     /**
-     * Activate/deactivate lens flare. Contains a float with the new intensity (real lens flare), or
-     * the boolean state (0 off, !=0 on).
+     * Activate/deactivate lens flare. Contains a float with the new strength value (0 to disable effect).
      **/
     LENS_FLARE_CMD,
 

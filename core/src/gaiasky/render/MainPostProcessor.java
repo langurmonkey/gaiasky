@@ -268,7 +268,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             pseudoLensFlare.setLensColorTexture(lensColor);
             pseudoLensFlare.setLensDirtTexture(lensDirt);
             pseudoLensFlare.setLensStarburstTexture(lensStarBurst);
-            pseudoLensFlare.setFlareIntesity(lensFlareSettings.active ? lensFlareSettings.intensity : 0f);
+            pseudoLensFlare.setFlareIntesity(lensFlareSettings.active ? lensFlareSettings.strength * 0.15f : 0f);
             pseudoLensFlare.setFlareSaturation(lensFlareSettings.flareSaturation);
             pseudoLensFlare.setBaseIntesity(1f);
             pseudoLensFlare.setBias(lensFlareSettings.bias);
@@ -283,7 +283,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             Texture lensStarBurst = manager.get(lensStarburstName);
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             // Effect.
-            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity, lensFlareSettings.type.ordinal(), true);
+            LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.strength, lensFlareSettings.type.ordinal(), true);
             lensFlare.setColor(new float[] { 1f, 1f, 1f });
             lensFlare.setLensDirtTexture(lensDirt);
             lensFlare.setLensStarburstTexture(lensStarBurst);
@@ -789,17 +789,17 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             }
         });
         case LENS_FLARE_CMD -> {
-            var lensFlareActive = ((Float) data[0]) != 0;
+            var strength = (Float) data[0];
+            var enabled = strength > 0;
             var lensFlareSettings = Settings.settings.postprocess.lensFlare;
             if (lensFlareSettings.type.isPseudoLensFlare()) {
                 // Pseudo lens flare.
-                var numGhosts = lensFlareActive ? lensFlareSettings.numGhosts : 0;
-                var intensity = lensFlareActive ? lensFlareSettings.intensity : 0;
+                var intensity = enabled ? strength * 0.15f : 0;
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         PseudoLensFlare lensFlare = (PseudoLensFlare) ppb.get(PseudoLensFlare.class);
-                        lensFlare.setGhosts(numGhosts);
+                        lensFlare.setEnabled(enabled);
                         lensFlare.setFlareIntesity(intensity);
                     }
                 }
@@ -808,7 +808,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     PostProcessBean ppb = pps[i];
                     LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
-                    lensFlare.setEnabled(lensFlareActive);
+                    lensFlare.setEnabled(enabled);
+                    lensFlare.setIntensity(strength);
                 }
 
             }

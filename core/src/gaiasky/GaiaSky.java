@@ -1012,6 +1012,7 @@ public class GaiaSky implements ApplicationListener, IObserver {
 
         guiRegistry.registerGui(gamepadGui);
         guiRegistry.addProcessor(gamepadGui);
+
     }
 
     @Override
