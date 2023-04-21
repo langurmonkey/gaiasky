@@ -31,5 +31,10 @@ void main() {
 
     starburst = clamp(starburst + (1.0 - smoothstep(0.0, 0.4, d)), 0.0, 1.0);
 
-    fragColor = base * (dirt + starburst);
+    #ifdef addToBase
+        fragColor = base + base * (dirt + starburst);
+    #else
+        fragColor = base * (dirt + starburst);
+    #endif
+
 }

@@ -20,8 +20,8 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class PseudoLensFlare extends PostProcessorEffect {
     private final PingPongBuffer pingPongBuffer;
-    private final PseudoLensFlareFilter lensBefore;
-    private final PseudoLensFlareDirt lensAfter;
+    private final PseudoLensFlareFilter flare;
+    private final LensDirt dirt;
     private final Blur blur;
     private final Bias bias;
     private final Combine combine;
@@ -31,8 +31,8 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     public PseudoLensFlare(int fboWidth, int fboHeight) {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
 
-        lensBefore = new PseudoLensFlareFilter(fboWidth, fboHeight);
-        lensAfter = new PseudoLensFlareDirt();
+        flare = new PseudoLensFlareFilter(fboWidth, fboHeight);
+        dirt = new LensDirt();
         blur = new Blur(fboWidth, fboHeight);
         bias = new Bias();
         combine = new Combine();
@@ -57,23 +57,23 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     }
 
     public void setHaloWidth(float haloWidth) {
-        lensBefore.setHaloWidth(haloWidth);
+        flare.setHaloWidth(haloWidth);
     }
 
     public void setLensColorTexture(Texture tex) {
-        lensBefore.setLensColorTexture(tex);
+        flare.setLensColorTexture(tex);
     }
 
     public void setLensDirtTexture(Texture tex) {
-        lensAfter.setLensDirtTexture(tex);
+        dirt.setLensDirtTexture(tex);
     }
 
     public void setLensStarburstTexture(Texture tex) {
-        lensAfter.setLensStarburstTexture(tex);
+        dirt.setLensStarburstTexture(tex);
     }
 
     public void setStarburstOffset(float offset) {
-        lensAfter.setStarburstOffset(offset);
+        dirt.setStarburstOffset(offset);
     }
 
     public void enableBlending(int sfactor, int dfactor) {
@@ -119,11 +119,11 @@ public final class PseudoLensFlare extends PostProcessorEffect {
     }
 
     public int getGhosts() {
-        return lensBefore.getGhosts();
+        return flare.getGhosts();
     }
 
     public void setGhosts(int ghosts) {
-        lensBefore.setGhosts(ghosts);
+        flare.setGhosts(ghosts);
     }
 
     public boolean isBlendingEnabled() {
@@ -188,25 +188,24 @@ public final class PseudoLensFlare extends PostProcessorEffect {
 
     @Override
     public void render(final FrameBuffer src, final FrameBuffer dest, GaiaSkyFrameBuffer main) {
-        Texture texsrc = src.getColorBufferTexture();
-
         boolean blendingWasEnabled = PostProcessor.isStateEnabled(GL20.GL_BLEND);
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
         pingPongBuffer.begin();
         {
-            // apply bias
-            bias.setInput(texsrc).setOutput(pingPongBuffer.getSourceBuffer()).render();
+            // Apply bias.
+            bias.setInput(src.getColorBufferTexture()).setOutput(pingPongBuffer.getSourceBuffer()).render();
 
-            lensBefore.setInput(pingPongBuffer.getSourceBuffer()).setOutput(pingPongBuffer.getResultBuffer()).render();
+            // Apply flare.
+            flare.setInput(pingPongBuffer.getSourceBuffer()).setOutput(pingPongBuffer.getResultBuffer()).render();
 
             pingPongBuffer.set(pingPongBuffer.getResultBuffer(), pingPongBuffer.getSourceBuffer());
 
-            // blur pass
+            // Blur pass.
             blur.render(pingPongBuffer);
 
-            // Lens after
-            lensAfter.setInput(pingPongBuffer.getSourceBuffer()).setOutput(pingPongBuffer.getResultBuffer()).render();
+            // Apply lens dirt.
+            dirt.setInput(pingPongBuffer.getSourceBuffer()).setOutput(pingPongBuffer.getResultBuffer()).render();
         }
         pingPongBuffer.end();
 
@@ -221,7 +220,7 @@ public final class PseudoLensFlare extends PostProcessorEffect {
         restoreViewport(dest);
 
         // mix original scene and blurred threshold, modulate via
-        combine.setOutput(dest).setInput(texsrc, pingPongBuffer.getResultTexture()).render();
+        combine.setOutput(dest).setInput(src.getColorBufferTexture(), pingPongBuffer.getResultTexture()).render();
     }
 
     @Override

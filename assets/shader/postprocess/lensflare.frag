@@ -66,7 +66,7 @@ vec3 cc(vec3 color, float factor, float factor2) {
 }
 
 vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
-    vec3 color = u_color * flare_simple(uv, light_pos, intensity);
+    vec3 color = u_color * flare_simple(uv, light_pos, intensity) * 0.6;
     color = cc(color, 0.5, 0.1);
     return vec4(color, 1.0);
 }
@@ -143,7 +143,7 @@ vec4 lens_flare(vec2 uv, float intensity, vec2 light_pos) {
     //multiply by the exponetial e^x ? of 1.0-length which kind of masks the brightness more so that
     //there is a sharper roll of of the light decay from the sun.
     color *= exp(1.0 - length(uv - light_pos)) / 5.0;
-    color = color * 0.4 * intensity;
+    color = color * 0.35 * intensity;
     return vec4(color, 1.0);
 }
 #endif// complexLensFlare
@@ -156,20 +156,21 @@ float fy(float t, float a) {
     return a * t * sin(t);
 }
 
-#define N_SAMPLES 5
+#define N_SAMPLES 10
 void main(void) {
     if (u_intensity > 0.0) {
         vec2 uv = v_texCoords - 0.5;
         float ar = u_viewport.x / u_viewport.y;
         uv.x *= ar;
-        vec4 color = texture(u_texture0, v_texCoords);
+        //vec4 color = texture(u_texture0, v_texCoords);
+        vec4 color = vec4(0.0);
 
         for (int light = 0; light < u_nLights; light++) {
             vec2 light_pos = u_lightPositions[light] - 0.5;
 
             // Compute intensity of light.
             float t = 0;
-            float a = 6.0e-3;
+            float a = 0.01;
             float dt = 3.0 * 3.14159 / N_SAMPLES;
             float lum = 0.0;
             for (int idx = 0; idx < N_SAMPLES; idx++){
@@ -189,6 +190,6 @@ void main(void) {
 
         fragColor = color;
     } else {
-        fragColor = texture(u_texture0, v_texCoords);
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
 }

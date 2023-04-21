@@ -10,13 +10,17 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class PseudoLensFlareDirt extends Filter<PseudoLensFlareDirt> {
+public final class LensDirt extends Filter<LensDirt> {
     private Texture lensDirtTexture;
     private Texture lensStarburstTexture;
     private float starburstOffset;
 
-    public PseudoLensFlareDirt() {
-        super(ShaderLoader.fromFile("screenspace", "pseudolensflaredirt"));
+    public LensDirt() {
+        this(false);
+    }
+
+    public LensDirt(boolean addToBase) {
+        super(ShaderLoader.fromFile("screenspace", "lensdirt", addToBase? "#define addToBase" : ""));
         rebind();
     }
 
@@ -47,6 +51,7 @@ public final class PseudoLensFlareDirt extends Filter<PseudoLensFlareDirt> {
 
     @Override
     protected void onBeforeRender() {
+        inputTexture.bind(u_texture0);
         lensDirtTexture.bind(u_texture1);
         if (lensStarburstTexture != null)
             lensStarburstTexture.bind(u_texture2);

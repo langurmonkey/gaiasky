@@ -254,12 +254,14 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         LensFlareSettings lensFlareSettings = settings.postprocess.lensFlare;
         if (lensFlareSettings.type.isPseudoLensFlare()) {
             // PSEUDO LENS FLARE
+            // Get resources.
             Texture lensColor = manager.get(lensColorName);
             lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             Texture lensDirt = manager.get(lensDirtName);
             lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
             Texture lensStarBurst = manager.get(lensStarburstName);
             lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            // Effect.
             PseudoLensFlare pseudoLensFlare = new PseudoLensFlare((int) (width * lensFlareSettings.fboScale), (int) (height * lensFlareSettings.fboScale));
             pseudoLensFlare.setGhosts(lensFlareSettings.numGhosts);
             pseudoLensFlare.setHaloWidth(lensFlareSettings.haloWidth);
@@ -275,8 +277,16 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
             ppb.set(pseudoLensFlare);
         } else {
             // TRUE LENS FLARE
+            // Get resources.
+            Texture lensDirt = manager.get(lensDirtName);
+            lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            Texture lensStarBurst = manager.get(lensStarburstName);
+            lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            // Effect.
             LensFlare lensFlare = new LensFlare((int) width, (int) height, lensFlareSettings.intensity, lensFlareSettings.type.ordinal());
             lensFlare.setColor(new float[] { 1f, 1f, 1f });
+            lensFlare.setLensDirtTexture(lensDirt);
+            lensFlare.setLensStarburstTexture(lensStarBurst);
             lensFlare.setEnabled(lensFlareSettings.active);
             lensFlare.setEnabledOptions(false, true);
             ppb.set(lensFlare);
