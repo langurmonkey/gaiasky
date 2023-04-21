@@ -400,7 +400,7 @@ program:
     scale: 1.5
     # UI animation time in milliseconds.
     animationMs: 600
-    # Preferred distance units [PC|LY].
+    # Preferred distance units [M|KM|AU|PC|LY|INTERNAL].
     distanceUnits: PC
     # Show mode change pop-up dialogs (panorama, planetarium, stereoscopic, and game modes).
     modeChangeInfo: true
@@ -444,10 +444,6 @@ controls:
     # window, Controls tab.
     # Example: blacklist: [Microsoft Xbox 360 pad, Playstation 4 dualshock]
     blacklist: [ ]
-  # VR controller settings
-  vr:
-    # The mappings file for the VR controllers (leave empty to automatically detect)
-    mappingsFile:
 
 #
 # Frame output configuration

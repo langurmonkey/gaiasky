@@ -252,7 +252,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
     }
 
     /**
-     * Updates the position of the VRUI object to follow the camera around.
+     * Updates the position of the VR user interface object to follow the camera around.
      */
     private void updatePosition() {
         if (entity != null) {

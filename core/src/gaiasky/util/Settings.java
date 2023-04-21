@@ -1621,15 +1621,6 @@ public class Settings {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ControlsSettings {
         public GamepadSettings gamepad;
-        public VRControllerSettings vr;
-
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class VRControllerSettings {
-            public String mappingsFile = null;
-
-            public VRControllerSettings() {
-            }
-        }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class GamepadSettings implements IObserver {
