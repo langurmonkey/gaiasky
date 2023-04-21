@@ -27,6 +27,7 @@ import gaiasky.render.api.ISceneRenderer;
 import gaiasky.scene.api.IFocus;
 import gaiasky.scene.camera.CameraManager.CameraMode;
 import gaiasky.scene.camera.ICamera;
+import gaiasky.scene.camera.NaturalCamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
@@ -337,6 +338,15 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
             camera.getPos().sub(sideRemainder);
         }
         cam.update();
+
+        // Update natural camera too.
+        if (camera instanceof NaturalCamera) {
+            var naturalCamera = (NaturalCamera) camera;
+            naturalCamera.vrOffset.set(cam.position).scl(Constants.M_TO_U);
+            naturalCamera.direction.set(cam.direction);
+            naturalCamera.up.set(cam.up);
+            rc.vrOffset = naturalCamera.vrOffset;
+        }
     }
 
     private int getKey(int w, int h) {
@@ -360,21 +370,19 @@ public class RenderModeStereoscopic extends RenderModeAbstract implements IRende
     }
 
     public void resize(int rw, int rh, int tw, int th) {
-        final int w = tw;
-        final int h = th;
         if (Settings.settings.program.modeStereo.active) {
-            extendViewport.update(w, h);
-            stretchViewport.update(w, h);
+            extendViewport.update(tw, th);
+            stretchViewport.update(tw, th);
 
-            int keyHalf = getKey(w / 2, h);
-            int keyFull = getKey(w, h);
+            int keyHalf = getKey(tw / 2, th);
+            int keyFull = getKey(tw, th);
 
             if (!fb3D.containsKey(keyHalf)) {
-                fb3D.put(keyHalf, new FrameBuffer(Format.RGB888, w / 2, h, true));
+                fb3D.put(keyHalf, new FrameBuffer(Format.RGB888, tw / 2, th, true));
             }
 
             if (!fb3D.containsKey(keyFull)) {
-                fb3D.put(keyFull, new FrameBuffer(Format.RGB888, w, h, true));
+                fb3D.put(keyFull, new FrameBuffer(Format.RGB888, tw, th, true));
             }
 
             Iterator<Map.Entry<Integer, FrameBuffer>> iterator = fb3D.entrySet().iterator();

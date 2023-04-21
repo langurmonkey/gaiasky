@@ -169,7 +169,7 @@ scene:
   # Label settings
   label:
     # Label size factor
-    size: 0.45
+    size: 0.85
     # Controls the number of labels to render. The threshold solid angle is divided by this number, effectively
     # lowering it (when number > 1) or raising it (when label < 0).
     number: 1.8

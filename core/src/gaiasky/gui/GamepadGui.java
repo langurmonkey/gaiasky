@@ -1569,7 +1569,7 @@ public class GamepadGui extends AbstractGui {
                 }
             }
             case STAR_POINT_SIZE_CMD -> {
-                if (source != pointSize) {
+                if (source != pointSize && pointSize != null) {
                     hackProgrammaticChangeEvents = false;
                     float newSize = (float) data[0];
                     pointSize.setMappedValue(newSize);
@@ -1577,7 +1577,7 @@ public class GamepadGui extends AbstractGui {
                 }
             }
             case STAR_BRIGHTNESS_CMD -> {
-                if (source != starBrightness) {
+                if (source != starBrightness && starBrightness != null) {
                     Float brightness = (Float) data[0];
                     hackProgrammaticChangeEvents = false;
                     starBrightness.setMappedValue(brightness);
@@ -1585,7 +1585,7 @@ public class GamepadGui extends AbstractGui {
                 }
             }
             case STAR_BRIGHTNESS_POW_CMD -> {
-                if (source != magnitudeMultiplier) {
+                if (source != magnitudeMultiplier && magnitudeMultiplier != null) {
                     Float pow = (Float) data[0];
                     hackProgrammaticChangeEvents = false;
                     magnitudeMultiplier.setMappedValue(pow);
@@ -1593,7 +1593,7 @@ public class GamepadGui extends AbstractGui {
                 }
             }
             case STAR_GLOW_FACTOR_CMD -> {
-                if (source != starGlowFactor) {
+                if (source != starGlowFactor && starGlowFactor != null) {
                     Float glowFactor = (Float) data[0];
                     hackProgrammaticChangeEvents = false;
                     starGlowFactor.setMappedValue(glowFactor);

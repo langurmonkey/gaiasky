@@ -78,7 +78,7 @@ public class StarSetQuadComponent {
     }
 
     protected void setOpacityLimitsUniform(ExtShaderProgram shaderProgram, Highlight highlight) {
-        if (highlight.isHighlighted() && highlight.isHlAllVisible()) {
+        if (highlight != null && highlight.isHighlighted() && highlight.isHlAllVisible()) {
             opacityLimitsHlShowAll[0] = 0.95f;
             opacityLimitsHlShowAll[1] = Settings.settings.scene.star.opacity[1];
             shaderProgram.setUniform2fv("u_opacityLimits", opacityLimitsHlShowAll, 0, 2);

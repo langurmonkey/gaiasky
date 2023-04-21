@@ -213,7 +213,7 @@ public class SceneRenderer implements ISceneRenderer, IObserver {
         final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
 
         // SINGLE STAR POINTS
-        AbstractRenderSystem singlePointProc = new SinglePointRenderer(this, POINT_STAR, alphas, renderAssets.starPointShaders, ComponentType.Stars);
+        AbstractRenderSystem singlePointProc = new SinglePointRenderer(this, POINT_STAR, alphas, renderAssets.starGroupShaders, ComponentType.Stars);
         singlePointProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // SKYBOX - (MW panorama, CMWB)

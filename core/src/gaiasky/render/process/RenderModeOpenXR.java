@@ -74,7 +74,7 @@ public class RenderModeOpenXR extends RenderModeAbstract implements IRenderMode,
 
             // Env
             controllersEnvironment = new Environment();
-            controllersEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, .2f, .2f, .2f, 1f));
+            controllersEnvironment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
             DirectionalLight directionalLight = new DirectionalLight();
             directionalLight.color.set(1f, 1f, 1f, 1f);
             directionalLight.direction.set(0f, -0.3f, -4.0f);
