@@ -37,8 +37,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 
-public class SinglePointRenderer extends PointCloudQuadRenderer implements IObserver {
-    protected static final Log logger = Logger.getLogger(SinglePointRenderer.class);
+public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IObserver {
+    protected static final Log logger = Logger.getLogger(SingleStarQuadRenderer.class);
 
     private final RenderView view;
     private final Vector3 aux1 = new Vector3();
@@ -47,7 +47,7 @@ public class SinglePointRenderer extends PointCloudQuadRenderer implements IObse
     private int sizeOffset, pmOffset, uvOffset, starPosOffset;
     private StarSetQuadComponent triComponent;
 
-    public SinglePointRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
+    public SingleStarQuadRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(sceneRenderer, rg, alphas, shaders);
         this.view = new RenderView();
         this.ct = ct;
