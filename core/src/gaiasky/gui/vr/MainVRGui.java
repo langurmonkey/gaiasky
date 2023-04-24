@@ -63,8 +63,8 @@ import java.util.Set;
 
 public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserver, Disposable {
 
-    public static final int WIDTH = 1920;
-    public static final int HEIGHT = 1080;
+    public static final int WIDTH = (int) (1920 * 0.85);
+    public static final int HEIGHT = (int) (1080 * 0.85);
 
     Scene scene;
     Stage stage;

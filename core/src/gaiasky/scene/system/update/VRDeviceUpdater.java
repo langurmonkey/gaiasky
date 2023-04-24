@@ -31,7 +31,6 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
     @Override
     public void updateEntity(Entity entity, float deltaTime) {
         // The numbers in the beams should not depend on internal units!
-        var model = Mapper.model.get(entity);
         var vr = Mapper.vr.get(entity);
         vr.beamP0.set(0, -0.01f, 0);
         vr.beamP1.set(0, (float) (-0.42 ), (float) (-0.6));
@@ -40,10 +39,10 @@ public class VRDeviceUpdater extends AbstractUpdateSystem {
         if (vr.hitUI) {
             if (vr.interacting) {
                 // Shorten beam.
-                aux.set(vr.beamP1).sub(vr.beamP0).nor().scl(0.2);
+                aux.set(vr.beamP1).sub(vr.beamP0).nor().scl(0.1);
                 vr.beamP1.set(vr.beamP0).add(aux);
 
-                aux.set(vr.beamP2).sub(vr.beamP0).nor().scl(0.5);
+                aux.set(vr.beamP2).sub(vr.beamP0).nor().scl(0.3);
                 vr.beamP2.set(vr.beamP0).add(aux);
             } else {
                 // Cut beam completely.

@@ -954,22 +954,19 @@ public class GamepadGui extends AbstractGui {
                 }
                 return false;
             });
-        }
+            // Star glow
+            starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
+            graphicsModel[1][1] = starGlowButton;
+            starGlowButton.setWidth(ww);
+            starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
+            starGlowButton.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    EventManager.publish(Event.LIGHT_GLOW_CMD, starGlowButton, starGlowButton.isChecked());
+                    return true;
+                }
+                return false;
+            });
 
-        // Star glow
-        starGlowButton = new OwnTextButton(I18n.msg("gui.lightscattering"), skin, "toggle-big");
-        graphicsModel[1][1] = starGlowButton;
-        starGlowButton.setWidth(ww);
-        starGlowButton.setChecked(Settings.settings.postprocess.lightGlow.active);
-        starGlowButton.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                EventManager.publish(Event.LIGHT_GLOW_CMD, starGlowButton, starGlowButton.isChecked());
-                return true;
-            }
-            return false;
-        });
-
-        if (!vr) {
             // Motion blur
             motionBlurButton = new OwnTextButton(I18n.msg("gui.motionblur"), skin, "toggle-big");
             graphicsModel[1][2] = motionBlurButton;
@@ -1030,23 +1027,34 @@ public class GamepadGui extends AbstractGui {
             return false;
         });
 
-        // Add to table
-        graphicsT.add(starBrightness).padBottom(pad10).padRight(pad40);
-        if (!vr)
+        // Add to table.
+        if (!vr) {
+            // Regular mode (gamepad).
+            graphicsT.add(starBrightness).padBottom(pad10).padRight(pad40);
             graphicsT.add(lensFlare).padBottom(pad10).row();
-        graphicsT.add(magnitudeMultiplier).padBottom(pad10).padRight(pad40);
-        graphicsT.add(starGlowButton).padBottom(pad10).row();
-        graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad40);
-        if (!vr)
+            graphicsT.add(magnitudeMultiplier).padBottom(pad10).padRight(pad40);
+            graphicsT.add(starGlowButton).padBottom(pad10).row();
+            graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad40);
             graphicsT.add(motionBlurButton).padBottom(pad10).row();
-        graphicsT.add(pointSize).padBottom(pad10).padRight(pad40);
-        graphicsT.add(resetDefaults).padBottom(pad10).row();
-        graphicsT.add(starBaseLevel).padBottom(pad10).padRight(pad40);
-        graphicsT.add().row();
-        graphicsT.add(bloomSlider).padBottom(pad10).padRight(pad40);
-        graphicsT.add().row();
-        graphicsT.add(unsharpMaskSlider).padBottom(pad10).padRight(pad40);
-        graphicsT.add().row();
+            graphicsT.add(pointSize).padBottom(pad10).padRight(pad40);
+            graphicsT.add(resetDefaults).padBottom(pad10).row();
+            graphicsT.add(starBaseLevel).padBottom(pad10).padRight(pad40);
+            graphicsT.add().row();
+            graphicsT.add(bloomSlider).padBottom(pad10).padRight(pad40);
+            graphicsT.add().row();
+            graphicsT.add(unsharpMaskSlider).padBottom(pad10).padRight(pad40);
+            graphicsT.add().row();
+        } else {
+            // VR mode.
+            graphicsT.add(starBrightness).padBottom(pad10).padRight(pad40);
+            graphicsT.add(magnitudeMultiplier).padBottom(pad10).row();
+            graphicsT.add(starGlowFactor).padBottom(pad10).padRight(pad40);
+            graphicsT.add(pointSize).padBottom(pad10).row();
+            graphicsT.add(starBaseLevel).padBottom(pad10).padRight(pad40);
+            graphicsT.add(unsharpMaskSlider).padBottom(pad10).row();
+            graphicsT.add(bloomSlider).padBottom(pad10).padRight(pad40);
+            graphicsT.add(resetDefaults).padBottom(pad10).row();
+        }
 
         tabContents.add(container(graphicsT, w, h));
         updatePads(graphicsT);
