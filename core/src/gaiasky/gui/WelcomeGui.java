@@ -757,7 +757,8 @@ public class WelcomeGui extends AbstractGui {
     private void removeOwnListeners() {
         if (kbdListener != null) {
             var multiplexer = (InputMultiplexer) Gdx.input.getInputProcessor();
-            multiplexer.removeProcessor(kbdListener);
+            if (multiplexer != null)
+                multiplexer.removeProcessor(kbdListener);
             kbdListener.deactivate();
         }
 
