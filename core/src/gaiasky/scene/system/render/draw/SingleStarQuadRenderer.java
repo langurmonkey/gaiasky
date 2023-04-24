@@ -33,6 +33,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
@@ -118,88 +119,106 @@ public class SingleStarQuadRenderer extends PointCloudQuadRenderer implements IO
     private void renderObjects(ExtShaderProgram shaderProgram, List<IRenderable> renderables) {
 
         int n = renderables.size();
-        ensureTempVertsSize(n * 4 * curr.vertexSize);
-        ensureTempIndicesSize(n * 6);
-        int numVerticesAdded = 0;
-        int numStarsAdded = 0;
-        curr.clear();
+        if (n > 0) {
+            ensureMeshDataSize(n * 4 * curr.vertexSize, n * 6);
+            ensureTempVertsSize(n * 4 * curr.vertexSize);
+            ensureTempIndicesSize(n * 6);
+            int numVerticesAdded = 0;
+            int numStarsAdded = 0;
+            curr.clear();
 
-        for (int i = 0; i < n; i++) {
-            Entity entity = ((Render) renderables.get(i)).entity;
-            view.setEntity(entity);
-            var base = Mapper.base.get(entity);
-            var body = Mapper.body.get(entity);
-            var graph = Mapper.graph.get(entity);
-            float[] col = body.color;
-            // 4 vertices per star
-            for (int vert = 0; vert < 4; vert++) {
-                // Vertex POSITION
-                tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
-                tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
+            for (int i = 0; i < n; i++) {
+                Entity entity = ((Render) renderables.get(i)).entity;
+                view.setEntity(entity);
+                var base = Mapper.base.get(entity);
+                var body = Mapper.body.get(entity);
+                var graph = Mapper.graph.get(entity);
+                float[] col = body.color;
+                // 4 vertices per star
+                for (int vert = 0; vert < 4; vert++) {
+                    // Vertex POSITION
+                    tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
+                    tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
 
-                // UV coordinates
-                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+                    // UV coordinates
+                    tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                    tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
-                // COLOR
-                tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], base.opacity);
+                    // COLOR
+                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], base.opacity);
 
-                // SIZE
-                tempVerts[curr.vertexIdx + sizeOffset] = (float) (view.getRadius() * 5.0);
+                    // SIZE
+                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (view.getRadius() * 5.0);
 
-                // POSITION
-                graph.translation.put(aux1);
-                tempVerts[curr.vertexIdx + starPosOffset] = aux1.x;
-                tempVerts[curr.vertexIdx + starPosOffset + 1] = aux1.y;
-                tempVerts[curr.vertexIdx + starPosOffset + 2] = aux1.z;
+                    // POSITION
+                    graph.translation.put(aux1);
+                    tempVerts[curr.vertexIdx + starPosOffset] = aux1.x;
+                    tempVerts[curr.vertexIdx + starPosOffset + 1] = aux1.y;
+                    tempVerts[curr.vertexIdx + starPosOffset + 2] = aux1.z;
 
-                // PROPER MOTION (body position already has the proper motion for single stars)
-                tempVerts[curr.vertexIdx + pmOffset] = 0;
-                tempVerts[curr.vertexIdx + pmOffset + 1] = 0;
-                tempVerts[curr.vertexIdx + pmOffset + 2] = 0;
+                    // PROPER MOTION (body position already has the proper motion for single stars)
+                    tempVerts[curr.vertexIdx + pmOffset] = 0;
+                    tempVerts[curr.vertexIdx + pmOffset + 1] = 0;
+                    tempVerts[curr.vertexIdx + pmOffset + 2] = 0;
 
-                curr.vertexIdx += curr.vertexSize;
-                curr.numVertices++;
-                numVerticesAdded++;
+                    curr.vertexIdx += curr.vertexSize;
+                    curr.numVertices++;
+                    numVerticesAdded++;
+                }
+                // Indices
+                quadIndices(curr);
+                numStarsAdded++;
             }
-            // Indices
-            quadIndices(curr);
-            numStarsAdded++;
+            int count = numVerticesAdded * curr.vertexSize;
+            curr.mesh.setVertices(tempVerts, 0, count);
+            curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
+
+            /*
+             * RENDER
+             */
+            if (curr != null) {
+                if (triComponent.starTex != null) {
+                    triComponent.starTex.bind(0);
+                    shaderProgram.setUniformi("u_starTex", 0);
+                }
+
+                triComponent.alphaSizeBr[0] = alphas[ct.ordinal()];
+                triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f;
+                shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
+
+                // Fixed size
+                shaderProgram.setUniformf("u_fixedAngularSize", -1f);
+
+                // Days since epoch
+                // Emulate double with floats, for compatibility
+                double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), AstroUtils.JD_J2015);
+                float curRt2 = (float) (curRt - (double) ((float) curRt));
+                shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
+
+                // Opacity limits
+                triComponent.setOpacityLimitsUniform(shaderProgram, null);
+
+                try {
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                } catch (IllegalArgumentException e) {
+                    logger.error(e, "Render exception");
+                }
+            }
         }
-        int count = numVerticesAdded * curr.vertexSize;
-        curr.mesh.setVertices(tempVerts, 0, count);
-        curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
+    }
 
-        /*
-         * RENDER
-         */
-        if (curr != null) {
-            if (triComponent.starTex != null) {
-                triComponent.starTex.bind(0);
-                shaderProgram.setUniformi("u_starTex", 0);
-            }
-
-            triComponent.alphaSizeBr[0] = alphas[ct.ordinal()];
-            triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f;
-            shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
-
-            // Fixed size
-            shaderProgram.setUniformf("u_fixedAngularSize", -1f);
-
-            // Days since epoch
-            // Emulate double with floats, for compatibility
-            double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), AstroUtils.JD_J2015);
-            float curRt2 = (float) (curRt - (double) ((float) curRt));
-            shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
-
-            // Opacity limits
-            triComponent.setOpacityLimitsUniform(shaderProgram, null);
-
-            try {
-                curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-            } catch (IllegalArgumentException e) {
-                logger.error(e, "Render exception");
-            }
+    /**
+     * Makes sure the current mesh data can hold the required number of vertices and indices.
+     *
+     * @param numVertices The required number of vertices.
+     * @param numIndices  The required number of indices.
+     */
+    private void ensureMeshDataSize(int numVertices, int numIndices) {
+        if (curr.mesh.getNumVertices() < numVertices || curr.mesh.getNumIndices() < numIndices) {
+            // Re-create.
+            curr.dispose();
+            meshes.clear();
+            addMeshData(numVertices, numIndices);
         }
     }
 
