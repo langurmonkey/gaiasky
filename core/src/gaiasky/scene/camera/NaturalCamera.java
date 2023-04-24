@@ -1180,10 +1180,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (closestBody != null && closestBody.getDistToCamera() < proximity.effective[0].getDistToCamera()) {
                 dist = closestBody.getDistToCamera() - (closestBody.getElevationAt(pos, false) + MIN_DIST);
             } else if (proximity.effective[0] != null && !proximity.effective[0].isStar() && (proximity.effective[0].getClosestDistToCamera() + MIN_DIST) < starEdge) {
-                dist = distance * Math.pow((proximity.effective[0].getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
-                if (vr) {
-                    dist *= 15.0;
-                }
+                dist = distance * Math.pow((proximity.effective[0].getClosestDistToCamera() + MIN_DIST) / starEdge, vr ? 1.3 : 1.6);
             } else {
                 dist = distance;
             }
