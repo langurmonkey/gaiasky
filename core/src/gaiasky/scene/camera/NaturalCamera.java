@@ -1171,7 +1171,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public double speedScaling(double min) {
         double dist;
-        double starEdge = 0.5 * Constants.PC_TO_U;
+        double starEdge = 0.2 * Constants.PC_TO_U;
         if (parent.mode.useFocus() && focus != null && !focus.isEmpty()) {
             // FOCUS mode -> use focus object
             dist = focus.getDistToCamera() - (focus.getElevationAt(pos, false) + MIN_DIST);
@@ -1181,6 +1181,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 dist = closestBody.getDistToCamera() - (closestBody.getElevationAt(pos, false) + MIN_DIST);
             } else if (proximity.effective[0] != null && !proximity.effective[0].isStar() && (proximity.effective[0].getClosestDistToCamera() + MIN_DIST) < starEdge) {
                 dist = distance * Math.pow((proximity.effective[0].getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
+                if (vr) {
+                    dist *= 15.0;
+                }
             } else {
                 dist = distance;
             }
@@ -1191,16 +1194,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double func;
         if (dist < DIST_A) {
             // d < 0.1 pc
-            func = MathUtilsDouble.lint(dist, 0, DIST_A, 0, 1e6) * Constants.DISTANCE_SCALE_FACTOR;
+            func = MathUtilsDouble.lint(dist, 0, DIST_A, 0, 1e6);
         } else if (dist < DIST_B) {
             // 0.1 pc < d < 5 Kpc
-            func = MathUtilsDouble.lint(dist, DIST_A, DIST_B, 1e6, 1e10) * Constants.DISTANCE_SCALE_FACTOR;
+            func = MathUtilsDouble.lint(dist, DIST_A, DIST_B, 1e6, 1e10);
         } else {
             // d > 5 Kpc
-            func = MathUtilsDouble.lint(dist, DIST_B, DIST_C, 1e10, 2e16) * Constants.DISTANCE_SCALE_FACTOR;
+            func = MathUtilsDouble.lint(dist, DIST_B, DIST_C, 1e10, 2e16);
         }
 
-        return dist >= 0 ? Math.max(func, min) * Settings.settings.scene.camera.speed : 0;
+        return dist >= 0 ? (Math.max(func, min) * Settings.settings.scene.camera.speed) * Constants.DISTANCE_SCALE_FACTOR : 0;
     }
 
     /**
