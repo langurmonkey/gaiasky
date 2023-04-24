@@ -1,7 +1,7 @@
 #version 330 core
 // Light scattering implementation by Toni Sagrista
 
-#define MAX_LIGHTS 30
+#define MAX_LIGHTS 8
 
 // Current frame
 uniform sampler2D u_texture0;

@@ -15,7 +15,7 @@
  ******************************************************************************/
 #version 330 core
 
-#define N 30
+#define N 8
 
 // Pre pass
 uniform sampler2D u_texture2;

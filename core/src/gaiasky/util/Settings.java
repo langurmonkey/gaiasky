@@ -353,13 +353,13 @@ public class Settings {
             if (isLow()) {
                 return 3;
             } else if (isNormal()) {
-                return 4;
-            } else if (isHigh()) {
                 return 5;
-            } else if (isUltra()) {
+            } else if (isHigh()) {
                 return 6;
+            } else if (isUltra()) {
+                return 8;
             }
-            return 4;
+            return 5;
         }
     }
 
