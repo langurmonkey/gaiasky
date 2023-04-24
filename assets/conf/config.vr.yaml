@@ -528,7 +528,7 @@ postprocess:
     active: false
   # Lens flare effect settings
   lensFlare:
-    active: true
+    active: false
     # Type of lens flare effect (essentially, the shader to use).
     # Possible values are:
     # SIMPLE - simple lens flare shader with 4 ghosts and a reasonable look.
@@ -552,7 +552,7 @@ postprocess:
     fboScale: 0.2
   # Light glow effect
   lightGlow:
-    active: true
+    active: false
     samples: 10
   # Re-projection as post-processing.
   # Modes are:

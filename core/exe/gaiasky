@@ -81,6 +81,9 @@ OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
 # SimpleLogger defaults 
 OPTS="$OPTS -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.showThreadName=false"
 
+# Process name
+OPTS="$OPTS -Dname=gaiasky"
+
 #
 # Run.
 #

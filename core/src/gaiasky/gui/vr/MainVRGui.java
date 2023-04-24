@@ -518,7 +518,7 @@ public class MainVRGui implements XrInputListener, InputProcessor, IGui, IObserv
                         dir.nor();
                         var body = Mapper.body.get(entity);
                         if (vr) {
-                            body.pos.set(camera.getPos().cpy().add(camera.getCamera().position).add(dir.scl(1.3)));
+                            body.pos.set(camera.getPos().cpy().add(camera.getCamera().position).add(dir.scl(2.0)));
                             body.pos.add(0, 0.0, 0);
                         } else {
                             body.pos.set(camera.getPos().cpy().add(dir.scl(2.0 * Constants.KM_TO_U)));

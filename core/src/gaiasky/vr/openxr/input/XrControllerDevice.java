@@ -58,9 +58,11 @@ public class XrControllerDevice {
 
     public void initialize(XrDriver driver) {
         var model = XrHelper.loadRenderModel(driver, this);
-        modelInstance = new IntModelInstance(model);
+        if (model != null) {
+            modelInstance = new IntModelInstance(model);
+        }
         aimTransform = new Matrix4();
-        initialized = true;
+        initialized = model != null && modelInstance != null;
     }
 
     public boolean isInitialized() {
@@ -86,7 +88,9 @@ public class XrControllerDevice {
     }
 
     public void setGripPose(XrPosef grip) {
-        setFromXrPose(grip, modelInstance.transform);
+        if(modelInstance != null) {
+            setFromXrPose(grip, modelInstance.transform);
+        }
     }
 
     public void setAim(XrPosef aim) {
