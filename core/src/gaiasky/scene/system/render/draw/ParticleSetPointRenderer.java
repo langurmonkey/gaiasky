@@ -57,7 +57,6 @@ public class ParticleSetPointRenderer extends PointCloudRenderer implements IObs
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 

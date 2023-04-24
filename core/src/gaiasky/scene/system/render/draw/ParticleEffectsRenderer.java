@@ -84,8 +84,7 @@ public class ParticleEffectsRenderer extends ImmediateModeRenderSystem {
     @Override
     protected void initShaderProgram() {
         Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
-        Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
-        Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
+        Gdx.gl.glHint(GL30.GL_LINE_SMOOTH_HINT, GL30.GL_NICEST);
         getShaderProgram().begin();
         getShaderProgram().setUniformf("u_ttl", 1f);
         getShaderProgram().end();

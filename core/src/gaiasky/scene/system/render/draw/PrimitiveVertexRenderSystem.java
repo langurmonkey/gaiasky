@@ -65,14 +65,11 @@ public class PrimitiveVertexRenderSystem<T extends IGPUVertsRenderable> extends 
         if (isLine()) {
             if (shaderAliasMethod) {
                 Gdx.gl.glDisable(GL30.GL_LINE_SMOOTH);
-                Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
             } else {
                 Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
-                Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
                 Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
             }
         } else if (isPoint()) {
-            Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
             Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
         }
     }

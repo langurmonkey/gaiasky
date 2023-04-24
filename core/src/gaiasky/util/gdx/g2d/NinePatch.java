@@ -311,12 +311,12 @@ public class NinePatch {
         // of the texel where the neighboring pixel has 0% contribution in linear blending mode.
         if (texture.getMagFilter() == TextureFilter.Linear || texture.getMinFilter() == TextureFilter.Linear) {
             if (isStretchW) {
-                float halfTexelWidth = 0.5f * 1.0f / texture.getWidth();
+                float halfTexelWidth = 0.5f / texture.getWidth();
                 u += halfTexelWidth;
                 u2 -= halfTexelWidth;
             }
             if (isStretchH) {
-                float halfTexelHeight = 0.5f * 1.0f / texture.getHeight();
+                float halfTexelHeight = 0.5f / texture.getHeight();
                 v -= halfTexelHeight;
                 v2 += halfTexelHeight;
             }

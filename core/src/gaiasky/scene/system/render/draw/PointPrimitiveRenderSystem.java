@@ -35,9 +35,9 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
     protected static final Log logger = Logger.getLogger(PointPrimitiveRenderSystem.class);
 
     private final PointView pointView;
-    private int glType;
+    private final int glType;
     private int sizeOffset;
-    private Vector3d D31 = new Vector3d();
+    private final Vector3d D31 = new Vector3d();
 
     public PointPrimitiveRenderSystem(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders, -1);
@@ -47,7 +47,6 @@ public class PointPrimitiveRenderSystem extends ImmediateModeRenderSystem {
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 

@@ -74,7 +74,6 @@ public class VariableSetPointRenderer extends ImmediateModeRenderSystem implemen
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
         opacityLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };

@@ -280,18 +280,17 @@ public class CrashReporter {
             strArray.add("GL version: " + Gdx.gl.glGetString(GL20.GL_VERSION));
             strArray.add("GLSL version: " + Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
 
-            String extensions = Gdx.gl.glGetString(GL20.GL_EXTENSIONS);
             IntBuffer buf = BufferUtils.newIntBuffer(16);
-            if (extensions == null || extensions.isEmpty()) {
-                Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
-                int next = buf.get(0);
-                String[] extensionsString = new String[next];
-                for (int i = 0; i < next; i++) {
+            Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
+            int extensionCount = buf.get(0);
+            if (extensionCount > 0) {
+                String[] extensionsString = new String[extensionCount];
+                for (int i = 0; i < extensionCount; i++) {
                     extensionsString[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
                 }
-                extensions = TextUtils.arrayToStr(extensionsString, "", "", " ");
+                String extensions = TextUtils.arrayToStr(extensionsString, "", "", " ");
+                strArray.add("GL extensions: " + extensions);
             }
-            strArray.add("GL extensions: " + extensions);
 
             Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
             int maxSize = buf.get(0);

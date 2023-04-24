@@ -12,7 +12,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -149,7 +148,7 @@ public class ExtShaderProgram implements Disposable {
     /**
      * Invalidates all shaders so the next time they are used new handles are generated
      *
-     * @param app
+     * @param app The application.
      */
     public static void invalidateAllShaderPrograms(Application app) {
         if (Gdx.gl20 == null)
@@ -171,7 +170,6 @@ public class ExtShaderProgram implements Disposable {
 
     public static String getManagedStatus() {
         StringBuilder builder = new StringBuilder();
-        int i = 0;
         builder.append("Managed shaders/app: { ");
         for (Application app : shaders.keys()) {
             builder.append(shaders.get(app).size);
@@ -203,7 +201,9 @@ public class ExtShaderProgram implements Disposable {
                 logger.info(I18n.msg("notif.shader.compile", name));
             }
 
-            logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
+            if (vertexShaderFile != null || fragmentShaderFile != null) {
+                logger.debug(I18n.msg("notif.shader.load", vertexShaderFile, fragmentShaderFile));
+            }
 
             compileShaders(vertexShaderSource, fragmentShaderSource);
             if (isCompiled()) {
@@ -263,13 +263,9 @@ public class ExtShaderProgram implements Disposable {
 
         int compiled = intbuf.get(0);
         if (compiled == 0) {
-            // gl.glGetShaderiv(shader, GL20.GL_INFO_LOG_LENGTH, intbuf);
-            // int infoLogLength = intbuf.get(0);
-            // if (infoLogLength > 1) {
             String infoLog = gl.glGetShaderInfoLog(shader);
             log += type == GL20.GL_VERTEX_SHADER ? "Vertex shader\n" : "Fragment shader:\n";
             log += infoLog;
-            // }
             return -1;
         }
 
@@ -300,11 +296,7 @@ public class ExtShaderProgram implements Disposable {
         gl.glGetProgramiv(program, GL20.GL_LINK_STATUS, intBuffer);
         int linked = intBuffer.get(0);
         if (linked == 0) {
-            // Gdx.gl20.glGetProgramiv(program, GL20.GL_INFO_LOG_LENGTH, intbuf);
-            // int infoLogLength = intbuf.get(0);
-            // if (infoLogLength > 1) {
             log = Gdx.gl20.glGetProgramInfoLog(program);
-            // }
             return -1;
         }
 
@@ -317,11 +309,7 @@ public class ExtShaderProgram implements Disposable {
      */
     public String getLog() {
         if (isCompiled) {
-            // Gdx.gl20.glGetProgramiv(program, GL20.GL_INFO_LOG_LENGTH, intbuf);
-            // int infoLogLength = intbuf.get(0);
-            // if (infoLogLength > 1) {
             log = Gdx.gl20.glGetProgramInfoLog(program);
-            // }
         }
         return log;
     }

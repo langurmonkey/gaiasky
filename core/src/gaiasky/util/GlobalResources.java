@@ -652,19 +652,16 @@ public class GlobalResources {
     }
 
     public static synchronized String getGLExtensions() {
-        String extensions = Gdx.gl.glGetString(GL30.GL_EXTENSIONS);
-        if (extensions == null || extensions.isEmpty()) {
-            Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
-            int next = buf.get(0);
-            String[] extensionsstr = new String[next];
-            for (int i = 0; i < next; i++) {
-                extensionsstr[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
+        Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
+        int extensionCount = buf.get(0);
+        if (extensionCount > 0) {
+            String[] extensionStrings = new String[extensionCount];
+            for (int i = 0; i < extensionCount; i++) {
+                extensionStrings[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
             }
-            extensions = TextUtils.arrayToStr(extensionsstr);
-        } else {
-            extensions = extensions.replaceAll(" ", "\n");
+            return TextUtils.arrayToStr(extensionStrings);
         }
-        return extensions;
+        return "";
     }
 
     /**
