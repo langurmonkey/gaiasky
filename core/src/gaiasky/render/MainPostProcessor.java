@@ -334,8 +334,10 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         ppb.set(reprojection);
 
         // CHROMATIC ABERRATION
-        ChromaticAberration aberration = new ChromaticAberration(Settings.settings.postprocess.chromaticAberration.amount * GaiaSky.instance.cameraManager.getFovFactor());
+        float amount = Settings.settings.postprocess.chromaticAberration.amount * GaiaSky.instance.cameraManager.getFovFactor();
+        ChromaticAberration aberration = new ChromaticAberration(amount);
         aberration.setEnabledOptions(false, false);
+        aberration.setEnabled(amount > 0);
         ppb.set(aberration);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
