@@ -8,16 +8,16 @@
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
+import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 public final class ChromaticAberrationFilter extends Filter<ChromaticAberrationFilter> {
     private float aberrationAmount;
 
     /**
-     * Creates a crhomatic aberration filter with the given aberration amount.
+     * Creates a chromatic aberration filter with the given aberration amount.
      *
-     * @param amount      The aberration amount in [0..1].
+     * @param amount The aberration amount in [0,0.2].
      */
     public ChromaticAberrationFilter(float amount) {
         super(ShaderLoader.fromFile("screenspace", "chromaticaberration"));
@@ -28,10 +28,10 @@ public final class ChromaticAberrationFilter extends Filter<ChromaticAberrationF
     /**
      * Updates the chromatic aberration amount.
      *
-     * @param amount      The aberration amount in [0..1].
+     * @param amount The aberration amount in [0,0.2].
      */
     public void setAberrationAmount(float amount) {
-        this.aberrationAmount = MathUtils.clamp(amount, 0f, 0.5f);
+        this.aberrationAmount = MathUtils.clamp(amount, Constants.MIN_CHROMATIC_ABERRATION_AMOUNT, Constants.MAX_CHROMATIC_ABERRATION_AMOUNT);
         setParam(Param.AberrationAmount, aberrationAmount);
         super.updateProgram(ShaderLoader.fromFile("screenspace", "chromaticaberration"));
     }
