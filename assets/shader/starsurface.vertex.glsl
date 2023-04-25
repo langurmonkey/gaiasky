@@ -110,10 +110,12 @@ out vec3 v_ambientLight;
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-#include shader/lib_geometry.glsl
 #include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
+#if defined(relativisticEffects) || defined(velocityBufferFlag)
+#include shader/lib_geometry.glsl
+#endif // relativisticEffects || velocityBufferFlag
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////GRAVITATIONAL WAVES - VERTEX
@@ -127,6 +129,7 @@ out float v_depth;
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
+
 
 void main() {
 	v_time = u_time;
