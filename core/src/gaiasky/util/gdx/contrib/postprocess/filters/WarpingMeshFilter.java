@@ -7,7 +7,6 @@
 
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.postprocess.utils.FullscreenMesh;
@@ -15,13 +14,13 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
 
-public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
+public final class WarpingMeshFilter extends Filter<WarpingMeshFilter> {
     private final FullscreenMesh mesh;
     private Texture blendTexture;
     private final Vector2 viewport;
     private int blend;
 
-    public GeometryWarpFilter(PFMData warpData, float rw, float rh) {
+    public WarpingMeshFilter(PFMData warpData, float rw, float rh) {
         super(ShaderLoader.fromFile("screenspace", "geometrywarp"));
         this.blend = 0;
         this.mesh = new FullscreenMesh(warpData.data, warpData.width, warpData.height);
@@ -29,7 +28,7 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         rebind();
     }
 
-    public GeometryWarpFilter(PFMData warpData, Texture blend) {
+    public WarpingMeshFilter(PFMData warpData, Texture blend) {
         super(ShaderLoader.fromFile("screenspace", "geometrywarp"));
         this.mesh = new FullscreenMesh(warpData.data, warpData.width, warpData.height);
         this.viewport = new Vector2();
@@ -37,7 +36,7 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         setBlendTexture(blend);
     }
 
-    public GeometryWarpFilter(WarpMesh warpMesh, int rw, int rh) {
+    public WarpingMeshFilter(WarpMesh warpMesh, int rw, int rh) {
         super(ShaderLoader.fromFile("screenspace-alpha", "geometrywarp-alpha"));
         this.mesh = new FullscreenMesh(warpMesh);
         this.viewport = new Vector2(rw, rh);

@@ -10,24 +10,24 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.GeometryWarpFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.WarpingMeshFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.WarpMeshReader.WarpMesh;
 
-public final class GeometryWarp extends PostProcessorEffect {
-    private GeometryWarpFilter warpFilter;
+public final class WarpingMesh extends PostProcessorEffect {
+    private WarpingMeshFilter warpFilter;
 
-    public GeometryWarp(PFMData data, float rw, float rh) {
-        warpFilter = new GeometryWarpFilter(data, rw, rh);
+    public WarpingMesh(PFMData data, float rw, float rh) {
+        warpFilter = new WarpingMeshFilter(data, rw, rh);
     }
 
-    public GeometryWarp(PFMData data, Texture blend) {
-        warpFilter = new GeometryWarpFilter(data, blend);
+    public WarpingMesh(PFMData data, Texture blend) {
+        warpFilter = new WarpingMeshFilter(data, blend);
     }
 
-    public GeometryWarp(WarpMesh data, int rw, int rh) {
-        warpFilter = new GeometryWarpFilter(data, rw, rh);
+    public WarpingMesh(WarpMesh data, int rw, int rh) {
+        warpFilter = new WarpingMeshFilter(data, rw, rh);
     }
 
     public void setViewportSize(int width, int height) {

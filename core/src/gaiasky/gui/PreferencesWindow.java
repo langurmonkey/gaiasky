@@ -2295,7 +2295,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         bean = aa.getSelected();
-        Antialias newAntiAlias = settings.postprocess.getAntialias(bean.value);
+        AntialiasSettings newAntiAlias = settings.postprocess.getAntialias(bean.value);
         if (settings.postprocess.antialias != newAntiAlias) {
             settings.postprocess.antialias = settings.postprocess.getAntialias(bean.value);
             EventManager.publish(Event.ANTIALIASING_CMD, this, settings.postprocess.antialias);
@@ -2630,7 +2630,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         enableComponents(fullscreen, fullScreenResolutions);
     }
 
-    private int idxAa(int base, Antialias x) {
+    private int idxAa(int base, AntialiasSettings x) {
         if (x.getAACode() == -1)
             return 1;
         if (x.getAACode() == -2)

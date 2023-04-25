@@ -584,6 +584,12 @@ postprocess:
     exposure: 0.0
   # Upscale filter to use when the back-buffer size is smaller than the screen: [NEAREST|LINEAR|XBRZ]
   upscaleFilter: LINEAR
+  # Warping mesh in PFM (portable float map) format, where each coordinate contains the mapping value in UV.
+  # This enables arbitrary distortions on the final image.
+  # For more information, see the MPCDI v2.0 specification.
+  warpingMesh:
+    # The absolute path to the geometry warp file in PFM.
+    pfmFile: null
 
 #
 # Spacecraft configuration

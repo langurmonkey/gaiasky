@@ -376,7 +376,7 @@ public class Settings {
         }
     }
 
-    public enum Antialias {
+    public enum AntialiasSettings {
         NONE(0),
         FXAA(-1),
         NFAA(-2),
@@ -384,11 +384,11 @@ public class Settings {
 
         int aaCode;
 
-        Antialias(int aacode) {
+        AntialiasSettings(int aacode) {
             this.aaCode = aacode;
         }
 
-        public static Antialias getFromCode(int code) {
+        public static AntialiasSettings getFromCode(int code) {
             return switch (code) {
                 case 0 -> NONE;
                 case -1 -> FXAA;
@@ -1964,7 +1964,7 @@ public class Settings {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PostprocessSettings implements IObserver {
-        public Antialias antialias;
+        public AntialiasSettings antialias;
         public BloomSettings bloom;
         public UnsharpMaskSettings unsharpMask;
         public ChromaticAberrationSettings chromaticAberration;
@@ -1976,25 +1976,26 @@ public class Settings {
         public MotionBlurSettings motionBlur;
         public ReprojectionSettings reprojection;
         public UpscaleFilter upscaleFilter = UpscaleFilter.NEAREST;
+        public GeometryWarpSettings geometryWarp;
 
         public PostprocessSettings() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
-            antialias = Antialias.valueOf(antialiasString.toUpperCase());
+            antialias = AntialiasSettings.valueOf(antialiasString.toUpperCase());
         }
 
         public void setUpscaleFilter(final String upscaleFilterString) {
             upscaleFilter = UpscaleFilter.valueOf(upscaleFilterString.toUpperCase());
         }
 
-        public Antialias getAntialias(int code) {
+        public AntialiasSettings getAntialias(int code) {
             return switch (code) {
-                case -1 -> Antialias.FXAA;
-                case -2 -> Antialias.NFAA;
-                case 1 -> Antialias.SSAA;
-                default -> Antialias.NONE;
+                case -1 -> AntialiasSettings.FXAA;
+                case -2 -> AntialiasSettings.NFAA;
+                case 1 -> AntialiasSettings.SSAA;
+                default -> AntialiasSettings.NONE;
             };
         }
 
@@ -2035,6 +2036,11 @@ public class Settings {
             default -> {
             }
             }
+        }
+        
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public static class GeometryWarpSettings {
+            public String pfmFile = null;
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)

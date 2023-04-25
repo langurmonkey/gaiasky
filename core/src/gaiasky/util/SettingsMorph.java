@@ -241,7 +241,7 @@ public class SettingsMorph {
 
         // Postprocess
         var postprocess = new PostprocessSettings();
-        postprocess.antialias = Antialias.getFromCode(i32("postprocess.antialiasing", p));
+        postprocess.antialias = AntialiasSettings.getFromCode(i32("postprocess.antialiasing", p));
         postprocess.bloom = new BloomSettings();
         postprocess.bloom.intensity = f32("postprocess.bloom.intensity", p);
         postprocess.unsharpMask = new UnsharpMaskSettings();

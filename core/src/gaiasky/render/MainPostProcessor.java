@@ -46,6 +46,7 @@ import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.math.Vector3b;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -356,27 +357,34 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 // Generate identity
                 data = PFMReader.constructPFMData(50, 50, x -> x, y -> y);
             }
-            GeometryWarp geometryWarp;
+            WarpingMesh warpingMesh;
             if (blendFile != null) {
                 // Set up blend texture
                 Texture blendTex = manager.get(blendFile.toString());
-                geometryWarp = new GeometryWarp(data, blendTex);
+                warpingMesh = new WarpingMesh(data, blendTex);
             } else {
                 // No blend
-                geometryWarp = new GeometryWarp(data, width, height);
+                warpingMesh = new WarpingMesh(data, width, height);
             }
-            geometryWarp.setEnabled(true);
-            geometryWarp.setEnabledOptions(false, false);
-            ppb.set(geometryWarp);
+            warpingMesh.setEnabled(true);
+            warpingMesh.setEnabledOptions(false, false);
+            ppb.set(warpingMesh);
 
         }
 
-        // GEOMETRY WARP TEST
-        // PFMData data = PFMReader.readPFMData(Gdx.files.absolute("/home/tsagrista/Documents/mpcdi/warp-natural.pfm"), false, false);
-        // GeometryWarp warp = new GeometryWarp(data, width, height);
-        // warp.setEnabled(true);
-        // warp.setEnabledOptions(false, false);
-        // ppb.set(warp);
+        // GEOMETRY WARP
+        if (settings.postprocess.geometryWarp != null && settings.postprocess.geometryWarp.pfmFile != null) {
+            Path path = Path.of(settings.postprocess.geometryWarp.pfmFile);
+            if (Files.exists(path)) {
+                PFMData data = PFMReader.readPFMData(Gdx.files.absolute(path.toAbsolutePath().toString()), false, false);
+                WarpingMesh warpingMesh = new WarpingMesh(data, width, height);
+                warpingMesh.setEnabled(true);
+                warpingMesh.setEnabledOptions(false, false);
+                ppb.set(warpingMesh);
+            } else {
+                logger.error("Warping mesh PFM file does not exist: " + settings.postprocess.geometryWarp.pfmFile);
+            }
+        }
 
         // UPSCALE (only screen, last effect in chain!)
         if (rt == RenderType.screen) {
@@ -517,12 +525,12 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         };
     }
 
-    private void initAntiAliasing(Antialias aavalue, float width, float height, PostProcessBean ppb) {
+    private void initAntiAliasing(AntialiasSettings aavalue, float width, float height, PostProcessBean ppb) {
         Antialiasing antialiasing = null;
-        if (aavalue.equals(Antialias.FXAA)) {
+        if (aavalue.equals(AntialiasSettings.FXAA)) {
             antialiasing = new Fxaa(width, height, getFxaaQuality(Settings.settings.graphics.quality));
             Logger.getLogger(this.getClass()).debug(I18n.msg("notif.selected", "FXAA"));
-        } else if (aavalue.equals(Antialias.NFAA)) {
+        } else if (aavalue.equals(AntialiasSettings.NFAA)) {
             antialiasing = new Nfaa(width, height);
             Logger.getLogger(this.getClass()).debug(I18n.msg("notif.selected", "NFAA"));
         }
@@ -959,7 +967,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         case STEREOSCOPIC_CMD -> updateStereo((boolean) data[0], Settings.settings.program.modeStereo.profile);
         case STEREO_PROFILE_CMD -> updateStereo(Settings.settings.program.modeStereo.active, StereoProfile.values()[(Integer) data[0]]);
         case ANTIALIASING_CMD -> {
-            final Antialias antiAliasingValue = (Antialias) data[0];
+            final AntialiasSettings antiAliasingValue = (AntialiasSettings) data[0];
             GaiaSky.postRunnable(() -> {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {

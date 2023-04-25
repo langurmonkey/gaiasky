@@ -22,7 +22,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubmeapProjectionEffect.CubemapProjection;
-import gaiasky.util.gdx.contrib.postprocess.effects.GeometryWarp;
+import gaiasky.util.gdx.contrib.postprocess.effects.WarpingMesh;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.loader.WarpMeshReader;
 
@@ -34,7 +34,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     private static final Log logger = Logger.getLogger(RenderModeCubemapProjections.class);
 
     private final CubmeapProjectionEffect cubemapProjection;
-    private GeometryWarp geometryWarp;
+    private WarpingMesh geometryWarp;
     private final Copy copy;
 
     public RenderModeCubemapProjections() {
@@ -188,7 +188,7 @@ public class RenderModeCubemapProjections extends RenderModeCubemap implements I
     private void initializeGeometryWarp(Path file) {
         if (file != null && Files.exists(file)) {
             var warp = WarpMeshReader.readWarpMeshAscii(Gdx.files.absolute(file.toString()));
-            geometryWarp = new GeometryWarp(warp, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            geometryWarp = new WarpingMesh(warp, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             logger.info("Spherical mirror geometry warp initialized with: " + file.toString());
         }
     }
