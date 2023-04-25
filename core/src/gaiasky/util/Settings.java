@@ -1976,7 +1976,7 @@ public class Settings {
         public MotionBlurSettings motionBlur;
         public ReprojectionSettings reprojection;
         public UpscaleFilter upscaleFilter = UpscaleFilter.NEAREST;
-        public GeometryWarpSettings geometryWarp;
+        public GeometryWarpSettings warpingMesh;
 
         public PostprocessSettings() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_GLOW_CMD, Event.REPROJECTION_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.UPSCALE_FILTER_CMD, Event.CHROMATIC_ABERRATION_CMD);

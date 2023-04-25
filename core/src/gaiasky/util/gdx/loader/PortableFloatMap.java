@@ -204,17 +204,11 @@ public final class PortableFloatMap {
     }
 
     private int calcPixelArrayLength() {
-        int channels;
-        switch (mode) {
-        case COLOR:
-            channels = 3;
-            break;
-        case GRAYSCALE:
-            channels = 1;
-            break;
-        default:
-            throw new AssertionError();
-        }
+        int channels = switch (mode) {
+            case COLOR -> 3;
+            case GRAYSCALE -> 1;
+            default -> throw new AssertionError();
+        };
         if (Integer.MAX_VALUE / width / height / channels == 0)
             throw new IllegalArgumentException("Dimensions are too large to make a pixel array");
         else

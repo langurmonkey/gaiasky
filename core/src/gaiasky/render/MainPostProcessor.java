@@ -373,8 +373,8 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         }
 
         // GEOMETRY WARP
-        if (settings.postprocess.geometryWarp != null && settings.postprocess.geometryWarp.pfmFile != null) {
-            Path path = Path.of(settings.postprocess.geometryWarp.pfmFile);
+        if (settings.postprocess.warpingMesh != null && settings.postprocess.warpingMesh.pfmFile != null) {
+            Path path = Path.of(settings.postprocess.warpingMesh.pfmFile);
             if (Files.exists(path)) {
                 PFMData data = PFMReader.readPFMData(Gdx.files.absolute(path.toAbsolutePath().toString()), false, false);
                 WarpingMesh warpingMesh = new WarpingMesh(data, width, height);
@@ -382,7 +382,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
                 warpingMesh.setEnabledOptions(false, false);
                 ppb.set(warpingMesh);
             } else {
-                logger.error("Warping mesh PFM file does not exist: " + settings.postprocess.geometryWarp.pfmFile);
+                logger.error("Warping mesh PFM file does not exist: " + settings.postprocess.warpingMesh.pfmFile);
             }
         }
 
