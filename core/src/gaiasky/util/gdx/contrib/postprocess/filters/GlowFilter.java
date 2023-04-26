@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class Glow extends Filter<Glow> {
+public final class GlowFilter extends Filter<GlowFilter> {
     private final Vector2 viewport;
 
     private float[] lightPositions;
@@ -28,7 +28,7 @@ public final class Glow extends Filter<Glow> {
     private Texture prePassTexture;
     private Texture lightGlowTexture;
 
-    public Glow(int width, int height) {
+    public GlowFilter(int width, int height) {
         super(ShaderLoader.fromFile("lightglow", "lightglow"));
         viewport = new Vector2(width, height);
         rebind();

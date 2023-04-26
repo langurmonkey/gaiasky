@@ -67,8 +67,8 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
     public void setLightPositions(int nLights, float[] vec) {
         this.nLights = nLights;
         this.lightPositions = vec;
-        setParam(Glow.Param.NLights, this.nLights);
-        setParamv(Glow.Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
+        setParam(GlowFilter.Param.NLights, this.nLights);
+        setParamv(GlowFilter.Param.LightPositions, this.lightPositions, 0, this.nLights * 2);
     }
 
     public void setIntensity(float intensity) {
@@ -88,9 +88,9 @@ public final class LensFlareFilter extends Filter<LensFlareFilter> {
         setParams(Param.Viewport, viewport);
         setParams(Param.Intensity, intensity);
         setParams(Param.Color, color);
-        setParams(Glow.Param.NLights, nLights);
+        setParams(GlowFilter.Param.NLights, nLights);
         if (lightPositions != null)
-            setParamsv(Glow.Param.LightPositions, lightPositions, 0, nLights * 2);
+            setParamsv(GlowFilter.Param.LightPositions, lightPositions, 0, nLights * 2);
         endParams();
     }
 

@@ -59,7 +59,7 @@ void main() {
         glow_tc /= size;
         glow_tc += 0.5;
 
-        float color_glow = brightness(starImage(glow_tc)) * 1.2;
+        float color_glow = brightness(starImage(glow_tc));
         float core_inc = (0.1 - min(0.1, dist_center)) * color_glow;
         fragColor += vec4(color_glow * lightColor.r + core_inc, color_glow * lightColor.g + core_inc, color_glow * lightColor.b + core_inc, 1.0);
     }

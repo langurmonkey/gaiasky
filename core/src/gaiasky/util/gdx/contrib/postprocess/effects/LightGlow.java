@@ -10,16 +10,16 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.Glow;
+import gaiasky.util.gdx.contrib.postprocess.filters.GlowFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class LightGlow extends PostProcessorEffect {
-    private final Glow glow;
+    private final GlowFilter glow;
     private Settings settings;
     private boolean blending = false;
     private int sfactor, dfactor;
     public LightGlow(int width, int height) {
-        glow = new Glow(width, height);
+        glow = new GlowFilter(width, height);
     }
 
     @Override

@@ -41,7 +41,7 @@ float fy(float t, float a){
     return a * t * sin(t);
 }
 
-void main(){
+void main() {
     float ar = u_viewport.x / u_viewport.y;
     for (int li = 0; li < u_nLights; li++){
         // Size of sampling spiral
