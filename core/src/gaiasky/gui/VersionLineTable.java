@@ -33,6 +33,11 @@ public class VersionLineTable extends Table {
         top().left();
         pad(pad16);
 
+        Table content = new Table(skin);
+        content.setBackground("table-bg");
+        content.pad(2f, pad16, 2f, pad16);
+        content.top().left();
+
         final Settings settings = Settings.settings;
 
         String style = vr ? "hud" : "hud-med";
@@ -40,38 +45,42 @@ public class VersionLineTable extends Table {
         // Gaia Sky version
         OwnLabel gsVersion = new OwnLabel(settings.version.version, skin, style);
         gsVersion.addListener(new OwnTextTooltip(I18n.msg("gui.help.version", Settings.APPLICATION_NAME), skin));
-        add(gsVersion).bottom().left().padRight(pad16);
+        content.add(gsVersion).bottom().left().padRight(pad16);
 
         // Gaia Sky build
         OwnLabel gsBuild = new OwnLabel(I18n.msg("gui.buildandtime", settings.version.build, settings.version.getBuildTimePretty()), skin, style);
         gsBuild.addListener(new OwnTextTooltip(I18n.msg("gui.help.buildandtime"), skin));
-        gsBuild.setColor(ColorUtils.oLightGrayC);
-        add(gsBuild).bottom().left().padRight(pad32 * 2f);
+        gsBuild.setColor(ColorUtils.oLighterGrayC);
+        content.add(gsBuild).bottom().left().padRight(pad32 * 2f);
 
         // Graphics device
         OwnLabel device = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, style);
         device.addListener(new OwnTextTooltip(I18n.msg("gui.help.graphicsdevice"), skin));
-        device.setColor(ColorUtils.oDarkGrayC);
-        add(device).bottom().left().padRight(pad32);
+        device.setColor(ColorUtils.oLighterGrayC);
+        content.add(device).bottom().left().padRight(pad32);
 
         // OpenGL version
         OwnLabel glVersion = new OwnLabel(I18n.msg("notif.glversion", Gdx.gl.glGetString(GL20.GL_VERSION)), skin, style);
         glVersion.addListener(new OwnTextTooltip(I18n.msg("gui.help.openglversion"), skin));
-        glVersion.setColor(ColorUtils.oDarkGrayC);
-        add(glVersion).bottom().left().padRight(pad32);
+        glVersion.setColor(ColorUtils.oLighterGrayC);
+        content.add(glVersion).bottom().left().padRight(pad32);
 
         // GLSL version
         OwnLabel glslVersion = new OwnLabel(I18n.msg("notif.glslversion", Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION)), skin, style);
         glslVersion.addListener(new OwnTextTooltip(I18n.msg("gui.help.glslversion"), skin));
-        glslVersion.setColor(ColorUtils.oDarkGrayC);
-        add(glslVersion).bottom().left().padRight(pad32);
+        glslVersion.setColor(ColorUtils.oLighterGrayC);
+        content.add(glslVersion).bottom().left().padRight(settings.runtime.openXr
+                || settings.program.net.master.active
+                || settings.program.net.slave.active
+                || settings.program.safeMode
+                || settings.program.offlineMode ? pad32 : 0);
 
         // VR
         if (!vr && settings.runtime.openXr) {
             OwnLabel vrLabel = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.vr.mode")), skin, style);
             vrLabel.setColor(ColorUtils.gPinkC);
             vrLabel.addListener(new OwnTextTooltip(I18n.msg("gui.vr.mode.tooltip"), skin));
-            add(vrLabel).bottom().left().padRight(pad32);
+            content.add(vrLabel).bottom().left().padRight(pad32);
         }
 
         // Master instance
@@ -79,7 +88,7 @@ public class VersionLineTable extends Table {
             OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.master.instance")), skin, style);
             master.setColor(ColorUtils.gBlueC);
             master.addListener(new OwnTextTooltip(I18n.msg("gui.master.instance.tooltip"), skin));
-            add(master).bottom().left().padRight(pad32);
+            content.add(master).bottom().left().padRight(pad32);
         }
 
         // Slave instance
@@ -87,7 +96,7 @@ public class VersionLineTable extends Table {
             OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.slave.instance")), skin, style);
             slave.setColor(ColorUtils.gYellowC);
             slave.addListener(new OwnTextTooltip(I18n.msg("gui.slave.instance.tooltip"), skin));
-            add(slave).colspan(2).bottom().right().padBottom(pad16).row();
+            content.add(slave).colspan(2).bottom().right().padBottom(pad16).row();
         }
 
         // Safe graphics mode
@@ -95,7 +104,7 @@ public class VersionLineTable extends Table {
             OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.debug.safemode")), skin, style);
             safeMode.setColor(ColorUtils.gRedC);
             safeMode.addListener(new OwnTextTooltip(I18n.msg("gui.debug.safemode.tooltip"), skin));
-            add(safeMode).bottom().left().padRight(pad32);
+            content.add(safeMode).bottom().left().padRight(pad32);
         }
 
         // Offline mode
@@ -103,8 +112,9 @@ public class VersionLineTable extends Table {
             OwnLabel offlineMode = new OwnLabel(TextUtils.surroundBrackets(I18n.msg("gui.system.offlinemode")), skin, style);
             offlineMode.setColor(ColorUtils.gRedC);
             offlineMode.addListener(new OwnTextTooltip(I18n.msg("gui.system.offlinemode.tooltip"), skin));
-            add(offlineMode).bottom().left().padRight(pad32);
+            content.add(offlineMode).bottom().left().padRight(pad32);
         }
 
+        add(content);
     }
 }

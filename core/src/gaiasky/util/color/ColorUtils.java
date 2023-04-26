@@ -48,7 +48,9 @@ public class ColorUtils {
     public static float[] ddBrown = new float[] { 101f / 255f, 56f / 255f, 25f / 255f, 1f };
     public static Color ddBrownC = getCol(ddBrown);
     // Others
-    public static float[] oLightGray = new float[] { 0.6f, 0.6f, 0.6f, 1f };
+    public static float[] oLighterGray = new float[] { 0.85f, 0.85f, 0.85f, 1f };
+    public static Color oLighterGrayC = getCol(oLighterGray);
+    public static float[] oLightGray = new float[] { 0.85f, 0.85f, 0.85f, 1f };
     public static Color oLightGrayC = getCol(oLightGray);
     public static float[] oDarkGray = new float[] { 0.3f, 0.3f, 0.3f, 1f };
     public static Color oDarkGrayC = getCol(oDarkGray);
