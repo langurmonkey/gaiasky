@@ -2413,7 +2413,7 @@ public interface IScriptingInterface {
     /**
      * Sets the amount of chromatic aberration. Set to 0 to disable the effect.
      *
-     * @param value Chromatic aberration amount in [0,0.2].
+     * @param value Chromatic aberration amount in [0,0.05].
      */
     void setChromaticAberration(float value);
 

@@ -518,8 +518,8 @@ postprocess:
     factor: 0.0
   # Chromatic aberration effect
   chromaticAberration:
-    # The amount, in [0,0.2]
-    amount: 0.01
+    # The amount, in [0,0.05]
+    amount: 0.003
   # Motion blur effect
   motionBlur:
     active: false
