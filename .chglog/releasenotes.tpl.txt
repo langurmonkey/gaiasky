@@ -1,5 +1,5 @@
 {{ range .Versions }}
-# {{ .Tag.Name }}
+# Gaia Sky {{ .Tag.Name }}
 
 {{ range .CommitGroups -}}
 ## {{ .Title }}

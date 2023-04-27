@@ -25,7 +25,7 @@ RELEASENOTES=$GSDIR/releasenotes.txt
 
 echo "Creating release notes: $CURRENT_TAG"
 # Test tag for regexp, if it does not fit, use $RELEASENOTES if it exists
-RE="^([0-9]+\.)?([0-9]+\.)?([0-9]+)$"
+RE="^([0-9]+\.)?([0-9]+\.)?([0-9]+)(-rc[0-9]+)?$"
 
 if [[ -e $RELEASENOTES ]]; then
     # If $GS/releasenotes.txt exists, use it
@@ -37,7 +37,7 @@ else
   else
       # Use regexp to match x.y.z[-rcww]
       echo "git-chglog -> $OUTPUT"
-      git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)?$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $CURRENT_TAG
+      git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)?(-rc\d+)?$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $CURRENT_TAG
 
       # Remove duplicate lines
       awk '!seen[$0]++' $OUTPUT > $OUTPUT.bak

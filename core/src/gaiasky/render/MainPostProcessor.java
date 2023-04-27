@@ -169,7 +169,7 @@ public class MainPostProcessor implements IPostProcessor, IObserver {
         LightGlowSettings glowSettings = Settings.settings.postprocess.lightGlow;
         Texture glow = manager.get(starLensTextureName);
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        LightGlow lightGlow = new LightGlow(5, 5);
+        LightGlow lightGlow = new LightGlow((int) width, (int) height);
         lightGlow.setLightGlowTexture(glow);
         lightGlow.setTextureScale(getGlowTextureScale(ss.brightness, ss.glowFactor, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), settings.program.modeCubemap.active));
         lightGlow.setSpiralScale(getGlowSpiralScale(ss.brightness, ss.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));

@@ -21,7 +21,15 @@ options:
 
     commit_groups:
         group_by: Type
-        sort_by: Title
+        sort_by: Custom
+        title_order:
+            - feat
+            - fix
+            - perf
+            - refactor
+            - build
+            - docs
+            - style
         title_maps:
             feat: Features
             fix: Bug Fixes
