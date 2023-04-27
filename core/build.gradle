@@ -190,7 +190,7 @@ task manGen(type: Exec) {
 task genReleaseNotes(type: Exec) {
     println("generate-releasenotes $tag $distDir/releasenotes.txt")
     workingDir "$baseDir/core/scripts/release/"
-    commandLine "generate-releasenotes", "$tag", "$distDir/releasenotes.txt"
+    commandLine "/bin/bash", "generate-releasenotes", "$tag", "$distDir/releasenotes.txt"
 }
 
 task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
