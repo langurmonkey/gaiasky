@@ -51,7 +51,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
     private int elems01Offset;
     private int elems02Offset;
     private int sizeOffset;
-    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.025)), Math.tan(Math.toRadians(0.9)) };
+    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.075)), Math.tan(Math.toRadians(0.9)) };
 
     public ElementsSetRenderer(SceneRenderer sceneRenderer, RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(sceneRenderer, rg, alphas, shaders);
@@ -164,7 +164,6 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
 
             curr = meshes.get(getOffset(renderable));
             if (curr != null) {
-                var set = Mapper.orbitElementsSet.get(render.entity);
                 var hl = Mapper.highlight.get(render.entity);
 
                 ExtShaderProgram shaderProgram = getShaderProgram();
@@ -174,7 +173,7 @@ public class ElementsSetRenderer extends PointCloudTriRenderSystem implements IO
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
                 shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.08f * hl.pointscaling);
+                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.1f * hl.pointscaling * (Settings.settings.runtime.openXr ? 3f : 1f));
                 shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
 
                 // VR scale

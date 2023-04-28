@@ -124,7 +124,7 @@ void main() {
     
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
-    float quadSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
+    float quadSize = clamp(a_size * u_sizeFactor * u_vrScale, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
