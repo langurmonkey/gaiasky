@@ -34,7 +34,6 @@ allprojects {
         joiseVersion = "1.1.0"
         ashleyVersion = "1.7.4"
         gltfVersion = "-SNAPSHOT"
-        jpegxlVersion = "+"
     }
 
     repositories {
@@ -164,9 +163,6 @@ project(":core") {
 
         // Joise
         api group: "com.sudoplay.joise", name: "joise", version: "$joiseVersion"
-
-        // JPEG XL bindings
-        api group: "com.github.umjammer", name: "vavi-image-jpegxl", version: "$jpegxlVersion"
 
         // ****************
         // REST SERVER DEPS
